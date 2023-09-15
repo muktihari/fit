@@ -1,4 +1,10 @@
 # Fit SDK for Go
+
+![GitHub Workflow Status](https://github.com/muktihari/fit/workflows/CI/badge.svg)
+[![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)
+[![CodeCov](https://codecov.io/gh/muktihari/fit/branch/master/graph/badge.svg)](https://codecov.io/gh/muktihari/fit)
+[![Go Report Card](https://goreportcard.com/badge/github.com/muktihari/fit)](https://goreportcard.com/report/github.com/muktihari/fit)
+
 The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. 
 When recording an activity using devices such as cycling computer, smartwatch, and more, chances are the resulting file is often in FIT format (*.fit). 
 The FIT file is a binary file format known for its compact size, making it the preferred choice for manufacturers to be used in their embedded devices. 
