@@ -1,0 +1,9 @@
+ignore:
+  # Example:
+  # - "path/to/folder"  # ignore folders and all its contents
+  # - "test_*.rb"       # wildcards accepted
+  # - "**/*.py"         # glob accepted
+  # Please specify the rules below:
+  - "cmd"
+  - "internal"
+  - "**/*_gen.go" # ignore generated code in any depth

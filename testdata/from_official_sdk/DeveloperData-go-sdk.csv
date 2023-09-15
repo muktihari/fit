@@ -1,0 +1,11 @@
+Type,Local Number,Message,Field 1,Value 1,Units 1,Field 2,Value 2,Units 2,Field 3,Value 3,Units 3,Field 4,Value 4,Units 4,Field 5,Value 5,Units 5,Field 6,Value 6,Units 6,Field 7,Value 7,Units 7,Field 8,Value 8,Units 8,Field 9,Value 9,Units 9,Field 10,Value 10,Units 10,Field 11,Value 11,Units 11,Field 12,Value 12,Units 12,Field 13,Value 13,Units 13,Field 14,Value 14,Units 14,Field 15,Value 15,Units 15,Field 16,Value 16,Units 16,Field 17,Value 17,Units 17,Field 18,Value 18,Units 18,Field 19,Value 19,Units 19,Field 20,Value 20,Units 20,Field 21,Value 21,Units 21,Field 22,Value 22,Units 22,Field 23,Value 23,Units 23,Field 24,Value 24,Units 24,Field 25,Value 25,Units 25,Field 26,Value 26,Units 26,Field 27,Value 27,Units 27,Field 28,Value 28,Units 28,Field 29,Value 29,Units 29,Field 30,Value 30,Units 30,Field 31,Value 31,Units 31,Field 32,Value 32,Units 32,Field 33,Value 33,Units 33,Field 34,Value 34,Units 34,Field 35,Value 35,Units 35,Field 36,Value 36,Units 36,Field 37,Value 37,Units 37,Field 38,Value 38,Units 38,Field 39,Value 39,Units 39,Field 40,Value 40,Units 40
+Definition,0,file_id,manufacturer,1,,type,1,,product,1,,serial_number,1,,
+Data,0,file_id,manufacturer,"15",,type,"4",,garmin_product,"9001",,serial_number,"1701",,
+Definition,0,developer_data_id,application_id,16,,developer_data_index,1,,
+Data,0,developer_data_id,application_id,"1|1|2|3|5|8|13|21|34|55|89|144|233|121|98|219",,developer_data_index,"0",,
+Definition,0,field_description,developer_data_index,1,,field_definition_number,1,,fit_base_type_id,1,,field_name,17,,units,10,,
+Data,0,field_description,developer_data_index,"0",,field_definition_number,"0",,fit_base_type_id,"1",,field_name,"doughnuts_earned",,units,"doughnuts",,
+Definition,0,record,heart_rate,1,,cadence,1,,distance,1,,speed,1,,doughnuts_earned,1,,
+Data,0,record,heart_rate,"140",bpm,cadence,"88",rpm,distance,"510.0",m,speed,"47.488",m/s,enhanced_speed,"47.488",m/s,doughnuts_earned,1,doughnuts,
+Data,0,record,heart_rate,"143",bpm,cadence,"90",rpm,distance,"2080.0",m,speed,"36.416",m/s,enhanced_speed,"36.416",m/s,doughnuts_earned,2,doughnuts,
+Data,0,record,heart_rate,"144",bpm,cadence,"92",rpm,distance,"3710.0",m,speed,"35.344",m/s,enhanced_speed,"35.344",m/s,doughnuts_earned,3,doughnuts,
