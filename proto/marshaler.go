@@ -63,7 +63,7 @@ func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
 	b = append(b, m.Architecture)
 
 	globalMesgNum := make([]byte, 2)
-	binary.LittleEndian.PutUint16(globalMesgNum, uint16(m.MesgNum))
+	byteorder.Select(m.Architecture).PutUint16(globalMesgNum, uint16(m.MesgNum))
 	b = append(b, globalMesgNum...)
 
 	b = append(b, byte(len(m.FieldDefinitions)))
