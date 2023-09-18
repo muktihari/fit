@@ -38,7 +38,7 @@ func ToTime(value any) time.Time {
 	return epoch.Add(time.Duration(val) * time.Second)
 }
 
-// ToLocalTime returns time in local time zone by specifying the time zone offset hours.
+// ToLocalTime returns time in local time zone by specifying the time zone offset hours (+7 for GMT+7).
 func ToLocalTime(value any, tzOffsetHours int) time.Time {
 	t := ToTime(value)
 	if t == (time.Time{}) {
@@ -47,12 +47,13 @@ func ToLocalTime(value any, tzOffsetHours int) time.Time {
 
 	zone := new(strings.Builder)
 	zone.WriteString("UTC")
-	if tzOffsetHours > 0 {
+	tzSec := tzOffsetHours * 60 * 60
+	if tzSec > 0 {
 		zone.WriteRune('+')
 	}
 
-	zone.WriteString(strconv.Itoa(tzOffsetHours)) // e.g. zone name -> UTC+7, UTC-7, etc...
-	loc := time.FixedZone(zone.String(), tzOffsetHours)
+	zone.WriteString(strconv.Itoa(tzSec)) // e.g. zone name -> UTC+7, UTC-7, etc...
+	loc := time.FixedZone(zone.String(), tzSec)
 
 	return t.In(loc)
 }
