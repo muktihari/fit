@@ -64,8 +64,7 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 			name: "mesg def fields only",
 			mesgdef: &proto.MessageDefinition{
 				Header:       64,
-				LocalMesgNum: 0,
-				Reserved:     0,
+				Reserved:     1,
 				Architecture: 0,
 				MesgNum:      typedef.MesgNumFileId,
 				FieldDefinitions: []proto.FieldDefinition{
@@ -78,12 +77,11 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 				},
 				DeveloperFieldDefinitions: nil},
 			b: []byte{
-				64, // Header
-				0,  // LocalMesgNum
-				0,  // Reserved
-				0,  // Architecture
-				0,  // MesgNum
-				6,  // len(FieldDefinitions)
+				64,   // Header
+				1,    // Reserved
+				0,    // Architecture
+				0, 0, // MesgNum
+				6, // len(FieldDefinitions)
 				0, 1, 0,
 				1, 2, 132,
 				2, 2, 132,
@@ -93,11 +91,9 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 			},
 		},
 		{
-			name: "mesg def fields only",
+			name: "mesg def fields and developer fields",
 			mesgdef: &proto.MessageDefinition{
 				Header:       64 | 32,
-				LocalMesgNum: 0,
-				Reserved:     0,
 				Architecture: 0,
 				MesgNum:      typedef.MesgNumFileId,
 				FieldDefinitions: []proto.FieldDefinition{
@@ -113,11 +109,10 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 				}},
 			b: []byte{
 				64 | 32, // Header
-				0,       // LocalMesgNum
 				0,       // Reserved
 				0,       // Architecture
-				0,       // MesgNum
-				6,       // len(FieldDefinitions)
+				0, 0,    // MesgNum
+				6, // len(FieldDefinitions)
 				0, 1, 0,
 				1, 2, 132,
 				2, 2, 132,
@@ -159,10 +154,8 @@ func TestMessageMarshaler(t *testing.T) {
 		{
 			name: "file_id mesg",
 			mesg: &proto.Message{
-				Header:   0,
-				Name:     "file_id",
-				Num:      typedef.MesgNumFileId,
-				LocalNum: 0,
+				Header: 0,
+				Num:    typedef.MesgNumFileId,
 				Fields: []proto.Field{
 					{Value: uint8(4)},
 					{Value: uint16(292)},
@@ -186,10 +179,8 @@ func TestMessageMarshaler(t *testing.T) {
 		{
 			name: "record mesg with developer fields",
 			mesg: &proto.Message{
-				Header:   0,
-				Name:     "record",
-				Num:      typedef.MesgNumRecord,
-				LocalNum: 0,
+				Header: 0,
+				Num:    typedef.MesgNumRecord,
 				Fields: []proto.Field{
 					{Value: uint8(4)},
 					{Value: uint16(292)},
@@ -216,10 +207,8 @@ func TestMessageMarshaler(t *testing.T) {
 		{
 			name: "marshal fields return error",
 			mesg: &proto.Message{
-				Header:   0,
-				Name:     "file_id",
-				Num:      typedef.MesgNumFileId,
-				LocalNum: 0,
+				Header: 0,
+				Num:    typedef.MesgNumFileId,
 				Fields: []proto.Field{
 					{FieldBase: &proto.FieldBase{Num: 99, Name: "error"}, Value: struct{}{}},
 				},
@@ -230,10 +219,8 @@ func TestMessageMarshaler(t *testing.T) {
 		{
 			name: "marshal fields return error",
 			mesg: &proto.Message{
-				Header:   0,
-				Name:     "file_id",
-				Num:      typedef.MesgNumFileId,
-				LocalNum: 0,
+				Header: 0,
+				Num:    typedef.MesgNumFileId,
 				DeveloperFields: []proto.DeveloperField{
 					{Num: 0, DeveloperDataIndex: 0, Value: struct{}{}},
 				},

@@ -41,7 +41,7 @@ func NewDeviceAuxBatteryInfo(mesg proto.Message) *DeviceAuxBatteryInfo {
 		3:   basetype.Uint8Invalid,  /* BatteryIdentifier */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

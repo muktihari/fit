@@ -35,7 +35,7 @@ func NewRespirationRate(mesg proto.Message) *RespirationRate {
 		0:   basetype.Sint16Invalid, /* RespirationRate */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

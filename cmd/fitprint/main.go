@@ -6,7 +6,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"io"
 	"os"
@@ -52,7 +51,7 @@ func main() {
 		decoder.WithIgnoreChecksum(),
 	)
 
-	_, err = dec.Decode(context.Background())
+	_, err = dec.Decode()
 	if err != nil {
 		fatalf("could not decode: %v\n", err)
 	}
@@ -96,7 +95,7 @@ func (p *printer) Wait() {
 func (p *printer) OnMesg(mesg proto.Message) { p.eventch <- mesg }
 
 func (p *printer) writeMesg(mesg proto.Message) {
-	fmt.Fprintf(p.w, "%s:\n", mesg.Name)
+	fmt.Fprintf(p.w, "%s:\n", mesg.Num.String())
 	for i := range mesg.Fields {
 		fmt.Fprintf(p.w, "    %s: %v\n", mesg.Fields[i].Name, formatValue(&mesg.Fields[i]))
 	}

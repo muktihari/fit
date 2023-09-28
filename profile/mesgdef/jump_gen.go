@@ -52,7 +52,7 @@ func NewJump(mesg proto.Message) *Jump {
 		8:   basetype.Uint32Invalid,                        /* EnhancedSpeed */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

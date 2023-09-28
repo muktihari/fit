@@ -75,7 +75,7 @@ func NewLength(mesg proto.Message) *Length {
 		25:  basetype.Uint8Invalid,  /* MaxRespirationRate */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

@@ -37,7 +37,7 @@ func NewWatchfaceSettings(mesg proto.Message) *WatchfaceSettings {
 		1:   basetype.ByteInvalid,   /* Layout */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

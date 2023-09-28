@@ -55,7 +55,7 @@ func NewAviationAttitude(mesg proto.Message) *AviationAttitude {
 		10:  nil,                    /* Validity */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

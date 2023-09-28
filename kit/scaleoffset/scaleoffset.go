@@ -21,7 +21,7 @@ func Apply[T Numeric](value T, scale, offset float64) float64 {
 // Apply applies scale and offset on slice values.
 func ApplySlice[S []E, E Numeric](values S, scale, offset float64) []float64 {
 	vals := make([]float64, 0, len(values))
-	for i := 0; i < len(values); i++ {
+	for i := range values {
 		vals = append(vals, Apply[E](values[i], scale, offset))
 	}
 	return vals
@@ -91,7 +91,7 @@ func Discard(value, scale, offset float64) float64 {
 // DiscardSlice discards applied scale and offset on slice values.
 func DiscardSlice[E Numeric](values []float64, scale, offset float64) []E {
 	vals := make([]E, 0, len(values))
-	for i := 0; i < len(values); i++ {
+	for i := range values {
 		if scale == 1 && offset == 0 {
 			vals = append(vals, E(values[i]))
 			continue

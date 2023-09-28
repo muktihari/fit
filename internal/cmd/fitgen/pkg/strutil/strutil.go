@@ -81,7 +81,7 @@ func TrimRepeatedChar(s string, char rune) string {
 	}
 	var last byte
 	var strbuf = new(strings.Builder)
-	for i := 0; i < len(s); i++ {
+	for i := range s {
 		c := s[i]
 		if c != last || rune(c) != char {
 			last = c

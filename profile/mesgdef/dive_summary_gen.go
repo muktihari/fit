@@ -77,7 +77,7 @@ func NewDiveSummary(mesg proto.Message) *DiveSummary {
 		25:  basetype.Uint32Invalid, /* HangTime */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

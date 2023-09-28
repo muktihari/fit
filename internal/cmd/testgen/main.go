@@ -81,7 +81,7 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 	)
 
 	enc := encoder.New(bufferedwriter.New(f))
-	if err := enc.Encode(ctx, fit); err != nil {
+	if err := enc.EncodeWithContext(ctx, fit); err != nil {
 		return err
 	}
 

@@ -132,14 +132,13 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	strbuf.WriteString("[]proto.Message{\n")
 	for _, message := range b.messages {
 		strbuf.WriteString(b.transformMesgnum(message.Name) + ": {\n") // indexed to create fixed-size slice.
-		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", message.Name))
-		strbuf.WriteString(fmt.Sprintf("Num: %s,\n", b.transformMesgnum(message.Name)))
+		strbuf.WriteString(fmt.Sprintf("Num: %s, /* %s */\n", b.transformMesgnum(message.Name), message.Name))
 		strbuf.WriteString(fmt.Sprintf("Fields: %s,\n", b.makeFields(message)))
 		strbuf.WriteString("DeveloperFields: nil,\n") // default nil
 		strbuf.WriteString("},\n")
 	}
 
-	strbuf.WriteString(fmt.Sprintf("{Name: \"mfg_range_min\", Num: %s},{Name: \"mfg_range_min\", Num: %s} %s,\n",
+	strbuf.WriteString(fmt.Sprintf("{Num: %s /* mfg_range_min */},{Num: %s /* mfg_range_min */} %s,\n",
 		b.valueMapByTypeNameByValueName["mesg_num"]["mfg_range_min"].Value,
 		b.valueMapByTypeNameByValueName["mesg_num"]["mfg_range_max"].Value,
 		"/* 0xFF00 - 0xFFFE reserved for manufacturer specific messages */"))

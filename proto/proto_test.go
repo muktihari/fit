@@ -5,6 +5,7 @@
 package proto_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -15,6 +16,31 @@ import (
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestLocalMesgNum(t *testing.T) {
+	tt := []struct {
+		header       byte
+		localMesgNum byte
+	}{
+		{
+			header:       proto.MesgCompressedHeaderMask | 0b00111111,
+			localMesgNum: 1,
+		},
+		{
+			header:       proto.MesgNormalHeaderMask | 2,
+			localMesgNum: 2,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("0b%08b", tc.header), func(t *testing.T) {
+			localMesgNum := proto.LocalMesgNum(tc.header)
+			if localMesgNum != tc.localMesgNum {
+				t.Fatalf("expected: %d, got: %d", tc.localMesgNum, localMesgNum)
+			}
+		})
+	}
+}
 
 func TestFitWithMessages(t *testing.T) {
 	tt := []struct {

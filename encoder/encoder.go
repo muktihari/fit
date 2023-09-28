@@ -25,14 +25,7 @@ var (
 	ErrEmptyMessages = errors.New("empty messages")
 )
 
-const ( // header is 1 byte -> 0bxxxxxxxx
-	MesgDefinitionMask       = 0b01000000 // Mask for determining if the message type is a message definition.
-	MesgNormalHeaderMask     = 0b00000000 // Mask for determining if the message type is a normal message data .
-	MesgCompressedHeaderMask = 0b10000000 // Mask for determining if the message type is a compressed timestamp message data.
-	LocalMesgNumMask         = 0b00001111 // Mask for mapping normal message data to the message definition.
-	CompressedTimeMask       = 0b00011111 // Mask for measuring time offset value from header. Compressed timestamp is using 5 least significant bits (lsb) of header
-	DevDataMask              = 0b00100000 // Mask for determining if a message contains developer fields.
-
+const (
 	RolloverEvent     = 32  // The 5-bit time offset rolls over every 32 seconds. When an incoming time offset is less than previous time offset, rollover event has occurred.
 	FieldNumTimestamp = 253 // Num for timestamp across all defined messages in the profile.
 )
@@ -149,8 +142,8 @@ func WithCompressedTimestampHeader() Option {
 // For instance, embedded devices may only support decoding data from local message type 0. Additionally, multiple local message types
 // should be avoided in file types like settings, where messages of the same type can be grouped together.
 func WithNormalHeader(multipleLocalMessageType byte) Option {
-	if multipleLocalMessageType > LocalMesgNumMask {
-		multipleLocalMessageType = LocalMesgNumMask
+	if multipleLocalMessageType > proto.LocalMesgNumMask {
+		multipleLocalMessageType = proto.LocalMesgNumMask
 	}
 	return fnApply(func(o *options) {
 		o.multipleLocalMessageType = multipleLocalMessageType
@@ -204,23 +197,15 @@ func New(w io.Writer, opts ...Option) *Encoder {
 	}
 }
 
-// Encode encodes fit into the dest writer. Encoder will do the following validations:
-//  1. Calculating Header's CRC & DataSize and Fit's CRC: any mismatch calculation will be corrected and updated to the given fit structure.
-//  2. Checking if fit.Messages are having all of its mesg definitions, return error if it's missing any mesg definition.
-//
-// Multiple Fit files can be chained together into a single Fit file by calling Encode for each fit data.
-//
-//	for _, fit := range fits {
-//	   err := enc.Encode(context.Background(), fit)
-//	}
-func (e *Encoder) Encode(ctx context.Context, fit *proto.Fit) (err error) {
+// EncodeWithContext wraps Encode to respect context propagation.
+func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
 	done := make(chan struct{})
 	go func() {
-		err = e.encode(fit)
+		err = e.Encode(fit)
 		close(done)
 	}()
 
@@ -232,8 +217,18 @@ func (e *Encoder) Encode(ctx context.Context, fit *proto.Fit) (err error) {
 	}
 }
 
-// encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
-func (e *Encoder) encode(fit *proto.Fit) error {
+// Encode encodes fit into the dest writer. Encoder will do the following validations:
+//  1. Calculating Header's CRC & DataSize and Fit's CRC: any mismatch calculation will be corrected and updated to the given fit structure.
+//  2. Checking if fit.Messages are having all of its mesg definitions, return error if it's missing any mesg definition.
+//
+// Multiple Fit files can be chained together into a single Fit file by calling Encode for each fit data.
+//
+//	for _, fit := range fits {
+//	   err := enc.Encode(context.Background(), fit)
+//	}
+//
+// Encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
+func (e *Encoder) Encode(fit *proto.Fit) error {
 	defer e.reset()
 
 	// Encode Strategy
@@ -392,7 +387,7 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
-	mesg.Header = MesgNormalHeaderMask
+	mesg.Header = proto.MesgNormalHeaderMask
 
 	if err := e.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
@@ -414,11 +409,11 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 		if e.options.multipleLocalMessageType == 0 {
 			writeable = e.isMesgDefinitionWriteable(b) // Local Message Type Zero
 		} else {
-			localMesgNum, writeable = e.redefineLocalMesgNum(b) // Multiple Local Message Type
-			b[0] = (b[0] &^ LocalMesgNumMask) | localMesgNum    // localMesgNum redefined, update the message definition header.
+			localMesgNum, writeable = e.redefineLocalMesgNum(b)    // Multiple Local Message Type
+			b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // localMesgNum redefined, update the message definition header.
 		}
 
-		mesg.Header = (mesg.Header &^ LocalMesgNumMask) | localMesgNum
+		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
 	case headerOptionCompressedTimestamp:
 		e.compressTimestampIntoHeader(mesg)
 
@@ -532,8 +527,8 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 
 	e.timestampReference = timestamp
 
-	timeOffset := byte(timestamp & CompressedTimeMask)
-	mesg.Header |= MesgCompressedHeaderMask | timeOffset
+	timeOffset := byte(timestamp & proto.CompressedTimeMask)
+	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(fieldnum.TimestampCorrelationTimestamp)
 }
 
@@ -584,7 +579,7 @@ func isEqual(x, y []byte) bool {
 	if len(x) != len(y) {
 		return false
 	}
-	for i := 0; i < len(x); i++ {
+	for i := range x {
 		if x[i] != y[i] {
 			return false
 		}

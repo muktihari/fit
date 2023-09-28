@@ -25,11 +25,11 @@ type {{ .Name }} struct {
 	{{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
 	{{ end }}
 
-	{{ if and (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 	// Developer Fields are dynamic, can't be mapped as struct's fields. 
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-	{{ end }}
+	{{- end -}}
 }
 
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. If mesg is nil or mesg.Num is not equal to {{ .Name }} mesg number, it will return nil.
@@ -44,7 +44,7 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 		{{ end -}}
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}
@@ -56,7 +56,7 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 			{{ .Name }}: {{ .AssignedValue }},
 		{{ end -}}
 
-		{{ if and (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 		DeveloperFields: mesg.DeveloperFields,
 		{{ end }}
 	}
@@ -85,7 +85,7 @@ func (m {{ .Name }}) PutMessage(mesg *proto.Message) {
 		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
 	}
 
-	{{- if and (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 	mesg.DeveloperFields = m.DeveloperFields
 	{{ end }}
 }

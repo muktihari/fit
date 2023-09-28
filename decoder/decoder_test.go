@@ -10,7 +10,6 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -63,7 +62,7 @@ func TestDecodeRealFiles(t *testing.T) {
 
 			dec := New(bufio.NewReader(f))
 
-			_, err = dec.Decode(context.Background())
+			_, err = dec.DecodeWithContext(context.Background())
 			if err != nil {
 				// NOTE: Doubts exist regarding the integrity of these files.
 				if info.Name() == "Settings.fit" || info.Name() == "WeightScaleMultiUser.fit" {
@@ -104,9 +103,10 @@ func TestOptions(t *testing.T) {
 		{
 			name: "defaultOptions",
 			options: &options{
-				factory:        factory.StandardFactory(),
-				shouldChecksum: true,
-				broadcastOnly:  false,
+				factory:               factory.StandardFactory(),
+				shouldChecksum:        true,
+				broadcastOnly:         false,
+				shouldExpandComponent: true,
 			},
 		},
 		{
@@ -117,13 +117,15 @@ func TestOptions(t *testing.T) {
 				WithMesgListener(mesglis), WithMesgListener(mesglis),
 				WithMesgDefListener(mesgDefLis), WithMesgDefListener(mesgDefLis),
 				WithBroadcastOnly(),
+				WithNoComponentExpansion(),
 			},
 			options: &options{
-				factory:          decoderFactory,
-				shouldChecksum:   false,
-				mesgListeners:    []listener.MesgListener{mesglis, mesglis},
-				mesgDefListeners: []listener.MesgDefListener{mesgDefLis, mesgDefLis},
-				broadcastOnly:    true,
+				factory:               decoderFactory,
+				shouldChecksum:        false,
+				mesgListeners:         []listener.MesgListener{mesglis, mesglis},
+				mesgDefListeners:      []listener.MesgDefListener{mesgDefLis, mesgDefLis},
+				broadcastOnly:         true,
+				shouldExpandComponent: false,
 			},
 		},
 	}
@@ -216,46 +218,7 @@ func TestDecodeHeaderOnce(t *testing.T) {
 	}
 }
 
-func TestPeekFileIdExported(t *testing.T) {
-	tt := []struct {
-		name string
-		r    io.Reader
-		ctx  context.Context
-		err  error
-	}{
-		{
-			name: "nil context",
-			r:    fnReaderOK,
-			ctx:  nil,
-			err:  nil,
-		},
-		{
-			name: "context background decode return error",
-			r:    fnReaderErr,
-			ctx:  context.Background(),
-			err:  io.EOF,
-		},
-		{
-			name: "context canceled",
-			r:    fnReaderOK,
-			ctx: func() context.Context {
-				ctx, cancel := context.WithCancel(context.Background())
-				cancel()
-				return ctx
-			}(),
-			err: context.Canceled,
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			dec := New(tc.r)
-			dec.PeekFileId(tc.ctx)
-		})
-	}
-}
-
-func TestPeekFileIdUnexported(t *testing.T) {
+func TestPeekFileId(t *testing.T) {
 	fit, buf := createFitForTest()
 
 	tt := []struct {
@@ -279,7 +242,17 @@ func TestPeekFileIdUnexported(t *testing.T) {
 			fileId: mesgdef.NewFileId(fit.Messages[0]),
 		},
 		{
-			name: "peek file id return error",
+			name: "peek file id decode header return error",
+			r: func() io.Reader {
+				return fnReader(func(b []byte) (n int, err error) {
+					return 0, io.EOF
+				})
+			}(),
+			fileId: mesgdef.NewFileId(fit.Messages[0]),
+			err:    io.EOF,
+		},
+		{
+			name: "peek file id decode message return error",
 			r: func() io.Reader {
 				buf, cur := slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -298,7 +271,7 @@ func TestPeekFileIdUnexported(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			fileId, err := dec.peekFileId()
+			fileId, err := dec.PeekFileId()
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -444,7 +417,7 @@ func TestNext(t *testing.T) {
 	dec := New(r)
 	prevAccumulator := dec.accumulator
 
-	_, err := dec.Decode(context.Background())
+	_, err := dec.DecodeWithContext(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -521,7 +494,7 @@ func TestDecodeExported(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			_, err := dec.Decode(tc.ctx)
+			_, err := dec.DecodeWithContext(tc.ctx)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -604,7 +577,7 @@ func TestDecodeUnexported(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			fit, err := dec.Decode(context.Background())
+			fit, err := dec.DecodeWithContext(context.Background())
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -782,7 +755,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			opts: []Option{
 				WithMesgDefListener(fnMesgDefListener(func(mesgDef proto.MessageDefinition) {})),
 			},
-			header:  MesgDefinitionMask,
+			header:  proto.MesgDefinitionMask,
 			mesgDef: proto.CreateMessageDefinition(&fit.Messages[0]), // file_id
 		},
 		{
@@ -817,7 +790,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
-			header: MesgDefinitionMask | DevDataMask,
+			header: proto.MesgDefinitionMask | proto.DevDataMask,
 			err:    io.EOF,
 		},
 		{
@@ -833,7 +806,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
-			header: MesgDefinitionMask | DevDataMask,
+			header: proto.MesgDefinitionMask | proto.DevDataMask,
 			err:    io.EOF,
 		},
 	}
@@ -848,7 +821,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			if err != nil {
 				return
 			}
-			mesgDef := *dec.localMessageDefinitions[MesgDefinitionMask&LocalMesgNumMask]
+			mesgDef := *dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
 			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
 				t.Fatal(diff)
 			}
@@ -871,9 +844,9 @@ func TestDecodeMessageData(t *testing.T) {
 			r:      fnReaderOK,
 			header: 0,
 			mesgdef: &proto.MessageDefinition{
-				Header:       MesgDefinitionMask,
-				LocalMesgNum: 0,
-				MesgNum:      mesgnum.Record,
+				Header: proto.MesgDefinitionMask,
+				// LocalMesgNum: 0,
+				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
 						Num:      fieldnum.RecordTimestamp,
@@ -886,11 +859,11 @@ func TestDecodeMessageData(t *testing.T) {
 		{
 			name:   "decode message data compressed header happy flow",
 			r:      fnReaderOK,
-			header: MesgCompressedHeaderMask,
+			header: proto.MesgCompressedHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header:       MesgDefinitionMask,
-				LocalMesgNum: 0,
-				MesgNum:      mesgnum.Record,
+				Header: proto.MesgDefinitionMask,
+				// LocalMesgNum: 0,
+				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
 						Num:      fieldnum.RecordTimestamp,
@@ -910,18 +883,18 @@ func TestDecodeMessageData(t *testing.T) {
 		{
 			name:    "decode message data compressed header missing mesg definition",
 			r:       fnReaderOK,
-			header:  MesgCompressedHeaderMask,
+			header:  proto.MesgCompressedHeaderMask,
 			mesgdef: nil,
 			err:     ErrMesgDefMissing,
 		},
 		{
 			name:   "decode message data decode fields return error",
 			r:      fnReaderErr,
-			header: MesgCompressedHeaderMask,
+			header: proto.MesgCompressedHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header:       MesgDefinitionMask,
-				LocalMesgNum: 0,
-				MesgNum:      mesgnum.Record,
+				Header: proto.MesgDefinitionMask,
+				// LocalMesgNum: 0,
+				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
 						Num:      fieldnum.RecordTimestamp,
@@ -942,11 +915,11 @@ func TestDecodeMessageData(t *testing.T) {
 					return f.Read(b)
 				})
 			}(),
-			header: MesgNormalHeaderMask,
+			header: proto.MesgNormalHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header:       MesgDefinitionMask | DevDataMask,
-				LocalMesgNum: 0,
-				MesgNum:      mesgnum.Record,
+				Header: proto.MesgDefinitionMask | proto.DevDataMask,
+				// LocalMesgNum: 0,
+				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
 						Num:      fieldnum.RecordTimestamp,
@@ -974,7 +947,13 @@ func TestDecodeMessageData(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r, WithMesgListener(fnMesgListener(func(mesg proto.Message) {})))
 			if tc.mesgdef != nil {
-				dec.localMessageDefinitions[tc.mesgdef.LocalMesgNum] = tc.mesgdef
+				if (tc.mesgdef.Header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
+					dec.localMessageDefinitions[(tc.mesgdef.Header&proto.CompressedLocalMesgNumMask)>>proto.CompressedBitShift] = tc.mesgdef
+				} else {
+					dec.localMessageDefinitions[tc.mesgdef.Header&proto.LocalMesgNumMask] = tc.mesgdef
+
+				}
+
 			}
 			if tc.fieldDescription != nil {
 				dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
@@ -991,6 +970,7 @@ func TestDecodeFields(t *testing.T) {
 	tt := []struct {
 		name    string
 		r       io.Reader
+		opts    []Option
 		mesgdef *proto.MessageDefinition
 		mesg    proto.Message
 		err     error
@@ -999,7 +979,7 @@ func TestDecodeFields(t *testing.T) {
 			name: "decode fields happy flow",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1014,7 +994,7 @@ func TestDecodeFields(t *testing.T) {
 			name: "decode fields unknown field",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.FileId,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1029,11 +1009,11 @@ func TestDecodeFields(t *testing.T) {
 			name: "decode fields timestamp not uint32",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: 68,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
-						Num:      FieldNumTimestamp,
+						Num:      fieldNumTimestamp,
 						Size:     1,
 						BaseType: basetype.Uint8,
 					},
@@ -1045,7 +1025,7 @@ func TestDecodeFields(t *testing.T) {
 			name: "decode fields accumulate distance",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1060,7 +1040,7 @@ func TestDecodeFields(t *testing.T) {
 			name: "subfield subtitution",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Event,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1076,11 +1056,27 @@ func TestDecodeFields(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "decode fields without component expansion",
+			r:    fnReaderOK,
+			opts: []Option{WithNoComponentExpansion()},
+			mesgdef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.Record,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.RecordCadence,
+						Size:     1,
+						BaseType: basetype.Uint8,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			dec := New(tc.r)
+			dec := New(tc.r, tc.opts...)
 			err := dec.decodeFields(tc.mesgdef, &tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
@@ -1165,7 +1161,6 @@ func TestExpandComponents(t *testing.T) {
 		{
 			name: "expand components accumulate",
 			mesg: factory.CreateMesgOnly(mesgnum.Hr).WithFields(
-				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
 				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue(uint8(10)),
 			),
 			containingField:      factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
@@ -1208,7 +1203,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				),
 			),
 			mesgDef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
 					{
@@ -1234,7 +1229,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				),
 			),
 			mesgDef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
 					{
@@ -1260,7 +1255,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				),
 			),
 			mesgDef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
 					{
@@ -1286,7 +1281,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				),
 			),
 			mesgDef: &proto.MessageDefinition{
-				Header:  MesgDefinitionMask,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
 					{
@@ -1352,45 +1347,6 @@ func TestReadValue(t *testing.T) {
 				return
 			}
 			if diff := cmp.Diff(res, tc.result); diff != "" {
-				t.Fatal(diff)
-			}
-		})
-	}
-}
-
-func TestExpandValue(t *testing.T) {
-	tt := []struct {
-		target any
-		value  int64
-		result any
-	}{
-		{target: int8(4), value: 10, result: []int8{4, 10}},
-		{target: uint8(4), value: 10, result: []uint8{4, 10}},
-		{target: int16(4), value: 10, result: []int16{4, 10}},
-		{target: uint16(4), value: 10, result: []uint16{4, 10}},
-		{target: int32(4), value: 10, result: []int32{4, 10}},
-		{target: uint32(4), value: 10, result: []uint32{4, 10}},
-		{target: float32(4), value: 10, result: []float32{4, 10}},
-		{target: float64(4), value: 10, result: []float64{4, 10}},
-		{target: int64(4), value: 10, result: []int64{4, 10}},
-		{target: uint64(4), value: 10, result: []uint64{4, 10}},
-		{target: []int8{4}, value: 10, result: []int8{4, 10}},
-		{target: []uint8{4}, value: 10, result: []uint8{4, 10}},
-		{target: []int16{4}, value: 10, result: []int16{4, 10}},
-		{target: []uint16{4}, value: 10, result: []uint16{4, 10}},
-		{target: []int32{4}, value: 10, result: []int32{4, 10}},
-		{target: []uint32{4}, value: 10, result: []uint32{4, 10}},
-		{target: []float32{4}, value: 10, result: []float32{4, 10}},
-		{target: []float64{4}, value: 10, result: []float64{4, 10}},
-		{target: []int64{4}, value: 10, result: []int64{4, 10}},
-		{target: []uint64{4}, value: 10, result: []uint64{4, 10}},
-		{target: "not supported", value: 10, result: "not supported"},
-	}
-
-	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%T(%#v)", tc.value, tc.value), func(t *testing.T) {
-			result := expandValue(tc.target, tc.value)
-			if diff := cmp.Diff(result, tc.result); diff != "" {
 				t.Fatal(diff)
 			}
 		})

@@ -23,10 +23,6 @@ type FileId struct {
 	TimeCreated  typedef.DateTime // Only set for files that are can be created/erased.
 	Number       uint16           // Only set for files that are not created/erased.
 	ProductName  string           // Optional free form string to indicate the devices name or model
-
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
 }
 
 // NewFileId creates new FileId struct based on given mesg. If mesg is nil or mesg.Num is not equal to FileId mesg number, it will return nil.
@@ -45,7 +41,7 @@ func NewFileId(mesg proto.Message) *FileId {
 		8: basetype.StringInvalid,  /* ProductName */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}
@@ -60,8 +56,6 @@ func NewFileId(mesg proto.Message) *FileId {
 		TimeCreated:  typeconv.ToUint32[typedef.DateTime](vals[4]),
 		Number:       typeconv.ToUint16[uint16](vals[5]),
 		ProductName:  typeconv.ToString[string](vals[8]),
-
-		DeveloperFields: mesg.DeveloperFields,
 	}
 }
 
@@ -91,6 +85,4 @@ func (m FileId) PutMessage(mesg *proto.Message) {
 	for i := range mesg.Fields {
 		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
-
 }

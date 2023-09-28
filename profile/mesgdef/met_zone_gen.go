@@ -39,7 +39,7 @@ func NewMetZone(mesg proto.Message) *MetZone {
 		3:   basetype.Uint8Invalid,  /* FatCalories */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

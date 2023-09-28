@@ -46,7 +46,7 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 		return createUnknownMesg(num)
 	}
 
-	if f.mesgs[num].Name == "" {
+	if f.mesgs[num].Num != num {
 		return createUnknownMesg(num)
 	}
 
@@ -60,7 +60,7 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 		return createUnknownMesg(num)
 	}
 
-	if f.mesgs[num].Name == "" {
+	if f.mesgs[num].Num != num {
 		return createUnknownMesg(num)
 	}
 
@@ -72,7 +72,7 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 }
 
 func createUnknownMesg(num typedef.MesgNum) proto.Message {
-	return proto.Message{Name: NameUnknown, Num: num}
+	return proto.Message{Num: num}
 }
 
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
@@ -84,7 +84,7 @@ func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 		return createUnknownField(mesgNum, num)
 	}
 
-	if f.mesgs[mesgNum].Name == "" {
+	if f.mesgs[mesgNum].Num != mesgNum {
 		return createUnknownField(mesgNum, num)
 	}
 
@@ -122,8 +122,7 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 	return []proto.Message{
 		typedef.MesgNumFileId: {
-			Name: "file_id",
-			Num:  typedef.MesgNumFileId,
+			Num: typedef.MesgNumFileId, /* file_id */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -250,8 +249,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumFileCreator: {
-			Name: "file_creator",
-			Num:  typedef.MesgNumFileCreator,
+			Num: typedef.MesgNumFileCreator, /* file_creator */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -287,8 +285,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTimestampCorrelation: {
-			Name: "timestamp_correlation",
-			Num:  typedef.MesgNumTimestampCorrelation,
+			Num: typedef.MesgNumTimestampCorrelation, /* timestamp_correlation */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -399,8 +396,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSoftware: {
-			Name: "software",
-			Num:  typedef.MesgNumSoftware,
+			Num: typedef.MesgNumSoftware, /* software */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -451,8 +447,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSlaveDevice: {
-			Name: "slave_device",
-			Num:  typedef.MesgNumSlaveDevice,
+			Num: typedef.MesgNumSlaveDevice, /* slave_device */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -504,8 +499,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumCapabilities: {
-			Name: "capabilities",
-			Num:  typedef.MesgNumCapabilities,
+			Num: typedef.MesgNumCapabilities, /* capabilities */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -571,8 +565,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumFileCapabilities: {
-			Name: "file_capabilities",
-			Num:  typedef.MesgNumFileCapabilities,
+			Num: typedef.MesgNumFileCapabilities, /* file_capabilities */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -668,8 +661,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMesgCapabilities: {
-			Name: "mesg_capabilities",
-			Num:  typedef.MesgNumMesgCapabilities,
+			Num: typedef.MesgNumMesgCapabilities, /* mesg_capabilities */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -769,8 +761,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumFieldCapabilities: {
-			Name: "field_capabilities",
-			Num:  typedef.MesgNumFieldCapabilities,
+			Num: typedef.MesgNumFieldCapabilities, /* field_capabilities */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -851,8 +842,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDeviceSettings: {
-			Name: "device_settings",
-			Num:  typedef.MesgNumDeviceSettings,
+			Num: typedef.MesgNumDeviceSettings, /* device_settings */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -1218,8 +1208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumUserProfile: {
-			Name: "user_profile",
-			Num:  typedef.MesgNumUserProfile,
+			Num: typedef.MesgNumUserProfile, /* user_profile */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -1660,8 +1649,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHrmProfile: {
-			Name: "hrm_profile",
-			Num:  typedef.MesgNumHrmProfile,
+			Num: typedef.MesgNumHrmProfile, /* hrm_profile */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -1742,8 +1730,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSdmProfile: {
-			Name: "sdm_profile",
-			Num:  typedef.MesgNumSdmProfile,
+			Num: typedef.MesgNumSdmProfile, /* sdm_profile */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -1869,8 +1856,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumBikeProfile: {
-			Name: "bike_profile",
-			Num:  typedef.MesgNumBikeProfile,
+			Num: typedef.MesgNumBikeProfile, /* bike_profile */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -2356,8 +2342,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumConnectivity: {
-			Name: "connectivity",
-			Num:  typedef.MesgNumConnectivity,
+			Num: typedef.MesgNumConnectivity, /* connectivity */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -2558,8 +2543,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWatchfaceSettings: {
-			Name: "watchface_settings",
-			Num:  typedef.MesgNumWatchfaceSettings,
+			Num: typedef.MesgNumWatchfaceSettings, /* watchface_settings */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -2623,8 +2607,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumOhrSettings: {
-			Name: "ohr_settings",
-			Num:  typedef.MesgNumOhrSettings,
+			Num: typedef.MesgNumOhrSettings, /* ohr_settings */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -2660,8 +2643,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTimeInZone: {
-			Name: "time_in_zone",
-			Num:  typedef.MesgNumTimeInZone,
+			Num: typedef.MesgNumTimeInZone, /* time_in_zone */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -2922,8 +2904,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumZonesTarget: {
-			Name: "zones_target",
-			Num:  typedef.MesgNumZonesTarget,
+			Num: typedef.MesgNumZonesTarget, /* zones_target */
 			Fields: []proto.Field{
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3004,8 +2985,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSport: {
-			Name: "sport",
-			Num:  typedef.MesgNumSport,
+			Num: typedef.MesgNumSport, /* sport */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -3056,8 +3036,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHrZone: {
-			Name: "hr_zone",
-			Num:  typedef.MesgNumHrZone,
+			Num: typedef.MesgNumHrZone, /* hr_zone */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3108,8 +3087,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSpeedZone: {
-			Name: "speed_zone",
-			Num:  typedef.MesgNumSpeedZone,
+			Num: typedef.MesgNumSpeedZone, /* speed_zone */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3160,8 +3138,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumCadenceZone: {
-			Name: "cadence_zone",
-			Num:  typedef.MesgNumCadenceZone,
+			Num: typedef.MesgNumCadenceZone, /* cadence_zone */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3212,8 +3189,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumPowerZone: {
-			Name: "power_zone",
-			Num:  typedef.MesgNumPowerZone,
+			Num: typedef.MesgNumPowerZone, /* power_zone */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3264,8 +3240,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMetZone: {
-			Name: "met_zone",
-			Num:  typedef.MesgNumMetZone,
+			Num: typedef.MesgNumMetZone, /* met_zone */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3331,8 +3306,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDiveSettings: {
-			Name: "dive_settings",
-			Num:  typedef.MesgNumDiveSettings,
+			Num: typedef.MesgNumDiveSettings, /* dive_settings */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -3876,8 +3850,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDiveAlarm: {
-			Name: "dive_alarm",
-			Num:  typedef.MesgNumDiveAlarm,
+			Num: typedef.MesgNumDiveAlarm, /* dive_alarm */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -4078,8 +4051,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDiveApneaAlarm: {
-			Name: "dive_apnea_alarm",
-			Num:  typedef.MesgNumDiveApneaAlarm,
+			Num: typedef.MesgNumDiveApneaAlarm, /* dive_apnea_alarm */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -4280,8 +4252,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDiveGas: {
-			Name: "dive_gas",
-			Num:  typedef.MesgNumDiveGas,
+			Num: typedef.MesgNumDiveGas, /* dive_gas */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -4362,8 +4333,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumGoal: {
-			Name: "goal",
-			Num:  typedef.MesgNumGoal,
+			Num: typedef.MesgNumGoal, /* goal */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -4564,8 +4534,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumActivity: {
-			Name: "activity",
-			Num:  typedef.MesgNumActivity,
+			Num: typedef.MesgNumActivity, /* activity */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -4691,8 +4660,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSession: {
-			Name: "session",
-			Num:  typedef.MesgNumSession,
+			Num: typedef.MesgNumSession, /* session */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -7055,8 +7023,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumLap: {
-			Name: "lap",
-			Num:  typedef.MesgNumLap,
+			Num: typedef.MesgNumLap, /* lap */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -8952,8 +8919,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumLength: {
-			Name: "length",
-			Num:  typedef.MesgNumLength,
+			Num: typedef.MesgNumLength, /* length */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -9293,8 +9259,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumRecord: {
-			Name: "record",
-			Num:  typedef.MesgNumRecord,
+			Num: typedef.MesgNumRecord, /* record */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -10573,8 +10538,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumEvent: {
-			Name: "event",
-			Num:  typedef.MesgNumEvent,
+			Num: typedef.MesgNumEvent, /* event */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11027,8 +10991,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDeviceInfo: {
-			Name: "device_info",
-			Num:  typedef.MesgNumDeviceInfo,
+			Num: typedef.MesgNumDeviceInfo, /* device_info */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11360,8 +11323,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDeviceAuxBatteryInfo: {
-			Name: "device_aux_battery_info",
-			Num:  typedef.MesgNumDeviceAuxBatteryInfo,
+			Num: typedef.MesgNumDeviceAuxBatteryInfo, /* device_aux_battery_info */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11442,8 +11404,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTrainingFile: {
-			Name: "training_file",
-			Num:  typedef.MesgNumTrainingFile,
+			Num: typedef.MesgNumTrainingFile, /* training_file */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11555,8 +11516,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWeatherConditions: {
-			Name: "weather_conditions",
-			Num:  typedef.MesgNumWeatherConditions,
+			Num: typedef.MesgNumWeatherConditions, /* weather_conditions */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11802,8 +11762,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWeatherAlert: {
-			Name: "weather_alert",
-			Num:  typedef.MesgNumWeatherAlert,
+			Num: typedef.MesgNumWeatherAlert, /* weather_alert */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -11899,8 +11858,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumGpsMetadata: {
-			Name: "gps_metadata",
-			Num:  typedef.MesgNumGpsMetadata,
+			Num: typedef.MesgNumGpsMetadata, /* gps_metadata */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12041,8 +11999,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumCameraEvent: {
-			Name: "camera_event",
-			Num:  typedef.MesgNumCameraEvent,
+			Num: typedef.MesgNumCameraEvent, /* camera_event */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12123,8 +12080,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumGyroscopeData: {
-			Name: "gyroscope_data",
-			Num:  typedef.MesgNumGyroscopeData,
+			Num: typedef.MesgNumGyroscopeData, /* gyroscope_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12265,8 +12221,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumAccelerometerData: {
-			Name: "accelerometer_data",
-			Num:  typedef.MesgNumAccelerometerData,
+			Num: typedef.MesgNumAccelerometerData, /* accelerometer_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12452,8 +12407,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMagnetometerData: {
-			Name: "magnetometer_data",
-			Num:  typedef.MesgNumMagnetometerData,
+			Num: typedef.MesgNumMagnetometerData, /* magnetometer_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12594,8 +12548,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumBarometerData: {
-			Name: "barometer_data",
-			Num:  typedef.MesgNumBarometerData,
+			Num: typedef.MesgNumBarometerData, /* barometer_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12661,8 +12614,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumThreeDSensorCalibration: {
-			Name: "three_d_sensor_calibration",
-			Num:  typedef.MesgNumThreeDSensorCalibration,
+			Num: typedef.MesgNumThreeDSensorCalibration, /* three_d_sensor_calibration */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12786,8 +12738,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumOneDSensorCalibration: {
-			Name: "one_d_sensor_calibration",
-			Num:  typedef.MesgNumOneDSensorCalibration,
+			Num: typedef.MesgNumOneDSensorCalibration, /* one_d_sensor_calibration */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12890,8 +12841,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumVideoFrame: {
-			Name: "video_frame",
-			Num:  typedef.MesgNumVideoFrame,
+			Num: typedef.MesgNumVideoFrame, /* video_frame */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -12942,8 +12892,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumObdiiData: {
-			Name: "obdii_data",
-			Num:  typedef.MesgNumObdiiData,
+			Num: typedef.MesgNumObdiiData, /* obdii_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -13084,8 +13033,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumNmeaSentence: {
-			Name: "nmea_sentence",
-			Num:  typedef.MesgNumNmeaSentence,
+			Num: typedef.MesgNumNmeaSentence, /* nmea_sentence */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -13136,8 +13084,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumAviationAttitude: {
-			Name: "aviation_attitude",
-			Num:  typedef.MesgNumAviationAttitude,
+			Num: typedef.MesgNumAviationAttitude, /* aviation_attitude */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -13323,8 +13270,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumVideo: {
-			Name: "video",
-			Num:  typedef.MesgNumVideo,
+			Num: typedef.MesgNumVideo, /* video */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13375,8 +13321,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumVideoTitle: {
-			Name: "video_title",
-			Num:  typedef.MesgNumVideoTitle,
+			Num: typedef.MesgNumVideoTitle, /* video_title */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -13427,8 +13372,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumVideoDescription: {
-			Name: "video_description",
-			Num:  typedef.MesgNumVideoDescription,
+			Num: typedef.MesgNumVideoDescription, /* video_description */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -13479,8 +13423,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumVideoClip: {
-			Name: "video_clip",
-			Num:  typedef.MesgNumVideoClip,
+			Num: typedef.MesgNumVideoClip, /* video_clip */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13591,8 +13534,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSet: {
-			Name: "set",
-			Num:  typedef.MesgNumSet,
+			Num: typedef.MesgNumSet, /* set */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -13763,8 +13705,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumJump: {
-			Name: "jump",
-			Num:  typedef.MesgNumJump,
+			Num: typedef.MesgNumJump, /* jump */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -13922,8 +13863,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSplit: {
-			Name: "split",
-			Num:  typedef.MesgNumSplit,
+			Num: typedef.MesgNumSplit, /* split */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14004,8 +13944,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumClimbPro: {
-			Name: "climb_pro",
-			Num:  typedef.MesgNumClimbPro,
+			Num: typedef.MesgNumClimbPro, /* climb_pro */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -14116,8 +14055,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumFieldDescription: {
-			Name: "field_description",
-			Num:  typedef.MesgNumFieldDescription,
+			Num: typedef.MesgNumFieldDescription, /* field_description */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14333,8 +14271,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDeveloperDataId: {
-			Name: "developer_data_id",
-			Num:  typedef.MesgNumDeveloperDataId,
+			Num: typedef.MesgNumDeveloperDataId, /* developer_data_id */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14415,8 +14352,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumCourse: {
-			Name: "course",
-			Num:  typedef.MesgNumCourse,
+			Num: typedef.MesgNumCourse, /* course */
 			Fields: []proto.Field{
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14482,8 +14418,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumCoursePoint: {
-			Name: "course_point",
-			Num:  typedef.MesgNumCoursePoint,
+			Num: typedef.MesgNumCoursePoint, /* course_point */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -14609,8 +14544,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSegmentId: {
-			Name: "segment_id",
-			Num:  typedef.MesgNumSegmentId,
+			Num: typedef.MesgNumSegmentId, /* segment_id */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14751,8 +14685,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSegmentLeaderboardEntry: {
-			Name: "segment_leaderboard_entry",
-			Num:  typedef.MesgNumSegmentLeaderboardEntry,
+			Num: typedef.MesgNumSegmentLeaderboardEntry, /* segment_leaderboard_entry */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -14863,8 +14796,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSegmentPoint: {
-			Name: "segment_point",
-			Num:  typedef.MesgNumSegmentPoint,
+			Num: typedef.MesgNumSegmentPoint, /* segment_point */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -14977,8 +14909,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSegmentLap: {
-			Name: "segment_lap",
-			Num:  typedef.MesgNumSegmentLap,
+			Num: typedef.MesgNumSegmentLap, /* segment_lap */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -16422,8 +16353,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSegmentFile: {
-			Name: "segment_file",
-			Num:  typedef.MesgNumSegmentFile,
+			Num: typedef.MesgNumSegmentFile, /* segment_file */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -16564,8 +16494,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWorkout: {
-			Name: "workout",
-			Num:  typedef.MesgNumWorkout,
+			Num: typedef.MesgNumWorkout, /* workout */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -16691,8 +16620,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWorkoutSession: {
-			Name: "workout_session",
-			Num:  typedef.MesgNumWorkoutSession,
+			Num: typedef.MesgNumWorkoutSession, /* workout_session */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -16803,8 +16731,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWorkoutStep: {
-			Name: "workout_step",
-			Num:  typedef.MesgNumWorkoutStep,
+			Num: typedef.MesgNumWorkoutStep, /* workout_step */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -17348,8 +17275,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumExerciseTitle: {
-			Name: "exercise_title",
-			Num:  typedef.MesgNumExerciseTitle,
+			Num: typedef.MesgNumExerciseTitle, /* exercise_title */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -17415,8 +17341,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSchedule: {
-			Name: "schedule",
-			Num:  typedef.MesgNumSchedule,
+			Num: typedef.MesgNumSchedule, /* schedule */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -17543,8 +17468,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTotals: {
-			Name: "totals",
-			Num:  typedef.MesgNumTotals,
+			Num: typedef.MesgNumTotals, /* totals */
 			Fields: []proto.Field{
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -17700,8 +17624,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumWeightScale: {
-			Name: "weight_scale",
-			Num:  typedef.MesgNumWeightScale,
+			Num: typedef.MesgNumWeightScale, /* weight_scale */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -17917,8 +17840,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumBloodPressure: {
-			Name: "blood_pressure",
-			Num:  typedef.MesgNumBloodPressure,
+			Num: typedef.MesgNumBloodPressure, /* blood_pressure */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18089,8 +18011,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMonitoringInfo: {
-			Name: "monitoring_info",
-			Num:  typedef.MesgNumMonitoringInfo,
+			Num: typedef.MesgNumMonitoringInfo, /* monitoring_info */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18186,8 +18107,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMonitoring: {
-			Name: "monitoring",
-			Num:  typedef.MesgNumMonitoring,
+			Num: typedef.MesgNumMonitoring, /* monitoring */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18646,8 +18566,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMonitoringHrData: {
-			Name: "monitoring_hr_data",
-			Num:  typedef.MesgNumMonitoringHrData,
+			Num: typedef.MesgNumMonitoringHrData, /* monitoring_hr_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18698,8 +18617,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSpo2Data: {
-			Name: "spo2_data",
-			Num:  typedef.MesgNumSpo2Data,
+			Num: typedef.MesgNumSpo2Data, /* spo2_data */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18765,8 +18683,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHr: {
-			Name: "hr",
-			Num:  typedef.MesgNumHr,
+			Num: typedef.MesgNumHr, /* hr */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -18875,8 +18792,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumStressLevel: {
-			Name: "stress_level",
-			Num:  typedef.MesgNumStressLevel,
+			Num: typedef.MesgNumStressLevel, /* stress_level */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -18912,8 +18828,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMaxMetData: {
-			Name: "max_met_data",
-			Num:  typedef.MesgNumMaxMetData,
+			Num: typedef.MesgNumMaxMetData, /* max_met_data */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19039,8 +18954,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumMemoGlob: {
-			Name: "memo_glob",
-			Num:  typedef.MesgNumMemoGlob,
+			Num: typedef.MesgNumMemoGlob, /* memo_glob */
 			Fields: []proto.Field{
 				250: {
 					FieldBase: &proto.FieldBase{
@@ -19136,8 +19050,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSleepLevel: {
-			Name: "sleep_level",
-			Num:  typedef.MesgNumSleepLevel,
+			Num: typedef.MesgNumSleepLevel, /* sleep_level */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -19173,8 +19086,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumAntChannelId: {
-			Name: "ant_channel_id",
-			Num:  typedef.MesgNumAntChannelId,
+			Num: typedef.MesgNumAntChannelId, /* ant_channel_id */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19255,8 +19167,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumAntRx: {
-			Name: "ant_rx",
-			Num:  typedef.MesgNumAntRx,
+			Num: typedef.MesgNumAntRx, /* ant_rx */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -19362,8 +19273,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumAntTx: {
-			Name: "ant_tx",
-			Num:  typedef.MesgNumAntTx,
+			Num: typedef.MesgNumAntTx, /* ant_tx */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -19469,8 +19379,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumExdScreenConfiguration: {
-			Name: "exd_screen_configuration",
-			Num:  typedef.MesgNumExdScreenConfiguration,
+			Num: typedef.MesgNumExdScreenConfiguration, /* exd_screen_configuration */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19536,8 +19445,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumExdDataFieldConfiguration: {
-			Name: "exd_data_field_configuration",
-			Num:  typedef.MesgNumExdDataFieldConfiguration,
+			Num: typedef.MesgNumExdDataFieldConfiguration, /* exd_data_field_configuration */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19636,8 +19544,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumExdDataConceptConfiguration: {
-			Name: "exd_data_concept_configuration",
-			Num:  typedef.MesgNumExdDataConceptConfiguration,
+			Num: typedef.MesgNumExdDataConceptConfiguration, /* exd_data_concept_configuration */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19811,8 +19718,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumDiveSummary: {
-			Name: "dive_summary",
-			Num:  typedef.MesgNumDiveSummary,
+			Num: typedef.MesgNumDiveSummary, /* dive_summary */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20163,8 +20069,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHrv: {
-			Name: "hrv",
-			Num:  typedef.MesgNumHrv,
+			Num: typedef.MesgNumHrv, /* hrv */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20185,8 +20090,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumBeatIntervals: {
-			Name: "beat_intervals",
-			Num:  typedef.MesgNumBeatIntervals,
+			Num: typedef.MesgNumBeatIntervals, /* beat_intervals */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20237,8 +20141,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHrvStatusSummary: {
-			Name: "hrv_status_summary",
-			Num:  typedef.MesgNumHrvStatusSummary,
+			Num: typedef.MesgNumHrvStatusSummary, /* hrv_status_summary */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20364,8 +20267,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumHrvValue: {
-			Name: "hrv_value",
-			Num:  typedef.MesgNumHrvValue,
+			Num: typedef.MesgNumHrvValue, /* hrv_value */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20401,8 +20303,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumRespirationRate: {
-			Name: "respiration_rate",
-			Num:  typedef.MesgNumRespirationRate,
+			Num: typedef.MesgNumRespirationRate, /* respiration_rate */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20438,8 +20339,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTankUpdate: {
-			Name: "tank_update",
-			Num:  typedef.MesgNumTankUpdate,
+			Num: typedef.MesgNumTankUpdate, /* tank_update */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20490,8 +20390,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumTankSummary: {
-			Name: "tank_summary",
-			Num:  typedef.MesgNumTankSummary,
+			Num: typedef.MesgNumTankSummary, /* tank_summary */
 			Fields: []proto.Field{
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -20572,8 +20471,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			DeveloperFields: nil,
 		},
 		typedef.MesgNumSleepAssessment: {
-			Name: "sleep_assessment",
-			Num:  typedef.MesgNumSleepAssessment,
+			Num: typedef.MesgNumSleepAssessment, /* sleep_assessment */
 			Fields: []proto.Field{
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20788,6 +20686,6 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 			},
 			DeveloperFields: nil,
 		},
-		{Name: "mfg_range_min", Num: 0xFF00}, {Name: "mfg_range_min", Num: 0xFFFE}, /* 0xFF00 - 0xFFFE reserved for manufacturer specific messages */
+		{Num: 0xFF00 /* mfg_range_min */}, {Num: 0xFFFE /* mfg_range_min */}, /* 0xFF00 - 0xFFFE reserved for manufacturer specific messages */
 	}
 }

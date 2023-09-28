@@ -39,7 +39,7 @@ func NewBarometerData(mesg proto.Message) *BarometerData {
 		2:   nil,                    /* BaroPres */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

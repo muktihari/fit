@@ -37,7 +37,7 @@ func NewSport(mesg proto.Message) *Sport {
 		3: basetype.StringInvalid, /* Name */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

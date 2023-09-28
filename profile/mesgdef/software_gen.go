@@ -37,7 +37,7 @@ func NewSoftware(mesg proto.Message) *Software {
 		5:   basetype.StringInvalid, /* PartNumber */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

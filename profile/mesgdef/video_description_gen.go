@@ -37,7 +37,7 @@ func NewVideoDescription(mesg proto.Message) *VideoDescription {
 		1:   basetype.StringInvalid, /* Text */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

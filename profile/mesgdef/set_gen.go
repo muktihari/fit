@@ -53,7 +53,7 @@ func NewSet(mesg proto.Message) *Set {
 		11:  basetype.Uint16Invalid, /* WktStepIndex */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

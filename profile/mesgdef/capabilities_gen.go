@@ -39,7 +39,7 @@ func NewCapabilities(mesg proto.Message) *Capabilities {
 		23: basetype.Uint32zInvalid, /* ConnectivitySupported */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

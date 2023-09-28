@@ -43,7 +43,7 @@ func NewMonitoringInfo(mesg proto.Message) *MonitoringInfo {
 		5:   basetype.Uint16Invalid, /* RestingMetabolicRate */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}
