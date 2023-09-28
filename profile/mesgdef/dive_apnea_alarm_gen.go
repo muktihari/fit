@@ -57,7 +57,7 @@ func NewDiveApneaAlarm(mesg proto.Message) *DiveApneaAlarm {
 		11:  basetype.Sint32Invalid, /* Speed */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

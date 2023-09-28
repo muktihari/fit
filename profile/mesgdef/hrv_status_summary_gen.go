@@ -47,7 +47,7 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 		6:   basetype.EnumInvalid,   /* Status */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

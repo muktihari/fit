@@ -65,7 +65,7 @@ func TestEncodeRealFiles(t *testing.T) {
 
 	f := new(bytes.Buffer)
 	enc := New(f)
-	if err := enc.Encode(context.Background(), fit); err != nil {
+	if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
 		panic(err)
 	}
 
@@ -169,7 +169,7 @@ func TestEncodeExported(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(nil)
-			err := enc.Encode(tc.ctx, tc.fit)
+			err := enc.EncodeWithContext(tc.ctx, tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -222,7 +222,7 @@ func TestEncodeUnexported(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.encode(&proto.Fit{})
+			_ = enc.Encode(&proto.Fit{})
 		})
 	}
 }
@@ -288,7 +288,7 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.encode(tc.fit)
+			_ = enc.Encode(tc.fit)
 		})
 	}
 }
@@ -358,7 +358,7 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w, WithMessageValidator(fnValidateOK))
-			_ = enc.encode(tc.fit)
+			_ = enc.Encode(tc.fit)
 		})
 	}
 }
@@ -652,7 +652,7 @@ func TestEncodeMessage(t *testing.T) {
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
-			if (tc.mesg.Header & DevDataMask) == DevDataMask {
+			if (tc.mesg.Header & proto.DevDataMask) == proto.DevDataMask {
 				t.Fatalf("message header should not contain Developer Data Flag")
 			}
 		})
@@ -693,7 +693,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 			}
 
 			mesgDefHeader := w.Bytes()
-			expectedHeader := (mesgDefHeader[0] &^ LocalMesgNumMask) | byte(i)
+			expectedHeader := (mesgDefHeader[0] &^ proto.LocalMesgNumMask) | byte(i)
 			if mesgDefHeader[0] != expectedHeader {
 				t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, mesgDefHeader[0])
 			}
@@ -880,7 +880,7 @@ func TestIsMesgDefinitionWriteable(t *testing.T) {
 
 func TestCompressTimestampInHeader(t *testing.T) {
 	now := time.Now()
-	offset := byte(datetime.ToUint32(now) & CompressedTimeMask)
+	offset := byte(datetime.ToUint32(now) & proto.CompressedTimeMask)
 	tt := []struct {
 		name    string
 		mesgs   []proto.Message
@@ -907,11 +907,11 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				}),
 			},
 			headers: []byte{
-				MesgNormalHeaderMask, // file_id: has no timestamp
-				MesgNormalHeaderMask, // record: the message containing timestamp reference prior to the use of compressed header.
-				MesgCompressedHeaderMask | (offset+1)&CompressedTimeMask,
-				MesgCompressedHeaderMask | (offset+2)&CompressedTimeMask,
-				MesgCompressedHeaderMask | (offset+32)&CompressedTimeMask,
+				proto.MesgNormalHeaderMask, // file_id: has no timestamp
+				proto.MesgNormalHeaderMask, // record: the message containing timestamp reference prior to the use of compressed header.
+				proto.MesgCompressedHeaderMask | (offset+1)&proto.CompressedTimeMask,
+				proto.MesgCompressedHeaderMask | (offset+2)&proto.CompressedTimeMask,
+				proto.MesgCompressedHeaderMask | (offset+32)&proto.CompressedTimeMask,
 			},
 		},
 		{
@@ -926,8 +926,8 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				}),
 			},
 			headers: []byte{
-				MesgNormalHeaderMask,
-				MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
 			},
 		},
 		{
@@ -942,8 +942,8 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				}),
 			},
 			headers: []byte{
-				MesgNormalHeaderMask,
-				MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
 			},
 		},
 		{
@@ -958,8 +958,8 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				}),
 			},
 			headers: []byte{
-				MesgNormalHeaderMask,
-				MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
+				proto.MesgNormalHeaderMask,
 			},
 		},
 	}

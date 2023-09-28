@@ -77,7 +77,7 @@ type messageValidator struct {
 }
 
 func (v *messageValidator) Validate(mesg *proto.Message) error {
-	mesg.Header = MesgNormalHeaderMask // reset default
+	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
 	fields := make([]proto.Field, 0, len(mesg.Fields))
 	for i := range mesg.Fields {
@@ -250,7 +250,7 @@ func hasValidValue(val any) bool {
 		return val != basetype.Uint64.Invalid()
 	case []int8:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint8.Invalid() {
 				invalidcounter++
 			}
@@ -258,7 +258,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []uint8:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint8.Invalid() {
 				invalidcounter++
 			}
@@ -266,7 +266,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []int16:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint16.Invalid() {
 				invalidcounter++
 			}
@@ -274,7 +274,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []uint16:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint16.Invalid() {
 				invalidcounter++
 			}
@@ -282,7 +282,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []int32:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint32.Invalid() {
 				invalidcounter++
 			}
@@ -290,7 +290,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []uint32:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint32.Invalid() {
 				invalidcounter++
 			}
@@ -298,7 +298,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []float32:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if math.IsNaN(float64(vs[i])) {
 				invalidcounter++
 			}
@@ -306,7 +306,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []float64:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if math.IsNaN(vs[i]) {
 				invalidcounter++
 			}
@@ -314,7 +314,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []int64:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint64.Invalid() {
 				invalidcounter++
 			}
@@ -322,7 +322,7 @@ func hasValidValue(val any) bool {
 		return invalidcounter != len(vs)
 	case []uint64:
 		invalidcounter := 0
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint64.Invalid() {
 				invalidcounter++
 			}

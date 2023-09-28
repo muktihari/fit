@@ -41,7 +41,7 @@ func NewTankSummary(mesg proto.Message) *TankSummary {
 		3:   basetype.Uint32Invalid,  /* VolumeUsed */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

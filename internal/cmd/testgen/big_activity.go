@@ -94,7 +94,7 @@ func createBigActivityFile(ctx context.Context) error {
 	defer bw.Flush()
 
 	enc := encoder.New(bw)
-	if err := enc.Encode(context.Background(), fit); err != nil {
+	if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
 		return err
 	}
 

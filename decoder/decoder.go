@@ -22,7 +22,6 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -38,17 +37,12 @@ var (
 	ErrByteSizeMismatch       = errors.New("byte size mismath")
 )
 
-const ( // header is 1 byte ->	 0bxxxxxxxx
-	MesgDefinitionMask         = 0b01000000 // Mask for determining if the message type is a message definition.
-	MesgNormalHeaderMask       = 0b00000000 // Mask for determining if the message type is a normal message data .
-	MesgCompressedHeaderMask   = 0b10000000 // Mask for determining if the message type is a compressed timestamp message data.
-	LocalMesgNumMask           = 0b00001111 // Mask for mapping normal message data to the message definition.
-	CompressedLocalMesgNumMask = 0b01100000 // Mask for mapping compressed timestamp message data to the message definition. Used with CompressedBitShift.
-	CompressedTimeMask         = 0b00011111 // Mask for measuring time offset value from header. Compressed timestamp is using 5 least significant bits (lsb) of header
-	DevDataMask                = 0b00100000 // Mask for determining if a message contains developer fields.
+const (
+	fieldNumTimestamp = 253 // Num for timestamp across all defined messages in the profile.
 
-	CompressedBitShift = 5   // Used for right shifting the 5 least significant bits (lsb) of compressed timestamp header.
-	FieldNumTimestamp  = 253 // Num for timestamp across all defined messages in the profile.
+	// Buffer for component expansion to avoid runtime grow slice which more expensive than having buffered size at front.
+	// The value 10 is from the current max components in factory (MesgNumHr -> event_timestamp_12).
+	bufferSizeFields = 10
 )
 
 // Decoder is Fit file decoder. See New() for details.
@@ -75,7 +69,7 @@ type Decoder struct {
 	fileId *mesgdef.FileId
 
 	// Message Definition Lookup
-	localMessageDefinitions [LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
+	localMessageDefinitions [proto.LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
 
 	// Developer Data Lookup
 	developerDataIds  []*mesgdef.DeveloperDataId
@@ -95,18 +89,20 @@ type Factory interface {
 }
 
 type options struct {
-	factory          Factory
-	mesgListeners    []listener.MesgListener
-	mesgDefListeners []listener.MesgDefListener
-	shouldChecksum   bool
-	broadcastOnly    bool
+	factory               Factory
+	mesgListeners         []listener.MesgListener
+	mesgDefListeners      []listener.MesgDefListener
+	shouldChecksum        bool
+	broadcastOnly         bool
+	shouldExpandComponent bool
 }
 
 func defaultOptions() *options {
 	return &options{
-		factory:        factory.StandardFactory(),
-		shouldChecksum: true,
-		broadcastOnly:  false,
+		factory:               factory.StandardFactory(),
+		shouldChecksum:        true,
+		broadcastOnly:         false,
+		shouldExpandComponent: true,
 	}
 }
 
@@ -155,6 +151,11 @@ func WithIgnoreChecksum() Option {
 	return fnApply(func(o *options) { o.shouldChecksum = false })
 }
 
+// WithNoComponentExpansion directs the Decoder to not expand the components.
+func WithNoComponentExpansion() Option {
+	return fnApply(func(o *options) { o.shouldExpandComponent = false })
+}
+
 // New returns a FIT File Decoder to decode given r.
 //
 // The FIT protocol allows for multiple FIT files to be chained together in a single FIT file.
@@ -181,7 +182,7 @@ func New(r io.Reader, opts ...Option) *Decoder {
 		factory:                 options.factory,
 		accumulator:             NewAccumulator(),
 		crc16:                   crc16.New(crc16.MakeFitTable()),
-		localMessageDefinitions: [LocalMesgNumMask + 1]*proto.MessageDefinition{},
+		localMessageDefinitions: [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{},
 		messages:                make([]proto.Message, 0),
 		mesgListeners:           options.mesgListeners,
 		mesgDefListeners:        options.mesgDefListeners,
@@ -209,26 +210,7 @@ func (d *Decoder) initDecodeHeaderOnce() {
 //
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
-func (d *Decoder) PeekFileId(ctx context.Context) (fileId *mesgdef.FileId, err error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	done := make(chan struct{})
-	go func() {
-		fileId, err = d.peekFileId()
-		close(done)
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-done:
-		return
-	}
-}
-
-func (d *Decoder) peekFileId() (fileId *mesgdef.FileId, err error) {
+func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 	if err = d.decodeHeaderOnce(); err != nil {
 		return
 	}
@@ -248,7 +230,7 @@ func (d *Decoder) Next() bool {
 	d.accumulator = NewAccumulator()
 	d.crc16.Reset()
 	d.fileHeader = proto.FileHeader{}
-	d.localMessageDefinitions = [LocalMesgNumMask + 1]*proto.MessageDefinition{}
+	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
 	d.messages = make([]proto.Message, 0)
 	d.fileId = nil
 	d.developerDataIds = make([]*mesgdef.DeveloperDataId, 0)
@@ -264,21 +246,15 @@ func (d *Decoder) Next() bool {
 	return d.decodeHeaderOnce() != nil
 }
 
-// The Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.
-// To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
-// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained proto.
-//
-//	for dec.Next() {
-//	   fit, err := dec.Decode(context.Background())
-//	}
-func (d *Decoder) Decode(ctx context.Context) (fit *proto.Fit, err error) {
+// DecodeWithContext wraps Decode to respect context propagation.
+func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
 	done := make(chan struct{})
 	go func() {
-		fit, err = d.decode()
+		fit, err = d.Decode()
 		close(done)
 	}()
 
@@ -290,7 +266,14 @@ func (d *Decoder) Decode(ctx context.Context) (fit *proto.Fit, err error) {
 	}
 }
 
-func (d *Decoder) decode() (fit *proto.Fit, err error) {
+// Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.
+// To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
+// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
+//
+//	for dec.Next() {
+//	   fit, err := dec.Decode()
+//	}
+func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 	if err = d.decodeHeaderOnce(); err != nil {
 		return nil, err
 	}
@@ -380,7 +363,7 @@ func (d *Decoder) decodeMessage() error {
 		return err
 	}
 
-	if (header & MesgDefinitionMask) == MesgDefinitionMask {
+	if (header & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
 		return d.decodeMessageDefinition(header)
 	}
 
@@ -395,7 +378,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 
 	mesgDef := proto.MessageDefinition{
 		Header:       header,
-		LocalMesgNum: header & LocalMesgNumMask,
 		Reserved:     b[0],
 		Architecture: b[1],
 		MesgNum:      typedef.MesgNum(byteorder.Select(b[1]).Uint16(b[2:4])),
@@ -416,7 +398,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		})
 	}
 
-	if (header & DevDataMask) == DevDataMask {
+	if (header & proto.DevDataMask) == proto.DevDataMask {
 		n, err := d.readByte()
 		if err != nil {
 			return err
@@ -437,7 +419,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		}
 	}
 
-	localMesgNum := header & LocalMesgNumMask
+	localMesgNum := header & proto.LocalMesgNumMask
 	d.localMessageDefinitions[localMesgNum] = &mesgDef
 
 	for _, mesgDefListener := range d.mesgDefListeners {
@@ -448,39 +430,25 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 }
 
 func (d *Decoder) decodeMessageData(header byte) error {
-	var (
-		mesgDef *proto.MessageDefinition
-		mesg    proto.Message
-	)
+	localMesgNum := proto.LocalMesgNum(header)
+	mesgDef := d.localMessageDefinitions[localMesgNum]
+	if mesgDef == nil {
+		return ErrMesgDefMissing
+	}
 
-	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask { // Compressed Timestamp Message Data
-		timeOffset := header & CompressedTimeMask
-		d.timestamp += uint32((timeOffset - d.lastTimeOffset) & CompressedTimeMask)
+	mesg := d.factory.CreateMesgOnly(mesgDef.MesgNum)
+	mesg.Reserved = mesgDef.Reserved
+	mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+bufferSizeFields)
+
+	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
+		timeOffset := header & proto.CompressedTimeMask
+		d.timestamp += uint32((timeOffset - d.lastTimeOffset) & proto.CompressedTimeMask)
 		d.lastTimeOffset = timeOffset
 
-		localMesgNum := (header & CompressedLocalMesgNumMask) >> CompressedBitShift
-		mesgDef = d.localMessageDefinitions[localMesgNum]
-		if mesgDef == nil {
-			return ErrMesgDefMissing
-		}
-
-		timestampField := d.factory.CreateField(mesgDef.MesgNum, fieldnum.TimestampCorrelationTimestamp)
+		timestampField := d.factory.CreateField(mesgDef.MesgNum, fieldNumTimestamp)
 		timestampField.Value = d.timestamp
 
-		mesg = d.factory.CreateMesgOnly(mesgDef.MesgNum)
-		mesg.LocalNum = localMesgNum                                           // ref to mesg definition
-		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+11) // +1 is for timestamp, +10 is component expansion buffer (avoid grow slice)
-		mesg.Fields = append(mesg.Fields, timestampField)                      // add timestamp field
-	} else { // Normal Message Data
-		localMesgNum := header & LocalMesgNumMask
-		mesgDef = d.localMessageDefinitions[localMesgNum]
-		if mesgDef == nil {
-			return ErrMesgDefMissing
-		}
-
-		mesg = d.factory.CreateMesgOnly(mesgDef.MesgNum)
-		mesg.LocalNum = localMesgNum                                           // ref to mesg definition
-		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+10) // +10 is component expansion buffer (avoid grow slice)
+		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
 	}
 
 	mesg.Header = header
@@ -538,7 +506,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			return err
 		}
 
-		if field.Num == FieldNumTimestamp {
+		if field.Num == fieldNumTimestamp {
 			timestamp, ok := val.(uint32)
 			if !ok {
 				// This can only happen when:
@@ -547,7 +515,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val, ErrFieldValueTypeMismatch)
 			}
 			d.timestamp = timestamp
-			d.lastTimeOffset = byte(timestamp & CompressedTimeMask)
+			d.lastTimeOffset = byte(timestamp & proto.CompressedTimeMask)
 		}
 
 		field.Value = val
@@ -559,6 +527,10 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		mesg.Fields = append(mesg.Fields, field)
+	}
+
+	if !d.options.shouldExpandComponent {
+		return nil
 	}
 
 	// Now that all fields has been decoded, we need to expand all components and accumulate the accumulable values.
@@ -614,11 +586,6 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 			var mask int64 = (1 << component.Bits) - 1                                    // e.g. (1 << 8) - 1     = 255
 			val = val & mask                                                              // e.g. 0x27010E08 & 255 = 0x08
 			bitVals[containingField.Num] = bitVals[containingField.Num] >> component.Bits // e.g. 0x27010E08 >> 8  = 0x27010E
-		}
-
-		if field, ok := mesg.FieldByNum(component.FieldNum); ok {
-			field.Value = expandValue(field.Value, val)
-			continue
 		}
 
 		// QUESTION: Should we expand componentField.Components too (?)
@@ -718,55 +685,4 @@ func (d *Decoder) readValue(size byte, baseType basetype.BaseType, arch byte) (a
 	}
 
 	return val, nil
-}
-
-// expandValue appends value to target:
-//  1. If target is not slice and value is valid, []Type{target, cast(value)} will be returned
-//  2. If target is a slice and value is valid, append(target, cast(value)) will be returned
-func expandValue(target any, value int64) any {
-	// Make slice or append existing.
-	switch targetValue := target.(type) {
-	case int8:
-		return []int8{targetValue, int8(value)}
-	case uint8:
-		return []uint8{targetValue, uint8(value)}
-	case int16:
-		return []int16{targetValue, int16(value)}
-	case uint16:
-		return []uint16{targetValue, uint16(value)}
-	case int32:
-		return []int32{targetValue, int32(value)}
-	case uint32:
-		return []uint32{targetValue, uint32(value)}
-	case float32:
-		return []float32{targetValue, float32(value)}
-	case float64:
-		return []float64{targetValue, float64(value)}
-	case int64:
-		return []int64{targetValue, value}
-	case uint64:
-		return []uint64{targetValue, uint64(value)}
-	case []int8:
-		return append(targetValue, int8(value))
-	case []uint8:
-		return append(targetValue, uint8(value))
-	case []int16:
-		return append(targetValue, int16(value))
-	case []uint16:
-		return append(targetValue, uint16(value))
-	case []int32:
-		return append(targetValue, int32(value))
-	case []uint32:
-		return append(targetValue, uint32(value))
-	case []float32:
-		return append(targetValue, float32(value))
-	case []float64:
-		return append(targetValue, float64(value))
-	case []int64:
-		return append(targetValue, int64(value))
-	case []uint64:
-		return append(targetValue, uint64(value))
-	}
-
-	return target // not supported.
 }

@@ -47,7 +47,7 @@ func NewCoursePoint(mesg proto.Message) *CoursePoint {
 		8:   false,                  /* Favorite */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

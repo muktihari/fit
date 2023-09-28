@@ -45,7 +45,7 @@ func NewWorkoutSession(mesg proto.Message) *WorkoutSession {
 		5:   basetype.EnumInvalid,   /* PoolLengthUnit */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

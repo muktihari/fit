@@ -35,7 +35,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		return []byte{byte(boolean)}, nil
 	case []bool:
 		b := make([]byte, 0, len(val))
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			if val[i] {
 				b = append(b, 1)
 			} else {
@@ -47,7 +47,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		return []byte{byte(val)}, nil
 	case []int8:
 		b := make([]byte, 0, len(val))
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			b = append(b, byte(val[i]))
 		}
 		return b, nil
@@ -62,7 +62,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []int16:
 		n, cur := 2, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint16(b[cur:cur+n], uint16(val[i]))
 			cur += n
 		}
@@ -74,7 +74,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []uint16:
 		n, cur := 2, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint16(b[cur:cur+n], val[i])
 			cur += n
 		}
@@ -86,7 +86,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []int32:
 		n, cur := 4, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint32(b[cur:cur+n], uint32(val[i]))
 			cur += n
 		}
@@ -98,7 +98,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []uint32:
 		n, cur := 4, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint32(b[cur:cur+n], val[i])
 			cur += n
 		}
@@ -110,7 +110,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []int64:
 		n, cur := 8, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint64(b[cur:cur+n], uint64(val[i]))
 			cur += n
 		}
@@ -122,7 +122,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []uint64:
 		n, cur := 8, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint64(b[cur:cur+n], val[i])
 			cur += n
 		}
@@ -135,7 +135,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []float32:
 		n, cur := 4, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint32(b[cur:cur+n], math.Float32bits(val[i]))
 			cur += n
 		}
@@ -148,7 +148,7 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 	case []float64:
 		n, cur := 8, 0
 		b := make([]byte, len(val)*n)
-		for i := 0; i < len(val); i++ {
+		for i := range val {
 			bo.PutUint64(b[cur:cur+n], math.Float64bits(val[i]))
 			cur += n
 		}

@@ -17,7 +17,7 @@ func NewAccumulator() *Accumulator {
 }
 
 func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value int64) {
-	for i := 0; i < len(a.AccumulatedValues); i++ {
+	for i := range a.AccumulatedValues {
 		field := &a.AccumulatedValues[i]
 		if field.MesgNum == mesgNum && field.DestFieldNum == destFieldNum {
 			field.Value = value
@@ -34,7 +34,7 @@ func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value 
 }
 
 func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, value int64, bits byte) int64 {
-	for i := 0; i < len(a.AccumulatedValues); i++ {
+	for i := range a.AccumulatedValues {
 		av := &a.AccumulatedValues[i]
 		if av.MesgNum == mesgNum && av.DestFieldNum == destFieldNum {
 			return av.Accumulate(value, bits)

@@ -16,10 +16,6 @@ import (
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
-const (
-	DevDataMask = 0b00100000 // Mask for determining if a message contains developer fields.
-)
-
 var (
 	_ encoding.BinaryMarshaler = &FileHeader{}
 	_ encoding.BinaryMarshaler = &MessageDefinition{}

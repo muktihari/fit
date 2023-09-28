@@ -130,8 +130,13 @@ func (c *Conv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	c.once.Do(func() { c.printHeader() })
 
 	c.buf.WriteString("Definition,")
-	c.buf.WriteString(strconv.Itoa(int(mesgDef.LocalMesgNum)) + ",")
-	c.buf.WriteString(mesgDef.MesgNum.String() + ",")
+	c.buf.WriteString(strconv.Itoa(int(proto.LocalMesgNum(mesgDef.Header))) + ",")
+	mesgName := mesgDef.MesgNum.String()
+	if mesgName == strconv.FormatInt(int64(mesgDef.MesgNum), 10) {
+		mesgName = factory.NameUnknown
+	}
+	c.buf.WriteString(mesgName)
+	c.buf.WriteRune(',')
 
 	for i := range mesgDef.FieldDefinitions {
 		fieldDef := mesgDef.FieldDefinitions[i]
@@ -186,8 +191,13 @@ func (c *Conv) writeMesg(mesg proto.Message) {
 	}
 
 	c.buf.WriteString("Data,")
-	c.buf.WriteString(strconv.Itoa(int(mesg.LocalNum)) + ",")
-	c.buf.WriteString(mesg.Num.String() + ",")
+	c.buf.WriteString(strconv.Itoa(int(proto.LocalMesgNum(mesg.Header))) + ",")
+	mesgName := mesg.Num.String()
+	if mesgName == strconv.FormatInt(int64(mesg.Num), 10) {
+		mesgName = factory.NameUnknown
+	}
+	c.buf.WriteString(mesgName)
+	c.buf.WriteRune(',')
 
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
@@ -205,7 +215,7 @@ func (c *Conv) writeMesg(mesg proto.Message) {
 			c.buf.WriteByte(',')
 
 			c.buf.WriteByte('"')
-			for i := 0; i < len(vals); i++ {
+			for i := range vals {
 				value := vals[i]
 				if !c.debugUseRawValue {
 					value = scaleoffset.ApplyAny(vals[i], field.Scale, field.Offset)
@@ -263,7 +273,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 	isSlice = true
 	switch vs := val.(type) {
 	case []int8:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint8.Invalid() {
 				continue
 			}
@@ -271,7 +281,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []uint8:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint8.Invalid() {
 				continue
 			}
@@ -279,7 +289,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []int16:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint16.Invalid() {
 				continue
 			}
@@ -287,7 +297,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []uint16:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint16.Invalid() {
 				continue
 			}
@@ -295,7 +305,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []int32:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Sint32.Invalid() {
 				continue
 			}
@@ -303,7 +313,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []uint32:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if vs[i] == basetype.Uint32.Invalid() {
 				continue
 			}
@@ -311,7 +321,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []float32:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if math.IsNaN(float64(vs[i])) {
 				continue
 			}
@@ -319,7 +329,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []float64:
-		for i := 0; i < len(vs); i++ {
+		for i := range vs {
 			if math.IsNaN(float64(vs[i])) {
 				continue
 			}

@@ -37,7 +37,7 @@ func NewCadenceZone(mesg proto.Message) *CadenceZone {
 		1:   basetype.StringInvalid, /* Name */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

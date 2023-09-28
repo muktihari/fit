@@ -54,7 +54,7 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 		return createUnknownMesg(num)
 	}
 	
-	if f.mesgs[num].Name == "" {
+	if f.mesgs[num].Num != num {
 		return createUnknownMesg(num)
 	}
 
@@ -67,7 +67,7 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 		return createUnknownMesg(num)
 	}
 
-	if f.mesgs[num].Name == "" {
+	if f.mesgs[num].Num != num {
 		return createUnknownMesg(num)
 	}
 
@@ -79,7 +79,7 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 }
 
 func createUnknownMesg(num typedef.MesgNum) proto.Message {
-	return proto.Message{Name: NameUnknown, Num: num}
+	return proto.Message{Num: num}
 }
 
 {{ template "create_field_doc" -}}
@@ -88,7 +88,7 @@ func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 		return createUnknownField(mesgNum, num)
 	}
 
-	if f.mesgs[mesgNum].Name == "" {
+	if f.mesgs[mesgNum].Num != mesgNum {
 		return createUnknownField(mesgNum, num)
 	}
 

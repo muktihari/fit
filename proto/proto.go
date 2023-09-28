@@ -14,74 +14,34 @@ import (
 
 // NOTE: The term "Global Fit Profile" refers to the definition provided in the Profile.xlsx proto.
 
-const (
-	MesgDefinitionMask = 0b01000000 // Mask for determining if the message type is a message definition.
+const ( // header is 1 byte ->	 0bxxxxxxxx
+	MesgDefinitionMask         = 0b01000000 // Mask for determining if the message type is a message definition.
+	MesgNormalHeaderMask       = 0b00000000 // Mask for determining if the message type is a normal message data .
+	MesgCompressedHeaderMask   = 0b10000000 // Mask for determining if the message type is a compressed timestamp message data.
+	LocalMesgNumMask           = 0b00001111 // Mask for mapping normal message data to the message definition.
+	CompressedLocalMesgNumMask = 0b01100000 // Mask for mapping compressed timestamp message data to the message definition. Used with CompressedBitShift.
+	CompressedTimeMask         = 0b00011111 // Mask for measuring time offset value from header. Compressed timestamp is using 5 least significant bits (lsb) of header
+	DevDataMask                = 0b00100000 // Mask for determining if a message contains developer fields.
+
+	CompressedBitShift = 5 // Used for right shifting the 5 least significant bits (lsb) of compressed ti
 
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
 )
 
-// Fit represents a structure for Fit Files.
-type Fit struct {
-	FileHeader FileHeader // File Header contains either 12 or 14 bytes
-	Messages   []Message  // Messages.
-	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
-}
-
-// WithMessages set Messages and return the pointer to the Fit.
-func (f *Fit) WithMessages(messages ...Message) *Fit {
-	f.Messages = make([]Message, len(messages))
-	copy(f.Messages, messages)
-	return f
-}
-
-// FileHeader is a Fit's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
-type FileHeader struct {
-	Size            byte   // Header size either 12 (legacy) or 14.
-	ProtocolVersion byte   // The Fit Protocol version which is being used to encode the Fit file.
-	ProfileVersion  uint16 // The Fit Profile Version (associated with data defined in Global Fit Profile).
-	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
-	DataType        string // ".FIT" (a string constant)
-	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity if the header. (this field will be automatically updated by the encoder)
-}
-
-// MessageDefinition is the definition of the upcoming data messages.
-type MessageDefinition struct {
-	Header                    byte                       // The message definition header with mask 0b01000000.
-	LocalMesgNum              byte                       // Serves as a reference for the upcoming message during decoding and encoding.
-	Reserved                  byte                       // Currently undetermined; the default value is 0.
-	Architecture              byte                       // The Byte Order to be used to decode the values of both this message definition and the upcoming message. (0: Little-Endian, 1: Big-Endian)
-	MesgNum                   typedef.MesgNum            // Global Message Number defined by factory (retrieved from Profile.xslx). (endianness of this 2 Byte value is defined in the Architecture byte)
-	FieldDefinitions          []FieldDefinition          // List of the field definition
-	DeveloperFieldDefinitions []DeveloperFieldDefinition // List of the developer field definition (only if Developer Data Flag is set in Header)
-}
-
-// Clone clones MessageDefinition
-func (m MessageDefinition) Clone() MessageDefinition {
-	m.FieldDefinitions = slices.Clone(m.FieldDefinitions)
-	m.DeveloperFieldDefinitions = slices.Clone(m.DeveloperFieldDefinitions)
-	return m
-}
-
-// FieldDefinition is the definition of the upcoming field within the message's structure.
-type FieldDefinition struct {
-	Num      byte              // The field definition number
-	Size     byte              // The size of the upcoming value
-	BaseType basetype.BaseType // The type of the upcoming value to be represented
-}
-
-// FieldDefinition is the definition of the upcoming developer field within the message's structure.
-type DeveloperFieldDefinition struct { // 3 bits
-	Num                byte // Map to the `field_definition_number` of a `field_description` Message.
-	Size               byte // Size (in bytes) of the specified FIT message’s field
-	DeveloperDataIndex byte // Maps to the `developer_data_index`` of a `developer_data_id` Message
+// LocalMesgNum extracts LocalMesgNum from message header.
+func LocalMesgNum(header byte) byte {
+	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
+		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
+	}
+	return header & LocalMesgNumMask
 }
 
 // CreateMessageDefinition creates new MessageDefinition base on given Message.
 func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
 	mesgDef = MessageDefinition{
 		Header:       MesgDefinitionMask,
-		Reserved:     0, // default
+		Reserved:     mesg.Reserved,
 		Architecture: mesg.Architecture,
 		MesgNum:      mesg.Num,
 	}
@@ -120,12 +80,66 @@ func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
 	return
 }
 
+// Fit represents a structure for Fit Files.
+type Fit struct {
+	FileHeader FileHeader // File Header contains either 12 or 14 bytes
+	Messages   []Message  // Messages.
+	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
+}
+
+// WithMessages set Messages and return the pointer to the Fit.
+func (f *Fit) WithMessages(messages ...Message) *Fit {
+	f.Messages = make([]Message, len(messages))
+	copy(f.Messages, messages)
+	return f
+}
+
+// FileHeader is a Fit's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
+type FileHeader struct {
+	Size            byte   // Header size either 12 (legacy) or 14.
+	ProtocolVersion byte   // The Fit Protocol version which is being used to encode the Fit file.
+	ProfileVersion  uint16 // The Fit Profile Version (associated with data defined in Global Fit Profile).
+	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
+	DataType        string // ".FIT" (a string constant)
+	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity if the header. (this field will be automatically updated by the encoder)
+}
+
+// MessageDefinition is the definition of the upcoming data messages.
+type MessageDefinition struct {
+	Header                    byte                       // The message definition header with mask 0b01000000.
+	Reserved                  byte                       // Currently undetermined; the default value is 0.
+	Architecture              byte                       // The Byte Order to be used to decode the values of both this message definition and the upcoming message. (0: Little-Endian, 1: Big-Endian)
+	MesgNum                   typedef.MesgNum            // Global Message Number defined by factory (retrieved from Profile.xslx). (endianness of this 2 Byte value is defined in the Architecture byte)
+	FieldDefinitions          []FieldDefinition          // List of the field definition
+	DeveloperFieldDefinitions []DeveloperFieldDefinition // List of the developer field definition (only if Developer Data Flag is set in Header)
+}
+
+// Clone clones MessageDefinition
+func (m MessageDefinition) Clone() MessageDefinition {
+	m.FieldDefinitions = slices.Clone(m.FieldDefinitions)
+	m.DeveloperFieldDefinitions = slices.Clone(m.DeveloperFieldDefinitions)
+	return m
+}
+
+// FieldDefinition is the definition of the upcoming field within the message's structure.
+type FieldDefinition struct {
+	Num      byte              // The field definition number
+	Size     byte              // The size of the upcoming value
+	BaseType basetype.BaseType // The type of the upcoming value to be represented
+}
+
+// FieldDefinition is the definition of the upcoming developer field within the message's structure.
+type DeveloperFieldDefinition struct { // 3 bits
+	Num                byte // Map to the `field_definition_number` of a `field_description` Message.
+	Size               byte // Size (in bytes) of the specified FIT message’s field
+	DeveloperDataIndex byte // Maps to the `developer_data_index`` of a `developer_data_id` Message
+}
+
 // Message is a FIT protocol message containing the data defined in the Message Definition
 type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
-	Name            string           // The Name of the Global Message Number.
 	Num             typedef.MesgNum  // Global Message Number defined in Global Fit Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
-	LocalNum        byte             // Only used as a reference for its definition message during decoding and encoding.
+	Reserved        byte             // Currently undetermined; the default value is 0.
 	Architecture    byte             // Architecture type / Endianess. Must be the same
 	Fields          []Field          // List of Field
 	DeveloperFields []DeveloperField // List of DeveloperField
@@ -240,7 +254,7 @@ func (f Field) WithValue(v any) Field {
 func (f *Field) SubFieldSubtitution(mesgRef *Message) (*SubField, bool) {
 	for i := range f.SubFields {
 		subField := &f.SubFields[i]
-		for j := range subField.Maps {
+		for j := 0; j < len(subField.Maps); j++ {
 			smap := &subField.Maps[j]
 			fieldRef, ok := mesgRef.FieldByNum(smap.RefFieldNum)
 			if !ok {

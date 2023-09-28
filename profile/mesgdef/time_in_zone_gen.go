@@ -65,7 +65,7 @@ func NewTimeInZone(mesg proto.Message) *TimeInZone {
 		15:  basetype.Uint16Invalid, /* FunctionalThresholdPower */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

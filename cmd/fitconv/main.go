@@ -6,7 +6,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -78,13 +77,14 @@ func main() {
 
 	bw := bufferedwriter.NewSize(cf, 1000<<10)
 	csvconv := csv.NewConverter(bw)
+
 	dec := decoder.New(bufio.NewReaderSize(ff, 1000<<10),
 		decoder.WithMesgDefListener(csvconv),
 		decoder.WithMesgListener(csvconv),
 		decoder.WithBroadcastOnly(),
 	)
 
-	_, err = dec.Decode(context.Background())
+	_, err = dec.Decode()
 	if err != nil {
 		fmt.Printf("decode failed: %v\n", err)
 		return

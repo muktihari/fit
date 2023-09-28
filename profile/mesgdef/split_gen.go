@@ -41,7 +41,7 @@ func NewSplit(mesg proto.Message) *Split {
 		9: basetype.Uint32Invalid, /* StartTime */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

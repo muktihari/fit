@@ -57,7 +57,7 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 		12: false,                  /* GrouptrackEnabled */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

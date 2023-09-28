@@ -41,7 +41,7 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 		4: basetype.Uint8Invalid,   /* DeviceIndex */
 	}
 
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		if mesg.Fields[i].Value == nil {
 			continue // keep the invalid value
 		}

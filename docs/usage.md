@@ -1,19 +1,24 @@
 # Usage
+
 Table of Contents:
+
 1. [Dicoding](./usage.md#Decoding)
-    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
-    - [Decode to Common File Types](#Decode-to-Common-File-Types) (It is partial)
-    - [Peek FileId](#Peek-FileId)
-    - [Available Decode Options](#Available-Decode-Options)
-2. [Encoding](#Encoding) 
-    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
-    - [Encode Common File Types](#) (It has not been developed yet)
-    - [Available Encode Options](#Available-Encode-Options)
+   - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
+   - [Decode to Common File Types](#Decode-to-Common-File-Types) (Currently only 4 common file types are defined)
+   - [Peek FileId](#Peek-FileId)
+   - [Available Decode Options](#Available-Decode-Options)
+2. [Encoding](#Encoding)
+   - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
+   - [Encode Common File Types](#) (It has not been developed yet)
+   - [Available Encode Options](#Available-Encode-Options)
 
 ## Decoding
+
 ### Decode RAW Protocol Messages
-Decode as RAW Protocol Messages allows us to interact with FIT files through their original protocol message structures 
+
+Decode as RAW Protocol Messages allows us to interact with FIT files through their original protocol message structures
 without the needs to do conversions.
+
 ```go
 package main
 
@@ -36,7 +41,7 @@ func main() {
 
     dec := decoder.New(bufio.NewReader(f))
 
-    fit, err := dec.Decode(context.Background())
+    fit, err := dec.Decode()
     if err != nil {
         panic(err)
     }
@@ -54,7 +59,9 @@ func main() {
 ```
 
 ### Decode to Common File Types
+
 Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and more, which group protocol messages based on specific purposes.
+
 ```go
 package main
 
@@ -83,13 +90,13 @@ func main() {
         decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
     )
 
-    _, err = dec.Decode(context.Background())
+    _, err = dec.Decode()
     if err != nil {
         panic(err)
     }
 
     // The resulting Activity File can be retrieved after decoding process completed.
-    activity := al.File() 
+    activity := al.File()
 
     fmt.Printf("File Type: %s\n", activity.FileId.Type)
     fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
@@ -109,7 +116,7 @@ func main() {
     // Sessions count: 1
     // Laps count: 1
     // Records count: 3601
-    // 
+    //
     // Sample value of record[100]:
     //   Lat: 0 semicircles
     //   Long: 10717 semicircles
@@ -120,7 +127,9 @@ func main() {
 ```
 
 ### Peek FileId
-We don't need to decode the entire Fit file to verify its type. Instead, we can use the 'PeekFileId' method to check the corresponding type. After invoking this method, we can decide whether to proceed with decoding the file or to stop. If we choose to continue, Decode picks up  where this left then continue decoding next messages instead of starting from zero.
+
+We don't need to decode the entire Fit file to verify its type. Instead, we can use the 'PeekFileId' method to check the corresponding type. After invoking this method, we can decide whether to proceed with decoding the file or to stop. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
+
 ```go
 package main
 
@@ -148,7 +157,7 @@ func main() {
         decoder.WithBroadcastOnly(),
     )
 
-    fileId, err = dec.PeekFileId(context.Background())
+    fileId, err = dec.PeekFileId()
     if err != nil {
         panic(err)
     }
@@ -160,84 +169,98 @@ func main() {
 
     if fileId.Type != typedef.FileActivity {
         _ = al.File() // Note: It is recommended to call this method to release the listener's channel.
-        return // Let's stop. 
+        return // Let's stop.
     }
-        
+
     // It's an Activity File, let's Decode it.
-    _, err = dec.Decode(context.Background())
+    _, err = dec.Decode()
     // ...
 }
 ```
 
 ### Available Decode Options
-1. __WithFactory__: allow us to use custom Factory, for example if we are working with multiple manufacturer specific messages at the same time.
-    
-    Example
-    ```go
-    fac := factory.New()
-	fac.RegisterMesg(proto.Message{
-        Num:  65281,
-        Name: "Manufacturer specific message",
-        Fields: []proto.Field{
-            {
-                FieldBase: &proto.FieldBase{
-                    Num:    253,
-                    Name:   "Timestamp",
-                    Type:   profile.Uint32,
-                    Size:   4,
-                    Scale:  1,
-                    Offset: 0,
-                    Units:  "s",
-                },
-            },
-        },
-    })
 
-    dec := decoder.New(f, decoder.WithFactory(fac))
-    ```
-1. __WithMesgListener__: adds message listener to the listener pool so that we can receive the messages as soon as it is decoded.
+1. **WithFactory**: allow us to use custom Factory, for example if we are working with multiple manufacturer specific messages at the same time.
 
-    Example:
-    ```go
-    al := filedef.NewListener(filedef.NewActivity())
-    dec := decoder.New(f,
-        decoder.WithMesgListener(al),
-    )
-    ```
-1. __WithMesgDefListener__: adds message definition listener to the listener pool so that we can receive the message definitions as soon as it is decoded.
+   Example
 
-    Example:
-    ```go
-    csvconv := csv.NewConverter(bw)
-	defer csvconv.Wait()
+   ```go
+   fac := factory.New()
+   fac.RegisterMesg(proto.Message{
+       Num:  65281,
+       Name: "Manufacturer specific message",
+       Fields: []proto.Field{
+           {
+               FieldBase: &proto.FieldBase{
+                   Num:    253,
+                   Name:   "Timestamp",
+                   Type:   profile.Uint32,
+                   Size:   4,
+                   Scale:  1,
+                   Offset: 0,
+                   Units:  "s",
+               },
+           },
+       },
+   })
 
-	dec := decoder.New(f,
-        decoder.WithMesgDefListener(csvconv),
-        decoder.WithMesgListener(csvconv),
-	)
-    ```
-1. __WithBroadcastOnly__: directs the decoder to only broadcast the messages without retaining them.
+   dec := decoder.New(f, decoder.WithFactory(fac))
+   ```
 
-    Example:
-    ```go
-    al := filedef.NewListener(filedef.NewActivity())
-    dec := decoder.New(f,
-        decoder.WithMesgListener(al),
-        decoder.WithBroadcastOnly(),
-    )
-    ```
-1. __WithIgnoreChecksum__: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
+1. **WithMesgListener**: adds message listener to the listener pool so that we can receive the messages as soon as it is decoded.
 
-    Example:
-    Example:
-    ```go
-    dec := decoder.New(f, decoder.WithIgnoreChecksum())
-    ```
+   Example:
+
+   ```go
+   al := filedef.NewListener(filedef.NewActivity())
+   dec := decoder.New(f,
+       decoder.WithMesgListener(al),
+   )
+   ```
+
+1. **WithMesgDefListener**: adds message definition listener to the listener pool so that we can receive the message definitions as soon as it is decoded.
+
+   Example:
+
+   ```go
+   csvconv := csv.NewConverter(bw)
+   defer csvconv.Wait()
+
+   dec := decoder.New(f,
+       decoder.WithMesgDefListener(csvconv),
+       decoder.WithMesgListener(csvconv),
+   )
+   ```
+
+1. **WithBroadcastOnly**: directs the decoder to only broadcast the messages without retaining them.
+
+   Example:
+
+   ```go
+   al := filedef.NewListener(filedef.NewActivity())
+   dec := decoder.New(f,
+       decoder.WithMesgListener(al),
+       decoder.WithBroadcastOnly(),
+   )
+   ```
+
+1. **WithIgnoreChecksum**: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
+
+   Example:
+   Example:
+
+   ```go
+   dec := decoder.New(f, decoder.WithIgnoreChecksum())
+   ```
 
 ## Encoding
+
 Note: By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
+
 ### Encode RAW Protocol Messages
+
 Example of encoding fit by self declaring the protocol messages, this is to show how we can compose the message using this SDK.
+
 ```go
 
 package main
@@ -296,53 +319,64 @@ func main() {
     defer bw.Flush() // write any buffered data to the underlying io.Writer.
 
     enc := encoder.New(bw)
-    if err := enc.Encode(context.Background(), fit); err != nil {
+    if err := enc.Encode(, fit); err != nil {
         panic(err)
     }
 }
 ```
 
 ### Available Encode Options
-1. __WithProtocolVersion__: directs the Encoder to use specific Protocol Version (default: proto.V1).
 
-    Example:
-    ```go
-    enc := encoder.New(f, encoder.WithProtocolVersion(proto.V2))
-    ```
-1. __WithMessageValidator__: directs the Encoder to use this message validator instead of the default one.
+1. **WithProtocolVersion**: directs the Encoder to use specific Protocol Version (default: proto.V1).
 
-    Example:
-    ```go
-    enc := encoder.New(f, encoder.WithMessageValidator(
-            encoder.ValidatorWithPreserveInvalidValues()),
-    )
-    ```
-1. __WithBigEndian__: directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
-    
-    Example:
-    ```go
-    enc := encoder.New(f, encoder.WithBigEndian())
-    ```
-1. __WithCompressedTimestampHeader__: directs the Encoder to compress timestamp in header to reduce file size.    
-    Saves 7 bytes per message: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
+   Example:
 
-    Example:
-    ```go
-    enc := encoder.New(f, encoder.WithCompressedTimestampHeader())
-    ```
-1. __WithNormalHeader__: directs the Encoder to use NormalHeader for encoding the message using 
-    specified multiple local message typedef. By default, the Encoder uses local message type 0. 
-    This option allows users to specify values between 0-15 (while entering zero is equivalent to using 
-    the default option, nothing is changed). Using multiple local message types optimizes file size by 
-    avoiding the need to interleave different message typedef.
+   ```go
+   enc := encoder.New(f, encoder.WithProtocolVersion(proto.V2))
+   ```
 
-    Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of 
-    local message types in a file. For instance, embedded devices may only support decoding data 
-    from local message type 0. Additionally, multiple local message types should be avoided in 
-    file types like settings, where messages of the same type can be grouped together.
+1. **WithMessageValidator**: directs the Encoder to use this message validator instead of the default one.
 
-    Example:
-    ```go
-    enc := encoder.New(f, encoder.WithNormalHeader(4)) // 0-15
-    ```
-    Note: we can only use either WithCompressedTimestampHeader or WithNormalHeader, can't use both at the same time.
+   Example:
+
+   ```go
+   enc := encoder.New(f, encoder.WithMessageValidator(
+           encoder.ValidatorWithPreserveInvalidValues()),
+   )
+   ```
+
+1. **WithBigEndian**: directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
+
+   Example:
+
+   ```go
+   enc := encoder.New(f, encoder.WithBigEndian())
+   ```
+
+1. **WithCompressedTimestampHeader**: directs the Encoder to compress timestamp in header to reduce file size.  
+   Saves 7 bytes per message: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
+
+   Example:
+
+   ```go
+   enc := encoder.New(f, encoder.WithCompressedTimestampHeader())
+   ```
+
+1. **WithNormalHeader**: directs the Encoder to use NormalHeader for encoding the message using
+   specified multiple local message typedef. By default, the Encoder uses local message type 0.
+   This option allows users to specify values between 0-15 (while entering zero is equivalent to using
+   the default option, nothing is changed). Using multiple local message types optimizes file size by
+   avoiding the need to interleave different message typedef.
+
+   Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of
+   local message types in a file. For instance, embedded devices may only support decoding data
+   from local message type 0. Additionally, multiple local message types should be avoided in
+   file types like settings, where messages of the same type can be grouped together.
+
+   Example:
+
+   ```go
+   enc := encoder.New(f, encoder.WithNormalHeader(4)) // 0-15
+   ```
+
+   Note: we can only use either WithCompressedTimestampHeader or WithNormalHeader, can't use both at the same time.
