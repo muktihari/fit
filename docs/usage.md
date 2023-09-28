@@ -4,7 +4,7 @@ Table of Contents:
 
 1. [Dicoding](./usage.md#Decoding)
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
-   - [Decode to Common File Types](#Decode-to-Common-File-Types) (Currently only 4 common file types are defined)
+   - [Decode to Common File Types](#Decode-to-Common-File-Types) (Currently only 3 common file types are defined)
    - [Peek FileId](#Peek-FileId)
    - [Available Decode Options](#Available-Decode-Options)
 2. [Encoding](#Encoding)
@@ -319,7 +319,7 @@ func main() {
     defer bw.Flush() // write any buffered data to the underlying io.Writer.
 
     enc := encoder.New(bw)
-    if err := enc.Encode(, fit); err != nil {
+    if err := enc.Encode(fit); err != nil {
         panic(err)
     }
 }
