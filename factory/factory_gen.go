@@ -103,14 +103,18 @@ func createUnknownField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return proto.Field{FieldBase: &proto.FieldBase{Name: NameUnknown, Num: num, Scale: 1, Offset: 0}}
 }
 
-// RegisterMesg registers manufacturer specific message within available range between 0xFF00 - 0xFFFE.
-// Return an error if num is outside that range. If same mesg number is given, it will replace the old mesg of the same number.
+// RegisterMesg registers a new message that is not defined in the profile.xlsx.
+// You can not edit or replace existing message in the factory, including the messages you have registered.
+// If you intend to edit your own messages, create a new factory instance using New() and define the new message definitions on it.
 //
 // By registering, any Fit file containing these messages can be recognized instead of returning "unknown" message.
 func (f *Factory) RegisterMesg(mesg proto.Message) error {
-	if mesg.Num < typedef.MesgNumMfgRangeMin || mesg.Num > typedef.MesgNumMfgRangeMax {
-		return fmt.Errorf("could not register mesg num \"%#X\", available range: %#X-%#X: %w",
-			mesg.Num, typedef.MesgNumMfgRangeMin, typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
+	if mesg.Num > typedef.MesgNumMfgRangeMax {
+		return fmt.Errorf("could not register outside max range: %d", typedef.MesgNumMfgRangeMax)
+	}
+
+	if f.mesgs[mesg.Num].Num == mesg.Num {
+		return fmt.Errorf("could not register to an existing message: %d (%s)", mesg.Num, mesg.Num)
 	}
 
 	mesg = mesg.Clone()

@@ -96,15 +96,21 @@ func ListFile() []File {
 	return vs
 }
 
-// RegisterMfgRange registers manufacturer specific typedef so that the value can be recognized instead of getting Invalid value,
-// while you define the constants somewhere else (not a must but preferred to tracks your own specifications).
+// FileRegister registers a manufacturer specific File so that the value can be recognized.
+// It is recommended to define the constants somewhere else to track your own specifications.
 //
 // This is intended for those who prefer using this SDK as it is without the need to generate custom SDK using cmd/fitgen.
-func FileRegisterMfgRange(v File, s string) error {
-	if v < FileMfgRangeMin || v > FileMfgRangeMax {
-		return fmt.Errorf("v is outside available range %#X-%#X", FileMfgRangeMin, FileMfgRangeMax)
+func FileRegister(v File, s string) error {
+	if v >= FileInvalid {
+		return fmt.Errorf("could not register outside max range: %d", FileInvalid)
 	}
+
+	if str, ok := filetostrs[v]; ok {
+		return fmt.Errorf("could not register to an existing File: %d (%s)", v, str)
+	}
+
 	filetostrs[v] = s
 	strtofile[s] = v
+
 	return nil
 }

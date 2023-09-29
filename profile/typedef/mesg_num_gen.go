@@ -266,15 +266,21 @@ func ListMesgNum() []MesgNum {
 	return vs
 }
 
-// RegisterMfgRange registers manufacturer specific typedef so that the value can be recognized instead of getting Invalid value,
-// while you define the constants somewhere else (not a must but preferred to tracks your own specifications).
+// MesgNumRegister registers a manufacturer specific MesgNum so that the value can be recognized.
+// It is recommended to define the constants somewhere else to track your own specifications.
 //
 // This is intended for those who prefer using this SDK as it is without the need to generate custom SDK using cmd/fitgen.
-func MesgNumRegisterMfgRange(v MesgNum, s string) error {
-	if v < MesgNumMfgRangeMin || v > MesgNumMfgRangeMax {
-		return fmt.Errorf("v is outside available range %#X-%#X", MesgNumMfgRangeMin, MesgNumMfgRangeMax)
+func MesgNumRegister(v MesgNum, s string) error {
+	if v >= MesgNumInvalid {
+		return fmt.Errorf("could not register outside max range: %d", MesgNumInvalid)
 	}
+
+	if str, ok := mesgnumtostrs[v]; ok {
+		return fmt.Errorf("could not register to an existing MesgNum: %d (%s)", v, str)
+	}
+
 	mesgnumtostrs[v] = s
 	strtomesgnum[s] = v
+
 	return nil
 }
