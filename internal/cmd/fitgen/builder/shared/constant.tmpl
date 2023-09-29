@@ -125,18 +125,30 @@ func ({{ $r }} {{ .Type }}) String() string {
 }
 {{ end }}
 
-// Registrer Manufacturer Specific Range:
+// Registrer Manufacturer Specific Type:
 {{ define "register" }}
-// RegisterMfgRange registers manufacturer specific {{ .Package }} so that the value can be recognized instead of getting Invalid value, 
-// while you define the constants somewhere else (not a must but preferred to tracks your own specifications).
+// {{ .Type }}Register registers a manufacturer specific {{ .Type }} so that the value can be recognized. 
+// It is recommended to define the constants somewhere else to track your own specifications.
 // 
 // This is intended for those who prefer using this SDK as it is without the need to generate custom SDK using cmd/fitgen.
-func {{ .Type }}RegisterMfgRange(v {{ .Type }}, s string) error {
-	if v < {{ .Type }}MfgRangeMin || v > {{ .Type }}MfgRangeMax {
-		return fmt.Errorf("v is outside available range %#X-%#X", {{ .Type }}MfgRangeMin, {{ .Type }}MfgRangeMax )
+func {{ .Type }}Register(v {{ .Type }}, s string) error {
+	if v >= {{ .Type}}Invalid {
+		return fmt.Errorf("could not register outside max range: %d", {{ .Type}}Invalid)
 	}
+
+	{{ if eq .StringerMode 0x0 -}} 
+		if str, ok := {{ .Type | ToLower }}tostrs[v]; ok {
+			return fmt.Errorf("could not register to an existing {{ .Type }}: %d (%s)", v, str)
+		}
+	{{ else -}}
+		if str := {{ .Type | ToLower }}tostrs[v]; v != "" {
+			return fmt.Errorf("could not register to an existing {{ .Type }}: %d (%s)", v, str)
+		}
+	{{ end }}
+
 	{{ .Type | ToLower }}tostrs[v] = s
 	strto{{ .Type | ToLower }}[s] = v
+
 	return nil
 }
 {{ end }}
