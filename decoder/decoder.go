@@ -554,38 +554,29 @@ func isEligibleToAccumulate(accumulate bool, baseType basetype.BaseType) bool {
 }
 
 func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
-	var bitVals = map[byte]int64{}
+	bitVal, ok := typeconv.NumericToInt64(containingField.Value)
+	if !ok {
+		return
+	}
+
 	for i := range components {
 		component := &components[i]
-		if component.FieldNum == basetype.ByteInvalid {
-			continue
-		}
-
-		if _, ok := bitVals[containingField.Num]; !ok {
-			val, ok := typeconv.NumericToInt64(containingField.Value)
-			if !ok {
-				continue
-			}
-
-			bitVals[containingField.Num] = val
-		}
 
 		componentField := d.factory.CreateField(mesg.Num, component.FieldNum)
 		componentField.IsExpandedField = true
 
-		val := bitVals[containingField.Num]
 		if isEligibleToAccumulate(component.Accumulate, componentField.Type.BaseType()) {
-			val = d.accumulator.Accumulate(mesg.Num, component.FieldNum, val, component.Bits)
-			bitVals[containingField.Num] = val
+			bitVal = d.accumulator.Accumulate(mesg.Num, component.FieldNum, bitVal, component.Bits)
 		}
 
+		var val = bitVal
 		if len(components) > 1 {
-			if val == 0 {
+			if bitVal == 0 {
 				break // no more bits to shift
 			}
-			var mask int64 = (1 << component.Bits) - 1                                    // e.g. (1 << 8) - 1     = 255
-			val = val & mask                                                              // e.g. 0x27010E08 & 255 = 0x08
-			bitVals[containingField.Num] = bitVals[containingField.Num] >> component.Bits // e.g. 0x27010E08 >> 8  = 0x27010E
+			var mask int64 = (1 << component.Bits) - 1 // e.g. (1 << 8) - 1     = 255
+			val = val & mask                           // e.g. 0x27010E08 & 255 = 0x08
+			bitVal = bitVal >> component.Bits          // e.g. 0x27010E08 >> 8  = 0x27010E
 		}
 
 		// QUESTION: Should we expand componentField.Components too (?)
