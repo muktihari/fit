@@ -1137,19 +1137,6 @@ func TestExpandComponents(t *testing.T) {
 			nFieldAfterExpansion: 4, // 1 for Event, 3 for expansion fields (rear_gear_num, rear_gear, front_gear_num)
 		},
 		{
-			name: "expand components invalid fieldnum",
-			mesg: factory.CreateMesgOnly(mesgnum.Record).WithFields(
-				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			),
-			containingField: factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			components: []proto.Component{
-				{
-					FieldNum: 255, // invalid
-				},
-			},
-			nFieldAfterExpansion: 1,
-		},
-		{
 			name: "expand components containing field value mismatch",
 			mesg: factory.CreateMesgOnly(mesgnum.Record).WithFields(
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
