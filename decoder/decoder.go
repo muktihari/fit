@@ -438,7 +438,12 @@ func (d *Decoder) decodeMessageData(header byte) error {
 
 	mesg := d.factory.CreateMesgOnly(mesgDef.MesgNum)
 	mesg.Reserved = mesgDef.Reserved
-	mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+bufferSizeFields)
+
+	if d.options.shouldExpandComponent {
+		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+bufferSizeFields)
+	} else {
+		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions))
+	}
 
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
 		timeOffset := header & proto.CompressedTimeMask
