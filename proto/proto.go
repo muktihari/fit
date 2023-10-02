@@ -223,7 +223,7 @@ func (m Message) Clone() Message {
 }
 
 // FieldBase acts as a fundamental representation of a field as defined in the Global Fit Profile.
-// The value of this representation should not be altered,except in the case of an unknown field.
+// The value of this representation should not be altered, except in the case of an unknown field.
 type FieldBase struct {
 	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
 	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific number (defined by manufacturer). (255 == invalid)
@@ -239,9 +239,22 @@ type FieldBase struct {
 
 // Field represents the full representation of a field, as specified in the Global Fit Profile.
 type Field struct {
-	*FieldBase           // PERF: Embedding the struct as a pointer to avoid runtime duffcopy when creating a field since FieldBase should not be altered.
-	Value           any  // The decoded value, should always be any of these: any, []any, []byte. The underlying value of any will always a primitive-types: int8, uint16, etc.
-	IsExpandedField bool // A flag to detect whether this field is generated through component expansion.
+	// PERF: Embedding the struct as a pointer to avoid runtime duffcopy when creating a field since FieldBase should not be altered.
+	*FieldBase
+
+	// The decoded value, composed by decoder, will always in a form of a primitive-type (or a slice of primitive types):
+	// - int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64 and string.
+	// - []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []float32 and []float64.
+	//   (there is no []string)
+	//
+	// When the field is manually composed, you may use type-defined value as long as it refer to any of primitive-types
+	// (e.g. typedef.FileActivity). However, please note that marshaling type-defined value requires reflection.
+	//
+	// NOTE: You can not use distinct types such as int and uint.
+	Value any
+
+	// A flag to detect whether this field is generated through component expansion.
+	IsExpandedField bool
 }
 
 // WithValue returns a Field containing v value.
@@ -254,7 +267,7 @@ func (f Field) WithValue(v any) Field {
 func (f *Field) SubFieldSubtitution(mesgRef *Message) (*SubField, bool) {
 	for i := range f.SubFields {
 		subField := &f.SubFields[i]
-		for j := 0; j < len(subField.Maps); j++ {
+		for j := range subField.Maps {
 			smap := &subField.Maps[j]
 			fieldRef, ok := mesgRef.FieldByNum(smap.RefFieldNum)
 			if !ok {
