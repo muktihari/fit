@@ -243,7 +243,7 @@ func (d *Decoder) Next() bool {
 	d.initDecodeHeaderOnce() // reset to enable invocation.
 
 	// err is saved in the func, any exported will call this func anyway.
-	return d.decodeHeaderOnce() != nil
+	return d.decodeHeaderOnce() == nil
 }
 
 // DecodeWithContext wraps Decode to respect context propagation.
