@@ -423,7 +423,10 @@ func TestNext(t *testing.T) {
 	}
 
 	// Check whether after decode, fields are reset and next sequence is retrieved.
-	dec.Next()
+
+	if !dec.Next() {
+		t.Fatalf("should have next, return false")
+	}
 
 	if prevAccumulator == dec.accumulator {
 		t.Fatalf("expected new accumulator got same")
