@@ -112,7 +112,7 @@ After the program has been built or installed, you can call the fitactivity exec
 
 1. Using -o argument
    ```sh
-   fitactivity --combine -o result.fit part1.fit, part2.fit
+   fitactivity --combine -o result.fit part1.fit part2.fit
    ```
 2. Using redirection pipe '>'
    ```sh
