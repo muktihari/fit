@@ -18,6 +18,14 @@ This SDK is designed with efficiency in mind, but it places a higher priority on
 
 Please see [Usage](/docs/usage.md).
 
+## CLIs
+
+We provides some CLI programs to interact with FIT files that can be found in `cmd` folder.
+
+1. `fitconv`: Converts FIT file to a CSV file. [README.md](/cmd/fitconv/README.md)
+2. `fitprint`: Print FIT file into stdout in human-readable format. [README.md](/cmd/fitprint/README.md)
+3. `fitactivity`: Combine multiple FIT activity files into one continoues FIT activity. [README.md](/cmd/fitactivity/README.md)
+
 ## Generate Custom FIT SDK
 
 Please see [Generate Custom FIT SDK](/docs/generating_code.md#Generate-Custom-FIT-SDK)
