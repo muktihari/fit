@@ -158,28 +158,31 @@ func TestMessageFieldByNum(t *testing.T) {
 	}
 }
 
-func TestMessageRemoveByNum(t *testing.T) {
+func TestMessageRemoveFieldByNum(t *testing.T) {
 	tt := []struct {
 		name     string
 		mesg     proto.Message
 		fieldNum byte
 		ok       bool
+		size     int
 	}{
 		{
-			name: "RemoveByNum found",
+			name: "remove existing field",
 			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventEventType,
-			ok:       true,
+			ok:       false,
+			size:     0,
 		},
 		{
-			name: "FieldByNum not found",
+			name: "remove field that is not exist",
 			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventData,
 			ok:       false,
+			size:     1,
 		},
 	}
 
@@ -189,6 +192,9 @@ func TestMessageRemoveByNum(t *testing.T) {
 			_, ok := tc.mesg.FieldByNum(tc.fieldNum)
 			if ok != tc.ok {
 				t.Fatalf("expected: %t, got: %t", tc.ok, ok)
+			}
+			if len(tc.mesg.Fields) != tc.size {
+				t.Fatalf("expected len after removal: %d, got: %d", tc.size, len(tc.mesg.Fields))
 			}
 		})
 	}
