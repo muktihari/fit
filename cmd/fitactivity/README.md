@@ -106,13 +106,13 @@ go install .
 
 ## Usage Examples
 
-After the program has been built or installed, you can call the activity executable.
+After the program has been built or installed, you can call the fitactivity executable.
 
 ### Combine FIT files
 
-1. Using --out argument
+1. Using -o argument
    ```sh
-   fitactivity --combine --out result.fit part1.fit, part2.fit
+   fitactivity --combine -o result.fit part1.fit, part2.fit
    ```
 2. Using redirection pipe '>'
    ```sh
@@ -150,5 +150,5 @@ After the program has been built or installed, you can call the activity executa
 This will combine the activity and then conceal position of the resulting `result.fit`
 
 ```sh
-fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit, part2.fit > result.fit
+fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit > result.fit
 ```
