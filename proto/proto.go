@@ -188,7 +188,7 @@ func (m *Message) FieldByNum(num byte) (*Field, bool) {
 func (m *Message) RemoveFieldByNum(num byte) {
 	var idx *int
 	for i := range m.Fields {
-		if m.Fields[i].Num != num {
+		if m.Fields[i].Num == num {
 			idx = &i
 			break
 		}
