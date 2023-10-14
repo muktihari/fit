@@ -124,35 +124,72 @@ func TestMessageWithFieldValues(t *testing.T) {
 }
 
 func TestMessageFieldByNum(t *testing.T) {
+	sharedField := factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart)
+
 	tt := []struct {
 		name     string
 		mesg     proto.Message
 		fieldNum byte
-		ok       bool
+		field    *proto.Field
 	}{
 		{
 			name: "FieldByNum found",
 			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
-				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
+				sharedField,
 			),
 			fieldNum: fieldnum.EventEventType,
-			ok:       true,
+			field:    &sharedField,
 		},
 		{
 			name: "FieldByNum not found",
 			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
-				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
+				sharedField,
 			),
 			fieldNum: fieldnum.EventData,
-			ok:       false,
+			field:    nil,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			_, ok := tc.mesg.FieldByNum(tc.fieldNum)
-			if ok != tc.ok {
-				t.Fatalf("expected: %t, got: %t", tc.ok, ok)
+			field := tc.mesg.FieldByNum(tc.fieldNum)
+			if diff := cmp.Diff(tc.field, field); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestMessageFieldValueByNum(t *testing.T) {
+	tt := []struct {
+		name     string
+		mesg     proto.Message
+		fieldNum byte
+		value    any
+	}{
+		{
+			name: "FieldValueByNum found",
+			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
+			),
+			fieldNum: fieldnum.EventEventType,
+			value:    typedef.EventTypeStart,
+		},
+		{
+			name: "FieldValueByNum not found",
+			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
+			),
+			fieldNum: fieldnum.EventData,
+			value:    nil,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			value := tc.mesg.FieldValueByNum(tc.fieldNum)
+			if value != tc.value {
+				t.Fatalf("expected value: %T(%v), got: %T(%v)", tc.value, tc.value, value, value)
 			}
 		})
 	}
@@ -163,7 +200,7 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 		name     string
 		mesg     proto.Message
 		fieldNum byte
-		ok       bool
+		field    *proto.Field
 		size     int
 	}{
 		{
@@ -172,7 +209,7 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventEventType,
-			ok:       false,
+			field:    nil,
 			size:     0,
 		},
 		{
@@ -181,7 +218,7 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventData,
-			ok:       false,
+			field:    nil,
 			size:     1,
 		},
 	}
@@ -189,9 +226,9 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mesg.RemoveFieldByNum(tc.fieldNum)
-			_, ok := tc.mesg.FieldByNum(tc.fieldNum)
-			if ok != tc.ok {
-				t.Fatalf("expected: %t, got: %t", tc.ok, ok)
+			field := tc.mesg.FieldByNum(tc.fieldNum)
+			if diff := cmp.Diff(tc.field, field); diff != "" {
+				t.Fatal(diff)
 			}
 			if len(tc.mesg.Fields) != tc.size {
 				t.Fatalf("expected len after removal: %d, got: %d", tc.size, len(tc.mesg.Fields))

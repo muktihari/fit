@@ -174,14 +174,25 @@ func (m Message) WithDeveloperFields(developerFields ...DeveloperField) Message 
 	return m
 }
 
-// FieldByNum returns a pointer to the Field in a Message, if not found return false.
-func (m *Message) FieldByNum(num byte) (*Field, bool) {
+// FieldByNum returns a pointer to the Field in a Message, if not found return nil.
+func (m *Message) FieldByNum(num byte) *Field {
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {
-			return &m.Fields[i], true
+			return &m.Fields[i]
 		}
 	}
-	return nil, false
+	return nil
+}
+
+// FieldValueByNum returns the value of the Field in a Messsage, if not found return nil.
+func (m *Message) FieldValueByNum(num byte) any {
+	for i := range m.Fields {
+		field := &m.Fields[i]
+		if field.Num == num {
+			return field.Value
+		}
+	}
+	return nil
 }
 
 // RemoveFieldByNum removes Field in a Message by num.
@@ -269,8 +280,8 @@ func (f *Field) SubFieldSubtitution(mesgRef *Message) (*SubField, bool) {
 		subField := &f.SubFields[i]
 		for j := range subField.Maps {
 			smap := &subField.Maps[j]
-			fieldRef, ok := mesgRef.FieldByNum(smap.RefFieldNum)
-			if !ok {
+			fieldRef := mesgRef.FieldByNum(smap.RefFieldNum)
+			if fieldRef == nil {
 				return nil, false
 			}
 			if fieldRef.isValueEqualTo(smap.RefFieldValue) {

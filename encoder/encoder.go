@@ -498,8 +498,8 @@ func (e *Encoder) redefineLocalMesgNum(b []byte) (newLocalMesgNum byte, writeabl
 }
 
 func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
-	field, ok := mesg.FieldByNum(fieldnum.TimestampCorrelationTimestamp)
-	if !ok {
+	field := mesg.FieldByNum(fieldnum.TimestampCorrelationTimestamp)
+	if field == nil {
 		return
 	}
 

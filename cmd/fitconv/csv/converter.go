@@ -163,19 +163,19 @@ func (c *Conv) writeMesgDef(mesgDef proto.MessageDefinition) {
 func (c *Conv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition) string {
 	for i := range c.fieldDesciptionMessages {
 		fieldDescMesg := &c.fieldDesciptionMessages[i]
-		devDataIndex, ok := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionDeveloperDataIndex)
-		if !ok {
+		devDataIndex := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionDeveloperDataIndex)
+		if devDataIndex == nil {
 			continue
 		}
-		fieldDefNum, ok := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionFieldDefinitionNumber)
-		if !ok {
+		fieldDefNum := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionFieldDefinitionNumber)
+		if fieldDefNum == nil {
 			continue
 		}
 
 		if typeconv.ToByte[byte](devDataIndex.Value) == devFieldDef.DeveloperDataIndex &&
 			typeconv.ToByte[byte](fieldDefNum.Value) == devFieldDef.Num {
-			fieldName, ok := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionFieldName)
-			if !ok {
+			fieldName := fieldDescMesg.FieldByNum(fieldnum.FieldDescriptionFieldName)
+			if fieldName == nil {
 				break
 			}
 			return typeconv.ToString[string](fieldName.Value)
