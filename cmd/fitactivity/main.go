@@ -84,6 +84,8 @@ func combineAndConcealPosition(paths []string, out string, concealStart, conceal
 		return fmt.Errorf("could not conceal: %v", err)
 	}
 
+	concealer.ConcealLapStartAndEndPosition(fit)
+
 	var fout = os.Stdout // default output to stdout if not specified.
 	if out != "" {
 		fout, err = os.OpenFile(out, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o666)
@@ -133,6 +135,7 @@ func openAndConcealPosition(path string, concealStart, concealEnd uint32) error 
 		if err := concealer.ConcealPosition(fits[i], concealStart, concealEnd); err != nil {
 			return fmt.Errorf("could not conceal fits[%d of %d]: %v", i+1, len(fits), err)
 		}
+		concealer.ConcealLapStartAndEndPosition(fits[i])
 	}
 
 	ext := filepath.Ext(path)

@@ -5,8 +5,8 @@
 package concealer
 
 import (
-	"github.com/muktihari/fit/cmd/fitactivity/finder"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -26,8 +26,11 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 		return nil
 	}
 
-	sessionInfo := finder.FindFirstSessionInfo(fit)
-	for i := sessionInfo.RecordFirstIndex; i <= sessionInfo.RecordLastIndex; i++ {
+	for i := range fit.Messages {
+		if fit.Messages[i].Num != mesgnum.Record {
+			continue
+		}
+
 		if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
 			fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
 			continue
@@ -55,9 +58,12 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 		return nil
 	}
 
-	sessionInfo := finder.FindLastSessionInfo(fit)
 	var lastDistance uint32
-	for i := sessionInfo.RecordLastIndex; i >= sessionInfo.RecordFirstIndex; i-- {
+	for i := len(fit.Messages) - 1; i >= 0; i-- {
+		if fit.Messages[i].Num != mesgnum.Record {
+			continue
+		}
+
 		if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
 			fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
 			continue
@@ -80,4 +86,16 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 	}
 
 	return nil
+}
+
+// ConcealLapStartAndEndPosition removes StartPositionLat, StartPositionLong, EndPositionLat and EndPositionLong from any lap messages.
+func ConcealLapStartAndEndPosition(fit *proto.Fit) {
+	for i := range fit.Messages {
+		if fit.Messages[i].Num == mesgnum.Lap {
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLong)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLong)
+		}
+	}
 }

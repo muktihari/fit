@@ -64,7 +64,7 @@ func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.Wa
 		decoder.WithNoComponentExpansion(),
 	)
 
-	for dec.Next() {
+	for {
 		fileId, err := dec.PeekFileId()
 		if err != nil {
 			resultc <- result{err: err}
@@ -83,5 +83,9 @@ func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.Wa
 		}
 
 		resultc <- result{fit: fit}
+
+		if !dec.Next() {
+			break
+		}
 	}
 }
