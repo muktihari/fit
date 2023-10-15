@@ -26,6 +26,8 @@ We provides some CLI programs to interact with FIT files that can be found in `c
 2. `fitconv`: Converts FIT file to a CSV file, allowing us to read the FIT file in a human-readable format. [README.md](/cmd/fitconv/README.md)
 3. `fitprint`: Print FIT file into stdout in human-readable format. [README.md](/cmd/fitprint/README.md)
 
+> Now, the `fitactivity` and `fitconv` programs are automatically built during release for Linux, Windows, and macOS platforms. They are available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
+
 ## Generate Custom FIT SDK
 
 Please see [Generate Custom FIT SDK](/docs/generating_code.md#Generate-Custom-FIT-SDK)
