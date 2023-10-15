@@ -22,9 +22,9 @@ Please see [Usage](/docs/usage.md).
 
 We provides some CLI programs to interact with FIT files that can be found in `cmd` folder.
 
-1. `fitconv`: Converts FIT file to a CSV file. [README.md](/cmd/fitconv/README.md)
-2. `fitprint`: Print FIT file into stdout in human-readable format. [README.md](/cmd/fitprint/README.md)
-3. `fitactivity`: Combine multiple FIT activity files into one continoues FIT activity. [README.md](/cmd/fitactivity/README.md)
+1. `fitactivity`: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
+2. `fitconv`: Converts FIT file to a CSV file, allowing us to read the FIT file in a human-readable format. [README.md](/cmd/fitconv/README.md)
+3. `fitprint`: Print FIT file into stdout in human-readable format. [README.md](/cmd/fitprint/README.md)
 
 ## Generate Custom FIT SDK
 

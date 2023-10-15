@@ -10,9 +10,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/muktihari/fit/cmd/fitconv/csv"
 	"github.com/muktihari/fit/decoder"
+	"github.com/pkg/profile"
 )
 
 func main() {
@@ -23,11 +25,33 @@ func main() {
 		)
 	}
 
+	var opt string
+	flag.StringVar(&opt, "opt", "", "")
+
 	flag.Parse()
 	paths := flag.Args()
 
 	if len(paths) == 0 {
 		fatalf("missing file argument, e.g.: fitconv Activity.fit\n")
+	}
+
+	switch opt {
+	case "cpu":
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	case "mem":
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	case "clock":
+		defer profile.Start(profile.ClockProfile, profile.ProfilePath(".")).Stop()
+	case "trace":
+		defer profile.Start(profile.TraceProfile, profile.ProfilePath(".")).Stop()
+	case "threadcreation":
+		defer profile.Start(profile.ThreadcreationProfile, profile.ProfilePath(".")).Stop()
+	case "block":
+		defer profile.Start(profile.BlockProfile, profile.ProfilePath(".")).Stop()
+	case "took":
+		defer func(begin time.Time) {
+			fmt.Printf("took: %s\n", time.Since(begin))
+		}(time.Now())
 	}
 
 	for _, path := range paths {

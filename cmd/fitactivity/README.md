@@ -58,20 +58,22 @@ We will combine last session group (include record, event, and lap) of the first
 
 Example:
 
-- File A: swimming, cycling
-- File B: cycling, running
-- File C: running, walking
+- File A: swimming, **cycling**
+- File B: **cycling**, _running_
+- File C: _running_, walking
 - Result: swimming, cycling, running, walking
 
 If the last session sport type is not match with the first session of the next file, error will be returned.
 
 Mismatch example:
 
-- File A: cycling
-- File B: running
+- File A: swimming, **cycling**
+- File B: **running**, walking
 - Result: error sport type mismatch
 
 That is the only guard that we implement, it is user responsibility to select the correct files.
+
+_NOTE: Combining FIT activity files is NOT the same as merging multiple files into a single chained FIT file._
 
 ## Build or Install
 
@@ -81,17 +83,17 @@ That is the only guard that we implement, it is user responsibility to select th
 
 1. MacOS
    ```sh
-   GOOS=darwin GOARCH=amd64 go build -out fitactivity main.go
+   GOOS=darwin GOARCH=amd64 go build -o fitactivity main.go
    ```
 2. Windows
 
    ```sh
-   GOOS=windows GOARCH=amd64 go build -out fitactivity main.go
+   GOOS=windows GOARCH=amd64 go build -o fitactivity main.go
    ```
 
 3. Linux
    ```sh
-   GOOS=linux GOARCH=amd64 go build -out fitactivity main.go
+   GOOS=linux GOARCH=amd64 go build -o fitactivity main.go
    ```
 
 More: [How to build Go Executable for Multiple Platforms](https://www.digitalocean.com/community/tutorials/how-to-build-go-executables-for-multiple-platforms-on-ubuntu-16-04)
@@ -108,7 +110,7 @@ go install .
 
 After the program has been built or installed, you can call the fitactivity executable.
 
-### Combine FIT files
+### Combine Multiple FIT files
 
 1. Using -o argument
    ```sh
@@ -119,36 +121,45 @@ After the program has been built or installed, you can call the fitactivity exec
    fitactivity --combine part1.fit part2.fit > result.fit
    ```
 
-### Conceal Position (Latitude and Longitude)
+### Conceal GPS Position (Latitude and Longitude)
 
-1. Conceal position for 1km from the start position for each files.
+Note: conceal value is in meters
 
-   Results: `part1_concealed_1000_0.fit`, `part2_concealed_1000_0.fit`
+1. Conceal GPS position for 1km away from the actual start position for each files.
 
    ```sh
    fitactivity --conceal-start 1000 part1.fit part2.fit
+
+
+   # ls output
+   # part1.fit part1_concealed_1000_0.fit part2.fit part2_concealed_1000_0.fit
    ```
 
-2. Conceal position for 1km from the end position for each files.
-
-   Results: `part1_concealed_0_1000.fit`, `part2_concealed_0_1000.fit`
+2. Conceal GPS position for 1km away from the actual end position for each files.
 
    ```sh
    fitactivity --conceal-end 1000 part1.fit part2.fit
+
+   # ls output
+   # part1.fit part1_concealed_0_1000.fit part2.fit part2_concealed_0_1000.fit
    ```
 
-3. Conceal position for 1km from both start and end position for each files
-
-   Results: part1_concealed_1000_1000.fit part2_concealed_1000_1000.fit
+3. Conceal GPS position for 1km away from both start and end position for each files
 
    ```sh
    fitactivity --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit
+
+   # ls output
+   # part1.fit part1_concealed_1000_1000.fit part2.fit part2_concealed_1000_1000.fit
    ```
 
-### Combine and Conceal Position
+### Combine Multiple Files and Conceal GPS Position of the Resulting File.
 
-This will combine the activity and then conceal position of the resulting `result.fit`
+This will combine the FIT activity files (`part1.fit` and `part2.fit`) into one continues FIT activity file `result.fit` and then concealing the start and end GPS position of `result.fit` for 1km away from the actual start and end position.
 
 ```sh
 fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit > result.fit
+
+# ls output
+# part1.fit part2.fit result.fit
 ```

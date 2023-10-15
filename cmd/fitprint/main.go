@@ -19,7 +19,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-const usage = "./fitprint activity.fit"
+const usage = "fitprint activity.fit"
 
 func main() {
 	if len(os.Args) == 1 {
@@ -51,14 +51,19 @@ func main() {
 		decoder.WithIgnoreChecksum(),
 	)
 
-	_, err = dec.Decode()
-	if err != nil {
-		fatalf("could not decode: %v\n", err)
+	for {
+		_, err = dec.Decode()
+		if err != nil {
+			fatalf("could not decode: %v\n", err)
+		}
+		if !dec.Next() {
+			break
+		}
 	}
 }
 
 func fatalf(format string, args ...any) {
-	fmt.Printf(format, args...)
+	fmt.Fprintf(os.Stderr, format, args...)
 	os.Exit(1)
 }
 

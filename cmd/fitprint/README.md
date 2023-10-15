@@ -5,7 +5,8 @@ Fitconv prints the FIT file into stdout in human-readable format.
 ## Usage Examples
 
 ```sh
-➜ go run main.go ../../testdata/from_official_sdk/Settings.fit
+go run main.go ../../testdata/from_official_sdk/Settings.fit
+
 # Output:
 # file_id:
 #     manufacturer: 1
