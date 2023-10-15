@@ -20,9 +20,11 @@ First, we will order the files by `FileId.TimeCreated`.
 The first file will be the base for the resulting file and we will combine these following messages from the next FIT files into the resulting file:
 
 - Session: combine session by calculating some fields (list fields will be shown after this)
-- Record: field distance will be calculated before append, the rest will be appended as it is
+- Record: field `distance` will be calculated before append, the rest will be appended as it is
 - Event: append as it is
-- Lap: append as it is
+- Lap: field `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` will be removed only if conceal option is specified, the rest will be appended as it is.
+
+  Why lap positions must be removed? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
 
 Other messages from the next FIT files will not be combined.
 
@@ -77,7 +79,7 @@ _NOTE: Combining FIT activity files is NOT the same as merging multiple files in
 
 ## Build or Install
 
-> Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/install)
+_Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/install)_
 
 ### Build
 
@@ -106,6 +108,8 @@ Or you can install the program instead of manual build, this will build base on 
 go install .
 ```
 
+**Alternatively, now you can just download the the binary from [Release's Assets](https://github.com/muktihari/fit/releases)**
+
 ## Usage Examples
 
 After the program has been built or installed, you can call the fitactivity executable.
@@ -129,7 +133,6 @@ Note: conceal value is in meters
 
    ```sh
    fitactivity --conceal-start 1000 part1.fit part2.fit
-
 
    # ls output
    # part1.fit part1_concealed_1000_0.fit part2.fit part2_concealed_1000_0.fit
