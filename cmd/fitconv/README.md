@@ -7,11 +7,12 @@ Note: Currently only Convert to CSV format is supported, other format might be a
 ## Usage Examples
 
 ```sh
-go run main.go --path activity.fit
+go run main.go activity.fit activity2.fit
 
 # Output:
 # Converted! activity.csv
+# Converted! activity2.csv
 
 ls
-# activity.fit activity.csv
+# activity.fit activity.csv activity2.fit activity2.csv
 ```

@@ -4,12 +4,12 @@ Table of Contents:
 
 1. [Dicoding](./usage.md#Decoding)
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
-   - [Decode to Common File Types](#Decode-to-Common-File-Types) (Currently only 3 common file types are defined)
+   - [Decode to Common File Types](#Decode-to-Common-File-Types)
    - [Peek FileId](#Peek-FileId)
    - [Available Decode Options](#Available-Decode-Options)
 2. [Encoding](#Encoding)
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
-   - [Encode Common File Types](#) (It has not been developed yet)
+   - [Encode Common File Types](#Encode-Common-File-Types)
    - [Available Encode Options](#Available-Encode-Options)
 
 ## Decoding
@@ -58,9 +58,33 @@ func main() {
 }
 ```
 
+#### Decode Chained FIT FIle
+
+If you are uncertain if it's a chained fit file. Create a loop and use dec.Next() to check whether next sequence of bytes are still a valid FIT sequence.
+
+```go
+    ...
+
+    dec := decoder.New(bufio.NewReader(f))
+    for {
+        fit, err := dec.Decode()
+        if err != nil {
+            return err
+        }
+        /* do something with fit */
+        if !dec.Next() {
+            break
+        }
+    }
+
+    ...
+```
+
 ### Decode to Common File Types
 
 Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and more, which group protocol messages based on specific purposes.
+
+_Note: Currently only 3 common file types are defined: Activity, Course & Workout_
 
 ```go
 package main
@@ -323,6 +347,25 @@ func main() {
         panic(err)
     }
 }
+```
+
+### Encode Common File Types
+
+Currently, only Activity Files are supported. Please note that this feature is still under development and has not been tested yet.
+
+```go
+    ...
+
+    /* activity is a *filedef.Activity */
+
+    // Convert back to RAW Protocol Messages
+    fit := activity.ToFit(factory.StandardFactory())
+    enc := encoder.New(bw)
+    if err := enc.Encode(&fit); err != nil {
+        panic(err)
+    }
+
+    ...
 ```
 
 ### Available Encode Options

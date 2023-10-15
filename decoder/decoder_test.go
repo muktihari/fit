@@ -836,6 +836,7 @@ func TestDecodeMessageData(t *testing.T) {
 	tt := []struct {
 		name             string
 		r                io.Reader
+		opts             []Option
 		header           byte
 		mesgdef          *proto.MessageDefinition
 		fieldDescription *mesgdef.FieldDescription
@@ -845,6 +846,24 @@ func TestDecodeMessageData(t *testing.T) {
 		{
 			name:   "decode message data normal header happy flow",
 			r:      fnReaderOK,
+			header: 0,
+			mesgdef: &proto.MessageDefinition{
+				Header: proto.MesgDefinitionMask,
+				// LocalMesgNum: 0,
+				MesgNum: mesgnum.Record,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.RecordTimestamp,
+						Size:     4,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+		},
+		{
+			name:   "decode message data normal header happy flow without component expansions",
+			r:      fnReaderOK,
+			opts:   []Option{WithNoComponentExpansion()},
 			header: 0,
 			mesgdef: &proto.MessageDefinition{
 				Header: proto.MesgDefinitionMask,
@@ -948,7 +967,8 @@ func TestDecodeMessageData(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			dec := New(tc.r, WithMesgListener(fnMesgListener(func(mesg proto.Message) {})))
+			opts := append(tc.opts, WithMesgListener(fnMesgListener(func(mesg proto.Message) {})))
+			dec := New(tc.r, opts...)
 			if tc.mesgdef != nil {
 				if (tc.mesgdef.Header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
 					dec.localMessageDefinitions[(tc.mesgdef.Header&proto.CompressedLocalMesgNumMask)>>proto.CompressedBitShift] = tc.mesgdef

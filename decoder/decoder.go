@@ -270,8 +270,15 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 // To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
 // multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
 //
-//	for dec.Next() {
-//	   fit, err := dec.Decode()
+//	for {
+//	     fit, err := dec.Decode()
+//	     if err != nil {
+//	         return err
+//	     }
+//	     /* do something with fit */
+//	     if !dec.Next() {
+//	         break
+//	     }
 //	}
 func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 	if err = d.decodeHeaderOnce(); err != nil {
