@@ -5,6 +5,7 @@
 package concealer
 
 import (
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -26,26 +27,67 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 		return nil
 	}
 
+	var sessionIndex = -1
+	var newStartRecordIndex = -1
 	for i := range fit.Messages {
-		if fit.Messages[i].Num != mesgnum.Record {
-			continue
+		switch fit.Messages[i].Num {
+		case mesgnum.Session:
+			if sessionIndex == -1 {
+				sessionIndex = i
+			}
+		case mesgnum.Record:
+			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
+				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
+				continue
+			}
+
+			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
+			if !ok {
+				continue
+			}
+			if distance > concealDistance {
+				newStartRecordIndex = i
+				break
+			}
+
+			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
+		}
+	}
+
+	if sessionIndex == -1 { // no session found during first iteration
+		for i := newStartRecordIndex + 1; i < len(fit.Messages); i++ {
+			if fit.Messages[i].Num == mesgnum.Session {
+				sessionIndex = i
+				break
+			}
+		}
+	}
+
+	if newStartRecordIndex == -1 { // all record are concealed
+		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLat)
+		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
+	} else {
+		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
+		for i := newStartRecordIndex; i < len(fit.Messages); i++ { // find new start record that has lat and long
+			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
+			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
+			if lat != nil && long != nil {
+				newLat, _ = lat.(int32)
+				newLong, _ = long.(int32)
+				break
+			}
 		}
 
-		if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
-			fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
-			continue
+		fieldEndPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLat)
+		if fieldEndPositionLat != nil {
+			fieldEndPositionLat.Value = newLat
 		}
 
-		distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
-		if !ok {
-			continue
+		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
+		if fieldEndPositionLong != nil {
+			fieldEndPositionLong.Value = newLong
 		}
-		if distance > concealDistance {
-			break
-		}
-
-		fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
-		fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
 	}
 
 	return nil
@@ -58,31 +100,75 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 		return nil
 	}
 
+	var sessionIndex = -1
+	var newEndRecordIndex = -1
 	var lastDistance uint32
 	for i := len(fit.Messages) - 1; i >= 0; i-- {
 		if fit.Messages[i].Num != mesgnum.Record {
 			continue
 		}
+		switch fit.Messages[i].Num {
+		case mesgnum.Session:
+			if sessionIndex == -1 {
+				sessionIndex = i
+			}
+		case mesgnum.Record:
+			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
+				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
+				continue
+			}
+			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
+			if !ok {
+				continue
+			}
 
-		if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
-			fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
-			continue
+			if lastDistance == 0 { // first valid last distance
+				lastDistance = distance
+			}
+
+			if lastDistance-distance > concealDistance {
+				newEndRecordIndex = i
+				break
+			}
+
+			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
 		}
-		distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
-		if !ok {
-			continue
+	}
+
+	if sessionIndex == -1 { // no session found during first iteration
+		for i := newEndRecordIndex - 1; i > 0; i-- { // find session to update
+			if fit.Messages[i].Num == mesgnum.Session {
+				sessionIndex = i
+				break
+			}
+		}
+	}
+
+	if newEndRecordIndex == -1 { // all record concelead
+		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLat)
+		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
+	} else {
+		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
+		for i := newEndRecordIndex; i > 0; i++ { // find new end record that has lat and long
+			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
+			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
+			if lat != nil && long != nil {
+				newLat, _ = lat.(int32)
+				newLong, _ = long.(int32)
+				break
+			}
 		}
 
-		if lastDistance == 0 { // first valid last distance
-			lastDistance = distance
+		fieldEndPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLat)
+		if fieldEndPositionLat != nil {
+			fieldEndPositionLat.Value = newLat
 		}
 
-		if lastDistance-distance > concealDistance {
-			break
+		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
+		if fieldEndPositionLong != nil {
+			fieldEndPositionLong.Value = newLong
 		}
-
-		fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
-		fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
 	}
 
 	return nil

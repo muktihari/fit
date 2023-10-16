@@ -133,9 +133,17 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 
 // combineSession combines s2 into s1.
 func combineSession(s1, s2 *mesgdef.Session) {
+	s1EndTime := uint32(s1.StartTime) + (s1.TotalElapsedTime / 1000)
+	elapsedTimeGap := uint32(s2.StartTime) - s1EndTime
+	if elapsedTimeGap <= uint32(s2.StartTime) { // only if not overflow
+		s1.TotalElapsedTime += elapsedTimeGap
+	}
+
 	s1.TotalElapsedTime += s2.TotalElapsedTime
 	s1.TotalTimerTime += s2.TotalTimerTime
 	s1.TotalDistance += s2.TotalDistance
+	s1.EndPositionLat = s2.EndPositionLat
+	s1.EndPositionLong = s2.EndPositionLong
 
 	if s1.TotalAscent != basetype.Uint16Invalid && s2.TotalAscent != basetype.Uint16Invalid {
 		s1.TotalAscent += s2.TotalAscent

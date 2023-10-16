@@ -32,8 +32,11 @@ Other messages from the next FIT files will not be combined.
 
 Currently we only care these following session fields:
 
-- sport
-- sub_sport
+- sport (is used to match two sessions)
+- sub_sport (is not used since different devices may have different value)
+- start_time (is used to calculate time gap between two sessions, add time gap to total_elapsed_time)
+- end_position_lat (will be replaced with next files session's end_position_lat)
+- end_position_long (will be replaced with next files session's end_position_long)
 - total_elapsed_time
 - total_timer_time
 - total_distance
@@ -76,6 +79,13 @@ Mismatch example:
 That is the only guard that we implement, it is user responsibility to select the correct files.
 
 _NOTE: Combining FIT activity files is NOT the same as merging multiple files into a single chained FIT file._
+
+## How We Conceal GPS Positions
+
+1. Conceal Start Position
+   We will iterate from the beginning of FIT Messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `start_position_lat` and `start_position_long`.
+1. Conceal End Position
+   We will backward-iterate from the end of the FIT messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `end_position_lat` and `end_position_long`.
 
 ## Build or Install
 
@@ -132,33 +142,33 @@ Note: conceal value is in meters
 1. Conceal GPS position for 1km away from the actual start position for each files.
 
    ```sh
-   fitactivity --conceal-start 1000 part1.fit part2.fit
+   fitactivity --conceal-start 1000 file1.fit file2.fit
 
    # ls output
-   # part1.fit part1_concealed_1000_0.fit part2.fit part2_concealed_1000_0.fit
+   # file1.fit file1_concealed_1000_0.fit file2.fit file2_concealed_1000_0.fit
    ```
 
 2. Conceal GPS position for 1km away from the actual end position for each files.
 
    ```sh
-   fitactivity --conceal-end 1000 part1.fit part2.fit
+   fitactivity --conceal-end 1000 file1.fit file2.fit
 
    # ls output
-   # part1.fit part1_concealed_0_1000.fit part2.fit part2_concealed_0_1000.fit
+   # file1.fit file1_concealed_0_1000.fit file2.fit file2_concealed_0_1000.fit
    ```
 
 3. Conceal GPS position for 1km away from both start and end position for each files
 
    ```sh
-   fitactivity --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit
+   fitactivity --conceal-start 1000 --conceal-end 1000 file1.fit file2.fit
 
    # ls output
-   # part1.fit part1_concealed_1000_1000.fit part2.fit part2_concealed_1000_1000.fit
+   # file1.fit file1_concealed_1000_1000.fit file2.fit file2_concealed_1000_1000.fit
    ```
 
 ### Combine Multiple Files and Conceal GPS Position of the Resulting File.
 
-This will combine the FIT activity files (`part1.fit` and `part2.fit`) into one continues FIT activity file `result.fit` and then concealing the start and end GPS position of `result.fit` for 1km away from the actual start and end position.
+This will combine the FIT activity files, `part1.fit` and `part2.fit`, into one continues FIT activity file `result.fit` and then concealing the start and end GPS position of `result.fit` for 1km away from the actual start and end position.
 
 ```sh
 fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit > result.fit
