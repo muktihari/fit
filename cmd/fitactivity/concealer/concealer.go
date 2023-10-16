@@ -5,6 +5,8 @@
 package concealer
 
 import (
+	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -29,6 +31,8 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 
 	var sessionIndex = -1
 	var newStartRecordIndex = -1
+
+loop:
 	for i := range fit.Messages {
 		switch fit.Messages[i].Num {
 		case mesgnum.Session:
@@ -38,16 +42,16 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 		case mesgnum.Record:
 			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
 				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
-				continue
+				continue loop
 			}
 
 			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
 			if !ok {
-				continue
+				continue loop
 			}
 			if distance > concealDistance {
 				newStartRecordIndex = i
-				break
+				break loop
 			}
 
 			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
@@ -62,6 +66,9 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 				break
 			}
 		}
+		if sessionIndex == -1 {
+			return nil // no session found to update
+		}
 	}
 
 	if newStartRecordIndex == -1 { // all record are concealed
@@ -73,21 +80,31 @@ func ConcealPositionStart(fit *proto.Fit, concealDistance uint32) error {
 			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
 			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
 			if lat != nil && long != nil {
-				newLat, _ = lat.(int32)
-				newLong, _ = long.(int32)
+				newLat = typeconv.ToSint32[int32](lat)
+				newLong = typeconv.ToSint32[int32](lat)
 				break
 			}
 		}
 
-		fieldEndPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLat)
-		if fieldEndPositionLat != nil {
-			fieldEndPositionLat.Value = newLat
+		fieldStartPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionStartPositionLat)
+		if fieldStartPositionLat == nil {
+			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
+				factory.CreateField(mesgnum.Session, fieldnum.SessionStartPositionLat),
+			)
+			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
+			fieldStartPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
+		fieldStartPositionLat.Value = newLat
 
-		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
-		if fieldEndPositionLong != nil {
-			fieldEndPositionLong.Value = newLong
+		fieldStartPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionStartPositionLong)
+		if fieldStartPositionLong == nil {
+			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
+				factory.CreateField(mesgnum.Session, fieldnum.SessionStartPositionLong),
+			)
+			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
+			fieldStartPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
+		fieldStartPositionLong.Value = newLong
 	}
 
 	return nil
@@ -103,10 +120,9 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 	var sessionIndex = -1
 	var newEndRecordIndex = -1
 	var lastDistance uint32
+
+loop:
 	for i := len(fit.Messages) - 1; i >= 0; i-- {
-		if fit.Messages[i].Num != mesgnum.Record {
-			continue
-		}
 		switch fit.Messages[i].Num {
 		case mesgnum.Session:
 			if sessionIndex == -1 {
@@ -115,11 +131,11 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 		case mesgnum.Record:
 			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
 				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
-				continue
+				continue loop
 			}
 			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
 			if !ok {
-				continue
+				continue loop
 			}
 
 			if lastDistance == 0 { // first valid last distance
@@ -128,7 +144,7 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 
 			if lastDistance-distance > concealDistance {
 				newEndRecordIndex = i
-				break
+				break loop
 			}
 
 			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
@@ -137,15 +153,18 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 	}
 
 	if sessionIndex == -1 { // no session found during first iteration
-		for i := newEndRecordIndex - 1; i > 0; i-- { // find session to update
+		for i := newEndRecordIndex - 1; i >= 0; i-- { // find session to update
 			if fit.Messages[i].Num == mesgnum.Session {
 				sessionIndex = i
 				break
 			}
 		}
+		if sessionIndex == -1 {
+			return nil // no session found to update
+		}
 	}
 
-	if newEndRecordIndex == -1 { // all record concelead
+	if newEndRecordIndex == -1 { // all record are concealed
 		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLat)
 		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
 	} else {
@@ -154,21 +173,31 @@ func ConcealPositionEnd(fit *proto.Fit, concealDistance uint32) error {
 			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
 			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
 			if lat != nil && long != nil {
-				newLat, _ = lat.(int32)
-				newLong, _ = long.(int32)
+				newLat = typeconv.ToSint32[int32](lat)
+				newLong = typeconv.ToSint32[int32](lat)
 				break
 			}
 		}
 
 		fieldEndPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLat)
-		if fieldEndPositionLat != nil {
-			fieldEndPositionLat.Value = newLat
+		if fieldEndPositionLat == nil {
+			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
+				factory.CreateField(mesgnum.Session, fieldnum.SessionEndPositionLat),
+			)
+			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
+			fieldEndPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
+		fieldEndPositionLat.Value = newLat
 
 		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
-		if fieldEndPositionLong != nil {
-			fieldEndPositionLong.Value = newLong
+		if fieldEndPositionLong == nil {
+			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
+				factory.CreateField(mesgnum.Session, fieldnum.SessionEndPositionLong),
+			)
+			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
+			fieldEndPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
+		fieldEndPositionLong.Value = newLong
 	}
 
 	return nil
