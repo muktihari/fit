@@ -3,7 +3,7 @@ name: Build CLIs and Upload Them as Release Assets
 on:
   release:
     types:
-      - created
+      - published
 
 jobs:
   build:
@@ -13,7 +13,6 @@ jobs:
       matrix:
         cli: [fitactivity, fitconv]
         os: [linux, macOS, windows]
-        arch: [amd64, arm64]
 
     steps:
       - uses: actions/checkout@v3
@@ -26,59 +25,61 @@ jobs:
       - name: Build [macOS]
         if: matrix.os == 'macOS'
         run: |
-          CGO=0 GOOS=darwin GOARCH=$arch go build -ldflags="-s -w" -trimpath -o $cli cmd/$cli/main.go
-          zip -q $cli-$os-$arch.zip $cli
+          CGO=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o $cli cmd/$cli/main.go
+          zip -q $cli-$os-amd64.zip $cli
+          CGO=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o $cli cmd/$cli/main.go
+          zip -q $cli-$os-arm64.zip $cli
           rm $cli
-          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-$arch.zip)"
+          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
+          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-arm64.zip)"
         env:
           cli: ${{ matrix.cli }}
           os: ${{ matrix.os }}
-          arch: ${{ matrix.arch }}
 
       - name: Build [windows]
         if: matrix.os == 'windows'
         run: |
-          CGO=0 GOOS=$os GOARCH=$arch go build -ldflags="-s -w" -trimpath -o $cli.exe cmd/$cli/main.go
-          zip -q $cli-$os-$arch.zip $cli.exe
+          CGO=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o $cli.exe cmd/$cli/main.go
+          zip -q $cli-$os-amd64.zip $cli.exe
           rm $cli.exe
-          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-$arch.zip)"
+          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
         env:
           cli: ${{ matrix.cli }}
           os: ${{ matrix.os }}
-          arch: ${{ matrix.arch }}
 
       - name: Build [linux]
         if: matrix.os == 'linux'
         run: |
-          CGO=0 GOOS=$os GOARCH=$arch go build -ldflags="-s -w" -trimpath -o $cli cmd/$cli/main.go
-          tar -czf $cli-$os-$arch.tar.gz $cli
+          CGO=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o $cli cmd/$cli/main.go
+          tar -czf $cli-$os-amd64.tar.gz $cli
           rm $cli
-          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-$arch.tar.gz)"
+          printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.tar.gz)"
         env:
           cli: ${{ matrix.cli }}
           os: ${{ matrix.os }}
-          arch: ${{ matrix.arch }}
 
-      - name: Upload Release Assets [macOS and windows]
-        if: startsWith(github.ref, 'refs/tags/v') && (matrix.os == 'macOS' || matrix.os == 'windows')
-        continue-on-error: true
-        uses: actions/upload-release-asset@v1
+      - name: Upload Release Assets [macOS]
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == 'macOS'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ matrix.cli }}-${{ matrix.os }}-${{ matrix.arch }}.zip
-          asset_name: ${{ matrix.cli }}-${{ matrix.os }}-${{ matrix.arch }}.zip
-          asset_content_type: application/octet-stream
+          files: |
+            ${{ matrix.cli }}-${{ matrix.os }}-amd64.zip
+            ${{ matrix.cli }}-${{ matrix.os }}-arm64.zip
+
+      - name: Upload Release Assets [windows]
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.os == 'windows'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ${{ matrix.cli }}-${{ matrix.os }}-amd64.zip
 
       - name: Upload Release Assets [linux]
+        uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v') && matrix.os == 'linux'
-        continue-on-error: true
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ matrix.cli }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-          asset_name: ${{ matrix.cli }}-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-          asset_content_type: application/octet-stream
+          files: ${{ matrix.cli }}-${{ matrix.os }}-amd64.tar.gz
