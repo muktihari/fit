@@ -66,14 +66,10 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
     ...
 
     dec := decoder.New(bufio.NewReader(f))
-    for {
+    for dec.Next() {
         fit, err := dec.Decode()
         if err != nil {
             return err
-        }
-        /* do something with fit */
-        if !dec.Next() {
-            break
         }
     }
 

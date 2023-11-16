@@ -21,6 +21,8 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+var version = "dev"
+
 func main() {
 	var flagOut string
 	flag.StringVar(&flagOut, "o", "", "output of combined files: result.fit")
@@ -43,7 +45,15 @@ func main() {
 		" 3. fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit > result.fit",
 	)
 
+	var flagVersion bool
+	flag.BoolVar(&flagVersion, "v", false, "show version")
+
 	flag.Parse()
+
+	if flagVersion {
+		fmt.Println(version)
+		return
+	}
 
 	paths := flag.Args()
 
