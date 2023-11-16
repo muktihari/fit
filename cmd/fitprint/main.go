@@ -51,13 +51,10 @@ func main() {
 		decoder.WithIgnoreChecksum(),
 	)
 
-	for {
+	for dec.Next() {
 		_, err = dec.Decode()
 		if err != nil {
 			fatalf("could not decode: %v\n", err)
-		}
-		if !dec.Next() {
-			break
 		}
 	}
 }

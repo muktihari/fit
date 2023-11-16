@@ -417,6 +417,10 @@ func TestNext(t *testing.T) {
 	dec := New(r)
 	prevAccumulator := dec.accumulator
 
+	if !dec.Next() {
+		t.Fatalf("should have next, return false")
+	}
+
 	_, err := dec.DecodeWithContext(context.Background())
 	if err != nil {
 		t.Fatal(err)
@@ -464,6 +468,14 @@ func TestNext(t *testing.T) {
 
 	if dec.lastTimeOffset != 0 {
 		t.Fatalf("lastTimeOffset should be zero")
+	}
+
+	if _, err := dec.PeekFileId(); err != io.EOF {
+		t.Fatalf("expected EOF got %v", err)
+	}
+
+	if dec.Next() {
+		t.Fatalf("should be false, got true")
 	}
 }
 

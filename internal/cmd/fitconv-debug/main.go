@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/muktihari/fit/cmd/fitconv/csv"
+	"github.com/muktihari/fit/cmd/fitconv/fitcsv"
 	"github.com/muktihari/fit/decoder"
 	"github.com/pkg/profile"
 )
@@ -99,7 +99,7 @@ func convertCSV(path string) error {
 
 	const bsize = 1000 << 10 // 1 MB
 	bw := bufio.NewWriterSize(cf, bsize)
-	csvconv := csv.NewConverter(bw)
+	csvconv := fitcsv.NewConverter(bw)
 
 	dec := decoder.New(bufio.NewReaderSize(ff, bsize),
 		decoder.WithMesgDefListener(csvconv),
@@ -107,15 +107,12 @@ func convertCSV(path string) error {
 		decoder.WithBroadcastOnly(),
 	)
 
-	for {
+	for dec.Next() {
 		_, err = dec.Decode()
 		if err != nil {
 			return fmt.Errorf("decode failed: %w", err)
 		}
 		sequenceCompleted++
-		if !dec.Next() {
-			break
-		}
 	}
 
 	csvconv.Wait()

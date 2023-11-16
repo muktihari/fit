@@ -54,11 +54,13 @@ type Decoder struct {
 
 	options *options
 
-	decodeHeaderOnce func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
-	n                int64        // The n read bytes counter, always moving forward, do not reset
-	cur              uint32       // The current byte position relative to bytes of the messages, reset on next chained Fit file.
-	timestamp        uint32       // Active timestamp
-	lastTimeOffset   byte         // Last time offset
+	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
+	n                 int64        // The n read bytes counter, always moving forward, do not reset
+	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained Fit file.
+	timestamp         uint32       // Active timestamp
+	lastTimeOffset    byte         // Last time offset
+	sequenceCompleted bool         // True after a decode is completed. Reset to false on Next().
+	err               error        // Any error occurs during process.
 
 	// Fit File Representation
 	fileHeader proto.FileHeader
@@ -211,21 +213,28 @@ func (d *Decoder) initDecodeHeaderOnce() {
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
 func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
+	defer func() { d.err = err }()
 	if err = d.decodeHeaderOnce(); err != nil {
 		return
 	}
-
 	for d.fileId == nil {
 		if err = d.decodeMessage(); err != nil {
 			return
 		}
 	}
-
 	return d.fileId, nil
 }
 
 // Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
 func (d *Decoder) Next() bool {
+	if d.err != nil {
+		return false
+	}
+
+	if !d.sequenceCompleted {
+		return true
+	}
+
 	// reset values for the next chained Fit file
 	d.accumulator = NewAccumulator()
 	d.crc16.Reset()
@@ -239,6 +248,7 @@ func (d *Decoder) Next() bool {
 	d.cur = 0
 	d.timestamp = 0
 	d.lastTimeOffset = 0
+	d.sequenceCompleted = false
 
 	d.initDecodeHeaderOnce() // reset to enable invocation.
 
@@ -270,17 +280,14 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 // To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
 // multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
 //
-//	for {
+//	for dec.Next() {
 //	     fit, err := dec.Decode()
 //	     if err != nil {
 //	         return err
 //	     }
-//	     /* do something with fit */
-//	     if !dec.Next() {
-//	         break
-//	     }
 //	}
 func (d *Decoder) Decode() (fit *proto.Fit, err error) {
+	defer func() { d.err = err }()
 	if err = d.decodeHeaderOnce(); err != nil {
 		return nil, err
 	}
@@ -293,6 +300,7 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
 		return nil, ErrCRCChecksumMismatch
 	}
+	d.sequenceCompleted = true
 	return &proto.Fit{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
@@ -446,11 +454,14 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	mesg := d.factory.CreateMesgOnly(mesgDef.MesgNum)
 	mesg.Reserved = mesgDef.Reserved
 
+	size := len(mesgDef.FieldDefinitions)
 	if d.options.shouldExpandComponent {
-		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions)+bufferSizeFields)
-	} else {
-		mesg.Fields = make([]proto.Field, 0, len(mesgDef.FieldDefinitions))
+		size += bufferSizeFields
 	}
+	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
+		size += 1 // +1 for timestamp field
+	}
+	mesg.Fields = make([]proto.Field, 0, size)
 
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
 		timeOffset := header & proto.CompressedTimeMask
