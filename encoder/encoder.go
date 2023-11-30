@@ -324,8 +324,10 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
 	n := e.n
 	for i := range fit.Messages { // calculating messages actual size
-		if err := e.encodeMessage(io.Discard, &fit.Messages[i]); err != nil {
-			return err
+		mesg := &fit.Messages[i]
+		if err := e.encodeMessage(io.Discard, mesg); err != nil {
+			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
+				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
 
@@ -376,9 +378,10 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 	}
 
 	for i := range messages {
-		if err := e.encodeMessage(e.w, &messages[i]); err != nil {
-			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d: %w",
-				e.n, i, messages[i].Num, err)
+		mesg := &messages[i]
+		if err := e.encodeMessage(e.w, mesg); err != nil {
+			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
+				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
 
