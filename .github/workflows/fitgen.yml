@@ -34,7 +34,7 @@ jobs:
         run: |
           export wd=$(pwd)
           cd internal/cmd/fitgen
-          make build
+          make build all
           cd $wd
 
       - name: Run Test
