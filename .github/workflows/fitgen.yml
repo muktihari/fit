@@ -33,6 +33,7 @@ jobs:
         if: steps.check-comment.outputs.trigger == 'true'
         run: |
           export wd=$(pwd)
+          echo $wd
           cd internal/cmd/fitgen
           go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version 21.115 --verbose -y
           cd $wd
@@ -50,6 +51,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git config --global user.email "muktihaz@gmail.com"
+          git config --global user.name "Hikmatulloh Hari Mukti"
+          
           touch dummy-file-for-test
           git add .
           git commit -m "update: files generated from Profile.xlsx"
