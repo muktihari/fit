@@ -10,15 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
+      
       - name: Check PR comment
         id: check-comment
-        run: echo "::set-output name=trigger::${{ contains(github.event.comment.body, 'run fitgen') }}"
+        run: |
+          echo "trigger=${{ startsWith(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event.comment.body }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
+            echo "sdkversion=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else 
+            echo "comment syntax error"
+            exit 1
+          fi
 
       - name: Checkout PR
         if: steps.check-comment.outputs.trigger == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr checkout ${{ github.event.pull_request.number }}
+        run: |
+          gh pr checkout ${{ github.event.issue.number }}
 
       - name: Set up Go
         if: steps.check-comment.outputs.trigger == 'true'
@@ -30,8 +40,9 @@ jobs:
         if: steps.check-comment.outputs.trigger == 'true'
         run: |
           export wd=$(pwd)
+          echo $wd
           cd internal/cmd/fitgen
-          make build
+          go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version ${{ steps.check-comment.outputs.sdkversion }} --verbose -y
           cd $wd
 
       - name: Run Test
@@ -47,7 +58,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          touch dummy-file-for-test
+          git config --global user.email "muktihaz@gmail.com"
+          git config --global user.name "Hikmatulloh Hari Mukti"
+          
+          touch dummy-file-for-test-2
           git add .
           git commit -m "update: files generated from Profile.xlsx"
           git push
