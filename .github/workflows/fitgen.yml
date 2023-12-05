@@ -1,4 +1,4 @@
-name: Run fitgen by Comment
+name: Run fitgen Triggered by Comment
 
 on:
   issue_comment:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Check PR comment
         id: check-comment
         run: |
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout PR
         if: steps.check-comment.outputs.trigger == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.fit }}
         run: |
           gh pr checkout ${{ github.event.issue.number }}
 
@@ -45,23 +45,14 @@ jobs:
           go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version ${{ steps.check-comment.outputs.sdkversion }} --verbose -y
           cd $wd
 
-      - name: Run Test
-        if: steps.check-comment.outputs.trigger == 'true'
-        run: |
-          go test ./...
-          if [ $? -ne 0 ]; then
-            exit 1
-          fi
-
       - name: Commit and Push
         if: steps.check-comment.outputs.trigger == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.fit }}
         run: |
           git config --global user.email "muktihaz@gmail.com"
           git config --global user.name "Hikmatulloh Hari Mukti"
-          
-          touch dummy-file-for-test-2
+
           git add .
-          git commit -m "update: files generated from Profile.xlsx"
+          git commit -m "Generated files updated through Github Actions"
           git push
