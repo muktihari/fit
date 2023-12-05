@@ -34,7 +34,7 @@ jobs:
         run: |
           export wd=$(pwd)
           cd internal/cmd/fitgen
-          make build all
+          go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version 21.115 --verbose -y
           cd $wd
 
       - name: Run Test
