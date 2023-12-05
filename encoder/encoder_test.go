@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"container/list"
 	"context"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -20,6 +21,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -80,8 +82,14 @@ func TestEncodeRealFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	resultb := f.Bytes()
+
+	// Ignore profile version and crc checksum since it will change when we update the Profile.xlsx
+	b[2], b[3] = resultb[2], resultb[3]
+	b[12], b[13] = resultb[12], resultb[13]
+
 	// Compare with the actual file
-	if diff := cmp.Diff(f.Bytes(), b); diff != "" {
+	if diff := cmp.Diff(resultb, b); diff != "" {
 		t.Fatal(diff)
 	}
 }
@@ -435,14 +443,24 @@ func TestEncodeHeader(t *testing.T) {
 		{
 			name:   "no header",
 			header: proto.FileHeader{},
-			b: []byte{
-				14,
-				16,
-				123, 82,
-				0, 0, 0, 0, // dataSize zero
-				46, 70, 73, 84, // .FIT
-				245, 40,
-			},
+			b: func() []byte {
+				b := []byte{
+					14,
+					16,
+					0, 0, // profile version will be updated
+					0, 0, 0, 0, // dataSize zero
+					46, 70, 73, 84, // .FIT
+					0, 0, // crc checksum will be calculated
+				}
+
+				binary.LittleEndian.PutUint16(b[2:4], profile.Version())
+
+				crc := crc16.New(crc16.MakeFitTable())
+				crc.Write(b[:12])
+				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
+
+				return b
+			}(),
 		},
 		{
 			name:            "header 12 legacy",
