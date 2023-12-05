@@ -1,0 +1,53 @@
+name: Run fitgen by Comment
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  run-fitgen:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR comment
+        id: check-comment
+        run: echo "::set-output name=trigger::${{ contains(github.event.comment.body, 'run fitgen') }}"
+
+      - name: Checkout PR
+        if: steps.check-comment.outputs.trigger == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
+
+      - name: Set up Go
+        if: steps.check-comment.outputs.trigger == 'true'
+        uses: actions/setup-go@v4
+        with:
+          go-version: ">=1.18"
+
+      - name: Run fitgen
+        if: steps.check-comment.outputs.trigger == 'true'
+        run: |
+          export wd=$(pwd)
+          cd internal/cmd/fitgen
+          make build
+          cd $wd
+
+      - name: Run Test
+        if: steps.check-comment.outputs.trigger == 'true'
+        run: |
+          go test ./...
+          if [ $? -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Commit and Push
+        if: steps.check-comment.outputs.trigger == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          touch dummy-file-for-test
+          git add .
+          git commit -m "update: files generated from Profile.xlsx"
+          git push
