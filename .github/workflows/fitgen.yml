@@ -26,7 +26,7 @@ jobs:
       - name: Checkout PR
         if: steps.check-comment.outputs.trigger == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.fit }}
+          GITHUB_TOKEN: ${{ secrets.FIT }}
         run: |
           gh pr checkout ${{ github.event.issue.number }}
 
@@ -48,7 +48,7 @@ jobs:
       - name: Commit and Push
         if: steps.check-comment.outputs.trigger == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.fit }}
+          GITHUB_TOKEN: ${{ secrets.FIT }}
         run: |
           git config --global user.email "muktihaz@gmail.com"
           git config --global user.name "Hikmatulloh Hari Mukti"
