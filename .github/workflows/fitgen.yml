@@ -14,7 +14,11 @@ jobs:
       
       - name: Check PR comment
         id: check-comment
-        run: echo "trigger=${{ contains(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
+        run: |
+          echo "trigger=${{ contains(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
+          if [[ "$a" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
+            echo "sdkversion=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Checkout PR
         if: steps.check-comment.outputs.trigger == 'true'
@@ -35,7 +39,7 @@ jobs:
           export wd=$(pwd)
           echo $wd
           cd internal/cmd/fitgen
-          go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version 21.115 --verbose -y
+          go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version ${{ steps.check-comment.outputs.sdkversion }} --verbose -y
           cd $wd
 
       - name: Run Test
@@ -54,7 +58,7 @@ jobs:
           git config --global user.email "muktihaz@gmail.com"
           git config --global user.name "Hikmatulloh Hari Mukti"
           
-          touch dummy-file-for-test
+          touch dummy-file-for-test-2
           git add .
           git commit -m "update: files generated from Profile.xlsx"
           git push
