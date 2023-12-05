@@ -15,7 +15,7 @@ jobs:
       - name: Check PR comment
         id: check-comment
         run: |
-          echo "trigger=${{ startWith(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
+          echo "trigger=${{ startsWith(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
           if [[ "${{ github.event.comment.body }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
             echo "sdkversion=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
           else 
