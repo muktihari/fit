@@ -40,8 +40,12 @@ func ToTime(value any) time.Time {
 
 // ToLocalTime returns time in local time zone by specifying the time zone offset hours (+7 for GMT+7).
 func ToLocalTime(value any, tzOffsetHours int) time.Time {
-	t := ToTime(value)
-	if t == (time.Time{}) {
+	t, ok := value.(time.Time)
+	if !ok {
+		t = ToTime(value)
+	}
+
+	if t.IsZero() {
 		return t
 	}
 

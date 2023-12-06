@@ -45,7 +45,7 @@ func TestToTime(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestToLocalTime(t *testing.T) {
 	locJakarta, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
 		t.Fatal(err)
@@ -66,6 +66,11 @@ func Test(t *testing.T) {
 			value:  1029622579, // int int
 			result: time.Time{},
 		},
+		{
+			name:   "value is already in time.Time",
+			value:  time.Date(2022, 8, 17, 05, 16, 19, 0, time.UTC),
+			result: time.Date(2022, 8, 17, 12, 16, 19, 0, locJakarta),
+		},
 	}
 
 	for _, tc := range tt {
@@ -78,6 +83,7 @@ func Test(t *testing.T) {
 	}
 }
 
+// 2022-08-17T05:16:19+07:00, got: 2022-08-17T12:16:19+07:00
 func TestTzOffsetHours(t *testing.T) {
 	tt := []struct {
 		name          string
