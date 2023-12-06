@@ -22,6 +22,7 @@ jobs:
           fi
 
       - uses: actions/checkout@v4
+        if: steps.check-comment.outputs.trigger == 'true'
         with:
           token: "${{ secrets.FIT }}"
 
@@ -57,5 +58,5 @@ jobs:
           git config --global user.name "Hikmatulloh Hari Mukti"
 
           git add .
-          git commit -m "Generated files updated through Github Actions"
+          git commit -m "gh actions: generate files for v${{ steps.check-comment.outputs.sdkversion }}"
           git push
