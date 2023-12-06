@@ -46,7 +46,9 @@ func NewBuilder(path, version string, message []parser.Message, types []parser.T
 	return &fieldnumBuilder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
-			ParseFiles(filepath.Join(cd, "fieldnum.tmpl"), "builder/shared/untyped_constant.tmpl")),
+			ParseFiles(
+				filepath.Join(cd, "fieldnum.tmpl"),
+				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
 		templateExec: "fieldnum",
 		path:         filepath.Join(path, "profile", "untyped", "fieldnum"),
 		sdkVersion:   version,
@@ -84,16 +86,23 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 			if scale != 1 || offset != 0 {
 				scaleOffset = fmt.Sprintf(", Scale: %g, Offset: %g", scale, offset)
 			}
+
+			var units string
+			if field.Units != "" {
+				units = fmt.Sprintf(", Units: %s", field.Units)
+			}
+
 			c := shared.Constant{
 				Name:   strutil.ToTitle(mesg.Name) + strutil.ToTitle(field.Name),
 				Type:   _type,
 				Op:     "=",
 				Value:  strconv.Itoa(int(field.Num)),
 				String: mesg.Name + ": " + field.Name,
-				Comment: fmt.Sprintf("[Type: %s, Base: %s%s]; %s",
+				Comment: fmt.Sprintf("[Type: %s, Base: %s%s%s]; %s",
 					strutil.ToTitle(field.Type),
 					b.baseTypeMapByProfileType[field.Type],
 					scaleOffset,
+					units,
 					field.Comment),
 			}
 			constants = append(constants, c)

@@ -37,7 +37,9 @@ func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
 	return &typebuilder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
-			ParseFiles(filepath.Join(cd, "typedef.tmpl"), "builder/shared/constant.tmpl")),
+			ParseFiles(
+				filepath.Join(cd, "typedef.tmpl"),
+				filepath.Join(cd, "..", "..", "builder", "shared", "constant.tmpl"))),
 		templateExec: "typedef",
 		path:         filepath.Join(path, "profile", "typedef"),
 		sdkVersion:   sdkVersion,

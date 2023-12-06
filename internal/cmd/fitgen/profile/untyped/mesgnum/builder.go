@@ -36,7 +36,9 @@ func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
 	return &mesgnumbuilder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
-			ParseFiles(filepath.Join(cd, "mesgnum.tmpl"), "builder/shared/untyped_constant.tmpl")),
+			ParseFiles(
+				filepath.Join(cd, "mesgnum.tmpl"),
+				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
 		templateExec: "mesgnum",
 		path:         filepath.Join(path, "profile", "untyped", "mesgnum"),
 		sdkVersion:   sdkVersion,
