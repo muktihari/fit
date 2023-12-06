@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          token: '${{ secrets.FIT }}'
-
       - name: Check PR comment
         id: check-comment
         run: |
@@ -21,9 +17,13 @@ jobs:
           if [[ "${{ github.event.comment.body }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
             echo "sdkversion=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
           else 
-            echo "comment syntax error"
-            exit 1
+            echo "Aborted: not a valid 'run fitgen <sdk.version>' command"
+            exit 0
           fi
+
+      - uses: actions/checkout@v4
+        with:
+          token: "${{ secrets.FIT }}"
 
       - name: Checkout PR
         if: steps.check-comment.outputs.trigger == 'true'
@@ -46,6 +46,7 @@ jobs:
           cd internal/cmd/fitgen
           go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version ${{ steps.check-comment.outputs.sdkversion }} --verbose -y
           cd $wd
+          sed -E -i 's/sdkversion\-[0-9]+\.[0-9]+-lightblue.svg/\sdkversion-${{ steps.check-comment.outputs.sdkversion }}-lightblue.svg/' README.md
 
       - name: Commit and Push
         if: steps.check-comment.outputs.trigger == 'true'
