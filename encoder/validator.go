@@ -225,136 +225,136 @@ func hasValidValue(val any) bool {
 		return false
 	}
 
-	switch vs := val.(type) { // Fast Path
+	switch v := val.(type) { // Fast Path
 	case int8:
-		return val != basetype.Sint8.Invalid()
+		return v != basetype.Sint8Invalid
 	case uint8:
-		return val != basetype.Uint8.Invalid()
+		return v != basetype.Uint8Invalid
 	case int16:
-		return val != basetype.Sint16.Invalid()
+		return v != basetype.Sint16Invalid
 	case uint16:
-		return val != basetype.Uint16.Invalid()
+		return v != basetype.Uint16Invalid
 	case int32:
-		return val != basetype.Sint32.Invalid()
+		return v != basetype.Sint32Invalid
 	case uint32:
-		return val != basetype.Uint32.Invalid()
+		return v != basetype.Uint32Invalid
 	case string:
-		return vs != basetype.StringInvalid && vs != ""
+		return v != basetype.StringInvalid && v != ""
 	case float32:
-		return !math.IsNaN(float64(vs))
+		return math.Float32bits(v) != basetype.Float32Invalid
 	case float64:
-		return !math.IsNaN(vs)
+		return math.Float64bits(v) != basetype.Float64Invalid
 	case int64:
-		return val != basetype.Sint64.Invalid()
+		return v != basetype.Sint64Invalid
 	case uint64:
-		return val != basetype.Uint64.Invalid()
+		return v != basetype.Uint64Invalid
 	case []int8:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Sint8.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Sint8Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []uint8:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Uint8.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Uint8Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []int16:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Sint16.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Sint16Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []uint16:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Uint16.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Uint16Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []int32:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Sint32.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Sint32Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []uint32:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Uint32.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Uint32Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []float32:
 		invalidcounter := 0
-		for i := range vs {
-			if math.IsNaN(float64(vs[i])) {
+		for i := range v {
+			if math.Float32bits(v[i]) == basetype.Float32Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []float64:
 		invalidcounter := 0
-		for i := range vs {
-			if math.IsNaN(vs[i]) {
+		for i := range v {
+			if math.Float64bits(v[i]) == basetype.Float64Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []int64:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Sint64.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Sint64Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	case []uint64:
 		invalidcounter := 0
-		for i := range vs {
-			if vs[i] == basetype.Uint64.Invalid() {
+		for i := range v {
+			if v[i] == basetype.Uint64Invalid {
 				invalidcounter++
 			}
 		}
-		return invalidcounter != len(vs)
+		return invalidcounter != len(v)
 	}
 
 	// Fallback to reflection
 	rv := reflect.ValueOf(val)
 	switch rv.Kind() {
 	case reflect.Int8:
-		return int8(rv.Int()) != basetype.Sint8.Invalid()
+		return int8(rv.Int()) != basetype.Sint8Invalid
 	case reflect.Uint8:
-		return uint8(rv.Uint()) != basetype.Uint8.Invalid()
+		return uint8(rv.Uint()) != basetype.Uint8Invalid
 	case reflect.Int16:
-		return int16(rv.Int()) != basetype.Sint16.Invalid()
+		return int16(rv.Int()) != basetype.Sint16Invalid
 	case reflect.Uint16:
-		return uint16(rv.Uint()) != basetype.Uint16.Invalid()
+		return uint16(rv.Uint()) != basetype.Uint16Invalid
 	case reflect.Int32:
-		return int32(rv.Int()) != basetype.Sint32.Invalid()
+		return int32(rv.Int()) != basetype.Sint32Invalid
 	case reflect.Uint32:
-		return uint32(rv.Uint()) != basetype.Uint32.Invalid()
+		return uint32(rv.Uint()) != basetype.Uint32Invalid
 	case reflect.String:
-		return rv.String() != basetype.String.Invalid()
+		return rv.String() != basetype.StringInvalid
 	case reflect.Float32:
-		return !math.IsNaN(rv.Float())
+		return math.Float32bits(float32(rv.Float())) != basetype.Float32Invalid
 	case reflect.Float64:
-		return !math.IsNaN(rv.Float())
+		return math.Float64bits(rv.Float()) != basetype.Float64Invalid
 	case reflect.Int64:
-		return int64(rv.Int()) != basetype.Sint64.Invalid()
+		return int64(rv.Int()) != basetype.Sint64Invalid
 	case reflect.Uint64:
-		return uint64(rv.Uint()) != basetype.Uint64.Invalid()
+		return uint64(rv.Uint()) != basetype.Uint64Invalid
 	case reflect.Slice:
 		invalidcounter := 0
 		for i := 0; i < rv.Len(); i++ {
@@ -362,45 +362,45 @@ func hasValidValue(val any) bool {
 
 			switch rve.Kind() {
 			case reflect.Int8:
-				if int8(rve.Int()) == basetype.Sint8.Invalid() {
+				if int8(rve.Int()) == basetype.Sint8Invalid {
 					invalidcounter++
 				}
 			case reflect.Uint8:
-				if uint8(rve.Uint()) == basetype.Uint8.Invalid() {
+				if uint8(rve.Uint()) == basetype.Uint8Invalid {
 					invalidcounter++
 				}
 			case reflect.Int16:
-				if int16(rve.Int()) == basetype.Sint16.Invalid() {
+				if int16(rve.Int()) == basetype.Sint16Invalid {
 					invalidcounter++
 				}
 			case reflect.Uint16:
-				if uint16(rve.Uint()) == basetype.Uint16.Invalid() {
+				if uint16(rve.Uint()) == basetype.Uint16Invalid {
 					invalidcounter++
 				}
 			case reflect.Int32:
-				if int32(rve.Int()) == basetype.Sint32.Invalid() {
+				if int32(rve.Int()) == basetype.Sint32Invalid {
 					invalidcounter++
 				}
 			case reflect.Uint32:
-				if uint32(rve.Uint()) == basetype.Uint32.Invalid() {
+				if uint32(rve.Uint()) == basetype.Uint32Invalid {
 					invalidcounter++
 				}
 			case reflect.String:
 				return false // we have no []string values
 			case reflect.Float32:
-				if math.IsNaN(rve.Float()) {
+				if math.Float32bits(float32(rve.Float())) == basetype.Float32Invalid {
 					invalidcounter++
 				}
 			case reflect.Float64:
-				if math.IsNaN(rve.Float()) {
+				if math.Float64bits(rve.Float()) == basetype.Float64Invalid {
 					invalidcounter++
 				}
 			case reflect.Int64:
-				if int64(rve.Int()) == basetype.Sint64.Invalid() {
+				if int64(rve.Int()) == basetype.Sint64Invalid {
 					invalidcounter++
 				}
 			case reflect.Uint64:
-				if uint64(rve.Uint()) == basetype.Uint64.Invalid() {
+				if uint64(rve.Uint()) == basetype.Uint64Invalid {
 					invalidcounter++
 				}
 			default: // not supported

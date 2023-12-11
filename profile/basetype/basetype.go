@@ -45,8 +45,8 @@ const (
 	Sint32Invalid  int32  = math.MaxInt32  // 0x7FFFFFFF
 	Uint32Invalid  uint32 = math.MaxUint32 // 0xFFFFFFFF
 	StringInvalid  string = "\x00"         // 0x00. Same as string([]byte{0x00}), 0x00 is utf-8 null-terminated string.
-	Float32Invalid uint32 = math.MaxUint32 // 0xFFFFFFFF. math.Float32frombits(0xFFFFFFFF) produces float64 NaN which is uncomparable. Can only check using math.IsNaN or convert it in Integer form like this.
-	Float64Invalid uint64 = math.MaxUint64 // 0xFFFFFFFFFFFFFFFF. math.Float64frombits(0xFFFFFFFFFFFFFFFF) produces float32 NaN which is uncomparable. Can only check using math.IsNaN or convert it in Integer form like this.
+	Float32Invalid uint32 = math.MaxUint32 // 0xFFFFFFFF. math.Float32frombits(0xFFFFFFFF) produces float64 NaN which is uncomparable. Can only check in its integer form e.g. math.Float32bits(float32value) == Float32Invalid.
+	Float64Invalid uint64 = math.MaxUint64 // 0xFFFFFFFFFFFFFFFF. math.Float64frombits(0xFFFFFFFFFFFFFFFF) produces float64 NaN which is uncomparable. Can only check in its integer form e.g. math.Float64bits(float64value) == Float64Invalid.
 	Uint8zInvalid  uint8  = 0              // 0x00
 	Uint16zInvalid uint16 = 0              // 0x0000
 	Uint32zInvalid uint32 = 0              // 0x00000000
