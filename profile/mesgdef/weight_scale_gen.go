@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -42,28 +41,29 @@ func NewWeightScale(mesg proto.Message) *WeightScale {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* Weight */
-		1:   basetype.Uint16Invalid, /* PercentFat */
-		2:   basetype.Uint16Invalid, /* PercentHydration */
-		3:   basetype.Uint16Invalid, /* VisceralFatMass */
-		4:   basetype.Uint16Invalid, /* BoneMass */
-		5:   basetype.Uint16Invalid, /* MuscleMass */
-		7:   basetype.Uint16Invalid, /* BasalMet */
-		8:   basetype.Uint8Invalid,  /* PhysiqueRating */
-		9:   basetype.Uint16Invalid, /* ActiveMet */
-		10:  basetype.Uint8Invalid,  /* MetabolicAge */
-		11:  basetype.Uint8Invalid,  /* VisceralFatRating */
-		12:  basetype.Uint16Invalid, /* UserProfileIndex */
-		13:  basetype.Uint16Invalid, /* Bmi */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* Weight */
+		1:   nil, /* PercentFat */
+		2:   nil, /* PercentHydration */
+		3:   nil, /* VisceralFatMass */
+		4:   nil, /* BoneMass */
+		5:   nil, /* MuscleMass */
+		7:   nil, /* BasalMet */
+		8:   nil, /* PhysiqueRating */
+		9:   nil, /* ActiveMet */
+		10:  nil, /* MetabolicAge */
+		11:  nil, /* VisceralFatRating */
+		12:  nil, /* UserProfileIndex */
+		13:  nil, /* Bmi */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &WeightScale{
@@ -99,7 +99,7 @@ func (m WeightScale) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.Weight,
 		1:   m.PercentFat,
@@ -117,8 +117,12 @@ func (m WeightScale) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

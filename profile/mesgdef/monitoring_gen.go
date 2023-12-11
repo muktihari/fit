@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -57,43 +56,44 @@ func NewMonitoring(mesg proto.Message) *Monitoring {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint8Invalid,  /* DeviceIndex */
-		1:   basetype.Uint16Invalid, /* Calories */
-		2:   basetype.Uint32Invalid, /* Distance */
-		3:   basetype.Uint32Invalid, /* Cycles */
-		4:   basetype.Uint32Invalid, /* ActiveTime */
-		5:   basetype.EnumInvalid,   /* ActivityType */
-		6:   basetype.EnumInvalid,   /* ActivitySubtype */
-		7:   basetype.EnumInvalid,   /* ActivityLevel */
-		8:   basetype.Uint16Invalid, /* Distance16 */
-		9:   basetype.Uint16Invalid, /* Cycles16 */
-		10:  basetype.Uint16Invalid, /* ActiveTime16 */
-		11:  basetype.Uint32Invalid, /* LocalTimestamp */
-		12:  basetype.Sint16Invalid, /* Temperature */
-		14:  basetype.Sint16Invalid, /* TemperatureMin */
-		15:  basetype.Sint16Invalid, /* TemperatureMax */
-		16:  nil,                    /* ActivityTime */
-		19:  basetype.Uint16Invalid, /* ActiveCalories */
-		24:  basetype.ByteInvalid,   /* CurrentActivityTypeIntensity */
-		25:  basetype.Uint8Invalid,  /* TimestampMin8 */
-		26:  basetype.Uint16Invalid, /* Timestamp16 */
-		27:  basetype.Uint8Invalid,  /* HeartRate */
-		28:  basetype.Uint8Invalid,  /* Intensity */
-		29:  basetype.Uint16Invalid, /* DurationMin */
-		30:  basetype.Uint32Invalid, /* Duration */
-		31:  basetype.Uint32Invalid, /* Ascent */
-		32:  basetype.Uint32Invalid, /* Descent */
-		33:  basetype.Uint16Invalid, /* ModerateActivityMinutes */
-		34:  basetype.Uint16Invalid, /* VigorousActivityMinutes */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* DeviceIndex */
+		1:   nil, /* Calories */
+		2:   nil, /* Distance */
+		3:   nil, /* Cycles */
+		4:   nil, /* ActiveTime */
+		5:   nil, /* ActivityType */
+		6:   nil, /* ActivitySubtype */
+		7:   nil, /* ActivityLevel */
+		8:   nil, /* Distance16 */
+		9:   nil, /* Cycles16 */
+		10:  nil, /* ActiveTime16 */
+		11:  nil, /* LocalTimestamp */
+		12:  nil, /* Temperature */
+		14:  nil, /* TemperatureMin */
+		15:  nil, /* TemperatureMax */
+		16:  nil, /* ActivityTime */
+		19:  nil, /* ActiveCalories */
+		24:  nil, /* CurrentActivityTypeIntensity */
+		25:  nil, /* TimestampMin8 */
+		26:  nil, /* Timestamp16 */
+		27:  nil, /* HeartRate */
+		28:  nil, /* Intensity */
+		29:  nil, /* DurationMin */
+		30:  nil, /* Duration */
+		31:  nil, /* Ascent */
+		32:  nil, /* Descent */
+		33:  nil, /* ModerateActivityMinutes */
+		34:  nil, /* VigorousActivityMinutes */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Monitoring{
@@ -144,7 +144,7 @@ func (m Monitoring) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.DeviceIndex,
 		1:   m.Calories,
@@ -177,8 +177,12 @@ func (m Monitoring) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

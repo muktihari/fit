@@ -9,10 +9,8 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
-	"math"
 )
 
 // DiveSettings is a DiveSettings message.
@@ -64,49 +62,50 @@ func NewDiveSettings(mesg proto.Message) *DiveSettings {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid,                        /* Timestamp */
-		254: basetype.Uint16Invalid,                        /* MessageIndex */
-		0:   basetype.StringInvalid,                        /* Name */
-		1:   basetype.EnumInvalid,                          /* Model */
-		2:   basetype.Uint8Invalid,                         /* GfLow */
-		3:   basetype.Uint8Invalid,                         /* GfHigh */
-		4:   basetype.EnumInvalid,                          /* WaterType */
-		5:   math.Float32frombits(basetype.Float32Invalid), /* WaterDensity */
-		6:   basetype.Uint8Invalid,                         /* Po2Warn */
-		7:   basetype.Uint8Invalid,                         /* Po2Critical */
-		8:   basetype.Uint8Invalid,                         /* Po2Deco */
-		9:   false,                                         /* SafetyStopEnabled */
-		10:  math.Float32frombits(basetype.Float32Invalid), /* BottomDepth */
-		11:  basetype.Uint32Invalid,                        /* BottomTime */
-		12:  false,                                         /* ApneaCountdownEnabled */
-		13:  basetype.Uint32Invalid,                        /* ApneaCountdownTime */
-		14:  basetype.EnumInvalid,                          /* BacklightMode */
-		15:  basetype.Uint8Invalid,                         /* BacklightBrightness */
-		16:  basetype.Uint8Invalid,                         /* BacklightTimeout */
-		17:  basetype.Uint16Invalid,                        /* RepeatDiveInterval */
-		18:  basetype.Uint16Invalid,                        /* SafetyStopTime */
-		19:  basetype.EnumInvalid,                          /* HeartRateSourceType */
-		20:  basetype.Uint8Invalid,                         /* HeartRateSource */
-		21:  basetype.Uint16Invalid,                        /* TravelGas */
-		22:  basetype.EnumInvalid,                          /* CcrLowSetpointSwitchMode */
-		23:  basetype.Uint8Invalid,                         /* CcrLowSetpoint */
-		24:  basetype.Uint32Invalid,                        /* CcrLowSetpointDepth */
-		25:  basetype.EnumInvalid,                          /* CcrHighSetpointSwitchMode */
-		26:  basetype.Uint8Invalid,                         /* CcrHighSetpoint */
-		27:  basetype.Uint32Invalid,                        /* CcrHighSetpointDepth */
-		29:  basetype.EnumInvalid,                          /* GasConsumptionDisplay */
-		30:  false,                                         /* UpKeyEnabled */
-		35:  basetype.EnumInvalid,                          /* DiveSounds */
-		36:  basetype.Uint8Invalid,                         /* LastStopMultiple */
-		37:  basetype.EnumInvalid,                          /* NoFlyTimeMode */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		254: nil, /* MessageIndex */
+		0:   nil, /* Name */
+		1:   nil, /* Model */
+		2:   nil, /* GfLow */
+		3:   nil, /* GfHigh */
+		4:   nil, /* WaterType */
+		5:   nil, /* WaterDensity */
+		6:   nil, /* Po2Warn */
+		7:   nil, /* Po2Critical */
+		8:   nil, /* Po2Deco */
+		9:   nil, /* SafetyStopEnabled */
+		10:  nil, /* BottomDepth */
+		11:  nil, /* BottomTime */
+		12:  nil, /* ApneaCountdownEnabled */
+		13:  nil, /* ApneaCountdownTime */
+		14:  nil, /* BacklightMode */
+		15:  nil, /* BacklightBrightness */
+		16:  nil, /* BacklightTimeout */
+		17:  nil, /* RepeatDiveInterval */
+		18:  nil, /* SafetyStopTime */
+		19:  nil, /* HeartRateSourceType */
+		20:  nil, /* HeartRateSource */
+		21:  nil, /* TravelGas */
+		22:  nil, /* CcrLowSetpointSwitchMode */
+		23:  nil, /* CcrLowSetpoint */
+		24:  nil, /* CcrLowSetpointDepth */
+		25:  nil, /* CcrHighSetpointSwitchMode */
+		26:  nil, /* CcrHighSetpoint */
+		27:  nil, /* CcrHighSetpointDepth */
+		29:  nil, /* GasConsumptionDisplay */
+		30:  nil, /* UpKeyEnabled */
+		35:  nil, /* DiveSounds */
+		36:  nil, /* LastStopMultiple */
+		37:  nil, /* NoFlyTimeMode */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &DiveSettings{
@@ -163,7 +162,7 @@ func (m DiveSettings) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		254: m.MessageIndex,
 		0:   m.Name,
@@ -202,8 +201,12 @@ func (m DiveSettings) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

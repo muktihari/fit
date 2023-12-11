@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -47,33 +46,34 @@ func NewSplit(mesg proto.Message) *Split {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.EnumInvalid,   /* SplitType */
-		1:   basetype.Uint32Invalid, /* TotalElapsedTime */
-		2:   basetype.Uint32Invalid, /* TotalTimerTime */
-		3:   basetype.Uint32Invalid, /* TotalDistance */
-		4:   basetype.Uint32Invalid, /* AvgSpeed */
-		9:   basetype.Uint32Invalid, /* StartTime */
-		13:  basetype.Uint16Invalid, /* TotalAscent */
-		14:  basetype.Uint16Invalid, /* TotalDescent */
-		21:  basetype.Sint32Invalid, /* StartPositionLat */
-		22:  basetype.Sint32Invalid, /* StartPositionLong */
-		23:  basetype.Sint32Invalid, /* EndPositionLat */
-		24:  basetype.Sint32Invalid, /* EndPositionLong */
-		25:  basetype.Uint32Invalid, /* MaxSpeed */
-		26:  basetype.Sint32Invalid, /* AvgVertSpeed */
-		27:  basetype.Uint32Invalid, /* EndTime */
-		28:  basetype.Uint32Invalid, /* TotalCalories */
-		74:  basetype.Uint32Invalid, /* StartElevation */
-		110: basetype.Uint32Invalid, /* TotalMovingTime */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* SplitType */
+		1:   nil, /* TotalElapsedTime */
+		2:   nil, /* TotalTimerTime */
+		3:   nil, /* TotalDistance */
+		4:   nil, /* AvgSpeed */
+		9:   nil, /* StartTime */
+		13:  nil, /* TotalAscent */
+		14:  nil, /* TotalDescent */
+		21:  nil, /* StartPositionLat */
+		22:  nil, /* StartPositionLong */
+		23:  nil, /* EndPositionLat */
+		24:  nil, /* EndPositionLong */
+		25:  nil, /* MaxSpeed */
+		26:  nil, /* AvgVertSpeed */
+		27:  nil, /* EndTime */
+		28:  nil, /* TotalCalories */
+		74:  nil, /* StartElevation */
+		110: nil, /* TotalMovingTime */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Split{
@@ -114,7 +114,7 @@ func (m Split) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.SplitType,
 		1:   m.TotalElapsedTime,
@@ -137,8 +137,12 @@ func (m Split) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

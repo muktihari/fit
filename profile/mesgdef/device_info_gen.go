@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -47,33 +46,34 @@ func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid,  /* Timestamp */
-		0:   basetype.Uint8Invalid,   /* DeviceIndex */
-		1:   basetype.Uint8Invalid,   /* DeviceType */
-		2:   basetype.Uint16Invalid,  /* Manufacturer */
-		3:   basetype.Uint32zInvalid, /* SerialNumber */
-		4:   basetype.Uint16Invalid,  /* Product */
-		5:   basetype.Uint16Invalid,  /* SoftwareVersion */
-		6:   basetype.Uint8Invalid,   /* HardwareVersion */
-		7:   basetype.Uint32Invalid,  /* CumOperatingTime */
-		10:  basetype.Uint16Invalid,  /* BatteryVoltage */
-		11:  basetype.Uint8Invalid,   /* BatteryStatus */
-		18:  basetype.EnumInvalid,    /* SensorPosition */
-		19:  basetype.StringInvalid,  /* Descriptor */
-		20:  basetype.Uint8zInvalid,  /* AntTransmissionType */
-		21:  basetype.Uint16zInvalid, /* AntDeviceNumber */
-		22:  basetype.EnumInvalid,    /* AntNetwork */
-		25:  basetype.EnumInvalid,    /* SourceType */
-		27:  basetype.StringInvalid,  /* ProductName */
-		32:  basetype.Uint8Invalid,   /* BatteryLevel */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* DeviceIndex */
+		1:   nil, /* DeviceType */
+		2:   nil, /* Manufacturer */
+		3:   nil, /* SerialNumber */
+		4:   nil, /* Product */
+		5:   nil, /* SoftwareVersion */
+		6:   nil, /* HardwareVersion */
+		7:   nil, /* CumOperatingTime */
+		10:  nil, /* BatteryVoltage */
+		11:  nil, /* BatteryStatus */
+		18:  nil, /* SensorPosition */
+		19:  nil, /* Descriptor */
+		20:  nil, /* AntTransmissionType */
+		21:  nil, /* AntDeviceNumber */
+		22:  nil, /* AntNetwork */
+		25:  nil, /* SourceType */
+		27:  nil, /* ProductName */
+		32:  nil, /* BatteryLevel */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &DeviceInfo{
@@ -114,7 +114,7 @@ func (m DeviceInfo) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.DeviceIndex,
 		1:   m.DeviceType,
@@ -137,8 +137,12 @@ func (m DeviceInfo) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

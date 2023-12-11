@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -50,36 +49,37 @@ func NewLength(mesg proto.Message) *Length {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.EnumInvalid,   /* Event */
-		1:   basetype.EnumInvalid,   /* EventType */
-		2:   basetype.Uint32Invalid, /* StartTime */
-		3:   basetype.Uint32Invalid, /* TotalElapsedTime */
-		4:   basetype.Uint32Invalid, /* TotalTimerTime */
-		5:   basetype.Uint16Invalid, /* TotalStrokes */
-		6:   basetype.Uint16Invalid, /* AvgSpeed */
-		7:   basetype.EnumInvalid,   /* SwimStroke */
-		9:   basetype.Uint8Invalid,  /* AvgSwimmingCadence */
-		10:  basetype.Uint8Invalid,  /* EventGroup */
-		11:  basetype.Uint16Invalid, /* TotalCalories */
-		12:  basetype.EnumInvalid,   /* LengthType */
-		18:  basetype.Uint16Invalid, /* PlayerScore */
-		19:  basetype.Uint16Invalid, /* OpponentScore */
-		20:  nil,                    /* StrokeCount */
-		21:  nil,                    /* ZoneCount */
-		22:  basetype.Uint16Invalid, /* EnhancedAvgRespirationRate */
-		23:  basetype.Uint16Invalid, /* EnhancedMaxRespirationRate */
-		24:  basetype.Uint8Invalid,  /* AvgRespirationRate */
-		25:  basetype.Uint8Invalid,  /* MaxRespirationRate */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		253: nil, /* Timestamp */
+		0:   nil, /* Event */
+		1:   nil, /* EventType */
+		2:   nil, /* StartTime */
+		3:   nil, /* TotalElapsedTime */
+		4:   nil, /* TotalTimerTime */
+		5:   nil, /* TotalStrokes */
+		6:   nil, /* AvgSpeed */
+		7:   nil, /* SwimStroke */
+		9:   nil, /* AvgSwimmingCadence */
+		10:  nil, /* EventGroup */
+		11:  nil, /* TotalCalories */
+		12:  nil, /* LengthType */
+		18:  nil, /* PlayerScore */
+		19:  nil, /* OpponentScore */
+		20:  nil, /* StrokeCount */
+		21:  nil, /* ZoneCount */
+		22:  nil, /* EnhancedAvgRespirationRate */
+		23:  nil, /* EnhancedMaxRespirationRate */
+		24:  nil, /* AvgRespirationRate */
+		25:  nil, /* MaxRespirationRate */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Length{
@@ -123,7 +123,7 @@ func (m Length) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		253: m.Timestamp,
 		0:   m.Event,
@@ -149,8 +149,12 @@ func (m Length) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

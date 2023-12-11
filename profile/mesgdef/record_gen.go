@@ -9,10 +9,8 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
-	"math"
 )
 
 // Record is a Record message.
@@ -113,98 +111,99 @@ func NewRecord(mesg proto.Message) *Record {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid,                        /* Timestamp */
-		0:   basetype.Sint32Invalid,                        /* PositionLat */
-		1:   basetype.Sint32Invalid,                        /* PositionLong */
-		2:   basetype.Uint16Invalid,                        /* Altitude */
-		3:   basetype.Uint8Invalid,                         /* HeartRate */
-		4:   basetype.Uint8Invalid,                         /* Cadence */
-		5:   basetype.Uint32Invalid,                        /* Distance */
-		6:   basetype.Uint16Invalid,                        /* Speed */
-		7:   basetype.Uint16Invalid,                        /* Power */
-		8:   nil,                                           /* CompressedSpeedDistance */
-		9:   basetype.Sint16Invalid,                        /* Grade */
-		10:  basetype.Uint8Invalid,                         /* Resistance */
-		11:  basetype.Sint32Invalid,                        /* TimeFromCourse */
-		12:  basetype.Uint8Invalid,                         /* CycleLength */
-		13:  basetype.Sint8Invalid,                         /* Temperature */
-		17:  nil,                                           /* Speed1S */
-		18:  basetype.Uint8Invalid,                         /* Cycles */
-		19:  basetype.Uint32Invalid,                        /* TotalCycles */
-		28:  basetype.Uint16Invalid,                        /* CompressedAccumulatedPower */
-		29:  basetype.Uint32Invalid,                        /* AccumulatedPower */
-		30:  basetype.Uint8Invalid,                         /* LeftRightBalance */
-		31:  basetype.Uint8Invalid,                         /* GpsAccuracy */
-		32:  basetype.Sint16Invalid,                        /* VerticalSpeed */
-		33:  basetype.Uint16Invalid,                        /* Calories */
-		39:  basetype.Uint16Invalid,                        /* VerticalOscillation */
-		40:  basetype.Uint16Invalid,                        /* StanceTimePercent */
-		41:  basetype.Uint16Invalid,                        /* StanceTime */
-		42:  basetype.EnumInvalid,                          /* ActivityType */
-		43:  basetype.Uint8Invalid,                         /* LeftTorqueEffectiveness */
-		44:  basetype.Uint8Invalid,                         /* RightTorqueEffectiveness */
-		45:  basetype.Uint8Invalid,                         /* LeftPedalSmoothness */
-		46:  basetype.Uint8Invalid,                         /* RightPedalSmoothness */
-		47:  basetype.Uint8Invalid,                         /* CombinedPedalSmoothness */
-		48:  basetype.Uint8Invalid,                         /* Time128 */
-		49:  basetype.EnumInvalid,                          /* StrokeType */
-		50:  basetype.Uint8Invalid,                         /* Zone */
-		51:  basetype.Uint16Invalid,                        /* BallSpeed */
-		52:  basetype.Uint16Invalid,                        /* Cadence256 */
-		53:  basetype.Uint8Invalid,                         /* FractionalCadence */
-		54:  basetype.Uint16Invalid,                        /* TotalHemoglobinConc */
-		55:  basetype.Uint16Invalid,                        /* TotalHemoglobinConcMin */
-		56:  basetype.Uint16Invalid,                        /* TotalHemoglobinConcMax */
-		57:  basetype.Uint16Invalid,                        /* SaturatedHemoglobinPercent */
-		58:  basetype.Uint16Invalid,                        /* SaturatedHemoglobinPercentMin */
-		59:  basetype.Uint16Invalid,                        /* SaturatedHemoglobinPercentMax */
-		62:  basetype.Uint8Invalid,                         /* DeviceIndex */
-		67:  basetype.Sint8Invalid,                         /* LeftPco */
-		68:  basetype.Sint8Invalid,                         /* RightPco */
-		69:  nil,                                           /* LeftPowerPhase */
-		70:  nil,                                           /* LeftPowerPhasePeak */
-		71:  nil,                                           /* RightPowerPhase */
-		72:  nil,                                           /* RightPowerPhasePeak */
-		73:  basetype.Uint32Invalid,                        /* EnhancedSpeed */
-		78:  basetype.Uint32Invalid,                        /* EnhancedAltitude */
-		81:  basetype.Uint8Invalid,                         /* BatterySoc */
-		82:  basetype.Uint16Invalid,                        /* MotorPower */
-		83:  basetype.Uint16Invalid,                        /* VerticalRatio */
-		84:  basetype.Uint16Invalid,                        /* StanceTimeBalance */
-		85:  basetype.Uint16Invalid,                        /* StepLength */
-		87:  basetype.Uint16Invalid,                        /* CycleLength16 */
-		91:  basetype.Uint32Invalid,                        /* AbsolutePressure */
-		92:  basetype.Uint32Invalid,                        /* Depth */
-		93:  basetype.Uint32Invalid,                        /* NextStopDepth */
-		94:  basetype.Uint32Invalid,                        /* NextStopTime */
-		95:  basetype.Uint32Invalid,                        /* TimeToSurface */
-		96:  basetype.Uint32Invalid,                        /* NdlTime */
-		97:  basetype.Uint8Invalid,                         /* CnsLoad */
-		98:  basetype.Uint16Invalid,                        /* N2Load */
-		99:  basetype.Uint8Invalid,                         /* RespirationRate */
-		108: basetype.Uint16Invalid,                        /* EnhancedRespirationRate */
-		114: math.Float32frombits(basetype.Float32Invalid), /* Grit */
-		115: math.Float32frombits(basetype.Float32Invalid), /* Flow */
-		116: basetype.Uint16Invalid,                        /* CurrentStress */
-		117: basetype.Uint16Invalid,                        /* EbikeTravelRange */
-		118: basetype.Uint8Invalid,                         /* EbikeBatteryLevel */
-		119: basetype.Uint8Invalid,                         /* EbikeAssistMode */
-		120: basetype.Uint8Invalid,                         /* EbikeAssistLevelPercent */
-		123: basetype.Uint32Invalid,                        /* AirTimeRemaining */
-		124: basetype.Uint16Invalid,                        /* PressureSac */
-		125: basetype.Uint16Invalid,                        /* VolumeSac */
-		126: basetype.Uint16Invalid,                        /* Rmv */
-		127: basetype.Sint32Invalid,                        /* AscentRate */
-		129: basetype.Uint8Invalid,                         /* Po2 */
-		139: basetype.Uint16Invalid,                        /* CoreTemperature */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* PositionLat */
+		1:   nil, /* PositionLong */
+		2:   nil, /* Altitude */
+		3:   nil, /* HeartRate */
+		4:   nil, /* Cadence */
+		5:   nil, /* Distance */
+		6:   nil, /* Speed */
+		7:   nil, /* Power */
+		8:   nil, /* CompressedSpeedDistance */
+		9:   nil, /* Grade */
+		10:  nil, /* Resistance */
+		11:  nil, /* TimeFromCourse */
+		12:  nil, /* CycleLength */
+		13:  nil, /* Temperature */
+		17:  nil, /* Speed1S */
+		18:  nil, /* Cycles */
+		19:  nil, /* TotalCycles */
+		28:  nil, /* CompressedAccumulatedPower */
+		29:  nil, /* AccumulatedPower */
+		30:  nil, /* LeftRightBalance */
+		31:  nil, /* GpsAccuracy */
+		32:  nil, /* VerticalSpeed */
+		33:  nil, /* Calories */
+		39:  nil, /* VerticalOscillation */
+		40:  nil, /* StanceTimePercent */
+		41:  nil, /* StanceTime */
+		42:  nil, /* ActivityType */
+		43:  nil, /* LeftTorqueEffectiveness */
+		44:  nil, /* RightTorqueEffectiveness */
+		45:  nil, /* LeftPedalSmoothness */
+		46:  nil, /* RightPedalSmoothness */
+		47:  nil, /* CombinedPedalSmoothness */
+		48:  nil, /* Time128 */
+		49:  nil, /* StrokeType */
+		50:  nil, /* Zone */
+		51:  nil, /* BallSpeed */
+		52:  nil, /* Cadence256 */
+		53:  nil, /* FractionalCadence */
+		54:  nil, /* TotalHemoglobinConc */
+		55:  nil, /* TotalHemoglobinConcMin */
+		56:  nil, /* TotalHemoglobinConcMax */
+		57:  nil, /* SaturatedHemoglobinPercent */
+		58:  nil, /* SaturatedHemoglobinPercentMin */
+		59:  nil, /* SaturatedHemoglobinPercentMax */
+		62:  nil, /* DeviceIndex */
+		67:  nil, /* LeftPco */
+		68:  nil, /* RightPco */
+		69:  nil, /* LeftPowerPhase */
+		70:  nil, /* LeftPowerPhasePeak */
+		71:  nil, /* RightPowerPhase */
+		72:  nil, /* RightPowerPhasePeak */
+		73:  nil, /* EnhancedSpeed */
+		78:  nil, /* EnhancedAltitude */
+		81:  nil, /* BatterySoc */
+		82:  nil, /* MotorPower */
+		83:  nil, /* VerticalRatio */
+		84:  nil, /* StanceTimeBalance */
+		85:  nil, /* StepLength */
+		87:  nil, /* CycleLength16 */
+		91:  nil, /* AbsolutePressure */
+		92:  nil, /* Depth */
+		93:  nil, /* NextStopDepth */
+		94:  nil, /* NextStopTime */
+		95:  nil, /* TimeToSurface */
+		96:  nil, /* NdlTime */
+		97:  nil, /* CnsLoad */
+		98:  nil, /* N2Load */
+		99:  nil, /* RespirationRate */
+		108: nil, /* EnhancedRespirationRate */
+		114: nil, /* Grit */
+		115: nil, /* Flow */
+		116: nil, /* CurrentStress */
+		117: nil, /* EbikeTravelRange */
+		118: nil, /* EbikeBatteryLevel */
+		119: nil, /* EbikeAssistMode */
+		120: nil, /* EbikeAssistLevelPercent */
+		123: nil, /* AirTimeRemaining */
+		124: nil, /* PressureSac */
+		125: nil, /* VolumeSac */
+		126: nil, /* Rmv */
+		127: nil, /* AscentRate */
+		129: nil, /* Po2 */
+		139: nil, /* CoreTemperature */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Record{
@@ -310,7 +309,7 @@ func (m Record) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.PositionLat,
 		1:   m.PositionLong,
@@ -398,8 +397,12 @@ func (m Record) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

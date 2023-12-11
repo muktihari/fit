@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,20 +33,21 @@ func NewMemoGlob(mesg proto.Message) *MemoGlob {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		250: basetype.Uint32Invalid, /* PartIndex */
-		0:   nil,                    /* Memo */
-		1:   basetype.Uint16Invalid, /* MesgNum */
-		2:   basetype.Uint16Invalid, /* ParentIndex */
-		3:   basetype.Uint8Invalid,  /* FieldNum */
-		4:   nil,                    /* Data */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		250: nil, /* PartIndex */
+		0:   nil, /* Memo */
+		1:   nil, /* MesgNum */
+		2:   nil, /* ParentIndex */
+		3:   nil, /* FieldNum */
+		4:   nil, /* Data */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &MemoGlob{
@@ -75,7 +75,7 @@ func (m MemoGlob) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		250: m.PartIndex,
 		0:   m.Memo,
 		1:   m.MesgNum,
@@ -85,8 +85,12 @@ func (m MemoGlob) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

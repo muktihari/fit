@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,22 +35,23 @@ func NewWorkout(mesg proto.Message) *Workout {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid,  /* MessageIndex */
-		4:   basetype.EnumInvalid,    /* Sport */
-		5:   basetype.Uint32zInvalid, /* Capabilities */
-		6:   basetype.Uint16Invalid,  /* NumValidSteps */
-		8:   basetype.StringInvalid,  /* WktName */
-		11:  basetype.EnumInvalid,    /* SubSport */
-		14:  basetype.Uint16Invalid,  /* PoolLength */
-		15:  basetype.EnumInvalid,    /* PoolLengthUnit */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		4:   nil, /* Sport */
+		5:   nil, /* Capabilities */
+		6:   nil, /* NumValidSteps */
+		8:   nil, /* WktName */
+		11:  nil, /* SubSport */
+		14:  nil, /* PoolLength */
+		15:  nil, /* PoolLengthUnit */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Workout{
@@ -81,7 +81,7 @@ func (m Workout) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		4:   m.Sport,
 		5:   m.Capabilities,
@@ -93,8 +93,12 @@ func (m Workout) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,22 +35,23 @@ func NewMaxMetData(mesg proto.Message) *MaxMetData {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:  basetype.Uint32Invalid, /* UpdateTime */
-		2:  basetype.Uint16Invalid, /* Vo2Max */
-		5:  basetype.EnumInvalid,   /* Sport */
-		6:  basetype.EnumInvalid,   /* SubSport */
-		8:  basetype.EnumInvalid,   /* MaxMetCategory */
-		9:  false,                  /* CalibratedData */
-		12: basetype.EnumInvalid,   /* HrSource */
-		13: basetype.EnumInvalid,   /* SpeedSource */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:  nil, /* UpdateTime */
+		2:  nil, /* Vo2Max */
+		5:  nil, /* Sport */
+		6:  nil, /* SubSport */
+		8:  nil, /* MaxMetCategory */
+		9:  nil, /* CalibratedData */
+		12: nil, /* HrSource */
+		13: nil, /* SpeedSource */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &MaxMetData{
@@ -81,7 +81,7 @@ func (m MaxMetData) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:  m.UpdateTime,
 		2:  m.Vo2Max,
 		5:  m.Sport,
@@ -93,8 +93,12 @@ func (m MaxMetData) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -9,10 +9,8 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
-	"math"
 )
 
 // Lap is a Lap message.
@@ -152,137 +150,138 @@ func NewLap(mesg proto.Message) *Lap {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid,                        /* MessageIndex */
-		253: basetype.Uint32Invalid,                        /* Timestamp */
-		0:   basetype.EnumInvalid,                          /* Event */
-		1:   basetype.EnumInvalid,                          /* EventType */
-		2:   basetype.Uint32Invalid,                        /* StartTime */
-		3:   basetype.Sint32Invalid,                        /* StartPositionLat */
-		4:   basetype.Sint32Invalid,                        /* StartPositionLong */
-		5:   basetype.Sint32Invalid,                        /* EndPositionLat */
-		6:   basetype.Sint32Invalid,                        /* EndPositionLong */
-		7:   basetype.Uint32Invalid,                        /* TotalElapsedTime */
-		8:   basetype.Uint32Invalid,                        /* TotalTimerTime */
-		9:   basetype.Uint32Invalid,                        /* TotalDistance */
-		10:  basetype.Uint32Invalid,                        /* TotalCycles */
-		11:  basetype.Uint16Invalid,                        /* TotalCalories */
-		12:  basetype.Uint16Invalid,                        /* TotalFatCalories */
-		13:  basetype.Uint16Invalid,                        /* AvgSpeed */
-		14:  basetype.Uint16Invalid,                        /* MaxSpeed */
-		15:  basetype.Uint8Invalid,                         /* AvgHeartRate */
-		16:  basetype.Uint8Invalid,                         /* MaxHeartRate */
-		17:  basetype.Uint8Invalid,                         /* AvgCadence */
-		18:  basetype.Uint8Invalid,                         /* MaxCadence */
-		19:  basetype.Uint16Invalid,                        /* AvgPower */
-		20:  basetype.Uint16Invalid,                        /* MaxPower */
-		21:  basetype.Uint16Invalid,                        /* TotalAscent */
-		22:  basetype.Uint16Invalid,                        /* TotalDescent */
-		23:  basetype.EnumInvalid,                          /* Intensity */
-		24:  basetype.EnumInvalid,                          /* LapTrigger */
-		25:  basetype.EnumInvalid,                          /* Sport */
-		26:  basetype.Uint8Invalid,                         /* EventGroup */
-		32:  basetype.Uint16Invalid,                        /* NumLengths */
-		33:  basetype.Uint16Invalid,                        /* NormalizedPower */
-		34:  basetype.Uint16Invalid,                        /* LeftRightBalance */
-		35:  basetype.Uint16Invalid,                        /* FirstLengthIndex */
-		37:  basetype.Uint16Invalid,                        /* AvgStrokeDistance */
-		38:  basetype.EnumInvalid,                          /* SwimStroke */
-		39:  basetype.EnumInvalid,                          /* SubSport */
-		40:  basetype.Uint16Invalid,                        /* NumActiveLengths */
-		41:  basetype.Uint32Invalid,                        /* TotalWork */
-		42:  basetype.Uint16Invalid,                        /* AvgAltitude */
-		43:  basetype.Uint16Invalid,                        /* MaxAltitude */
-		44:  basetype.Uint8Invalid,                         /* GpsAccuracy */
-		45:  basetype.Sint16Invalid,                        /* AvgGrade */
-		46:  basetype.Sint16Invalid,                        /* AvgPosGrade */
-		47:  basetype.Sint16Invalid,                        /* AvgNegGrade */
-		48:  basetype.Sint16Invalid,                        /* MaxPosGrade */
-		49:  basetype.Sint16Invalid,                        /* MaxNegGrade */
-		50:  basetype.Sint8Invalid,                         /* AvgTemperature */
-		51:  basetype.Sint8Invalid,                         /* MaxTemperature */
-		52:  basetype.Uint32Invalid,                        /* TotalMovingTime */
-		53:  basetype.Sint16Invalid,                        /* AvgPosVerticalSpeed */
-		54:  basetype.Sint16Invalid,                        /* AvgNegVerticalSpeed */
-		55:  basetype.Sint16Invalid,                        /* MaxPosVerticalSpeed */
-		56:  basetype.Sint16Invalid,                        /* MaxNegVerticalSpeed */
-		57:  nil,                                           /* TimeInHrZone */
-		58:  nil,                                           /* TimeInSpeedZone */
-		59:  nil,                                           /* TimeInCadenceZone */
-		60:  nil,                                           /* TimeInPowerZone */
-		61:  basetype.Uint16Invalid,                        /* RepetitionNum */
-		62:  basetype.Uint16Invalid,                        /* MinAltitude */
-		63:  basetype.Uint8Invalid,                         /* MinHeartRate */
-		71:  basetype.Uint16Invalid,                        /* WktStepIndex */
-		74:  basetype.Uint16Invalid,                        /* OpponentScore */
-		75:  nil,                                           /* StrokeCount */
-		76:  nil,                                           /* ZoneCount */
-		77:  basetype.Uint16Invalid,                        /* AvgVerticalOscillation */
-		78:  basetype.Uint16Invalid,                        /* AvgStanceTimePercent */
-		79:  basetype.Uint16Invalid,                        /* AvgStanceTime */
-		80:  basetype.Uint8Invalid,                         /* AvgFractionalCadence */
-		81:  basetype.Uint8Invalid,                         /* MaxFractionalCadence */
-		82:  basetype.Uint8Invalid,                         /* TotalFractionalCycles */
-		83:  basetype.Uint16Invalid,                        /* PlayerScore */
-		84:  nil,                                           /* AvgTotalHemoglobinConc */
-		85:  nil,                                           /* MinTotalHemoglobinConc */
-		86:  nil,                                           /* MaxTotalHemoglobinConc */
-		87:  nil,                                           /* AvgSaturatedHemoglobinPercent */
-		88:  nil,                                           /* MinSaturatedHemoglobinPercent */
-		89:  nil,                                           /* MaxSaturatedHemoglobinPercent */
-		91:  basetype.Uint8Invalid,                         /* AvgLeftTorqueEffectiveness */
-		92:  basetype.Uint8Invalid,                         /* AvgRightTorqueEffectiveness */
-		93:  basetype.Uint8Invalid,                         /* AvgLeftPedalSmoothness */
-		94:  basetype.Uint8Invalid,                         /* AvgRightPedalSmoothness */
-		95:  basetype.Uint8Invalid,                         /* AvgCombinedPedalSmoothness */
-		98:  basetype.Uint32Invalid,                        /* TimeStanding */
-		99:  basetype.Uint16Invalid,                        /* StandCount */
-		100: basetype.Sint8Invalid,                         /* AvgLeftPco */
-		101: basetype.Sint8Invalid,                         /* AvgRightPco */
-		102: nil,                                           /* AvgLeftPowerPhase */
-		103: nil,                                           /* AvgLeftPowerPhasePeak */
-		104: nil,                                           /* AvgRightPowerPhase */
-		105: nil,                                           /* AvgRightPowerPhasePeak */
-		106: nil,                                           /* AvgPowerPosition */
-		107: nil,                                           /* MaxPowerPosition */
-		108: nil,                                           /* AvgCadencePosition */
-		109: nil,                                           /* MaxCadencePosition */
-		110: basetype.Uint32Invalid,                        /* EnhancedAvgSpeed */
-		111: basetype.Uint32Invalid,                        /* EnhancedMaxSpeed */
-		112: basetype.Uint32Invalid,                        /* EnhancedAvgAltitude */
-		113: basetype.Uint32Invalid,                        /* EnhancedMinAltitude */
-		114: basetype.Uint32Invalid,                        /* EnhancedMaxAltitude */
-		115: basetype.Uint16Invalid,                        /* AvgLevMotorPower */
-		116: basetype.Uint16Invalid,                        /* MaxLevMotorPower */
-		117: basetype.Uint8Invalid,                         /* LevBatteryConsumption */
-		118: basetype.Uint16Invalid,                        /* AvgVerticalRatio */
-		119: basetype.Uint16Invalid,                        /* AvgStanceTimeBalance */
-		120: basetype.Uint16Invalid,                        /* AvgStepLength */
-		121: basetype.Uint16Invalid,                        /* AvgVam */
-		122: basetype.Uint32Invalid,                        /* AvgDepth */
-		123: basetype.Uint32Invalid,                        /* MaxDepth */
-		124: basetype.Sint8Invalid,                         /* MinTemperature */
-		136: basetype.Uint16Invalid,                        /* EnhancedAvgRespirationRate */
-		137: basetype.Uint16Invalid,                        /* EnhancedMaxRespirationRate */
-		147: basetype.Uint8Invalid,                         /* AvgRespirationRate */
-		148: basetype.Uint8Invalid,                         /* MaxRespirationRate */
-		149: math.Float32frombits(basetype.Float32Invalid), /* TotalGrit */
-		150: math.Float32frombits(basetype.Float32Invalid), /* TotalFlow */
-		151: basetype.Uint16Invalid,                        /* JumpCount */
-		153: math.Float32frombits(basetype.Float32Invalid), /* AvgGrit */
-		154: math.Float32frombits(basetype.Float32Invalid), /* AvgFlow */
-		156: basetype.Uint8Invalid,                         /* TotalFractionalAscent */
-		157: basetype.Uint8Invalid,                         /* TotalFractionalDescent */
-		158: basetype.Uint16Invalid,                        /* AvgCoreTemperature */
-		159: basetype.Uint16Invalid,                        /* MinCoreTemperature */
-		160: basetype.Uint16Invalid,                        /* MaxCoreTemperature */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		253: nil, /* Timestamp */
+		0:   nil, /* Event */
+		1:   nil, /* EventType */
+		2:   nil, /* StartTime */
+		3:   nil, /* StartPositionLat */
+		4:   nil, /* StartPositionLong */
+		5:   nil, /* EndPositionLat */
+		6:   nil, /* EndPositionLong */
+		7:   nil, /* TotalElapsedTime */
+		8:   nil, /* TotalTimerTime */
+		9:   nil, /* TotalDistance */
+		10:  nil, /* TotalCycles */
+		11:  nil, /* TotalCalories */
+		12:  nil, /* TotalFatCalories */
+		13:  nil, /* AvgSpeed */
+		14:  nil, /* MaxSpeed */
+		15:  nil, /* AvgHeartRate */
+		16:  nil, /* MaxHeartRate */
+		17:  nil, /* AvgCadence */
+		18:  nil, /* MaxCadence */
+		19:  nil, /* AvgPower */
+		20:  nil, /* MaxPower */
+		21:  nil, /* TotalAscent */
+		22:  nil, /* TotalDescent */
+		23:  nil, /* Intensity */
+		24:  nil, /* LapTrigger */
+		25:  nil, /* Sport */
+		26:  nil, /* EventGroup */
+		32:  nil, /* NumLengths */
+		33:  nil, /* NormalizedPower */
+		34:  nil, /* LeftRightBalance */
+		35:  nil, /* FirstLengthIndex */
+		37:  nil, /* AvgStrokeDistance */
+		38:  nil, /* SwimStroke */
+		39:  nil, /* SubSport */
+		40:  nil, /* NumActiveLengths */
+		41:  nil, /* TotalWork */
+		42:  nil, /* AvgAltitude */
+		43:  nil, /* MaxAltitude */
+		44:  nil, /* GpsAccuracy */
+		45:  nil, /* AvgGrade */
+		46:  nil, /* AvgPosGrade */
+		47:  nil, /* AvgNegGrade */
+		48:  nil, /* MaxPosGrade */
+		49:  nil, /* MaxNegGrade */
+		50:  nil, /* AvgTemperature */
+		51:  nil, /* MaxTemperature */
+		52:  nil, /* TotalMovingTime */
+		53:  nil, /* AvgPosVerticalSpeed */
+		54:  nil, /* AvgNegVerticalSpeed */
+		55:  nil, /* MaxPosVerticalSpeed */
+		56:  nil, /* MaxNegVerticalSpeed */
+		57:  nil, /* TimeInHrZone */
+		58:  nil, /* TimeInSpeedZone */
+		59:  nil, /* TimeInCadenceZone */
+		60:  nil, /* TimeInPowerZone */
+		61:  nil, /* RepetitionNum */
+		62:  nil, /* MinAltitude */
+		63:  nil, /* MinHeartRate */
+		71:  nil, /* WktStepIndex */
+		74:  nil, /* OpponentScore */
+		75:  nil, /* StrokeCount */
+		76:  nil, /* ZoneCount */
+		77:  nil, /* AvgVerticalOscillation */
+		78:  nil, /* AvgStanceTimePercent */
+		79:  nil, /* AvgStanceTime */
+		80:  nil, /* AvgFractionalCadence */
+		81:  nil, /* MaxFractionalCadence */
+		82:  nil, /* TotalFractionalCycles */
+		83:  nil, /* PlayerScore */
+		84:  nil, /* AvgTotalHemoglobinConc */
+		85:  nil, /* MinTotalHemoglobinConc */
+		86:  nil, /* MaxTotalHemoglobinConc */
+		87:  nil, /* AvgSaturatedHemoglobinPercent */
+		88:  nil, /* MinSaturatedHemoglobinPercent */
+		89:  nil, /* MaxSaturatedHemoglobinPercent */
+		91:  nil, /* AvgLeftTorqueEffectiveness */
+		92:  nil, /* AvgRightTorqueEffectiveness */
+		93:  nil, /* AvgLeftPedalSmoothness */
+		94:  nil, /* AvgRightPedalSmoothness */
+		95:  nil, /* AvgCombinedPedalSmoothness */
+		98:  nil, /* TimeStanding */
+		99:  nil, /* StandCount */
+		100: nil, /* AvgLeftPco */
+		101: nil, /* AvgRightPco */
+		102: nil, /* AvgLeftPowerPhase */
+		103: nil, /* AvgLeftPowerPhasePeak */
+		104: nil, /* AvgRightPowerPhase */
+		105: nil, /* AvgRightPowerPhasePeak */
+		106: nil, /* AvgPowerPosition */
+		107: nil, /* MaxPowerPosition */
+		108: nil, /* AvgCadencePosition */
+		109: nil, /* MaxCadencePosition */
+		110: nil, /* EnhancedAvgSpeed */
+		111: nil, /* EnhancedMaxSpeed */
+		112: nil, /* EnhancedAvgAltitude */
+		113: nil, /* EnhancedMinAltitude */
+		114: nil, /* EnhancedMaxAltitude */
+		115: nil, /* AvgLevMotorPower */
+		116: nil, /* MaxLevMotorPower */
+		117: nil, /* LevBatteryConsumption */
+		118: nil, /* AvgVerticalRatio */
+		119: nil, /* AvgStanceTimeBalance */
+		120: nil, /* AvgStepLength */
+		121: nil, /* AvgVam */
+		122: nil, /* AvgDepth */
+		123: nil, /* MaxDepth */
+		124: nil, /* MinTemperature */
+		136: nil, /* EnhancedAvgRespirationRate */
+		137: nil, /* EnhancedMaxRespirationRate */
+		147: nil, /* AvgRespirationRate */
+		148: nil, /* MaxRespirationRate */
+		149: nil, /* TotalGrit */
+		150: nil, /* TotalFlow */
+		151: nil, /* JumpCount */
+		153: nil, /* AvgGrit */
+		154: nil, /* AvgFlow */
+		156: nil, /* TotalFractionalAscent */
+		157: nil, /* TotalFractionalDescent */
+		158: nil, /* AvgCoreTemperature */
+		159: nil, /* MinCoreTemperature */
+		160: nil, /* MaxCoreTemperature */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Lap{
@@ -427,7 +426,7 @@ func (m Lap) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		253: m.Timestamp,
 		0:   m.Event,
@@ -554,8 +553,12 @@ func (m Lap) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

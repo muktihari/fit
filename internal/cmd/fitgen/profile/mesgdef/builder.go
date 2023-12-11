@@ -80,7 +80,6 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				Name:          strutil.ToTitle(mesg.Fields[i].Name),
 				String:        field.Name,
 				Type:          transformType(field.Type, field.Array),
-				InvalidValue:  b.baseTypeInvalid(strutil.ToTitle(b.baseTypeMapByProfileType[field.Type]), field.Array),
 				AssignedValue: b.transformValue(field.Num, field.Type, field.Array),
 				Comment:       field.Comment,
 			}
@@ -105,12 +104,8 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			}
 
 			fields = append(fields, f)
-			if strings.HasPrefix(f.InvalidValue, "basetype") {
+			if strings.HasPrefix(f.Type, "basetype") {
 				imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
-			}
-
-			if strings.HasPrefix(f.InvalidValue, "math") {
-				imports["math"] = struct{}{}
 			}
 		}
 
@@ -131,26 +126,6 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 	}
 
 	return dataBuilders, nil
-}
-
-func (b *mesgdefBuilder) baseTypeInvalid(_type, array string) string {
-	if strings.ToLower(_type) == "bool" {
-		return "false"
-	}
-
-	if array == "" {
-		if strings.HasPrefix(_type, "Float32") {
-			return fmt.Sprintf("math.Float32frombits(basetype.%sInvalid)", _type)
-		}
-
-		if strings.HasPrefix(_type, "Float64") {
-			return fmt.Sprintf("math.Float64frombits(basetype.%sInvalid)", _type)
-		}
-
-		return fmt.Sprintf("basetype.%sInvalid", _type)
-	}
-
-	return "nil"
 }
 
 func transformType(name, array string) string {

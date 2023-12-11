@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,21 +34,22 @@ func NewVideoClip(mesg proto.Message) *VideoClip {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0: basetype.Uint16Invalid, /* ClipNumber */
-		1: basetype.Uint32Invalid, /* StartTimestamp */
-		2: basetype.Uint16Invalid, /* StartTimestampMs */
-		3: basetype.Uint32Invalid, /* EndTimestamp */
-		4: basetype.Uint16Invalid, /* EndTimestampMs */
-		6: basetype.Uint32Invalid, /* ClipStart */
-		7: basetype.Uint32Invalid, /* ClipEnd */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0: nil, /* ClipNumber */
+		1: nil, /* StartTimestamp */
+		2: nil, /* StartTimestampMs */
+		3: nil, /* EndTimestamp */
+		4: nil, /* EndTimestampMs */
+		6: nil, /* ClipStart */
+		7: nil, /* ClipEnd */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &VideoClip{
@@ -78,7 +78,7 @@ func (m VideoClip) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0: m.ClipNumber,
 		1: m.StartTimestamp,
 		2: m.StartTimestampMs,
@@ -89,8 +89,12 @@ func (m VideoClip) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

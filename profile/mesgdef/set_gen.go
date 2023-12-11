@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -39,25 +38,26 @@ func NewSet(mesg proto.Message) *Set {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint32Invalid, /* Duration */
-		3:   basetype.Uint16Invalid, /* Repetitions */
-		4:   basetype.Uint16Invalid, /* Weight */
-		5:   basetype.Uint8Invalid,  /* SetType */
-		6:   basetype.Uint32Invalid, /* StartTime */
-		7:   nil,                    /* Category */
-		8:   nil,                    /* CategorySubtype */
-		9:   basetype.Uint16Invalid, /* WeightDisplayUnit */
-		10:  basetype.Uint16Invalid, /* MessageIndex */
-		11:  basetype.Uint16Invalid, /* WktStepIndex */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* Timestamp */
+		0:   nil, /* Duration */
+		3:   nil, /* Repetitions */
+		4:   nil, /* Weight */
+		5:   nil, /* SetType */
+		6:   nil, /* StartTime */
+		7:   nil, /* Category */
+		8:   nil, /* CategorySubtype */
+		9:   nil, /* WeightDisplayUnit */
+		10:  nil, /* MessageIndex */
+		11:  nil, /* WktStepIndex */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Set{
@@ -90,7 +90,7 @@ func (m Set) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.Timestamp,
 		0:   m.Duration,
 		3:   m.Repetitions,
@@ -105,8 +105,12 @@ func (m Set) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -38,28 +38,29 @@ func NewFieldDescription(mesg proto.Message) *FieldDescription {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:  basetype.Uint8Invalid,  /* DeveloperDataIndex */
-		1:  basetype.Uint8Invalid,  /* FieldDefinitionNumber */
-		2:  basetype.Uint8Invalid,  /* FitBaseTypeId */
-		3:  nil,                    /* FieldName */
-		4:  basetype.Uint8Invalid,  /* Array */
-		5:  basetype.StringInvalid, /* Components */
-		6:  basetype.Uint8Invalid,  /* Scale */
-		7:  basetype.Sint8Invalid,  /* Offset */
-		8:  nil,                    /* Units */
-		9:  basetype.StringInvalid, /* Bits */
-		10: basetype.StringInvalid, /* Accumulate */
-		13: basetype.Uint16Invalid, /* FitBaseUnitId */
-		14: basetype.Uint16Invalid, /* NativeMesgNum */
-		15: basetype.Uint8Invalid,  /* NativeFieldNum */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:  nil, /* DeveloperDataIndex */
+		1:  nil, /* FieldDefinitionNumber */
+		2:  nil, /* FitBaseTypeId */
+		3:  nil, /* FieldName */
+		4:  nil, /* Array */
+		5:  nil, /* Components */
+		6:  nil, /* Scale */
+		7:  nil, /* Offset */
+		8:  nil, /* Units */
+		9:  nil, /* Bits */
+		10: nil, /* Accumulate */
+		13: nil, /* FitBaseUnitId */
+		14: nil, /* NativeMesgNum */
+		15: nil, /* NativeFieldNum */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &FieldDescription{
@@ -93,7 +94,7 @@ func (m FieldDescription) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:  m.DeveloperDataIndex,
 		1:  m.FieldDefinitionNumber,
 		2:  m.FitBaseTypeId,
@@ -111,6 +112,11 @@ func (m FieldDescription) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
+
 }

@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,19 +32,20 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0: basetype.Uint8Invalid,   /* ChannelNumber */
-		1: basetype.Uint8zInvalid,  /* DeviceType */
-		2: basetype.Uint16zInvalid, /* DeviceNumber */
-		3: basetype.Uint8zInvalid,  /* TransmissionType */
-		4: basetype.Uint8Invalid,   /* DeviceIndex */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0: nil, /* ChannelNumber */
+		1: nil, /* DeviceType */
+		2: nil, /* DeviceNumber */
+		3: nil, /* TransmissionType */
+		4: nil, /* DeviceIndex */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &AntChannelId{
@@ -72,7 +72,7 @@ func (m AntChannelId) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0: m.ChannelNumber,
 		1: m.DeviceType,
 		2: m.DeviceNumber,
@@ -81,8 +81,12 @@ func (m AntChannelId) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }
