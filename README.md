@@ -29,9 +29,19 @@ We provides some CLI programs to interact with FIT files that can be found in `c
 
 Now, the `fitactivity` and `fitconv` programs are automatically built during release; for Linux, Windows, and macOS platforms. They are available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
-## Generate Custom FIT SDK
+## Custom FIT SDK
 
-Please see [Generate Custom FIT SDK](/docs/generating_code.md#Generate-Custom-FIT-SDK)
+A FIT file may contain manufacturer specific messages that are not defined in `Global Profile (Profile.xlsx)` since it's specific to a manufacturer (other manufacturers may have different meaning for that messages)
+
+To be able to decode or create the manufacturer specific messages, we provide options to pick based on your need:
+
+1. Register manufacturer specific messages at runtime
+
+   For those who prefer using this SDK as it is without need to generate their own custom SDK, we provide `factory` package as an abstraction to hold the profile messages. For example, please see [usage.md/#Available-Decode-Options (WithFactory)](/docs/usage.md#Available-Decode-Options).
+
+2. Generate custom FIT SDK
+
+   Please see [Generate Custom FIT SDK](/docs/generating_code.md#Generate-Custom-FIT-SDK)
 
 ## Contributing
 
