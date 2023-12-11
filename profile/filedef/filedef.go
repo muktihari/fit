@@ -5,26 +5,65 @@
 package filedef
 
 import (
+	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
+// File is an interface for defining common type file, any defined common file type should implement
+// the following methods to be able to work with Listener (and other building block in filedef package).
 type File interface {
+	// Add adds message into file structure.
 	Add(mesg proto.Message)
+	// ToFit converts file back to proto.Fit structure.
+	ToFit(fac Factory) proto.Fit
 }
 
+// Factory is factory interface used in filedef package to convert a common type file back to its proto.Fit representation.
 type Factory interface {
 	CreateMesg(num typedef.MesgNum) proto.Message
 }
 
-type PutMessage interface {
-	PutMessage(mesg *proto.Message)
-}
-
+// PutMessages bulks put messages
 func PutMessages[S []E, E PutMessage](factory Factory, messages *[]proto.Message, mesgNum typedef.MesgNum, s S) {
 	for i := range s {
 		mesg := factory.CreateMesg(mesgNum)
 		s[i].PutMessage(&mesg)
 		*messages = append(*messages, mesg)
 	}
+}
+
+// PutMessage is a type constraint to retrieve all mesgdef structures which implement PutMessage method.
+type PutMessage interface {
+	PutMessage(mesg *proto.Message)
+}
+
+// SortMessagesByTimestamp sorts messages by timestamp only if the message has timestamp field.
+// When a message has no timestamp field, its order will not be changed.
+func SortMessagesByTimestamp(messages []proto.Message) {
+	slices.SortFunc(messages, func(m1, m2 proto.Message) int {
+		value1 := m1.FieldValueByNum(proto.FieldNumTimestamp)
+		if value1 == nil {
+			return 0
+		}
+
+		value2 := m2.FieldValueByNum(proto.FieldNumTimestamp)
+		if value2 == nil {
+			return 0
+		}
+
+		timestamp1 := typeconv.ToUint32[uint32](value1)
+		timestamp2 := typeconv.ToUint32[uint32](value2)
+
+		if timestamp1 == timestamp2 {
+			return 0
+		}
+
+		if timestamp1 < timestamp2 {
+			return -1
+		}
+
+		return 1
+	})
 }

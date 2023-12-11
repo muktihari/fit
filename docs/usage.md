@@ -104,7 +104,9 @@ func main() {
 
     // The listener will receive every decoded message from the decoder as soon as it is decoded,
     // The Activity Listener will transform the messages into an Activity File.
-    al := filedef.NewListener(filedef.NewActivity())
+    al := filedef.NewListener[filedef.Activity]()
+    defer al.Close() // release channel used by listener
+
     dec := decoder.New(bufio.NewReader(f),
         decoder.WithMesgListener(al), // Add activity listener to the decoder
         decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
@@ -171,7 +173,9 @@ func main() {
     }
     defer f.Close()
 
-    al := filedef.NewListener(filedef.NewActivity())
+    al := filedef.NewListener[filedef.Activity]()
+    defer al.Close() // release channel used by listener
+
     dec := decoder.New(bufio.NewReader(f),
         decoder.WithMesgListener(al),
         decoder.WithBroadcastOnly(),
@@ -188,7 +192,6 @@ func main() {
     // File Type: activity
 
     if fileId.Type != typedef.FileActivity {
-        _ = al.File() // Note: It is recommended to call this method to release the listener's channel.
         return // Let's stop.
     }
 
@@ -347,7 +350,7 @@ func main() {
 
 ### Encode Common File Types
 
-Currently, only Activity Files are supported. Please note that this feature is still under development and has not been tested yet.
+Please note that this feature is still under development and has not been fully tested yet.
 
 ```go
     ...
