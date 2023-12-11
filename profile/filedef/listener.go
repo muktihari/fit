@@ -9,23 +9,31 @@ import (
 )
 
 // Listener is Message Listener.
-type Listener[T File] struct {
-	file  T
-	mesgc chan proto.Message
-	done  chan struct{}
+type Listener[F any, T FilePtr[F]] struct {
+	file    F
+	options *options
+	mesgc   chan proto.Message
+	done    chan struct{}
+}
+
+// FilePtr is a type constraint for pointer of File.
+type FilePtr[T any] interface {
+	*T
+	File
 }
 
 // NewListener creates mesg listener for given file T.
-func NewListener[T File](file T, opts ...Option) *Listener[T] {
+func NewListener[F any, T FilePtr[F]](opts ...Option) *Listener[F, T] {
 	options := defaultOptions()
 	for _, opt := range opts {
 		opt.apply(options)
 	}
 
-	l := &Listener[T]{
-		file:  file,
-		mesgc: make(chan proto.Message, options.channelBuffer),
-		done:  make(chan struct{}),
+	l := &Listener[F, T]{
+		file:    *new(F),
+		options: options,
+		mesgc:   make(chan proto.Message, options.channelBuffer),
+		done:    make(chan struct{}),
 	}
 
 	go l.loop()
@@ -33,20 +41,38 @@ func NewListener[T File](file T, opts ...Option) *Listener[T] {
 	return l
 }
 
-func (l *Listener[T]) loop() {
+func (l *Listener[F, T]) loop() {
 	for mesg := range l.mesgc {
-		l.file.Add(mesg)
+		T(&l.file).Add(mesg)
 	}
 	close(l.done)
 }
 
-func (l *Listener[T]) OnMesg(mesg proto.Message) { l.mesgc <- mesg }
+func (l *Listener[F, T]) OnMesg(mesg proto.Message) { l.mesgc <- mesg }
 
-// File returns the resulting file after the decode process is completed.
-func (l *Listener[T]) File() T {
+// Close closes channel and wait until all messages is consumed.
+func (l *Listener[F, T]) Close() {
 	close(l.mesgc)
 	<-l.done
-	return l.file
+}
+
+// File returns the resulting file after the a single decode process is completed. This will reset fields used by listener
+// and the listener is ready to be used for next chained FIT file.
+func (l *Listener[F, T]) File() T {
+	l.Close()
+
+	file := l.file
+	l.reset()
+
+	go l.loop()
+
+	return T(&file)
+}
+
+func (l *Listener[F, T]) reset() {
+	l.file = *new(F)
+	l.mesgc = make(chan proto.Message, l.options.channelBuffer)
+	l.done = make(chan struct{})
 }
 
 type options struct {

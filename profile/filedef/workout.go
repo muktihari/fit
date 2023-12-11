@@ -5,13 +5,17 @@
 package filedef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
-type WorkoutFile struct {
+// Workout is a file contains instructions for performing a structured activity.
+//
+// ref: https://developer.garmin.com/fit/file-types/workout/
+type Workout struct {
 	FileId       *mesgdef.FileId
 	Workout      *mesgdef.Workout
 	WorkoutSteps []*mesgdef.WorkoutStep
@@ -19,10 +23,15 @@ type WorkoutFile struct {
 	// Developer Data Lookup
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
+
+	// Messages not related to Workout
+	UnrelatedMessages []proto.Message
 }
 
-func NewWorkoutFile(mesgs ...proto.Message) (f *WorkoutFile, ok bool) {
-	f = &WorkoutFile{}
+var _ File = &Workout{}
+
+func NewWorkout(mesgs ...proto.Message) (f *Workout, ok bool) {
+	f = &Workout{}
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
@@ -34,7 +43,7 @@ func NewWorkoutFile(mesgs ...proto.Message) (f *WorkoutFile, ok bool) {
 	return f, true
 }
 
-func (f *WorkoutFile) Add(mesg proto.Message) {
+func (f *Workout) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
 		f.FileId = mesgdef.NewFileId(mesg)
@@ -46,5 +55,37 @@ func (f *WorkoutFile) Add(mesg proto.Message) {
 		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
 	case mesgnum.FieldDescription:
 		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
+	default:
+		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
+}
+
+func (f *Workout) ToFit(fac Factory) proto.Fit {
+	if fac == nil {
+		fac = factory.StandardFactory()
+	}
+
+	size := 2 /* non slice fields */
+
+	size += len(f.WorkoutSteps) + len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
+
+	fit := proto.Fit{
+		Messages: make([]proto.Message, 0, size),
+	}
+
+	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
+	if f.FileId != nil {
+		mesg := fac.CreateMesg(mesgnum.FileId)
+		f.FileId.PutMessage(&mesg)
+		fit.Messages = append(fit.Messages, mesg)
+	}
+
+	PutMessages(fac, &fit.Messages, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	PutMessages(fac, &fit.Messages, mesgnum.FieldDescription, f.FieldDescriptions)
+
+	PutMessages(fac, &fit.Messages, mesgnum.WorkoutStep, f.WorkoutSteps)
+
+	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
+
+	return fit
 }
