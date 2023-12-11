@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -45,31 +44,32 @@ func NewTimeInZone(mesg proto.Message) *TimeInZone {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* ReferenceMesg */
-		1:   basetype.Uint16Invalid, /* ReferenceIndex */
-		2:   nil,                    /* TimeInHrZone */
-		3:   nil,                    /* TimeInSpeedZone */
-		4:   nil,                    /* TimeInCadenceZone */
-		5:   nil,                    /* TimeInPowerZone */
-		6:   nil,                    /* HrZoneHighBoundary */
-		7:   nil,                    /* SpeedZoneHighBoundary */
-		8:   nil,                    /* CadenceZoneHighBondary */
-		9:   nil,                    /* PowerZoneHighBoundary */
-		10:  basetype.EnumInvalid,   /* HrCalcType */
-		11:  basetype.Uint8Invalid,  /* MaxHeartRate */
-		12:  basetype.Uint8Invalid,  /* RestingHeartRate */
-		13:  basetype.Uint8Invalid,  /* ThresholdHeartRate */
-		14:  basetype.EnumInvalid,   /* PwrCalcType */
-		15:  basetype.Uint16Invalid, /* FunctionalThresholdPower */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* ReferenceMesg */
+		1:   nil, /* ReferenceIndex */
+		2:   nil, /* TimeInHrZone */
+		3:   nil, /* TimeInSpeedZone */
+		4:   nil, /* TimeInCadenceZone */
+		5:   nil, /* TimeInPowerZone */
+		6:   nil, /* HrZoneHighBoundary */
+		7:   nil, /* SpeedZoneHighBoundary */
+		8:   nil, /* CadenceZoneHighBondary */
+		9:   nil, /* PowerZoneHighBoundary */
+		10:  nil, /* HrCalcType */
+		11:  nil, /* MaxHeartRate */
+		12:  nil, /* RestingHeartRate */
+		13:  nil, /* ThresholdHeartRate */
+		14:  nil, /* PwrCalcType */
+		15:  nil, /* FunctionalThresholdPower */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &TimeInZone{
@@ -108,7 +108,7 @@ func (m TimeInZone) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.ReferenceMesg,
 		1:   m.ReferenceIndex,
@@ -129,8 +129,12 @@ func (m TimeInZone) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

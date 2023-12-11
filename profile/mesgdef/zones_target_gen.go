@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,19 +32,20 @@ func NewZonesTarget(mesg proto.Message) *ZonesTarget {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		1: basetype.Uint8Invalid,  /* MaxHeartRate */
-		2: basetype.Uint8Invalid,  /* ThresholdHeartRate */
-		3: basetype.Uint16Invalid, /* FunctionalThresholdPower */
-		5: basetype.EnumInvalid,   /* HrCalcType */
-		7: basetype.EnumInvalid,   /* PwrCalcType */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		1: nil, /* MaxHeartRate */
+		2: nil, /* ThresholdHeartRate */
+		3: nil, /* FunctionalThresholdPower */
+		5: nil, /* HrCalcType */
+		7: nil, /* PwrCalcType */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &ZonesTarget{
@@ -72,7 +72,7 @@ func (m ZonesTarget) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		1: m.MaxHeartRate,
 		2: m.ThresholdHeartRate,
 		3: m.FunctionalThresholdPower,
@@ -81,8 +81,12 @@ func (m ZonesTarget) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

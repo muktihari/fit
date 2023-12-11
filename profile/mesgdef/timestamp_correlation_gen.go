@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,21 +34,22 @@ func NewTimestampCorrelation(mesg proto.Message) *TimestampCorrelation {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* FractionalTimestamp */
-		1:   basetype.Uint32Invalid, /* SystemTimestamp */
-		2:   basetype.Uint16Invalid, /* FractionalSystemTimestamp */
-		3:   basetype.Uint32Invalid, /* LocalTimestamp */
-		4:   basetype.Uint16Invalid, /* TimestampMs */
-		5:   basetype.Uint16Invalid, /* SystemTimestampMs */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* FractionalTimestamp */
+		1:   nil, /* SystemTimestamp */
+		2:   nil, /* FractionalSystemTimestamp */
+		3:   nil, /* LocalTimestamp */
+		4:   nil, /* TimestampMs */
+		5:   nil, /* SystemTimestampMs */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &TimestampCorrelation{
@@ -78,7 +78,7 @@ func (m TimestampCorrelation) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.FractionalTimestamp,
 		1:   m.SystemTimestamp,
@@ -89,8 +89,12 @@ func (m TimestampCorrelation) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

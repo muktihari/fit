@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -57,43 +56,44 @@ func NewUserProfile(mesg proto.Message) *UserProfile {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.StringInvalid, /* FriendlyName */
-		1:   basetype.EnumInvalid,   /* Gender */
-		2:   basetype.Uint8Invalid,  /* Age */
-		3:   basetype.Uint8Invalid,  /* Height */
-		4:   basetype.Uint16Invalid, /* Weight */
-		5:   basetype.EnumInvalid,   /* Language */
-		6:   basetype.EnumInvalid,   /* ElevSetting */
-		7:   basetype.EnumInvalid,   /* WeightSetting */
-		8:   basetype.Uint8Invalid,  /* RestingHeartRate */
-		9:   basetype.Uint8Invalid,  /* DefaultMaxRunningHeartRate */
-		10:  basetype.Uint8Invalid,  /* DefaultMaxBikingHeartRate */
-		11:  basetype.Uint8Invalid,  /* DefaultMaxHeartRate */
-		12:  basetype.EnumInvalid,   /* HrSetting */
-		13:  basetype.EnumInvalid,   /* SpeedSetting */
-		14:  basetype.EnumInvalid,   /* DistSetting */
-		16:  basetype.EnumInvalid,   /* PowerSetting */
-		17:  basetype.EnumInvalid,   /* ActivityClass */
-		18:  basetype.EnumInvalid,   /* PositionSetting */
-		21:  basetype.EnumInvalid,   /* TemperatureSetting */
-		22:  basetype.Uint16Invalid, /* LocalId */
-		23:  nil,                    /* GlobalId */
-		28:  basetype.Uint32Invalid, /* WakeTime */
-		29:  basetype.Uint32Invalid, /* SleepTime */
-		30:  basetype.EnumInvalid,   /* HeightSetting */
-		31:  basetype.Uint16Invalid, /* UserRunningStepLength */
-		32:  basetype.Uint16Invalid, /* UserWalkingStepLength */
-		47:  basetype.EnumInvalid,   /* DepthSetting */
-		49:  basetype.Uint32Invalid, /* DiveCount */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* FriendlyName */
+		1:   nil, /* Gender */
+		2:   nil, /* Age */
+		3:   nil, /* Height */
+		4:   nil, /* Weight */
+		5:   nil, /* Language */
+		6:   nil, /* ElevSetting */
+		7:   nil, /* WeightSetting */
+		8:   nil, /* RestingHeartRate */
+		9:   nil, /* DefaultMaxRunningHeartRate */
+		10:  nil, /* DefaultMaxBikingHeartRate */
+		11:  nil, /* DefaultMaxHeartRate */
+		12:  nil, /* HrSetting */
+		13:  nil, /* SpeedSetting */
+		14:  nil, /* DistSetting */
+		16:  nil, /* PowerSetting */
+		17:  nil, /* ActivityClass */
+		18:  nil, /* PositionSetting */
+		21:  nil, /* TemperatureSetting */
+		22:  nil, /* LocalId */
+		23:  nil, /* GlobalId */
+		28:  nil, /* WakeTime */
+		29:  nil, /* SleepTime */
+		30:  nil, /* HeightSetting */
+		31:  nil, /* UserRunningStepLength */
+		32:  nil, /* UserWalkingStepLength */
+		47:  nil, /* DepthSetting */
+		49:  nil, /* DiveCount */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &UserProfile{
@@ -144,7 +144,7 @@ func (m UserProfile) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.FriendlyName,
 		1:   m.Gender,
@@ -177,8 +177,12 @@ func (m UserProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

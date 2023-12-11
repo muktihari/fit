@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -51,37 +50,38 @@ func NewDiveSummary(mesg proto.Message) *DiveSummary {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* ReferenceMesg */
-		1:   basetype.Uint16Invalid, /* ReferenceIndex */
-		2:   basetype.Uint32Invalid, /* AvgDepth */
-		3:   basetype.Uint32Invalid, /* MaxDepth */
-		4:   basetype.Uint32Invalid, /* SurfaceInterval */
-		5:   basetype.Uint8Invalid,  /* StartCns */
-		6:   basetype.Uint8Invalid,  /* EndCns */
-		7:   basetype.Uint16Invalid, /* StartN2 */
-		8:   basetype.Uint16Invalid, /* EndN2 */
-		9:   basetype.Uint16Invalid, /* O2Toxicity */
-		10:  basetype.Uint32Invalid, /* DiveNumber */
-		11:  basetype.Uint32Invalid, /* BottomTime */
-		12:  basetype.Uint16Invalid, /* AvgPressureSac */
-		13:  basetype.Uint16Invalid, /* AvgVolumeSac */
-		14:  basetype.Uint16Invalid, /* AvgRmv */
-		15:  basetype.Uint32Invalid, /* DescentTime */
-		16:  basetype.Uint32Invalid, /* AscentTime */
-		17:  basetype.Sint32Invalid, /* AvgAscentRate */
-		22:  basetype.Uint32Invalid, /* AvgDescentRate */
-		23:  basetype.Uint32Invalid, /* MaxAscentRate */
-		24:  basetype.Uint32Invalid, /* MaxDescentRate */
-		25:  basetype.Uint32Invalid, /* HangTime */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* ReferenceMesg */
+		1:   nil, /* ReferenceIndex */
+		2:   nil, /* AvgDepth */
+		3:   nil, /* MaxDepth */
+		4:   nil, /* SurfaceInterval */
+		5:   nil, /* StartCns */
+		6:   nil, /* EndCns */
+		7:   nil, /* StartN2 */
+		8:   nil, /* EndN2 */
+		9:   nil, /* O2Toxicity */
+		10:  nil, /* DiveNumber */
+		11:  nil, /* BottomTime */
+		12:  nil, /* AvgPressureSac */
+		13:  nil, /* AvgVolumeSac */
+		14:  nil, /* AvgRmv */
+		15:  nil, /* DescentTime */
+		16:  nil, /* AscentTime */
+		17:  nil, /* AvgAscentRate */
+		22:  nil, /* AvgDescentRate */
+		23:  nil, /* MaxAscentRate */
+		24:  nil, /* MaxDescentRate */
+		25:  nil, /* HangTime */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &DiveSummary{
@@ -126,7 +126,7 @@ func (m DiveSummary) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.ReferenceMesg,
 		1:   m.ReferenceIndex,
@@ -153,8 +153,12 @@ func (m DiveSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -47,33 +46,34 @@ func NewWorkoutStep(mesg proto.Message) *WorkoutStep {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.StringInvalid, /* WktStepName */
-		1:   basetype.EnumInvalid,   /* DurationType */
-		2:   basetype.Uint32Invalid, /* DurationValue */
-		3:   basetype.EnumInvalid,   /* TargetType */
-		4:   basetype.Uint32Invalid, /* TargetValue */
-		5:   basetype.Uint32Invalid, /* CustomTargetValueLow */
-		6:   basetype.Uint32Invalid, /* CustomTargetValueHigh */
-		7:   basetype.EnumInvalid,   /* Intensity */
-		8:   basetype.StringInvalid, /* Notes */
-		9:   basetype.EnumInvalid,   /* Equipment */
-		10:  basetype.Uint16Invalid, /* ExerciseCategory */
-		11:  basetype.Uint16Invalid, /* ExerciseName */
-		12:  basetype.Uint16Invalid, /* ExerciseWeight */
-		13:  basetype.Uint16Invalid, /* WeightDisplayUnit */
-		19:  basetype.EnumInvalid,   /* SecondaryTargetType */
-		20:  basetype.Uint32Invalid, /* SecondaryTargetValue */
-		21:  basetype.Uint32Invalid, /* SecondaryCustomTargetValueLow */
-		22:  basetype.Uint32Invalid, /* SecondaryCustomTargetValueHigh */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* WktStepName */
+		1:   nil, /* DurationType */
+		2:   nil, /* DurationValue */
+		3:   nil, /* TargetType */
+		4:   nil, /* TargetValue */
+		5:   nil, /* CustomTargetValueLow */
+		6:   nil, /* CustomTargetValueHigh */
+		7:   nil, /* Intensity */
+		8:   nil, /* Notes */
+		9:   nil, /* Equipment */
+		10:  nil, /* ExerciseCategory */
+		11:  nil, /* ExerciseName */
+		12:  nil, /* ExerciseWeight */
+		13:  nil, /* WeightDisplayUnit */
+		19:  nil, /* SecondaryTargetType */
+		20:  nil, /* SecondaryTargetValue */
+		21:  nil, /* SecondaryCustomTargetValueLow */
+		22:  nil, /* SecondaryCustomTargetValueHigh */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &WorkoutStep{
@@ -114,7 +114,7 @@ func (m WorkoutStep) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.WktStepName,
 		1:   m.DurationType,
@@ -137,8 +137,12 @@ func (m WorkoutStep) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

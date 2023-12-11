@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -42,28 +41,29 @@ func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:  basetype.Uint8Invalid,  /* CombinedAwakeScore */
-		1:  basetype.Uint8Invalid,  /* AwakeTimeScore */
-		2:  basetype.Uint8Invalid,  /* AwakeningsCountScore */
-		3:  basetype.Uint8Invalid,  /* DeepSleepScore */
-		4:  basetype.Uint8Invalid,  /* SleepDurationScore */
-		5:  basetype.Uint8Invalid,  /* LightSleepScore */
-		6:  basetype.Uint8Invalid,  /* OverallSleepScore */
-		7:  basetype.Uint8Invalid,  /* SleepQualityScore */
-		8:  basetype.Uint8Invalid,  /* SleepRecoveryScore */
-		9:  basetype.Uint8Invalid,  /* RemSleepScore */
-		10: basetype.Uint8Invalid,  /* SleepRestlessnessScore */
-		11: basetype.Uint8Invalid,  /* AwakeningsCount */
-		14: basetype.Uint8Invalid,  /* InterruptionsScore */
-		15: basetype.Uint16Invalid, /* AverageStressDuringSleep */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:  nil, /* CombinedAwakeScore */
+		1:  nil, /* AwakeTimeScore */
+		2:  nil, /* AwakeningsCountScore */
+		3:  nil, /* DeepSleepScore */
+		4:  nil, /* SleepDurationScore */
+		5:  nil, /* LightSleepScore */
+		6:  nil, /* OverallSleepScore */
+		7:  nil, /* SleepQualityScore */
+		8:  nil, /* SleepRecoveryScore */
+		9:  nil, /* RemSleepScore */
+		10: nil, /* SleepRestlessnessScore */
+		11: nil, /* AwakeningsCount */
+		14: nil, /* InterruptionsScore */
+		15: nil, /* AverageStressDuringSleep */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &SleepAssessment{
@@ -99,7 +99,7 @@ func (m SleepAssessment) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:  m.CombinedAwakeScore,
 		1:  m.AwakeTimeScore,
 		2:  m.AwakeningsCountScore,
@@ -117,8 +117,12 @@ func (m SleepAssessment) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

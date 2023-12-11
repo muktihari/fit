@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -42,28 +41,29 @@ func NewSplitSummary(mesg proto.Message) *SplitSummary {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.EnumInvalid,   /* SplitType */
-		3:   basetype.Uint16Invalid, /* NumSplits */
-		4:   basetype.Uint32Invalid, /* TotalTimerTime */
-		5:   basetype.Uint32Invalid, /* TotalDistance */
-		6:   basetype.Uint32Invalid, /* AvgSpeed */
-		7:   basetype.Uint32Invalid, /* MaxSpeed */
-		8:   basetype.Uint16Invalid, /* TotalAscent */
-		9:   basetype.Uint16Invalid, /* TotalDescent */
-		10:  basetype.Uint8Invalid,  /* AvgHeartRate */
-		11:  basetype.Uint8Invalid,  /* MaxHeartRate */
-		12:  basetype.Sint32Invalid, /* AvgVertSpeed */
-		13:  basetype.Uint32Invalid, /* TotalCalories */
-		77:  basetype.Uint32Invalid, /* TotalMovingTime */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* SplitType */
+		3:   nil, /* NumSplits */
+		4:   nil, /* TotalTimerTime */
+		5:   nil, /* TotalDistance */
+		6:   nil, /* AvgSpeed */
+		7:   nil, /* MaxSpeed */
+		8:   nil, /* TotalAscent */
+		9:   nil, /* TotalDescent */
+		10:  nil, /* AvgHeartRate */
+		11:  nil, /* MaxHeartRate */
+		12:  nil, /* AvgVertSpeed */
+		13:  nil, /* TotalCalories */
+		77:  nil, /* TotalMovingTime */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &SplitSummary{
@@ -99,7 +99,7 @@ func (m SplitSummary) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.SplitType,
 		3:   m.NumSplits,
@@ -117,8 +117,12 @@ func (m SplitSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

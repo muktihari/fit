@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,22 +35,23 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* WeeklyAverage */
-		1:   basetype.Uint16Invalid, /* LastNightAverage */
-		2:   basetype.Uint16Invalid, /* LastNight5MinHigh */
-		3:   basetype.Uint16Invalid, /* BaselineLowUpper */
-		4:   basetype.Uint16Invalid, /* BaselineBalancedLower */
-		5:   basetype.Uint16Invalid, /* BaselineBalancedUpper */
-		6:   basetype.EnumInvalid,   /* Status */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* WeeklyAverage */
+		1:   nil, /* LastNightAverage */
+		2:   nil, /* LastNight5MinHigh */
+		3:   nil, /* BaselineLowUpper */
+		4:   nil, /* BaselineBalancedLower */
+		5:   nil, /* BaselineBalancedUpper */
+		6:   nil, /* Status */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &HrvStatusSummary{
@@ -81,7 +81,7 @@ func (m HrvStatusSummary) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.WeeklyAverage,
 		1:   m.LastNightAverage,
@@ -93,8 +93,12 @@ func (m HrvStatusSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

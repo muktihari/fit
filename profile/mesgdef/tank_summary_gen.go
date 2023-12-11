@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,19 +32,20 @@ func NewTankSummary(mesg proto.Message) *TankSummary {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid,  /* Timestamp */
-		0:   basetype.Uint32zInvalid, /* Sensor */
-		1:   basetype.Uint16Invalid,  /* StartPressure */
-		2:   basetype.Uint16Invalid,  /* EndPressure */
-		3:   basetype.Uint32Invalid,  /* VolumeUsed */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* Sensor */
+		1:   nil, /* StartPressure */
+		2:   nil, /* EndPressure */
+		3:   nil, /* VolumeUsed */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &TankSummary{
@@ -72,7 +72,7 @@ func (m TankSummary) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.Sensor,
 		1:   m.StartPressure,
@@ -81,8 +81,12 @@ func (m TankSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

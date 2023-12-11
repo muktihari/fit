@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,20 +33,21 @@ func NewFileCapabilities(mesg proto.Message) *FileCapabilities {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.EnumInvalid,   /* Type */
-		1:   basetype.Uint8zInvalid, /* Flags */
-		2:   basetype.StringInvalid, /* Directory */
-		3:   basetype.Uint16Invalid, /* MaxCount */
-		4:   basetype.Uint32Invalid, /* MaxSize */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* Type */
+		1:   nil, /* Flags */
+		2:   nil, /* Directory */
+		3:   nil, /* MaxCount */
+		4:   nil, /* MaxSize */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &FileCapabilities{
@@ -75,7 +75,7 @@ func (m FileCapabilities) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.Type,
 		1:   m.Flags,
@@ -85,8 +85,12 @@ func (m FileCapabilities) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

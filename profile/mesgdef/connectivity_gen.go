@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -41,27 +40,28 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:  false,                  /* BluetoothEnabled */
-		1:  false,                  /* BluetoothLeEnabled */
-		2:  false,                  /* AntEnabled */
-		3:  basetype.StringInvalid, /* Name */
-		4:  false,                  /* LiveTrackingEnabled */
-		5:  false,                  /* WeatherConditionsEnabled */
-		6:  false,                  /* WeatherAlertsEnabled */
-		7:  false,                  /* AutoActivityUploadEnabled */
-		8:  false,                  /* CourseDownloadEnabled */
-		9:  false,                  /* WorkoutDownloadEnabled */
-		10: false,                  /* GpsEphemerisDownloadEnabled */
-		11: false,                  /* IncidentDetectionEnabled */
-		12: false,                  /* GrouptrackEnabled */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:  nil, /* BluetoothEnabled */
+		1:  nil, /* BluetoothLeEnabled */
+		2:  nil, /* AntEnabled */
+		3:  nil, /* Name */
+		4:  nil, /* LiveTrackingEnabled */
+		5:  nil, /* WeatherConditionsEnabled */
+		6:  nil, /* WeatherAlertsEnabled */
+		7:  nil, /* AutoActivityUploadEnabled */
+		8:  nil, /* CourseDownloadEnabled */
+		9:  nil, /* WorkoutDownloadEnabled */
+		10: nil, /* GpsEphemerisDownloadEnabled */
+		11: nil, /* IncidentDetectionEnabled */
+		12: nil, /* GrouptrackEnabled */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Connectivity{
@@ -96,7 +96,7 @@ func (m Connectivity) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:  m.BluetoothEnabled,
 		1:  m.BluetoothLeEnabled,
 		2:  m.AntEnabled,
@@ -113,8 +113,12 @@ func (m Connectivity) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -39,25 +38,26 @@ func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfigura
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:  basetype.Uint8Invalid, /* ScreenIndex */
-		1:  basetype.ByteInvalid,  /* ConceptField */
-		2:  basetype.Uint8Invalid, /* FieldId */
-		3:  basetype.Uint8Invalid, /* ConceptIndex */
-		4:  basetype.Uint8Invalid, /* DataPage */
-		5:  basetype.Uint8Invalid, /* ConceptKey */
-		6:  basetype.Uint8Invalid, /* Scaling */
-		8:  basetype.EnumInvalid,  /* DataUnits */
-		9:  basetype.EnumInvalid,  /* Qualifier */
-		10: basetype.EnumInvalid,  /* Descriptor */
-		11: false,                 /* IsSigned */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:  nil, /* ScreenIndex */
+		1:  nil, /* ConceptField */
+		2:  nil, /* FieldId */
+		3:  nil, /* ConceptIndex */
+		4:  nil, /* DataPage */
+		5:  nil, /* ConceptKey */
+		6:  nil, /* Scaling */
+		8:  nil, /* DataUnits */
+		9:  nil, /* Qualifier */
+		10: nil, /* Descriptor */
+		11: nil, /* IsSigned */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &ExdDataConceptConfiguration{
@@ -90,7 +90,7 @@ func (m ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:  m.ScreenIndex,
 		1:  m.ConceptField,
 		2:  m.FieldId,
@@ -105,8 +105,12 @@ func (m ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

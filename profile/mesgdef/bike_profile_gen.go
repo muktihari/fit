@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -60,46 +59,47 @@ func NewBikeProfile(mesg proto.Message) *BikeProfile {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid,  /* MessageIndex */
-		0:   basetype.StringInvalid,  /* Name */
-		1:   basetype.EnumInvalid,    /* Sport */
-		2:   basetype.EnumInvalid,    /* SubSport */
-		3:   basetype.Uint32Invalid,  /* Odometer */
-		4:   basetype.Uint16zInvalid, /* BikeSpdAntId */
-		5:   basetype.Uint16zInvalid, /* BikeCadAntId */
-		6:   basetype.Uint16zInvalid, /* BikeSpdcadAntId */
-		7:   basetype.Uint16zInvalid, /* BikePowerAntId */
-		8:   basetype.Uint16Invalid,  /* CustomWheelsize */
-		9:   basetype.Uint16Invalid,  /* AutoWheelsize */
-		10:  basetype.Uint16Invalid,  /* BikeWeight */
-		11:  basetype.Uint16Invalid,  /* PowerCalFactor */
-		12:  false,                   /* AutoWheelCal */
-		13:  false,                   /* AutoPowerZero */
-		14:  basetype.Uint8Invalid,   /* Id */
-		15:  false,                   /* SpdEnabled */
-		16:  false,                   /* CadEnabled */
-		17:  false,                   /* SpdcadEnabled */
-		18:  false,                   /* PowerEnabled */
-		19:  basetype.Uint8Invalid,   /* CrankLength */
-		20:  false,                   /* Enabled */
-		21:  basetype.Uint8zInvalid,  /* BikeSpdAntIdTransType */
-		22:  basetype.Uint8zInvalid,  /* BikeCadAntIdTransType */
-		23:  basetype.Uint8zInvalid,  /* BikeSpdcadAntIdTransType */
-		24:  basetype.Uint8zInvalid,  /* BikePowerAntIdTransType */
-		37:  basetype.Uint8Invalid,   /* OdometerRollover */
-		38:  basetype.Uint8zInvalid,  /* FrontGearNum */
-		39:  nil,                     /* FrontGear */
-		40:  basetype.Uint8zInvalid,  /* RearGearNum */
-		41:  nil,                     /* RearGear */
-		44:  false,                   /* ShimanoDi2Enabled */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* Name */
+		1:   nil, /* Sport */
+		2:   nil, /* SubSport */
+		3:   nil, /* Odometer */
+		4:   nil, /* BikeSpdAntId */
+		5:   nil, /* BikeCadAntId */
+		6:   nil, /* BikeSpdcadAntId */
+		7:   nil, /* BikePowerAntId */
+		8:   nil, /* CustomWheelsize */
+		9:   nil, /* AutoWheelsize */
+		10:  nil, /* BikeWeight */
+		11:  nil, /* PowerCalFactor */
+		12:  nil, /* AutoWheelCal */
+		13:  nil, /* AutoPowerZero */
+		14:  nil, /* Id */
+		15:  nil, /* SpdEnabled */
+		16:  nil, /* CadEnabled */
+		17:  nil, /* SpdcadEnabled */
+		18:  nil, /* PowerEnabled */
+		19:  nil, /* CrankLength */
+		20:  nil, /* Enabled */
+		21:  nil, /* BikeSpdAntIdTransType */
+		22:  nil, /* BikeCadAntIdTransType */
+		23:  nil, /* BikeSpdcadAntIdTransType */
+		24:  nil, /* BikePowerAntIdTransType */
+		37:  nil, /* OdometerRollover */
+		38:  nil, /* FrontGearNum */
+		39:  nil, /* FrontGear */
+		40:  nil, /* RearGearNum */
+		41:  nil, /* RearGear */
+		44:  nil, /* ShimanoDi2Enabled */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &BikeProfile{
@@ -153,7 +153,7 @@ func (m BikeProfile) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.Name,
 		1:   m.Sport,
@@ -189,8 +189,12 @@ func (m BikeProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

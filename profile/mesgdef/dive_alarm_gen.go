@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -41,27 +40,28 @@ func NewDiveAlarm(mesg proto.Message) *DiveAlarm {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		0:   basetype.Uint32Invalid, /* Depth */
-		1:   basetype.Sint32Invalid, /* Time */
-		2:   false,                  /* Enabled */
-		3:   basetype.EnumInvalid,   /* AlarmType */
-		4:   basetype.EnumInvalid,   /* Sound */
-		5:   nil,                    /* DiveTypes */
-		6:   basetype.Uint32Invalid, /* Id */
-		7:   false,                  /* PopupEnabled */
-		8:   false,                  /* TriggerOnDescent */
-		9:   false,                  /* TriggerOnAscent */
-		10:  false,                  /* Repeating */
-		11:  basetype.Sint32Invalid, /* Speed */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		0:   nil, /* Depth */
+		1:   nil, /* Time */
+		2:   nil, /* Enabled */
+		3:   nil, /* AlarmType */
+		4:   nil, /* Sound */
+		5:   nil, /* DiveTypes */
+		6:   nil, /* Id */
+		7:   nil, /* PopupEnabled */
+		8:   nil, /* TriggerOnDescent */
+		9:   nil, /* TriggerOnAscent */
+		10:  nil, /* Repeating */
+		11:  nil, /* Speed */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &DiveAlarm{
@@ -96,7 +96,7 @@ func (m DiveAlarm) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		0:   m.Depth,
 		1:   m.Time,
@@ -113,8 +113,12 @@ func (m DiveAlarm) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

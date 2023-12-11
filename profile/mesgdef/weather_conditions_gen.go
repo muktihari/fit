@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -44,30 +43,31 @@ func NewWeatherConditions(mesg proto.Message) *WeatherConditions {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.EnumInvalid,   /* WeatherReport */
-		1:   basetype.Sint8Invalid,  /* Temperature */
-		2:   basetype.EnumInvalid,   /* Condition */
-		3:   basetype.Uint16Invalid, /* WindDirection */
-		4:   basetype.Uint16Invalid, /* WindSpeed */
-		5:   basetype.Uint8Invalid,  /* PrecipitationProbability */
-		6:   basetype.Sint8Invalid,  /* TemperatureFeelsLike */
-		7:   basetype.Uint8Invalid,  /* RelativeHumidity */
-		8:   basetype.StringInvalid, /* Location */
-		9:   basetype.Uint32Invalid, /* ObservedAtTime */
-		10:  basetype.Sint32Invalid, /* ObservedLocationLat */
-		11:  basetype.Sint32Invalid, /* ObservedLocationLong */
-		12:  basetype.EnumInvalid,   /* DayOfWeek */
-		13:  basetype.Sint8Invalid,  /* HighTemperature */
-		14:  basetype.Sint8Invalid,  /* LowTemperature */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* WeatherReport */
+		1:   nil, /* Temperature */
+		2:   nil, /* Condition */
+		3:   nil, /* WindDirection */
+		4:   nil, /* WindSpeed */
+		5:   nil, /* PrecipitationProbability */
+		6:   nil, /* TemperatureFeelsLike */
+		7:   nil, /* RelativeHumidity */
+		8:   nil, /* Location */
+		9:   nil, /* ObservedAtTime */
+		10:  nil, /* ObservedLocationLat */
+		11:  nil, /* ObservedLocationLong */
+		12:  nil, /* DayOfWeek */
+		13:  nil, /* HighTemperature */
+		14:  nil, /* LowTemperature */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &WeatherConditions{
@@ -105,7 +105,7 @@ func (m WeatherConditions) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.WeatherReport,
 		1:   m.Temperature,
@@ -125,8 +125,12 @@ func (m WeatherConditions) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

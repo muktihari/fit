@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -38,24 +37,25 @@ func NewTotals(mesg proto.Message) *Totals {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint32Invalid, /* TimerTime */
-		1:   basetype.Uint32Invalid, /* Distance */
-		2:   basetype.Uint32Invalid, /* Calories */
-		3:   basetype.EnumInvalid,   /* Sport */
-		4:   basetype.Uint32Invalid, /* ElapsedTime */
-		5:   basetype.Uint16Invalid, /* Sessions */
-		6:   basetype.Uint32Invalid, /* ActiveTime */
-		9:   basetype.Uint8Invalid,  /* SportIndex */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		253: nil, /* Timestamp */
+		0:   nil, /* TimerTime */
+		1:   nil, /* Distance */
+		2:   nil, /* Calories */
+		3:   nil, /* Sport */
+		4:   nil, /* ElapsedTime */
+		5:   nil, /* Sessions */
+		6:   nil, /* ActiveTime */
+		9:   nil, /* SportIndex */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Totals{
@@ -87,7 +87,7 @@ func (m Totals) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		253: m.Timestamp,
 		0:   m.TimerTime,
@@ -101,8 +101,12 @@ func (m Totals) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -37,23 +36,24 @@ func NewSegmentFile(mesg proto.Message) *SegmentFile {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		254: basetype.Uint16Invalid, /* MessageIndex */
-		1:   basetype.StringInvalid, /* FileUuid */
-		3:   false,                  /* Enabled */
-		4:   basetype.Uint32Invalid, /* UserProfilePrimaryKey */
-		7:   nil,                    /* LeaderType */
-		8:   nil,                    /* LeaderGroupPrimaryKey */
-		9:   nil,                    /* LeaderActivityId */
-		10:  nil,                    /* LeaderActivityIdString */
-		11:  basetype.Uint8Invalid,  /* DefaultRaceLeader */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		254: nil, /* MessageIndex */
+		1:   nil, /* FileUuid */
+		3:   nil, /* Enabled */
+		4:   nil, /* UserProfilePrimaryKey */
+		7:   nil, /* LeaderType */
+		8:   nil, /* LeaderGroupPrimaryKey */
+		9:   nil, /* LeaderActivityId */
+		10:  nil, /* LeaderActivityIdString */
+		11:  nil, /* DefaultRaceLeader */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &SegmentFile{
@@ -84,7 +84,7 @@ func (m SegmentFile) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		254: m.MessageIndex,
 		1:   m.FileUuid,
 		3:   m.Enabled,
@@ -97,8 +97,12 @@ func (m SegmentFile) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

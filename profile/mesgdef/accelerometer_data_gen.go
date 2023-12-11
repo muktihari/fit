@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -40,26 +39,27 @@ func NewAccelerometerData(mesg proto.Message) *AccelerometerData {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.Uint16Invalid, /* TimestampMs */
-		1:   nil,                    /* SampleTimeOffset */
-		2:   nil,                    /* AccelX */
-		3:   nil,                    /* AccelY */
-		4:   nil,                    /* AccelZ */
-		5:   nil,                    /* CalibratedAccelX */
-		6:   nil,                    /* CalibratedAccelY */
-		7:   nil,                    /* CalibratedAccelZ */
-		8:   nil,                    /* CompressedCalibratedAccelX */
-		9:   nil,                    /* CompressedCalibratedAccelY */
-		10:  nil,                    /* CompressedCalibratedAccelZ */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* TimestampMs */
+		1:   nil, /* SampleTimeOffset */
+		2:   nil, /* AccelX */
+		3:   nil, /* AccelY */
+		4:   nil, /* AccelZ */
+		5:   nil, /* CalibratedAccelX */
+		6:   nil, /* CalibratedAccelY */
+		7:   nil, /* CalibratedAccelZ */
+		8:   nil, /* CompressedCalibratedAccelX */
+		9:   nil, /* CompressedCalibratedAccelY */
+		10:  nil, /* CompressedCalibratedAccelZ */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &AccelerometerData{
@@ -93,7 +93,7 @@ func (m AccelerometerData) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.TimestampMs,
 		1:   m.SampleTimeOffset,
@@ -109,8 +109,12 @@ func (m AccelerometerData) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

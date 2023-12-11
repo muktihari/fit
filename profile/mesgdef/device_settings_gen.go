@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -52,38 +51,39 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0:   basetype.Uint8Invalid,  /* ActiveTimeZone */
-		1:   basetype.Uint32Invalid, /* UtcOffset */
-		2:   nil,                    /* TimeOffset */
-		4:   nil,                    /* TimeMode */
-		5:   nil,                    /* TimeZoneOffset */
-		12:  basetype.EnumInvalid,   /* BacklightMode */
-		36:  false,                  /* ActivityTrackerEnabled */
-		39:  basetype.Uint32Invalid, /* ClockTime */
-		40:  nil,                    /* PagesEnabled */
-		46:  false,                  /* MoveAlertEnabled */
-		47:  basetype.EnumInvalid,   /* DateMode */
-		55:  basetype.EnumInvalid,   /* DisplayOrientation */
-		56:  basetype.EnumInvalid,   /* MountingSide */
-		57:  nil,                    /* DefaultPage */
-		58:  basetype.Uint16Invalid, /* AutosyncMinSteps */
-		59:  basetype.Uint16Invalid, /* AutosyncMinTime */
-		80:  false,                  /* LactateThresholdAutodetectEnabled */
-		86:  false,                  /* BleAutoUploadEnabled */
-		89:  basetype.EnumInvalid,   /* AutoSyncFrequency */
-		90:  basetype.Uint32Invalid, /* AutoActivityDetect */
-		94:  basetype.Uint8Invalid,  /* NumberOfScreens */
-		95:  basetype.EnumInvalid,   /* SmartNotificationDisplayOrientation */
-		134: basetype.EnumInvalid,   /* TapInterface */
-		174: basetype.EnumInvalid,   /* TapSensitivity */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0:   nil, /* ActiveTimeZone */
+		1:   nil, /* UtcOffset */
+		2:   nil, /* TimeOffset */
+		4:   nil, /* TimeMode */
+		5:   nil, /* TimeZoneOffset */
+		12:  nil, /* BacklightMode */
+		36:  nil, /* ActivityTrackerEnabled */
+		39:  nil, /* ClockTime */
+		40:  nil, /* PagesEnabled */
+		46:  nil, /* MoveAlertEnabled */
+		47:  nil, /* DateMode */
+		55:  nil, /* DisplayOrientation */
+		56:  nil, /* MountingSide */
+		57:  nil, /* DefaultPage */
+		58:  nil, /* AutosyncMinSteps */
+		59:  nil, /* AutosyncMinTime */
+		80:  nil, /* LactateThresholdAutodetectEnabled */
+		86:  nil, /* BleAutoUploadEnabled */
+		89:  nil, /* AutoSyncFrequency */
+		90:  nil, /* AutoActivityDetect */
+		94:  nil, /* NumberOfScreens */
+		95:  nil, /* SmartNotificationDisplayOrientation */
+		134: nil, /* TapInterface */
+		174: nil, /* TapSensitivity */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &DeviceSettings{
@@ -129,7 +129,7 @@ func (m DeviceSettings) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0:   m.ActiveTimeZone,
 		1:   m.UtcOffset,
 		2:   m.TimeOffset,
@@ -157,8 +157,12 @@ func (m DeviceSettings) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

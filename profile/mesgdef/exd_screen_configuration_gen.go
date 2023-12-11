@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,18 +31,19 @@ func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0: basetype.Uint8Invalid, /* ScreenIndex */
-		1: basetype.Uint8Invalid, /* FieldCount */
-		2: basetype.EnumInvalid,  /* Layout */
-		3: false,                 /* ScreenEnabled */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0: nil, /* ScreenIndex */
+		1: nil, /* FieldCount */
+		2: nil, /* Layout */
+		3: nil, /* ScreenEnabled */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &ExdScreenConfiguration{
@@ -69,7 +69,7 @@ func (m ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0: m.ScreenIndex,
 		1: m.FieldCount,
 		2: m.Layout,
@@ -77,8 +77,12 @@ func (m ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

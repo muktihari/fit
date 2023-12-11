@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -47,33 +46,34 @@ func NewEvent(mesg proto.Message) *Event {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.EnumInvalid,   /* Event */
-		1:   basetype.EnumInvalid,   /* EventType */
-		2:   basetype.Uint16Invalid, /* Data16 */
-		3:   basetype.Uint32Invalid, /* Data */
-		4:   basetype.Uint8Invalid,  /* EventGroup */
-		7:   basetype.Uint16Invalid, /* Score */
-		8:   basetype.Uint16Invalid, /* OpponentScore */
-		9:   basetype.Uint8zInvalid, /* FrontGearNum */
-		10:  basetype.Uint8zInvalid, /* FrontGear */
-		11:  basetype.Uint8zInvalid, /* RearGearNum */
-		12:  basetype.Uint8zInvalid, /* RearGear */
-		13:  basetype.Uint8Invalid,  /* DeviceIndex */
-		14:  basetype.EnumInvalid,   /* ActivityType */
-		15:  basetype.Uint32Invalid, /* StartTimestamp */
-		21:  basetype.EnumInvalid,   /* RadarThreatLevelMax */
-		22:  basetype.Uint8Invalid,  /* RadarThreatCount */
-		23:  basetype.Uint8Invalid,  /* RadarThreatAvgApproachSpeed */
-		24:  basetype.Uint8Invalid,  /* RadarThreatMaxApproachSpeed */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* Event */
+		1:   nil, /* EventType */
+		2:   nil, /* Data16 */
+		3:   nil, /* Data */
+		4:   nil, /* EventGroup */
+		7:   nil, /* Score */
+		8:   nil, /* OpponentScore */
+		9:   nil, /* FrontGearNum */
+		10:  nil, /* FrontGear */
+		11:  nil, /* RearGearNum */
+		12:  nil, /* RearGear */
+		13:  nil, /* DeviceIndex */
+		14:  nil, /* ActivityType */
+		15:  nil, /* StartTimestamp */
+		21:  nil, /* RadarThreatLevelMax */
+		22:  nil, /* RadarThreatCount */
+		23:  nil, /* RadarThreatAvgApproachSpeed */
+		24:  nil, /* RadarThreatMaxApproachSpeed */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &Event{
@@ -114,7 +114,7 @@ func (m Event) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.Event,
 		1:   m.EventType,
@@ -137,8 +137,12 @@ func (m Event) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

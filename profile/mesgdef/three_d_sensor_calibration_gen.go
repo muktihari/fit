@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,21 +34,22 @@ func NewThreeDSensorCalibration(mesg proto.Message) *ThreeDSensorCalibration {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		253: basetype.Uint32Invalid, /* Timestamp */
-		0:   basetype.EnumInvalid,   /* SensorType */
-		1:   basetype.Uint32Invalid, /* CalibrationFactor */
-		2:   basetype.Uint32Invalid, /* CalibrationDivisor */
-		3:   basetype.Uint32Invalid, /* LevelShift */
-		4:   nil,                    /* OffsetCal */
-		5:   nil,                    /* OrientationMatrix */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		253: nil, /* Timestamp */
+		0:   nil, /* SensorType */
+		1:   nil, /* CalibrationFactor */
+		2:   nil, /* CalibrationDivisor */
+		3:   nil, /* LevelShift */
+		4:   nil, /* OffsetCal */
+		5:   nil, /* OrientationMatrix */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &ThreeDSensorCalibration{
@@ -78,7 +78,7 @@ func (m ThreeDSensorCalibration) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		253: m.Timestamp,
 		0:   m.SensorType,
 		1:   m.CalibrationFactor,
@@ -89,8 +89,12 @@ func (m ThreeDSensorCalibration) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }

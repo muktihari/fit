@@ -9,7 +9,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -37,23 +36,24 @@ func NewSegmentId(mesg proto.Message) *SegmentId {
 		return nil
 	}
 
-	vals := [256]any{ // Mark all values as invalid, replace only when specified.
-		0: basetype.StringInvalid, /* Name */
-		1: basetype.StringInvalid, /* Uuid */
-		2: basetype.EnumInvalid,   /* Sport */
-		3: false,                  /* Enabled */
-		4: basetype.Uint32Invalid, /* UserProfilePrimaryKey */
-		5: basetype.Uint32Invalid, /* DeviceId */
-		6: basetype.Uint8Invalid,  /* DefaultRaceLeader */
-		7: basetype.EnumInvalid,   /* DeleteStatus */
-		8: basetype.EnumInvalid,   /* SelectionType */
+	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
+		0: nil, /* Name */
+		1: nil, /* Uuid */
+		2: nil, /* Sport */
+		3: nil, /* Enabled */
+		4: nil, /* UserProfilePrimaryKey */
+		5: nil, /* DeviceId */
+		6: nil, /* DefaultRaceLeader */
+		7: nil, /* DeleteStatus */
+		8: nil, /* SelectionType */
 	}
 
 	for i := range mesg.Fields {
-		if mesg.Fields[i].Value == nil {
-			continue // keep the invalid value
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
 		}
-		vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		vals[field.Num] = field.Value
 	}
 
 	return &SegmentId{
@@ -84,7 +84,7 @@ func (m SegmentId) PutMessage(mesg *proto.Message) {
 		return
 	}
 
-	vals := [256]any{
+	vals := [...]any{
 		0: m.Name,
 		1: m.Uuid,
 		2: m.Sport,
@@ -97,8 +97,12 @@ func (m SegmentId) PutMessage(mesg *proto.Message) {
 	}
 
 	for i := range mesg.Fields {
-		mesg.Fields[i].Value = vals[mesg.Fields[i].Num]
+		field := &mesg.Fields[i]
+		if field.Num >= byte(len(vals)) {
+			continue
+		}
+		field.Value = vals[field.Num]
 	}
-	mesg.DeveloperFields = m.DeveloperFields
 
+	mesg.DeveloperFields = m.DeveloperFields
 }
