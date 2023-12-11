@@ -1048,7 +1048,7 @@ func TestDecodeFields(t *testing.T) {
 				MesgNum: 68,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
-						Num:      fieldNumTimestamp,
+						Num:      proto.FieldNumTimestamp,
 						Size:     1,
 						BaseType: basetype.Uint8,
 					},

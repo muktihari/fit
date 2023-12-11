@@ -38,8 +38,6 @@ var (
 )
 
 const (
-	fieldNumTimestamp = 253 // Num for timestamp across all defined messages in the profile.
-
 	// Buffer for component expansion to avoid runtime grow slice which more expensive than having buffered size at front.
 	// The value 10 is from the current max components in factory (MesgNumHr -> event_timestamp_12).
 	bufferSizeFields = 10
@@ -468,7 +466,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		d.timestamp += uint32((timeOffset - d.lastTimeOffset) & proto.CompressedTimeMask)
 		d.lastTimeOffset = timeOffset
 
-		timestampField := d.factory.CreateField(mesgDef.MesgNum, fieldNumTimestamp)
+		timestampField := d.factory.CreateField(mesgDef.MesgNum, proto.FieldNumTimestamp)
 		timestampField.Value = d.timestamp
 
 		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
@@ -529,7 +527,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			return err
 		}
 
-		if field.Num == fieldNumTimestamp {
+		if field.Num == proto.FieldNumTimestamp {
 			timestamp, ok := val.(uint32)
 			if !ok {
 				// This can only happen when:

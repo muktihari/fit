@@ -26,8 +26,7 @@ var (
 )
 
 const (
-	RolloverEvent     = 32  // The 5-bit time offset rolls over every 32 seconds. When an incoming time offset is less than previous time offset, rollover event has occurred.
-	FieldNumTimestamp = 253 // Num for timestamp across all defined messages in the profile.
+	RolloverEvent = 32 // The 5-bit time offset rolls over every 32 seconds. When an incoming time offset is less than previous time offset, rollover event has occurred.
 )
 
 // headerOption is header option.

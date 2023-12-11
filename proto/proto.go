@@ -27,6 +27,8 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
+
+	FieldNumTimestamp = 253 // Field Num for timestamp across all defined messages in the profile.
 )
 
 // LocalMesgNum extracts LocalMesgNum from message header.
