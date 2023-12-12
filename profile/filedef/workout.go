@@ -7,7 +7,6 @@ package filedef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
-	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -30,17 +29,13 @@ type Workout struct {
 
 var _ File = &Workout{}
 
-func NewWorkout(mesgs ...proto.Message) (f *Workout, ok bool) {
-	f = &Workout{}
+func NewWorkout(mesgs ...proto.Message) *Workout {
+	f := &Workout{}
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
 
-	if f.FileId == nil || f.FileId.Type != typedef.FileCourse {
-		return
-	}
-
-	return f, true
+	return f
 }
 
 func (f *Workout) Add(mesg proto.Message) {

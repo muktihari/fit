@@ -71,6 +71,7 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
         if err != nil {
             return err
         }
+        // do something with fit variable
     }
 
     ...
@@ -80,14 +81,13 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
 
 Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and more, which group protocol messages based on specific purposes.
 
-_Note: Currently only 3 common file types are defined: Activity, Course & Workout_
+_Note: Currently only 3 common file types are defined: Activity, Course & Workout, but you can create your own file types using our building block and register it in the listener as an option using WithFileSets()_
 
 ```go
 package main
 
 import (
     "bufio"
-    "context"
     "fmt"
     "os"
 
@@ -102,9 +102,9 @@ func main() {
     }
     defer f.Close()
 
-    // The listener will receive every decoded message from the decoder as soon as it is decoded,
-    // The Activity Listener will transform the messages into an Activity File.
-    al := filedef.NewListener[filedef.Activity]()
+    // The listener will receive every decoded message from the decoder as soon as it is decoded
+    // and transform it into an filedef's File.
+    al := filedef.NewListener()
     defer al.Close() // release channel used by listener
 
     dec := decoder.New(bufio.NewReader(f),
@@ -112,39 +112,46 @@ func main() {
         decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
     )
 
-    _, err = dec.Decode()
-    if err != nil {
-        panic(err)
+    for dec.Next() {
+        _, err = dec.Decode()
+        if err != nil {
+            panic(err)
+        }
+
+        // The resulting File can be retrieved after decoding process completed.
+        switch file := al.File().(type) {
+        case *filedef.Course:
+            // do something if it's a course file
+        case *filedef.Workout:
+            // do something if it's a workout file
+        case *filedef.Activity:
+            fmt.Printf("File Type: %s\n", file.FileId.Type)
+            fmt.Printf("Sessions count: %d\n", len(file.Sessions))
+            fmt.Printf("Laps count: %d\n", len(file.Laps))
+            fmt.Printf("Records count: %d\n", len(file.Records))
+
+            i := 100
+            fmt.Printf("\nSample value of record[%d]:\n", i)
+            fmt.Printf("  Lat: %v semicircles\n", file.Records[i].PositionLat)
+            fmt.Printf("  Long: %v semicircles\n", file.Records[i].PositionLong)
+            fmt.Printf("  Speed: %g m/s\n", float64(file.Records[i].Speed)/1000)
+            fmt.Printf("  HeartRate: %v bpm\n", file.Records[i].HeartRate)
+            fmt.Printf("  Cadence: %v rpm\n", file.Records[i].Cadence)
+
+            // Output:
+            // File Type: activity
+            // Sessions count: 1
+            // Laps count: 1
+            // Records count: 3601
+            //
+            // Sample value of record[100]:
+            //   Lat: 0 semicircles
+            //   Long: 10717 semicircles
+            //   Speed: 1 m/s
+            //   HeartRate: 126 bpm
+            //   Cadence: 100 rpm
+        }
     }
-
-    // The resulting Activity File can be retrieved after decoding process completed.
-    activity := al.File()
-
-    fmt.Printf("File Type: %s\n", activity.FileId.Type)
-    fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
-    fmt.Printf("Laps count: %d\n", len(activity.Laps))
-    fmt.Printf("Records count: %d\n", len(activity.Records))
-
-    i := 100
-    fmt.Printf("\nSample value of record[%d]:\n", i)
-    fmt.Printf("  Lat: %v semicircles\n", activity.Records[i].PositionLat)
-    fmt.Printf("  Long: %v semicircles\n", activity.Records[i].PositionLong)
-    fmt.Printf("  Speed: %g m/s\n", float64(activity.Records[i].Speed)/1000)
-    fmt.Printf("  HeartRate: %v bpm\n", activity.Records[i].HeartRate)
-    fmt.Printf("  Cadence: %v rpm\n", activity.Records[i].Cadence)
-
-    // Output:
-    // File Type: activity
-    // Sessions count: 1
-    // Laps count: 1
-    // Records count: 3601
-    //
-    // Sample value of record[100]:
-    //   Lat: 0 semicircles
-    //   Long: 10717 semicircles
-    //   Speed: 1 m/s
-    //   HeartRate: 126 bpm
-    //   Cadence: 100 rpm
 }
 ```
 
@@ -157,7 +164,6 @@ package main
 
 import (
     "bufio"
-    "context"
     "fmt"
     "os"
 
@@ -173,7 +179,7 @@ func main() {
     }
     defer f.Close()
 
-    al := filedef.NewListener[filedef.Activity]()
+    al := filedef.NewListener()
     defer al.Close() // release channel used by listener
 
     dec := decoder.New(bufio.NewReader(f),
@@ -181,7 +187,7 @@ func main() {
         decoder.WithBroadcastOnly(),
     )
 
-    fileId, err = dec.PeekFileId()
+    fileId, err := dec.PeekFileId()
     if err != nil {
         panic(err)
     }
@@ -197,6 +203,15 @@ func main() {
 
     // It's an Activity File, let's Decode it.
     _, err = dec.Decode()
+    if err != nil {
+        panic(err)
+    }
+
+    activity := al.File().(*filedef.Activity)
+
+    fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
+    fmt.Printf("Laps count: %d\n", len(activity.Laps))
+    fmt.Printf("Records count: %d\n", len(activity.Records))
     // ...
 }
 ```

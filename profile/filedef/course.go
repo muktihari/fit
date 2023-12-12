@@ -7,7 +7,6 @@ package filedef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
-	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -39,17 +38,13 @@ type Course struct {
 
 var _ File = &Course{}
 
-func NewCourse(mesgs ...proto.Message) (f *Course, ok bool) {
-	f = &Course{}
+func NewCourse(mesgs ...proto.Message) *Course {
+	f := &Course{}
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
 
-	if f.FileId == nil || f.FileId.Type != typedef.FileCourse {
-		return
-	}
-
-	return f, true
+	return f
 }
 
 func (f *Course) Add(mesg proto.Message) {
