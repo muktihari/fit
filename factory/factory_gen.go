@@ -141,7 +141,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -156,7 +156,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -187,7 +187,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -202,7 +202,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -217,7 +217,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -232,7 +232,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -247,7 +247,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -268,7 +268,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -283,7 +283,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -304,7 +304,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -319,7 +319,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -334,7 +334,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -349,7 +349,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -364,7 +364,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -379,7 +379,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -394,7 +394,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -415,7 +415,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -430,7 +430,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -445,7 +445,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -466,7 +466,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -497,7 +497,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -518,7 +518,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -533,7 +533,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -548,7 +548,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -563,7 +563,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -584,7 +584,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -599,7 +599,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -614,7 +614,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -629,7 +629,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -644,7 +644,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -659,7 +659,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -680,7 +680,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -695,7 +695,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -710,7 +710,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -725,7 +725,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -759,7 +759,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -780,7 +780,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -795,7 +795,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -810,7 +810,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -825,7 +825,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -840,7 +840,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -861,7 +861,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -876,7 +876,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -891,7 +891,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -906,7 +906,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -921,7 +921,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: []int8(nil), /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -936,7 +936,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				36: {
 					FieldBase: &proto.FieldBase{
@@ -966,7 +966,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				40: {
 					FieldBase: &proto.FieldBase{
@@ -981,7 +981,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				46: {
 					FieldBase: &proto.FieldBase{
@@ -1011,7 +1011,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				55: {
 					FieldBase: &proto.FieldBase{
@@ -1026,7 +1026,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				56: {
 					FieldBase: &proto.FieldBase{
@@ -1041,7 +1041,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				57: {
 					FieldBase: &proto.FieldBase{
@@ -1056,7 +1056,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				58: {
 					FieldBase: &proto.FieldBase{
@@ -1071,7 +1071,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				59: {
 					FieldBase: &proto.FieldBase{
@@ -1086,7 +1086,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				80: {
 					FieldBase: &proto.FieldBase{
@@ -1131,7 +1131,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				90: {
 					FieldBase: &proto.FieldBase{
@@ -1146,7 +1146,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				94: {
 					FieldBase: &proto.FieldBase{
@@ -1161,7 +1161,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				95: {
 					FieldBase: &proto.FieldBase{
@@ -1176,7 +1176,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				134: {
 					FieldBase: &proto.FieldBase{
@@ -1191,7 +1191,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				174: {
 					FieldBase: &proto.FieldBase{
@@ -1206,7 +1206,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -1227,7 +1227,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -1242,7 +1242,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -1257,7 +1257,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -1272,7 +1272,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -1287,7 +1287,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -1302,7 +1302,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -1317,7 +1317,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -1332,7 +1332,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -1347,7 +1347,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -1362,7 +1362,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -1377,7 +1377,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -1392,7 +1392,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -1407,7 +1407,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -1422,7 +1422,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -1437,7 +1437,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -1452,7 +1452,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -1467,7 +1467,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -1482,7 +1482,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -1497,7 +1497,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -1512,7 +1512,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -1527,7 +1527,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -1542,7 +1542,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -1557,7 +1557,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -1572,7 +1572,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -1587,7 +1587,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				31: {
 					FieldBase: &proto.FieldBase{
@@ -1602,7 +1602,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -1617,7 +1617,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				47: {
 					FieldBase: &proto.FieldBase{
@@ -1632,7 +1632,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				49: {
 					FieldBase: &proto.FieldBase{
@@ -1647,7 +1647,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -1668,7 +1668,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -1698,7 +1698,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -1728,7 +1728,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -1749,7 +1749,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -1779,7 +1779,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -1794,7 +1794,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -1809,7 +1809,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -1839,7 +1839,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -1854,7 +1854,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -1875,7 +1875,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -1890,7 +1890,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -1905,7 +1905,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -1920,7 +1920,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -1935,7 +1935,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -1950,7 +1950,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -1965,7 +1965,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -1980,7 +1980,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -1995,7 +1995,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -2010,7 +2010,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -2025,7 +2025,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -2040,7 +2040,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -2055,7 +2055,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -2100,7 +2100,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -2175,7 +2175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -2205,7 +2205,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -2220,7 +2220,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -2235,7 +2235,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -2250,7 +2250,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				37: {
 					FieldBase: &proto.FieldBase{
@@ -2265,7 +2265,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				38: {
 					FieldBase: &proto.FieldBase{
@@ -2280,7 +2280,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				39: {
 					FieldBase: &proto.FieldBase{
@@ -2295,7 +2295,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				40: {
 					FieldBase: &proto.FieldBase{
@@ -2310,7 +2310,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				41: {
 					FieldBase: &proto.FieldBase{
@@ -2325,7 +2325,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				44: {
 					FieldBase: &proto.FieldBase{
@@ -2406,7 +2406,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -2562,7 +2562,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -2577,7 +2577,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -2605,7 +2605,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -2626,7 +2626,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -2641,7 +2641,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -2662,7 +2662,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -2677,7 +2677,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -2692,7 +2692,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -2707,7 +2707,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -2722,7 +2722,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -2737,7 +2737,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -2752,7 +2752,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -2767,7 +2767,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -2782,7 +2782,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -2797,7 +2797,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -2812,7 +2812,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -2827,7 +2827,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -2842,7 +2842,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -2857,7 +2857,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -2872,7 +2872,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -2887,7 +2887,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -2902,7 +2902,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -2923,7 +2923,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -2938,7 +2938,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -2953,7 +2953,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -2968,7 +2968,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -2983,7 +2983,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3004,7 +3004,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3019,7 +3019,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -3034,7 +3034,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3055,7 +3055,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3070,7 +3070,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -3085,7 +3085,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3106,7 +3106,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -3121,7 +3121,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3136,7 +3136,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3157,7 +3157,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -3172,7 +3172,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3187,7 +3187,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3208,7 +3208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3223,7 +3223,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -3238,7 +3238,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3259,7 +3259,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3274,7 +3274,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -3289,7 +3289,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -3304,7 +3304,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3325,7 +3325,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				254: {
 					FieldBase: &proto.FieldBase{
@@ -3340,7 +3340,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -3355,7 +3355,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3370,7 +3370,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -3385,7 +3385,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -3400,7 +3400,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -3415,7 +3415,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -3445,7 +3445,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -3460,7 +3460,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -3475,7 +3475,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -3520,7 +3520,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -3550,7 +3550,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -3565,7 +3565,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -3580,7 +3580,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -3595,7 +3595,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -3610,7 +3610,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -3625,7 +3625,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -3640,7 +3640,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -3668,7 +3668,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -3683,7 +3683,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -3698,7 +3698,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -3713,7 +3713,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -3728,7 +3728,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -3743,7 +3743,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -3758,7 +3758,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -3773,7 +3773,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -3788,7 +3788,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -3818,7 +3818,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				36: {
 					FieldBase: &proto.FieldBase{
@@ -3833,7 +3833,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				37: {
 					FieldBase: &proto.FieldBase{
@@ -3848,7 +3848,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -3869,7 +3869,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -3884,7 +3884,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -3899,7 +3899,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -3929,7 +3929,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -3944,7 +3944,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -3959,7 +3959,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -3974,7 +3974,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -4049,7 +4049,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -4070,7 +4070,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -4085,7 +4085,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -4100,7 +4100,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -4130,7 +4130,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -4145,7 +4145,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -4160,7 +4160,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -4175,7 +4175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -4250,7 +4250,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -4271,7 +4271,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -4286,7 +4286,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -4301,7 +4301,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -4316,7 +4316,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -4331,7 +4331,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -4352,7 +4352,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -4367,7 +4367,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -4382,7 +4382,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -4397,7 +4397,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -4412,7 +4412,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -4427,7 +4427,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -4442,7 +4442,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -4472,7 +4472,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -4487,7 +4487,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -4502,7 +4502,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -4532,7 +4532,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -4553,7 +4553,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -4568,7 +4568,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -4583,7 +4583,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -4598,7 +4598,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -4613,7 +4613,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -4628,7 +4628,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -4643,7 +4643,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -4658,7 +4658,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -4679,7 +4679,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -4694,7 +4694,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -4709,7 +4709,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -4724,7 +4724,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -4739,7 +4739,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -4754,7 +4754,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -4769,7 +4769,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -4784,7 +4784,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -4799,7 +4799,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -4814,7 +4814,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -4829,7 +4829,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -4844,7 +4844,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -4876,7 +4876,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -4891,7 +4891,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -4906,7 +4906,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -4923,7 +4923,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -4940,7 +4940,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -4955,7 +4955,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -4970,7 +4970,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -4992,7 +4992,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -5014,7 +5014,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -5029,7 +5029,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -5044,7 +5044,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -5059,7 +5059,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -5074,7 +5074,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -5089,7 +5089,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -5104,7 +5104,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -5119,7 +5119,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -5134,7 +5134,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -5149,7 +5149,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -5164,7 +5164,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -5179,7 +5179,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				31: {
 					FieldBase: &proto.FieldBase{
@@ -5194,7 +5194,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -5209,7 +5209,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				33: {
 					FieldBase: &proto.FieldBase{
@@ -5224,7 +5224,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				34: {
 					FieldBase: &proto.FieldBase{
@@ -5239,7 +5239,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				35: {
 					FieldBase: &proto.FieldBase{
@@ -5254,7 +5254,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				36: {
 					FieldBase: &proto.FieldBase{
@@ -5269,7 +5269,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				37: {
 					FieldBase: &proto.FieldBase{
@@ -5284,7 +5284,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				38: {
 					FieldBase: &proto.FieldBase{
@@ -5299,7 +5299,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				39: {
 					FieldBase: &proto.FieldBase{
@@ -5314,7 +5314,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				41: {
 					FieldBase: &proto.FieldBase{
@@ -5329,7 +5329,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				42: {
 					FieldBase: &proto.FieldBase{
@@ -5344,7 +5344,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				43: {
 					FieldBase: &proto.FieldBase{
@@ -5359,7 +5359,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				44: {
 					FieldBase: &proto.FieldBase{
@@ -5374,7 +5374,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				45: {
 					FieldBase: &proto.FieldBase{
@@ -5389,7 +5389,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				46: {
 					FieldBase: &proto.FieldBase{
@@ -5404,7 +5404,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				47: {
 					FieldBase: &proto.FieldBase{
@@ -5419,7 +5419,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				48: {
 					FieldBase: &proto.FieldBase{
@@ -5434,7 +5434,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				49: {
 					FieldBase: &proto.FieldBase{
@@ -5451,7 +5451,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				50: {
 					FieldBase: &proto.FieldBase{
@@ -5468,7 +5468,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				51: {
 					FieldBase: &proto.FieldBase{
@@ -5483,7 +5483,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				52: {
 					FieldBase: &proto.FieldBase{
@@ -5498,7 +5498,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				53: {
 					FieldBase: &proto.FieldBase{
@@ -5513,7 +5513,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				54: {
 					FieldBase: &proto.FieldBase{
@@ -5528,7 +5528,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				55: {
 					FieldBase: &proto.FieldBase{
@@ -5543,7 +5543,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				56: {
 					FieldBase: &proto.FieldBase{
@@ -5558,7 +5558,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				57: {
 					FieldBase: &proto.FieldBase{
@@ -5573,7 +5573,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				58: {
 					FieldBase: &proto.FieldBase{
@@ -5588,7 +5588,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				59: {
 					FieldBase: &proto.FieldBase{
@@ -5603,7 +5603,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				60: {
 					FieldBase: &proto.FieldBase{
@@ -5618,7 +5618,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				61: {
 					FieldBase: &proto.FieldBase{
@@ -5633,7 +5633,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				62: {
 					FieldBase: &proto.FieldBase{
@@ -5648,7 +5648,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				63: {
 					FieldBase: &proto.FieldBase{
@@ -5663,7 +5663,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				64: {
 					FieldBase: &proto.FieldBase{
@@ -5678,7 +5678,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				65: {
 					FieldBase: &proto.FieldBase{
@@ -5693,7 +5693,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				66: {
 					FieldBase: &proto.FieldBase{
@@ -5708,7 +5708,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				67: {
 					FieldBase: &proto.FieldBase{
@@ -5723,7 +5723,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				68: {
 					FieldBase: &proto.FieldBase{
@@ -5738,7 +5738,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				69: {
 					FieldBase: &proto.FieldBase{
@@ -5753,7 +5753,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				70: {
 					FieldBase: &proto.FieldBase{
@@ -5768,7 +5768,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				71: {
 					FieldBase: &proto.FieldBase{
@@ -5785,7 +5785,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				82: {
 					FieldBase: &proto.FieldBase{
@@ -5800,7 +5800,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				83: {
 					FieldBase: &proto.FieldBase{
@@ -5815,7 +5815,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				84: {
 					FieldBase: &proto.FieldBase{
@@ -5830,7 +5830,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				85: {
 					FieldBase: &proto.FieldBase{
@@ -5845,7 +5845,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				86: {
 					FieldBase: &proto.FieldBase{
@@ -5860,7 +5860,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				87: {
 					FieldBase: &proto.FieldBase{
@@ -5875,7 +5875,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				88: {
 					FieldBase: &proto.FieldBase{
@@ -5890,7 +5890,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				89: {
 					FieldBase: &proto.FieldBase{
@@ -5905,7 +5905,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				90: {
 					FieldBase: &proto.FieldBase{
@@ -5920,7 +5920,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				91: {
 					FieldBase: &proto.FieldBase{
@@ -5935,7 +5935,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				92: {
 					FieldBase: &proto.FieldBase{
@@ -5950,7 +5950,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				93: {
 					FieldBase: &proto.FieldBase{
@@ -5965,7 +5965,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				94: {
 					FieldBase: &proto.FieldBase{
@@ -5980,7 +5980,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				95: {
 					FieldBase: &proto.FieldBase{
@@ -5995,7 +5995,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				96: {
 					FieldBase: &proto.FieldBase{
@@ -6010,7 +6010,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				97: {
 					FieldBase: &proto.FieldBase{
@@ -6025,7 +6025,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				98: {
 					FieldBase: &proto.FieldBase{
@@ -6040,7 +6040,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				99: {
 					FieldBase: &proto.FieldBase{
@@ -6055,7 +6055,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				100: {
 					FieldBase: &proto.FieldBase{
@@ -6070,7 +6070,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				101: {
 					FieldBase: &proto.FieldBase{
@@ -6085,7 +6085,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				102: {
 					FieldBase: &proto.FieldBase{
@@ -6100,7 +6100,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				103: {
 					FieldBase: &proto.FieldBase{
@@ -6115,7 +6115,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				104: {
 					FieldBase: &proto.FieldBase{
@@ -6130,7 +6130,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				105: {
 					FieldBase: &proto.FieldBase{
@@ -6145,7 +6145,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				110: {
 					FieldBase: &proto.FieldBase{
@@ -6160,7 +6160,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				111: {
 					FieldBase: &proto.FieldBase{
@@ -6175,7 +6175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				112: {
 					FieldBase: &proto.FieldBase{
@@ -6190,7 +6190,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				113: {
 					FieldBase: &proto.FieldBase{
@@ -6205,7 +6205,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				114: {
 					FieldBase: &proto.FieldBase{
@@ -6220,7 +6220,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				115: {
 					FieldBase: &proto.FieldBase{
@@ -6235,7 +6235,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				116: {
 					FieldBase: &proto.FieldBase{
@@ -6250,7 +6250,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				117: {
 					FieldBase: &proto.FieldBase{
@@ -6265,7 +6265,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				118: {
 					FieldBase: &proto.FieldBase{
@@ -6280,7 +6280,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				119: {
 					FieldBase: &proto.FieldBase{
@@ -6295,7 +6295,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				120: {
 					FieldBase: &proto.FieldBase{
@@ -6310,7 +6310,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				121: {
 					FieldBase: &proto.FieldBase{
@@ -6325,7 +6325,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				122: {
 					FieldBase: &proto.FieldBase{
@@ -6340,7 +6340,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				123: {
 					FieldBase: &proto.FieldBase{
@@ -6355,7 +6355,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				124: {
 					FieldBase: &proto.FieldBase{
@@ -6370,7 +6370,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				125: {
 					FieldBase: &proto.FieldBase{
@@ -6385,7 +6385,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				126: {
 					FieldBase: &proto.FieldBase{
@@ -6400,7 +6400,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				127: {
 					FieldBase: &proto.FieldBase{
@@ -6415,7 +6415,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				128: {
 					FieldBase: &proto.FieldBase{
@@ -6430,7 +6430,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				129: {
 					FieldBase: &proto.FieldBase{
@@ -6445,7 +6445,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				130: {
 					FieldBase: &proto.FieldBase{
@@ -6460,7 +6460,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				131: {
 					FieldBase: &proto.FieldBase{
@@ -6475,7 +6475,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				132: {
 					FieldBase: &proto.FieldBase{
@@ -6490,7 +6490,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				133: {
 					FieldBase: &proto.FieldBase{
@@ -6505,7 +6505,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				134: {
 					FieldBase: &proto.FieldBase{
@@ -6520,7 +6520,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				137: {
 					FieldBase: &proto.FieldBase{
@@ -6535,7 +6535,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				139: {
 					FieldBase: &proto.FieldBase{
@@ -6550,7 +6550,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				140: {
 					FieldBase: &proto.FieldBase{
@@ -6565,7 +6565,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				141: {
 					FieldBase: &proto.FieldBase{
@@ -6580,7 +6580,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				142: {
 					FieldBase: &proto.FieldBase{
@@ -6595,7 +6595,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				143: {
 					FieldBase: &proto.FieldBase{
@@ -6610,7 +6610,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				144: {
 					FieldBase: &proto.FieldBase{
@@ -6625,7 +6625,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				145: {
 					FieldBase: &proto.FieldBase{
@@ -6640,7 +6640,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				146: {
 					FieldBase: &proto.FieldBase{
@@ -6655,7 +6655,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				147: {
 					FieldBase: &proto.FieldBase{
@@ -6672,7 +6672,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				148: {
 					FieldBase: &proto.FieldBase{
@@ -6689,7 +6689,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				149: {
 					FieldBase: &proto.FieldBase{
@@ -6706,7 +6706,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				150: {
 					FieldBase: &proto.FieldBase{
@@ -6721,7 +6721,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				155: {
 					FieldBase: &proto.FieldBase{
@@ -6736,7 +6736,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				156: {
 					FieldBase: &proto.FieldBase{
@@ -6751,7 +6751,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				168: {
 					FieldBase: &proto.FieldBase{
@@ -6766,7 +6766,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				169: {
 					FieldBase: &proto.FieldBase{
@@ -6781,7 +6781,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				170: {
 					FieldBase: &proto.FieldBase{
@@ -6796,7 +6796,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				180: {
 					FieldBase: &proto.FieldBase{
@@ -6811,7 +6811,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				181: {
 					FieldBase: &proto.FieldBase{
@@ -6856,7 +6856,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				186: {
 					FieldBase: &proto.FieldBase{
@@ -6901,7 +6901,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				195: {
 					FieldBase: &proto.FieldBase{
@@ -6916,7 +6916,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				197: {
 					FieldBase: &proto.FieldBase{
@@ -6931,7 +6931,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				198: {
 					FieldBase: &proto.FieldBase{
@@ -6946,7 +6946,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				199: {
 					FieldBase: &proto.FieldBase{
@@ -6961,7 +6961,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				200: {
 					FieldBase: &proto.FieldBase{
@@ -6976,7 +6976,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				208: {
 					FieldBase: &proto.FieldBase{
@@ -6991,7 +6991,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				209: {
 					FieldBase: &proto.FieldBase{
@@ -7006,7 +7006,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				210: {
 					FieldBase: &proto.FieldBase{
@@ -7021,7 +7021,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -7042,7 +7042,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -7057,7 +7057,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -7072,7 +7072,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -7087,7 +7087,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -7102,7 +7102,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -7117,7 +7117,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -7132,7 +7132,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -7147,7 +7147,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -7162,7 +7162,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -7177,7 +7177,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -7192,7 +7192,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -7207,7 +7207,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -7239,7 +7239,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -7254,7 +7254,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -7269,7 +7269,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -7286,7 +7286,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -7303,7 +7303,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -7318,7 +7318,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -7333,7 +7333,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -7355,7 +7355,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -7377,7 +7377,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -7392,7 +7392,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -7407,7 +7407,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -7422,7 +7422,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -7437,7 +7437,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -7452,7 +7452,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -7467,7 +7467,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -7482,7 +7482,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -7497,7 +7497,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -7512,7 +7512,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				33: {
 					FieldBase: &proto.FieldBase{
@@ -7527,7 +7527,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				34: {
 					FieldBase: &proto.FieldBase{
@@ -7542,7 +7542,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				35: {
 					FieldBase: &proto.FieldBase{
@@ -7557,7 +7557,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				37: {
 					FieldBase: &proto.FieldBase{
@@ -7572,7 +7572,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				38: {
 					FieldBase: &proto.FieldBase{
@@ -7587,7 +7587,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				39: {
 					FieldBase: &proto.FieldBase{
@@ -7602,7 +7602,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				40: {
 					FieldBase: &proto.FieldBase{
@@ -7617,7 +7617,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				41: {
 					FieldBase: &proto.FieldBase{
@@ -7632,7 +7632,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				42: {
 					FieldBase: &proto.FieldBase{
@@ -7649,7 +7649,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				43: {
 					FieldBase: &proto.FieldBase{
@@ -7666,7 +7666,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				44: {
 					FieldBase: &proto.FieldBase{
@@ -7681,7 +7681,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				45: {
 					FieldBase: &proto.FieldBase{
@@ -7696,7 +7696,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				46: {
 					FieldBase: &proto.FieldBase{
@@ -7711,7 +7711,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				47: {
 					FieldBase: &proto.FieldBase{
@@ -7726,7 +7726,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				48: {
 					FieldBase: &proto.FieldBase{
@@ -7741,7 +7741,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				49: {
 					FieldBase: &proto.FieldBase{
@@ -7756,7 +7756,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				50: {
 					FieldBase: &proto.FieldBase{
@@ -7771,7 +7771,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				51: {
 					FieldBase: &proto.FieldBase{
@@ -7786,7 +7786,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				52: {
 					FieldBase: &proto.FieldBase{
@@ -7801,7 +7801,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				53: {
 					FieldBase: &proto.FieldBase{
@@ -7816,7 +7816,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				54: {
 					FieldBase: &proto.FieldBase{
@@ -7831,7 +7831,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				55: {
 					FieldBase: &proto.FieldBase{
@@ -7846,7 +7846,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				56: {
 					FieldBase: &proto.FieldBase{
@@ -7861,7 +7861,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				57: {
 					FieldBase: &proto.FieldBase{
@@ -7876,7 +7876,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				58: {
 					FieldBase: &proto.FieldBase{
@@ -7891,7 +7891,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				59: {
 					FieldBase: &proto.FieldBase{
@@ -7906,7 +7906,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				60: {
 					FieldBase: &proto.FieldBase{
@@ -7921,7 +7921,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				61: {
 					FieldBase: &proto.FieldBase{
@@ -7936,7 +7936,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				62: {
 					FieldBase: &proto.FieldBase{
@@ -7953,7 +7953,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				63: {
 					FieldBase: &proto.FieldBase{
@@ -7968,7 +7968,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				71: {
 					FieldBase: &proto.FieldBase{
@@ -7983,7 +7983,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				74: {
 					FieldBase: &proto.FieldBase{
@@ -7998,7 +7998,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				75: {
 					FieldBase: &proto.FieldBase{
@@ -8013,7 +8013,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				76: {
 					FieldBase: &proto.FieldBase{
@@ -8028,7 +8028,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				77: {
 					FieldBase: &proto.FieldBase{
@@ -8043,7 +8043,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				78: {
 					FieldBase: &proto.FieldBase{
@@ -8058,7 +8058,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				79: {
 					FieldBase: &proto.FieldBase{
@@ -8073,7 +8073,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				80: {
 					FieldBase: &proto.FieldBase{
@@ -8088,7 +8088,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				81: {
 					FieldBase: &proto.FieldBase{
@@ -8103,7 +8103,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				82: {
 					FieldBase: &proto.FieldBase{
@@ -8118,7 +8118,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				83: {
 					FieldBase: &proto.FieldBase{
@@ -8133,7 +8133,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				84: {
 					FieldBase: &proto.FieldBase{
@@ -8148,7 +8148,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				85: {
 					FieldBase: &proto.FieldBase{
@@ -8163,7 +8163,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				86: {
 					FieldBase: &proto.FieldBase{
@@ -8178,7 +8178,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				87: {
 					FieldBase: &proto.FieldBase{
@@ -8193,7 +8193,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				88: {
 					FieldBase: &proto.FieldBase{
@@ -8208,7 +8208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				89: {
 					FieldBase: &proto.FieldBase{
@@ -8223,7 +8223,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				91: {
 					FieldBase: &proto.FieldBase{
@@ -8238,7 +8238,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				92: {
 					FieldBase: &proto.FieldBase{
@@ -8253,7 +8253,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				93: {
 					FieldBase: &proto.FieldBase{
@@ -8268,7 +8268,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				94: {
 					FieldBase: &proto.FieldBase{
@@ -8283,7 +8283,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				95: {
 					FieldBase: &proto.FieldBase{
@@ -8298,7 +8298,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				98: {
 					FieldBase: &proto.FieldBase{
@@ -8313,7 +8313,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				99: {
 					FieldBase: &proto.FieldBase{
@@ -8328,7 +8328,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				100: {
 					FieldBase: &proto.FieldBase{
@@ -8343,7 +8343,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				101: {
 					FieldBase: &proto.FieldBase{
@@ -8358,7 +8358,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				102: {
 					FieldBase: &proto.FieldBase{
@@ -8373,7 +8373,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				103: {
 					FieldBase: &proto.FieldBase{
@@ -8388,7 +8388,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				104: {
 					FieldBase: &proto.FieldBase{
@@ -8403,7 +8403,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				105: {
 					FieldBase: &proto.FieldBase{
@@ -8418,7 +8418,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				106: {
 					FieldBase: &proto.FieldBase{
@@ -8433,7 +8433,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				107: {
 					FieldBase: &proto.FieldBase{
@@ -8448,7 +8448,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				108: {
 					FieldBase: &proto.FieldBase{
@@ -8463,7 +8463,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				109: {
 					FieldBase: &proto.FieldBase{
@@ -8478,7 +8478,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				110: {
 					FieldBase: &proto.FieldBase{
@@ -8493,7 +8493,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				111: {
 					FieldBase: &proto.FieldBase{
@@ -8508,7 +8508,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				112: {
 					FieldBase: &proto.FieldBase{
@@ -8523,7 +8523,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				113: {
 					FieldBase: &proto.FieldBase{
@@ -8538,7 +8538,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				114: {
 					FieldBase: &proto.FieldBase{
@@ -8553,7 +8553,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				115: {
 					FieldBase: &proto.FieldBase{
@@ -8568,7 +8568,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				116: {
 					FieldBase: &proto.FieldBase{
@@ -8583,7 +8583,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				117: {
 					FieldBase: &proto.FieldBase{
@@ -8598,7 +8598,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				118: {
 					FieldBase: &proto.FieldBase{
@@ -8613,7 +8613,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				119: {
 					FieldBase: &proto.FieldBase{
@@ -8628,7 +8628,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				120: {
 					FieldBase: &proto.FieldBase{
@@ -8643,7 +8643,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				121: {
 					FieldBase: &proto.FieldBase{
@@ -8658,7 +8658,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				122: {
 					FieldBase: &proto.FieldBase{
@@ -8673,7 +8673,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				123: {
 					FieldBase: &proto.FieldBase{
@@ -8688,7 +8688,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				124: {
 					FieldBase: &proto.FieldBase{
@@ -8703,7 +8703,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				136: {
 					FieldBase: &proto.FieldBase{
@@ -8718,7 +8718,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				137: {
 					FieldBase: &proto.FieldBase{
@@ -8733,7 +8733,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				147: {
 					FieldBase: &proto.FieldBase{
@@ -8750,7 +8750,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				148: {
 					FieldBase: &proto.FieldBase{
@@ -8767,7 +8767,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				149: {
 					FieldBase: &proto.FieldBase{
@@ -8812,7 +8812,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				153: {
 					FieldBase: &proto.FieldBase{
@@ -8857,7 +8857,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				157: {
 					FieldBase: &proto.FieldBase{
@@ -8872,7 +8872,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				158: {
 					FieldBase: &proto.FieldBase{
@@ -8887,7 +8887,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				159: {
 					FieldBase: &proto.FieldBase{
@@ -8902,7 +8902,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				160: {
 					FieldBase: &proto.FieldBase{
@@ -8917,7 +8917,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -8938,7 +8938,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -8953,7 +8953,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -8968,7 +8968,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -8983,7 +8983,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -8998,7 +8998,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -9013,7 +9013,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -9028,7 +9028,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -9043,7 +9043,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -9058,7 +9058,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -9073,7 +9073,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -9088,7 +9088,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -9103,7 +9103,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -9118,7 +9118,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -9133,7 +9133,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -9148,7 +9148,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -9163,7 +9163,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -9178,7 +9178,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -9193,7 +9193,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -9208,7 +9208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -9223,7 +9223,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -9240,7 +9240,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -9257,7 +9257,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -9278,7 +9278,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -9293,7 +9293,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -9308,7 +9308,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -9325,7 +9325,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -9340,7 +9340,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -9355,7 +9355,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -9370,7 +9370,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -9387,7 +9387,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -9402,7 +9402,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -9420,7 +9420,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -9435,7 +9435,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -9450,7 +9450,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -9465,7 +9465,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -9480,7 +9480,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -9495,7 +9495,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -9510,7 +9510,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -9527,7 +9527,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -9542,7 +9542,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -9559,7 +9559,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -9574,7 +9574,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -9589,7 +9589,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				31: {
 					FieldBase: &proto.FieldBase{
@@ -9604,7 +9604,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -9619,7 +9619,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				33: {
 					FieldBase: &proto.FieldBase{
@@ -9634,7 +9634,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				39: {
 					FieldBase: &proto.FieldBase{
@@ -9649,7 +9649,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				40: {
 					FieldBase: &proto.FieldBase{
@@ -9664,7 +9664,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				41: {
 					FieldBase: &proto.FieldBase{
@@ -9679,7 +9679,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				42: {
 					FieldBase: &proto.FieldBase{
@@ -9694,7 +9694,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				43: {
 					FieldBase: &proto.FieldBase{
@@ -9709,7 +9709,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				44: {
 					FieldBase: &proto.FieldBase{
@@ -9724,7 +9724,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				45: {
 					FieldBase: &proto.FieldBase{
@@ -9739,7 +9739,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				46: {
 					FieldBase: &proto.FieldBase{
@@ -9754,7 +9754,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				47: {
 					FieldBase: &proto.FieldBase{
@@ -9769,7 +9769,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				48: {
 					FieldBase: &proto.FieldBase{
@@ -9784,7 +9784,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				49: {
 					FieldBase: &proto.FieldBase{
@@ -9799,7 +9799,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				50: {
 					FieldBase: &proto.FieldBase{
@@ -9814,7 +9814,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				51: {
 					FieldBase: &proto.FieldBase{
@@ -9829,7 +9829,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				52: {
 					FieldBase: &proto.FieldBase{
@@ -9844,7 +9844,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				53: {
 					FieldBase: &proto.FieldBase{
@@ -9859,7 +9859,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				54: {
 					FieldBase: &proto.FieldBase{
@@ -9874,7 +9874,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				55: {
 					FieldBase: &proto.FieldBase{
@@ -9889,7 +9889,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				56: {
 					FieldBase: &proto.FieldBase{
@@ -9904,7 +9904,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				57: {
 					FieldBase: &proto.FieldBase{
@@ -9919,7 +9919,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				58: {
 					FieldBase: &proto.FieldBase{
@@ -9934,7 +9934,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				59: {
 					FieldBase: &proto.FieldBase{
@@ -9949,7 +9949,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				62: {
 					FieldBase: &proto.FieldBase{
@@ -9964,7 +9964,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				67: {
 					FieldBase: &proto.FieldBase{
@@ -9979,7 +9979,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				68: {
 					FieldBase: &proto.FieldBase{
@@ -9994,7 +9994,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				69: {
 					FieldBase: &proto.FieldBase{
@@ -10009,7 +10009,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				70: {
 					FieldBase: &proto.FieldBase{
@@ -10024,7 +10024,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				71: {
 					FieldBase: &proto.FieldBase{
@@ -10039,7 +10039,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				72: {
 					FieldBase: &proto.FieldBase{
@@ -10054,7 +10054,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				73: {
 					FieldBase: &proto.FieldBase{
@@ -10069,7 +10069,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				78: {
 					FieldBase: &proto.FieldBase{
@@ -10084,7 +10084,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				81: {
 					FieldBase: &proto.FieldBase{
@@ -10099,7 +10099,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				82: {
 					FieldBase: &proto.FieldBase{
@@ -10114,7 +10114,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				83: {
 					FieldBase: &proto.FieldBase{
@@ -10129,7 +10129,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				84: {
 					FieldBase: &proto.FieldBase{
@@ -10144,7 +10144,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				85: {
 					FieldBase: &proto.FieldBase{
@@ -10159,7 +10159,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				87: {
 					FieldBase: &proto.FieldBase{
@@ -10174,7 +10174,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				91: {
 					FieldBase: &proto.FieldBase{
@@ -10189,7 +10189,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				92: {
 					FieldBase: &proto.FieldBase{
@@ -10204,7 +10204,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				93: {
 					FieldBase: &proto.FieldBase{
@@ -10219,7 +10219,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				94: {
 					FieldBase: &proto.FieldBase{
@@ -10234,7 +10234,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				95: {
 					FieldBase: &proto.FieldBase{
@@ -10249,7 +10249,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				96: {
 					FieldBase: &proto.FieldBase{
@@ -10264,7 +10264,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				97: {
 					FieldBase: &proto.FieldBase{
@@ -10279,7 +10279,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				98: {
 					FieldBase: &proto.FieldBase{
@@ -10294,7 +10294,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				99: {
 					FieldBase: &proto.FieldBase{
@@ -10311,7 +10311,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				108: {
 					FieldBase: &proto.FieldBase{
@@ -10326,7 +10326,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				114: {
 					FieldBase: &proto.FieldBase{
@@ -10371,7 +10371,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				117: {
 					FieldBase: &proto.FieldBase{
@@ -10386,7 +10386,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				118: {
 					FieldBase: &proto.FieldBase{
@@ -10401,7 +10401,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				119: {
 					FieldBase: &proto.FieldBase{
@@ -10416,7 +10416,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				120: {
 					FieldBase: &proto.FieldBase{
@@ -10431,7 +10431,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				123: {
 					FieldBase: &proto.FieldBase{
@@ -10446,7 +10446,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				124: {
 					FieldBase: &proto.FieldBase{
@@ -10461,7 +10461,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				125: {
 					FieldBase: &proto.FieldBase{
@@ -10476,7 +10476,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				126: {
 					FieldBase: &proto.FieldBase{
@@ -10491,7 +10491,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				127: {
 					FieldBase: &proto.FieldBase{
@@ -10506,7 +10506,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				129: {
 					FieldBase: &proto.FieldBase{
@@ -10521,7 +10521,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				139: {
 					FieldBase: &proto.FieldBase{
@@ -10536,7 +10536,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -10557,7 +10557,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -10572,7 +10572,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -10587,7 +10587,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -10604,7 +10604,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -10772,7 +10772,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -10787,7 +10787,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -10802,7 +10802,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -10817,7 +10817,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -10832,7 +10832,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -10847,7 +10847,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -10862,7 +10862,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -10877,7 +10877,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -10892,7 +10892,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -10907,7 +10907,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -10929,7 +10929,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -10944,7 +10944,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -10959,7 +10959,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -10974,7 +10974,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -10989,7 +10989,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11010,7 +11010,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11025,7 +11025,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11065,7 +11065,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11080,7 +11080,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11095,7 +11095,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -11126,7 +11126,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -11141,7 +11141,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -11156,7 +11156,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -11171,7 +11171,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -11186,7 +11186,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -11201,7 +11201,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -11216,7 +11216,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -11231,7 +11231,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -11246,7 +11246,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -11261,7 +11261,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -11276,7 +11276,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -11291,7 +11291,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -11306,7 +11306,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -11321,7 +11321,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11342,7 +11342,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11357,7 +11357,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11372,7 +11372,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11387,7 +11387,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11402,7 +11402,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11423,7 +11423,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11438,7 +11438,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11453,7 +11453,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11484,7 +11484,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11499,7 +11499,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -11514,7 +11514,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11535,7 +11535,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11550,7 +11550,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11565,7 +11565,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11580,7 +11580,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11595,7 +11595,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -11610,7 +11610,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -11625,7 +11625,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -11640,7 +11640,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -11655,7 +11655,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -11670,7 +11670,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -11685,7 +11685,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -11700,7 +11700,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -11715,7 +11715,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -11730,7 +11730,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -11745,7 +11745,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -11760,7 +11760,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11781,7 +11781,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11796,7 +11796,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11811,7 +11811,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11826,7 +11826,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11841,7 +11841,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -11856,7 +11856,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -11877,7 +11877,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -11892,7 +11892,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -11907,7 +11907,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -11922,7 +11922,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -11937,7 +11937,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -11952,7 +11952,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -11967,7 +11967,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -11982,7 +11982,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -11997,7 +11997,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12018,7 +12018,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12033,7 +12033,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12048,7 +12048,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12063,7 +12063,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12078,7 +12078,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12099,7 +12099,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12114,7 +12114,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12129,7 +12129,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12144,7 +12144,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12159,7 +12159,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12174,7 +12174,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -12189,7 +12189,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -12204,7 +12204,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -12219,7 +12219,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12240,7 +12240,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12255,7 +12255,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12270,7 +12270,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12285,7 +12285,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12300,7 +12300,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12315,7 +12315,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -12330,7 +12330,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -12345,7 +12345,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -12360,7 +12360,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -12375,7 +12375,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -12390,7 +12390,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -12405,7 +12405,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12426,7 +12426,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12441,7 +12441,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12456,7 +12456,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12471,7 +12471,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12486,7 +12486,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12501,7 +12501,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -12516,7 +12516,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -12531,7 +12531,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -12546,7 +12546,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
+					Value: []float32(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12567,7 +12567,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12582,7 +12582,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12597,7 +12597,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12612,7 +12612,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12633,7 +12633,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12648,7 +12648,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12676,7 +12676,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12691,7 +12691,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12706,7 +12706,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12721,7 +12721,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: []int32(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -12736,7 +12736,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: []int32(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12757,7 +12757,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12772,7 +12772,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12794,7 +12794,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12809,7 +12809,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12824,7 +12824,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12839,7 +12839,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12860,7 +12860,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12875,7 +12875,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12890,7 +12890,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -12911,7 +12911,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -12926,7 +12926,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -12941,7 +12941,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -12956,7 +12956,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -12971,7 +12971,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -12986,7 +12986,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -13001,7 +13001,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -13016,7 +13016,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -13031,7 +13031,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13052,7 +13052,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13067,7 +13067,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13082,7 +13082,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13103,7 +13103,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13118,7 +13118,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13133,7 +13133,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -13148,7 +13148,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -13163,7 +13163,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -13178,7 +13178,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -13193,7 +13193,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -13208,7 +13208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: []int16(nil), /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -13223,7 +13223,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -13238,7 +13238,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -13253,7 +13253,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -13268,7 +13268,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13289,7 +13289,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13304,7 +13304,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -13319,7 +13319,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13340,7 +13340,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13355,7 +13355,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13370,7 +13370,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13391,7 +13391,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13406,7 +13406,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13421,7 +13421,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13442,7 +13442,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13457,7 +13457,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -13472,7 +13472,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -13487,7 +13487,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -13502,7 +13502,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -13517,7 +13517,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -13532,7 +13532,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13553,7 +13553,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13568,7 +13568,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -13583,7 +13583,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -13598,7 +13598,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -13613,7 +13613,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -13628,7 +13628,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -13643,7 +13643,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -13658,7 +13658,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -13673,7 +13673,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -13688,7 +13688,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -13703,7 +13703,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13724,7 +13724,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13769,7 +13769,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -13814,7 +13814,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -13829,7 +13829,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -13846,7 +13846,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -13861,7 +13861,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -13882,7 +13882,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -13897,7 +13897,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -13912,7 +13912,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -13927,7 +13927,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -13942,7 +13942,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -13957,7 +13957,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -13972,7 +13972,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -13987,7 +13987,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -14002,7 +14002,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -14017,7 +14017,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -14032,7 +14032,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -14047,7 +14047,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -14062,7 +14062,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -14077,7 +14077,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -14092,7 +14092,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -14107,7 +14107,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -14122,7 +14122,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				74: {
 					FieldBase: &proto.FieldBase{
@@ -14137,7 +14137,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				110: {
 					FieldBase: &proto.FieldBase{
@@ -14152,7 +14152,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -14173,7 +14173,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14188,7 +14188,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -14203,7 +14203,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14218,7 +14218,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -14233,7 +14233,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -14248,7 +14248,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -14263,7 +14263,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -14278,7 +14278,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -14293,7 +14293,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -14308,7 +14308,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -14323,7 +14323,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -14338,7 +14338,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -14353,7 +14353,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				77: {
 					FieldBase: &proto.FieldBase{
@@ -14368,7 +14368,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -14389,7 +14389,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -14404,7 +14404,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -14419,7 +14419,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -14434,7 +14434,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -14449,7 +14449,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14464,7 +14464,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -14500,7 +14500,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -14515,7 +14515,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -14530,7 +14530,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -14545,7 +14545,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14560,7 +14560,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -14575,7 +14575,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -14590,7 +14590,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -14605,7 +14605,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -14620,7 +14620,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -14635,7 +14635,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -14650,7 +14650,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -14665,7 +14665,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -14680,7 +14680,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -14695,7 +14695,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -14716,7 +14716,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -14731,7 +14731,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -14746,7 +14746,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -14761,7 +14761,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14776,7 +14776,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -14797,7 +14797,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -14812,7 +14812,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -14827,7 +14827,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -14842,7 +14842,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -14863,7 +14863,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -14878,7 +14878,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -14893,7 +14893,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -14908,7 +14908,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -14923,7 +14923,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -14938,7 +14938,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -14953,7 +14953,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -14989,7 +14989,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -15004,7 +15004,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -15019,7 +15019,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -15049,7 +15049,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -15064,7 +15064,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -15079,7 +15079,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -15094,7 +15094,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -15109,7 +15109,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -15130,7 +15130,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -15145,7 +15145,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -15160,7 +15160,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -15175,7 +15175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -15190,7 +15190,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -15205,7 +15205,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -15220,7 +15220,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -15241,7 +15241,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -15256,7 +15256,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -15271,7 +15271,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -15286,7 +15286,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -15303,7 +15303,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -15318,7 +15318,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -15333,7 +15333,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -15354,7 +15354,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -15369,7 +15369,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -15384,7 +15384,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -15399,7 +15399,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -15414,7 +15414,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -15429,7 +15429,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -15444,7 +15444,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -15459,7 +15459,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -15474,7 +15474,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -15489,7 +15489,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -15504,7 +15504,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -15519,7 +15519,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -15541,7 +15541,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -15556,7 +15556,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -15571,7 +15571,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -15586,7 +15586,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -15601,7 +15601,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -15616,7 +15616,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -15631,7 +15631,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -15646,7 +15646,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				18: {
 					FieldBase: &proto.FieldBase{
@@ -15661,7 +15661,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -15676,7 +15676,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -15691,7 +15691,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -15706,7 +15706,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -15721,7 +15721,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -15736,7 +15736,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -15751,7 +15751,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -15766,7 +15766,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -15781,7 +15781,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -15796,7 +15796,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -15811,7 +15811,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -15826,7 +15826,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -15841,7 +15841,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				31: {
 					FieldBase: &proto.FieldBase{
@@ -15856,7 +15856,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -15871,7 +15871,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				33: {
 					FieldBase: &proto.FieldBase{
@@ -15886,7 +15886,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				34: {
 					FieldBase: &proto.FieldBase{
@@ -15903,7 +15903,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				35: {
 					FieldBase: &proto.FieldBase{
@@ -15920,7 +15920,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				36: {
 					FieldBase: &proto.FieldBase{
@@ -15935,7 +15935,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				37: {
 					FieldBase: &proto.FieldBase{
@@ -15950,7 +15950,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				38: {
 					FieldBase: &proto.FieldBase{
@@ -15965,7 +15965,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				39: {
 					FieldBase: &proto.FieldBase{
@@ -15980,7 +15980,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				40: {
 					FieldBase: &proto.FieldBase{
@@ -15995,7 +15995,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				41: {
 					FieldBase: &proto.FieldBase{
@@ -16010,7 +16010,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				42: {
 					FieldBase: &proto.FieldBase{
@@ -16025,7 +16025,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				43: {
 					FieldBase: &proto.FieldBase{
@@ -16040,7 +16040,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				44: {
 					FieldBase: &proto.FieldBase{
@@ -16055,7 +16055,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				45: {
 					FieldBase: &proto.FieldBase{
@@ -16070,7 +16070,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				46: {
 					FieldBase: &proto.FieldBase{
@@ -16085,7 +16085,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				47: {
 					FieldBase: &proto.FieldBase{
@@ -16100,7 +16100,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				48: {
 					FieldBase: &proto.FieldBase{
@@ -16115,7 +16115,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				49: {
 					FieldBase: &proto.FieldBase{
@@ -16130,7 +16130,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				50: {
 					FieldBase: &proto.FieldBase{
@@ -16145,7 +16145,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				51: {
 					FieldBase: &proto.FieldBase{
@@ -16160,7 +16160,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				52: {
 					FieldBase: &proto.FieldBase{
@@ -16175,7 +16175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				53: {
 					FieldBase: &proto.FieldBase{
@@ -16190,7 +16190,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				54: {
 					FieldBase: &proto.FieldBase{
@@ -16207,7 +16207,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				55: {
 					FieldBase: &proto.FieldBase{
@@ -16222,7 +16222,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				56: {
 					FieldBase: &proto.FieldBase{
@@ -16237,7 +16237,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				57: {
 					FieldBase: &proto.FieldBase{
@@ -16252,7 +16252,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				58: {
 					FieldBase: &proto.FieldBase{
@@ -16267,7 +16267,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				59: {
 					FieldBase: &proto.FieldBase{
@@ -16282,7 +16282,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				60: {
 					FieldBase: &proto.FieldBase{
@@ -16297,7 +16297,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				61: {
 					FieldBase: &proto.FieldBase{
@@ -16312,7 +16312,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				62: {
 					FieldBase: &proto.FieldBase{
@@ -16327,7 +16327,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				63: {
 					FieldBase: &proto.FieldBase{
@@ -16342,7 +16342,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				64: {
 					FieldBase: &proto.FieldBase{
@@ -16357,7 +16357,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				65: {
 					FieldBase: &proto.FieldBase{
@@ -16372,7 +16372,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				66: {
 					FieldBase: &proto.FieldBase{
@@ -16387,7 +16387,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				67: {
 					FieldBase: &proto.FieldBase{
@@ -16402,7 +16402,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				68: {
 					FieldBase: &proto.FieldBase{
@@ -16417,7 +16417,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				69: {
 					FieldBase: &proto.FieldBase{
@@ -16432,7 +16432,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				70: {
 					FieldBase: &proto.FieldBase{
@@ -16447,7 +16447,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				71: {
 					FieldBase: &proto.FieldBase{
@@ -16462,7 +16462,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				72: {
 					FieldBase: &proto.FieldBase{
@@ -16477,7 +16477,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				73: {
 					FieldBase: &proto.FieldBase{
@@ -16492,7 +16492,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				74: {
 					FieldBase: &proto.FieldBase{
@@ -16507,7 +16507,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int8(127), /* Default Value: Invalid */
+					Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 				},
 				75: {
 					FieldBase: &proto.FieldBase{
@@ -16522,7 +16522,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				76: {
 					FieldBase: &proto.FieldBase{
@@ -16537,7 +16537,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				77: {
 					FieldBase: &proto.FieldBase{
@@ -16552,7 +16552,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				78: {
 					FieldBase: &proto.FieldBase{
@@ -16567,7 +16567,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				79: {
 					FieldBase: &proto.FieldBase{
@@ -16582,7 +16582,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				80: {
 					FieldBase: &proto.FieldBase{
@@ -16597,7 +16597,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				81: {
 					FieldBase: &proto.FieldBase{
@@ -16612,7 +16612,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				82: {
 					FieldBase: &proto.FieldBase{
@@ -16627,7 +16627,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				83: {
 					FieldBase: &proto.FieldBase{
@@ -16642,7 +16642,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				84: {
 					FieldBase: &proto.FieldBase{
@@ -16717,7 +16717,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				90: {
 					FieldBase: &proto.FieldBase{
@@ -16732,7 +16732,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				91: {
 					FieldBase: &proto.FieldBase{
@@ -16747,7 +16747,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				92: {
 					FieldBase: &proto.FieldBase{
@@ -16762,7 +16762,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				93: {
 					FieldBase: &proto.FieldBase{
@@ -16777,7 +16777,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -16798,7 +16798,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -16813,7 +16813,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -16843,7 +16843,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -16858,7 +16858,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -16873,7 +16873,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -16888,7 +16888,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -16903,7 +16903,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -16918,7 +16918,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -16939,7 +16939,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -16954,7 +16954,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -16969,7 +16969,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -16984,7 +16984,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -16999,7 +16999,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -17014,7 +17014,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -17029,7 +17029,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -17044,7 +17044,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -17065,7 +17065,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -17080,7 +17080,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -17095,7 +17095,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -17110,7 +17110,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -17125,7 +17125,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -17140,7 +17140,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -17155,7 +17155,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -17176,7 +17176,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -17191,7 +17191,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -17206,7 +17206,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -17274,7 +17274,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -17289,7 +17289,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -17373,7 +17373,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -17413,7 +17413,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -17453,7 +17453,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -17468,7 +17468,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -17483,7 +17483,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -17498,7 +17498,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -17513,7 +17513,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -17528,7 +17528,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -17543,7 +17543,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -17558,7 +17558,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -17573,7 +17573,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				20: {
 					FieldBase: &proto.FieldBase{
@@ -17619,7 +17619,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				21: {
 					FieldBase: &proto.FieldBase{
@@ -17659,7 +17659,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -17699,7 +17699,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -17720,7 +17720,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -17735,7 +17735,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -17750,7 +17750,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -17765,7 +17765,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -17786,7 +17786,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -17817,7 +17817,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -17832,7 +17832,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -17847,7 +17847,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -17877,7 +17877,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -17892,7 +17892,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -17913,7 +17913,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				253: {
 					FieldBase: &proto.FieldBase{
@@ -17928,7 +17928,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -17943,7 +17943,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -17958,7 +17958,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -17973,7 +17973,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -17988,7 +17988,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -18003,7 +18003,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -18018,7 +18018,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -18033,7 +18033,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -18048,7 +18048,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -18069,7 +18069,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -18084,7 +18084,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -18099,7 +18099,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -18114,7 +18114,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -18129,7 +18129,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -18144,7 +18144,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -18159,7 +18159,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -18174,7 +18174,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -18189,7 +18189,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -18204,7 +18204,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -18219,7 +18219,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -18234,7 +18234,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -18249,7 +18249,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -18264,7 +18264,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -18285,7 +18285,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -18300,7 +18300,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -18315,7 +18315,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -18330,7 +18330,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -18345,7 +18345,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -18360,7 +18360,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -18375,7 +18375,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -18390,7 +18390,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -18405,7 +18405,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -18420,7 +18420,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -18435,7 +18435,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -18456,7 +18456,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -18471,7 +18471,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -18486,7 +18486,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -18501,7 +18501,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -18516,7 +18516,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -18531,7 +18531,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -18552,7 +18552,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -18567,7 +18567,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -18582,7 +18582,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -18597,7 +18597,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -18627,7 +18627,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 							},
 						},
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -18642,7 +18642,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -18657,7 +18657,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -18672,7 +18672,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -18687,7 +18687,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -18702,7 +18702,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -18717,7 +18717,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -18732,7 +18732,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -18747,7 +18747,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -18762,7 +18762,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -18777,7 +18777,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -18792,7 +18792,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -18807,7 +18807,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 				19: {
 					FieldBase: &proto.FieldBase{
@@ -18822,7 +18822,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -18840,7 +18840,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -18855,7 +18855,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				26: {
 					FieldBase: &proto.FieldBase{
@@ -18870,7 +18870,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				27: {
 					FieldBase: &proto.FieldBase{
@@ -18885,7 +18885,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				28: {
 					FieldBase: &proto.FieldBase{
@@ -18900,7 +18900,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				29: {
 					FieldBase: &proto.FieldBase{
@@ -18915,7 +18915,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				30: {
 					FieldBase: &proto.FieldBase{
@@ -18930,7 +18930,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				31: {
 					FieldBase: &proto.FieldBase{
@@ -18945,7 +18945,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				32: {
 					FieldBase: &proto.FieldBase{
@@ -18960,7 +18960,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				33: {
 					FieldBase: &proto.FieldBase{
@@ -18975,7 +18975,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				34: {
 					FieldBase: &proto.FieldBase{
@@ -18990,7 +18990,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19011,7 +19011,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19026,7 +19026,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19041,7 +19041,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19062,7 +19062,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19077,7 +19077,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19092,7 +19092,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19107,7 +19107,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19128,7 +19128,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19143,7 +19143,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19160,7 +19160,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -19175,7 +19175,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -19190,7 +19190,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: []uint32(nil), /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -19216,7 +19216,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: true,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19237,7 +19237,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19252,7 +19252,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19273,7 +19273,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19288,7 +19288,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -19303,7 +19303,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -19318,7 +19318,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -19333,7 +19333,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -19363,7 +19363,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -19378,7 +19378,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19399,7 +19399,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19414,7 +19414,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19429,7 +19429,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19444,7 +19444,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19459,7 +19459,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -19474,7 +19474,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: []uint8(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19495,7 +19495,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19510,7 +19510,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19531,7 +19531,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19546,7 +19546,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19561,7 +19561,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(0), /* Default Value: Invalid */
+					Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19576,7 +19576,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(0), /* Default Value: Invalid */
+					Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -19591,7 +19591,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19612,7 +19612,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19627,7 +19627,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19642,7 +19642,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19667,7 +19667,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19682,7 +19682,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -19697,7 +19697,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19718,7 +19718,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -19733,7 +19733,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19748,7 +19748,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19773,7 +19773,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19788,7 +19788,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -19803,7 +19803,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: []byte(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19824,7 +19824,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19839,7 +19839,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19854,7 +19854,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19890,7 +19890,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -19908,7 +19908,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -19923,7 +19923,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -19938,7 +19938,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -19953,7 +19953,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -19968,7 +19968,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: "\x00", /* Default Value: Invalid */
+					Value: basetype.StringInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -19989,7 +19989,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20007,7 +20007,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.ByteInvalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -20022,7 +20022,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -20037,7 +20037,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -20052,7 +20052,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -20067,7 +20067,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -20082,7 +20082,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -20097,7 +20097,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -20112,7 +20112,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -20127,7 +20127,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -20163,7 +20163,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20178,7 +20178,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20193,7 +20193,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -20208,7 +20208,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -20223,7 +20223,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -20238,7 +20238,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -20253,7 +20253,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -20268,7 +20268,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -20283,7 +20283,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -20298,7 +20298,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -20313,7 +20313,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -20328,7 +20328,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -20343,7 +20343,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				12: {
 					FieldBase: &proto.FieldBase{
@@ -20358,7 +20358,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				13: {
 					FieldBase: &proto.FieldBase{
@@ -20373,7 +20373,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -20388,7 +20388,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -20403,7 +20403,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				16: {
 					FieldBase: &proto.FieldBase{
@@ -20418,7 +20418,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				17: {
 					FieldBase: &proto.FieldBase{
@@ -20433,7 +20433,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int32(2147483647), /* Default Value: Invalid */
+					Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 				},
 				22: {
 					FieldBase: &proto.FieldBase{
@@ -20448,7 +20448,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				23: {
 					FieldBase: &proto.FieldBase{
@@ -20463,7 +20463,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				24: {
 					FieldBase: &proto.FieldBase{
@@ -20478,7 +20478,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				25: {
 					FieldBase: &proto.FieldBase{
@@ -20493,7 +20493,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20514,7 +20514,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20535,7 +20535,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20550,7 +20550,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20565,7 +20565,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: []uint16(nil), /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20586,7 +20586,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20601,7 +20601,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20616,7 +20616,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -20631,7 +20631,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -20646,7 +20646,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -20661,7 +20661,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -20676,7 +20676,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -20691,7 +20691,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.EnumInvalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20712,7 +20712,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20727,7 +20727,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20748,7 +20748,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20763,7 +20763,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: int16(32767), /* Default Value: Invalid */
+					Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20784,7 +20784,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20799,7 +20799,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20814,7 +20814,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20835,7 +20835,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 				0: {
 					FieldBase: &proto.FieldBase{
@@ -20850,7 +20850,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(0), /* Default Value: Invalid */
+					Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20865,7 +20865,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -20880,7 +20880,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -20895,7 +20895,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint32(4294967295), /* Default Value: Invalid */
+					Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
@@ -20916,7 +20916,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				1: {
 					FieldBase: &proto.FieldBase{
@@ -20931,7 +20931,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				2: {
 					FieldBase: &proto.FieldBase{
@@ -20946,7 +20946,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				3: {
 					FieldBase: &proto.FieldBase{
@@ -20961,7 +20961,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				4: {
 					FieldBase: &proto.FieldBase{
@@ -20976,7 +20976,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				5: {
 					FieldBase: &proto.FieldBase{
@@ -20991,7 +20991,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				6: {
 					FieldBase: &proto.FieldBase{
@@ -21006,7 +21006,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				7: {
 					FieldBase: &proto.FieldBase{
@@ -21021,7 +21021,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				8: {
 					FieldBase: &proto.FieldBase{
@@ -21036,7 +21036,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				9: {
 					FieldBase: &proto.FieldBase{
@@ -21051,7 +21051,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				10: {
 					FieldBase: &proto.FieldBase{
@@ -21066,7 +21066,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				11: {
 					FieldBase: &proto.FieldBase{
@@ -21081,7 +21081,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				14: {
 					FieldBase: &proto.FieldBase{
@@ -21096,7 +21096,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint8(255), /* Default Value: Invalid */
+					Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 				},
 				15: {
 					FieldBase: &proto.FieldBase{
@@ -21111,7 +21111,7 @@ func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
 						Accumulate: false,
 						SubFields:  nil,
 					},
-					Value: uint16(65535), /* Default Value: Invalid */
+					Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 				},
 			},
 			DeveloperFields: nil,
