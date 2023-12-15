@@ -144,7 +144,7 @@ func NewBikeProfile(mesg proto.Message) *BikeProfile {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumBikeProfile)
-func (m BikeProfile) PutMessage(mesg *proto.Message) {
+func (m *BikeProfile) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -154,15 +154,15 @@ func (m BikeProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Name,
-		1:   m.Sport,
-		2:   m.SubSport,
+		1:   typeconv.ToEnum[byte](m.Sport),
+		2:   typeconv.ToEnum[byte](m.SubSport),
 		3:   m.Odometer,
-		4:   m.BikeSpdAntId,
-		5:   m.BikeCadAntId,
-		6:   m.BikeSpdcadAntId,
-		7:   m.BikePowerAntId,
+		4:   typeconv.ToUint16z[uint16](m.BikeSpdAntId),
+		5:   typeconv.ToUint16z[uint16](m.BikeCadAntId),
+		6:   typeconv.ToUint16z[uint16](m.BikeSpdcadAntId),
+		7:   typeconv.ToUint16z[uint16](m.BikePowerAntId),
 		8:   m.CustomWheelsize,
 		9:   m.AutoWheelsize,
 		10:  m.BikeWeight,
@@ -176,15 +176,15 @@ func (m BikeProfile) PutMessage(mesg *proto.Message) {
 		18:  m.PowerEnabled,
 		19:  m.CrankLength,
 		20:  m.Enabled,
-		21:  m.BikeSpdAntIdTransType,
-		22:  m.BikeCadAntIdTransType,
-		23:  m.BikeSpdcadAntIdTransType,
-		24:  m.BikePowerAntIdTransType,
+		21:  typeconv.ToUint8z[uint8](m.BikeSpdAntIdTransType),
+		22:  typeconv.ToUint8z[uint8](m.BikeCadAntIdTransType),
+		23:  typeconv.ToUint8z[uint8](m.BikeSpdcadAntIdTransType),
+		24:  typeconv.ToUint8z[uint8](m.BikePowerAntIdTransType),
 		37:  m.OdometerRollover,
-		38:  m.FrontGearNum,
-		39:  m.FrontGear,
-		40:  m.RearGearNum,
-		41:  m.RearGear,
+		38:  typeconv.ToUint8z[uint8](m.FrontGearNum),
+		39:  typeconv.ToSliceUint8z[uint8](m.FrontGear),
+		40:  typeconv.ToUint8z[uint8](m.RearGearNum),
+		41:  typeconv.ToSliceUint8z[uint8](m.RearGear),
 		44:  m.ShimanoDi2Enabled,
 	}
 

@@ -81,7 +81,7 @@ func NewBloodPressure(mesg proto.Message) *BloodPressure {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumBloodPressure)
-func (m BloodPressure) PutMessage(mesg *proto.Message) {
+func (m *BloodPressure) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -91,7 +91,7 @@ func (m BloodPressure) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.SystolicPressure,
 		1:   m.DiastolicPressure,
 		2:   m.MeanArterialPressure,
@@ -99,9 +99,9 @@ func (m BloodPressure) PutMessage(mesg *proto.Message) {
 		4:   m.MapMorningValues,
 		5:   m.MapEveningValues,
 		6:   m.HeartRate,
-		7:   m.HeartRateType,
-		8:   m.Status,
-		9:   m.UserProfileIndex,
+		7:   typeconv.ToEnum[byte](m.HeartRateType),
+		8:   typeconv.ToEnum[byte](m.Status),
+		9:   typeconv.ToUint16[uint16](m.UserProfileIndex),
 	}
 
 	for i := range mesg.Fields {

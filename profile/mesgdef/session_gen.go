@@ -510,7 +510,7 @@ func NewSession(mesg proto.Message) *Session {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSession)
-func (m Session) PutMessage(mesg *proto.Message) {
+func (m *Session) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -520,15 +520,15 @@ func (m Session) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		253: m.Timestamp,
-		0:   m.Event,
-		1:   m.EventType,
-		2:   m.StartTime,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Event),
+		1:   typeconv.ToEnum[byte](m.EventType),
+		2:   typeconv.ToUint32[uint32](m.StartTime),
 		3:   m.StartPositionLat,
 		4:   m.StartPositionLong,
-		5:   m.Sport,
-		6:   m.SubSport,
+		5:   typeconv.ToEnum[byte](m.Sport),
+		6:   typeconv.ToEnum[byte](m.SubSport),
 		7:   m.TotalElapsedTime,
 		8:   m.TotalTimerTime,
 		9:   m.TotalDistance,
@@ -549,7 +549,7 @@ func (m Session) PutMessage(mesg *proto.Message) {
 		25:  m.FirstLapIndex,
 		26:  m.NumLaps,
 		27:  m.EventGroup,
-		28:  m.Trigger,
+		28:  typeconv.ToEnum[byte](m.Trigger),
 		29:  m.NecLat,
 		30:  m.NecLong,
 		31:  m.SwcLat,
@@ -558,15 +558,15 @@ func (m Session) PutMessage(mesg *proto.Message) {
 		34:  m.NormalizedPower,
 		35:  m.TrainingStressScore,
 		36:  m.IntensityFactor,
-		37:  m.LeftRightBalance,
+		37:  typeconv.ToUint16[uint16](m.LeftRightBalance),
 		38:  m.EndPositionLat,
 		39:  m.EndPositionLong,
 		41:  m.AvgStrokeCount,
 		42:  m.AvgStrokeDistance,
-		43:  m.SwimStroke,
+		43:  typeconv.ToEnum[byte](m.SwimStroke),
 		44:  m.PoolLength,
 		45:  m.ThresholdPower,
-		46:  m.PoolLengthUnit,
+		46:  typeconv.ToEnum[byte](m.PoolLengthUnit),
 		47:  m.NumActiveLengths,
 		48:  m.TotalWork,
 		49:  m.AvgAltitude,

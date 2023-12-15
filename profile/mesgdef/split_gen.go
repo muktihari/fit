@@ -105,7 +105,7 @@ func NewSplit(mesg proto.Message) *Split {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSplit)
-func (m Split) PutMessage(mesg *proto.Message) {
+func (m *Split) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -115,13 +115,13 @@ func (m Split) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.SplitType,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.SplitType),
 		1:   m.TotalElapsedTime,
 		2:   m.TotalTimerTime,
 		3:   m.TotalDistance,
 		4:   m.AvgSpeed,
-		9:   m.StartTime,
+		9:   typeconv.ToUint32[uint32](m.StartTime),
 		13:  m.TotalAscent,
 		14:  m.TotalDescent,
 		21:  m.StartPositionLat,
@@ -130,7 +130,7 @@ func (m Split) PutMessage(mesg *proto.Message) {
 		24:  m.EndPositionLong,
 		25:  m.MaxSpeed,
 		26:  m.AvgVertSpeed,
-		27:  m.EndTime,
+		27:  typeconv.ToUint32[uint32](m.EndTime),
 		28:  m.TotalCalories,
 		74:  m.StartElevation,
 		110: m.TotalMovingTime,

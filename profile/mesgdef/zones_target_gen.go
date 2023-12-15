@@ -63,7 +63,7 @@ func NewZonesTarget(mesg proto.Message) *ZonesTarget {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumZonesTarget)
-func (m ZonesTarget) PutMessage(mesg *proto.Message) {
+func (m *ZonesTarget) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -76,8 +76,8 @@ func (m ZonesTarget) PutMessage(mesg *proto.Message) {
 		1: m.MaxHeartRate,
 		2: m.ThresholdHeartRate,
 		3: m.FunctionalThresholdPower,
-		5: m.HrCalcType,
-		7: m.PwrCalcType,
+		5: typeconv.ToEnum[byte](m.HrCalcType),
+		7: typeconv.ToEnum[byte](m.PwrCalcType),
 	}
 
 	for i := range mesg.Fields {

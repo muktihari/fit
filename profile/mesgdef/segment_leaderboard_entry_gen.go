@@ -69,7 +69,7 @@ func NewSegmentLeaderboardEntry(mesg proto.Message) *SegmentLeaderboardEntry {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSegmentLeaderboardEntry)
-func (m SegmentLeaderboardEntry) PutMessage(mesg *proto.Message) {
+func (m *SegmentLeaderboardEntry) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,9 +79,9 @@ func (m SegmentLeaderboardEntry) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Name,
-		1:   m.Type,
+		1:   typeconv.ToEnum[byte](m.Type),
 		2:   m.GroupPrimaryKey,
 		3:   m.ActivityId,
 		4:   m.SegmentTime,

@@ -87,7 +87,7 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumConnectivity)
-func (m Connectivity) PutMessage(mesg *proto.Message) {
+func (m *Connectivity) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}

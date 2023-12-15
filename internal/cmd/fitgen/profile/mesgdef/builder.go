@@ -30,7 +30,9 @@ type mesgdefBuilder struct {
 	messages []parser.Message
 	types    []parser.Type
 
-	baseTypeMapByProfileType map[string]string
+	goTypesByBaseTypes       map[string]string // (k -> v) enum -> byte
+	goTypesByProfileTypes    map[string]string // (k -> v) typedef.DateTime -> uint32
+	baseTypeMapByProfileType map[string]string // (k -> v) enum -> enum, typedef.DateTime -> uint32
 }
 
 func NewBuilder(path, version string, message []parser.Message, types []parser.Type) builder.Builder {
@@ -44,17 +46,26 @@ func NewBuilder(path, version string, message []parser.Message, types []parser.T
 		sdkVersion:               version,
 		messages:                 message,
 		types:                    types,
+		goTypesByBaseTypes:       make(map[string]string),
+		goTypesByProfileTypes:    make(map[string]string),
 		baseTypeMapByProfileType: make(map[string]string),
 	}
 }
 
 func (b *mesgdefBuilder) populateLookupData() {
-	for _, _basetype := range basetype.List() { // map to itself
-		b.baseTypeMapByProfileType[_basetype.String()] = _basetype.String()
+	b.goTypesByBaseTypes["bool"] = "bool"
+	b.goTypesByBaseTypes["fit_base_type"] = "basetype.BaseType"
+	for _, v := range basetype.List() {
+		b.goTypesByBaseTypes[v.String()] = v.GoType()
+		b.goTypesByProfileTypes[v.String()] = v.GoType()
+		b.baseTypeMapByProfileType[v.String()] = v.String()
 	}
-	b.baseTypeMapByProfileType["bool"] = "bool" // additional profile type which is not defined in basetype.
+
+	// additional profile type which is not defined in basetype.
+	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "bool"})
 
 	for _, _type := range b.types {
+		b.goTypesByProfileTypes[_type.Name] = b.goTypesByBaseTypes[_type.BaseType]
 		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
 	}
 }
@@ -76,12 +87,13 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		for i := range mesg.Fields {
 			field := &mesg.Fields[i]
 			f := Field{
-				Num:           field.Num,
-				Name:          strutil.ToTitle(mesg.Fields[i].Name),
-				String:        field.Name,
-				Type:          transformType(field.Type, field.Array),
-				AssignedValue: b.transformValue(field.Num, field.Type, field.Array),
-				Comment:       field.Comment,
+				Num:            field.Num,
+				Name:           strutil.ToTitle(mesg.Fields[i].Name),
+				String:         field.Name,
+				Type:           b.transformType(field.Type, field.Array),
+				TypedValue:     b.transformAssignedValue(field.Num, field.Type, field.Array),
+				PrimitiveValue: b.transformUnassignedValue(strutil.ToTitle(field.Name), field.Type, field.Array),
+				Comment:        field.Comment,
 			}
 
 			if field.Units != "" {
@@ -128,16 +140,9 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 	return dataBuilders, nil
 }
 
-func transformType(name, array string) string {
-	isBaseType := make(map[string]string)
-	for _, bt := range basetype.List() {
-		isBaseType[bt.String()] = bt.GoType()
-	}
-	isBaseType["bool"] = "bool"
-	isBaseType["fit_base_type"] = "basetype.BaseType"
-
+func (b *mesgdefBuilder) transformType(name, array string) string {
 	var _type string
-	if v, ok := isBaseType[name]; ok {
+	if v, ok := b.goTypesByBaseTypes[name]; ok {
 		_type = v
 	} else {
 		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(name))
@@ -150,30 +155,39 @@ func transformType(name, array string) string {
 	return fmt.Sprintf("[]%s", _type)
 }
 
-func (b *mesgdefBuilder) transformValue(num byte, name, array string) string {
-	isBaseType := make(map[string]string)
-	for _, bt := range basetype.List() {
-		isBaseType[bt.String()] = bt.GoType()
+func (b *mesgdefBuilder) transformUnassignedValue(fieldName, fieldType, array string) string {
+	if !strings.HasSuffix(fieldType, "z") && b.baseTypeMapByProfileType[fieldType] == fieldType {
+		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
-	isBaseType["bool"] = "bool"
-	isBaseType["fit_base_type"] = "basetype.BaseType"
 
-	if name == "fit_base_type" {
+	slicePrefix := ""
+	if array != "" {
+		slicePrefix = "Slice"
+	}
+
+	return fmt.Sprintf("typeconv.To%s%s[%s](m.%s)",
+		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), b.goTypesByProfileTypes[fieldType], fieldName)
+}
+
+func (b *mesgdefBuilder) transformAssignedValue(num byte, fieldType, array string) string {
+	if fieldType == "fit_base_type" {
 		return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](vals[%d])", num)
 	}
 
 	var _type string
-	if v, ok := isBaseType[name]; ok {
+	if v, ok := b.goTypesByBaseTypes[fieldType]; ok {
 		_type = v
 	} else {
-		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(name))
+		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
 	}
 
-	if array == "" || _type == "string" {
-		return fmt.Sprintf("typeconv.To%s[%s](vals[%d])", strutil.ToTitle(b.baseTypeMapByProfileType[name]), _type, num)
+	slicePrefix := ""
+	if array != "" && _type != "string" {
+		slicePrefix = "Slice"
 	}
 
-	return fmt.Sprintf("typeconv.ToSlice%s[%s](vals[%d])", strutil.ToTitle(b.baseTypeMapByProfileType[name]), _type, num)
+	return fmt.Sprintf("typeconv.To%s%s[%s](vals[%d])",
+		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), _type, num)
 }
 
 // Profile.xlsx says unless otherwise specified, scale of 1 is assumed.

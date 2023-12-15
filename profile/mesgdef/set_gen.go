@@ -81,7 +81,7 @@ func NewSet(mesg proto.Message) *Set {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSet)
-func (m Set) PutMessage(mesg *proto.Message) {
+func (m *Set) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -91,17 +91,17 @@ func (m Set) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.Timestamp,
+		254: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.Duration,
 		3:   m.Repetitions,
 		4:   m.Weight,
-		5:   m.SetType,
-		6:   m.StartTime,
-		7:   m.Category,
+		5:   typeconv.ToUint8[uint8](m.SetType),
+		6:   typeconv.ToUint32[uint32](m.StartTime),
+		7:   typeconv.ToSliceUint16[uint16](m.Category),
 		8:   m.CategorySubtype,
-		9:   m.WeightDisplayUnit,
-		10:  m.MessageIndex,
-		11:  m.WktStepIndex,
+		9:   typeconv.ToUint16[uint16](m.WeightDisplayUnit),
+		10:  typeconv.ToUint16[uint16](m.MessageIndex),
+		11:  typeconv.ToUint16[uint16](m.WktStepIndex),
 	}
 
 	for i := range mesg.Fields {

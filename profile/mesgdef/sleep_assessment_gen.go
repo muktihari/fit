@@ -90,7 +90,7 @@ func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSleepAssessment)
-func (m SleepAssessment) PutMessage(mesg *proto.Message) {
+func (m *SleepAssessment) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}

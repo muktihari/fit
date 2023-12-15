@@ -57,7 +57,7 @@ func NewDeveloperDataId(mesg proto.Message) *DeveloperDataId {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDeveloperDataId)
-func (m DeveloperDataId) PutMessage(mesg *proto.Message) {
+func (m *DeveloperDataId) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -69,7 +69,7 @@ func (m DeveloperDataId) PutMessage(mesg *proto.Message) {
 	vals := [...]any{
 		0: m.DeveloperId,
 		1: m.ApplicationId,
-		2: m.ManufacturerId,
+		2: typeconv.ToUint16[uint16](m.ManufacturerId),
 		3: m.DeveloperDataIndex,
 		4: m.ApplicationVersion,
 	}

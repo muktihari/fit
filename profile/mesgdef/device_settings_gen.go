@@ -120,7 +120,7 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDeviceSettings)
-func (m DeviceSettings) PutMessage(mesg *proto.Message) {
+func (m *DeviceSettings) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -133,27 +133,27 @@ func (m DeviceSettings) PutMessage(mesg *proto.Message) {
 		0:   m.ActiveTimeZone,
 		1:   m.UtcOffset,
 		2:   m.TimeOffset,
-		4:   m.TimeMode,
+		4:   typeconv.ToSliceEnum[byte](m.TimeMode),
 		5:   m.TimeZoneOffset,
-		12:  m.BacklightMode,
+		12:  typeconv.ToEnum[byte](m.BacklightMode),
 		36:  m.ActivityTrackerEnabled,
-		39:  m.ClockTime,
+		39:  typeconv.ToUint32[uint32](m.ClockTime),
 		40:  m.PagesEnabled,
 		46:  m.MoveAlertEnabled,
-		47:  m.DateMode,
-		55:  m.DisplayOrientation,
-		56:  m.MountingSide,
+		47:  typeconv.ToEnum[byte](m.DateMode),
+		55:  typeconv.ToEnum[byte](m.DisplayOrientation),
+		56:  typeconv.ToEnum[byte](m.MountingSide),
 		57:  m.DefaultPage,
 		58:  m.AutosyncMinSteps,
 		59:  m.AutosyncMinTime,
 		80:  m.LactateThresholdAutodetectEnabled,
 		86:  m.BleAutoUploadEnabled,
-		89:  m.AutoSyncFrequency,
-		90:  m.AutoActivityDetect,
+		89:  typeconv.ToEnum[byte](m.AutoSyncFrequency),
+		90:  typeconv.ToUint32[uint32](m.AutoActivityDetect),
 		94:  m.NumberOfScreens,
-		95:  m.SmartNotificationDisplayOrientation,
-		134: m.TapInterface,
-		174: m.TapSensitivity,
+		95:  typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation),
+		134: typeconv.ToEnum[byte](m.TapInterface),
+		174: typeconv.ToEnum[byte](m.TapSensitivity),
 	}
 
 	for i := range mesg.Fields {

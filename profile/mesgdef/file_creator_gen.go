@@ -54,7 +54,7 @@ func NewFileCreator(mesg proto.Message) *FileCreator {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumFileCreator)
-func (m FileCreator) PutMessage(mesg *proto.Message) {
+func (m *FileCreator) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}

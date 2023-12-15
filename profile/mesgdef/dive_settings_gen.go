@@ -153,7 +153,7 @@ func NewDiveSettings(mesg proto.Message) *DiveSettings {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDiveSettings)
-func (m DiveSettings) PutMessage(mesg *proto.Message) {
+func (m *DiveSettings) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -163,13 +163,13 @@ func (m DiveSettings) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		254: m.MessageIndex,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Name,
-		1:   m.Model,
+		1:   typeconv.ToEnum[byte](m.Model),
 		2:   m.GfLow,
 		3:   m.GfHigh,
-		4:   m.WaterType,
+		4:   typeconv.ToEnum[byte](m.WaterType),
 		5:   m.WaterDensity,
 		6:   m.Po2Warn,
 		7:   m.Po2Critical,
@@ -179,25 +179,25 @@ func (m DiveSettings) PutMessage(mesg *proto.Message) {
 		11:  m.BottomTime,
 		12:  m.ApneaCountdownEnabled,
 		13:  m.ApneaCountdownTime,
-		14:  m.BacklightMode,
+		14:  typeconv.ToEnum[byte](m.BacklightMode),
 		15:  m.BacklightBrightness,
-		16:  m.BacklightTimeout,
+		16:  typeconv.ToUint8[uint8](m.BacklightTimeout),
 		17:  m.RepeatDiveInterval,
 		18:  m.SafetyStopTime,
-		19:  m.HeartRateSourceType,
+		19:  typeconv.ToEnum[byte](m.HeartRateSourceType),
 		20:  m.HeartRateSource,
-		21:  m.TravelGas,
-		22:  m.CcrLowSetpointSwitchMode,
+		21:  typeconv.ToUint16[uint16](m.TravelGas),
+		22:  typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode),
 		23:  m.CcrLowSetpoint,
 		24:  m.CcrLowSetpointDepth,
-		25:  m.CcrHighSetpointSwitchMode,
+		25:  typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode),
 		26:  m.CcrHighSetpoint,
 		27:  m.CcrHighSetpointDepth,
-		29:  m.GasConsumptionDisplay,
+		29:  typeconv.ToEnum[byte](m.GasConsumptionDisplay),
 		30:  m.UpKeyEnabled,
-		35:  m.DiveSounds,
+		35:  typeconv.ToEnum[byte](m.DiveSounds),
 		36:  m.LastStopMultiple,
-		37:  m.NoFlyTimeMode,
+		37:  typeconv.ToEnum[byte](m.NoFlyTimeMode),
 	}
 
 	for i := range mesg.Fields {

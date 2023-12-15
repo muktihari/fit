@@ -54,7 +54,7 @@ func NewSlaveDevice(mesg proto.Message) *SlaveDevice {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSlaveDevice)
-func (m SlaveDevice) PutMessage(mesg *proto.Message) {
+func (m *SlaveDevice) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -64,7 +64,7 @@ func (m SlaveDevice) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0: m.Manufacturer,
+		0: typeconv.ToUint16[uint16](m.Manufacturer),
 		1: m.Product,
 	}
 

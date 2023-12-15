@@ -135,7 +135,7 @@ func NewUserProfile(mesg proto.Message) *UserProfile {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumUserProfile)
-func (m UserProfile) PutMessage(mesg *proto.Message) {
+func (m *UserProfile) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -145,34 +145,34 @@ func (m UserProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.FriendlyName,
-		1:   m.Gender,
+		1:   typeconv.ToEnum[byte](m.Gender),
 		2:   m.Age,
 		3:   m.Height,
 		4:   m.Weight,
-		5:   m.Language,
-		6:   m.ElevSetting,
-		7:   m.WeightSetting,
+		5:   typeconv.ToEnum[byte](m.Language),
+		6:   typeconv.ToEnum[byte](m.ElevSetting),
+		7:   typeconv.ToEnum[byte](m.WeightSetting),
 		8:   m.RestingHeartRate,
 		9:   m.DefaultMaxRunningHeartRate,
 		10:  m.DefaultMaxBikingHeartRate,
 		11:  m.DefaultMaxHeartRate,
-		12:  m.HrSetting,
-		13:  m.SpeedSetting,
-		14:  m.DistSetting,
-		16:  m.PowerSetting,
-		17:  m.ActivityClass,
-		18:  m.PositionSetting,
-		21:  m.TemperatureSetting,
-		22:  m.LocalId,
+		12:  typeconv.ToEnum[byte](m.HrSetting),
+		13:  typeconv.ToEnum[byte](m.SpeedSetting),
+		14:  typeconv.ToEnum[byte](m.DistSetting),
+		16:  typeconv.ToEnum[byte](m.PowerSetting),
+		17:  typeconv.ToEnum[byte](m.ActivityClass),
+		18:  typeconv.ToEnum[byte](m.PositionSetting),
+		21:  typeconv.ToEnum[byte](m.TemperatureSetting),
+		22:  typeconv.ToUint16[uint16](m.LocalId),
 		23:  m.GlobalId,
-		28:  m.WakeTime,
-		29:  m.SleepTime,
-		30:  m.HeightSetting,
+		28:  typeconv.ToUint32[uint32](m.WakeTime),
+		29:  typeconv.ToUint32[uint32](m.SleepTime),
+		30:  typeconv.ToEnum[byte](m.HeightSetting),
 		31:  m.UserRunningStepLength,
 		32:  m.UserWalkingStepLength,
-		47:  m.DepthSetting,
+		47:  typeconv.ToEnum[byte](m.DepthSetting),
 		49:  m.DiveCount,
 	}
 

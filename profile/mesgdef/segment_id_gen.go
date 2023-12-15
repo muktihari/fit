@@ -75,7 +75,7 @@ func NewSegmentId(mesg proto.Message) *SegmentId {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSegmentId)
-func (m SegmentId) PutMessage(mesg *proto.Message) {
+func (m *SegmentId) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -87,13 +87,13 @@ func (m SegmentId) PutMessage(mesg *proto.Message) {
 	vals := [...]any{
 		0: m.Name,
 		1: m.Uuid,
-		2: m.Sport,
+		2: typeconv.ToEnum[byte](m.Sport),
 		3: m.Enabled,
 		4: m.UserProfilePrimaryKey,
 		5: m.DeviceId,
 		6: m.DefaultRaceLeader,
-		7: m.DeleteStatus,
-		8: m.SelectionType,
+		7: typeconv.ToEnum[byte](m.DeleteStatus),
+		8: typeconv.ToEnum[byte](m.SelectionType),
 	}
 
 	for i := range mesg.Fields {

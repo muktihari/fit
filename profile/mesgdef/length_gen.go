@@ -114,7 +114,7 @@ func NewLength(mesg proto.Message) *Length {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumLength)
-func (m Length) PutMessage(mesg *proto.Message) {
+func (m *Length) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -124,20 +124,20 @@ func (m Length) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		253: m.Timestamp,
-		0:   m.Event,
-		1:   m.EventType,
-		2:   m.StartTime,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Event),
+		1:   typeconv.ToEnum[byte](m.EventType),
+		2:   typeconv.ToUint32[uint32](m.StartTime),
 		3:   m.TotalElapsedTime,
 		4:   m.TotalTimerTime,
 		5:   m.TotalStrokes,
 		6:   m.AvgSpeed,
-		7:   m.SwimStroke,
+		7:   typeconv.ToEnum[byte](m.SwimStroke),
 		9:   m.AvgSwimmingCadence,
 		10:  m.EventGroup,
 		11:  m.TotalCalories,
-		12:  m.LengthType,
+		12:  typeconv.ToEnum[byte](m.LengthType),
 		18:  m.PlayerScore,
 		19:  m.OpponentScore,
 		20:  m.StrokeCount,

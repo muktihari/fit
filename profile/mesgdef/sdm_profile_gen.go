@@ -72,7 +72,7 @@ func NewSdmProfile(mesg proto.Message) *SdmProfile {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSdmProfile)
-func (m SdmProfile) PutMessage(mesg *proto.Message) {
+func (m *SdmProfile) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -82,13 +82,13 @@ func (m SdmProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Enabled,
-		1:   m.SdmAntId,
+		1:   typeconv.ToUint16z[uint16](m.SdmAntId),
 		2:   m.SdmCalFactor,
 		3:   m.Odometer,
 		4:   m.SpeedSource,
-		5:   m.SdmAntIdTransType,
+		5:   typeconv.ToUint8z[uint8](m.SdmAntIdTransType),
 		7:   m.OdometerRollover,
 	}
 

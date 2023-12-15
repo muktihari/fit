@@ -57,7 +57,7 @@ func NewSpeedZone(mesg proto.Message) *SpeedZone {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSpeedZone)
-func (m SpeedZone) PutMessage(mesg *proto.Message) {
+func (m *SpeedZone) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func (m SpeedZone) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.HighValue,
 		1:   m.Name,
 	}

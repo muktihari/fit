@@ -105,7 +105,7 @@ func NewWorkoutStep(mesg proto.Message) *WorkoutStep {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumWorkoutStep)
-func (m WorkoutStep) PutMessage(mesg *proto.Message) {
+func (m *WorkoutStep) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -115,22 +115,22 @@ func (m WorkoutStep) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.WktStepName,
-		1:   m.DurationType,
+		1:   typeconv.ToEnum[byte](m.DurationType),
 		2:   m.DurationValue,
-		3:   m.TargetType,
+		3:   typeconv.ToEnum[byte](m.TargetType),
 		4:   m.TargetValue,
 		5:   m.CustomTargetValueLow,
 		6:   m.CustomTargetValueHigh,
-		7:   m.Intensity,
+		7:   typeconv.ToEnum[byte](m.Intensity),
 		8:   m.Notes,
-		9:   m.Equipment,
-		10:  m.ExerciseCategory,
+		9:   typeconv.ToEnum[byte](m.Equipment),
+		10:  typeconv.ToUint16[uint16](m.ExerciseCategory),
 		11:  m.ExerciseName,
 		12:  m.ExerciseWeight,
-		13:  m.WeightDisplayUnit,
-		19:  m.SecondaryTargetType,
+		13:  typeconv.ToUint16[uint16](m.WeightDisplayUnit),
+		19:  typeconv.ToEnum[byte](m.SecondaryTargetType),
 		20:  m.SecondaryTargetValue,
 		21:  m.SecondaryCustomTargetValueLow,
 		22:  m.SecondaryCustomTargetValueHigh,

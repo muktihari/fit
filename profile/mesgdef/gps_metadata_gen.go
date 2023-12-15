@@ -75,7 +75,7 @@ func NewGpsMetadata(mesg proto.Message) *GpsMetadata {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumGpsMetadata)
-func (m GpsMetadata) PutMessage(mesg *proto.Message) {
+func (m *GpsMetadata) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -85,14 +85,14 @@ func (m GpsMetadata) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TimestampMs,
 		1:   m.PositionLat,
 		2:   m.PositionLong,
 		3:   m.EnhancedAltitude,
 		4:   m.EnhancedSpeed,
 		5:   m.Heading,
-		6:   m.UtcTimestamp,
+		6:   typeconv.ToUint32[uint32](m.UtcTimestamp),
 		7:   m.Velocity,
 	}
 

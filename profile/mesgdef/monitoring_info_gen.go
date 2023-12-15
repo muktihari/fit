@@ -66,7 +66,7 @@ func NewMonitoringInfo(mesg proto.Message) *MonitoringInfo {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumMonitoringInfo)
-func (m MonitoringInfo) PutMessage(mesg *proto.Message) {
+func (m *MonitoringInfo) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -76,9 +76,9 @@ func (m MonitoringInfo) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.LocalTimestamp,
-		1:   m.ActivityType,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint32[uint32](m.LocalTimestamp),
+		1:   typeconv.ToSliceEnum[byte](m.ActivityType),
 		3:   m.CyclesToDistance,
 		4:   m.CyclesToCalories,
 		5:   m.RestingMetabolicRate,

@@ -117,7 +117,7 @@ func NewDiveSummary(mesg proto.Message) *DiveSummary {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDiveSummary)
-func (m DiveSummary) PutMessage(mesg *proto.Message) {
+func (m *DiveSummary) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -127,9 +127,9 @@ func (m DiveSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.ReferenceMesg,
-		1:   m.ReferenceIndex,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint16[uint16](m.ReferenceMesg),
+		1:   typeconv.ToUint16[uint16](m.ReferenceIndex),
 		2:   m.AvgDepth,
 		3:   m.MaxDepth,
 		4:   m.SurfaceInterval,

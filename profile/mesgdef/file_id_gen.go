@@ -63,7 +63,7 @@ func NewFileId(mesg proto.Message) *FileId {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumFileId)
-func (m FileId) PutMessage(mesg *proto.Message) {
+func (m *FileId) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,11 +73,11 @@ func (m FileId) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0: m.Type,
-		1: m.Manufacturer,
+		0: typeconv.ToEnum[byte](m.Type),
+		1: typeconv.ToUint16[uint16](m.Manufacturer),
 		2: m.Product,
-		3: m.SerialNumber,
-		4: m.TimeCreated,
+		3: typeconv.ToUint32z[uint32](m.SerialNumber),
+		4: typeconv.ToUint32[uint32](m.TimeCreated),
 		5: m.Number,
 		8: m.ProductName,
 	}

@@ -57,7 +57,7 @@ func NewWatchfaceSettings(mesg proto.Message) *WatchfaceSettings {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumWatchfaceSettings)
-func (m WatchfaceSettings) PutMessage(mesg *proto.Message) {
+func (m *WatchfaceSettings) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -67,8 +67,8 @@ func (m WatchfaceSettings) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.Mode,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.Mode),
 		1:   m.Layout,
 	}
 

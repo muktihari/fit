@@ -63,7 +63,7 @@ func NewFieldCapabilities(mesg proto.Message) *FieldCapabilities {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumFieldCapabilities)
-func (m FieldCapabilities) PutMessage(mesg *proto.Message) {
+func (m *FieldCapabilities) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,9 +73,9 @@ func (m FieldCapabilities) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.File,
-		1:   m.MesgNum,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.File),
+		1:   typeconv.ToUint16[uint16](m.MesgNum),
 		2:   m.FieldNum,
 		3:   m.Count,
 	}

@@ -63,7 +63,7 @@ func NewDeviceAuxBatteryInfo(mesg proto.Message) *DeviceAuxBatteryInfo {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDeviceAuxBatteryInfo)
-func (m DeviceAuxBatteryInfo) PutMessage(mesg *proto.Message) {
+func (m *DeviceAuxBatteryInfo) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,10 +73,10 @@ func (m DeviceAuxBatteryInfo) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.DeviceIndex,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint8[uint8](m.DeviceIndex),
 		1:   m.BatteryVoltage,
-		2:   m.BatteryStatus,
+		2:   typeconv.ToUint8[uint8](m.BatteryStatus),
 		3:   m.BatteryIdentifier,
 	}
 

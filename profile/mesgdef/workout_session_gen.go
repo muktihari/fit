@@ -69,7 +69,7 @@ func NewWorkoutSession(mesg proto.Message) *WorkoutSession {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumWorkoutSession)
-func (m WorkoutSession) PutMessage(mesg *proto.Message) {
+func (m *WorkoutSession) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,13 +79,13 @@ func (m WorkoutSession) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.Sport,
-		1:   m.SubSport,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.Sport),
+		1:   typeconv.ToEnum[byte](m.SubSport),
 		2:   m.NumValidSteps,
 		3:   m.FirstStepIndex,
 		4:   m.PoolLength,
-		5:   m.PoolLengthUnit,
+		5:   typeconv.ToEnum[byte](m.PoolLengthUnit),
 	}
 
 	for i := range mesg.Fields {

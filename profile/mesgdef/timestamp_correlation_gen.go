@@ -69,7 +69,7 @@ func NewTimestampCorrelation(mesg proto.Message) *TimestampCorrelation {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumTimestampCorrelation)
-func (m TimestampCorrelation) PutMessage(mesg *proto.Message) {
+func (m *TimestampCorrelation) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,11 +79,11 @@ func (m TimestampCorrelation) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.FractionalTimestamp,
-		1:   m.SystemTimestamp,
+		1:   typeconv.ToUint32[uint32](m.SystemTimestamp),
 		2:   m.FractionalSystemTimestamp,
-		3:   m.LocalTimestamp,
+		3:   typeconv.ToUint32[uint32](m.LocalTimestamp),
 		4:   m.TimestampMs,
 		5:   m.SystemTimestampMs,
 	}

@@ -105,7 +105,7 @@ func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDeviceInfo)
-func (m DeviceInfo) PutMessage(mesg *proto.Message) {
+func (m *DeviceInfo) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -115,23 +115,23 @@ func (m DeviceInfo) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.DeviceIndex,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint8[uint8](m.DeviceIndex),
 		1:   m.DeviceType,
-		2:   m.Manufacturer,
-		3:   m.SerialNumber,
+		2:   typeconv.ToUint16[uint16](m.Manufacturer),
+		3:   typeconv.ToUint32z[uint32](m.SerialNumber),
 		4:   m.Product,
 		5:   m.SoftwareVersion,
 		6:   m.HardwareVersion,
 		7:   m.CumOperatingTime,
 		10:  m.BatteryVoltage,
-		11:  m.BatteryStatus,
-		18:  m.SensorPosition,
+		11:  typeconv.ToUint8[uint8](m.BatteryStatus),
+		18:  typeconv.ToEnum[byte](m.SensorPosition),
 		19:  m.Descriptor,
-		20:  m.AntTransmissionType,
-		21:  m.AntDeviceNumber,
-		22:  m.AntNetwork,
-		25:  m.SourceType,
+		20:  typeconv.ToUint8z[uint8](m.AntTransmissionType),
+		21:  typeconv.ToUint16z[uint16](m.AntDeviceNumber),
+		22:  typeconv.ToEnum[byte](m.AntNetwork),
+		25:  typeconv.ToEnum[byte](m.SourceType),
 		27:  m.ProductName,
 		32:  m.BatteryLevel,
 	}

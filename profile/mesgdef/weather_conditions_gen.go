@@ -96,7 +96,7 @@ func NewWeatherConditions(mesg proto.Message) *WeatherConditions {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumWeatherConditions)
-func (m WeatherConditions) PutMessage(mesg *proto.Message) {
+func (m *WeatherConditions) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -106,20 +106,20 @@ func (m WeatherConditions) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.WeatherReport,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.WeatherReport),
 		1:   m.Temperature,
-		2:   m.Condition,
+		2:   typeconv.ToEnum[byte](m.Condition),
 		3:   m.WindDirection,
 		4:   m.WindSpeed,
 		5:   m.PrecipitationProbability,
 		6:   m.TemperatureFeelsLike,
 		7:   m.RelativeHumidity,
 		8:   m.Location,
-		9:   m.ObservedAtTime,
+		9:   typeconv.ToUint32[uint32](m.ObservedAtTime),
 		10:  m.ObservedLocationLat,
 		11:  m.ObservedLocationLong,
-		12:  m.DayOfWeek,
+		12:  typeconv.ToEnum[byte](m.DayOfWeek),
 		13:  m.HighTemperature,
 		14:  m.LowTemperature,
 	}

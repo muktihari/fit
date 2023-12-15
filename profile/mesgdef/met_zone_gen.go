@@ -60,7 +60,7 @@ func NewMetZone(mesg proto.Message) *MetZone {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumMetZone)
-func (m MetZone) PutMessage(mesg *proto.Message) {
+func (m *MetZone) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -70,7 +70,7 @@ func (m MetZone) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		1:   m.HighBpm,
 		2:   m.Calories,
 		3:   m.FatCalories,

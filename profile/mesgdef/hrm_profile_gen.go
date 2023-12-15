@@ -63,7 +63,7 @@ func NewHrmProfile(mesg proto.Message) *HrmProfile {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumHrmProfile)
-func (m HrmProfile) PutMessage(mesg *proto.Message) {
+func (m *HrmProfile) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,11 +73,11 @@ func (m HrmProfile) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Enabled,
-		1:   m.HrmAntId,
+		1:   typeconv.ToUint16z[uint16](m.HrmAntId),
 		2:   m.LogHrv,
-		3:   m.HrmAntIdTransType,
+		3:   typeconv.ToUint8z[uint8](m.HrmAntIdTransType),
 	}
 
 	for i := range mesg.Fields {

@@ -81,7 +81,7 @@ func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfigura
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumExdDataConceptConfiguration)
-func (m ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
+func (m *ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -98,9 +98,9 @@ func (m ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
 		4:  m.DataPage,
 		5:  m.ConceptKey,
 		6:  m.Scaling,
-		8:  m.DataUnits,
-		9:  m.Qualifier,
-		10: m.Descriptor,
+		8:  typeconv.ToEnum[byte](m.DataUnits),
+		9:  typeconv.ToEnum[byte](m.Qualifier),
+		10: typeconv.ToEnum[byte](m.Descriptor),
 		11: m.IsSigned,
 	}
 

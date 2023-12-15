@@ -66,7 +66,7 @@ func NewFileCapabilities(mesg proto.Message) *FileCapabilities {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumFileCapabilities)
-func (m FileCapabilities) PutMessage(mesg *proto.Message) {
+func (m *FileCapabilities) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -76,9 +76,9 @@ func (m FileCapabilities) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.Type,
-		1:   m.Flags,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.Type),
+		1:   typeconv.ToUint8z[uint8](m.Flags),
 		2:   m.Directory,
 		3:   m.MaxCount,
 		4:   m.MaxSize,

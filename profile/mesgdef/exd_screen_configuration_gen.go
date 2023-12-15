@@ -60,7 +60,7 @@ func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumExdScreenConfiguration)
-func (m ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
+func (m *ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -72,7 +72,7 @@ func (m ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
 	vals := [...]any{
 		0: m.ScreenIndex,
 		1: m.FieldCount,
-		2: m.Layout,
+		2: typeconv.ToEnum[byte](m.Layout),
 		3: m.ScreenEnabled,
 	}
 

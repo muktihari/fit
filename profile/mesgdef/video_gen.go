@@ -57,7 +57,7 @@ func NewVideo(mesg proto.Message) *Video {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumVideo)
-func (m Video) PutMessage(mesg *proto.Message) {
+func (m *Video) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}

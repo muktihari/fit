@@ -63,7 +63,7 @@ func NewCameraEvent(mesg proto.Message) *CameraEvent {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumCameraEvent)
-func (m CameraEvent) PutMessage(mesg *proto.Message) {
+func (m *CameraEvent) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,11 +73,11 @@ func (m CameraEvent) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TimestampMs,
-		1:   m.CameraEventType,
+		1:   typeconv.ToEnum[byte](m.CameraEventType),
 		2:   m.CameraFileUuid,
-		3:   m.CameraOrientation,
+		3:   typeconv.ToEnum[byte](m.CameraOrientation),
 	}
 
 	for i := range mesg.Fields {

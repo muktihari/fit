@@ -99,7 +99,7 @@ func NewTimeInZone(mesg proto.Message) *TimeInZone {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumTimeInZone)
-func (m TimeInZone) PutMessage(mesg *proto.Message) {
+func (m *TimeInZone) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -109,9 +109,9 @@ func (m TimeInZone) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.ReferenceMesg,
-		1:   m.ReferenceIndex,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint16[uint16](m.ReferenceMesg),
+		1:   typeconv.ToUint16[uint16](m.ReferenceIndex),
 		2:   m.TimeInHrZone,
 		3:   m.TimeInSpeedZone,
 		4:   m.TimeInCadenceZone,
@@ -120,11 +120,11 @@ func (m TimeInZone) PutMessage(mesg *proto.Message) {
 		7:   m.SpeedZoneHighBoundary,
 		8:   m.CadenceZoneHighBondary,
 		9:   m.PowerZoneHighBoundary,
-		10:  m.HrCalcType,
+		10:  typeconv.ToEnum[byte](m.HrCalcType),
 		11:  m.MaxHeartRate,
 		12:  m.RestingHeartRate,
 		13:  m.ThresholdHeartRate,
-		14:  m.PwrCalcType,
+		14:  typeconv.ToEnum[byte](m.PwrCalcType),
 		15:  m.FunctionalThresholdPower,
 	}
 
