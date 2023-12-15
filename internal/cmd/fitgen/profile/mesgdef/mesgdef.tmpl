@@ -54,7 +54,7 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 
 	return &{{ .Name }}{
 		{{ range .Fields -}}
-			{{ .Name }}: {{ .AssignedValue }},
+			{{ .Name }}: {{ .TypedValue }},
 		{{ end -}}
 
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
@@ -67,7 +67,7 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory: 
 //  
 //  factory.CreateMesg(typedef.MesgNum{{ .Name }})
-func (m {{ .Name }}) PutMessage(mesg *proto.Message) {
+func (m *{{ .Name }}) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -78,7 +78,7 @@ func (m {{ .Name }}) PutMessage(mesg *proto.Message) {
 
 	vals := [...]any{
 		{{ range .Fields -}}
-			{{ .Num }}: m.{{ .Name }},
+			{{ .Num }}: {{ .PrimitiveValue }},
 		{{ end -}}
 	}
 

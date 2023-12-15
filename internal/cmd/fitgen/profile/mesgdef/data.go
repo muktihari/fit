@@ -13,11 +13,11 @@ type Data struct {
 }
 
 type Field struct {
-	Num           byte
-	Name          string
-	String        string
-	Type          string
-	InvalidValue  string
-	AssignedValue string
-	Comment       string
+	Num            byte
+	Name           string
+	String         string
+	Type           string
+	TypedValue     string
+	PrimitiveValue string
+	Comment        string
 }
