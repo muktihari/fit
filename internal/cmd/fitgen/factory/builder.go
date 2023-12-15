@@ -20,7 +20,6 @@ import (
 
 type ( // type aliasing for better code reading.
 	// types
-	TypeName  = string
 	ValueName = string
 	BaseType  = string
 
@@ -47,9 +46,9 @@ type factoryBuilder struct {
 	once sync.Once
 
 	// types lookup
-	baseTypeMapByProfileType      map[ProfileType]BaseType
-	baseTypeMapByTypeName         map[TypeName]BaseType                   // e.g. mesg_num 				 -> uint16 ,  data_time -> uint32
-	valueMapByTypeNameByValueName map[TypeName]map[ValueName]parser.Value // e.g. map[mesg_num][file_id] -> Value{}
+	goTypesByProfileTypes            map[ProfileType]string                     // (k -> v) typedef.DateTime -> uint32
+	baseTypeMapByProfileType         map[ProfileType]BaseType                   // e.g. mesg_num 				 -> uint16 ,  data_time -> uint32
+	valueMapByProfileTypeByValueName map[ProfileType]map[ValueName]parser.Value // e.g. map[mesg_num][file_id] -> Value{}
 
 	// message-field lookup
 	fieldMapByMessageNameByFieldNum  map[MessageName]map[FieldNum]parser.Field  // e.g. map[file_id][0] 					 -> Field{}
@@ -60,31 +59,40 @@ func NewBuilder(path, sdkVersion string, types []parser.Type, messages []parser.
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &factoryBuilder{
-		template:           template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
-		path:               filepath.Join(path, "factory"),
-		mesgnumPackageName: "typedef",
-		profilePackageName: "profile",
-		sdkVersion:         sdkVersion,
-		types:              types,
-		messages:           messages}
+		template:                         template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
+		path:                             filepath.Join(path, "factory"),
+		mesgnumPackageName:               "typedef",
+		profilePackageName:               "profile",
+		sdkVersion:                       sdkVersion,
+		types:                            types,
+		messages:                         messages,
+		goTypesByProfileTypes:            make(map[ProfileType]string),
+		baseTypeMapByProfileType:         make(map[ProfileType]BaseType),
+		valueMapByProfileTypeByValueName: make(map[ProfileType]map[ValueName]parser.Value),
+	}
 }
 
 func (b *factoryBuilder) populateLookupData() {
-	b.baseTypeMapByProfileType = make(map[ProfileType]BaseType)
-	b.baseTypeMapByTypeName = make(map[TypeName]BaseType)
-	b.valueMapByTypeNameByValueName = make(map[TypeName]map[ValueName]parser.Value)
-
-	for _, _basetype := range basetype.List() { // map to itself
-		b.baseTypeMapByProfileType[_basetype.String()] = _basetype.String()
+	goTypesByBaseTypes := map[BaseType]string{
+		"bool":          "bool",
+		"fit_base_type": "basetype.BaseType",
 	}
-	b.baseTypeMapByProfileType["bool"] = "bool" // additional profile type which is not defined in basetype.
+
+	for _, v := range basetype.List() { // map to itself
+		goTypesByBaseTypes[v.String()] = v.GoType()
+		b.goTypesByProfileTypes[v.String()] = v.GoType()
+		b.baseTypeMapByProfileType[v.String()] = v.String()
+	}
+
+	// additional profile type which is not defined in basetype.
+	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "bool"})
 
 	for _, _type := range b.types {
+		b.goTypesByProfileTypes[_type.Name] = goTypesByBaseTypes[_type.BaseType]
 		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
-		b.baseTypeMapByTypeName[_type.Name] = _type.BaseType
-		b.valueMapByTypeNameByValueName[_type.Name] = make(map[ValueName]parser.Value)
+		b.valueMapByProfileTypeByValueName[_type.Name] = make(map[ValueName]parser.Value)
 		for _, value := range _type.Values {
-			b.valueMapByTypeNameByValueName[_type.Name][value.Name] = value
+			b.valueMapByProfileTypeByValueName[_type.Name][value.Name] = value
 		}
 	}
 
@@ -139,8 +147,8 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	}
 
 	strbuf.WriteString(fmt.Sprintf("{Num: %s /* mfg_range_min */},{Num: %s /* mfg_range_min */} %s,\n",
-		b.valueMapByTypeNameByValueName["mesg_num"]["mfg_range_min"].Value,
-		b.valueMapByTypeNameByValueName["mesg_num"]["mfg_range_max"].Value,
+		b.valueMapByProfileTypeByValueName["mesg_num"]["mfg_range_min"].Value,
+		b.valueMapByProfileTypeByValueName["mesg_num"]["mfg_range_max"].Value,
 		"/* 0xFF00 - 0xFFFE reserved for manufacturer specific messages */"))
 
 	strbuf.WriteString("}")
@@ -197,7 +205,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 		strbuf.WriteString(fmt.Sprintf("Accumulate: %t,\n", accumulateOrDefault(field.Accumulate, 0)))
 		strbuf.WriteString(fmt.Sprintf("SubFields: %s,\n", b.makeSubFields(field, message.Name)))
 		strbuf.WriteString("},\n")
-		strbuf.WriteString(fmt.Sprintf("Value: %s, /* Default Value: Invalid */\n", b.invalidValueOf(field.Type)))
+		strbuf.WriteString(fmt.Sprintf("Value: %s, /* Default Value: Invalid */\n", b.invalidValueOf(field.Type, field.Array)))
 		strbuf.WriteString("},\n")
 	}
 	strbuf.WriteString("}")
@@ -262,7 +270,7 @@ func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName 
 		strbuf.WriteString("{")
 		strbuf.WriteString(fmt.Sprintf("RefFieldNum: %d /* %s */,", fieldRef.Num, fieldRef.Name))
 
-		typeRef := b.valueMapByTypeNameByValueName[fieldRef.Type][subfield.RefFieldValue[i]]
+		typeRef := b.valueMapByProfileTypeByValueName[fieldRef.Type][subfield.RefFieldValue[i]]
 		strbuf.WriteString(fmt.Sprintf("RefFieldValue: %s /* %s */,", typeRef.Value, typeRef.Name))
 		strbuf.WriteString("},\n")
 	}
@@ -280,27 +288,34 @@ func (b *factoryBuilder) transformBaseType(fieldType string) string {
 
 func (b *factoryBuilder) transformMesgnum(s string) string {
 	return b.mesgnumPackageName + ".MesgNum" + strutil.ToTitle(s) // types.MesgNumFileId
-
 }
 
-func (b *factoryBuilder) invalidValueOf(fieldType string) string {
-	if fieldType == "string" {
-		return "\"\\x00\""
+func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
+	if b.baseTypeMapByProfileType[fieldType] == "string" {
+		return "basetype.StringInvalid"
 	}
+
 	if fieldType == "bool" {
 		return "false"
 	}
 
-	if fieldType == "float32" {
-		return "basetype.Float32.Invalid()"
+	if array != "" {
+		goType := b.goTypesByProfileTypes[fieldType]
+		return fmt.Sprintf("[]%s(nil)", goType)
 	}
 
-	if fieldType == "float64" {
-		return "basetype.Float64.Invalid()"
+	// Float is a special case since NaN is not comparable, so for example, basetype.Float32Invalid, is not a float,
+	// but its representation in integer form. This way we can compare it in its integer form later.
+	if b.baseTypeMapByProfileType[fieldType] == "float32" {
+		return "basetype.Float32.Invalid()" // same as `math.Float32frombits(basetype.Float32Invalid)`
 	}
 
-	val := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).Invalid()
-	return fmt.Sprintf("%T(%v)", val, val)
+	if b.baseTypeMapByProfileType[fieldType] == "float64" {
+		return "basetype.Float64.Invalid()" // same as `math.Float64frombits(basetype.Float64Invalid)`
+	}
+
+	bt := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).String()
+	return fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(bt))
 }
 
 func bitsOrDefault(bits []byte, index int) byte {
