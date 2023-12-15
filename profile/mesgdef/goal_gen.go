@@ -87,7 +87,7 @@ func NewGoal(mesg proto.Message) *Goal {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumGoal)
-func (m Goal) PutMessage(mesg *proto.Message) {
+func (m *Goal) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -97,19 +97,19 @@ func (m Goal) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.Sport,
-		1:   m.SubSport,
-		2:   m.StartDate,
-		3:   m.EndDate,
-		4:   m.Type,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.Sport),
+		1:   typeconv.ToEnum[byte](m.SubSport),
+		2:   typeconv.ToUint32[uint32](m.StartDate),
+		3:   typeconv.ToUint32[uint32](m.EndDate),
+		4:   typeconv.ToEnum[byte](m.Type),
 		5:   m.Value,
 		6:   m.Repeat,
 		7:   m.TargetValue,
-		8:   m.Recurrence,
+		8:   typeconv.ToEnum[byte](m.Recurrence),
 		9:   m.RecurrenceValue,
 		10:  m.Enabled,
-		11:  m.Source,
+		11:  typeconv.ToEnum[byte](m.Source),
 	}
 
 	for i := range mesg.Fields {

@@ -333,7 +333,7 @@ func NewSegmentLap(mesg proto.Message) *SegmentLap {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSegmentLap)
-func (m SegmentLap) PutMessage(mesg *proto.Message) {
+func (m *SegmentLap) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -343,11 +343,11 @@ func (m SegmentLap) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		253: m.Timestamp,
-		0:   m.Event,
-		1:   m.EventType,
-		2:   m.StartTime,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Event),
+		1:   typeconv.ToEnum[byte](m.EventType),
+		2:   typeconv.ToUint32[uint32](m.StartTime),
 		3:   m.StartPositionLat,
 		4:   m.StartPositionLong,
 		5:   m.EndPositionLat,
@@ -368,7 +368,7 @@ func (m SegmentLap) PutMessage(mesg *proto.Message) {
 		20:  m.MaxPower,
 		21:  m.TotalAscent,
 		22:  m.TotalDescent,
-		23:  m.Sport,
+		23:  typeconv.ToEnum[byte](m.Sport),
 		24:  m.EventGroup,
 		25:  m.NecLat,
 		26:  m.NecLong,
@@ -376,8 +376,8 @@ func (m SegmentLap) PutMessage(mesg *proto.Message) {
 		28:  m.SwcLong,
 		29:  m.Name,
 		30:  m.NormalizedPower,
-		31:  m.LeftRightBalance,
-		32:  m.SubSport,
+		31:  typeconv.ToUint16[uint16](m.LeftRightBalance),
+		32:  typeconv.ToEnum[byte](m.SubSport),
 		33:  m.TotalWork,
 		34:  m.AvgAltitude,
 		35:  m.MaxAltitude,
@@ -402,14 +402,14 @@ func (m SegmentLap) PutMessage(mesg *proto.Message) {
 		54:  m.MinAltitude,
 		55:  m.MinHeartRate,
 		56:  m.ActiveTime,
-		57:  m.WktStepIndex,
-		58:  m.SportEvent,
+		57:  typeconv.ToUint16[uint16](m.WktStepIndex),
+		58:  typeconv.ToEnum[byte](m.SportEvent),
 		59:  m.AvgLeftTorqueEffectiveness,
 		60:  m.AvgRightTorqueEffectiveness,
 		61:  m.AvgLeftPedalSmoothness,
 		62:  m.AvgRightPedalSmoothness,
 		63:  m.AvgCombinedPedalSmoothness,
-		64:  m.Status,
+		64:  typeconv.ToEnum[byte](m.Status),
 		65:  m.Uuid,
 		66:  m.AvgFractionalCadence,
 		67:  m.MaxFractionalCadence,
@@ -428,7 +428,7 @@ func (m SegmentLap) PutMessage(mesg *proto.Message) {
 		80:  m.MaxPowerPosition,
 		81:  m.AvgCadencePosition,
 		82:  m.MaxCadencePosition,
-		83:  m.Manufacturer,
+		83:  typeconv.ToUint16[uint16](m.Manufacturer),
 		84:  m.TotalGrit,
 		85:  m.TotalFlow,
 		86:  m.AvgGrit,

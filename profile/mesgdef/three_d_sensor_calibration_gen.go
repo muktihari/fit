@@ -69,7 +69,7 @@ func NewThreeDSensorCalibration(mesg proto.Message) *ThreeDSensorCalibration {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumThreeDSensorCalibration)
-func (m ThreeDSensorCalibration) PutMessage(mesg *proto.Message) {
+func (m *ThreeDSensorCalibration) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,8 +79,8 @@ func (m ThreeDSensorCalibration) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.SensorType,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.SensorType),
 		1:   m.CalibrationFactor,
 		2:   m.CalibrationDivisor,
 		3:   m.LevelShift,

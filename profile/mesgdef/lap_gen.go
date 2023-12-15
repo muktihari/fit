@@ -417,7 +417,7 @@ func NewLap(mesg proto.Message) *Lap {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumLap)
-func (m Lap) PutMessage(mesg *proto.Message) {
+func (m *Lap) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -427,11 +427,11 @@ func (m Lap) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		253: m.Timestamp,
-		0:   m.Event,
-		1:   m.EventType,
-		2:   m.StartTime,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Event),
+		1:   typeconv.ToEnum[byte](m.EventType),
+		2:   typeconv.ToUint32[uint32](m.StartTime),
 		3:   m.StartPositionLat,
 		4:   m.StartPositionLong,
 		5:   m.EndPositionLat,
@@ -452,17 +452,17 @@ func (m Lap) PutMessage(mesg *proto.Message) {
 		20:  m.MaxPower,
 		21:  m.TotalAscent,
 		22:  m.TotalDescent,
-		23:  m.Intensity,
-		24:  m.LapTrigger,
-		25:  m.Sport,
+		23:  typeconv.ToEnum[byte](m.Intensity),
+		24:  typeconv.ToEnum[byte](m.LapTrigger),
+		25:  typeconv.ToEnum[byte](m.Sport),
 		26:  m.EventGroup,
 		32:  m.NumLengths,
 		33:  m.NormalizedPower,
-		34:  m.LeftRightBalance,
+		34:  typeconv.ToUint16[uint16](m.LeftRightBalance),
 		35:  m.FirstLengthIndex,
 		37:  m.AvgStrokeDistance,
-		38:  m.SwimStroke,
-		39:  m.SubSport,
+		38:  typeconv.ToEnum[byte](m.SwimStroke),
+		39:  typeconv.ToEnum[byte](m.SubSport),
 		40:  m.NumActiveLengths,
 		41:  m.TotalWork,
 		42:  m.AvgAltitude,
@@ -487,7 +487,7 @@ func (m Lap) PutMessage(mesg *proto.Message) {
 		61:  m.RepetitionNum,
 		62:  m.MinAltitude,
 		63:  m.MinHeartRate,
-		71:  m.WktStepIndex,
+		71:  typeconv.ToUint16[uint16](m.WktStepIndex),
 		74:  m.OpponentScore,
 		75:  m.StrokeCount,
 		76:  m.ZoneCount,

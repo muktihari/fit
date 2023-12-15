@@ -63,7 +63,7 @@ func NewTankSummary(mesg proto.Message) *TankSummary {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumTankSummary)
-func (m TankSummary) PutMessage(mesg *proto.Message) {
+func (m *TankSummary) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,8 +73,8 @@ func (m TankSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.Sensor,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint32z[uint32](m.Sensor),
 		1:   m.StartPressure,
 		2:   m.EndPressure,
 		3:   m.VolumeUsed,

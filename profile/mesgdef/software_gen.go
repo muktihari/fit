@@ -57,7 +57,7 @@ func NewSoftware(mesg proto.Message) *Software {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSoftware)
-func (m Software) PutMessage(mesg *proto.Message) {
+func (m *Software) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func (m Software) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		3:   m.Version,
 		5:   m.PartNumber,
 	}

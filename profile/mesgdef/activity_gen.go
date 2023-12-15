@@ -72,7 +72,7 @@ func NewActivity(mesg proto.Message) *Activity {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumActivity)
-func (m Activity) PutMessage(mesg *proto.Message) {
+func (m *Activity) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -82,13 +82,13 @@ func (m Activity) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TotalTimerTime,
 		1:   m.NumSessions,
-		2:   m.Type,
-		3:   m.Event,
-		4:   m.EventType,
-		5:   m.LocalTimestamp,
+		2:   typeconv.ToEnum[byte](m.Type),
+		3:   typeconv.ToEnum[byte](m.Event),
+		4:   typeconv.ToEnum[byte](m.EventType),
+		5:   typeconv.ToUint32[uint32](m.LocalTimestamp),
 		6:   m.EventGroup,
 	}
 

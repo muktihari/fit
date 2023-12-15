@@ -63,7 +63,7 @@ func NewDiveGas(mesg proto.Message) *DiveGas {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDiveGas)
-func (m DiveGas) PutMessage(mesg *proto.Message) {
+func (m *DiveGas) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -73,11 +73,11 @@ func (m DiveGas) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.HeliumContent,
 		1:   m.OxygenContent,
-		2:   m.Status,
-		3:   m.Mode,
+		2:   typeconv.ToEnum[byte](m.Status),
+		3:   typeconv.ToEnum[byte](m.Mode),
 	}
 
 	for i := range mesg.Fields {

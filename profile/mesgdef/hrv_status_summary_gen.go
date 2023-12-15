@@ -72,7 +72,7 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumHrvStatusSummary)
-func (m HrvStatusSummary) PutMessage(mesg *proto.Message) {
+func (m *HrvStatusSummary) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -82,14 +82,14 @@ func (m HrvStatusSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.WeeklyAverage,
 		1:   m.LastNightAverage,
 		2:   m.LastNight5MinHigh,
 		3:   m.BaselineLowUpper,
 		4:   m.BaselineBalancedLower,
 		5:   m.BaselineBalancedUpper,
-		6:   m.Status,
+		6:   typeconv.ToEnum[byte](m.Status),
 	}
 
 	for i := range mesg.Fields {

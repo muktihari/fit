@@ -57,7 +57,7 @@ func NewSport(mesg proto.Message) *Sport {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSport)
-func (m Sport) PutMessage(mesg *proto.Message) {
+func (m *Sport) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -67,8 +67,8 @@ func (m Sport) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0: m.Sport,
-		1: m.SubSport,
+		0: typeconv.ToEnum[byte](m.Sport),
+		1: typeconv.ToEnum[byte](m.SubSport),
 		3: m.Name,
 	}
 

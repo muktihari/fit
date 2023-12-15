@@ -69,7 +69,7 @@ func NewSegmentPoint(mesg proto.Message) *SegmentPoint {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSegmentPoint)
-func (m SegmentPoint) PutMessage(mesg *proto.Message) {
+func (m *SegmentPoint) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (m SegmentPoint) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		1:   m.PositionLat,
 		2:   m.PositionLong,
 		3:   m.Distance,

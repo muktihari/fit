@@ -60,7 +60,7 @@ func NewCapabilities(mesg proto.Message) *Capabilities {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumCapabilities)
-func (m Capabilities) PutMessage(mesg *proto.Message) {
+func (m *Capabilities) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -70,10 +70,10 @@ func (m Capabilities) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0:  m.Languages,
-		1:  m.Sports,
-		21: m.WorkoutsSupported,
-		23: m.ConnectivitySupported,
+		0:  typeconv.ToSliceUint8z[uint8](m.Languages),
+		1:  typeconv.ToSliceUint8z[uint8](m.Sports),
+		21: typeconv.ToUint32z[uint32](m.WorkoutsSupported),
+		23: typeconv.ToUint32z[uint32](m.ConnectivitySupported),
 	}
 
 	for i := range mesg.Fields {

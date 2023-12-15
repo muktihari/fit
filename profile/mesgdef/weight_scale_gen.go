@@ -90,7 +90,7 @@ func NewWeightScale(mesg proto.Message) *WeightScale {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumWeightScale)
-func (m WeightScale) PutMessage(mesg *proto.Message) {
+func (m *WeightScale) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -100,8 +100,8 @@ func (m WeightScale) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.Weight,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToUint16[uint16](m.Weight),
 		1:   m.PercentFat,
 		2:   m.PercentHydration,
 		3:   m.VisceralFatMass,
@@ -112,7 +112,7 @@ func (m WeightScale) PutMessage(mesg *proto.Message) {
 		9:   m.ActiveMet,
 		10:  m.MetabolicAge,
 		11:  m.VisceralFatRating,
-		12:  m.UserProfileIndex,
+		12:  typeconv.ToUint16[uint16](m.UserProfileIndex),
 		13:  m.Bmi,
 	}
 

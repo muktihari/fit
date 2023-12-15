@@ -63,7 +63,7 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumAntChannelId)
-func (m AntChannelId) PutMessage(mesg *proto.Message) {
+func (m *AntChannelId) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -74,10 +74,10 @@ func (m AntChannelId) PutMessage(mesg *proto.Message) {
 
 	vals := [...]any{
 		0: m.ChannelNumber,
-		1: m.DeviceType,
-		2: m.DeviceNumber,
-		3: m.TransmissionType,
-		4: m.DeviceIndex,
+		1: typeconv.ToUint8z[uint8](m.DeviceType),
+		2: typeconv.ToUint16z[uint16](m.DeviceNumber),
+		3: typeconv.ToUint8z[uint8](m.TransmissionType),
+		4: typeconv.ToUint8[uint8](m.DeviceIndex),
 	}
 
 	for i := range mesg.Fields {

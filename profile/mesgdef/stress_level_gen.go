@@ -54,7 +54,7 @@ func NewStressLevel(mesg proto.Message) *StressLevel {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumStressLevel)
-func (m StressLevel) PutMessage(mesg *proto.Message) {
+func (m *StressLevel) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -65,7 +65,7 @@ func (m StressLevel) PutMessage(mesg *proto.Message) {
 
 	vals := [...]any{
 		0: m.StressLevelValue,
-		1: m.StressLevelTime,
+		1: typeconv.ToUint32[uint32](m.StressLevelTime),
 	}
 
 	for i := range mesg.Fields {

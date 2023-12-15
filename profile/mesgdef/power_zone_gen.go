@@ -57,7 +57,7 @@ func NewPowerZone(mesg proto.Message) *PowerZone {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumPowerZone)
-func (m PowerZone) PutMessage(mesg *proto.Message) {
+func (m *PowerZone) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func (m PowerZone) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		1:   m.HighValue,
 		2:   m.Name,
 	}

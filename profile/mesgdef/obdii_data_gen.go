@@ -75,7 +75,7 @@ func NewObdiiData(mesg proto.Message) *ObdiiData {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumObdiiData)
-func (m ObdiiData) PutMessage(mesg *proto.Message) {
+func (m *ObdiiData) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -85,14 +85,14 @@ func (m ObdiiData) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TimestampMs,
 		1:   m.TimeOffset,
 		2:   m.Pid,
 		3:   m.RawData,
 		4:   m.PidDataSize,
 		5:   m.SystemTime,
-		6:   m.StartTimestamp,
+		6:   typeconv.ToUint32[uint32](m.StartTimestamp),
 		7:   m.StartTimestampMs,
 	}
 

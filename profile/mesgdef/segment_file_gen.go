@@ -75,7 +75,7 @@ func NewSegmentFile(mesg proto.Message) *SegmentFile {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSegmentFile)
-func (m SegmentFile) PutMessage(mesg *proto.Message) {
+func (m *SegmentFile) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -85,11 +85,11 @@ func (m SegmentFile) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		1:   m.FileUuid,
 		3:   m.Enabled,
 		4:   m.UserProfilePrimaryKey,
-		7:   m.LeaderType,
+		7:   typeconv.ToSliceEnum[byte](m.LeaderType),
 		8:   m.LeaderGroupPrimaryKey,
 		9:   m.LeaderActivityId,
 		10:  m.LeaderActivityIdString,

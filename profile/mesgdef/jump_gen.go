@@ -78,7 +78,7 @@ func NewJump(mesg proto.Message) *Jump {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumJump)
-func (m Jump) PutMessage(mesg *proto.Message) {
+func (m *Jump) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -88,7 +88,7 @@ func (m Jump) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.Distance,
 		1:   m.Height,
 		2:   m.Rotations,

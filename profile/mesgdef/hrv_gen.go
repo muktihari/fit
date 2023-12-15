@@ -51,7 +51,7 @@ func NewHrv(mesg proto.Message) *Hrv {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumHrv)
-func (m Hrv) PutMessage(mesg *proto.Message) {
+func (m *Hrv) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}

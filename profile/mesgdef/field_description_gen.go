@@ -85,7 +85,7 @@ func NewFieldDescription(mesg proto.Message) *FieldDescription {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumFieldDescription)
-func (m FieldDescription) PutMessage(mesg *proto.Message) {
+func (m *FieldDescription) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -97,7 +97,7 @@ func (m FieldDescription) PutMessage(mesg *proto.Message) {
 	vals := [...]any{
 		0:  m.DeveloperDataIndex,
 		1:  m.FieldDefinitionNumber,
-		2:  m.FitBaseTypeId,
+		2:  typeconv.ToUint8[uint8](m.FitBaseTypeId),
 		3:  m.FieldName,
 		4:  m.Array,
 		5:  m.Components,
@@ -106,8 +106,8 @@ func (m FieldDescription) PutMessage(mesg *proto.Message) {
 		8:  m.Units,
 		9:  m.Bits,
 		10: m.Accumulate,
-		13: m.FitBaseUnitId,
-		14: m.NativeMesgNum,
+		13: typeconv.ToUint16[uint16](m.FitBaseUnitId),
+		14: typeconv.ToUint16[uint16](m.NativeMesgNum),
 		15: m.NativeFieldNum,
 	}
 

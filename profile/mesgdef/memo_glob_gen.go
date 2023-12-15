@@ -66,7 +66,7 @@ func NewMemoGlob(mesg proto.Message) *MemoGlob {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumMemoGlob)
-func (m MemoGlob) PutMessage(mesg *proto.Message) {
+func (m *MemoGlob) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -78,10 +78,10 @@ func (m MemoGlob) PutMessage(mesg *proto.Message) {
 	vals := [...]any{
 		250: m.PartIndex,
 		0:   m.Memo,
-		1:   m.MesgNum,
-		2:   m.ParentIndex,
+		1:   typeconv.ToUint16[uint16](m.MesgNum),
+		2:   typeconv.ToUint16[uint16](m.ParentIndex),
 		3:   m.FieldNum,
-		4:   m.Data,
+		4:   typeconv.ToSliceUint8z[uint8](m.Data),
 	}
 
 	for i := range mesg.Fields {

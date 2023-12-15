@@ -69,7 +69,7 @@ func NewVideoClip(mesg proto.Message) *VideoClip {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumVideoClip)
-func (m VideoClip) PutMessage(mesg *proto.Message) {
+func (m *VideoClip) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -80,9 +80,9 @@ func (m VideoClip) PutMessage(mesg *proto.Message) {
 
 	vals := [...]any{
 		0: m.ClipNumber,
-		1: m.StartTimestamp,
+		1: typeconv.ToUint32[uint32](m.StartTimestamp),
 		2: m.StartTimestampMs,
-		3: m.EndTimestamp,
+		3: typeconv.ToUint32[uint32](m.EndTimestamp),
 		4: m.EndTimestampMs,
 		6: m.ClipStart,
 		7: m.ClipEnd,

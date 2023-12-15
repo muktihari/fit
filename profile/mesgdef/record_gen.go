@@ -300,7 +300,7 @@ func NewRecord(mesg proto.Message) *Record {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumRecord)
-func (m Record) PutMessage(mesg *proto.Message) {
+func (m *Record) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -310,7 +310,7 @@ func (m Record) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.PositionLat,
 		1:   m.PositionLong,
 		2:   m.Altitude,
@@ -330,21 +330,21 @@ func (m Record) PutMessage(mesg *proto.Message) {
 		19:  m.TotalCycles,
 		28:  m.CompressedAccumulatedPower,
 		29:  m.AccumulatedPower,
-		30:  m.LeftRightBalance,
+		30:  typeconv.ToUint8[uint8](m.LeftRightBalance),
 		31:  m.GpsAccuracy,
 		32:  m.VerticalSpeed,
 		33:  m.Calories,
 		39:  m.VerticalOscillation,
 		40:  m.StanceTimePercent,
 		41:  m.StanceTime,
-		42:  m.ActivityType,
+		42:  typeconv.ToEnum[byte](m.ActivityType),
 		43:  m.LeftTorqueEffectiveness,
 		44:  m.RightTorqueEffectiveness,
 		45:  m.LeftPedalSmoothness,
 		46:  m.RightPedalSmoothness,
 		47:  m.CombinedPedalSmoothness,
 		48:  m.Time128,
-		49:  m.StrokeType,
+		49:  typeconv.ToEnum[byte](m.StrokeType),
 		50:  m.Zone,
 		51:  m.BallSpeed,
 		52:  m.Cadence256,
@@ -355,7 +355,7 @@ func (m Record) PutMessage(mesg *proto.Message) {
 		57:  m.SaturatedHemoglobinPercent,
 		58:  m.SaturatedHemoglobinPercentMin,
 		59:  m.SaturatedHemoglobinPercentMax,
-		62:  m.DeviceIndex,
+		62:  typeconv.ToUint8[uint8](m.DeviceIndex),
 		67:  m.LeftPco,
 		68:  m.RightPco,
 		69:  m.LeftPowerPhase,

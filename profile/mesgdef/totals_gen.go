@@ -78,7 +78,7 @@ func NewTotals(mesg proto.Message) *Totals {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumTotals)
-func (m Totals) PutMessage(mesg *proto.Message) {
+func (m *Totals) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -88,12 +88,12 @@ func (m Totals) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		253: m.Timestamp,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TimerTime,
 		1:   m.Distance,
 		2:   m.Calories,
-		3:   m.Sport,
+		3:   typeconv.ToEnum[byte](m.Sport),
 		4:   m.ElapsedTime,
 		5:   m.Sessions,
 		6:   m.ActiveTime,

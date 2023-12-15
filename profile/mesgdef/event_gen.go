@@ -105,7 +105,7 @@ func NewEvent(mesg proto.Message) *Event {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumEvent)
-func (m Event) PutMessage(mesg *proto.Message) {
+func (m *Event) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -115,22 +115,22 @@ func (m Event) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.Event,
-		1:   m.EventType,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Event),
+		1:   typeconv.ToEnum[byte](m.EventType),
 		2:   m.Data16,
 		3:   m.Data,
 		4:   m.EventGroup,
 		7:   m.Score,
 		8:   m.OpponentScore,
-		9:   m.FrontGearNum,
-		10:  m.FrontGear,
-		11:  m.RearGearNum,
-		12:  m.RearGear,
-		13:  m.DeviceIndex,
-		14:  m.ActivityType,
-		15:  m.StartTimestamp,
-		21:  m.RadarThreatLevelMax,
+		9:   typeconv.ToUint8z[uint8](m.FrontGearNum),
+		10:  typeconv.ToUint8z[uint8](m.FrontGear),
+		11:  typeconv.ToUint8z[uint8](m.RearGearNum),
+		12:  typeconv.ToUint8z[uint8](m.RearGear),
+		13:  typeconv.ToUint8[uint8](m.DeviceIndex),
+		14:  typeconv.ToEnum[byte](m.ActivityType),
+		15:  typeconv.ToUint32[uint32](m.StartTimestamp),
+		21:  typeconv.ToEnum[byte](m.RadarThreatLevelMax),
 		22:  m.RadarThreatCount,
 		23:  m.RadarThreatAvgApproachSpeed,
 		24:  m.RadarThreatMaxApproachSpeed,

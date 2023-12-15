@@ -60,7 +60,7 @@ func NewCourse(mesg proto.Message) *Course {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumCourse)
-func (m Course) PutMessage(mesg *proto.Message) {
+func (m *Course) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -70,10 +70,10 @@ func (m Course) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		4: m.Sport,
+		4: typeconv.ToEnum[byte](m.Sport),
 		5: m.Name,
-		6: m.Capabilities,
-		7: m.SubSport,
+		6: typeconv.ToUint32z[uint32](m.Capabilities),
+		7: typeconv.ToEnum[byte](m.SubSport),
 	}
 
 	for i := range mesg.Fields {

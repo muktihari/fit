@@ -90,7 +90,7 @@ func NewSplitSummary(mesg proto.Message) *SplitSummary {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSplitSummary)
-func (m SplitSummary) PutMessage(mesg *proto.Message) {
+func (m *SplitSummary) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -100,8 +100,8 @@ func (m SplitSummary) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		0:   m.SplitType,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		0:   typeconv.ToEnum[byte](m.SplitType),
 		3:   m.NumSplits,
 		4:   m.TotalTimerTime,
 		5:   m.TotalDistance,

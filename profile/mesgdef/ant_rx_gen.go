@@ -66,7 +66,7 @@ func NewAntRx(mesg proto.Message) *AntRx {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumAntRx)
-func (m AntRx) PutMessage(mesg *proto.Message) {
+func (m *AntRx) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (m AntRx) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.FractionalTimestamp,
 		1:   m.MesgId,
 		2:   m.MesgData,

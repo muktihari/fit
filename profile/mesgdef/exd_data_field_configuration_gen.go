@@ -66,7 +66,7 @@ func NewExdDataFieldConfiguration(mesg proto.Message) *ExdDataFieldConfiguration
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumExdDataFieldConfiguration)
-func (m ExdDataFieldConfiguration) PutMessage(mesg *proto.Message) {
+func (m *ExdDataFieldConfiguration) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -80,7 +80,7 @@ func (m ExdDataFieldConfiguration) PutMessage(mesg *proto.Message) {
 		1: m.ConceptField,
 		2: m.FieldId,
 		3: m.ConceptCount,
-		4: m.DisplayType,
+		4: typeconv.ToEnum[byte](m.DisplayType),
 		5: m.Title,
 	}
 

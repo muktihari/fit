@@ -54,7 +54,7 @@ func NewOhrSettings(mesg proto.Message) *OhrSettings {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumOhrSettings)
-func (m OhrSettings) PutMessage(mesg *proto.Message) {
+func (m *OhrSettings) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -64,8 +64,8 @@ func (m OhrSettings) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
-		0:   m.Enabled,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
+		0:   typeconv.ToEnum[byte](m.Enabled),
 	}
 
 	for i := range mesg.Fields {

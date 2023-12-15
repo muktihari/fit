@@ -72,7 +72,7 @@ func NewCoursePoint(mesg proto.Message) *CoursePoint {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumCoursePoint)
-func (m CoursePoint) PutMessage(mesg *proto.Message) {
+func (m *CoursePoint) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -82,12 +82,12 @@ func (m CoursePoint) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
-		1:   m.Timestamp,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
+		1:   typeconv.ToUint32[uint32](m.Timestamp),
 		2:   m.PositionLat,
 		3:   m.PositionLong,
 		4:   m.Distance,
-		5:   m.Type,
+		5:   typeconv.ToEnum[byte](m.Type),
 		6:   m.Name,
 		8:   m.Favorite,
 	}

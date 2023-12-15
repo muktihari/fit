@@ -84,7 +84,7 @@ func NewAviationAttitude(mesg proto.Message) *AviationAttitude {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumAviationAttitude)
-func (m AviationAttitude) PutMessage(mesg *proto.Message) {
+func (m *AviationAttitude) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -94,7 +94,7 @@ func (m AviationAttitude) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.TimestampMs,
 		1:   m.SystemTime,
 		2:   m.Pitch,
@@ -102,10 +102,10 @@ func (m AviationAttitude) PutMessage(mesg *proto.Message) {
 		4:   m.AccelLateral,
 		5:   m.AccelNormal,
 		6:   m.TurnRate,
-		7:   m.Stage,
+		7:   typeconv.ToSliceEnum[byte](m.Stage),
 		8:   m.AttitudeStageComplete,
 		9:   m.Track,
-		10:  m.Validity,
+		10:  typeconv.ToSliceUint16[uint16](m.Validity),
 	}
 
 	for i := range mesg.Fields {

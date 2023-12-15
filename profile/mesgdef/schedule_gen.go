@@ -69,7 +69,7 @@ func NewSchedule(mesg proto.Message) *Schedule {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumSchedule)
-func (m Schedule) PutMessage(mesg *proto.Message) {
+func (m *Schedule) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,13 +79,13 @@ func (m Schedule) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0: m.Manufacturer,
+		0: typeconv.ToUint16[uint16](m.Manufacturer),
 		1: m.Product,
-		2: m.SerialNumber,
-		3: m.TimeCreated,
+		2: typeconv.ToUint32z[uint32](m.SerialNumber),
+		3: typeconv.ToUint32[uint32](m.TimeCreated),
 		4: m.Completed,
-		5: m.Type,
-		6: m.ScheduledTime,
+		5: typeconv.ToEnum[byte](m.Type),
+		6: typeconv.ToUint32[uint32](m.ScheduledTime),
 	}
 
 	for i := range mesg.Fields {

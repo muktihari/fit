@@ -69,7 +69,7 @@ func NewClimbPro(mesg proto.Message) *ClimbPro {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumClimbPro)
-func (m ClimbPro) PutMessage(mesg *proto.Message) {
+func (m *ClimbPro) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -79,10 +79,10 @@ func (m ClimbPro) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.PositionLat,
 		1:   m.PositionLong,
-		2:   m.ClimbProEvent,
+		2:   typeconv.ToEnum[byte](m.ClimbProEvent),
 		3:   m.ClimbNumber,
 		4:   m.ClimbCategory,
 		5:   m.CurrentDist,

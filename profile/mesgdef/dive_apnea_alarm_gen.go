@@ -87,7 +87,7 @@ func NewDiveApneaAlarm(mesg proto.Message) *DiveApneaAlarm {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumDiveApneaAlarm)
-func (m DiveApneaAlarm) PutMessage(mesg *proto.Message) {
+func (m *DiveApneaAlarm) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -97,13 +97,13 @@ func (m DiveApneaAlarm) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		254: m.MessageIndex,
+		254: typeconv.ToUint16[uint16](m.MessageIndex),
 		0:   m.Depth,
 		1:   m.Time,
 		2:   m.Enabled,
-		3:   m.AlarmType,
-		4:   m.Sound,
-		5:   m.DiveTypes,
+		3:   typeconv.ToEnum[byte](m.AlarmType),
+		4:   typeconv.ToEnum[byte](m.Sound),
+		5:   typeconv.ToSliceEnum[byte](m.DiveTypes),
 		6:   m.Id,
 		7:   m.PopupEnabled,
 		8:   m.TriggerOnDescent,

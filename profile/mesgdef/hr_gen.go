@@ -66,7 +66,7 @@ func NewHr(mesg proto.Message) *Hr {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumHr)
-func (m Hr) PutMessage(mesg *proto.Message) {
+func (m *Hr) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -76,7 +76,7 @@ func (m Hr) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		253: m.Timestamp,
+		253: typeconv.ToUint32[uint32](m.Timestamp),
 		0:   m.FractionalTimestamp,
 		1:   m.Time256,
 		6:   m.FilteredBpm,

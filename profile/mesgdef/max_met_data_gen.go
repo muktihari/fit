@@ -72,7 +72,7 @@ func NewMaxMetData(mesg proto.Message) *MaxMetData {
 // It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
 //
 //	factory.CreateMesg(typedef.MesgNumMaxMetData)
-func (m MaxMetData) PutMessage(mesg *proto.Message) {
+func (m *MaxMetData) PutMessage(mesg *proto.Message) {
 	if mesg == nil {
 		return
 	}
@@ -82,14 +82,14 @@ func (m MaxMetData) PutMessage(mesg *proto.Message) {
 	}
 
 	vals := [...]any{
-		0:  m.UpdateTime,
+		0:  typeconv.ToUint32[uint32](m.UpdateTime),
 		2:  m.Vo2Max,
-		5:  m.Sport,
-		6:  m.SubSport,
-		8:  m.MaxMetCategory,
+		5:  typeconv.ToEnum[byte](m.Sport),
+		6:  typeconv.ToEnum[byte](m.SubSport),
+		8:  typeconv.ToEnum[byte](m.MaxMetCategory),
 		9:  m.CalibratedData,
-		12: m.HrSource,
-		13: m.SpeedSource,
+		12: typeconv.ToEnum[byte](m.HrSource),
+		13: typeconv.ToEnum[byte](m.SpeedSource),
 	}
 
 	for i := range mesg.Fields {
