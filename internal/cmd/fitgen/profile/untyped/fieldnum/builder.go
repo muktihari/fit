@@ -91,6 +91,10 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 			if field.Units != "" {
 				units = fmt.Sprintf(", Units: %s", field.Units)
 			}
+			var array string
+			if field.Array != "" {
+				array = fmt.Sprintf(", Array: %s", field.Array)
+			}
 
 			c := shared.Constant{
 				Name:   strutil.ToTitle(mesg.Name) + strutil.ToTitle(field.Name),
@@ -98,12 +102,14 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 				Op:     "=",
 				Value:  strconv.Itoa(int(field.Num)),
 				String: mesg.Name + ": " + field.Name,
-				Comment: fmt.Sprintf("[Type: %s, Base: %s%s%s]; %s",
+				Comment: fmt.Sprintf("[Type: %s, Base: %s%s%s%s]; %s",
 					strutil.ToTitle(field.Type),
 					b.baseTypeMapByProfileType[field.Type],
+					array,
 					scaleOffset,
 					units,
-					field.Comment),
+					field.Comment,
+				),
 			}
 			constants = append(constants, c)
 		}
