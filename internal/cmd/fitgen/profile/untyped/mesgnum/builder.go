@@ -54,12 +54,11 @@ func (b *mesgnumbuilder) Build() ([]builder.Data, error) {
 		}
 
 		data := shared.ConstantData{
-			Package:      "mesgnum",
-			SDKVersion:   b.sdkVersion,
-			Imports:      []string{"strconv"},
-			Type:         strutil.ToTitle(t.Name),
-			Base:         basetype.FromString(t.BaseType).GoType(),
-			StringerMode: shared.StringerMap,
+			Package:    "mesgnum",
+			SDKVersion: b.sdkVersion,
+			Imports:    []string{"strconv"},
+			Type:       strutil.ToTitle(t.Name),
+			Base:       basetype.FromString(t.BaseType).GoType(),
 		}
 
 		data.Constants = make([]shared.Constant, 0, len(t.Values))

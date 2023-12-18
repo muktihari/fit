@@ -10,14 +10,6 @@ import (
 	"text/template"
 )
 
-type StringerMode byte
-
-const (
-	StringerMap StringerMode = iota // default
-	StringerArray
-	NoStringer
-)
-
 func FuncMap() template.FuncMap {
 	return template.FuncMap{
 		"ToLower": strings.ToLower,
@@ -32,11 +24,11 @@ type ConstantData struct {
 	PackageDoc    string
 	Package       string
 	Imports       []string
-	StringerMode  StringerMode
 	AllowRegister bool
 	Type          string
 	Base          string
 	Constants     []Constant
+	Invalid       Constant
 }
 
 // Constant represent declared constants within proto.

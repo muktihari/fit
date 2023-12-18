@@ -78,6 +78,12 @@ func (f *Workout) ToFit(fac Factory) proto.Fit {
 	PutMessages(fac, &fit.Messages, mesgnum.DeveloperDataId, f.DeveloperDataIds)
 	PutMessages(fac, &fit.Messages, mesgnum.FieldDescription, f.FieldDescriptions)
 
+	if f.Workout != nil {
+		mesg := fac.CreateMesg(mesgnum.Workout)
+		f.FileId.PutMessage(&mesg)
+		fit.Messages = append(fit.Messages, mesg)
+	}
+
 	PutMessages(fac, &fit.Messages, mesgnum.WorkoutStep, f.WorkoutSteps)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)

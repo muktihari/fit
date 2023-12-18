@@ -16,7 +16,7 @@ import (
             {{ printf "%q" $v }}
         {{ end -}}
     {{ end -}}
-    {{ if .AllowRegister }}"fmt"{{ end }}
+	{{ if .AllowRegister }}"fmt"{{ end }}
 )
 
 type {{ .Type }} {{ .Base }}
@@ -25,34 +25,84 @@ const (
     {{ range .Constants -}}
     {{ .Name }} {{ .Type }} {{ .Op }} {{ .Value }} {{ if .Comment }} // {{ .Comment }} {{ end }}
     {{ end -}}
+    {{ .Invalid.Name }} {{ .Invalid.Type }} {{ .Invalid.Op }} {{ .Invalid.Value }}
 )
 
-{{ if eq .StringerMode 0x0 }} {{ template "stringer_map" . }} {{ else }} {{ template "stringer_array" . }} {{ end }}
+{{ if .AllowRegister }}
+var {{ .Type | ToLower }}ToString = map[{{ .Type }}]string{}
+var stringTo{{ .Type }} = map[string]{{ .Type }}{}
+{{ end }}
 
-var strto{{ .Type | ToLower }} = func() map[string]{{ .Type }} {
-	m := make(map[string]{{ .Type }})
-	for t, str := range {{ .Type | ToLower }}tostrs {
-		m[str] = {{ .Type }}(t)
+{{ $r := printf "%.1s" $.Type | ToLower }}
+{{ $vals := print $.Type "ToString" | ToLower }}
+func ({{ $r }} {{ $.Type }}) String() string {
+	switch {{ $r }} {
+	{{ range .Constants -}}
+		{{ if not (eq (printf "%.2s" .Name) "//") -}}
+		case {{ .Name }}:
+			return {{ printf "%q" .String }}
+		{{ end -}}
+	{{ end -}}
+	default:
+	{{ if .AllowRegister -}}
+		if val, ok := {{ .Type | ToLower }}ToString[{{ $r }}]; ok {
+			return val
+		}
+	{{ end -}}
+	return "{{ .Type }}Invalid(" + {{- if eq (sprintf "%.4s" .Base) "byte" -}}
+			strconv.Itoa(int({{ $r }}))
+		{{- else if eq (sprintf "%.3s" .Base) "int" -}}
+			strconv.FormatInt(int64({{ $r }}), 10)
+		{{- else if eq (sprintf "%.4s" .Base) "uint" -}}
+			strconv.FormatUint(uint64({{ $r }}), 10)
+		{{- else if eq (sprintf "%.7s" .Base) "float32" -}}
+			strconv.FormatFloat(float64({{ $r }}), 'f', -1, 32)
+		{{- else if eq (sprintf "%.7s" .Base) "float64" -}}
+			strconv.FormatFloat(float64({{ $r }}), 'f', -1, 64)
+		{{- else if eq .Base "string" -}}
+			string({{ $r }})
+	{{ end -}} + ")"
 	}
-	return m
-}()
+}
 
 // FromString parse string into {{ .Type }} constant it's represent, return {{ .Type }}Invalid if not found.
 func {{ .Type }}FromString(s string) {{ .Type }} {
-    val, ok := strto{{ .Type | ToLower }}[s]
-    if !ok {
-        return strto{{ .Type | ToLower }}["invalid"]
-    }
-    return val
+	switch s {
+	{{ range .Constants -}}
+	{{ if and (not (eq (printf "%.2s" .Name) "//")) (not (eq .String "invalid")) -}}
+		case {{ printf "%q" .String }}:
+			return {{ .Name }}
+		{{ end -}}
+	{{ end -}}
+	default:
+		{{ if .AllowRegister -}}
+		if val, ok := stringTo{{ .Type }}[s]; ok {
+			return val
+		}
+		{{ end -}}
+		return {{ .Invalid.Name }}
+	}
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func List{{ .Type }}() []{{ .Type }} {
-    vs := make([]{{ .Type }}, 0, len({{ .Type | ToLower }}tostrs))
-    for i := range {{ .Type | ToLower }}tostrs {
-        vs = append(vs, {{ .Type }}(i))
-    }
-    return vs
+	{{ if .AllowRegister -}}
+		list := []{{ .Type }} {
+			{{ range .Constants -}}
+				{{ .Name }},
+			{{ end -}}
+		}
+		for k := range {{ .Type | ToLower }}ToString {
+			list = append(list, k)
+		}
+		return list
+	{{ else -}}
+		return []{{ .Type }} {
+			{{ range .Constants -}}
+				{{ .Name }},
+			{{ end -}}
+		}
+	{{ end -}}
 }
 
 {{ if .AllowRegister }}
@@ -61,71 +111,7 @@ func List{{ .Type }}() []{{ .Type }} {
 
 {{ end }} // end of constant
 
-// Stringer Definitions:
-{{ define "stringer_array" }}
-var {{ $.Type | ToLower }}tostrs = [...]string{
-    {{ range .Constants -}}
-    {{ .Name -}}: {{ printf "%q" .String }},
-    {{ end -}}
-}
-
-{{ $r := printf "%.1s" $.Type | ToLower }}
-{{ $vals := print $.Type "tostrs" | ToLower }}
-func ({{ $r }} {{ $.Type }}) String() string {
-    {{- $lessThanZeroOp := print $r " < 0 || " -}}
-    {{ if eq (printf "%.1s" $.Base) "u" -}}
-    {{ $lessThanZeroOp = "" }}
-    {{ end -}}
-    if {{ $lessThanZeroOp }} {{ $r }} >= {{ $.Type }}(len({{ $vals }})) {
-        {{ if eq (sprintf "%.4s" .Base) "byte" -}}
-            return strconv.Itoa(int({{ $r }}))
-        {{ else if eq (sprintf "%.3s" .Base) "int" -}}
-            return strconv.FormatInt(int64({{ $r }}), 10)
-        {{ else if eq (sprintf "%.4s" .Base) "uint" -}}
-            return strconv.FormatUint(uint64({{ $r }}), 10)
-        {{ else if eq (sprintf "%.7s" .Base) "float32" -}}
-            return strconv.FormatFloat(float64({{ $r }}), 'f', -1, 32)
-        {{ else if eq (sprintf "%.7s" .Base) "float64" -}}
-            return strconv.FormatFloat(float64({{ $r }}), 'f', -1, 64)
-        {{ else if eq .Base "string" -}}
-            return string({{ $r }})
-        {{ end -}}
-    }
-    return {{ $vals }}[{{ $r }}]
-}
-{{ end }}
-
-{{ define "stringer_map" }}
-var {{ .Type | ToLower }}tostrs = map[{{ .Type }}]string{
-    {{ range .Constants -}}
-    {{ .Name -}}: {{ printf "%q" .String }},
-    {{ end -}}
-}
-
-{{ $r := printf "%.1s" .Type | ToLower }}
-{{ $vals := print $.Type "tostrs" | ToLower }}
-func ({{ $r }} {{ .Type }}) String() string {
-    val, ok := {{ $vals }}[{{ $r }}]
-    if !ok {
-        {{ if eq (sprintf "%.4s" .Base) "byte" -}}
-            return strconv.Itoa(int({{ $r }}))
-        {{ else if eq (sprintf "%.3s" .Base) "int" -}}
-            return strconv.FormatInt(int64({{ $r }}), 10)
-        {{ else if eq (sprintf "%.4s" .Base) "uint" -}}
-            return strconv.FormatUint(uint64({{ $r }}), 10)
-        {{ else if eq (sprintf "%.7s" .Base) "float32" -}}
-            return strconv.FormatFloat(float64({{ $r }}), 'f', -1, 32)
-        {{ else if eq (sprintf "%.7s" .Base) "float64" -}}
-            return strconv.FormatFloat(float64({{ $r }}), 'f', -1, 64)
-        {{ else if eq .Base "string" -}}
-            return string({{ $r }})
-        {{ end -}}
-    }
-    return val
-}
-{{ end }}
-
-// Registrer Manufacturer Specific Type:
+// Register Manufacturer Specific Type:
 {{ define "register" }}
 // {{ .Type }}Register registers a manufacturer specific {{ .Type }} so that the value can be recognized. 
 // It is recommended to define the constants somewhere else to track your own specifications.
@@ -136,18 +122,8 @@ func {{ .Type }}Register(v {{ .Type }}, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", {{ .Type}}Invalid)
 	}
 
-	{{ if eq .StringerMode 0x0 -}} 
-		if str, ok := {{ .Type | ToLower }}tostrs[v]; ok {
-			return fmt.Errorf("could not register to an existing {{ .Type }}: %d (%s)", v, str)
-		}
-	{{ else -}}
-		if str := {{ .Type | ToLower }}tostrs[v]; v != "" {
-			return fmt.Errorf("could not register to an existing {{ .Type }}: %d (%s)", v, str)
-		}
-	{{ end }}
-
-	{{ .Type | ToLower }}tostrs[v] = s
-	strto{{ .Type | ToLower }}[s] = v
+	{{ .Type | ToLower }}ToString[v] = s
+	stringTo{{ .Type }}[s] = v
 
 	return nil
 }

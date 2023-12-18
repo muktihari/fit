@@ -30,7 +30,7 @@ type Activity struct {
 	Events       []*mesgdef.Event
 	Lengths      []*mesgdef.Length
 	SegmentLap   []*mesgdef.SegmentLap
-	ZoneTargets  []*mesgdef.ZonesTarget
+	ZonesTargets []*mesgdef.ZonesTarget
 	Workouts     []*mesgdef.Workout
 	WorkoutSteps []*mesgdef.WorkoutStep
 	HRs          []*mesgdef.Hr
@@ -78,9 +78,11 @@ func (f *Activity) Add(mesg proto.Message) {
 	case mesgnum.SegmentLap:
 		f.SegmentLap = append(f.SegmentLap, mesgdef.NewSegmentLap(mesg))
 	case mesgnum.ZonesTarget:
-		f.ZoneTargets = append(f.ZoneTargets, mesgdef.NewZonesTarget(mesg))
+		f.ZonesTargets = append(f.ZonesTargets, mesgdef.NewZonesTarget(mesg))
 	case mesgnum.Workout:
 		f.Workouts = append(f.Workouts, mesgdef.NewWorkout(mesg))
+	case mesgnum.WorkoutStep:
+		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(mesg))
 	case mesgnum.Hr:
 		f.HRs = append(f.HRs, mesgdef.NewHr(mesg))
 	case mesgnum.Hrv:
@@ -102,7 +104,7 @@ func (f *Activity) ToFit(fac Factory) proto.Fit {
 	var size = 3 // non slice fields
 
 	size += len(f.Sessions) + len(f.Laps) + len(f.Records) + len(f.DeviceInfos) +
-		len(f.Events) + len(f.Lengths) + len(f.SegmentLap) + len(f.ZoneTargets) +
+		len(f.Events) + len(f.Lengths) + len(f.SegmentLap) + len(f.ZonesTargets) +
 		len(f.Workouts) + len(f.WorkoutSteps) + len(f.HRs) + len(f.HRVs) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
@@ -140,7 +142,7 @@ func (f *Activity) ToFit(fac Factory) proto.Fit {
 	PutMessages(fac, &fit.Messages, mesgnum.Event, f.Events)
 	PutMessages(fac, &fit.Messages, mesgnum.Length, f.Lengths)
 	PutMessages(fac, &fit.Messages, mesgnum.SegmentLap, f.SegmentLap)
-	PutMessages(fac, &fit.Messages, mesgnum.ZonesTarget, f.ZoneTargets)
+	PutMessages(fac, &fit.Messages, mesgnum.ZonesTarget, f.ZonesTargets)
 	PutMessages(fac, &fit.Messages, mesgnum.Workout, f.Workouts)
 	PutMessages(fac, &fit.Messages, mesgnum.WorkoutStep, f.WorkoutSteps)
 	PutMessages(fac, &fit.Messages, mesgnum.Hr, f.HRs)

@@ -6,6 +6,7 @@ package filedef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"golang.org/x/exp/slices"
@@ -42,7 +43,7 @@ type PutMessage interface {
 // SortMessagesByTimestamp sorts messages by timestamp only if the message has timestamp field.
 // When a message has no timestamp field, its order will not be changed.
 func SortMessagesByTimestamp(messages []proto.Message) {
-	slices.SortFunc(messages, func(m1, m2 proto.Message) int {
+	slices.SortStableFunc(messages, func(m1, m2 proto.Message) int {
 		value1 := m1.FieldValueByNum(proto.FieldNumTimestamp)
 		if value1 == nil {
 			return 0
@@ -56,11 +57,11 @@ func SortMessagesByTimestamp(messages []proto.Message) {
 		timestamp1 := typeconv.ToUint32[uint32](value1)
 		timestamp2 := typeconv.ToUint32[uint32](value2)
 
-		if timestamp1 == timestamp2 {
+		if timestamp1 == basetype.Uint32Invalid || timestamp2 == basetype.Uint32Invalid {
 			return 0
 		}
 
-		if timestamp1 < timestamp2 {
+		if timestamp1 <= timestamp2 {
 			return -1
 		}
 
