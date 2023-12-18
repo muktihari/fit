@@ -365,15 +365,48 @@ func main() {
 
 ### Encode Common File Types
 
-Please note that this feature is still under development and has not been fully tested yet.
+Example decoding FIT file into common file `Activity File`, edit the manufacturer and product, and then encode it again.
 
 ```go
     ...
+    /* Assume you retrive the activity file from decoding a Fit file. */
 
-    /* activity is a *filedef.Activity */
+    fin, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+
+    al := filedef.NewListener()
+    defer al.Close()
+
+    dec := decoder.New(bufio.NewReader(fin),
+        decoder.WithMesgListener(al),
+        decoder.WithBroadcastOnly(),
+    )
+
+    _, err = dec.Decode()
+    if err != nil {
+        panic(err)
+    }
+
+    activity := al.File().(*filedef.Activity)
+
+    /* Do something with the Activity File, for example changing manufacturer and product like this */
+    activity.FileId.Manufacturer = typedef.ManufacturerGarmin
+    activity.FileId.Product = uint16(typedef.GarminProductEdge530)
 
     // Convert back to RAW Protocol Messages
     fit := activity.ToFit(factory.StandardFactory())
+
+    fout, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+    if err != nil {
+        panic(err)
+    }
+
+    bw := bufferedwriter.New(fout)
+    defer bw.Flush()
+
+    // Encode FIT to file
     enc := encoder.New(bw)
     if err := enc.Encode(&fit); err != nil {
         panic(err)
