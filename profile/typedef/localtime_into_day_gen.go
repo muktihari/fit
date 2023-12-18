@@ -14,43 +14,25 @@ import (
 type LocaltimeIntoDay uint32
 
 const (
-	LocaltimeIntoDayInvalid LocaltimeIntoDay = 0xFFFFFFFF // INVALID
+	LocaltimeIntoDayInvalid LocaltimeIntoDay = 0xFFFFFFFF
 )
 
-var localtimeintodaytostrs = map[LocaltimeIntoDay]string{
-	LocaltimeIntoDayInvalid: "invalid",
-}
-
 func (l LocaltimeIntoDay) String() string {
-	val, ok := localtimeintodaytostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	default:
+		return "LocaltimeIntoDayInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolocaltimeintoday = func() map[string]LocaltimeIntoDay {
-	m := make(map[string]LocaltimeIntoDay)
-	for t, str := range localtimeintodaytostrs {
-		m[str] = LocaltimeIntoDay(t)
-	}
-	return m
-}()
 
 // FromString parse string into LocaltimeIntoDay constant it's represent, return LocaltimeIntoDayInvalid if not found.
 func LocaltimeIntoDayFromString(s string) LocaltimeIntoDay {
-	val, ok := strtolocaltimeintoday[s]
-	if !ok {
-		return strtolocaltimeintoday["invalid"]
+	switch s {
+	default:
+		return LocaltimeIntoDayInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLocaltimeIntoDay() []LocaltimeIntoDay {
-	vs := make([]LocaltimeIntoDay, 0, len(localtimeintodaytostrs))
-	for i := range localtimeintodaytostrs {
-		vs = append(vs, LocaltimeIntoDay(i))
-	}
-	return vs
+	return []LocaltimeIntoDay{}
 }

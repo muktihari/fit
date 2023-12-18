@@ -99,128 +99,451 @@ const (
 	WeatherSevereTypeLowWater                WeatherSevereType = 82
 	WeatherSevereTypeHydrological            WeatherSevereType = 83
 	WeatherSevereTypeSpecialWeather          WeatherSevereType = 84
-	WeatherSevereTypeInvalid                 WeatherSevereType = 0xFF // INVALID
+	WeatherSevereTypeInvalid                 WeatherSevereType = 0xFF
 )
 
-var weatherseveretypetostrs = map[WeatherSevereType]string{
-	WeatherSevereTypeUnspecified:             "unspecified",
-	WeatherSevereTypeTornado:                 "tornado",
-	WeatherSevereTypeTsunami:                 "tsunami",
-	WeatherSevereTypeHurricane:               "hurricane",
-	WeatherSevereTypeExtremeWind:             "extreme_wind",
-	WeatherSevereTypeTyphoon:                 "typhoon",
-	WeatherSevereTypeInlandHurricane:         "inland_hurricane",
-	WeatherSevereTypeHurricaneForceWind:      "hurricane_force_wind",
-	WeatherSevereTypeWaterspout:              "waterspout",
-	WeatherSevereTypeSevereThunderstorm:      "severe_thunderstorm",
-	WeatherSevereTypeWreckhouseWinds:         "wreckhouse_winds",
-	WeatherSevereTypeLesSuetesWind:           "les_suetes_wind",
-	WeatherSevereTypeAvalanche:               "avalanche",
-	WeatherSevereTypeFlashFlood:              "flash_flood",
-	WeatherSevereTypeTropicalStorm:           "tropical_storm",
-	WeatherSevereTypeInlandTropicalStorm:     "inland_tropical_storm",
-	WeatherSevereTypeBlizzard:                "blizzard",
-	WeatherSevereTypeIceStorm:                "ice_storm",
-	WeatherSevereTypeFreezingRain:            "freezing_rain",
-	WeatherSevereTypeDebrisFlow:              "debris_flow",
-	WeatherSevereTypeFlashFreeze:             "flash_freeze",
-	WeatherSevereTypeDustStorm:               "dust_storm",
-	WeatherSevereTypeHighWind:                "high_wind",
-	WeatherSevereTypeWinterStorm:             "winter_storm",
-	WeatherSevereTypeHeavyFreezingSpray:      "heavy_freezing_spray",
-	WeatherSevereTypeExtremeCold:             "extreme_cold",
-	WeatherSevereTypeWindChill:               "wind_chill",
-	WeatherSevereTypeColdWave:                "cold_wave",
-	WeatherSevereTypeHeavySnowAlert:          "heavy_snow_alert",
-	WeatherSevereTypeLakeEffectBlowingSnow:   "lake_effect_blowing_snow",
-	WeatherSevereTypeSnowSquall:              "snow_squall",
-	WeatherSevereTypeLakeEffectSnow:          "lake_effect_snow",
-	WeatherSevereTypeWinterWeather:           "winter_weather",
-	WeatherSevereTypeSleet:                   "sleet",
-	WeatherSevereTypeSnowfall:                "snowfall",
-	WeatherSevereTypeSnowAndBlowingSnow:      "snow_and_blowing_snow",
-	WeatherSevereTypeBlowingSnow:             "blowing_snow",
-	WeatherSevereTypeSnowAlert:               "snow_alert",
-	WeatherSevereTypeArcticOutflow:           "arctic_outflow",
-	WeatherSevereTypeFreezingDrizzle:         "freezing_drizzle",
-	WeatherSevereTypeStorm:                   "storm",
-	WeatherSevereTypeStormSurge:              "storm_surge",
-	WeatherSevereTypeRainfall:                "rainfall",
-	WeatherSevereTypeArealFlood:              "areal_flood",
-	WeatherSevereTypeCoastalFlood:            "coastal_flood",
-	WeatherSevereTypeLakeshoreFlood:          "lakeshore_flood",
-	WeatherSevereTypeExcessiveHeat:           "excessive_heat",
-	WeatherSevereTypeHeat:                    "heat",
-	WeatherSevereTypeWeather:                 "weather",
-	WeatherSevereTypeHighHeatAndHumidity:     "high_heat_and_humidity",
-	WeatherSevereTypeHumidexAndHealth:        "humidex_and_health",
-	WeatherSevereTypeHumidex:                 "humidex",
-	WeatherSevereTypeGale:                    "gale",
-	WeatherSevereTypeFreezingSpray:           "freezing_spray",
-	WeatherSevereTypeSpecialMarine:           "special_marine",
-	WeatherSevereTypeSquall:                  "squall",
-	WeatherSevereTypeStrongWind:              "strong_wind",
-	WeatherSevereTypeLakeWind:                "lake_wind",
-	WeatherSevereTypeMarineWeather:           "marine_weather",
-	WeatherSevereTypeWind:                    "wind",
-	WeatherSevereTypeSmallCraftHazardousSeas: "small_craft_hazardous_seas",
-	WeatherSevereTypeHazardousSeas:           "hazardous_seas",
-	WeatherSevereTypeSmallCraft:              "small_craft",
-	WeatherSevereTypeSmallCraftWinds:         "small_craft_winds",
-	WeatherSevereTypeSmallCraftRoughBar:      "small_craft_rough_bar",
-	WeatherSevereTypeHighWaterLevel:          "high_water_level",
-	WeatherSevereTypeAshfall:                 "ashfall",
-	WeatherSevereTypeFreezingFog:             "freezing_fog",
-	WeatherSevereTypeDenseFog:                "dense_fog",
-	WeatherSevereTypeDenseSmoke:              "dense_smoke",
-	WeatherSevereTypeBlowingDust:             "blowing_dust",
-	WeatherSevereTypeHardFreeze:              "hard_freeze",
-	WeatherSevereTypeFreeze:                  "freeze",
-	WeatherSevereTypeFrost:                   "frost",
-	WeatherSevereTypeFireWeather:             "fire_weather",
-	WeatherSevereTypeFlood:                   "flood",
-	WeatherSevereTypeRipTide:                 "rip_tide",
-	WeatherSevereTypeHighSurf:                "high_surf",
-	WeatherSevereTypeSmog:                    "smog",
-	WeatherSevereTypeAirQuality:              "air_quality",
-	WeatherSevereTypeBriskWind:               "brisk_wind",
-	WeatherSevereTypeAirStagnation:           "air_stagnation",
-	WeatherSevereTypeLowWater:                "low_water",
-	WeatherSevereTypeHydrological:            "hydrological",
-	WeatherSevereTypeSpecialWeather:          "special_weather",
-	WeatherSevereTypeInvalid:                 "invalid",
-}
-
 func (w WeatherSevereType) String() string {
-	val, ok := weatherseveretypetostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WeatherSevereTypeUnspecified:
+		return "unspecified"
+	case WeatherSevereTypeTornado:
+		return "tornado"
+	case WeatherSevereTypeTsunami:
+		return "tsunami"
+	case WeatherSevereTypeHurricane:
+		return "hurricane"
+	case WeatherSevereTypeExtremeWind:
+		return "extreme_wind"
+	case WeatherSevereTypeTyphoon:
+		return "typhoon"
+	case WeatherSevereTypeInlandHurricane:
+		return "inland_hurricane"
+	case WeatherSevereTypeHurricaneForceWind:
+		return "hurricane_force_wind"
+	case WeatherSevereTypeWaterspout:
+		return "waterspout"
+	case WeatherSevereTypeSevereThunderstorm:
+		return "severe_thunderstorm"
+	case WeatherSevereTypeWreckhouseWinds:
+		return "wreckhouse_winds"
+	case WeatherSevereTypeLesSuetesWind:
+		return "les_suetes_wind"
+	case WeatherSevereTypeAvalanche:
+		return "avalanche"
+	case WeatherSevereTypeFlashFlood:
+		return "flash_flood"
+	case WeatherSevereTypeTropicalStorm:
+		return "tropical_storm"
+	case WeatherSevereTypeInlandTropicalStorm:
+		return "inland_tropical_storm"
+	case WeatherSevereTypeBlizzard:
+		return "blizzard"
+	case WeatherSevereTypeIceStorm:
+		return "ice_storm"
+	case WeatherSevereTypeFreezingRain:
+		return "freezing_rain"
+	case WeatherSevereTypeDebrisFlow:
+		return "debris_flow"
+	case WeatherSevereTypeFlashFreeze:
+		return "flash_freeze"
+	case WeatherSevereTypeDustStorm:
+		return "dust_storm"
+	case WeatherSevereTypeHighWind:
+		return "high_wind"
+	case WeatherSevereTypeWinterStorm:
+		return "winter_storm"
+	case WeatherSevereTypeHeavyFreezingSpray:
+		return "heavy_freezing_spray"
+	case WeatherSevereTypeExtremeCold:
+		return "extreme_cold"
+	case WeatherSevereTypeWindChill:
+		return "wind_chill"
+	case WeatherSevereTypeColdWave:
+		return "cold_wave"
+	case WeatherSevereTypeHeavySnowAlert:
+		return "heavy_snow_alert"
+	case WeatherSevereTypeLakeEffectBlowingSnow:
+		return "lake_effect_blowing_snow"
+	case WeatherSevereTypeSnowSquall:
+		return "snow_squall"
+	case WeatherSevereTypeLakeEffectSnow:
+		return "lake_effect_snow"
+	case WeatherSevereTypeWinterWeather:
+		return "winter_weather"
+	case WeatherSevereTypeSleet:
+		return "sleet"
+	case WeatherSevereTypeSnowfall:
+		return "snowfall"
+	case WeatherSevereTypeSnowAndBlowingSnow:
+		return "snow_and_blowing_snow"
+	case WeatherSevereTypeBlowingSnow:
+		return "blowing_snow"
+	case WeatherSevereTypeSnowAlert:
+		return "snow_alert"
+	case WeatherSevereTypeArcticOutflow:
+		return "arctic_outflow"
+	case WeatherSevereTypeFreezingDrizzle:
+		return "freezing_drizzle"
+	case WeatherSevereTypeStorm:
+		return "storm"
+	case WeatherSevereTypeStormSurge:
+		return "storm_surge"
+	case WeatherSevereTypeRainfall:
+		return "rainfall"
+	case WeatherSevereTypeArealFlood:
+		return "areal_flood"
+	case WeatherSevereTypeCoastalFlood:
+		return "coastal_flood"
+	case WeatherSevereTypeLakeshoreFlood:
+		return "lakeshore_flood"
+	case WeatherSevereTypeExcessiveHeat:
+		return "excessive_heat"
+	case WeatherSevereTypeHeat:
+		return "heat"
+	case WeatherSevereTypeWeather:
+		return "weather"
+	case WeatherSevereTypeHighHeatAndHumidity:
+		return "high_heat_and_humidity"
+	case WeatherSevereTypeHumidexAndHealth:
+		return "humidex_and_health"
+	case WeatherSevereTypeHumidex:
+		return "humidex"
+	case WeatherSevereTypeGale:
+		return "gale"
+	case WeatherSevereTypeFreezingSpray:
+		return "freezing_spray"
+	case WeatherSevereTypeSpecialMarine:
+		return "special_marine"
+	case WeatherSevereTypeSquall:
+		return "squall"
+	case WeatherSevereTypeStrongWind:
+		return "strong_wind"
+	case WeatherSevereTypeLakeWind:
+		return "lake_wind"
+	case WeatherSevereTypeMarineWeather:
+		return "marine_weather"
+	case WeatherSevereTypeWind:
+		return "wind"
+	case WeatherSevereTypeSmallCraftHazardousSeas:
+		return "small_craft_hazardous_seas"
+	case WeatherSevereTypeHazardousSeas:
+		return "hazardous_seas"
+	case WeatherSevereTypeSmallCraft:
+		return "small_craft"
+	case WeatherSevereTypeSmallCraftWinds:
+		return "small_craft_winds"
+	case WeatherSevereTypeSmallCraftRoughBar:
+		return "small_craft_rough_bar"
+	case WeatherSevereTypeHighWaterLevel:
+		return "high_water_level"
+	case WeatherSevereTypeAshfall:
+		return "ashfall"
+	case WeatherSevereTypeFreezingFog:
+		return "freezing_fog"
+	case WeatherSevereTypeDenseFog:
+		return "dense_fog"
+	case WeatherSevereTypeDenseSmoke:
+		return "dense_smoke"
+	case WeatherSevereTypeBlowingDust:
+		return "blowing_dust"
+	case WeatherSevereTypeHardFreeze:
+		return "hard_freeze"
+	case WeatherSevereTypeFreeze:
+		return "freeze"
+	case WeatherSevereTypeFrost:
+		return "frost"
+	case WeatherSevereTypeFireWeather:
+		return "fire_weather"
+	case WeatherSevereTypeFlood:
+		return "flood"
+	case WeatherSevereTypeRipTide:
+		return "rip_tide"
+	case WeatherSevereTypeHighSurf:
+		return "high_surf"
+	case WeatherSevereTypeSmog:
+		return "smog"
+	case WeatherSevereTypeAirQuality:
+		return "air_quality"
+	case WeatherSevereTypeBriskWind:
+		return "brisk_wind"
+	case WeatherSevereTypeAirStagnation:
+		return "air_stagnation"
+	case WeatherSevereTypeLowWater:
+		return "low_water"
+	case WeatherSevereTypeHydrological:
+		return "hydrological"
+	case WeatherSevereTypeSpecialWeather:
+		return "special_weather"
+	default:
+		return "WeatherSevereTypeInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtoweatherseveretype = func() map[string]WeatherSevereType {
-	m := make(map[string]WeatherSevereType)
-	for t, str := range weatherseveretypetostrs {
-		m[str] = WeatherSevereType(t)
-	}
-	return m
-}()
 
 // FromString parse string into WeatherSevereType constant it's represent, return WeatherSevereTypeInvalid if not found.
 func WeatherSevereTypeFromString(s string) WeatherSevereType {
-	val, ok := strtoweatherseveretype[s]
-	if !ok {
-		return strtoweatherseveretype["invalid"]
+	switch s {
+	case "unspecified":
+		return WeatherSevereTypeUnspecified
+	case "tornado":
+		return WeatherSevereTypeTornado
+	case "tsunami":
+		return WeatherSevereTypeTsunami
+	case "hurricane":
+		return WeatherSevereTypeHurricane
+	case "extreme_wind":
+		return WeatherSevereTypeExtremeWind
+	case "typhoon":
+		return WeatherSevereTypeTyphoon
+	case "inland_hurricane":
+		return WeatherSevereTypeInlandHurricane
+	case "hurricane_force_wind":
+		return WeatherSevereTypeHurricaneForceWind
+	case "waterspout":
+		return WeatherSevereTypeWaterspout
+	case "severe_thunderstorm":
+		return WeatherSevereTypeSevereThunderstorm
+	case "wreckhouse_winds":
+		return WeatherSevereTypeWreckhouseWinds
+	case "les_suetes_wind":
+		return WeatherSevereTypeLesSuetesWind
+	case "avalanche":
+		return WeatherSevereTypeAvalanche
+	case "flash_flood":
+		return WeatherSevereTypeFlashFlood
+	case "tropical_storm":
+		return WeatherSevereTypeTropicalStorm
+	case "inland_tropical_storm":
+		return WeatherSevereTypeInlandTropicalStorm
+	case "blizzard":
+		return WeatherSevereTypeBlizzard
+	case "ice_storm":
+		return WeatherSevereTypeIceStorm
+	case "freezing_rain":
+		return WeatherSevereTypeFreezingRain
+	case "debris_flow":
+		return WeatherSevereTypeDebrisFlow
+	case "flash_freeze":
+		return WeatherSevereTypeFlashFreeze
+	case "dust_storm":
+		return WeatherSevereTypeDustStorm
+	case "high_wind":
+		return WeatherSevereTypeHighWind
+	case "winter_storm":
+		return WeatherSevereTypeWinterStorm
+	case "heavy_freezing_spray":
+		return WeatherSevereTypeHeavyFreezingSpray
+	case "extreme_cold":
+		return WeatherSevereTypeExtremeCold
+	case "wind_chill":
+		return WeatherSevereTypeWindChill
+	case "cold_wave":
+		return WeatherSevereTypeColdWave
+	case "heavy_snow_alert":
+		return WeatherSevereTypeHeavySnowAlert
+	case "lake_effect_blowing_snow":
+		return WeatherSevereTypeLakeEffectBlowingSnow
+	case "snow_squall":
+		return WeatherSevereTypeSnowSquall
+	case "lake_effect_snow":
+		return WeatherSevereTypeLakeEffectSnow
+	case "winter_weather":
+		return WeatherSevereTypeWinterWeather
+	case "sleet":
+		return WeatherSevereTypeSleet
+	case "snowfall":
+		return WeatherSevereTypeSnowfall
+	case "snow_and_blowing_snow":
+		return WeatherSevereTypeSnowAndBlowingSnow
+	case "blowing_snow":
+		return WeatherSevereTypeBlowingSnow
+	case "snow_alert":
+		return WeatherSevereTypeSnowAlert
+	case "arctic_outflow":
+		return WeatherSevereTypeArcticOutflow
+	case "freezing_drizzle":
+		return WeatherSevereTypeFreezingDrizzle
+	case "storm":
+		return WeatherSevereTypeStorm
+	case "storm_surge":
+		return WeatherSevereTypeStormSurge
+	case "rainfall":
+		return WeatherSevereTypeRainfall
+	case "areal_flood":
+		return WeatherSevereTypeArealFlood
+	case "coastal_flood":
+		return WeatherSevereTypeCoastalFlood
+	case "lakeshore_flood":
+		return WeatherSevereTypeLakeshoreFlood
+	case "excessive_heat":
+		return WeatherSevereTypeExcessiveHeat
+	case "heat":
+		return WeatherSevereTypeHeat
+	case "weather":
+		return WeatherSevereTypeWeather
+	case "high_heat_and_humidity":
+		return WeatherSevereTypeHighHeatAndHumidity
+	case "humidex_and_health":
+		return WeatherSevereTypeHumidexAndHealth
+	case "humidex":
+		return WeatherSevereTypeHumidex
+	case "gale":
+		return WeatherSevereTypeGale
+	case "freezing_spray":
+		return WeatherSevereTypeFreezingSpray
+	case "special_marine":
+		return WeatherSevereTypeSpecialMarine
+	case "squall":
+		return WeatherSevereTypeSquall
+	case "strong_wind":
+		return WeatherSevereTypeStrongWind
+	case "lake_wind":
+		return WeatherSevereTypeLakeWind
+	case "marine_weather":
+		return WeatherSevereTypeMarineWeather
+	case "wind":
+		return WeatherSevereTypeWind
+	case "small_craft_hazardous_seas":
+		return WeatherSevereTypeSmallCraftHazardousSeas
+	case "hazardous_seas":
+		return WeatherSevereTypeHazardousSeas
+	case "small_craft":
+		return WeatherSevereTypeSmallCraft
+	case "small_craft_winds":
+		return WeatherSevereTypeSmallCraftWinds
+	case "small_craft_rough_bar":
+		return WeatherSevereTypeSmallCraftRoughBar
+	case "high_water_level":
+		return WeatherSevereTypeHighWaterLevel
+	case "ashfall":
+		return WeatherSevereTypeAshfall
+	case "freezing_fog":
+		return WeatherSevereTypeFreezingFog
+	case "dense_fog":
+		return WeatherSevereTypeDenseFog
+	case "dense_smoke":
+		return WeatherSevereTypeDenseSmoke
+	case "blowing_dust":
+		return WeatherSevereTypeBlowingDust
+	case "hard_freeze":
+		return WeatherSevereTypeHardFreeze
+	case "freeze":
+		return WeatherSevereTypeFreeze
+	case "frost":
+		return WeatherSevereTypeFrost
+	case "fire_weather":
+		return WeatherSevereTypeFireWeather
+	case "flood":
+		return WeatherSevereTypeFlood
+	case "rip_tide":
+		return WeatherSevereTypeRipTide
+	case "high_surf":
+		return WeatherSevereTypeHighSurf
+	case "smog":
+		return WeatherSevereTypeSmog
+	case "air_quality":
+		return WeatherSevereTypeAirQuality
+	case "brisk_wind":
+		return WeatherSevereTypeBriskWind
+	case "air_stagnation":
+		return WeatherSevereTypeAirStagnation
+	case "low_water":
+		return WeatherSevereTypeLowWater
+	case "hydrological":
+		return WeatherSevereTypeHydrological
+	case "special_weather":
+		return WeatherSevereTypeSpecialWeather
+	default:
+		return WeatherSevereTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWeatherSevereType() []WeatherSevereType {
-	vs := make([]WeatherSevereType, 0, len(weatherseveretypetostrs))
-	for i := range weatherseveretypetostrs {
-		vs = append(vs, WeatherSevereType(i))
+	return []WeatherSevereType{
+		WeatherSevereTypeUnspecified,
+		WeatherSevereTypeTornado,
+		WeatherSevereTypeTsunami,
+		WeatherSevereTypeHurricane,
+		WeatherSevereTypeExtremeWind,
+		WeatherSevereTypeTyphoon,
+		WeatherSevereTypeInlandHurricane,
+		WeatherSevereTypeHurricaneForceWind,
+		WeatherSevereTypeWaterspout,
+		WeatherSevereTypeSevereThunderstorm,
+		WeatherSevereTypeWreckhouseWinds,
+		WeatherSevereTypeLesSuetesWind,
+		WeatherSevereTypeAvalanche,
+		WeatherSevereTypeFlashFlood,
+		WeatherSevereTypeTropicalStorm,
+		WeatherSevereTypeInlandTropicalStorm,
+		WeatherSevereTypeBlizzard,
+		WeatherSevereTypeIceStorm,
+		WeatherSevereTypeFreezingRain,
+		WeatherSevereTypeDebrisFlow,
+		WeatherSevereTypeFlashFreeze,
+		WeatherSevereTypeDustStorm,
+		WeatherSevereTypeHighWind,
+		WeatherSevereTypeWinterStorm,
+		WeatherSevereTypeHeavyFreezingSpray,
+		WeatherSevereTypeExtremeCold,
+		WeatherSevereTypeWindChill,
+		WeatherSevereTypeColdWave,
+		WeatherSevereTypeHeavySnowAlert,
+		WeatherSevereTypeLakeEffectBlowingSnow,
+		WeatherSevereTypeSnowSquall,
+		WeatherSevereTypeLakeEffectSnow,
+		WeatherSevereTypeWinterWeather,
+		WeatherSevereTypeSleet,
+		WeatherSevereTypeSnowfall,
+		WeatherSevereTypeSnowAndBlowingSnow,
+		WeatherSevereTypeBlowingSnow,
+		WeatherSevereTypeSnowAlert,
+		WeatherSevereTypeArcticOutflow,
+		WeatherSevereTypeFreezingDrizzle,
+		WeatherSevereTypeStorm,
+		WeatherSevereTypeStormSurge,
+		WeatherSevereTypeRainfall,
+		WeatherSevereTypeArealFlood,
+		WeatherSevereTypeCoastalFlood,
+		WeatherSevereTypeLakeshoreFlood,
+		WeatherSevereTypeExcessiveHeat,
+		WeatherSevereTypeHeat,
+		WeatherSevereTypeWeather,
+		WeatherSevereTypeHighHeatAndHumidity,
+		WeatherSevereTypeHumidexAndHealth,
+		WeatherSevereTypeHumidex,
+		WeatherSevereTypeGale,
+		WeatherSevereTypeFreezingSpray,
+		WeatherSevereTypeSpecialMarine,
+		WeatherSevereTypeSquall,
+		WeatherSevereTypeStrongWind,
+		WeatherSevereTypeLakeWind,
+		WeatherSevereTypeMarineWeather,
+		WeatherSevereTypeWind,
+		WeatherSevereTypeSmallCraftHazardousSeas,
+		WeatherSevereTypeHazardousSeas,
+		WeatherSevereTypeSmallCraft,
+		WeatherSevereTypeSmallCraftWinds,
+		WeatherSevereTypeSmallCraftRoughBar,
+		WeatherSevereTypeHighWaterLevel,
+		WeatherSevereTypeAshfall,
+		WeatherSevereTypeFreezingFog,
+		WeatherSevereTypeDenseFog,
+		WeatherSevereTypeDenseSmoke,
+		WeatherSevereTypeBlowingDust,
+		WeatherSevereTypeHardFreeze,
+		WeatherSevereTypeFreeze,
+		WeatherSevereTypeFrost,
+		WeatherSevereTypeFireWeather,
+		WeatherSevereTypeFlood,
+		WeatherSevereTypeRipTide,
+		WeatherSevereTypeHighSurf,
+		WeatherSevereTypeSmog,
+		WeatherSevereTypeAirQuality,
+		WeatherSevereTypeBriskWind,
+		WeatherSevereTypeAirStagnation,
+		WeatherSevereTypeLowWater,
+		WeatherSevereTypeHydrological,
+		WeatherSevereTypeSpecialWeather,
 	}
-	return vs
 }

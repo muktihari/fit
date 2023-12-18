@@ -28,57 +28,96 @@ const (
 	WktStepTargetSwimStroke   WktStepTarget = 11
 	WktStepTargetSpeedLap     WktStepTarget = 12
 	WktStepTargetHeartRateLap WktStepTarget = 13
-	WktStepTargetInvalid      WktStepTarget = 0xFF // INVALID
+	WktStepTargetInvalid      WktStepTarget = 0xFF
 )
 
-var wktsteptargettostrs = map[WktStepTarget]string{
-	WktStepTargetSpeed:        "speed",
-	WktStepTargetHeartRate:    "heart_rate",
-	WktStepTargetOpen:         "open",
-	WktStepTargetCadence:      "cadence",
-	WktStepTargetPower:        "power",
-	WktStepTargetGrade:        "grade",
-	WktStepTargetResistance:   "resistance",
-	WktStepTargetPower3S:      "power_3s",
-	WktStepTargetPower10S:     "power_10s",
-	WktStepTargetPower30S:     "power_30s",
-	WktStepTargetPowerLap:     "power_lap",
-	WktStepTargetSwimStroke:   "swim_stroke",
-	WktStepTargetSpeedLap:     "speed_lap",
-	WktStepTargetHeartRateLap: "heart_rate_lap",
-	WktStepTargetInvalid:      "invalid",
-}
-
 func (w WktStepTarget) String() string {
-	val, ok := wktsteptargettostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WktStepTargetSpeed:
+		return "speed"
+	case WktStepTargetHeartRate:
+		return "heart_rate"
+	case WktStepTargetOpen:
+		return "open"
+	case WktStepTargetCadence:
+		return "cadence"
+	case WktStepTargetPower:
+		return "power"
+	case WktStepTargetGrade:
+		return "grade"
+	case WktStepTargetResistance:
+		return "resistance"
+	case WktStepTargetPower3S:
+		return "power_3s"
+	case WktStepTargetPower10S:
+		return "power_10s"
+	case WktStepTargetPower30S:
+		return "power_30s"
+	case WktStepTargetPowerLap:
+		return "power_lap"
+	case WktStepTargetSwimStroke:
+		return "swim_stroke"
+	case WktStepTargetSpeedLap:
+		return "speed_lap"
+	case WktStepTargetHeartRateLap:
+		return "heart_rate_lap"
+	default:
+		return "WktStepTargetInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtowktsteptarget = func() map[string]WktStepTarget {
-	m := make(map[string]WktStepTarget)
-	for t, str := range wktsteptargettostrs {
-		m[str] = WktStepTarget(t)
-	}
-	return m
-}()
 
 // FromString parse string into WktStepTarget constant it's represent, return WktStepTargetInvalid if not found.
 func WktStepTargetFromString(s string) WktStepTarget {
-	val, ok := strtowktsteptarget[s]
-	if !ok {
-		return strtowktsteptarget["invalid"]
+	switch s {
+	case "speed":
+		return WktStepTargetSpeed
+	case "heart_rate":
+		return WktStepTargetHeartRate
+	case "open":
+		return WktStepTargetOpen
+	case "cadence":
+		return WktStepTargetCadence
+	case "power":
+		return WktStepTargetPower
+	case "grade":
+		return WktStepTargetGrade
+	case "resistance":
+		return WktStepTargetResistance
+	case "power_3s":
+		return WktStepTargetPower3S
+	case "power_10s":
+		return WktStepTargetPower10S
+	case "power_30s":
+		return WktStepTargetPower30S
+	case "power_lap":
+		return WktStepTargetPowerLap
+	case "swim_stroke":
+		return WktStepTargetSwimStroke
+	case "speed_lap":
+		return WktStepTargetSpeedLap
+	case "heart_rate_lap":
+		return WktStepTargetHeartRateLap
+	default:
+		return WktStepTargetInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWktStepTarget() []WktStepTarget {
-	vs := make([]WktStepTarget, 0, len(wktsteptargettostrs))
-	for i := range wktsteptargettostrs {
-		vs = append(vs, WktStepTarget(i))
+	return []WktStepTarget{
+		WktStepTargetSpeed,
+		WktStepTargetHeartRate,
+		WktStepTargetOpen,
+		WktStepTargetCadence,
+		WktStepTargetPower,
+		WktStepTargetGrade,
+		WktStepTargetResistance,
+		WktStepTargetPower3S,
+		WktStepTargetPower10S,
+		WktStepTargetPower30S,
+		WktStepTargetPowerLap,
+		WktStepTargetSwimStroke,
+		WktStepTargetSpeedLap,
+		WktStepTargetHeartRateLap,
 	}
-	return vs
 }

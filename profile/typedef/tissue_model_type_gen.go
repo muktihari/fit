@@ -14,45 +14,32 @@ import (
 type TissueModelType byte
 
 const (
-	TissueModelTypeZhl16C  TissueModelType = 0    // Buhlmann's decompression algorithm, version C
-	TissueModelTypeInvalid TissueModelType = 0xFF // INVALID
+	TissueModelTypeZhl16C  TissueModelType = 0 // Buhlmann's decompression algorithm, version C
+	TissueModelTypeInvalid TissueModelType = 0xFF
 )
 
-var tissuemodeltypetostrs = map[TissueModelType]string{
-	TissueModelTypeZhl16C:  "zhl_16c",
-	TissueModelTypeInvalid: "invalid",
-}
-
 func (t TissueModelType) String() string {
-	val, ok := tissuemodeltypetostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TissueModelTypeZhl16C:
+		return "zhl_16c"
+	default:
+		return "TissueModelTypeInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotissuemodeltype = func() map[string]TissueModelType {
-	m := make(map[string]TissueModelType)
-	for t, str := range tissuemodeltypetostrs {
-		m[str] = TissueModelType(t)
-	}
-	return m
-}()
 
 // FromString parse string into TissueModelType constant it's represent, return TissueModelTypeInvalid if not found.
 func TissueModelTypeFromString(s string) TissueModelType {
-	val, ok := strtotissuemodeltype[s]
-	if !ok {
-		return strtotissuemodeltype["invalid"]
+	switch s {
+	case "zhl_16c":
+		return TissueModelTypeZhl16C
+	default:
+		return TissueModelTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTissueModelType() []TissueModelType {
-	vs := make([]TissueModelType, 0, len(tissuemodeltypetostrs))
-	for i := range tissuemodeltypetostrs {
-		vs = append(vs, TissueModelType(i))
+	return []TissueModelType{
+		TissueModelTypeZhl16C,
 	}
-	return vs
 }

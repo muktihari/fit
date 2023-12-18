@@ -16,45 +16,36 @@ type DateMode byte
 const (
 	DateModeDayMonth DateMode = 0
 	DateModeMonthDay DateMode = 1
-	DateModeInvalid  DateMode = 0xFF // INVALID
+	DateModeInvalid  DateMode = 0xFF
 )
 
-var datemodetostrs = map[DateMode]string{
-	DateModeDayMonth: "day_month",
-	DateModeMonthDay: "month_day",
-	DateModeInvalid:  "invalid",
-}
-
 func (d DateMode) String() string {
-	val, ok := datemodetostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DateModeDayMonth:
+		return "day_month"
+	case DateModeMonthDay:
+		return "month_day"
+	default:
+		return "DateModeInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodatemode = func() map[string]DateMode {
-	m := make(map[string]DateMode)
-	for t, str := range datemodetostrs {
-		m[str] = DateMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into DateMode constant it's represent, return DateModeInvalid if not found.
 func DateModeFromString(s string) DateMode {
-	val, ok := strtodatemode[s]
-	if !ok {
-		return strtodatemode["invalid"]
+	switch s {
+	case "day_month":
+		return DateModeDayMonth
+	case "month_day":
+		return DateModeMonthDay
+	default:
+		return DateModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDateMode() []DateMode {
-	vs := make([]DateMode, 0, len(datemodetostrs))
-	for i := range datemodetostrs {
-		vs = append(vs, DateMode(i))
+	return []DateMode{
+		DateModeDayMonth,
+		DateModeMonthDay,
 	}
-	return vs
 }

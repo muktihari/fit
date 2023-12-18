@@ -16,45 +16,36 @@ type HrType byte
 const (
 	HrTypeNormal    HrType = 0
 	HrTypeIrregular HrType = 1
-	HrTypeInvalid   HrType = 0xFF // INVALID
+	HrTypeInvalid   HrType = 0xFF
 )
 
-var hrtypetostrs = map[HrType]string{
-	HrTypeNormal:    "normal",
-	HrTypeIrregular: "irregular",
-	HrTypeInvalid:   "invalid",
-}
-
 func (h HrType) String() string {
-	val, ok := hrtypetostrs[h]
-	if !ok {
-		return strconv.Itoa(int(h))
+	switch h {
+	case HrTypeNormal:
+		return "normal"
+	case HrTypeIrregular:
+		return "irregular"
+	default:
+		return "HrTypeInvalid(" + strconv.Itoa(int(h)) + ")"
 	}
-	return val
 }
-
-var strtohrtype = func() map[string]HrType {
-	m := make(map[string]HrType)
-	for t, str := range hrtypetostrs {
-		m[str] = HrType(t)
-	}
-	return m
-}()
 
 // FromString parse string into HrType constant it's represent, return HrTypeInvalid if not found.
 func HrTypeFromString(s string) HrType {
-	val, ok := strtohrtype[s]
-	if !ok {
-		return strtohrtype["invalid"]
+	switch s {
+	case "normal":
+		return HrTypeNormal
+	case "irregular":
+		return HrTypeIrregular
+	default:
+		return HrTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHrType() []HrType {
-	vs := make([]HrType, 0, len(hrtypetostrs))
-	for i := range hrtypetostrs {
-		vs = append(vs, HrType(i))
+	return []HrType{
+		HrTypeNormal,
+		HrTypeIrregular,
 	}
-	return vs
 }

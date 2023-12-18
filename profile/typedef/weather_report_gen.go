@@ -18,47 +18,42 @@ const (
 	// WeatherReportForecast WeatherReport = 1  // [DUPLICATE!] Deprecated use hourly_forecast instead
 	WeatherReportHourlyForecast WeatherReport = 1
 	WeatherReportDailyForecast  WeatherReport = 2
-	WeatherReportInvalid        WeatherReport = 0xFF // INVALID
+	WeatherReportInvalid        WeatherReport = 0xFF
 )
 
-var weatherreporttostrs = map[WeatherReport]string{
-	WeatherReportCurrent: "current",
-	// WeatherReportForecast: "forecast",
-	WeatherReportHourlyForecast: "hourly_forecast",
-	WeatherReportDailyForecast:  "daily_forecast",
-	WeatherReportInvalid:        "invalid",
-}
-
 func (w WeatherReport) String() string {
-	val, ok := weatherreporttostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WeatherReportCurrent:
+		return "current"
+	case WeatherReportHourlyForecast:
+		return "hourly_forecast"
+	case WeatherReportDailyForecast:
+		return "daily_forecast"
+	default:
+		return "WeatherReportInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtoweatherreport = func() map[string]WeatherReport {
-	m := make(map[string]WeatherReport)
-	for t, str := range weatherreporttostrs {
-		m[str] = WeatherReport(t)
-	}
-	return m
-}()
 
 // FromString parse string into WeatherReport constant it's represent, return WeatherReportInvalid if not found.
 func WeatherReportFromString(s string) WeatherReport {
-	val, ok := strtoweatherreport[s]
-	if !ok {
-		return strtoweatherreport["invalid"]
+	switch s {
+	case "current":
+		return WeatherReportCurrent
+	case "hourly_forecast":
+		return WeatherReportHourlyForecast
+	case "daily_forecast":
+		return WeatherReportDailyForecast
+	default:
+		return WeatherReportInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWeatherReport() []WeatherReport {
-	vs := make([]WeatherReport, 0, len(weatherreporttostrs))
-	for i := range weatherreporttostrs {
-		vs = append(vs, WeatherReport(i))
+	return []WeatherReport{
+		WeatherReportCurrent,
+		// WeatherReportForecast,
+		WeatherReportHourlyForecast,
+		WeatherReportDailyForecast,
 	}
-	return vs
 }

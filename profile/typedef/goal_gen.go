@@ -21,50 +21,61 @@ const (
 	GoalSteps         Goal = 4
 	GoalAscent        Goal = 5
 	GoalActiveMinutes Goal = 6
-	GoalInvalid       Goal = 0xFF // INVALID
+	GoalInvalid       Goal = 0xFF
 )
 
-var goaltostrs = map[Goal]string{
-	GoalTime:          "time",
-	GoalDistance:      "distance",
-	GoalCalories:      "calories",
-	GoalFrequency:     "frequency",
-	GoalSteps:         "steps",
-	GoalAscent:        "ascent",
-	GoalActiveMinutes: "active_minutes",
-	GoalInvalid:       "invalid",
-}
-
 func (g Goal) String() string {
-	val, ok := goaltostrs[g]
-	if !ok {
-		return strconv.Itoa(int(g))
+	switch g {
+	case GoalTime:
+		return "time"
+	case GoalDistance:
+		return "distance"
+	case GoalCalories:
+		return "calories"
+	case GoalFrequency:
+		return "frequency"
+	case GoalSteps:
+		return "steps"
+	case GoalAscent:
+		return "ascent"
+	case GoalActiveMinutes:
+		return "active_minutes"
+	default:
+		return "GoalInvalid(" + strconv.Itoa(int(g)) + ")"
 	}
-	return val
 }
-
-var strtogoal = func() map[string]Goal {
-	m := make(map[string]Goal)
-	for t, str := range goaltostrs {
-		m[str] = Goal(t)
-	}
-	return m
-}()
 
 // FromString parse string into Goal constant it's represent, return GoalInvalid if not found.
 func GoalFromString(s string) Goal {
-	val, ok := strtogoal[s]
-	if !ok {
-		return strtogoal["invalid"]
+	switch s {
+	case "time":
+		return GoalTime
+	case "distance":
+		return GoalDistance
+	case "calories":
+		return GoalCalories
+	case "frequency":
+		return GoalFrequency
+	case "steps":
+		return GoalSteps
+	case "ascent":
+		return GoalAscent
+	case "active_minutes":
+		return GoalActiveMinutes
+	default:
+		return GoalInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListGoal() []Goal {
-	vs := make([]Goal, 0, len(goaltostrs))
-	for i := range goaltostrs {
-		vs = append(vs, Goal(i))
+	return []Goal{
+		GoalTime,
+		GoalDistance,
+		GoalCalories,
+		GoalFrequency,
+		GoalSteps,
+		GoalAscent,
+		GoalActiveMinutes,
 	}
-	return vs
 }

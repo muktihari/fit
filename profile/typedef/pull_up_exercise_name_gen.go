@@ -53,82 +53,221 @@ const (
 	PullUpExerciseNameSuspendedChinUp                  PullUpExerciseName = 36
 	PullUpExerciseNameWeightedSuspendedChinUp          PullUpExerciseName = 37
 	PullUpExerciseNamePullUp                           PullUpExerciseName = 38
-	PullUpExerciseNameInvalid                          PullUpExerciseName = 0xFFFF // INVALID
+	PullUpExerciseNameInvalid                          PullUpExerciseName = 0xFFFF
 )
 
-var pullupexercisenametostrs = map[PullUpExerciseName]string{
-	PullUpExerciseNameBandedPullUps:                    "banded_pull_ups",
-	PullUpExerciseName30DegreeLatPulldown:              "30_degree_lat_pulldown",
-	PullUpExerciseNameBandAssistedChinUp:               "band_assisted_chin_up",
-	PullUpExerciseNameCloseGripChinUp:                  "close_grip_chin_up",
-	PullUpExerciseNameWeightedCloseGripChinUp:          "weighted_close_grip_chin_up",
-	PullUpExerciseNameCloseGripLatPulldown:             "close_grip_lat_pulldown",
-	PullUpExerciseNameCrossoverChinUp:                  "crossover_chin_up",
-	PullUpExerciseNameWeightedCrossoverChinUp:          "weighted_crossover_chin_up",
-	PullUpExerciseNameEzBarPullover:                    "ez_bar_pullover",
-	PullUpExerciseNameHangingHurdle:                    "hanging_hurdle",
-	PullUpExerciseNameWeightedHangingHurdle:            "weighted_hanging_hurdle",
-	PullUpExerciseNameKneelingLatPulldown:              "kneeling_lat_pulldown",
-	PullUpExerciseNameKneelingUnderhandGripLatPulldown: "kneeling_underhand_grip_lat_pulldown",
-	PullUpExerciseNameLatPulldown:                      "lat_pulldown",
-	PullUpExerciseNameMixedGripChinUp:                  "mixed_grip_chin_up",
-	PullUpExerciseNameWeightedMixedGripChinUp:          "weighted_mixed_grip_chin_up",
-	PullUpExerciseNameMixedGripPullUp:                  "mixed_grip_pull_up",
-	PullUpExerciseNameWeightedMixedGripPullUp:          "weighted_mixed_grip_pull_up",
-	PullUpExerciseNameReverseGripPulldown:              "reverse_grip_pulldown",
-	PullUpExerciseNameStandingCablePullover:            "standing_cable_pullover",
-	PullUpExerciseNameStraightArmPulldown:              "straight_arm_pulldown",
-	PullUpExerciseNameSwissBallEzBarPullover:           "swiss_ball_ez_bar_pullover",
-	PullUpExerciseNameTowelPullUp:                      "towel_pull_up",
-	PullUpExerciseNameWeightedTowelPullUp:              "weighted_towel_pull_up",
-	PullUpExerciseNameWeightedPullUp:                   "weighted_pull_up",
-	PullUpExerciseNameWideGripLatPulldown:              "wide_grip_lat_pulldown",
-	PullUpExerciseNameWideGripPullUp:                   "wide_grip_pull_up",
-	PullUpExerciseNameWeightedWideGripPullUp:           "weighted_wide_grip_pull_up",
-	PullUpExerciseNameBurpeePullUp:                     "burpee_pull_up",
-	PullUpExerciseNameWeightedBurpeePullUp:             "weighted_burpee_pull_up",
-	PullUpExerciseNameJumpingPullUps:                   "jumping_pull_ups",
-	PullUpExerciseNameWeightedJumpingPullUps:           "weighted_jumping_pull_ups",
-	PullUpExerciseNameKippingPullUp:                    "kipping_pull_up",
-	PullUpExerciseNameWeightedKippingPullUp:            "weighted_kipping_pull_up",
-	PullUpExerciseNameLPullUp:                          "l_pull_up",
-	PullUpExerciseNameWeightedLPullUp:                  "weighted_l_pull_up",
-	PullUpExerciseNameSuspendedChinUp:                  "suspended_chin_up",
-	PullUpExerciseNameWeightedSuspendedChinUp:          "weighted_suspended_chin_up",
-	PullUpExerciseNamePullUp:                           "pull_up",
-	PullUpExerciseNameInvalid:                          "invalid",
-}
-
 func (p PullUpExerciseName) String() string {
-	val, ok := pullupexercisenametostrs[p]
-	if !ok {
-		return strconv.FormatUint(uint64(p), 10)
+	switch p {
+	case PullUpExerciseNameBandedPullUps:
+		return "banded_pull_ups"
+	case PullUpExerciseName30DegreeLatPulldown:
+		return "30_degree_lat_pulldown"
+	case PullUpExerciseNameBandAssistedChinUp:
+		return "band_assisted_chin_up"
+	case PullUpExerciseNameCloseGripChinUp:
+		return "close_grip_chin_up"
+	case PullUpExerciseNameWeightedCloseGripChinUp:
+		return "weighted_close_grip_chin_up"
+	case PullUpExerciseNameCloseGripLatPulldown:
+		return "close_grip_lat_pulldown"
+	case PullUpExerciseNameCrossoverChinUp:
+		return "crossover_chin_up"
+	case PullUpExerciseNameWeightedCrossoverChinUp:
+		return "weighted_crossover_chin_up"
+	case PullUpExerciseNameEzBarPullover:
+		return "ez_bar_pullover"
+	case PullUpExerciseNameHangingHurdle:
+		return "hanging_hurdle"
+	case PullUpExerciseNameWeightedHangingHurdle:
+		return "weighted_hanging_hurdle"
+	case PullUpExerciseNameKneelingLatPulldown:
+		return "kneeling_lat_pulldown"
+	case PullUpExerciseNameKneelingUnderhandGripLatPulldown:
+		return "kneeling_underhand_grip_lat_pulldown"
+	case PullUpExerciseNameLatPulldown:
+		return "lat_pulldown"
+	case PullUpExerciseNameMixedGripChinUp:
+		return "mixed_grip_chin_up"
+	case PullUpExerciseNameWeightedMixedGripChinUp:
+		return "weighted_mixed_grip_chin_up"
+	case PullUpExerciseNameMixedGripPullUp:
+		return "mixed_grip_pull_up"
+	case PullUpExerciseNameWeightedMixedGripPullUp:
+		return "weighted_mixed_grip_pull_up"
+	case PullUpExerciseNameReverseGripPulldown:
+		return "reverse_grip_pulldown"
+	case PullUpExerciseNameStandingCablePullover:
+		return "standing_cable_pullover"
+	case PullUpExerciseNameStraightArmPulldown:
+		return "straight_arm_pulldown"
+	case PullUpExerciseNameSwissBallEzBarPullover:
+		return "swiss_ball_ez_bar_pullover"
+	case PullUpExerciseNameTowelPullUp:
+		return "towel_pull_up"
+	case PullUpExerciseNameWeightedTowelPullUp:
+		return "weighted_towel_pull_up"
+	case PullUpExerciseNameWeightedPullUp:
+		return "weighted_pull_up"
+	case PullUpExerciseNameWideGripLatPulldown:
+		return "wide_grip_lat_pulldown"
+	case PullUpExerciseNameWideGripPullUp:
+		return "wide_grip_pull_up"
+	case PullUpExerciseNameWeightedWideGripPullUp:
+		return "weighted_wide_grip_pull_up"
+	case PullUpExerciseNameBurpeePullUp:
+		return "burpee_pull_up"
+	case PullUpExerciseNameWeightedBurpeePullUp:
+		return "weighted_burpee_pull_up"
+	case PullUpExerciseNameJumpingPullUps:
+		return "jumping_pull_ups"
+	case PullUpExerciseNameWeightedJumpingPullUps:
+		return "weighted_jumping_pull_ups"
+	case PullUpExerciseNameKippingPullUp:
+		return "kipping_pull_up"
+	case PullUpExerciseNameWeightedKippingPullUp:
+		return "weighted_kipping_pull_up"
+	case PullUpExerciseNameLPullUp:
+		return "l_pull_up"
+	case PullUpExerciseNameWeightedLPullUp:
+		return "weighted_l_pull_up"
+	case PullUpExerciseNameSuspendedChinUp:
+		return "suspended_chin_up"
+	case PullUpExerciseNameWeightedSuspendedChinUp:
+		return "weighted_suspended_chin_up"
+	case PullUpExerciseNamePullUp:
+		return "pull_up"
+	default:
+		return "PullUpExerciseNameInvalid(" + strconv.FormatUint(uint64(p), 10) + ")"
 	}
-	return val
 }
-
-var strtopullupexercisename = func() map[string]PullUpExerciseName {
-	m := make(map[string]PullUpExerciseName)
-	for t, str := range pullupexercisenametostrs {
-		m[str] = PullUpExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into PullUpExerciseName constant it's represent, return PullUpExerciseNameInvalid if not found.
 func PullUpExerciseNameFromString(s string) PullUpExerciseName {
-	val, ok := strtopullupexercisename[s]
-	if !ok {
-		return strtopullupexercisename["invalid"]
+	switch s {
+	case "banded_pull_ups":
+		return PullUpExerciseNameBandedPullUps
+	case "30_degree_lat_pulldown":
+		return PullUpExerciseName30DegreeLatPulldown
+	case "band_assisted_chin_up":
+		return PullUpExerciseNameBandAssistedChinUp
+	case "close_grip_chin_up":
+		return PullUpExerciseNameCloseGripChinUp
+	case "weighted_close_grip_chin_up":
+		return PullUpExerciseNameWeightedCloseGripChinUp
+	case "close_grip_lat_pulldown":
+		return PullUpExerciseNameCloseGripLatPulldown
+	case "crossover_chin_up":
+		return PullUpExerciseNameCrossoverChinUp
+	case "weighted_crossover_chin_up":
+		return PullUpExerciseNameWeightedCrossoverChinUp
+	case "ez_bar_pullover":
+		return PullUpExerciseNameEzBarPullover
+	case "hanging_hurdle":
+		return PullUpExerciseNameHangingHurdle
+	case "weighted_hanging_hurdle":
+		return PullUpExerciseNameWeightedHangingHurdle
+	case "kneeling_lat_pulldown":
+		return PullUpExerciseNameKneelingLatPulldown
+	case "kneeling_underhand_grip_lat_pulldown":
+		return PullUpExerciseNameKneelingUnderhandGripLatPulldown
+	case "lat_pulldown":
+		return PullUpExerciseNameLatPulldown
+	case "mixed_grip_chin_up":
+		return PullUpExerciseNameMixedGripChinUp
+	case "weighted_mixed_grip_chin_up":
+		return PullUpExerciseNameWeightedMixedGripChinUp
+	case "mixed_grip_pull_up":
+		return PullUpExerciseNameMixedGripPullUp
+	case "weighted_mixed_grip_pull_up":
+		return PullUpExerciseNameWeightedMixedGripPullUp
+	case "reverse_grip_pulldown":
+		return PullUpExerciseNameReverseGripPulldown
+	case "standing_cable_pullover":
+		return PullUpExerciseNameStandingCablePullover
+	case "straight_arm_pulldown":
+		return PullUpExerciseNameStraightArmPulldown
+	case "swiss_ball_ez_bar_pullover":
+		return PullUpExerciseNameSwissBallEzBarPullover
+	case "towel_pull_up":
+		return PullUpExerciseNameTowelPullUp
+	case "weighted_towel_pull_up":
+		return PullUpExerciseNameWeightedTowelPullUp
+	case "weighted_pull_up":
+		return PullUpExerciseNameWeightedPullUp
+	case "wide_grip_lat_pulldown":
+		return PullUpExerciseNameWideGripLatPulldown
+	case "wide_grip_pull_up":
+		return PullUpExerciseNameWideGripPullUp
+	case "weighted_wide_grip_pull_up":
+		return PullUpExerciseNameWeightedWideGripPullUp
+	case "burpee_pull_up":
+		return PullUpExerciseNameBurpeePullUp
+	case "weighted_burpee_pull_up":
+		return PullUpExerciseNameWeightedBurpeePullUp
+	case "jumping_pull_ups":
+		return PullUpExerciseNameJumpingPullUps
+	case "weighted_jumping_pull_ups":
+		return PullUpExerciseNameWeightedJumpingPullUps
+	case "kipping_pull_up":
+		return PullUpExerciseNameKippingPullUp
+	case "weighted_kipping_pull_up":
+		return PullUpExerciseNameWeightedKippingPullUp
+	case "l_pull_up":
+		return PullUpExerciseNameLPullUp
+	case "weighted_l_pull_up":
+		return PullUpExerciseNameWeightedLPullUp
+	case "suspended_chin_up":
+		return PullUpExerciseNameSuspendedChinUp
+	case "weighted_suspended_chin_up":
+		return PullUpExerciseNameWeightedSuspendedChinUp
+	case "pull_up":
+		return PullUpExerciseNamePullUp
+	default:
+		return PullUpExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListPullUpExerciseName() []PullUpExerciseName {
-	vs := make([]PullUpExerciseName, 0, len(pullupexercisenametostrs))
-	for i := range pullupexercisenametostrs {
-		vs = append(vs, PullUpExerciseName(i))
+	return []PullUpExerciseName{
+		PullUpExerciseNameBandedPullUps,
+		PullUpExerciseName30DegreeLatPulldown,
+		PullUpExerciseNameBandAssistedChinUp,
+		PullUpExerciseNameCloseGripChinUp,
+		PullUpExerciseNameWeightedCloseGripChinUp,
+		PullUpExerciseNameCloseGripLatPulldown,
+		PullUpExerciseNameCrossoverChinUp,
+		PullUpExerciseNameWeightedCrossoverChinUp,
+		PullUpExerciseNameEzBarPullover,
+		PullUpExerciseNameHangingHurdle,
+		PullUpExerciseNameWeightedHangingHurdle,
+		PullUpExerciseNameKneelingLatPulldown,
+		PullUpExerciseNameKneelingUnderhandGripLatPulldown,
+		PullUpExerciseNameLatPulldown,
+		PullUpExerciseNameMixedGripChinUp,
+		PullUpExerciseNameWeightedMixedGripChinUp,
+		PullUpExerciseNameMixedGripPullUp,
+		PullUpExerciseNameWeightedMixedGripPullUp,
+		PullUpExerciseNameReverseGripPulldown,
+		PullUpExerciseNameStandingCablePullover,
+		PullUpExerciseNameStraightArmPulldown,
+		PullUpExerciseNameSwissBallEzBarPullover,
+		PullUpExerciseNameTowelPullUp,
+		PullUpExerciseNameWeightedTowelPullUp,
+		PullUpExerciseNameWeightedPullUp,
+		PullUpExerciseNameWideGripLatPulldown,
+		PullUpExerciseNameWideGripPullUp,
+		PullUpExerciseNameWeightedWideGripPullUp,
+		PullUpExerciseNameBurpeePullUp,
+		PullUpExerciseNameWeightedBurpeePullUp,
+		PullUpExerciseNameJumpingPullUps,
+		PullUpExerciseNameWeightedJumpingPullUps,
+		PullUpExerciseNameKippingPullUp,
+		PullUpExerciseNameWeightedKippingPullUp,
+		PullUpExerciseNameLPullUp,
+		PullUpExerciseNameWeightedLPullUp,
+		PullUpExerciseNameSuspendedChinUp,
+		PullUpExerciseNameWeightedSuspendedChinUp,
+		PullUpExerciseNamePullUp,
 	}
-	return vs
 }

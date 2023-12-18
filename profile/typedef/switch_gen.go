@@ -17,46 +17,41 @@ const (
 	SwitchOff     Switch = 0
 	SwitchOn      Switch = 1
 	SwitchAuto    Switch = 2
-	SwitchInvalid Switch = 0xFF // INVALID
+	SwitchInvalid Switch = 0xFF
 )
 
-var switchtostrs = map[Switch]string{
-	SwitchOff:     "off",
-	SwitchOn:      "on",
-	SwitchAuto:    "auto",
-	SwitchInvalid: "invalid",
-}
-
 func (s Switch) String() string {
-	val, ok := switchtostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SwitchOff:
+		return "off"
+	case SwitchOn:
+		return "on"
+	case SwitchAuto:
+		return "auto"
+	default:
+		return "SwitchInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtoswitch = func() map[string]Switch {
-	m := make(map[string]Switch)
-	for t, str := range switchtostrs {
-		m[str] = Switch(t)
-	}
-	return m
-}()
 
 // FromString parse string into Switch constant it's represent, return SwitchInvalid if not found.
 func SwitchFromString(s string) Switch {
-	val, ok := strtoswitch[s]
-	if !ok {
-		return strtoswitch["invalid"]
+	switch s {
+	case "off":
+		return SwitchOff
+	case "on":
+		return SwitchOn
+	case "auto":
+		return SwitchAuto
+	default:
+		return SwitchInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSwitch() []Switch {
-	vs := make([]Switch, 0, len(switchtostrs))
-	for i := range switchtostrs {
-		vs = append(vs, Switch(i))
+	return []Switch{
+		SwitchOff,
+		SwitchOn,
+		SwitchAuto,
 	}
-	return vs
 }

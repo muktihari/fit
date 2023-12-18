@@ -22,53 +22,72 @@ const (
 	ActivityTypeSwimming         ActivityType = 5
 	ActivityTypeWalking          ActivityType = 6
 	ActivityTypeSedentary        ActivityType = 8
-	ActivityTypeAll              ActivityType = 254  // All is for goals only to include all sports.
-	ActivityTypeInvalid          ActivityType = 0xFF // INVALID
+	ActivityTypeAll              ActivityType = 254 // All is for goals only to include all sports.
+	ActivityTypeInvalid          ActivityType = 0xFF
 )
 
-var activitytypetostrs = map[ActivityType]string{
-	ActivityTypeGeneric:          "generic",
-	ActivityTypeRunning:          "running",
-	ActivityTypeCycling:          "cycling",
-	ActivityTypeTransition:       "transition",
-	ActivityTypeFitnessEquipment: "fitness_equipment",
-	ActivityTypeSwimming:         "swimming",
-	ActivityTypeWalking:          "walking",
-	ActivityTypeSedentary:        "sedentary",
-	ActivityTypeAll:              "all",
-	ActivityTypeInvalid:          "invalid",
-}
-
 func (a ActivityType) String() string {
-	val, ok := activitytypetostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case ActivityTypeGeneric:
+		return "generic"
+	case ActivityTypeRunning:
+		return "running"
+	case ActivityTypeCycling:
+		return "cycling"
+	case ActivityTypeTransition:
+		return "transition"
+	case ActivityTypeFitnessEquipment:
+		return "fitness_equipment"
+	case ActivityTypeSwimming:
+		return "swimming"
+	case ActivityTypeWalking:
+		return "walking"
+	case ActivityTypeSedentary:
+		return "sedentary"
+	case ActivityTypeAll:
+		return "all"
+	default:
+		return "ActivityTypeInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoactivitytype = func() map[string]ActivityType {
-	m := make(map[string]ActivityType)
-	for t, str := range activitytypetostrs {
-		m[str] = ActivityType(t)
-	}
-	return m
-}()
 
 // FromString parse string into ActivityType constant it's represent, return ActivityTypeInvalid if not found.
 func ActivityTypeFromString(s string) ActivityType {
-	val, ok := strtoactivitytype[s]
-	if !ok {
-		return strtoactivitytype["invalid"]
+	switch s {
+	case "generic":
+		return ActivityTypeGeneric
+	case "running":
+		return ActivityTypeRunning
+	case "cycling":
+		return ActivityTypeCycling
+	case "transition":
+		return ActivityTypeTransition
+	case "fitness_equipment":
+		return ActivityTypeFitnessEquipment
+	case "swimming":
+		return ActivityTypeSwimming
+	case "walking":
+		return ActivityTypeWalking
+	case "sedentary":
+		return ActivityTypeSedentary
+	case "all":
+		return ActivityTypeAll
+	default:
+		return ActivityTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListActivityType() []ActivityType {
-	vs := make([]ActivityType, 0, len(activitytypetostrs))
-	for i := range activitytypetostrs {
-		vs = append(vs, ActivityType(i))
+	return []ActivityType{
+		ActivityTypeGeneric,
+		ActivityTypeRunning,
+		ActivityTypeCycling,
+		ActivityTypeTransition,
+		ActivityTypeFitnessEquipment,
+		ActivityTypeSwimming,
+		ActivityTypeWalking,
+		ActivityTypeSedentary,
+		ActivityTypeAll,
 	}
-	return vs
 }

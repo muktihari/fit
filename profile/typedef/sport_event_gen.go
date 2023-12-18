@@ -23,52 +23,71 @@ const (
 	SportEventTraining       SportEvent = 6
 	SportEventTransportation SportEvent = 7
 	SportEventTouring        SportEvent = 8
-	SportEventInvalid        SportEvent = 0xFF // INVALID
+	SportEventInvalid        SportEvent = 0xFF
 )
 
-var sporteventtostrs = map[SportEvent]string{
-	SportEventUncategorized:  "uncategorized",
-	SportEventGeocaching:     "geocaching",
-	SportEventFitness:        "fitness",
-	SportEventRecreation:     "recreation",
-	SportEventRace:           "race",
-	SportEventSpecialEvent:   "special_event",
-	SportEventTraining:       "training",
-	SportEventTransportation: "transportation",
-	SportEventTouring:        "touring",
-	SportEventInvalid:        "invalid",
-}
-
 func (s SportEvent) String() string {
-	val, ok := sporteventtostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SportEventUncategorized:
+		return "uncategorized"
+	case SportEventGeocaching:
+		return "geocaching"
+	case SportEventFitness:
+		return "fitness"
+	case SportEventRecreation:
+		return "recreation"
+	case SportEventRace:
+		return "race"
+	case SportEventSpecialEvent:
+		return "special_event"
+	case SportEventTraining:
+		return "training"
+	case SportEventTransportation:
+		return "transportation"
+	case SportEventTouring:
+		return "touring"
+	default:
+		return "SportEventInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosportevent = func() map[string]SportEvent {
-	m := make(map[string]SportEvent)
-	for t, str := range sporteventtostrs {
-		m[str] = SportEvent(t)
-	}
-	return m
-}()
 
 // FromString parse string into SportEvent constant it's represent, return SportEventInvalid if not found.
 func SportEventFromString(s string) SportEvent {
-	val, ok := strtosportevent[s]
-	if !ok {
-		return strtosportevent["invalid"]
+	switch s {
+	case "uncategorized":
+		return SportEventUncategorized
+	case "geocaching":
+		return SportEventGeocaching
+	case "fitness":
+		return SportEventFitness
+	case "recreation":
+		return SportEventRecreation
+	case "race":
+		return SportEventRace
+	case "special_event":
+		return SportEventSpecialEvent
+	case "training":
+		return SportEventTraining
+	case "transportation":
+		return SportEventTransportation
+	case "touring":
+		return SportEventTouring
+	default:
+		return SportEventInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSportEvent() []SportEvent {
-	vs := make([]SportEvent, 0, len(sporteventtostrs))
-	for i := range sporteventtostrs {
-		vs = append(vs, SportEvent(i))
+	return []SportEvent{
+		SportEventUncategorized,
+		SportEventGeocaching,
+		SportEventFitness,
+		SportEventRecreation,
+		SportEventRace,
+		SportEventSpecialEvent,
+		SportEventTraining,
+		SportEventTransportation,
+		SportEventTouring,
 	}
-	return vs
 }

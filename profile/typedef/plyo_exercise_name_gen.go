@@ -47,76 +47,191 @@ const (
 	PlyoExerciseNameWeightedSquatJumpOntoBox              PlyoExerciseName = 30
 	PlyoExerciseNameSquatJumpsInAndOut                    PlyoExerciseName = 31
 	PlyoExerciseNameWeightedSquatJumpsInAndOut            PlyoExerciseName = 32
-	PlyoExerciseNameInvalid                               PlyoExerciseName = 0xFFFF // INVALID
+	PlyoExerciseNameInvalid                               PlyoExerciseName = 0xFFFF
 )
 
-var plyoexercisenametostrs = map[PlyoExerciseName]string{
-	PlyoExerciseNameAlternatingJumpLunge:                  "alternating_jump_lunge",
-	PlyoExerciseNameWeightedAlternatingJumpLunge:          "weighted_alternating_jump_lunge",
-	PlyoExerciseNameBarbellJumpSquat:                      "barbell_jump_squat",
-	PlyoExerciseNameBodyWeightJumpSquat:                   "body_weight_jump_squat",
-	PlyoExerciseNameWeightedJumpSquat:                     "weighted_jump_squat",
-	PlyoExerciseNameCrossKneeStrike:                       "cross_knee_strike",
-	PlyoExerciseNameWeightedCrossKneeStrike:               "weighted_cross_knee_strike",
-	PlyoExerciseNameDepthJump:                             "depth_jump",
-	PlyoExerciseNameWeightedDepthJump:                     "weighted_depth_jump",
-	PlyoExerciseNameDumbbellJumpSquat:                     "dumbbell_jump_squat",
-	PlyoExerciseNameDumbbellSplitJump:                     "dumbbell_split_jump",
-	PlyoExerciseNameFrontKneeStrike:                       "front_knee_strike",
-	PlyoExerciseNameWeightedFrontKneeStrike:               "weighted_front_knee_strike",
-	PlyoExerciseNameHighBoxJump:                           "high_box_jump",
-	PlyoExerciseNameWeightedHighBoxJump:                   "weighted_high_box_jump",
-	PlyoExerciseNameIsometricExplosiveBodyWeightJumpSquat: "isometric_explosive_body_weight_jump_squat",
-	PlyoExerciseNameWeightedIsometricExplosiveJumpSquat:   "weighted_isometric_explosive_jump_squat",
-	PlyoExerciseNameLateralLeapAndHop:                     "lateral_leap_and_hop",
-	PlyoExerciseNameWeightedLateralLeapAndHop:             "weighted_lateral_leap_and_hop",
-	PlyoExerciseNameLateralPlyoSquats:                     "lateral_plyo_squats",
-	PlyoExerciseNameWeightedLateralPlyoSquats:             "weighted_lateral_plyo_squats",
-	PlyoExerciseNameLateralSlide:                          "lateral_slide",
-	PlyoExerciseNameWeightedLateralSlide:                  "weighted_lateral_slide",
-	PlyoExerciseNameMedicineBallOverheadThrows:            "medicine_ball_overhead_throws",
-	PlyoExerciseNameMedicineBallSideThrow:                 "medicine_ball_side_throw",
-	PlyoExerciseNameMedicineBallSlam:                      "medicine_ball_slam",
-	PlyoExerciseNameSideToSideMedicineBallThrows:          "side_to_side_medicine_ball_throws",
-	PlyoExerciseNameSideToSideShuffleJump:                 "side_to_side_shuffle_jump",
-	PlyoExerciseNameWeightedSideToSideShuffleJump:         "weighted_side_to_side_shuffle_jump",
-	PlyoExerciseNameSquatJumpOntoBox:                      "squat_jump_onto_box",
-	PlyoExerciseNameWeightedSquatJumpOntoBox:              "weighted_squat_jump_onto_box",
-	PlyoExerciseNameSquatJumpsInAndOut:                    "squat_jumps_in_and_out",
-	PlyoExerciseNameWeightedSquatJumpsInAndOut:            "weighted_squat_jumps_in_and_out",
-	PlyoExerciseNameInvalid:                               "invalid",
-}
-
 func (p PlyoExerciseName) String() string {
-	val, ok := plyoexercisenametostrs[p]
-	if !ok {
-		return strconv.FormatUint(uint64(p), 10)
+	switch p {
+	case PlyoExerciseNameAlternatingJumpLunge:
+		return "alternating_jump_lunge"
+	case PlyoExerciseNameWeightedAlternatingJumpLunge:
+		return "weighted_alternating_jump_lunge"
+	case PlyoExerciseNameBarbellJumpSquat:
+		return "barbell_jump_squat"
+	case PlyoExerciseNameBodyWeightJumpSquat:
+		return "body_weight_jump_squat"
+	case PlyoExerciseNameWeightedJumpSquat:
+		return "weighted_jump_squat"
+	case PlyoExerciseNameCrossKneeStrike:
+		return "cross_knee_strike"
+	case PlyoExerciseNameWeightedCrossKneeStrike:
+		return "weighted_cross_knee_strike"
+	case PlyoExerciseNameDepthJump:
+		return "depth_jump"
+	case PlyoExerciseNameWeightedDepthJump:
+		return "weighted_depth_jump"
+	case PlyoExerciseNameDumbbellJumpSquat:
+		return "dumbbell_jump_squat"
+	case PlyoExerciseNameDumbbellSplitJump:
+		return "dumbbell_split_jump"
+	case PlyoExerciseNameFrontKneeStrike:
+		return "front_knee_strike"
+	case PlyoExerciseNameWeightedFrontKneeStrike:
+		return "weighted_front_knee_strike"
+	case PlyoExerciseNameHighBoxJump:
+		return "high_box_jump"
+	case PlyoExerciseNameWeightedHighBoxJump:
+		return "weighted_high_box_jump"
+	case PlyoExerciseNameIsometricExplosiveBodyWeightJumpSquat:
+		return "isometric_explosive_body_weight_jump_squat"
+	case PlyoExerciseNameWeightedIsometricExplosiveJumpSquat:
+		return "weighted_isometric_explosive_jump_squat"
+	case PlyoExerciseNameLateralLeapAndHop:
+		return "lateral_leap_and_hop"
+	case PlyoExerciseNameWeightedLateralLeapAndHop:
+		return "weighted_lateral_leap_and_hop"
+	case PlyoExerciseNameLateralPlyoSquats:
+		return "lateral_plyo_squats"
+	case PlyoExerciseNameWeightedLateralPlyoSquats:
+		return "weighted_lateral_plyo_squats"
+	case PlyoExerciseNameLateralSlide:
+		return "lateral_slide"
+	case PlyoExerciseNameWeightedLateralSlide:
+		return "weighted_lateral_slide"
+	case PlyoExerciseNameMedicineBallOverheadThrows:
+		return "medicine_ball_overhead_throws"
+	case PlyoExerciseNameMedicineBallSideThrow:
+		return "medicine_ball_side_throw"
+	case PlyoExerciseNameMedicineBallSlam:
+		return "medicine_ball_slam"
+	case PlyoExerciseNameSideToSideMedicineBallThrows:
+		return "side_to_side_medicine_ball_throws"
+	case PlyoExerciseNameSideToSideShuffleJump:
+		return "side_to_side_shuffle_jump"
+	case PlyoExerciseNameWeightedSideToSideShuffleJump:
+		return "weighted_side_to_side_shuffle_jump"
+	case PlyoExerciseNameSquatJumpOntoBox:
+		return "squat_jump_onto_box"
+	case PlyoExerciseNameWeightedSquatJumpOntoBox:
+		return "weighted_squat_jump_onto_box"
+	case PlyoExerciseNameSquatJumpsInAndOut:
+		return "squat_jumps_in_and_out"
+	case PlyoExerciseNameWeightedSquatJumpsInAndOut:
+		return "weighted_squat_jumps_in_and_out"
+	default:
+		return "PlyoExerciseNameInvalid(" + strconv.FormatUint(uint64(p), 10) + ")"
 	}
-	return val
 }
-
-var strtoplyoexercisename = func() map[string]PlyoExerciseName {
-	m := make(map[string]PlyoExerciseName)
-	for t, str := range plyoexercisenametostrs {
-		m[str] = PlyoExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into PlyoExerciseName constant it's represent, return PlyoExerciseNameInvalid if not found.
 func PlyoExerciseNameFromString(s string) PlyoExerciseName {
-	val, ok := strtoplyoexercisename[s]
-	if !ok {
-		return strtoplyoexercisename["invalid"]
+	switch s {
+	case "alternating_jump_lunge":
+		return PlyoExerciseNameAlternatingJumpLunge
+	case "weighted_alternating_jump_lunge":
+		return PlyoExerciseNameWeightedAlternatingJumpLunge
+	case "barbell_jump_squat":
+		return PlyoExerciseNameBarbellJumpSquat
+	case "body_weight_jump_squat":
+		return PlyoExerciseNameBodyWeightJumpSquat
+	case "weighted_jump_squat":
+		return PlyoExerciseNameWeightedJumpSquat
+	case "cross_knee_strike":
+		return PlyoExerciseNameCrossKneeStrike
+	case "weighted_cross_knee_strike":
+		return PlyoExerciseNameWeightedCrossKneeStrike
+	case "depth_jump":
+		return PlyoExerciseNameDepthJump
+	case "weighted_depth_jump":
+		return PlyoExerciseNameWeightedDepthJump
+	case "dumbbell_jump_squat":
+		return PlyoExerciseNameDumbbellJumpSquat
+	case "dumbbell_split_jump":
+		return PlyoExerciseNameDumbbellSplitJump
+	case "front_knee_strike":
+		return PlyoExerciseNameFrontKneeStrike
+	case "weighted_front_knee_strike":
+		return PlyoExerciseNameWeightedFrontKneeStrike
+	case "high_box_jump":
+		return PlyoExerciseNameHighBoxJump
+	case "weighted_high_box_jump":
+		return PlyoExerciseNameWeightedHighBoxJump
+	case "isometric_explosive_body_weight_jump_squat":
+		return PlyoExerciseNameIsometricExplosiveBodyWeightJumpSquat
+	case "weighted_isometric_explosive_jump_squat":
+		return PlyoExerciseNameWeightedIsometricExplosiveJumpSquat
+	case "lateral_leap_and_hop":
+		return PlyoExerciseNameLateralLeapAndHop
+	case "weighted_lateral_leap_and_hop":
+		return PlyoExerciseNameWeightedLateralLeapAndHop
+	case "lateral_plyo_squats":
+		return PlyoExerciseNameLateralPlyoSquats
+	case "weighted_lateral_plyo_squats":
+		return PlyoExerciseNameWeightedLateralPlyoSquats
+	case "lateral_slide":
+		return PlyoExerciseNameLateralSlide
+	case "weighted_lateral_slide":
+		return PlyoExerciseNameWeightedLateralSlide
+	case "medicine_ball_overhead_throws":
+		return PlyoExerciseNameMedicineBallOverheadThrows
+	case "medicine_ball_side_throw":
+		return PlyoExerciseNameMedicineBallSideThrow
+	case "medicine_ball_slam":
+		return PlyoExerciseNameMedicineBallSlam
+	case "side_to_side_medicine_ball_throws":
+		return PlyoExerciseNameSideToSideMedicineBallThrows
+	case "side_to_side_shuffle_jump":
+		return PlyoExerciseNameSideToSideShuffleJump
+	case "weighted_side_to_side_shuffle_jump":
+		return PlyoExerciseNameWeightedSideToSideShuffleJump
+	case "squat_jump_onto_box":
+		return PlyoExerciseNameSquatJumpOntoBox
+	case "weighted_squat_jump_onto_box":
+		return PlyoExerciseNameWeightedSquatJumpOntoBox
+	case "squat_jumps_in_and_out":
+		return PlyoExerciseNameSquatJumpsInAndOut
+	case "weighted_squat_jumps_in_and_out":
+		return PlyoExerciseNameWeightedSquatJumpsInAndOut
+	default:
+		return PlyoExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListPlyoExerciseName() []PlyoExerciseName {
-	vs := make([]PlyoExerciseName, 0, len(plyoexercisenametostrs))
-	for i := range plyoexercisenametostrs {
-		vs = append(vs, PlyoExerciseName(i))
+	return []PlyoExerciseName{
+		PlyoExerciseNameAlternatingJumpLunge,
+		PlyoExerciseNameWeightedAlternatingJumpLunge,
+		PlyoExerciseNameBarbellJumpSquat,
+		PlyoExerciseNameBodyWeightJumpSquat,
+		PlyoExerciseNameWeightedJumpSquat,
+		PlyoExerciseNameCrossKneeStrike,
+		PlyoExerciseNameWeightedCrossKneeStrike,
+		PlyoExerciseNameDepthJump,
+		PlyoExerciseNameWeightedDepthJump,
+		PlyoExerciseNameDumbbellJumpSquat,
+		PlyoExerciseNameDumbbellSplitJump,
+		PlyoExerciseNameFrontKneeStrike,
+		PlyoExerciseNameWeightedFrontKneeStrike,
+		PlyoExerciseNameHighBoxJump,
+		PlyoExerciseNameWeightedHighBoxJump,
+		PlyoExerciseNameIsometricExplosiveBodyWeightJumpSquat,
+		PlyoExerciseNameWeightedIsometricExplosiveJumpSquat,
+		PlyoExerciseNameLateralLeapAndHop,
+		PlyoExerciseNameWeightedLateralLeapAndHop,
+		PlyoExerciseNameLateralPlyoSquats,
+		PlyoExerciseNameWeightedLateralPlyoSquats,
+		PlyoExerciseNameLateralSlide,
+		PlyoExerciseNameWeightedLateralSlide,
+		PlyoExerciseNameMedicineBallOverheadThrows,
+		PlyoExerciseNameMedicineBallSideThrow,
+		PlyoExerciseNameMedicineBallSlam,
+		PlyoExerciseNameSideToSideMedicineBallThrows,
+		PlyoExerciseNameSideToSideShuffleJump,
+		PlyoExerciseNameWeightedSideToSideShuffleJump,
+		PlyoExerciseNameSquatJumpOntoBox,
+		PlyoExerciseNameWeightedSquatJumpOntoBox,
+		PlyoExerciseNameSquatJumpsInAndOut,
+		PlyoExerciseNameWeightedSquatJumpsInAndOut,
 	}
-	return vs
 }

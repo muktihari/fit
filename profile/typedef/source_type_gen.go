@@ -14,55 +14,62 @@ import (
 type SourceType byte
 
 const (
-	SourceTypeAnt                SourceType = 0    // External device connected with ANT
-	SourceTypeAntplus            SourceType = 1    // External device connected with ANT+
-	SourceTypeBluetooth          SourceType = 2    // External device connected with BT
-	SourceTypeBluetoothLowEnergy SourceType = 3    // External device connected with BLE
-	SourceTypeWifi               SourceType = 4    // External device connected with Wifi
-	SourceTypeLocal              SourceType = 5    // Onboard device
-	SourceTypeInvalid            SourceType = 0xFF // INVALID
+	SourceTypeAnt                SourceType = 0 // External device connected with ANT
+	SourceTypeAntplus            SourceType = 1 // External device connected with ANT+
+	SourceTypeBluetooth          SourceType = 2 // External device connected with BT
+	SourceTypeBluetoothLowEnergy SourceType = 3 // External device connected with BLE
+	SourceTypeWifi               SourceType = 4 // External device connected with Wifi
+	SourceTypeLocal              SourceType = 5 // Onboard device
+	SourceTypeInvalid            SourceType = 0xFF
 )
 
-var sourcetypetostrs = map[SourceType]string{
-	SourceTypeAnt:                "ant",
-	SourceTypeAntplus:            "antplus",
-	SourceTypeBluetooth:          "bluetooth",
-	SourceTypeBluetoothLowEnergy: "bluetooth_low_energy",
-	SourceTypeWifi:               "wifi",
-	SourceTypeLocal:              "local",
-	SourceTypeInvalid:            "invalid",
-}
-
 func (s SourceType) String() string {
-	val, ok := sourcetypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SourceTypeAnt:
+		return "ant"
+	case SourceTypeAntplus:
+		return "antplus"
+	case SourceTypeBluetooth:
+		return "bluetooth"
+	case SourceTypeBluetoothLowEnergy:
+		return "bluetooth_low_energy"
+	case SourceTypeWifi:
+		return "wifi"
+	case SourceTypeLocal:
+		return "local"
+	default:
+		return "SourceTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosourcetype = func() map[string]SourceType {
-	m := make(map[string]SourceType)
-	for t, str := range sourcetypetostrs {
-		m[str] = SourceType(t)
-	}
-	return m
-}()
 
 // FromString parse string into SourceType constant it's represent, return SourceTypeInvalid if not found.
 func SourceTypeFromString(s string) SourceType {
-	val, ok := strtosourcetype[s]
-	if !ok {
-		return strtosourcetype["invalid"]
+	switch s {
+	case "ant":
+		return SourceTypeAnt
+	case "antplus":
+		return SourceTypeAntplus
+	case "bluetooth":
+		return SourceTypeBluetooth
+	case "bluetooth_low_energy":
+		return SourceTypeBluetoothLowEnergy
+	case "wifi":
+		return SourceTypeWifi
+	case "local":
+		return SourceTypeLocal
+	default:
+		return SourceTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSourceType() []SourceType {
-	vs := make([]SourceType, 0, len(sourcetypetostrs))
-	for i := range sourcetypetostrs {
-		vs = append(vs, SourceType(i))
+	return []SourceType{
+		SourceTypeAnt,
+		SourceTypeAntplus,
+		SourceTypeBluetooth,
+		SourceTypeBluetoothLowEnergy,
+		SourceTypeWifi,
+		SourceTypeLocal,
 	}
-	return vs
 }

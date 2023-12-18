@@ -21,50 +21,61 @@ const (
 	DayOfWeekThursday  DayOfWeek = 4
 	DayOfWeekFriday    DayOfWeek = 5
 	DayOfWeekSaturday  DayOfWeek = 6
-	DayOfWeekInvalid   DayOfWeek = 0xFF // INVALID
+	DayOfWeekInvalid   DayOfWeek = 0xFF
 )
 
-var dayofweektostrs = map[DayOfWeek]string{
-	DayOfWeekSunday:    "sunday",
-	DayOfWeekMonday:    "monday",
-	DayOfWeekTuesday:   "tuesday",
-	DayOfWeekWednesday: "wednesday",
-	DayOfWeekThursday:  "thursday",
-	DayOfWeekFriday:    "friday",
-	DayOfWeekSaturday:  "saturday",
-	DayOfWeekInvalid:   "invalid",
-}
-
 func (d DayOfWeek) String() string {
-	val, ok := dayofweektostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DayOfWeekSunday:
+		return "sunday"
+	case DayOfWeekMonday:
+		return "monday"
+	case DayOfWeekTuesday:
+		return "tuesday"
+	case DayOfWeekWednesday:
+		return "wednesday"
+	case DayOfWeekThursday:
+		return "thursday"
+	case DayOfWeekFriday:
+		return "friday"
+	case DayOfWeekSaturday:
+		return "saturday"
+	default:
+		return "DayOfWeekInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodayofweek = func() map[string]DayOfWeek {
-	m := make(map[string]DayOfWeek)
-	for t, str := range dayofweektostrs {
-		m[str] = DayOfWeek(t)
-	}
-	return m
-}()
 
 // FromString parse string into DayOfWeek constant it's represent, return DayOfWeekInvalid if not found.
 func DayOfWeekFromString(s string) DayOfWeek {
-	val, ok := strtodayofweek[s]
-	if !ok {
-		return strtodayofweek["invalid"]
+	switch s {
+	case "sunday":
+		return DayOfWeekSunday
+	case "monday":
+		return DayOfWeekMonday
+	case "tuesday":
+		return DayOfWeekTuesday
+	case "wednesday":
+		return DayOfWeekWednesday
+	case "thursday":
+		return DayOfWeekThursday
+	case "friday":
+		return DayOfWeekFriday
+	case "saturday":
+		return DayOfWeekSaturday
+	default:
+		return DayOfWeekInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDayOfWeek() []DayOfWeek {
-	vs := make([]DayOfWeek, 0, len(dayofweektostrs))
-	for i := range dayofweektostrs {
-		vs = append(vs, DayOfWeek(i))
+	return []DayOfWeek{
+		DayOfWeekSunday,
+		DayOfWeekMonday,
+		DayOfWeekTuesday,
+		DayOfWeekWednesday,
+		DayOfWeekThursday,
+		DayOfWeekFriday,
+		DayOfWeekSaturday,
 	}
-	return vs
 }

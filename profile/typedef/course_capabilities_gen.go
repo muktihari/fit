@@ -26,55 +26,86 @@ const (
 	CourseCapabilitiesNavigation CourseCapabilities = 0x00000200
 	CourseCapabilitiesBikeway    CourseCapabilities = 0x00000400
 	CourseCapabilitiesAviation   CourseCapabilities = 0x00001000 // Denote course files to be used as flight plans
-	CourseCapabilitiesInvalid    CourseCapabilities = 0x0        // INVALID
+	CourseCapabilitiesInvalid    CourseCapabilities = 0x0
 )
 
-var coursecapabilitiestostrs = map[CourseCapabilities]string{
-	CourseCapabilitiesProcessed:  "processed",
-	CourseCapabilitiesValid:      "valid",
-	CourseCapabilitiesTime:       "time",
-	CourseCapabilitiesDistance:   "distance",
-	CourseCapabilitiesPosition:   "position",
-	CourseCapabilitiesHeartRate:  "heart_rate",
-	CourseCapabilitiesPower:      "power",
-	CourseCapabilitiesCadence:    "cadence",
-	CourseCapabilitiesTraining:   "training",
-	CourseCapabilitiesNavigation: "navigation",
-	CourseCapabilitiesBikeway:    "bikeway",
-	CourseCapabilitiesAviation:   "aviation",
-	CourseCapabilitiesInvalid:    "invalid",
-}
-
 func (c CourseCapabilities) String() string {
-	val, ok := coursecapabilitiestostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CourseCapabilitiesProcessed:
+		return "processed"
+	case CourseCapabilitiesValid:
+		return "valid"
+	case CourseCapabilitiesTime:
+		return "time"
+	case CourseCapabilitiesDistance:
+		return "distance"
+	case CourseCapabilitiesPosition:
+		return "position"
+	case CourseCapabilitiesHeartRate:
+		return "heart_rate"
+	case CourseCapabilitiesPower:
+		return "power"
+	case CourseCapabilitiesCadence:
+		return "cadence"
+	case CourseCapabilitiesTraining:
+		return "training"
+	case CourseCapabilitiesNavigation:
+		return "navigation"
+	case CourseCapabilitiesBikeway:
+		return "bikeway"
+	case CourseCapabilitiesAviation:
+		return "aviation"
+	default:
+		return "CourseCapabilitiesInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocoursecapabilities = func() map[string]CourseCapabilities {
-	m := make(map[string]CourseCapabilities)
-	for t, str := range coursecapabilitiestostrs {
-		m[str] = CourseCapabilities(t)
-	}
-	return m
-}()
 
 // FromString parse string into CourseCapabilities constant it's represent, return CourseCapabilitiesInvalid if not found.
 func CourseCapabilitiesFromString(s string) CourseCapabilities {
-	val, ok := strtocoursecapabilities[s]
-	if !ok {
-		return strtocoursecapabilities["invalid"]
+	switch s {
+	case "processed":
+		return CourseCapabilitiesProcessed
+	case "valid":
+		return CourseCapabilitiesValid
+	case "time":
+		return CourseCapabilitiesTime
+	case "distance":
+		return CourseCapabilitiesDistance
+	case "position":
+		return CourseCapabilitiesPosition
+	case "heart_rate":
+		return CourseCapabilitiesHeartRate
+	case "power":
+		return CourseCapabilitiesPower
+	case "cadence":
+		return CourseCapabilitiesCadence
+	case "training":
+		return CourseCapabilitiesTraining
+	case "navigation":
+		return CourseCapabilitiesNavigation
+	case "bikeway":
+		return CourseCapabilitiesBikeway
+	case "aviation":
+		return CourseCapabilitiesAviation
+	default:
+		return CourseCapabilitiesInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCourseCapabilities() []CourseCapabilities {
-	vs := make([]CourseCapabilities, 0, len(coursecapabilitiestostrs))
-	for i := range coursecapabilitiestostrs {
-		vs = append(vs, CourseCapabilities(i))
+	return []CourseCapabilities{
+		CourseCapabilitiesProcessed,
+		CourseCapabilitiesValid,
+		CourseCapabilitiesTime,
+		CourseCapabilitiesDistance,
+		CourseCapabilitiesPosition,
+		CourseCapabilitiesHeartRate,
+		CourseCapabilitiesPower,
+		CourseCapabilitiesCadence,
+		CourseCapabilitiesTraining,
+		CourseCapabilitiesNavigation,
+		CourseCapabilitiesBikeway,
+		CourseCapabilitiesAviation,
 	}
-	return vs
 }

@@ -15,44 +15,31 @@ type WorkoutHr uint32
 
 const (
 	WorkoutHrBpmOffset WorkoutHr = 100
-	WorkoutHrInvalid   WorkoutHr = 0xFFFFFFFF // INVALID
+	WorkoutHrInvalid   WorkoutHr = 0xFFFFFFFF
 )
 
-var workouthrtostrs = map[WorkoutHr]string{
-	WorkoutHrBpmOffset: "bpm_offset",
-	WorkoutHrInvalid:   "invalid",
-}
-
 func (w WorkoutHr) String() string {
-	val, ok := workouthrtostrs[w]
-	if !ok {
-		return strconv.FormatUint(uint64(w), 10)
+	switch w {
+	case WorkoutHrBpmOffset:
+		return "bpm_offset"
+	default:
+		return "WorkoutHrInvalid(" + strconv.FormatUint(uint64(w), 10) + ")"
 	}
-	return val
 }
-
-var strtoworkouthr = func() map[string]WorkoutHr {
-	m := make(map[string]WorkoutHr)
-	for t, str := range workouthrtostrs {
-		m[str] = WorkoutHr(t)
-	}
-	return m
-}()
 
 // FromString parse string into WorkoutHr constant it's represent, return WorkoutHrInvalid if not found.
 func WorkoutHrFromString(s string) WorkoutHr {
-	val, ok := strtoworkouthr[s]
-	if !ok {
-		return strtoworkouthr["invalid"]
+	switch s {
+	case "bpm_offset":
+		return WorkoutHrBpmOffset
+	default:
+		return WorkoutHrInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWorkoutHr() []WorkoutHr {
-	vs := make([]WorkoutHr, 0, len(workouthrtostrs))
-	for i := range workouthrtostrs {
-		vs = append(vs, WorkoutHr(i))
+	return []WorkoutHr{
+		WorkoutHrBpmOffset,
 	}
-	return vs
 }

@@ -16,45 +16,36 @@ type SetType uint8
 const (
 	SetTypeRest    SetType = 0
 	SetTypeActive  SetType = 1
-	SetTypeInvalid SetType = 0xFF // INVALID
+	SetTypeInvalid SetType = 0xFF
 )
 
-var settypetostrs = map[SetType]string{
-	SetTypeRest:    "rest",
-	SetTypeActive:  "active",
-	SetTypeInvalid: "invalid",
-}
-
 func (s SetType) String() string {
-	val, ok := settypetostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case SetTypeRest:
+		return "rest"
+	case SetTypeActive:
+		return "active"
+	default:
+		return "SetTypeInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtosettype = func() map[string]SetType {
-	m := make(map[string]SetType)
-	for t, str := range settypetostrs {
-		m[str] = SetType(t)
-	}
-	return m
-}()
 
 // FromString parse string into SetType constant it's represent, return SetTypeInvalid if not found.
 func SetTypeFromString(s string) SetType {
-	val, ok := strtosettype[s]
-	if !ok {
-		return strtosettype["invalid"]
+	switch s {
+	case "rest":
+		return SetTypeRest
+	case "active":
+		return SetTypeActive
+	default:
+		return SetTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSetType() []SetType {
-	vs := make([]SetType, 0, len(settypetostrs))
-	for i := range settypetostrs {
-		vs = append(vs, SetType(i))
+	return []SetType{
+		SetTypeRest,
+		SetTypeActive,
 	}
-	return vs
 }

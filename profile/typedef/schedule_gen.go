@@ -16,45 +16,36 @@ type Schedule byte
 const (
 	ScheduleWorkout Schedule = 0
 	ScheduleCourse  Schedule = 1
-	ScheduleInvalid Schedule = 0xFF // INVALID
+	ScheduleInvalid Schedule = 0xFF
 )
 
-var scheduletostrs = map[Schedule]string{
-	ScheduleWorkout: "workout",
-	ScheduleCourse:  "course",
-	ScheduleInvalid: "invalid",
-}
-
 func (s Schedule) String() string {
-	val, ok := scheduletostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case ScheduleWorkout:
+		return "workout"
+	case ScheduleCourse:
+		return "course"
+	default:
+		return "ScheduleInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtoschedule = func() map[string]Schedule {
-	m := make(map[string]Schedule)
-	for t, str := range scheduletostrs {
-		m[str] = Schedule(t)
-	}
-	return m
-}()
 
 // FromString parse string into Schedule constant it's represent, return ScheduleInvalid if not found.
 func ScheduleFromString(s string) Schedule {
-	val, ok := strtoschedule[s]
-	if !ok {
-		return strtoschedule["invalid"]
+	switch s {
+	case "workout":
+		return ScheduleWorkout
+	case "course":
+		return ScheduleCourse
+	default:
+		return ScheduleInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSchedule() []Schedule {
-	vs := make([]Schedule, 0, len(scheduletostrs))
-	for i := range scheduletostrs {
-		vs = append(vs, Schedule(i))
+	return []Schedule{
+		ScheduleWorkout,
+		ScheduleCourse,
 	}
-	return vs
 }

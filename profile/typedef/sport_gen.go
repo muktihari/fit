@@ -71,102 +71,317 @@ const (
 	SportMeditation            Sport = 67
 	SportWaterTubing           Sport = 76
 	SportWakesurfing           Sport = 77
-	SportAll                   Sport = 254  // All is for goals only to include all sports.
-	SportInvalid               Sport = 0xFF // INVALID
+	SportAll                   Sport = 254 // All is for goals only to include all sports.
+	SportInvalid               Sport = 0xFF
 )
 
-var sporttostrs = map[Sport]string{
-	SportGeneric:               "generic",
-	SportRunning:               "running",
-	SportCycling:               "cycling",
-	SportTransition:            "transition",
-	SportFitnessEquipment:      "fitness_equipment",
-	SportSwimming:              "swimming",
-	SportBasketball:            "basketball",
-	SportSoccer:                "soccer",
-	SportTennis:                "tennis",
-	SportAmericanFootball:      "american_football",
-	SportTraining:              "training",
-	SportWalking:               "walking",
-	SportCrossCountrySkiing:    "cross_country_skiing",
-	SportAlpineSkiing:          "alpine_skiing",
-	SportSnowboarding:          "snowboarding",
-	SportRowing:                "rowing",
-	SportMountaineering:        "mountaineering",
-	SportHiking:                "hiking",
-	SportMultisport:            "multisport",
-	SportPaddling:              "paddling",
-	SportFlying:                "flying",
-	SportEBiking:               "e_biking",
-	SportMotorcycling:          "motorcycling",
-	SportBoating:               "boating",
-	SportDriving:               "driving",
-	SportGolf:                  "golf",
-	SportHangGliding:           "hang_gliding",
-	SportHorsebackRiding:       "horseback_riding",
-	SportHunting:               "hunting",
-	SportFishing:               "fishing",
-	SportInlineSkating:         "inline_skating",
-	SportRockClimbing:          "rock_climbing",
-	SportSailing:               "sailing",
-	SportIceSkating:            "ice_skating",
-	SportSkyDiving:             "sky_diving",
-	SportSnowshoeing:           "snowshoeing",
-	SportSnowmobiling:          "snowmobiling",
-	SportStandUpPaddleboarding: "stand_up_paddleboarding",
-	SportSurfing:               "surfing",
-	SportWakeboarding:          "wakeboarding",
-	SportWaterSkiing:           "water_skiing",
-	SportKayaking:              "kayaking",
-	SportRafting:               "rafting",
-	SportWindsurfing:           "windsurfing",
-	SportKitesurfing:           "kitesurfing",
-	SportTactical:              "tactical",
-	SportJumpmaster:            "jumpmaster",
-	SportBoxing:                "boxing",
-	SportFloorClimbing:         "floor_climbing",
-	SportDiving:                "diving",
-	SportHiit:                  "hiit",
-	SportRacket:                "racket",
-	SportWheelchairPushWalk:    "wheelchair_push_walk",
-	SportWheelchairPushRun:     "wheelchair_push_run",
-	SportMeditation:            "meditation",
-	SportWaterTubing:           "water_tubing",
-	SportWakesurfing:           "wakesurfing",
-	SportAll:                   "all",
-	SportInvalid:               "invalid",
-}
-
 func (s Sport) String() string {
-	val, ok := sporttostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SportGeneric:
+		return "generic"
+	case SportRunning:
+		return "running"
+	case SportCycling:
+		return "cycling"
+	case SportTransition:
+		return "transition"
+	case SportFitnessEquipment:
+		return "fitness_equipment"
+	case SportSwimming:
+		return "swimming"
+	case SportBasketball:
+		return "basketball"
+	case SportSoccer:
+		return "soccer"
+	case SportTennis:
+		return "tennis"
+	case SportAmericanFootball:
+		return "american_football"
+	case SportTraining:
+		return "training"
+	case SportWalking:
+		return "walking"
+	case SportCrossCountrySkiing:
+		return "cross_country_skiing"
+	case SportAlpineSkiing:
+		return "alpine_skiing"
+	case SportSnowboarding:
+		return "snowboarding"
+	case SportRowing:
+		return "rowing"
+	case SportMountaineering:
+		return "mountaineering"
+	case SportHiking:
+		return "hiking"
+	case SportMultisport:
+		return "multisport"
+	case SportPaddling:
+		return "paddling"
+	case SportFlying:
+		return "flying"
+	case SportEBiking:
+		return "e_biking"
+	case SportMotorcycling:
+		return "motorcycling"
+	case SportBoating:
+		return "boating"
+	case SportDriving:
+		return "driving"
+	case SportGolf:
+		return "golf"
+	case SportHangGliding:
+		return "hang_gliding"
+	case SportHorsebackRiding:
+		return "horseback_riding"
+	case SportHunting:
+		return "hunting"
+	case SportFishing:
+		return "fishing"
+	case SportInlineSkating:
+		return "inline_skating"
+	case SportRockClimbing:
+		return "rock_climbing"
+	case SportSailing:
+		return "sailing"
+	case SportIceSkating:
+		return "ice_skating"
+	case SportSkyDiving:
+		return "sky_diving"
+	case SportSnowshoeing:
+		return "snowshoeing"
+	case SportSnowmobiling:
+		return "snowmobiling"
+	case SportStandUpPaddleboarding:
+		return "stand_up_paddleboarding"
+	case SportSurfing:
+		return "surfing"
+	case SportWakeboarding:
+		return "wakeboarding"
+	case SportWaterSkiing:
+		return "water_skiing"
+	case SportKayaking:
+		return "kayaking"
+	case SportRafting:
+		return "rafting"
+	case SportWindsurfing:
+		return "windsurfing"
+	case SportKitesurfing:
+		return "kitesurfing"
+	case SportTactical:
+		return "tactical"
+	case SportJumpmaster:
+		return "jumpmaster"
+	case SportBoxing:
+		return "boxing"
+	case SportFloorClimbing:
+		return "floor_climbing"
+	case SportDiving:
+		return "diving"
+	case SportHiit:
+		return "hiit"
+	case SportRacket:
+		return "racket"
+	case SportWheelchairPushWalk:
+		return "wheelchair_push_walk"
+	case SportWheelchairPushRun:
+		return "wheelchair_push_run"
+	case SportMeditation:
+		return "meditation"
+	case SportWaterTubing:
+		return "water_tubing"
+	case SportWakesurfing:
+		return "wakesurfing"
+	case SportAll:
+		return "all"
+	default:
+		return "SportInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosport = func() map[string]Sport {
-	m := make(map[string]Sport)
-	for t, str := range sporttostrs {
-		m[str] = Sport(t)
-	}
-	return m
-}()
 
 // FromString parse string into Sport constant it's represent, return SportInvalid if not found.
 func SportFromString(s string) Sport {
-	val, ok := strtosport[s]
-	if !ok {
-		return strtosport["invalid"]
+	switch s {
+	case "generic":
+		return SportGeneric
+	case "running":
+		return SportRunning
+	case "cycling":
+		return SportCycling
+	case "transition":
+		return SportTransition
+	case "fitness_equipment":
+		return SportFitnessEquipment
+	case "swimming":
+		return SportSwimming
+	case "basketball":
+		return SportBasketball
+	case "soccer":
+		return SportSoccer
+	case "tennis":
+		return SportTennis
+	case "american_football":
+		return SportAmericanFootball
+	case "training":
+		return SportTraining
+	case "walking":
+		return SportWalking
+	case "cross_country_skiing":
+		return SportCrossCountrySkiing
+	case "alpine_skiing":
+		return SportAlpineSkiing
+	case "snowboarding":
+		return SportSnowboarding
+	case "rowing":
+		return SportRowing
+	case "mountaineering":
+		return SportMountaineering
+	case "hiking":
+		return SportHiking
+	case "multisport":
+		return SportMultisport
+	case "paddling":
+		return SportPaddling
+	case "flying":
+		return SportFlying
+	case "e_biking":
+		return SportEBiking
+	case "motorcycling":
+		return SportMotorcycling
+	case "boating":
+		return SportBoating
+	case "driving":
+		return SportDriving
+	case "golf":
+		return SportGolf
+	case "hang_gliding":
+		return SportHangGliding
+	case "horseback_riding":
+		return SportHorsebackRiding
+	case "hunting":
+		return SportHunting
+	case "fishing":
+		return SportFishing
+	case "inline_skating":
+		return SportInlineSkating
+	case "rock_climbing":
+		return SportRockClimbing
+	case "sailing":
+		return SportSailing
+	case "ice_skating":
+		return SportIceSkating
+	case "sky_diving":
+		return SportSkyDiving
+	case "snowshoeing":
+		return SportSnowshoeing
+	case "snowmobiling":
+		return SportSnowmobiling
+	case "stand_up_paddleboarding":
+		return SportStandUpPaddleboarding
+	case "surfing":
+		return SportSurfing
+	case "wakeboarding":
+		return SportWakeboarding
+	case "water_skiing":
+		return SportWaterSkiing
+	case "kayaking":
+		return SportKayaking
+	case "rafting":
+		return SportRafting
+	case "windsurfing":
+		return SportWindsurfing
+	case "kitesurfing":
+		return SportKitesurfing
+	case "tactical":
+		return SportTactical
+	case "jumpmaster":
+		return SportJumpmaster
+	case "boxing":
+		return SportBoxing
+	case "floor_climbing":
+		return SportFloorClimbing
+	case "diving":
+		return SportDiving
+	case "hiit":
+		return SportHiit
+	case "racket":
+		return SportRacket
+	case "wheelchair_push_walk":
+		return SportWheelchairPushWalk
+	case "wheelchair_push_run":
+		return SportWheelchairPushRun
+	case "meditation":
+		return SportMeditation
+	case "water_tubing":
+		return SportWaterTubing
+	case "wakesurfing":
+		return SportWakesurfing
+	case "all":
+		return SportAll
+	default:
+		return SportInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSport() []Sport {
-	vs := make([]Sport, 0, len(sporttostrs))
-	for i := range sporttostrs {
-		vs = append(vs, Sport(i))
+	return []Sport{
+		SportGeneric,
+		SportRunning,
+		SportCycling,
+		SportTransition,
+		SportFitnessEquipment,
+		SportSwimming,
+		SportBasketball,
+		SportSoccer,
+		SportTennis,
+		SportAmericanFootball,
+		SportTraining,
+		SportWalking,
+		SportCrossCountrySkiing,
+		SportAlpineSkiing,
+		SportSnowboarding,
+		SportRowing,
+		SportMountaineering,
+		SportHiking,
+		SportMultisport,
+		SportPaddling,
+		SportFlying,
+		SportEBiking,
+		SportMotorcycling,
+		SportBoating,
+		SportDriving,
+		SportGolf,
+		SportHangGliding,
+		SportHorsebackRiding,
+		SportHunting,
+		SportFishing,
+		SportInlineSkating,
+		SportRockClimbing,
+		SportSailing,
+		SportIceSkating,
+		SportSkyDiving,
+		SportSnowshoeing,
+		SportSnowmobiling,
+		SportStandUpPaddleboarding,
+		SportSurfing,
+		SportWakeboarding,
+		SportWaterSkiing,
+		SportKayaking,
+		SportRafting,
+		SportWindsurfing,
+		SportKitesurfing,
+		SportTactical,
+		SportJumpmaster,
+		SportBoxing,
+		SportFloorClimbing,
+		SportDiving,
+		SportHiit,
+		SportRacket,
+		SportWheelchairPushWalk,
+		SportWheelchairPushRun,
+		SportMeditation,
+		SportWaterTubing,
+		SportWakesurfing,
+		SportAll,
 	}
-	return vs
 }

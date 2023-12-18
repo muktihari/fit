@@ -17,46 +17,41 @@ const (
 	MesgCountNumPerFile     MesgCount = 0
 	MesgCountMaxPerFile     MesgCount = 1
 	MesgCountMaxPerFileType MesgCount = 2
-	MesgCountInvalid        MesgCount = 0xFF // INVALID
+	MesgCountInvalid        MesgCount = 0xFF
 )
 
-var mesgcounttostrs = map[MesgCount]string{
-	MesgCountNumPerFile:     "num_per_file",
-	MesgCountMaxPerFile:     "max_per_file",
-	MesgCountMaxPerFileType: "max_per_file_type",
-	MesgCountInvalid:        "invalid",
-}
-
 func (m MesgCount) String() string {
-	val, ok := mesgcounttostrs[m]
-	if !ok {
-		return strconv.Itoa(int(m))
+	switch m {
+	case MesgCountNumPerFile:
+		return "num_per_file"
+	case MesgCountMaxPerFile:
+		return "max_per_file"
+	case MesgCountMaxPerFileType:
+		return "max_per_file_type"
+	default:
+		return "MesgCountInvalid(" + strconv.Itoa(int(m)) + ")"
 	}
-	return val
 }
-
-var strtomesgcount = func() map[string]MesgCount {
-	m := make(map[string]MesgCount)
-	for t, str := range mesgcounttostrs {
-		m[str] = MesgCount(t)
-	}
-	return m
-}()
 
 // FromString parse string into MesgCount constant it's represent, return MesgCountInvalid if not found.
 func MesgCountFromString(s string) MesgCount {
-	val, ok := strtomesgcount[s]
-	if !ok {
-		return strtomesgcount["invalid"]
+	switch s {
+	case "num_per_file":
+		return MesgCountNumPerFile
+	case "max_per_file":
+		return MesgCountMaxPerFile
+	case "max_per_file_type":
+		return MesgCountMaxPerFileType
+	default:
+		return MesgCountInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMesgCount() []MesgCount {
-	vs := make([]MesgCount, 0, len(mesgcounttostrs))
-	for i := range mesgcounttostrs {
-		vs = append(vs, MesgCount(i))
+	return []MesgCount{
+		MesgCountNumPerFile,
+		MesgCountMaxPerFile,
+		MesgCountMaxPerFileType,
 	}
-	return vs
 }

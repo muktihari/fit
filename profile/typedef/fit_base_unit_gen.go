@@ -17,46 +17,41 @@ const (
 	FitBaseUnitOther    FitBaseUnit = 0
 	FitBaseUnitKilogram FitBaseUnit = 1
 	FitBaseUnitPound    FitBaseUnit = 2
-	FitBaseUnitInvalid  FitBaseUnit = 0xFFFF // INVALID
+	FitBaseUnitInvalid  FitBaseUnit = 0xFFFF
 )
 
-var fitbaseunittostrs = map[FitBaseUnit]string{
-	FitBaseUnitOther:    "other",
-	FitBaseUnitKilogram: "kilogram",
-	FitBaseUnitPound:    "pound",
-	FitBaseUnitInvalid:  "invalid",
-}
-
 func (f FitBaseUnit) String() string {
-	val, ok := fitbaseunittostrs[f]
-	if !ok {
-		return strconv.FormatUint(uint64(f), 10)
+	switch f {
+	case FitBaseUnitOther:
+		return "other"
+	case FitBaseUnitKilogram:
+		return "kilogram"
+	case FitBaseUnitPound:
+		return "pound"
+	default:
+		return "FitBaseUnitInvalid(" + strconv.FormatUint(uint64(f), 10) + ")"
 	}
-	return val
 }
-
-var strtofitbaseunit = func() map[string]FitBaseUnit {
-	m := make(map[string]FitBaseUnit)
-	for t, str := range fitbaseunittostrs {
-		m[str] = FitBaseUnit(t)
-	}
-	return m
-}()
 
 // FromString parse string into FitBaseUnit constant it's represent, return FitBaseUnitInvalid if not found.
 func FitBaseUnitFromString(s string) FitBaseUnit {
-	val, ok := strtofitbaseunit[s]
-	if !ok {
-		return strtofitbaseunit["invalid"]
+	switch s {
+	case "other":
+		return FitBaseUnitOther
+	case "kilogram":
+		return FitBaseUnitKilogram
+	case "pound":
+		return FitBaseUnitPound
+	default:
+		return FitBaseUnitInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListFitBaseUnit() []FitBaseUnit {
-	vs := make([]FitBaseUnit, 0, len(fitbaseunittostrs))
-	for i := range fitbaseunittostrs {
-		vs = append(vs, FitBaseUnit(i))
+	return []FitBaseUnit{
+		FitBaseUnitOther,
+		FitBaseUnitKilogram,
+		FitBaseUnitPound,
 	}
-	return vs
 }

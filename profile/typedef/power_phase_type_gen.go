@@ -18,47 +18,46 @@ const (
 	PowerPhaseTypePowerPhaseEndAngle   PowerPhaseType = 1
 	PowerPhaseTypePowerPhaseArcLength  PowerPhaseType = 2
 	PowerPhaseTypePowerPhaseCenter     PowerPhaseType = 3
-	PowerPhaseTypeInvalid              PowerPhaseType = 0xFF // INVALID
+	PowerPhaseTypeInvalid              PowerPhaseType = 0xFF
 )
 
-var powerphasetypetostrs = map[PowerPhaseType]string{
-	PowerPhaseTypePowerPhaseStartAngle: "power_phase_start_angle",
-	PowerPhaseTypePowerPhaseEndAngle:   "power_phase_end_angle",
-	PowerPhaseTypePowerPhaseArcLength:  "power_phase_arc_length",
-	PowerPhaseTypePowerPhaseCenter:     "power_phase_center",
-	PowerPhaseTypeInvalid:              "invalid",
-}
-
 func (p PowerPhaseType) String() string {
-	val, ok := powerphasetypetostrs[p]
-	if !ok {
-		return strconv.Itoa(int(p))
+	switch p {
+	case PowerPhaseTypePowerPhaseStartAngle:
+		return "power_phase_start_angle"
+	case PowerPhaseTypePowerPhaseEndAngle:
+		return "power_phase_end_angle"
+	case PowerPhaseTypePowerPhaseArcLength:
+		return "power_phase_arc_length"
+	case PowerPhaseTypePowerPhaseCenter:
+		return "power_phase_center"
+	default:
+		return "PowerPhaseTypeInvalid(" + strconv.Itoa(int(p)) + ")"
 	}
-	return val
 }
-
-var strtopowerphasetype = func() map[string]PowerPhaseType {
-	m := make(map[string]PowerPhaseType)
-	for t, str := range powerphasetypetostrs {
-		m[str] = PowerPhaseType(t)
-	}
-	return m
-}()
 
 // FromString parse string into PowerPhaseType constant it's represent, return PowerPhaseTypeInvalid if not found.
 func PowerPhaseTypeFromString(s string) PowerPhaseType {
-	val, ok := strtopowerphasetype[s]
-	if !ok {
-		return strtopowerphasetype["invalid"]
+	switch s {
+	case "power_phase_start_angle":
+		return PowerPhaseTypePowerPhaseStartAngle
+	case "power_phase_end_angle":
+		return PowerPhaseTypePowerPhaseEndAngle
+	case "power_phase_arc_length":
+		return PowerPhaseTypePowerPhaseArcLength
+	case "power_phase_center":
+		return PowerPhaseTypePowerPhaseCenter
+	default:
+		return PowerPhaseTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListPowerPhaseType() []PowerPhaseType {
-	vs := make([]PowerPhaseType, 0, len(powerphasetypetostrs))
-	for i := range powerphasetypetostrs {
-		vs = append(vs, PowerPhaseType(i))
+	return []PowerPhaseType{
+		PowerPhaseTypePowerPhaseStartAngle,
+		PowerPhaseTypePowerPhaseEndAngle,
+		PowerPhaseTypePowerPhaseArcLength,
+		PowerPhaseTypePowerPhaseCenter,
 	}
-	return vs
 }

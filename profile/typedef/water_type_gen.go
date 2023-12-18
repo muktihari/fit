@@ -18,47 +18,46 @@ const (
 	WaterTypeSalt    WaterType = 1
 	WaterTypeEn13319 WaterType = 2
 	WaterTypeCustom  WaterType = 3
-	WaterTypeInvalid WaterType = 0xFF // INVALID
+	WaterTypeInvalid WaterType = 0xFF
 )
 
-var watertypetostrs = map[WaterType]string{
-	WaterTypeFresh:   "fresh",
-	WaterTypeSalt:    "salt",
-	WaterTypeEn13319: "en13319",
-	WaterTypeCustom:  "custom",
-	WaterTypeInvalid: "invalid",
-}
-
 func (w WaterType) String() string {
-	val, ok := watertypetostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WaterTypeFresh:
+		return "fresh"
+	case WaterTypeSalt:
+		return "salt"
+	case WaterTypeEn13319:
+		return "en13319"
+	case WaterTypeCustom:
+		return "custom"
+	default:
+		return "WaterTypeInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtowatertype = func() map[string]WaterType {
-	m := make(map[string]WaterType)
-	for t, str := range watertypetostrs {
-		m[str] = WaterType(t)
-	}
-	return m
-}()
 
 // FromString parse string into WaterType constant it's represent, return WaterTypeInvalid if not found.
 func WaterTypeFromString(s string) WaterType {
-	val, ok := strtowatertype[s]
-	if !ok {
-		return strtowatertype["invalid"]
+	switch s {
+	case "fresh":
+		return WaterTypeFresh
+	case "salt":
+		return WaterTypeSalt
+	case "en13319":
+		return WaterTypeEn13319
+	case "custom":
+		return WaterTypeCustom
+	default:
+		return WaterTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWaterType() []WaterType {
-	vs := make([]WaterType, 0, len(watertypetostrs))
-	for i := range watertypetostrs {
-		vs = append(vs, WaterType(i))
+	return []WaterType{
+		WaterTypeFresh,
+		WaterTypeSalt,
+		WaterTypeEn13319,
+		WaterTypeCustom,
 	}
-	return vs
 }

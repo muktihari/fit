@@ -52,81 +52,216 @@ const (
 	TurnTypeUturnRightIdx           TurnType = 35
 	TurnTypeIconInvIdx              TurnType = 36
 	TurnTypeIconIdxCnt              TurnType = 37
-	TurnTypeInvalid                 TurnType = 0xFF // INVALID
+	TurnTypeInvalid                 TurnType = 0xFF
 )
 
-var turntypetostrs = map[TurnType]string{
-	TurnTypeArrivingIdx:             "arriving_idx",
-	TurnTypeArrivingLeftIdx:         "arriving_left_idx",
-	TurnTypeArrivingRightIdx:        "arriving_right_idx",
-	TurnTypeArrivingViaIdx:          "arriving_via_idx",
-	TurnTypeArrivingViaLeftIdx:      "arriving_via_left_idx",
-	TurnTypeArrivingViaRightIdx:     "arriving_via_right_idx",
-	TurnTypeBearKeepLeftIdx:         "bear_keep_left_idx",
-	TurnTypeBearKeepRightIdx:        "bear_keep_right_idx",
-	TurnTypeContinueIdx:             "continue_idx",
-	TurnTypeExitLeftIdx:             "exit_left_idx",
-	TurnTypeExitRightIdx:            "exit_right_idx",
-	TurnTypeFerryIdx:                "ferry_idx",
-	TurnTypeRoundabout45Idx:         "roundabout_45_idx",
-	TurnTypeRoundabout90Idx:         "roundabout_90_idx",
-	TurnTypeRoundabout135Idx:        "roundabout_135_idx",
-	TurnTypeRoundabout180Idx:        "roundabout_180_idx",
-	TurnTypeRoundabout225Idx:        "roundabout_225_idx",
-	TurnTypeRoundabout270Idx:        "roundabout_270_idx",
-	TurnTypeRoundabout315Idx:        "roundabout_315_idx",
-	TurnTypeRoundabout360Idx:        "roundabout_360_idx",
-	TurnTypeRoundaboutNeg45Idx:      "roundabout_neg_45_idx",
-	TurnTypeRoundaboutNeg90Idx:      "roundabout_neg_90_idx",
-	TurnTypeRoundaboutNeg135Idx:     "roundabout_neg_135_idx",
-	TurnTypeRoundaboutNeg180Idx:     "roundabout_neg_180_idx",
-	TurnTypeRoundaboutNeg225Idx:     "roundabout_neg_225_idx",
-	TurnTypeRoundaboutNeg270Idx:     "roundabout_neg_270_idx",
-	TurnTypeRoundaboutNeg315Idx:     "roundabout_neg_315_idx",
-	TurnTypeRoundaboutNeg360Idx:     "roundabout_neg_360_idx",
-	TurnTypeRoundaboutGenericIdx:    "roundabout_generic_idx",
-	TurnTypeRoundaboutNegGenericIdx: "roundabout_neg_generic_idx",
-	TurnTypeSharpTurnLeftIdx:        "sharp_turn_left_idx",
-	TurnTypeSharpTurnRightIdx:       "sharp_turn_right_idx",
-	TurnTypeTurnLeftIdx:             "turn_left_idx",
-	TurnTypeTurnRightIdx:            "turn_right_idx",
-	TurnTypeUturnLeftIdx:            "uturn_left_idx",
-	TurnTypeUturnRightIdx:           "uturn_right_idx",
-	TurnTypeIconInvIdx:              "icon_inv_idx",
-	TurnTypeIconIdxCnt:              "icon_idx_cnt",
-	TurnTypeInvalid:                 "invalid",
-}
-
 func (t TurnType) String() string {
-	val, ok := turntypetostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TurnTypeArrivingIdx:
+		return "arriving_idx"
+	case TurnTypeArrivingLeftIdx:
+		return "arriving_left_idx"
+	case TurnTypeArrivingRightIdx:
+		return "arriving_right_idx"
+	case TurnTypeArrivingViaIdx:
+		return "arriving_via_idx"
+	case TurnTypeArrivingViaLeftIdx:
+		return "arriving_via_left_idx"
+	case TurnTypeArrivingViaRightIdx:
+		return "arriving_via_right_idx"
+	case TurnTypeBearKeepLeftIdx:
+		return "bear_keep_left_idx"
+	case TurnTypeBearKeepRightIdx:
+		return "bear_keep_right_idx"
+	case TurnTypeContinueIdx:
+		return "continue_idx"
+	case TurnTypeExitLeftIdx:
+		return "exit_left_idx"
+	case TurnTypeExitRightIdx:
+		return "exit_right_idx"
+	case TurnTypeFerryIdx:
+		return "ferry_idx"
+	case TurnTypeRoundabout45Idx:
+		return "roundabout_45_idx"
+	case TurnTypeRoundabout90Idx:
+		return "roundabout_90_idx"
+	case TurnTypeRoundabout135Idx:
+		return "roundabout_135_idx"
+	case TurnTypeRoundabout180Idx:
+		return "roundabout_180_idx"
+	case TurnTypeRoundabout225Idx:
+		return "roundabout_225_idx"
+	case TurnTypeRoundabout270Idx:
+		return "roundabout_270_idx"
+	case TurnTypeRoundabout315Idx:
+		return "roundabout_315_idx"
+	case TurnTypeRoundabout360Idx:
+		return "roundabout_360_idx"
+	case TurnTypeRoundaboutNeg45Idx:
+		return "roundabout_neg_45_idx"
+	case TurnTypeRoundaboutNeg90Idx:
+		return "roundabout_neg_90_idx"
+	case TurnTypeRoundaboutNeg135Idx:
+		return "roundabout_neg_135_idx"
+	case TurnTypeRoundaboutNeg180Idx:
+		return "roundabout_neg_180_idx"
+	case TurnTypeRoundaboutNeg225Idx:
+		return "roundabout_neg_225_idx"
+	case TurnTypeRoundaboutNeg270Idx:
+		return "roundabout_neg_270_idx"
+	case TurnTypeRoundaboutNeg315Idx:
+		return "roundabout_neg_315_idx"
+	case TurnTypeRoundaboutNeg360Idx:
+		return "roundabout_neg_360_idx"
+	case TurnTypeRoundaboutGenericIdx:
+		return "roundabout_generic_idx"
+	case TurnTypeRoundaboutNegGenericIdx:
+		return "roundabout_neg_generic_idx"
+	case TurnTypeSharpTurnLeftIdx:
+		return "sharp_turn_left_idx"
+	case TurnTypeSharpTurnRightIdx:
+		return "sharp_turn_right_idx"
+	case TurnTypeTurnLeftIdx:
+		return "turn_left_idx"
+	case TurnTypeTurnRightIdx:
+		return "turn_right_idx"
+	case TurnTypeUturnLeftIdx:
+		return "uturn_left_idx"
+	case TurnTypeUturnRightIdx:
+		return "uturn_right_idx"
+	case TurnTypeIconInvIdx:
+		return "icon_inv_idx"
+	case TurnTypeIconIdxCnt:
+		return "icon_idx_cnt"
+	default:
+		return "TurnTypeInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtoturntype = func() map[string]TurnType {
-	m := make(map[string]TurnType)
-	for t, str := range turntypetostrs {
-		m[str] = TurnType(t)
-	}
-	return m
-}()
 
 // FromString parse string into TurnType constant it's represent, return TurnTypeInvalid if not found.
 func TurnTypeFromString(s string) TurnType {
-	val, ok := strtoturntype[s]
-	if !ok {
-		return strtoturntype["invalid"]
+	switch s {
+	case "arriving_idx":
+		return TurnTypeArrivingIdx
+	case "arriving_left_idx":
+		return TurnTypeArrivingLeftIdx
+	case "arriving_right_idx":
+		return TurnTypeArrivingRightIdx
+	case "arriving_via_idx":
+		return TurnTypeArrivingViaIdx
+	case "arriving_via_left_idx":
+		return TurnTypeArrivingViaLeftIdx
+	case "arriving_via_right_idx":
+		return TurnTypeArrivingViaRightIdx
+	case "bear_keep_left_idx":
+		return TurnTypeBearKeepLeftIdx
+	case "bear_keep_right_idx":
+		return TurnTypeBearKeepRightIdx
+	case "continue_idx":
+		return TurnTypeContinueIdx
+	case "exit_left_idx":
+		return TurnTypeExitLeftIdx
+	case "exit_right_idx":
+		return TurnTypeExitRightIdx
+	case "ferry_idx":
+		return TurnTypeFerryIdx
+	case "roundabout_45_idx":
+		return TurnTypeRoundabout45Idx
+	case "roundabout_90_idx":
+		return TurnTypeRoundabout90Idx
+	case "roundabout_135_idx":
+		return TurnTypeRoundabout135Idx
+	case "roundabout_180_idx":
+		return TurnTypeRoundabout180Idx
+	case "roundabout_225_idx":
+		return TurnTypeRoundabout225Idx
+	case "roundabout_270_idx":
+		return TurnTypeRoundabout270Idx
+	case "roundabout_315_idx":
+		return TurnTypeRoundabout315Idx
+	case "roundabout_360_idx":
+		return TurnTypeRoundabout360Idx
+	case "roundabout_neg_45_idx":
+		return TurnTypeRoundaboutNeg45Idx
+	case "roundabout_neg_90_idx":
+		return TurnTypeRoundaboutNeg90Idx
+	case "roundabout_neg_135_idx":
+		return TurnTypeRoundaboutNeg135Idx
+	case "roundabout_neg_180_idx":
+		return TurnTypeRoundaboutNeg180Idx
+	case "roundabout_neg_225_idx":
+		return TurnTypeRoundaboutNeg225Idx
+	case "roundabout_neg_270_idx":
+		return TurnTypeRoundaboutNeg270Idx
+	case "roundabout_neg_315_idx":
+		return TurnTypeRoundaboutNeg315Idx
+	case "roundabout_neg_360_idx":
+		return TurnTypeRoundaboutNeg360Idx
+	case "roundabout_generic_idx":
+		return TurnTypeRoundaboutGenericIdx
+	case "roundabout_neg_generic_idx":
+		return TurnTypeRoundaboutNegGenericIdx
+	case "sharp_turn_left_idx":
+		return TurnTypeSharpTurnLeftIdx
+	case "sharp_turn_right_idx":
+		return TurnTypeSharpTurnRightIdx
+	case "turn_left_idx":
+		return TurnTypeTurnLeftIdx
+	case "turn_right_idx":
+		return TurnTypeTurnRightIdx
+	case "uturn_left_idx":
+		return TurnTypeUturnLeftIdx
+	case "uturn_right_idx":
+		return TurnTypeUturnRightIdx
+	case "icon_inv_idx":
+		return TurnTypeIconInvIdx
+	case "icon_idx_cnt":
+		return TurnTypeIconIdxCnt
+	default:
+		return TurnTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTurnType() []TurnType {
-	vs := make([]TurnType, 0, len(turntypetostrs))
-	for i := range turntypetostrs {
-		vs = append(vs, TurnType(i))
+	return []TurnType{
+		TurnTypeArrivingIdx,
+		TurnTypeArrivingLeftIdx,
+		TurnTypeArrivingRightIdx,
+		TurnTypeArrivingViaIdx,
+		TurnTypeArrivingViaLeftIdx,
+		TurnTypeArrivingViaRightIdx,
+		TurnTypeBearKeepLeftIdx,
+		TurnTypeBearKeepRightIdx,
+		TurnTypeContinueIdx,
+		TurnTypeExitLeftIdx,
+		TurnTypeExitRightIdx,
+		TurnTypeFerryIdx,
+		TurnTypeRoundabout45Idx,
+		TurnTypeRoundabout90Idx,
+		TurnTypeRoundabout135Idx,
+		TurnTypeRoundabout180Idx,
+		TurnTypeRoundabout225Idx,
+		TurnTypeRoundabout270Idx,
+		TurnTypeRoundabout315Idx,
+		TurnTypeRoundabout360Idx,
+		TurnTypeRoundaboutNeg45Idx,
+		TurnTypeRoundaboutNeg90Idx,
+		TurnTypeRoundaboutNeg135Idx,
+		TurnTypeRoundaboutNeg180Idx,
+		TurnTypeRoundaboutNeg225Idx,
+		TurnTypeRoundaboutNeg270Idx,
+		TurnTypeRoundaboutNeg315Idx,
+		TurnTypeRoundaboutNeg360Idx,
+		TurnTypeRoundaboutGenericIdx,
+		TurnTypeRoundaboutNegGenericIdx,
+		TurnTypeSharpTurnLeftIdx,
+		TurnTypeSharpTurnRightIdx,
+		TurnTypeTurnLeftIdx,
+		TurnTypeTurnRightIdx,
+		TurnTypeUturnLeftIdx,
+		TurnTypeUturnRightIdx,
+		TurnTypeIconInvIdx,
+		TurnTypeIconIdxCnt,
 	}
-	return vs
 }

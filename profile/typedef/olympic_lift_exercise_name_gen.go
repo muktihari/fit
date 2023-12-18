@@ -35,64 +35,131 @@ const (
 	OlympicLiftExerciseNameSingleArmKettlebellSnatch  OlympicLiftExerciseName = 18
 	OlympicLiftExerciseNameSplitJerk                  OlympicLiftExerciseName = 19
 	OlympicLiftExerciseNameSquatCleanAndJerk          OlympicLiftExerciseName = 20
-	OlympicLiftExerciseNameInvalid                    OlympicLiftExerciseName = 0xFFFF // INVALID
+	OlympicLiftExerciseNameInvalid                    OlympicLiftExerciseName = 0xFFFF
 )
 
-var olympicliftexercisenametostrs = map[OlympicLiftExerciseName]string{
-	OlympicLiftExerciseNameBarbellHangPowerClean:      "barbell_hang_power_clean",
-	OlympicLiftExerciseNameBarbellHangSquatClean:      "barbell_hang_squat_clean",
-	OlympicLiftExerciseNameBarbellPowerClean:          "barbell_power_clean",
-	OlympicLiftExerciseNameBarbellPowerSnatch:         "barbell_power_snatch",
-	OlympicLiftExerciseNameBarbellSquatClean:          "barbell_squat_clean",
-	OlympicLiftExerciseNameCleanAndJerk:               "clean_and_jerk",
-	OlympicLiftExerciseNameBarbellHangPowerSnatch:     "barbell_hang_power_snatch",
-	OlympicLiftExerciseNameBarbellHangPull:            "barbell_hang_pull",
-	OlympicLiftExerciseNameBarbellHighPull:            "barbell_high_pull",
-	OlympicLiftExerciseNameBarbellSnatch:              "barbell_snatch",
-	OlympicLiftExerciseNameBarbellSplitJerk:           "barbell_split_jerk",
-	OlympicLiftExerciseNameClean:                      "clean",
-	OlympicLiftExerciseNameDumbbellClean:              "dumbbell_clean",
-	OlympicLiftExerciseNameDumbbellHangPull:           "dumbbell_hang_pull",
-	OlympicLiftExerciseNameOneHandDumbbellSplitSnatch: "one_hand_dumbbell_split_snatch",
-	OlympicLiftExerciseNamePushJerk:                   "push_jerk",
-	OlympicLiftExerciseNameSingleArmDumbbellSnatch:    "single_arm_dumbbell_snatch",
-	OlympicLiftExerciseNameSingleArmHangSnatch:        "single_arm_hang_snatch",
-	OlympicLiftExerciseNameSingleArmKettlebellSnatch:  "single_arm_kettlebell_snatch",
-	OlympicLiftExerciseNameSplitJerk:                  "split_jerk",
-	OlympicLiftExerciseNameSquatCleanAndJerk:          "squat_clean_and_jerk",
-	OlympicLiftExerciseNameInvalid:                    "invalid",
-}
-
 func (o OlympicLiftExerciseName) String() string {
-	val, ok := olympicliftexercisenametostrs[o]
-	if !ok {
-		return strconv.FormatUint(uint64(o), 10)
+	switch o {
+	case OlympicLiftExerciseNameBarbellHangPowerClean:
+		return "barbell_hang_power_clean"
+	case OlympicLiftExerciseNameBarbellHangSquatClean:
+		return "barbell_hang_squat_clean"
+	case OlympicLiftExerciseNameBarbellPowerClean:
+		return "barbell_power_clean"
+	case OlympicLiftExerciseNameBarbellPowerSnatch:
+		return "barbell_power_snatch"
+	case OlympicLiftExerciseNameBarbellSquatClean:
+		return "barbell_squat_clean"
+	case OlympicLiftExerciseNameCleanAndJerk:
+		return "clean_and_jerk"
+	case OlympicLiftExerciseNameBarbellHangPowerSnatch:
+		return "barbell_hang_power_snatch"
+	case OlympicLiftExerciseNameBarbellHangPull:
+		return "barbell_hang_pull"
+	case OlympicLiftExerciseNameBarbellHighPull:
+		return "barbell_high_pull"
+	case OlympicLiftExerciseNameBarbellSnatch:
+		return "barbell_snatch"
+	case OlympicLiftExerciseNameBarbellSplitJerk:
+		return "barbell_split_jerk"
+	case OlympicLiftExerciseNameClean:
+		return "clean"
+	case OlympicLiftExerciseNameDumbbellClean:
+		return "dumbbell_clean"
+	case OlympicLiftExerciseNameDumbbellHangPull:
+		return "dumbbell_hang_pull"
+	case OlympicLiftExerciseNameOneHandDumbbellSplitSnatch:
+		return "one_hand_dumbbell_split_snatch"
+	case OlympicLiftExerciseNamePushJerk:
+		return "push_jerk"
+	case OlympicLiftExerciseNameSingleArmDumbbellSnatch:
+		return "single_arm_dumbbell_snatch"
+	case OlympicLiftExerciseNameSingleArmHangSnatch:
+		return "single_arm_hang_snatch"
+	case OlympicLiftExerciseNameSingleArmKettlebellSnatch:
+		return "single_arm_kettlebell_snatch"
+	case OlympicLiftExerciseNameSplitJerk:
+		return "split_jerk"
+	case OlympicLiftExerciseNameSquatCleanAndJerk:
+		return "squat_clean_and_jerk"
+	default:
+		return "OlympicLiftExerciseNameInvalid(" + strconv.FormatUint(uint64(o), 10) + ")"
 	}
-	return val
 }
-
-var strtoolympicliftexercisename = func() map[string]OlympicLiftExerciseName {
-	m := make(map[string]OlympicLiftExerciseName)
-	for t, str := range olympicliftexercisenametostrs {
-		m[str] = OlympicLiftExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into OlympicLiftExerciseName constant it's represent, return OlympicLiftExerciseNameInvalid if not found.
 func OlympicLiftExerciseNameFromString(s string) OlympicLiftExerciseName {
-	val, ok := strtoolympicliftexercisename[s]
-	if !ok {
-		return strtoolympicliftexercisename["invalid"]
+	switch s {
+	case "barbell_hang_power_clean":
+		return OlympicLiftExerciseNameBarbellHangPowerClean
+	case "barbell_hang_squat_clean":
+		return OlympicLiftExerciseNameBarbellHangSquatClean
+	case "barbell_power_clean":
+		return OlympicLiftExerciseNameBarbellPowerClean
+	case "barbell_power_snatch":
+		return OlympicLiftExerciseNameBarbellPowerSnatch
+	case "barbell_squat_clean":
+		return OlympicLiftExerciseNameBarbellSquatClean
+	case "clean_and_jerk":
+		return OlympicLiftExerciseNameCleanAndJerk
+	case "barbell_hang_power_snatch":
+		return OlympicLiftExerciseNameBarbellHangPowerSnatch
+	case "barbell_hang_pull":
+		return OlympicLiftExerciseNameBarbellHangPull
+	case "barbell_high_pull":
+		return OlympicLiftExerciseNameBarbellHighPull
+	case "barbell_snatch":
+		return OlympicLiftExerciseNameBarbellSnatch
+	case "barbell_split_jerk":
+		return OlympicLiftExerciseNameBarbellSplitJerk
+	case "clean":
+		return OlympicLiftExerciseNameClean
+	case "dumbbell_clean":
+		return OlympicLiftExerciseNameDumbbellClean
+	case "dumbbell_hang_pull":
+		return OlympicLiftExerciseNameDumbbellHangPull
+	case "one_hand_dumbbell_split_snatch":
+		return OlympicLiftExerciseNameOneHandDumbbellSplitSnatch
+	case "push_jerk":
+		return OlympicLiftExerciseNamePushJerk
+	case "single_arm_dumbbell_snatch":
+		return OlympicLiftExerciseNameSingleArmDumbbellSnatch
+	case "single_arm_hang_snatch":
+		return OlympicLiftExerciseNameSingleArmHangSnatch
+	case "single_arm_kettlebell_snatch":
+		return OlympicLiftExerciseNameSingleArmKettlebellSnatch
+	case "split_jerk":
+		return OlympicLiftExerciseNameSplitJerk
+	case "squat_clean_and_jerk":
+		return OlympicLiftExerciseNameSquatCleanAndJerk
+	default:
+		return OlympicLiftExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListOlympicLiftExerciseName() []OlympicLiftExerciseName {
-	vs := make([]OlympicLiftExerciseName, 0, len(olympicliftexercisenametostrs))
-	for i := range olympicliftexercisenametostrs {
-		vs = append(vs, OlympicLiftExerciseName(i))
+	return []OlympicLiftExerciseName{
+		OlympicLiftExerciseNameBarbellHangPowerClean,
+		OlympicLiftExerciseNameBarbellHangSquatClean,
+		OlympicLiftExerciseNameBarbellPowerClean,
+		OlympicLiftExerciseNameBarbellPowerSnatch,
+		OlympicLiftExerciseNameBarbellSquatClean,
+		OlympicLiftExerciseNameCleanAndJerk,
+		OlympicLiftExerciseNameBarbellHangPowerSnatch,
+		OlympicLiftExerciseNameBarbellHangPull,
+		OlympicLiftExerciseNameBarbellHighPull,
+		OlympicLiftExerciseNameBarbellSnatch,
+		OlympicLiftExerciseNameBarbellSplitJerk,
+		OlympicLiftExerciseNameClean,
+		OlympicLiftExerciseNameDumbbellClean,
+		OlympicLiftExerciseNameDumbbellHangPull,
+		OlympicLiftExerciseNameOneHandDumbbellSplitSnatch,
+		OlympicLiftExerciseNamePushJerk,
+		OlympicLiftExerciseNameSingleArmDumbbellSnatch,
+		OlympicLiftExerciseNameSingleArmHangSnatch,
+		OlympicLiftExerciseNameSingleArmKettlebellSnatch,
+		OlympicLiftExerciseNameSplitJerk,
+		OlympicLiftExerciseNameSquatCleanAndJerk,
 	}
-	return vs
 }

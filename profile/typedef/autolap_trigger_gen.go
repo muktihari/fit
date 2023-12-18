@@ -21,50 +21,61 @@ const (
 	AutolapTriggerPositionWaypoint AutolapTrigger = 4
 	AutolapTriggerPositionMarked   AutolapTrigger = 5
 	AutolapTriggerOff              AutolapTrigger = 6
-	AutolapTriggerInvalid          AutolapTrigger = 0xFF // INVALID
+	AutolapTriggerInvalid          AutolapTrigger = 0xFF
 )
 
-var autolaptriggertostrs = map[AutolapTrigger]string{
-	AutolapTriggerTime:             "time",
-	AutolapTriggerDistance:         "distance",
-	AutolapTriggerPositionStart:    "position_start",
-	AutolapTriggerPositionLap:      "position_lap",
-	AutolapTriggerPositionWaypoint: "position_waypoint",
-	AutolapTriggerPositionMarked:   "position_marked",
-	AutolapTriggerOff:              "off",
-	AutolapTriggerInvalid:          "invalid",
-}
-
 func (a AutolapTrigger) String() string {
-	val, ok := autolaptriggertostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case AutolapTriggerTime:
+		return "time"
+	case AutolapTriggerDistance:
+		return "distance"
+	case AutolapTriggerPositionStart:
+		return "position_start"
+	case AutolapTriggerPositionLap:
+		return "position_lap"
+	case AutolapTriggerPositionWaypoint:
+		return "position_waypoint"
+	case AutolapTriggerPositionMarked:
+		return "position_marked"
+	case AutolapTriggerOff:
+		return "off"
+	default:
+		return "AutolapTriggerInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoautolaptrigger = func() map[string]AutolapTrigger {
-	m := make(map[string]AutolapTrigger)
-	for t, str := range autolaptriggertostrs {
-		m[str] = AutolapTrigger(t)
-	}
-	return m
-}()
 
 // FromString parse string into AutolapTrigger constant it's represent, return AutolapTriggerInvalid if not found.
 func AutolapTriggerFromString(s string) AutolapTrigger {
-	val, ok := strtoautolaptrigger[s]
-	if !ok {
-		return strtoautolaptrigger["invalid"]
+	switch s {
+	case "time":
+		return AutolapTriggerTime
+	case "distance":
+		return AutolapTriggerDistance
+	case "position_start":
+		return AutolapTriggerPositionStart
+	case "position_lap":
+		return AutolapTriggerPositionLap
+	case "position_waypoint":
+		return AutolapTriggerPositionWaypoint
+	case "position_marked":
+		return AutolapTriggerPositionMarked
+	case "off":
+		return AutolapTriggerOff
+	default:
+		return AutolapTriggerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAutolapTrigger() []AutolapTrigger {
-	vs := make([]AutolapTrigger, 0, len(autolaptriggertostrs))
-	for i := range autolaptriggertostrs {
-		vs = append(vs, AutolapTrigger(i))
+	return []AutolapTrigger{
+		AutolapTriggerTime,
+		AutolapTriggerDistance,
+		AutolapTriggerPositionStart,
+		AutolapTriggerPositionLap,
+		AutolapTriggerPositionWaypoint,
+		AutolapTriggerPositionMarked,
+		AutolapTriggerOff,
 	}
-	return vs
 }

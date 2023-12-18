@@ -14,45 +14,32 @@ import (
 type DeviceIndex uint8
 
 const (
-	DeviceIndexCreator DeviceIndex = 0    // Creator of the file is always device index 0.
-	DeviceIndexInvalid DeviceIndex = 0xFF // INVALID
+	DeviceIndexCreator DeviceIndex = 0 // Creator of the file is always device index 0.
+	DeviceIndexInvalid DeviceIndex = 0xFF
 )
 
-var deviceindextostrs = map[DeviceIndex]string{
-	DeviceIndexCreator: "creator",
-	DeviceIndexInvalid: "invalid",
-}
-
 func (d DeviceIndex) String() string {
-	val, ok := deviceindextostrs[d]
-	if !ok {
-		return strconv.FormatUint(uint64(d), 10)
+	switch d {
+	case DeviceIndexCreator:
+		return "creator"
+	default:
+		return "DeviceIndexInvalid(" + strconv.FormatUint(uint64(d), 10) + ")"
 	}
-	return val
 }
-
-var strtodeviceindex = func() map[string]DeviceIndex {
-	m := make(map[string]DeviceIndex)
-	for t, str := range deviceindextostrs {
-		m[str] = DeviceIndex(t)
-	}
-	return m
-}()
 
 // FromString parse string into DeviceIndex constant it's represent, return DeviceIndexInvalid if not found.
 func DeviceIndexFromString(s string) DeviceIndex {
-	val, ok := strtodeviceindex[s]
-	if !ok {
-		return strtodeviceindex["invalid"]
+	switch s {
+	case "creator":
+		return DeviceIndexCreator
+	default:
+		return DeviceIndexInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDeviceIndex() []DeviceIndex {
-	vs := make([]DeviceIndex, 0, len(deviceindextostrs))
-	for i := range deviceindextostrs {
-		vs = append(vs, DeviceIndex(i))
+	return []DeviceIndex{
+		DeviceIndexCreator,
 	}
-	return vs
 }

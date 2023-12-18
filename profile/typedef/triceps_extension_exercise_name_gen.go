@@ -55,84 +55,231 @@ const (
 	TricepsExtensionExerciseNameTricepsExtensionOnFloor                      TricepsExtensionExerciseName = 38
 	TricepsExtensionExerciseNameTricepsPressdown                             TricepsExtensionExerciseName = 39
 	TricepsExtensionExerciseNameWeightedDip                                  TricepsExtensionExerciseName = 40
-	TricepsExtensionExerciseNameInvalid                                      TricepsExtensionExerciseName = 0xFFFF // INVALID
+	TricepsExtensionExerciseNameInvalid                                      TricepsExtensionExerciseName = 0xFFFF
 )
 
-var tricepsextensionexercisenametostrs = map[TricepsExtensionExerciseName]string{
-	TricepsExtensionExerciseNameBenchDip:                                     "bench_dip",
-	TricepsExtensionExerciseNameWeightedBenchDip:                             "weighted_bench_dip",
-	TricepsExtensionExerciseNameBodyWeightDip:                                "body_weight_dip",
-	TricepsExtensionExerciseNameCableKickback:                                "cable_kickback",
-	TricepsExtensionExerciseNameCableLyingTricepsExtension:                   "cable_lying_triceps_extension",
-	TricepsExtensionExerciseNameCableOverheadTricepsExtension:                "cable_overhead_triceps_extension",
-	TricepsExtensionExerciseNameDumbbellKickback:                             "dumbbell_kickback",
-	TricepsExtensionExerciseNameDumbbellLyingTricepsExtension:                "dumbbell_lying_triceps_extension",
-	TricepsExtensionExerciseNameEzBarOverheadTricepsExtension:                "ez_bar_overhead_triceps_extension",
-	TricepsExtensionExerciseNameInclineDip:                                   "incline_dip",
-	TricepsExtensionExerciseNameWeightedInclineDip:                           "weighted_incline_dip",
-	TricepsExtensionExerciseNameInclineEzBarLyingTricepsExtension:            "incline_ez_bar_lying_triceps_extension",
-	TricepsExtensionExerciseNameLyingDumbbellPulloverToExtension:             "lying_dumbbell_pullover_to_extension",
-	TricepsExtensionExerciseNameLyingEzBarTricepsExtension:                   "lying_ez_bar_triceps_extension",
-	TricepsExtensionExerciseNameLyingTricepsExtensionToCloseGripBenchPress:   "lying_triceps_extension_to_close_grip_bench_press",
-	TricepsExtensionExerciseNameOverheadDumbbellTricepsExtension:             "overhead_dumbbell_triceps_extension",
-	TricepsExtensionExerciseNameRecliningTricepsPress:                        "reclining_triceps_press",
-	TricepsExtensionExerciseNameReverseGripPressdown:                         "reverse_grip_pressdown",
-	TricepsExtensionExerciseNameReverseGripTricepsPressdown:                  "reverse_grip_triceps_pressdown",
-	TricepsExtensionExerciseNameRopePressdown:                                "rope_pressdown",
-	TricepsExtensionExerciseNameSeatedBarbellOverheadTricepsExtension:        "seated_barbell_overhead_triceps_extension",
-	TricepsExtensionExerciseNameSeatedDumbbellOverheadTricepsExtension:       "seated_dumbbell_overhead_triceps_extension",
-	TricepsExtensionExerciseNameSeatedEzBarOverheadTricepsExtension:          "seated_ez_bar_overhead_triceps_extension",
-	TricepsExtensionExerciseNameSeatedSingleArmOverheadDumbbellExtension:     "seated_single_arm_overhead_dumbbell_extension",
-	TricepsExtensionExerciseNameSingleArmDumbbellOverheadTricepsExtension:    "single_arm_dumbbell_overhead_triceps_extension",
-	TricepsExtensionExerciseNameSingleDumbbellSeatedOverheadTricepsExtension: "single_dumbbell_seated_overhead_triceps_extension",
-	TricepsExtensionExerciseNameSingleLegBenchDipAndKick:                     "single_leg_bench_dip_and_kick",
-	TricepsExtensionExerciseNameWeightedSingleLegBenchDipAndKick:             "weighted_single_leg_bench_dip_and_kick",
-	TricepsExtensionExerciseNameSingleLegDip:                                 "single_leg_dip",
-	TricepsExtensionExerciseNameWeightedSingleLegDip:                         "weighted_single_leg_dip",
-	TricepsExtensionExerciseNameStaticLyingTricepsExtension:                  "static_lying_triceps_extension",
-	TricepsExtensionExerciseNameSuspendedDip:                                 "suspended_dip",
-	TricepsExtensionExerciseNameWeightedSuspendedDip:                         "weighted_suspended_dip",
-	TricepsExtensionExerciseNameSwissBallDumbbellLyingTricepsExtension:       "swiss_ball_dumbbell_lying_triceps_extension",
-	TricepsExtensionExerciseNameSwissBallEzBarLyingTricepsExtension:          "swiss_ball_ez_bar_lying_triceps_extension",
-	TricepsExtensionExerciseNameSwissBallEzBarOverheadTricepsExtension:       "swiss_ball_ez_bar_overhead_triceps_extension",
-	TricepsExtensionExerciseNameTabletopDip:                                  "tabletop_dip",
-	TricepsExtensionExerciseNameWeightedTabletopDip:                          "weighted_tabletop_dip",
-	TricepsExtensionExerciseNameTricepsExtensionOnFloor:                      "triceps_extension_on_floor",
-	TricepsExtensionExerciseNameTricepsPressdown:                             "triceps_pressdown",
-	TricepsExtensionExerciseNameWeightedDip:                                  "weighted_dip",
-	TricepsExtensionExerciseNameInvalid:                                      "invalid",
-}
-
 func (t TricepsExtensionExerciseName) String() string {
-	val, ok := tricepsextensionexercisenametostrs[t]
-	if !ok {
-		return strconv.FormatUint(uint64(t), 10)
+	switch t {
+	case TricepsExtensionExerciseNameBenchDip:
+		return "bench_dip"
+	case TricepsExtensionExerciseNameWeightedBenchDip:
+		return "weighted_bench_dip"
+	case TricepsExtensionExerciseNameBodyWeightDip:
+		return "body_weight_dip"
+	case TricepsExtensionExerciseNameCableKickback:
+		return "cable_kickback"
+	case TricepsExtensionExerciseNameCableLyingTricepsExtension:
+		return "cable_lying_triceps_extension"
+	case TricepsExtensionExerciseNameCableOverheadTricepsExtension:
+		return "cable_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameDumbbellKickback:
+		return "dumbbell_kickback"
+	case TricepsExtensionExerciseNameDumbbellLyingTricepsExtension:
+		return "dumbbell_lying_triceps_extension"
+	case TricepsExtensionExerciseNameEzBarOverheadTricepsExtension:
+		return "ez_bar_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameInclineDip:
+		return "incline_dip"
+	case TricepsExtensionExerciseNameWeightedInclineDip:
+		return "weighted_incline_dip"
+	case TricepsExtensionExerciseNameInclineEzBarLyingTricepsExtension:
+		return "incline_ez_bar_lying_triceps_extension"
+	case TricepsExtensionExerciseNameLyingDumbbellPulloverToExtension:
+		return "lying_dumbbell_pullover_to_extension"
+	case TricepsExtensionExerciseNameLyingEzBarTricepsExtension:
+		return "lying_ez_bar_triceps_extension"
+	case TricepsExtensionExerciseNameLyingTricepsExtensionToCloseGripBenchPress:
+		return "lying_triceps_extension_to_close_grip_bench_press"
+	case TricepsExtensionExerciseNameOverheadDumbbellTricepsExtension:
+		return "overhead_dumbbell_triceps_extension"
+	case TricepsExtensionExerciseNameRecliningTricepsPress:
+		return "reclining_triceps_press"
+	case TricepsExtensionExerciseNameReverseGripPressdown:
+		return "reverse_grip_pressdown"
+	case TricepsExtensionExerciseNameReverseGripTricepsPressdown:
+		return "reverse_grip_triceps_pressdown"
+	case TricepsExtensionExerciseNameRopePressdown:
+		return "rope_pressdown"
+	case TricepsExtensionExerciseNameSeatedBarbellOverheadTricepsExtension:
+		return "seated_barbell_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameSeatedDumbbellOverheadTricepsExtension:
+		return "seated_dumbbell_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameSeatedEzBarOverheadTricepsExtension:
+		return "seated_ez_bar_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameSeatedSingleArmOverheadDumbbellExtension:
+		return "seated_single_arm_overhead_dumbbell_extension"
+	case TricepsExtensionExerciseNameSingleArmDumbbellOverheadTricepsExtension:
+		return "single_arm_dumbbell_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameSingleDumbbellSeatedOverheadTricepsExtension:
+		return "single_dumbbell_seated_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameSingleLegBenchDipAndKick:
+		return "single_leg_bench_dip_and_kick"
+	case TricepsExtensionExerciseNameWeightedSingleLegBenchDipAndKick:
+		return "weighted_single_leg_bench_dip_and_kick"
+	case TricepsExtensionExerciseNameSingleLegDip:
+		return "single_leg_dip"
+	case TricepsExtensionExerciseNameWeightedSingleLegDip:
+		return "weighted_single_leg_dip"
+	case TricepsExtensionExerciseNameStaticLyingTricepsExtension:
+		return "static_lying_triceps_extension"
+	case TricepsExtensionExerciseNameSuspendedDip:
+		return "suspended_dip"
+	case TricepsExtensionExerciseNameWeightedSuspendedDip:
+		return "weighted_suspended_dip"
+	case TricepsExtensionExerciseNameSwissBallDumbbellLyingTricepsExtension:
+		return "swiss_ball_dumbbell_lying_triceps_extension"
+	case TricepsExtensionExerciseNameSwissBallEzBarLyingTricepsExtension:
+		return "swiss_ball_ez_bar_lying_triceps_extension"
+	case TricepsExtensionExerciseNameSwissBallEzBarOverheadTricepsExtension:
+		return "swiss_ball_ez_bar_overhead_triceps_extension"
+	case TricepsExtensionExerciseNameTabletopDip:
+		return "tabletop_dip"
+	case TricepsExtensionExerciseNameWeightedTabletopDip:
+		return "weighted_tabletop_dip"
+	case TricepsExtensionExerciseNameTricepsExtensionOnFloor:
+		return "triceps_extension_on_floor"
+	case TricepsExtensionExerciseNameTricepsPressdown:
+		return "triceps_pressdown"
+	case TricepsExtensionExerciseNameWeightedDip:
+		return "weighted_dip"
+	default:
+		return "TricepsExtensionExerciseNameInvalid(" + strconv.FormatUint(uint64(t), 10) + ")"
 	}
-	return val
 }
-
-var strtotricepsextensionexercisename = func() map[string]TricepsExtensionExerciseName {
-	m := make(map[string]TricepsExtensionExerciseName)
-	for t, str := range tricepsextensionexercisenametostrs {
-		m[str] = TricepsExtensionExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into TricepsExtensionExerciseName constant it's represent, return TricepsExtensionExerciseNameInvalid if not found.
 func TricepsExtensionExerciseNameFromString(s string) TricepsExtensionExerciseName {
-	val, ok := strtotricepsextensionexercisename[s]
-	if !ok {
-		return strtotricepsextensionexercisename["invalid"]
+	switch s {
+	case "bench_dip":
+		return TricepsExtensionExerciseNameBenchDip
+	case "weighted_bench_dip":
+		return TricepsExtensionExerciseNameWeightedBenchDip
+	case "body_weight_dip":
+		return TricepsExtensionExerciseNameBodyWeightDip
+	case "cable_kickback":
+		return TricepsExtensionExerciseNameCableKickback
+	case "cable_lying_triceps_extension":
+		return TricepsExtensionExerciseNameCableLyingTricepsExtension
+	case "cable_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameCableOverheadTricepsExtension
+	case "dumbbell_kickback":
+		return TricepsExtensionExerciseNameDumbbellKickback
+	case "dumbbell_lying_triceps_extension":
+		return TricepsExtensionExerciseNameDumbbellLyingTricepsExtension
+	case "ez_bar_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameEzBarOverheadTricepsExtension
+	case "incline_dip":
+		return TricepsExtensionExerciseNameInclineDip
+	case "weighted_incline_dip":
+		return TricepsExtensionExerciseNameWeightedInclineDip
+	case "incline_ez_bar_lying_triceps_extension":
+		return TricepsExtensionExerciseNameInclineEzBarLyingTricepsExtension
+	case "lying_dumbbell_pullover_to_extension":
+		return TricepsExtensionExerciseNameLyingDumbbellPulloverToExtension
+	case "lying_ez_bar_triceps_extension":
+		return TricepsExtensionExerciseNameLyingEzBarTricepsExtension
+	case "lying_triceps_extension_to_close_grip_bench_press":
+		return TricepsExtensionExerciseNameLyingTricepsExtensionToCloseGripBenchPress
+	case "overhead_dumbbell_triceps_extension":
+		return TricepsExtensionExerciseNameOverheadDumbbellTricepsExtension
+	case "reclining_triceps_press":
+		return TricepsExtensionExerciseNameRecliningTricepsPress
+	case "reverse_grip_pressdown":
+		return TricepsExtensionExerciseNameReverseGripPressdown
+	case "reverse_grip_triceps_pressdown":
+		return TricepsExtensionExerciseNameReverseGripTricepsPressdown
+	case "rope_pressdown":
+		return TricepsExtensionExerciseNameRopePressdown
+	case "seated_barbell_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSeatedBarbellOverheadTricepsExtension
+	case "seated_dumbbell_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSeatedDumbbellOverheadTricepsExtension
+	case "seated_ez_bar_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSeatedEzBarOverheadTricepsExtension
+	case "seated_single_arm_overhead_dumbbell_extension":
+		return TricepsExtensionExerciseNameSeatedSingleArmOverheadDumbbellExtension
+	case "single_arm_dumbbell_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSingleArmDumbbellOverheadTricepsExtension
+	case "single_dumbbell_seated_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSingleDumbbellSeatedOverheadTricepsExtension
+	case "single_leg_bench_dip_and_kick":
+		return TricepsExtensionExerciseNameSingleLegBenchDipAndKick
+	case "weighted_single_leg_bench_dip_and_kick":
+		return TricepsExtensionExerciseNameWeightedSingleLegBenchDipAndKick
+	case "single_leg_dip":
+		return TricepsExtensionExerciseNameSingleLegDip
+	case "weighted_single_leg_dip":
+		return TricepsExtensionExerciseNameWeightedSingleLegDip
+	case "static_lying_triceps_extension":
+		return TricepsExtensionExerciseNameStaticLyingTricepsExtension
+	case "suspended_dip":
+		return TricepsExtensionExerciseNameSuspendedDip
+	case "weighted_suspended_dip":
+		return TricepsExtensionExerciseNameWeightedSuspendedDip
+	case "swiss_ball_dumbbell_lying_triceps_extension":
+		return TricepsExtensionExerciseNameSwissBallDumbbellLyingTricepsExtension
+	case "swiss_ball_ez_bar_lying_triceps_extension":
+		return TricepsExtensionExerciseNameSwissBallEzBarLyingTricepsExtension
+	case "swiss_ball_ez_bar_overhead_triceps_extension":
+		return TricepsExtensionExerciseNameSwissBallEzBarOverheadTricepsExtension
+	case "tabletop_dip":
+		return TricepsExtensionExerciseNameTabletopDip
+	case "weighted_tabletop_dip":
+		return TricepsExtensionExerciseNameWeightedTabletopDip
+	case "triceps_extension_on_floor":
+		return TricepsExtensionExerciseNameTricepsExtensionOnFloor
+	case "triceps_pressdown":
+		return TricepsExtensionExerciseNameTricepsPressdown
+	case "weighted_dip":
+		return TricepsExtensionExerciseNameWeightedDip
+	default:
+		return TricepsExtensionExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTricepsExtensionExerciseName() []TricepsExtensionExerciseName {
-	vs := make([]TricepsExtensionExerciseName, 0, len(tricepsextensionexercisenametostrs))
-	for i := range tricepsextensionexercisenametostrs {
-		vs = append(vs, TricepsExtensionExerciseName(i))
+	return []TricepsExtensionExerciseName{
+		TricepsExtensionExerciseNameBenchDip,
+		TricepsExtensionExerciseNameWeightedBenchDip,
+		TricepsExtensionExerciseNameBodyWeightDip,
+		TricepsExtensionExerciseNameCableKickback,
+		TricepsExtensionExerciseNameCableLyingTricepsExtension,
+		TricepsExtensionExerciseNameCableOverheadTricepsExtension,
+		TricepsExtensionExerciseNameDumbbellKickback,
+		TricepsExtensionExerciseNameDumbbellLyingTricepsExtension,
+		TricepsExtensionExerciseNameEzBarOverheadTricepsExtension,
+		TricepsExtensionExerciseNameInclineDip,
+		TricepsExtensionExerciseNameWeightedInclineDip,
+		TricepsExtensionExerciseNameInclineEzBarLyingTricepsExtension,
+		TricepsExtensionExerciseNameLyingDumbbellPulloverToExtension,
+		TricepsExtensionExerciseNameLyingEzBarTricepsExtension,
+		TricepsExtensionExerciseNameLyingTricepsExtensionToCloseGripBenchPress,
+		TricepsExtensionExerciseNameOverheadDumbbellTricepsExtension,
+		TricepsExtensionExerciseNameRecliningTricepsPress,
+		TricepsExtensionExerciseNameReverseGripPressdown,
+		TricepsExtensionExerciseNameReverseGripTricepsPressdown,
+		TricepsExtensionExerciseNameRopePressdown,
+		TricepsExtensionExerciseNameSeatedBarbellOverheadTricepsExtension,
+		TricepsExtensionExerciseNameSeatedDumbbellOverheadTricepsExtension,
+		TricepsExtensionExerciseNameSeatedEzBarOverheadTricepsExtension,
+		TricepsExtensionExerciseNameSeatedSingleArmOverheadDumbbellExtension,
+		TricepsExtensionExerciseNameSingleArmDumbbellOverheadTricepsExtension,
+		TricepsExtensionExerciseNameSingleDumbbellSeatedOverheadTricepsExtension,
+		TricepsExtensionExerciseNameSingleLegBenchDipAndKick,
+		TricepsExtensionExerciseNameWeightedSingleLegBenchDipAndKick,
+		TricepsExtensionExerciseNameSingleLegDip,
+		TricepsExtensionExerciseNameWeightedSingleLegDip,
+		TricepsExtensionExerciseNameStaticLyingTricepsExtension,
+		TricepsExtensionExerciseNameSuspendedDip,
+		TricepsExtensionExerciseNameWeightedSuspendedDip,
+		TricepsExtensionExerciseNameSwissBallDumbbellLyingTricepsExtension,
+		TricepsExtensionExerciseNameSwissBallEzBarLyingTricepsExtension,
+		TricepsExtensionExerciseNameSwissBallEzBarOverheadTricepsExtension,
+		TricepsExtensionExerciseNameTabletopDip,
+		TricepsExtensionExerciseNameWeightedTabletopDip,
+		TricepsExtensionExerciseNameTricepsExtensionOnFloor,
+		TricepsExtensionExerciseNameTricepsPressdown,
+		TricepsExtensionExerciseNameWeightedDip,
 	}
-	return vs
 }

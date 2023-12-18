@@ -19,48 +19,51 @@ const (
 	WeatherSeverityWatch     WeatherSeverity = 2
 	WeatherSeverityAdvisory  WeatherSeverity = 3
 	WeatherSeverityStatement WeatherSeverity = 4
-	WeatherSeverityInvalid   WeatherSeverity = 0xFF // INVALID
+	WeatherSeverityInvalid   WeatherSeverity = 0xFF
 )
 
-var weatherseveritytostrs = map[WeatherSeverity]string{
-	WeatherSeverityUnknown:   "unknown",
-	WeatherSeverityWarning:   "warning",
-	WeatherSeverityWatch:     "watch",
-	WeatherSeverityAdvisory:  "advisory",
-	WeatherSeverityStatement: "statement",
-	WeatherSeverityInvalid:   "invalid",
-}
-
 func (w WeatherSeverity) String() string {
-	val, ok := weatherseveritytostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WeatherSeverityUnknown:
+		return "unknown"
+	case WeatherSeverityWarning:
+		return "warning"
+	case WeatherSeverityWatch:
+		return "watch"
+	case WeatherSeverityAdvisory:
+		return "advisory"
+	case WeatherSeverityStatement:
+		return "statement"
+	default:
+		return "WeatherSeverityInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtoweatherseverity = func() map[string]WeatherSeverity {
-	m := make(map[string]WeatherSeverity)
-	for t, str := range weatherseveritytostrs {
-		m[str] = WeatherSeverity(t)
-	}
-	return m
-}()
 
 // FromString parse string into WeatherSeverity constant it's represent, return WeatherSeverityInvalid if not found.
 func WeatherSeverityFromString(s string) WeatherSeverity {
-	val, ok := strtoweatherseverity[s]
-	if !ok {
-		return strtoweatherseverity["invalid"]
+	switch s {
+	case "unknown":
+		return WeatherSeverityUnknown
+	case "warning":
+		return WeatherSeverityWarning
+	case "watch":
+		return WeatherSeverityWatch
+	case "advisory":
+		return WeatherSeverityAdvisory
+	case "statement":
+		return WeatherSeverityStatement
+	default:
+		return WeatherSeverityInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWeatherSeverity() []WeatherSeverity {
-	vs := make([]WeatherSeverity, 0, len(weatherseveritytostrs))
-	for i := range weatherseveritytostrs {
-		vs = append(vs, WeatherSeverity(i))
+	return []WeatherSeverity{
+		WeatherSeverityUnknown,
+		WeatherSeverityWarning,
+		WeatherSeverityWatch,
+		WeatherSeverityAdvisory,
+		WeatherSeverityStatement,
 	}
-	return vs
 }

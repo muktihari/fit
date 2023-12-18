@@ -36,65 +36,136 @@ const (
 	CardioExerciseNameWeightedSquatJacks        CardioExerciseName = 19
 	CardioExerciseNameTripleUnder               CardioExerciseName = 20
 	CardioExerciseNameWeightedTripleUnder       CardioExerciseName = 21
-	CardioExerciseNameInvalid                   CardioExerciseName = 0xFFFF // INVALID
+	CardioExerciseNameInvalid                   CardioExerciseName = 0xFFFF
 )
 
-var cardioexercisenametostrs = map[CardioExerciseName]string{
-	CardioExerciseNameBobAndWeaveCircle:         "bob_and_weave_circle",
-	CardioExerciseNameWeightedBobAndWeaveCircle: "weighted_bob_and_weave_circle",
-	CardioExerciseNameCardioCoreCrawl:           "cardio_core_crawl",
-	CardioExerciseNameWeightedCardioCoreCrawl:   "weighted_cardio_core_crawl",
-	CardioExerciseNameDoubleUnder:               "double_under",
-	CardioExerciseNameWeightedDoubleUnder:       "weighted_double_under",
-	CardioExerciseNameJumpRope:                  "jump_rope",
-	CardioExerciseNameWeightedJumpRope:          "weighted_jump_rope",
-	CardioExerciseNameJumpRopeCrossover:         "jump_rope_crossover",
-	CardioExerciseNameWeightedJumpRopeCrossover: "weighted_jump_rope_crossover",
-	CardioExerciseNameJumpRopeJog:               "jump_rope_jog",
-	CardioExerciseNameWeightedJumpRopeJog:       "weighted_jump_rope_jog",
-	CardioExerciseNameJumpingJacks:              "jumping_jacks",
-	CardioExerciseNameWeightedJumpingJacks:      "weighted_jumping_jacks",
-	CardioExerciseNameSkiMoguls:                 "ski_moguls",
-	CardioExerciseNameWeightedSkiMoguls:         "weighted_ski_moguls",
-	CardioExerciseNameSplitJacks:                "split_jacks",
-	CardioExerciseNameWeightedSplitJacks:        "weighted_split_jacks",
-	CardioExerciseNameSquatJacks:                "squat_jacks",
-	CardioExerciseNameWeightedSquatJacks:        "weighted_squat_jacks",
-	CardioExerciseNameTripleUnder:               "triple_under",
-	CardioExerciseNameWeightedTripleUnder:       "weighted_triple_under",
-	CardioExerciseNameInvalid:                   "invalid",
-}
-
 func (c CardioExerciseName) String() string {
-	val, ok := cardioexercisenametostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CardioExerciseNameBobAndWeaveCircle:
+		return "bob_and_weave_circle"
+	case CardioExerciseNameWeightedBobAndWeaveCircle:
+		return "weighted_bob_and_weave_circle"
+	case CardioExerciseNameCardioCoreCrawl:
+		return "cardio_core_crawl"
+	case CardioExerciseNameWeightedCardioCoreCrawl:
+		return "weighted_cardio_core_crawl"
+	case CardioExerciseNameDoubleUnder:
+		return "double_under"
+	case CardioExerciseNameWeightedDoubleUnder:
+		return "weighted_double_under"
+	case CardioExerciseNameJumpRope:
+		return "jump_rope"
+	case CardioExerciseNameWeightedJumpRope:
+		return "weighted_jump_rope"
+	case CardioExerciseNameJumpRopeCrossover:
+		return "jump_rope_crossover"
+	case CardioExerciseNameWeightedJumpRopeCrossover:
+		return "weighted_jump_rope_crossover"
+	case CardioExerciseNameJumpRopeJog:
+		return "jump_rope_jog"
+	case CardioExerciseNameWeightedJumpRopeJog:
+		return "weighted_jump_rope_jog"
+	case CardioExerciseNameJumpingJacks:
+		return "jumping_jacks"
+	case CardioExerciseNameWeightedJumpingJacks:
+		return "weighted_jumping_jacks"
+	case CardioExerciseNameSkiMoguls:
+		return "ski_moguls"
+	case CardioExerciseNameWeightedSkiMoguls:
+		return "weighted_ski_moguls"
+	case CardioExerciseNameSplitJacks:
+		return "split_jacks"
+	case CardioExerciseNameWeightedSplitJacks:
+		return "weighted_split_jacks"
+	case CardioExerciseNameSquatJacks:
+		return "squat_jacks"
+	case CardioExerciseNameWeightedSquatJacks:
+		return "weighted_squat_jacks"
+	case CardioExerciseNameTripleUnder:
+		return "triple_under"
+	case CardioExerciseNameWeightedTripleUnder:
+		return "weighted_triple_under"
+	default:
+		return "CardioExerciseNameInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocardioexercisename = func() map[string]CardioExerciseName {
-	m := make(map[string]CardioExerciseName)
-	for t, str := range cardioexercisenametostrs {
-		m[str] = CardioExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into CardioExerciseName constant it's represent, return CardioExerciseNameInvalid if not found.
 func CardioExerciseNameFromString(s string) CardioExerciseName {
-	val, ok := strtocardioexercisename[s]
-	if !ok {
-		return strtocardioexercisename["invalid"]
+	switch s {
+	case "bob_and_weave_circle":
+		return CardioExerciseNameBobAndWeaveCircle
+	case "weighted_bob_and_weave_circle":
+		return CardioExerciseNameWeightedBobAndWeaveCircle
+	case "cardio_core_crawl":
+		return CardioExerciseNameCardioCoreCrawl
+	case "weighted_cardio_core_crawl":
+		return CardioExerciseNameWeightedCardioCoreCrawl
+	case "double_under":
+		return CardioExerciseNameDoubleUnder
+	case "weighted_double_under":
+		return CardioExerciseNameWeightedDoubleUnder
+	case "jump_rope":
+		return CardioExerciseNameJumpRope
+	case "weighted_jump_rope":
+		return CardioExerciseNameWeightedJumpRope
+	case "jump_rope_crossover":
+		return CardioExerciseNameJumpRopeCrossover
+	case "weighted_jump_rope_crossover":
+		return CardioExerciseNameWeightedJumpRopeCrossover
+	case "jump_rope_jog":
+		return CardioExerciseNameJumpRopeJog
+	case "weighted_jump_rope_jog":
+		return CardioExerciseNameWeightedJumpRopeJog
+	case "jumping_jacks":
+		return CardioExerciseNameJumpingJacks
+	case "weighted_jumping_jacks":
+		return CardioExerciseNameWeightedJumpingJacks
+	case "ski_moguls":
+		return CardioExerciseNameSkiMoguls
+	case "weighted_ski_moguls":
+		return CardioExerciseNameWeightedSkiMoguls
+	case "split_jacks":
+		return CardioExerciseNameSplitJacks
+	case "weighted_split_jacks":
+		return CardioExerciseNameWeightedSplitJacks
+	case "squat_jacks":
+		return CardioExerciseNameSquatJacks
+	case "weighted_squat_jacks":
+		return CardioExerciseNameWeightedSquatJacks
+	case "triple_under":
+		return CardioExerciseNameTripleUnder
+	case "weighted_triple_under":
+		return CardioExerciseNameWeightedTripleUnder
+	default:
+		return CardioExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCardioExerciseName() []CardioExerciseName {
-	vs := make([]CardioExerciseName, 0, len(cardioexercisenametostrs))
-	for i := range cardioexercisenametostrs {
-		vs = append(vs, CardioExerciseName(i))
+	return []CardioExerciseName{
+		CardioExerciseNameBobAndWeaveCircle,
+		CardioExerciseNameWeightedBobAndWeaveCircle,
+		CardioExerciseNameCardioCoreCrawl,
+		CardioExerciseNameWeightedCardioCoreCrawl,
+		CardioExerciseNameDoubleUnder,
+		CardioExerciseNameWeightedDoubleUnder,
+		CardioExerciseNameJumpRope,
+		CardioExerciseNameWeightedJumpRope,
+		CardioExerciseNameJumpRopeCrossover,
+		CardioExerciseNameWeightedJumpRopeCrossover,
+		CardioExerciseNameJumpRopeJog,
+		CardioExerciseNameWeightedJumpRopeJog,
+		CardioExerciseNameJumpingJacks,
+		CardioExerciseNameWeightedJumpingJacks,
+		CardioExerciseNameSkiMoguls,
+		CardioExerciseNameWeightedSkiMoguls,
+		CardioExerciseNameSplitJacks,
+		CardioExerciseNameWeightedSplitJacks,
+		CardioExerciseNameSquatJacks,
+		CardioExerciseNameWeightedSquatJacks,
+		CardioExerciseNameTripleUnder,
+		CardioExerciseNameWeightedTripleUnder,
 	}
-	return vs
 }

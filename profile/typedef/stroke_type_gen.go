@@ -20,49 +20,56 @@ const (
 	StrokeTypeForehand StrokeType = 3
 	StrokeTypeBackhand StrokeType = 4
 	StrokeTypeSmash    StrokeType = 5
-	StrokeTypeInvalid  StrokeType = 0xFF // INVALID
+	StrokeTypeInvalid  StrokeType = 0xFF
 )
 
-var stroketypetostrs = map[StrokeType]string{
-	StrokeTypeNoEvent:  "no_event",
-	StrokeTypeOther:    "other",
-	StrokeTypeServe:    "serve",
-	StrokeTypeForehand: "forehand",
-	StrokeTypeBackhand: "backhand",
-	StrokeTypeSmash:    "smash",
-	StrokeTypeInvalid:  "invalid",
-}
-
 func (s StrokeType) String() string {
-	val, ok := stroketypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case StrokeTypeNoEvent:
+		return "no_event"
+	case StrokeTypeOther:
+		return "other"
+	case StrokeTypeServe:
+		return "serve"
+	case StrokeTypeForehand:
+		return "forehand"
+	case StrokeTypeBackhand:
+		return "backhand"
+	case StrokeTypeSmash:
+		return "smash"
+	default:
+		return "StrokeTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtostroketype = func() map[string]StrokeType {
-	m := make(map[string]StrokeType)
-	for t, str := range stroketypetostrs {
-		m[str] = StrokeType(t)
-	}
-	return m
-}()
 
 // FromString parse string into StrokeType constant it's represent, return StrokeTypeInvalid if not found.
 func StrokeTypeFromString(s string) StrokeType {
-	val, ok := strtostroketype[s]
-	if !ok {
-		return strtostroketype["invalid"]
+	switch s {
+	case "no_event":
+		return StrokeTypeNoEvent
+	case "other":
+		return StrokeTypeOther
+	case "serve":
+		return StrokeTypeServe
+	case "forehand":
+		return StrokeTypeForehand
+	case "backhand":
+		return StrokeTypeBackhand
+	case "smash":
+		return StrokeTypeSmash
+	default:
+		return StrokeTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListStrokeType() []StrokeType {
-	vs := make([]StrokeType, 0, len(stroketypetostrs))
-	for i := range stroketypetostrs {
-		vs = append(vs, StrokeType(i))
+	return []StrokeType{
+		StrokeTypeNoEvent,
+		StrokeTypeOther,
+		StrokeTypeServe,
+		StrokeTypeForehand,
+		StrokeTypeBackhand,
+		StrokeTypeSmash,
 	}
-	return vs
 }

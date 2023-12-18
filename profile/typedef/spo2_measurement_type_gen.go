@@ -18,47 +18,46 @@ const (
 	Spo2MeasurementTypeSpotCheck       Spo2MeasurementType = 1
 	Spo2MeasurementTypeContinuousCheck Spo2MeasurementType = 2
 	Spo2MeasurementTypePeriodic        Spo2MeasurementType = 3
-	Spo2MeasurementTypeInvalid         Spo2MeasurementType = 0xFF // INVALID
+	Spo2MeasurementTypeInvalid         Spo2MeasurementType = 0xFF
 )
 
-var spo2measurementtypetostrs = map[Spo2MeasurementType]string{
-	Spo2MeasurementTypeOffWrist:        "off_wrist",
-	Spo2MeasurementTypeSpotCheck:       "spot_check",
-	Spo2MeasurementTypeContinuousCheck: "continuous_check",
-	Spo2MeasurementTypePeriodic:        "periodic",
-	Spo2MeasurementTypeInvalid:         "invalid",
-}
-
 func (s Spo2MeasurementType) String() string {
-	val, ok := spo2measurementtypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case Spo2MeasurementTypeOffWrist:
+		return "off_wrist"
+	case Spo2MeasurementTypeSpotCheck:
+		return "spot_check"
+	case Spo2MeasurementTypeContinuousCheck:
+		return "continuous_check"
+	case Spo2MeasurementTypePeriodic:
+		return "periodic"
+	default:
+		return "Spo2MeasurementTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtospo2measurementtype = func() map[string]Spo2MeasurementType {
-	m := make(map[string]Spo2MeasurementType)
-	for t, str := range spo2measurementtypetostrs {
-		m[str] = Spo2MeasurementType(t)
-	}
-	return m
-}()
 
 // FromString parse string into Spo2MeasurementType constant it's represent, return Spo2MeasurementTypeInvalid if not found.
 func Spo2MeasurementTypeFromString(s string) Spo2MeasurementType {
-	val, ok := strtospo2measurementtype[s]
-	if !ok {
-		return strtospo2measurementtype["invalid"]
+	switch s {
+	case "off_wrist":
+		return Spo2MeasurementTypeOffWrist
+	case "spot_check":
+		return Spo2MeasurementTypeSpotCheck
+	case "continuous_check":
+		return Spo2MeasurementTypeContinuousCheck
+	case "periodic":
+		return Spo2MeasurementTypePeriodic
+	default:
+		return Spo2MeasurementTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSpo2MeasurementType() []Spo2MeasurementType {
-	vs := make([]Spo2MeasurementType, 0, len(spo2measurementtypetostrs))
-	for i := range spo2measurementtypetostrs {
-		vs = append(vs, Spo2MeasurementType(i))
+	return []Spo2MeasurementType{
+		Spo2MeasurementTypeOffWrist,
+		Spo2MeasurementTypeSpotCheck,
+		Spo2MeasurementTypeContinuousCheck,
+		Spo2MeasurementTypePeriodic,
 	}
-	return vs
 }

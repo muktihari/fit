@@ -17,46 +17,41 @@ const (
 	DisplayMeasureMetric   DisplayMeasure = 0
 	DisplayMeasureStatute  DisplayMeasure = 1
 	DisplayMeasureNautical DisplayMeasure = 2
-	DisplayMeasureInvalid  DisplayMeasure = 0xFF // INVALID
+	DisplayMeasureInvalid  DisplayMeasure = 0xFF
 )
 
-var displaymeasuretostrs = map[DisplayMeasure]string{
-	DisplayMeasureMetric:   "metric",
-	DisplayMeasureStatute:  "statute",
-	DisplayMeasureNautical: "nautical",
-	DisplayMeasureInvalid:  "invalid",
-}
-
 func (d DisplayMeasure) String() string {
-	val, ok := displaymeasuretostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DisplayMeasureMetric:
+		return "metric"
+	case DisplayMeasureStatute:
+		return "statute"
+	case DisplayMeasureNautical:
+		return "nautical"
+	default:
+		return "DisplayMeasureInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodisplaymeasure = func() map[string]DisplayMeasure {
-	m := make(map[string]DisplayMeasure)
-	for t, str := range displaymeasuretostrs {
-		m[str] = DisplayMeasure(t)
-	}
-	return m
-}()
 
 // FromString parse string into DisplayMeasure constant it's represent, return DisplayMeasureInvalid if not found.
 func DisplayMeasureFromString(s string) DisplayMeasure {
-	val, ok := strtodisplaymeasure[s]
-	if !ok {
-		return strtodisplaymeasure["invalid"]
+	switch s {
+	case "metric":
+		return DisplayMeasureMetric
+	case "statute":
+		return DisplayMeasureStatute
+	case "nautical":
+		return DisplayMeasureNautical
+	default:
+		return DisplayMeasureInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDisplayMeasure() []DisplayMeasure {
-	vs := make([]DisplayMeasure, 0, len(displaymeasuretostrs))
-	for i := range displaymeasuretostrs {
-		vs = append(vs, DisplayMeasure(i))
+	return []DisplayMeasure{
+		DisplayMeasureMetric,
+		DisplayMeasureStatute,
+		DisplayMeasureNautical,
 	}
-	return vs
 }

@@ -14,47 +14,38 @@ import (
 type LengthType byte
 
 const (
-	LengthTypeIdle    LengthType = 0    // Rest period. Length with no strokes
-	LengthTypeActive  LengthType = 1    // Length with strokes.
-	LengthTypeInvalid LengthType = 0xFF // INVALID
+	LengthTypeIdle    LengthType = 0 // Rest period. Length with no strokes
+	LengthTypeActive  LengthType = 1 // Length with strokes.
+	LengthTypeInvalid LengthType = 0xFF
 )
 
-var lengthtypetostrs = map[LengthType]string{
-	LengthTypeIdle:    "idle",
-	LengthTypeActive:  "active",
-	LengthTypeInvalid: "invalid",
-}
-
 func (l LengthType) String() string {
-	val, ok := lengthtypetostrs[l]
-	if !ok {
-		return strconv.Itoa(int(l))
+	switch l {
+	case LengthTypeIdle:
+		return "idle"
+	case LengthTypeActive:
+		return "active"
+	default:
+		return "LengthTypeInvalid(" + strconv.Itoa(int(l)) + ")"
 	}
-	return val
 }
-
-var strtolengthtype = func() map[string]LengthType {
-	m := make(map[string]LengthType)
-	for t, str := range lengthtypetostrs {
-		m[str] = LengthType(t)
-	}
-	return m
-}()
 
 // FromString parse string into LengthType constant it's represent, return LengthTypeInvalid if not found.
 func LengthTypeFromString(s string) LengthType {
-	val, ok := strtolengthtype[s]
-	if !ok {
-		return strtolengthtype["invalid"]
+	switch s {
+	case "idle":
+		return LengthTypeIdle
+	case "active":
+		return LengthTypeActive
+	default:
+		return LengthTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLengthType() []LengthType {
-	vs := make([]LengthType, 0, len(lengthtypetostrs))
-	for i := range lengthtypetostrs {
-		vs = append(vs, LengthType(i))
+	return []LengthType{
+		LengthTypeIdle,
+		LengthTypeActive,
 	}
-	return vs
 }

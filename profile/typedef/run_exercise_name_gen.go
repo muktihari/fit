@@ -18,47 +18,46 @@ const (
 	RunExerciseNameWalk    RunExerciseName = 1
 	RunExerciseNameJog     RunExerciseName = 2
 	RunExerciseNameSprint  RunExerciseName = 3
-	RunExerciseNameInvalid RunExerciseName = 0xFFFF // INVALID
+	RunExerciseNameInvalid RunExerciseName = 0xFFFF
 )
 
-var runexercisenametostrs = map[RunExerciseName]string{
-	RunExerciseNameRun:     "run",
-	RunExerciseNameWalk:    "walk",
-	RunExerciseNameJog:     "jog",
-	RunExerciseNameSprint:  "sprint",
-	RunExerciseNameInvalid: "invalid",
-}
-
 func (r RunExerciseName) String() string {
-	val, ok := runexercisenametostrs[r]
-	if !ok {
-		return strconv.FormatUint(uint64(r), 10)
+	switch r {
+	case RunExerciseNameRun:
+		return "run"
+	case RunExerciseNameWalk:
+		return "walk"
+	case RunExerciseNameJog:
+		return "jog"
+	case RunExerciseNameSprint:
+		return "sprint"
+	default:
+		return "RunExerciseNameInvalid(" + strconv.FormatUint(uint64(r), 10) + ")"
 	}
-	return val
 }
-
-var strtorunexercisename = func() map[string]RunExerciseName {
-	m := make(map[string]RunExerciseName)
-	for t, str := range runexercisenametostrs {
-		m[str] = RunExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into RunExerciseName constant it's represent, return RunExerciseNameInvalid if not found.
 func RunExerciseNameFromString(s string) RunExerciseName {
-	val, ok := strtorunexercisename[s]
-	if !ok {
-		return strtorunexercisename["invalid"]
+	switch s {
+	case "run":
+		return RunExerciseNameRun
+	case "walk":
+		return RunExerciseNameWalk
+	case "jog":
+		return RunExerciseNameJog
+	case "sprint":
+		return RunExerciseNameSprint
+	default:
+		return RunExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListRunExerciseName() []RunExerciseName {
-	vs := make([]RunExerciseName, 0, len(runexercisenametostrs))
-	for i := range runexercisenametostrs {
-		vs = append(vs, RunExerciseName(i))
+	return []RunExerciseName{
+		RunExerciseNameRun,
+		RunExerciseNameWalk,
+		RunExerciseNameJog,
+		RunExerciseNameSprint,
 	}
-	return vs
 }

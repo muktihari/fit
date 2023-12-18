@@ -16,45 +16,36 @@ type SegmentLapStatus byte
 const (
 	SegmentLapStatusEnd     SegmentLapStatus = 0
 	SegmentLapStatusFail    SegmentLapStatus = 1
-	SegmentLapStatusInvalid SegmentLapStatus = 0xFF // INVALID
+	SegmentLapStatusInvalid SegmentLapStatus = 0xFF
 )
 
-var segmentlapstatustostrs = map[SegmentLapStatus]string{
-	SegmentLapStatusEnd:     "end",
-	SegmentLapStatusFail:    "fail",
-	SegmentLapStatusInvalid: "invalid",
-}
-
 func (s SegmentLapStatus) String() string {
-	val, ok := segmentlapstatustostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SegmentLapStatusEnd:
+		return "end"
+	case SegmentLapStatusFail:
+		return "fail"
+	default:
+		return "SegmentLapStatusInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosegmentlapstatus = func() map[string]SegmentLapStatus {
-	m := make(map[string]SegmentLapStatus)
-	for t, str := range segmentlapstatustostrs {
-		m[str] = SegmentLapStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into SegmentLapStatus constant it's represent, return SegmentLapStatusInvalid if not found.
 func SegmentLapStatusFromString(s string) SegmentLapStatus {
-	val, ok := strtosegmentlapstatus[s]
-	if !ok {
-		return strtosegmentlapstatus["invalid"]
+	switch s {
+	case "end":
+		return SegmentLapStatusEnd
+	case "fail":
+		return SegmentLapStatusFail
+	default:
+		return SegmentLapStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSegmentLapStatus() []SegmentLapStatus {
-	vs := make([]SegmentLapStatus, 0, len(segmentlapstatustostrs))
-	for i := range segmentlapstatustostrs {
-		vs = append(vs, SegmentLapStatus(i))
+	return []SegmentLapStatus{
+		SegmentLapStatusEnd,
+		SegmentLapStatusFail,
 	}
-	return vs
 }

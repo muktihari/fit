@@ -41,70 +41,161 @@ const (
 	BenchPressExerciseNameTripleStopBarbellBenchPress              BenchPressExerciseName = 24
 	BenchPressExerciseNameWideGripBarbellBenchPress                BenchPressExerciseName = 25
 	BenchPressExerciseNameAlternatingDumbbellChestPress            BenchPressExerciseName = 26
-	BenchPressExerciseNameInvalid                                  BenchPressExerciseName = 0xFFFF // INVALID
+	BenchPressExerciseNameInvalid                                  BenchPressExerciseName = 0xFFFF
 )
 
-var benchpressexercisenametostrs = map[BenchPressExerciseName]string{
-	BenchPressExerciseNameAlternatingDumbbellChestPressOnSwissBall: "alternating_dumbbell_chest_press_on_swiss_ball",
-	BenchPressExerciseNameBarbellBenchPress:                        "barbell_bench_press",
-	BenchPressExerciseNameBarbellBoardBenchPress:                   "barbell_board_bench_press",
-	BenchPressExerciseNameBarbellFloorPress:                        "barbell_floor_press",
-	BenchPressExerciseNameCloseGripBarbellBenchPress:               "close_grip_barbell_bench_press",
-	BenchPressExerciseNameDeclineDumbbellBenchPress:                "decline_dumbbell_bench_press",
-	BenchPressExerciseNameDumbbellBenchPress:                       "dumbbell_bench_press",
-	BenchPressExerciseNameDumbbellFloorPress:                       "dumbbell_floor_press",
-	BenchPressExerciseNameInclineBarbellBenchPress:                 "incline_barbell_bench_press",
-	BenchPressExerciseNameInclineDumbbellBenchPress:                "incline_dumbbell_bench_press",
-	BenchPressExerciseNameInclineSmithMachineBenchPress:            "incline_smith_machine_bench_press",
-	BenchPressExerciseNameIsometricBarbellBenchPress:               "isometric_barbell_bench_press",
-	BenchPressExerciseNameKettlebellChestPress:                     "kettlebell_chest_press",
-	BenchPressExerciseNameNeutralGripDumbbellBenchPress:            "neutral_grip_dumbbell_bench_press",
-	BenchPressExerciseNameNeutralGripDumbbellInclineBenchPress:     "neutral_grip_dumbbell_incline_bench_press",
-	BenchPressExerciseNameOneArmFloorPress:                         "one_arm_floor_press",
-	BenchPressExerciseNameWeightedOneArmFloorPress:                 "weighted_one_arm_floor_press",
-	BenchPressExerciseNamePartialLockout:                           "partial_lockout",
-	BenchPressExerciseNameReverseGripBarbellBenchPress:             "reverse_grip_barbell_bench_press",
-	BenchPressExerciseNameReverseGripInclineBenchPress:             "reverse_grip_incline_bench_press",
-	BenchPressExerciseNameSingleArmCableChestPress:                 "single_arm_cable_chest_press",
-	BenchPressExerciseNameSingleArmDumbbellBenchPress:              "single_arm_dumbbell_bench_press",
-	BenchPressExerciseNameSmithMachineBenchPress:                   "smith_machine_bench_press",
-	BenchPressExerciseNameSwissBallDumbbellChestPress:              "swiss_ball_dumbbell_chest_press",
-	BenchPressExerciseNameTripleStopBarbellBenchPress:              "triple_stop_barbell_bench_press",
-	BenchPressExerciseNameWideGripBarbellBenchPress:                "wide_grip_barbell_bench_press",
-	BenchPressExerciseNameAlternatingDumbbellChestPress:            "alternating_dumbbell_chest_press",
-	BenchPressExerciseNameInvalid:                                  "invalid",
-}
-
 func (b BenchPressExerciseName) String() string {
-	val, ok := benchpressexercisenametostrs[b]
-	if !ok {
-		return strconv.FormatUint(uint64(b), 10)
+	switch b {
+	case BenchPressExerciseNameAlternatingDumbbellChestPressOnSwissBall:
+		return "alternating_dumbbell_chest_press_on_swiss_ball"
+	case BenchPressExerciseNameBarbellBenchPress:
+		return "barbell_bench_press"
+	case BenchPressExerciseNameBarbellBoardBenchPress:
+		return "barbell_board_bench_press"
+	case BenchPressExerciseNameBarbellFloorPress:
+		return "barbell_floor_press"
+	case BenchPressExerciseNameCloseGripBarbellBenchPress:
+		return "close_grip_barbell_bench_press"
+	case BenchPressExerciseNameDeclineDumbbellBenchPress:
+		return "decline_dumbbell_bench_press"
+	case BenchPressExerciseNameDumbbellBenchPress:
+		return "dumbbell_bench_press"
+	case BenchPressExerciseNameDumbbellFloorPress:
+		return "dumbbell_floor_press"
+	case BenchPressExerciseNameInclineBarbellBenchPress:
+		return "incline_barbell_bench_press"
+	case BenchPressExerciseNameInclineDumbbellBenchPress:
+		return "incline_dumbbell_bench_press"
+	case BenchPressExerciseNameInclineSmithMachineBenchPress:
+		return "incline_smith_machine_bench_press"
+	case BenchPressExerciseNameIsometricBarbellBenchPress:
+		return "isometric_barbell_bench_press"
+	case BenchPressExerciseNameKettlebellChestPress:
+		return "kettlebell_chest_press"
+	case BenchPressExerciseNameNeutralGripDumbbellBenchPress:
+		return "neutral_grip_dumbbell_bench_press"
+	case BenchPressExerciseNameNeutralGripDumbbellInclineBenchPress:
+		return "neutral_grip_dumbbell_incline_bench_press"
+	case BenchPressExerciseNameOneArmFloorPress:
+		return "one_arm_floor_press"
+	case BenchPressExerciseNameWeightedOneArmFloorPress:
+		return "weighted_one_arm_floor_press"
+	case BenchPressExerciseNamePartialLockout:
+		return "partial_lockout"
+	case BenchPressExerciseNameReverseGripBarbellBenchPress:
+		return "reverse_grip_barbell_bench_press"
+	case BenchPressExerciseNameReverseGripInclineBenchPress:
+		return "reverse_grip_incline_bench_press"
+	case BenchPressExerciseNameSingleArmCableChestPress:
+		return "single_arm_cable_chest_press"
+	case BenchPressExerciseNameSingleArmDumbbellBenchPress:
+		return "single_arm_dumbbell_bench_press"
+	case BenchPressExerciseNameSmithMachineBenchPress:
+		return "smith_machine_bench_press"
+	case BenchPressExerciseNameSwissBallDumbbellChestPress:
+		return "swiss_ball_dumbbell_chest_press"
+	case BenchPressExerciseNameTripleStopBarbellBenchPress:
+		return "triple_stop_barbell_bench_press"
+	case BenchPressExerciseNameWideGripBarbellBenchPress:
+		return "wide_grip_barbell_bench_press"
+	case BenchPressExerciseNameAlternatingDumbbellChestPress:
+		return "alternating_dumbbell_chest_press"
+	default:
+		return "BenchPressExerciseNameInvalid(" + strconv.FormatUint(uint64(b), 10) + ")"
 	}
-	return val
 }
-
-var strtobenchpressexercisename = func() map[string]BenchPressExerciseName {
-	m := make(map[string]BenchPressExerciseName)
-	for t, str := range benchpressexercisenametostrs {
-		m[str] = BenchPressExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into BenchPressExerciseName constant it's represent, return BenchPressExerciseNameInvalid if not found.
 func BenchPressExerciseNameFromString(s string) BenchPressExerciseName {
-	val, ok := strtobenchpressexercisename[s]
-	if !ok {
-		return strtobenchpressexercisename["invalid"]
+	switch s {
+	case "alternating_dumbbell_chest_press_on_swiss_ball":
+		return BenchPressExerciseNameAlternatingDumbbellChestPressOnSwissBall
+	case "barbell_bench_press":
+		return BenchPressExerciseNameBarbellBenchPress
+	case "barbell_board_bench_press":
+		return BenchPressExerciseNameBarbellBoardBenchPress
+	case "barbell_floor_press":
+		return BenchPressExerciseNameBarbellFloorPress
+	case "close_grip_barbell_bench_press":
+		return BenchPressExerciseNameCloseGripBarbellBenchPress
+	case "decline_dumbbell_bench_press":
+		return BenchPressExerciseNameDeclineDumbbellBenchPress
+	case "dumbbell_bench_press":
+		return BenchPressExerciseNameDumbbellBenchPress
+	case "dumbbell_floor_press":
+		return BenchPressExerciseNameDumbbellFloorPress
+	case "incline_barbell_bench_press":
+		return BenchPressExerciseNameInclineBarbellBenchPress
+	case "incline_dumbbell_bench_press":
+		return BenchPressExerciseNameInclineDumbbellBenchPress
+	case "incline_smith_machine_bench_press":
+		return BenchPressExerciseNameInclineSmithMachineBenchPress
+	case "isometric_barbell_bench_press":
+		return BenchPressExerciseNameIsometricBarbellBenchPress
+	case "kettlebell_chest_press":
+		return BenchPressExerciseNameKettlebellChestPress
+	case "neutral_grip_dumbbell_bench_press":
+		return BenchPressExerciseNameNeutralGripDumbbellBenchPress
+	case "neutral_grip_dumbbell_incline_bench_press":
+		return BenchPressExerciseNameNeutralGripDumbbellInclineBenchPress
+	case "one_arm_floor_press":
+		return BenchPressExerciseNameOneArmFloorPress
+	case "weighted_one_arm_floor_press":
+		return BenchPressExerciseNameWeightedOneArmFloorPress
+	case "partial_lockout":
+		return BenchPressExerciseNamePartialLockout
+	case "reverse_grip_barbell_bench_press":
+		return BenchPressExerciseNameReverseGripBarbellBenchPress
+	case "reverse_grip_incline_bench_press":
+		return BenchPressExerciseNameReverseGripInclineBenchPress
+	case "single_arm_cable_chest_press":
+		return BenchPressExerciseNameSingleArmCableChestPress
+	case "single_arm_dumbbell_bench_press":
+		return BenchPressExerciseNameSingleArmDumbbellBenchPress
+	case "smith_machine_bench_press":
+		return BenchPressExerciseNameSmithMachineBenchPress
+	case "swiss_ball_dumbbell_chest_press":
+		return BenchPressExerciseNameSwissBallDumbbellChestPress
+	case "triple_stop_barbell_bench_press":
+		return BenchPressExerciseNameTripleStopBarbellBenchPress
+	case "wide_grip_barbell_bench_press":
+		return BenchPressExerciseNameWideGripBarbellBenchPress
+	case "alternating_dumbbell_chest_press":
+		return BenchPressExerciseNameAlternatingDumbbellChestPress
+	default:
+		return BenchPressExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBenchPressExerciseName() []BenchPressExerciseName {
-	vs := make([]BenchPressExerciseName, 0, len(benchpressexercisenametostrs))
-	for i := range benchpressexercisenametostrs {
-		vs = append(vs, BenchPressExerciseName(i))
+	return []BenchPressExerciseName{
+		BenchPressExerciseNameAlternatingDumbbellChestPressOnSwissBall,
+		BenchPressExerciseNameBarbellBenchPress,
+		BenchPressExerciseNameBarbellBoardBenchPress,
+		BenchPressExerciseNameBarbellFloorPress,
+		BenchPressExerciseNameCloseGripBarbellBenchPress,
+		BenchPressExerciseNameDeclineDumbbellBenchPress,
+		BenchPressExerciseNameDumbbellBenchPress,
+		BenchPressExerciseNameDumbbellFloorPress,
+		BenchPressExerciseNameInclineBarbellBenchPress,
+		BenchPressExerciseNameInclineDumbbellBenchPress,
+		BenchPressExerciseNameInclineSmithMachineBenchPress,
+		BenchPressExerciseNameIsometricBarbellBenchPress,
+		BenchPressExerciseNameKettlebellChestPress,
+		BenchPressExerciseNameNeutralGripDumbbellBenchPress,
+		BenchPressExerciseNameNeutralGripDumbbellInclineBenchPress,
+		BenchPressExerciseNameOneArmFloorPress,
+		BenchPressExerciseNameWeightedOneArmFloorPress,
+		BenchPressExerciseNamePartialLockout,
+		BenchPressExerciseNameReverseGripBarbellBenchPress,
+		BenchPressExerciseNameReverseGripInclineBenchPress,
+		BenchPressExerciseNameSingleArmCableChestPress,
+		BenchPressExerciseNameSingleArmDumbbellBenchPress,
+		BenchPressExerciseNameSmithMachineBenchPress,
+		BenchPressExerciseNameSwissBallDumbbellChestPress,
+		BenchPressExerciseNameTripleStopBarbellBenchPress,
+		BenchPressExerciseNameWideGripBarbellBenchPress,
+		BenchPressExerciseNameAlternatingDumbbellChestPress,
 	}
-	return vs
 }

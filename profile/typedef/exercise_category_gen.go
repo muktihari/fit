@@ -48,77 +48,196 @@ const (
 	ExerciseCategoryWarmUp            ExerciseCategory = 31
 	ExerciseCategoryRun               ExerciseCategory = 32
 	ExerciseCategoryUnknown           ExerciseCategory = 65534
-	ExerciseCategoryInvalid           ExerciseCategory = 0xFFFF // INVALID
+	ExerciseCategoryInvalid           ExerciseCategory = 0xFFFF
 )
 
-var exercisecategorytostrs = map[ExerciseCategory]string{
-	ExerciseCategoryBenchPress:        "bench_press",
-	ExerciseCategoryCalfRaise:         "calf_raise",
-	ExerciseCategoryCardio:            "cardio",
-	ExerciseCategoryCarry:             "carry",
-	ExerciseCategoryChop:              "chop",
-	ExerciseCategoryCore:              "core",
-	ExerciseCategoryCrunch:            "crunch",
-	ExerciseCategoryCurl:              "curl",
-	ExerciseCategoryDeadlift:          "deadlift",
-	ExerciseCategoryFlye:              "flye",
-	ExerciseCategoryHipRaise:          "hip_raise",
-	ExerciseCategoryHipStability:      "hip_stability",
-	ExerciseCategoryHipSwing:          "hip_swing",
-	ExerciseCategoryHyperextension:    "hyperextension",
-	ExerciseCategoryLateralRaise:      "lateral_raise",
-	ExerciseCategoryLegCurl:           "leg_curl",
-	ExerciseCategoryLegRaise:          "leg_raise",
-	ExerciseCategoryLunge:             "lunge",
-	ExerciseCategoryOlympicLift:       "olympic_lift",
-	ExerciseCategoryPlank:             "plank",
-	ExerciseCategoryPlyo:              "plyo",
-	ExerciseCategoryPullUp:            "pull_up",
-	ExerciseCategoryPushUp:            "push_up",
-	ExerciseCategoryRow:               "row",
-	ExerciseCategoryShoulderPress:     "shoulder_press",
-	ExerciseCategoryShoulderStability: "shoulder_stability",
-	ExerciseCategoryShrug:             "shrug",
-	ExerciseCategorySitUp:             "sit_up",
-	ExerciseCategorySquat:             "squat",
-	ExerciseCategoryTotalBody:         "total_body",
-	ExerciseCategoryTricepsExtension:  "triceps_extension",
-	ExerciseCategoryWarmUp:            "warm_up",
-	ExerciseCategoryRun:               "run",
-	ExerciseCategoryUnknown:           "unknown",
-	ExerciseCategoryInvalid:           "invalid",
-}
-
 func (e ExerciseCategory) String() string {
-	val, ok := exercisecategorytostrs[e]
-	if !ok {
-		return strconv.FormatUint(uint64(e), 10)
+	switch e {
+	case ExerciseCategoryBenchPress:
+		return "bench_press"
+	case ExerciseCategoryCalfRaise:
+		return "calf_raise"
+	case ExerciseCategoryCardio:
+		return "cardio"
+	case ExerciseCategoryCarry:
+		return "carry"
+	case ExerciseCategoryChop:
+		return "chop"
+	case ExerciseCategoryCore:
+		return "core"
+	case ExerciseCategoryCrunch:
+		return "crunch"
+	case ExerciseCategoryCurl:
+		return "curl"
+	case ExerciseCategoryDeadlift:
+		return "deadlift"
+	case ExerciseCategoryFlye:
+		return "flye"
+	case ExerciseCategoryHipRaise:
+		return "hip_raise"
+	case ExerciseCategoryHipStability:
+		return "hip_stability"
+	case ExerciseCategoryHipSwing:
+		return "hip_swing"
+	case ExerciseCategoryHyperextension:
+		return "hyperextension"
+	case ExerciseCategoryLateralRaise:
+		return "lateral_raise"
+	case ExerciseCategoryLegCurl:
+		return "leg_curl"
+	case ExerciseCategoryLegRaise:
+		return "leg_raise"
+	case ExerciseCategoryLunge:
+		return "lunge"
+	case ExerciseCategoryOlympicLift:
+		return "olympic_lift"
+	case ExerciseCategoryPlank:
+		return "plank"
+	case ExerciseCategoryPlyo:
+		return "plyo"
+	case ExerciseCategoryPullUp:
+		return "pull_up"
+	case ExerciseCategoryPushUp:
+		return "push_up"
+	case ExerciseCategoryRow:
+		return "row"
+	case ExerciseCategoryShoulderPress:
+		return "shoulder_press"
+	case ExerciseCategoryShoulderStability:
+		return "shoulder_stability"
+	case ExerciseCategoryShrug:
+		return "shrug"
+	case ExerciseCategorySitUp:
+		return "sit_up"
+	case ExerciseCategorySquat:
+		return "squat"
+	case ExerciseCategoryTotalBody:
+		return "total_body"
+	case ExerciseCategoryTricepsExtension:
+		return "triceps_extension"
+	case ExerciseCategoryWarmUp:
+		return "warm_up"
+	case ExerciseCategoryRun:
+		return "run"
+	case ExerciseCategoryUnknown:
+		return "unknown"
+	default:
+		return "ExerciseCategoryInvalid(" + strconv.FormatUint(uint64(e), 10) + ")"
 	}
-	return val
 }
-
-var strtoexercisecategory = func() map[string]ExerciseCategory {
-	m := make(map[string]ExerciseCategory)
-	for t, str := range exercisecategorytostrs {
-		m[str] = ExerciseCategory(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExerciseCategory constant it's represent, return ExerciseCategoryInvalid if not found.
 func ExerciseCategoryFromString(s string) ExerciseCategory {
-	val, ok := strtoexercisecategory[s]
-	if !ok {
-		return strtoexercisecategory["invalid"]
+	switch s {
+	case "bench_press":
+		return ExerciseCategoryBenchPress
+	case "calf_raise":
+		return ExerciseCategoryCalfRaise
+	case "cardio":
+		return ExerciseCategoryCardio
+	case "carry":
+		return ExerciseCategoryCarry
+	case "chop":
+		return ExerciseCategoryChop
+	case "core":
+		return ExerciseCategoryCore
+	case "crunch":
+		return ExerciseCategoryCrunch
+	case "curl":
+		return ExerciseCategoryCurl
+	case "deadlift":
+		return ExerciseCategoryDeadlift
+	case "flye":
+		return ExerciseCategoryFlye
+	case "hip_raise":
+		return ExerciseCategoryHipRaise
+	case "hip_stability":
+		return ExerciseCategoryHipStability
+	case "hip_swing":
+		return ExerciseCategoryHipSwing
+	case "hyperextension":
+		return ExerciseCategoryHyperextension
+	case "lateral_raise":
+		return ExerciseCategoryLateralRaise
+	case "leg_curl":
+		return ExerciseCategoryLegCurl
+	case "leg_raise":
+		return ExerciseCategoryLegRaise
+	case "lunge":
+		return ExerciseCategoryLunge
+	case "olympic_lift":
+		return ExerciseCategoryOlympicLift
+	case "plank":
+		return ExerciseCategoryPlank
+	case "plyo":
+		return ExerciseCategoryPlyo
+	case "pull_up":
+		return ExerciseCategoryPullUp
+	case "push_up":
+		return ExerciseCategoryPushUp
+	case "row":
+		return ExerciseCategoryRow
+	case "shoulder_press":
+		return ExerciseCategoryShoulderPress
+	case "shoulder_stability":
+		return ExerciseCategoryShoulderStability
+	case "shrug":
+		return ExerciseCategoryShrug
+	case "sit_up":
+		return ExerciseCategorySitUp
+	case "squat":
+		return ExerciseCategorySquat
+	case "total_body":
+		return ExerciseCategoryTotalBody
+	case "triceps_extension":
+		return ExerciseCategoryTricepsExtension
+	case "warm_up":
+		return ExerciseCategoryWarmUp
+	case "run":
+		return ExerciseCategoryRun
+	case "unknown":
+		return ExerciseCategoryUnknown
+	default:
+		return ExerciseCategoryInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExerciseCategory() []ExerciseCategory {
-	vs := make([]ExerciseCategory, 0, len(exercisecategorytostrs))
-	for i := range exercisecategorytostrs {
-		vs = append(vs, ExerciseCategory(i))
+	return []ExerciseCategory{
+		ExerciseCategoryBenchPress,
+		ExerciseCategoryCalfRaise,
+		ExerciseCategoryCardio,
+		ExerciseCategoryCarry,
+		ExerciseCategoryChop,
+		ExerciseCategoryCore,
+		ExerciseCategoryCrunch,
+		ExerciseCategoryCurl,
+		ExerciseCategoryDeadlift,
+		ExerciseCategoryFlye,
+		ExerciseCategoryHipRaise,
+		ExerciseCategoryHipStability,
+		ExerciseCategoryHipSwing,
+		ExerciseCategoryHyperextension,
+		ExerciseCategoryLateralRaise,
+		ExerciseCategoryLegCurl,
+		ExerciseCategoryLegRaise,
+		ExerciseCategoryLunge,
+		ExerciseCategoryOlympicLift,
+		ExerciseCategoryPlank,
+		ExerciseCategoryPlyo,
+		ExerciseCategoryPullUp,
+		ExerciseCategoryPushUp,
+		ExerciseCategoryRow,
+		ExerciseCategoryShoulderPress,
+		ExerciseCategoryShoulderStability,
+		ExerciseCategoryShrug,
+		ExerciseCategorySitUp,
+		ExerciseCategorySquat,
+		ExerciseCategoryTotalBody,
+		ExerciseCategoryTricepsExtension,
+		ExerciseCategoryWarmUp,
+		ExerciseCategoryRun,
+		ExerciseCategoryUnknown,
 	}
-	return vs
 }

@@ -53,82 +53,221 @@ const (
 	LanguageBurmese             Language = 36
 	LanguageMongolian           Language = 37
 	LanguageCustom              Language = 254
-	LanguageInvalid             Language = 0xFF // INVALID
+	LanguageInvalid             Language = 0xFF
 )
 
-var languagetostrs = map[Language]string{
-	LanguageEnglish:             "english",
-	LanguageFrench:              "french",
-	LanguageItalian:             "italian",
-	LanguageGerman:              "german",
-	LanguageSpanish:             "spanish",
-	LanguageCroatian:            "croatian",
-	LanguageCzech:               "czech",
-	LanguageDanish:              "danish",
-	LanguageDutch:               "dutch",
-	LanguageFinnish:             "finnish",
-	LanguageGreek:               "greek",
-	LanguageHungarian:           "hungarian",
-	LanguageNorwegian:           "norwegian",
-	LanguagePolish:              "polish",
-	LanguagePortuguese:          "portuguese",
-	LanguageSlovakian:           "slovakian",
-	LanguageSlovenian:           "slovenian",
-	LanguageSwedish:             "swedish",
-	LanguageRussian:             "russian",
-	LanguageTurkish:             "turkish",
-	LanguageLatvian:             "latvian",
-	LanguageUkrainian:           "ukrainian",
-	LanguageArabic:              "arabic",
-	LanguageFarsi:               "farsi",
-	LanguageBulgarian:           "bulgarian",
-	LanguageRomanian:            "romanian",
-	LanguageChinese:             "chinese",
-	LanguageJapanese:            "japanese",
-	LanguageKorean:              "korean",
-	LanguageTaiwanese:           "taiwanese",
-	LanguageThai:                "thai",
-	LanguageHebrew:              "hebrew",
-	LanguageBrazilianPortuguese: "brazilian_portuguese",
-	LanguageIndonesian:          "indonesian",
-	LanguageMalaysian:           "malaysian",
-	LanguageVietnamese:          "vietnamese",
-	LanguageBurmese:             "burmese",
-	LanguageMongolian:           "mongolian",
-	LanguageCustom:              "custom",
-	LanguageInvalid:             "invalid",
-}
-
 func (l Language) String() string {
-	val, ok := languagetostrs[l]
-	if !ok {
-		return strconv.Itoa(int(l))
+	switch l {
+	case LanguageEnglish:
+		return "english"
+	case LanguageFrench:
+		return "french"
+	case LanguageItalian:
+		return "italian"
+	case LanguageGerman:
+		return "german"
+	case LanguageSpanish:
+		return "spanish"
+	case LanguageCroatian:
+		return "croatian"
+	case LanguageCzech:
+		return "czech"
+	case LanguageDanish:
+		return "danish"
+	case LanguageDutch:
+		return "dutch"
+	case LanguageFinnish:
+		return "finnish"
+	case LanguageGreek:
+		return "greek"
+	case LanguageHungarian:
+		return "hungarian"
+	case LanguageNorwegian:
+		return "norwegian"
+	case LanguagePolish:
+		return "polish"
+	case LanguagePortuguese:
+		return "portuguese"
+	case LanguageSlovakian:
+		return "slovakian"
+	case LanguageSlovenian:
+		return "slovenian"
+	case LanguageSwedish:
+		return "swedish"
+	case LanguageRussian:
+		return "russian"
+	case LanguageTurkish:
+		return "turkish"
+	case LanguageLatvian:
+		return "latvian"
+	case LanguageUkrainian:
+		return "ukrainian"
+	case LanguageArabic:
+		return "arabic"
+	case LanguageFarsi:
+		return "farsi"
+	case LanguageBulgarian:
+		return "bulgarian"
+	case LanguageRomanian:
+		return "romanian"
+	case LanguageChinese:
+		return "chinese"
+	case LanguageJapanese:
+		return "japanese"
+	case LanguageKorean:
+		return "korean"
+	case LanguageTaiwanese:
+		return "taiwanese"
+	case LanguageThai:
+		return "thai"
+	case LanguageHebrew:
+		return "hebrew"
+	case LanguageBrazilianPortuguese:
+		return "brazilian_portuguese"
+	case LanguageIndonesian:
+		return "indonesian"
+	case LanguageMalaysian:
+		return "malaysian"
+	case LanguageVietnamese:
+		return "vietnamese"
+	case LanguageBurmese:
+		return "burmese"
+	case LanguageMongolian:
+		return "mongolian"
+	case LanguageCustom:
+		return "custom"
+	default:
+		return "LanguageInvalid(" + strconv.Itoa(int(l)) + ")"
 	}
-	return val
 }
-
-var strtolanguage = func() map[string]Language {
-	m := make(map[string]Language)
-	for t, str := range languagetostrs {
-		m[str] = Language(t)
-	}
-	return m
-}()
 
 // FromString parse string into Language constant it's represent, return LanguageInvalid if not found.
 func LanguageFromString(s string) Language {
-	val, ok := strtolanguage[s]
-	if !ok {
-		return strtolanguage["invalid"]
+	switch s {
+	case "english":
+		return LanguageEnglish
+	case "french":
+		return LanguageFrench
+	case "italian":
+		return LanguageItalian
+	case "german":
+		return LanguageGerman
+	case "spanish":
+		return LanguageSpanish
+	case "croatian":
+		return LanguageCroatian
+	case "czech":
+		return LanguageCzech
+	case "danish":
+		return LanguageDanish
+	case "dutch":
+		return LanguageDutch
+	case "finnish":
+		return LanguageFinnish
+	case "greek":
+		return LanguageGreek
+	case "hungarian":
+		return LanguageHungarian
+	case "norwegian":
+		return LanguageNorwegian
+	case "polish":
+		return LanguagePolish
+	case "portuguese":
+		return LanguagePortuguese
+	case "slovakian":
+		return LanguageSlovakian
+	case "slovenian":
+		return LanguageSlovenian
+	case "swedish":
+		return LanguageSwedish
+	case "russian":
+		return LanguageRussian
+	case "turkish":
+		return LanguageTurkish
+	case "latvian":
+		return LanguageLatvian
+	case "ukrainian":
+		return LanguageUkrainian
+	case "arabic":
+		return LanguageArabic
+	case "farsi":
+		return LanguageFarsi
+	case "bulgarian":
+		return LanguageBulgarian
+	case "romanian":
+		return LanguageRomanian
+	case "chinese":
+		return LanguageChinese
+	case "japanese":
+		return LanguageJapanese
+	case "korean":
+		return LanguageKorean
+	case "taiwanese":
+		return LanguageTaiwanese
+	case "thai":
+		return LanguageThai
+	case "hebrew":
+		return LanguageHebrew
+	case "brazilian_portuguese":
+		return LanguageBrazilianPortuguese
+	case "indonesian":
+		return LanguageIndonesian
+	case "malaysian":
+		return LanguageMalaysian
+	case "vietnamese":
+		return LanguageVietnamese
+	case "burmese":
+		return LanguageBurmese
+	case "mongolian":
+		return LanguageMongolian
+	case "custom":
+		return LanguageCustom
+	default:
+		return LanguageInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLanguage() []Language {
-	vs := make([]Language, 0, len(languagetostrs))
-	for i := range languagetostrs {
-		vs = append(vs, Language(i))
+	return []Language{
+		LanguageEnglish,
+		LanguageFrench,
+		LanguageItalian,
+		LanguageGerman,
+		LanguageSpanish,
+		LanguageCroatian,
+		LanguageCzech,
+		LanguageDanish,
+		LanguageDutch,
+		LanguageFinnish,
+		LanguageGreek,
+		LanguageHungarian,
+		LanguageNorwegian,
+		LanguagePolish,
+		LanguagePortuguese,
+		LanguageSlovakian,
+		LanguageSlovenian,
+		LanguageSwedish,
+		LanguageRussian,
+		LanguageTurkish,
+		LanguageLatvian,
+		LanguageUkrainian,
+		LanguageArabic,
+		LanguageFarsi,
+		LanguageBulgarian,
+		LanguageRomanian,
+		LanguageChinese,
+		LanguageJapanese,
+		LanguageKorean,
+		LanguageTaiwanese,
+		LanguageThai,
+		LanguageHebrew,
+		LanguageBrazilianPortuguese,
+		LanguageIndonesian,
+		LanguageMalaysian,
+		LanguageVietnamese,
+		LanguageBurmese,
+		LanguageMongolian,
+		LanguageCustom,
 	}
-	return vs
 }

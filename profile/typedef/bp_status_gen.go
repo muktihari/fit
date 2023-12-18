@@ -19,48 +19,51 @@ const (
 	BpStatusErrorNoMeasurement      BpStatus = 2
 	BpStatusErrorDataOutOfRange     BpStatus = 3
 	BpStatusErrorIrregularHeartRate BpStatus = 4
-	BpStatusInvalid                 BpStatus = 0xFF // INVALID
+	BpStatusInvalid                 BpStatus = 0xFF
 )
 
-var bpstatustostrs = map[BpStatus]string{
-	BpStatusNoError:                 "no_error",
-	BpStatusErrorIncompleteData:     "error_incomplete_data",
-	BpStatusErrorNoMeasurement:      "error_no_measurement",
-	BpStatusErrorDataOutOfRange:     "error_data_out_of_range",
-	BpStatusErrorIrregularHeartRate: "error_irregular_heart_rate",
-	BpStatusInvalid:                 "invalid",
-}
-
 func (b BpStatus) String() string {
-	val, ok := bpstatustostrs[b]
-	if !ok {
-		return strconv.Itoa(int(b))
+	switch b {
+	case BpStatusNoError:
+		return "no_error"
+	case BpStatusErrorIncompleteData:
+		return "error_incomplete_data"
+	case BpStatusErrorNoMeasurement:
+		return "error_no_measurement"
+	case BpStatusErrorDataOutOfRange:
+		return "error_data_out_of_range"
+	case BpStatusErrorIrregularHeartRate:
+		return "error_irregular_heart_rate"
+	default:
+		return "BpStatusInvalid(" + strconv.Itoa(int(b)) + ")"
 	}
-	return val
 }
-
-var strtobpstatus = func() map[string]BpStatus {
-	m := make(map[string]BpStatus)
-	for t, str := range bpstatustostrs {
-		m[str] = BpStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into BpStatus constant it's represent, return BpStatusInvalid if not found.
 func BpStatusFromString(s string) BpStatus {
-	val, ok := strtobpstatus[s]
-	if !ok {
-		return strtobpstatus["invalid"]
+	switch s {
+	case "no_error":
+		return BpStatusNoError
+	case "error_incomplete_data":
+		return BpStatusErrorIncompleteData
+	case "error_no_measurement":
+		return BpStatusErrorNoMeasurement
+	case "error_data_out_of_range":
+		return BpStatusErrorDataOutOfRange
+	case "error_irregular_heart_rate":
+		return BpStatusErrorIrregularHeartRate
+	default:
+		return BpStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBpStatus() []BpStatus {
-	vs := make([]BpStatus, 0, len(bpstatustostrs))
-	for i := range bpstatustostrs {
-		vs = append(vs, BpStatus(i))
+	return []BpStatus{
+		BpStatusNoError,
+		BpStatusErrorIncompleteData,
+		BpStatusErrorNoMeasurement,
+		BpStatusErrorDataOutOfRange,
+		BpStatusErrorIrregularHeartRate,
 	}
-	return vs
 }

@@ -18,47 +18,46 @@ const (
 	WatchfaceModeAnalog    WatchfaceMode = 1
 	WatchfaceModeConnectIq WatchfaceMode = 2
 	WatchfaceModeDisabled  WatchfaceMode = 3
-	WatchfaceModeInvalid   WatchfaceMode = 0xFF // INVALID
+	WatchfaceModeInvalid   WatchfaceMode = 0xFF
 )
 
-var watchfacemodetostrs = map[WatchfaceMode]string{
-	WatchfaceModeDigital:   "digital",
-	WatchfaceModeAnalog:    "analog",
-	WatchfaceModeConnectIq: "connect_iq",
-	WatchfaceModeDisabled:  "disabled",
-	WatchfaceModeInvalid:   "invalid",
-}
-
 func (w WatchfaceMode) String() string {
-	val, ok := watchfacemodetostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WatchfaceModeDigital:
+		return "digital"
+	case WatchfaceModeAnalog:
+		return "analog"
+	case WatchfaceModeConnectIq:
+		return "connect_iq"
+	case WatchfaceModeDisabled:
+		return "disabled"
+	default:
+		return "WatchfaceModeInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtowatchfacemode = func() map[string]WatchfaceMode {
-	m := make(map[string]WatchfaceMode)
-	for t, str := range watchfacemodetostrs {
-		m[str] = WatchfaceMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into WatchfaceMode constant it's represent, return WatchfaceModeInvalid if not found.
 func WatchfaceModeFromString(s string) WatchfaceMode {
-	val, ok := strtowatchfacemode[s]
-	if !ok {
-		return strtowatchfacemode["invalid"]
+	switch s {
+	case "digital":
+		return WatchfaceModeDigital
+	case "analog":
+		return WatchfaceModeAnalog
+	case "connect_iq":
+		return WatchfaceModeConnectIq
+	case "disabled":
+		return WatchfaceModeDisabled
+	default:
+		return WatchfaceModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWatchfaceMode() []WatchfaceMode {
-	vs := make([]WatchfaceMode, 0, len(watchfacemodetostrs))
-	for i := range watchfacemodetostrs {
-		vs = append(vs, WatchfaceMode(i))
+	return []WatchfaceMode{
+		WatchfaceModeDigital,
+		WatchfaceModeAnalog,
+		WatchfaceModeConnectIq,
+		WatchfaceModeDisabled,
 	}
-	return vs
 }

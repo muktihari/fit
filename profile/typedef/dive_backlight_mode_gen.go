@@ -16,45 +16,36 @@ type DiveBacklightMode byte
 const (
 	DiveBacklightModeAtDepth  DiveBacklightMode = 0
 	DiveBacklightModeAlwaysOn DiveBacklightMode = 1
-	DiveBacklightModeInvalid  DiveBacklightMode = 0xFF // INVALID
+	DiveBacklightModeInvalid  DiveBacklightMode = 0xFF
 )
 
-var divebacklightmodetostrs = map[DiveBacklightMode]string{
-	DiveBacklightModeAtDepth:  "at_depth",
-	DiveBacklightModeAlwaysOn: "always_on",
-	DiveBacklightModeInvalid:  "invalid",
-}
-
 func (d DiveBacklightMode) String() string {
-	val, ok := divebacklightmodetostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DiveBacklightModeAtDepth:
+		return "at_depth"
+	case DiveBacklightModeAlwaysOn:
+		return "always_on"
+	default:
+		return "DiveBacklightModeInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodivebacklightmode = func() map[string]DiveBacklightMode {
-	m := make(map[string]DiveBacklightMode)
-	for t, str := range divebacklightmodetostrs {
-		m[str] = DiveBacklightMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into DiveBacklightMode constant it's represent, return DiveBacklightModeInvalid if not found.
 func DiveBacklightModeFromString(s string) DiveBacklightMode {
-	val, ok := strtodivebacklightmode[s]
-	if !ok {
-		return strtodivebacklightmode["invalid"]
+	switch s {
+	case "at_depth":
+		return DiveBacklightModeAtDepth
+	case "always_on":
+		return DiveBacklightModeAlwaysOn
+	default:
+		return DiveBacklightModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDiveBacklightMode() []DiveBacklightMode {
-	vs := make([]DiveBacklightMode, 0, len(divebacklightmodetostrs))
-	for i := range divebacklightmodetostrs {
-		vs = append(vs, DiveBacklightMode(i))
+	return []DiveBacklightMode{
+		DiveBacklightModeAtDepth,
+		DiveBacklightModeAlwaysOn,
 	}
-	return vs
 }

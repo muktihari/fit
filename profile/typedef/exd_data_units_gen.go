@@ -64,93 +64,276 @@ const (
 	ExdDataUnitsMetersPerMin                   ExdDataUnits = 47
 	ExdDataUnitsMetersPerSec                   ExdDataUnits = 48
 	ExdDataUnitsEightCardinal                  ExdDataUnits = 49
-	ExdDataUnitsInvalid                        ExdDataUnits = 0xFF // INVALID
+	ExdDataUnitsInvalid                        ExdDataUnits = 0xFF
 )
 
-var exddataunitstostrs = map[ExdDataUnits]string{
-	ExdDataUnitsNoUnits:                        "no_units",
-	ExdDataUnitsLaps:                           "laps",
-	ExdDataUnitsMilesPerHour:                   "miles_per_hour",
-	ExdDataUnitsKilometersPerHour:              "kilometers_per_hour",
-	ExdDataUnitsFeetPerHour:                    "feet_per_hour",
-	ExdDataUnitsMetersPerHour:                  "meters_per_hour",
-	ExdDataUnitsDegreesCelsius:                 "degrees_celsius",
-	ExdDataUnitsDegreesFarenheit:               "degrees_farenheit",
-	ExdDataUnitsZone:                           "zone",
-	ExdDataUnitsGear:                           "gear",
-	ExdDataUnitsRpm:                            "rpm",
-	ExdDataUnitsBpm:                            "bpm",
-	ExdDataUnitsDegrees:                        "degrees",
-	ExdDataUnitsMillimeters:                    "millimeters",
-	ExdDataUnitsMeters:                         "meters",
-	ExdDataUnitsKilometers:                     "kilometers",
-	ExdDataUnitsFeet:                           "feet",
-	ExdDataUnitsYards:                          "yards",
-	ExdDataUnitsKilofeet:                       "kilofeet",
-	ExdDataUnitsMiles:                          "miles",
-	ExdDataUnitsTime:                           "time",
-	ExdDataUnitsEnumTurnType:                   "enum_turn_type",
-	ExdDataUnitsPercent:                        "percent",
-	ExdDataUnitsWatts:                          "watts",
-	ExdDataUnitsWattsPerKilogram:               "watts_per_kilogram",
-	ExdDataUnitsEnumBatteryStatus:              "enum_battery_status",
-	ExdDataUnitsEnumBikeLightBeamAngleMode:     "enum_bike_light_beam_angle_mode",
-	ExdDataUnitsEnumBikeLightBatteryStatus:     "enum_bike_light_battery_status",
-	ExdDataUnitsEnumBikeLightNetworkConfigType: "enum_bike_light_network_config_type",
-	ExdDataUnitsLights:                         "lights",
-	ExdDataUnitsSeconds:                        "seconds",
-	ExdDataUnitsMinutes:                        "minutes",
-	ExdDataUnitsHours:                          "hours",
-	ExdDataUnitsCalories:                       "calories",
-	ExdDataUnitsKilojoules:                     "kilojoules",
-	ExdDataUnitsMilliseconds:                   "milliseconds",
-	ExdDataUnitsSecondPerMile:                  "second_per_mile",
-	ExdDataUnitsSecondPerKilometer:             "second_per_kilometer",
-	ExdDataUnitsCentimeter:                     "centimeter",
-	ExdDataUnitsEnumCoursePoint:                "enum_course_point",
-	ExdDataUnitsBradians:                       "bradians",
-	ExdDataUnitsEnumSport:                      "enum_sport",
-	ExdDataUnitsInchesHg:                       "inches_hg",
-	ExdDataUnitsMmHg:                           "mm_hg",
-	ExdDataUnitsMbars:                          "mbars",
-	ExdDataUnitsHectoPascals:                   "hecto_pascals",
-	ExdDataUnitsFeetPerMin:                     "feet_per_min",
-	ExdDataUnitsMetersPerMin:                   "meters_per_min",
-	ExdDataUnitsMetersPerSec:                   "meters_per_sec",
-	ExdDataUnitsEightCardinal:                  "eight_cardinal",
-	ExdDataUnitsInvalid:                        "invalid",
-}
-
 func (e ExdDataUnits) String() string {
-	val, ok := exddataunitstostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case ExdDataUnitsNoUnits:
+		return "no_units"
+	case ExdDataUnitsLaps:
+		return "laps"
+	case ExdDataUnitsMilesPerHour:
+		return "miles_per_hour"
+	case ExdDataUnitsKilometersPerHour:
+		return "kilometers_per_hour"
+	case ExdDataUnitsFeetPerHour:
+		return "feet_per_hour"
+	case ExdDataUnitsMetersPerHour:
+		return "meters_per_hour"
+	case ExdDataUnitsDegreesCelsius:
+		return "degrees_celsius"
+	case ExdDataUnitsDegreesFarenheit:
+		return "degrees_farenheit"
+	case ExdDataUnitsZone:
+		return "zone"
+	case ExdDataUnitsGear:
+		return "gear"
+	case ExdDataUnitsRpm:
+		return "rpm"
+	case ExdDataUnitsBpm:
+		return "bpm"
+	case ExdDataUnitsDegrees:
+		return "degrees"
+	case ExdDataUnitsMillimeters:
+		return "millimeters"
+	case ExdDataUnitsMeters:
+		return "meters"
+	case ExdDataUnitsKilometers:
+		return "kilometers"
+	case ExdDataUnitsFeet:
+		return "feet"
+	case ExdDataUnitsYards:
+		return "yards"
+	case ExdDataUnitsKilofeet:
+		return "kilofeet"
+	case ExdDataUnitsMiles:
+		return "miles"
+	case ExdDataUnitsTime:
+		return "time"
+	case ExdDataUnitsEnumTurnType:
+		return "enum_turn_type"
+	case ExdDataUnitsPercent:
+		return "percent"
+	case ExdDataUnitsWatts:
+		return "watts"
+	case ExdDataUnitsWattsPerKilogram:
+		return "watts_per_kilogram"
+	case ExdDataUnitsEnumBatteryStatus:
+		return "enum_battery_status"
+	case ExdDataUnitsEnumBikeLightBeamAngleMode:
+		return "enum_bike_light_beam_angle_mode"
+	case ExdDataUnitsEnumBikeLightBatteryStatus:
+		return "enum_bike_light_battery_status"
+	case ExdDataUnitsEnumBikeLightNetworkConfigType:
+		return "enum_bike_light_network_config_type"
+	case ExdDataUnitsLights:
+		return "lights"
+	case ExdDataUnitsSeconds:
+		return "seconds"
+	case ExdDataUnitsMinutes:
+		return "minutes"
+	case ExdDataUnitsHours:
+		return "hours"
+	case ExdDataUnitsCalories:
+		return "calories"
+	case ExdDataUnitsKilojoules:
+		return "kilojoules"
+	case ExdDataUnitsMilliseconds:
+		return "milliseconds"
+	case ExdDataUnitsSecondPerMile:
+		return "second_per_mile"
+	case ExdDataUnitsSecondPerKilometer:
+		return "second_per_kilometer"
+	case ExdDataUnitsCentimeter:
+		return "centimeter"
+	case ExdDataUnitsEnumCoursePoint:
+		return "enum_course_point"
+	case ExdDataUnitsBradians:
+		return "bradians"
+	case ExdDataUnitsEnumSport:
+		return "enum_sport"
+	case ExdDataUnitsInchesHg:
+		return "inches_hg"
+	case ExdDataUnitsMmHg:
+		return "mm_hg"
+	case ExdDataUnitsMbars:
+		return "mbars"
+	case ExdDataUnitsHectoPascals:
+		return "hecto_pascals"
+	case ExdDataUnitsFeetPerMin:
+		return "feet_per_min"
+	case ExdDataUnitsMetersPerMin:
+		return "meters_per_min"
+	case ExdDataUnitsMetersPerSec:
+		return "meters_per_sec"
+	case ExdDataUnitsEightCardinal:
+		return "eight_cardinal"
+	default:
+		return "ExdDataUnitsInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoexddataunits = func() map[string]ExdDataUnits {
-	m := make(map[string]ExdDataUnits)
-	for t, str := range exddataunitstostrs {
-		m[str] = ExdDataUnits(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExdDataUnits constant it's represent, return ExdDataUnitsInvalid if not found.
 func ExdDataUnitsFromString(s string) ExdDataUnits {
-	val, ok := strtoexddataunits[s]
-	if !ok {
-		return strtoexddataunits["invalid"]
+	switch s {
+	case "no_units":
+		return ExdDataUnitsNoUnits
+	case "laps":
+		return ExdDataUnitsLaps
+	case "miles_per_hour":
+		return ExdDataUnitsMilesPerHour
+	case "kilometers_per_hour":
+		return ExdDataUnitsKilometersPerHour
+	case "feet_per_hour":
+		return ExdDataUnitsFeetPerHour
+	case "meters_per_hour":
+		return ExdDataUnitsMetersPerHour
+	case "degrees_celsius":
+		return ExdDataUnitsDegreesCelsius
+	case "degrees_farenheit":
+		return ExdDataUnitsDegreesFarenheit
+	case "zone":
+		return ExdDataUnitsZone
+	case "gear":
+		return ExdDataUnitsGear
+	case "rpm":
+		return ExdDataUnitsRpm
+	case "bpm":
+		return ExdDataUnitsBpm
+	case "degrees":
+		return ExdDataUnitsDegrees
+	case "millimeters":
+		return ExdDataUnitsMillimeters
+	case "meters":
+		return ExdDataUnitsMeters
+	case "kilometers":
+		return ExdDataUnitsKilometers
+	case "feet":
+		return ExdDataUnitsFeet
+	case "yards":
+		return ExdDataUnitsYards
+	case "kilofeet":
+		return ExdDataUnitsKilofeet
+	case "miles":
+		return ExdDataUnitsMiles
+	case "time":
+		return ExdDataUnitsTime
+	case "enum_turn_type":
+		return ExdDataUnitsEnumTurnType
+	case "percent":
+		return ExdDataUnitsPercent
+	case "watts":
+		return ExdDataUnitsWatts
+	case "watts_per_kilogram":
+		return ExdDataUnitsWattsPerKilogram
+	case "enum_battery_status":
+		return ExdDataUnitsEnumBatteryStatus
+	case "enum_bike_light_beam_angle_mode":
+		return ExdDataUnitsEnumBikeLightBeamAngleMode
+	case "enum_bike_light_battery_status":
+		return ExdDataUnitsEnumBikeLightBatteryStatus
+	case "enum_bike_light_network_config_type":
+		return ExdDataUnitsEnumBikeLightNetworkConfigType
+	case "lights":
+		return ExdDataUnitsLights
+	case "seconds":
+		return ExdDataUnitsSeconds
+	case "minutes":
+		return ExdDataUnitsMinutes
+	case "hours":
+		return ExdDataUnitsHours
+	case "calories":
+		return ExdDataUnitsCalories
+	case "kilojoules":
+		return ExdDataUnitsKilojoules
+	case "milliseconds":
+		return ExdDataUnitsMilliseconds
+	case "second_per_mile":
+		return ExdDataUnitsSecondPerMile
+	case "second_per_kilometer":
+		return ExdDataUnitsSecondPerKilometer
+	case "centimeter":
+		return ExdDataUnitsCentimeter
+	case "enum_course_point":
+		return ExdDataUnitsEnumCoursePoint
+	case "bradians":
+		return ExdDataUnitsBradians
+	case "enum_sport":
+		return ExdDataUnitsEnumSport
+	case "inches_hg":
+		return ExdDataUnitsInchesHg
+	case "mm_hg":
+		return ExdDataUnitsMmHg
+	case "mbars":
+		return ExdDataUnitsMbars
+	case "hecto_pascals":
+		return ExdDataUnitsHectoPascals
+	case "feet_per_min":
+		return ExdDataUnitsFeetPerMin
+	case "meters_per_min":
+		return ExdDataUnitsMetersPerMin
+	case "meters_per_sec":
+		return ExdDataUnitsMetersPerSec
+	case "eight_cardinal":
+		return ExdDataUnitsEightCardinal
+	default:
+		return ExdDataUnitsInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExdDataUnits() []ExdDataUnits {
-	vs := make([]ExdDataUnits, 0, len(exddataunitstostrs))
-	for i := range exddataunitstostrs {
-		vs = append(vs, ExdDataUnits(i))
+	return []ExdDataUnits{
+		ExdDataUnitsNoUnits,
+		ExdDataUnitsLaps,
+		ExdDataUnitsMilesPerHour,
+		ExdDataUnitsKilometersPerHour,
+		ExdDataUnitsFeetPerHour,
+		ExdDataUnitsMetersPerHour,
+		ExdDataUnitsDegreesCelsius,
+		ExdDataUnitsDegreesFarenheit,
+		ExdDataUnitsZone,
+		ExdDataUnitsGear,
+		ExdDataUnitsRpm,
+		ExdDataUnitsBpm,
+		ExdDataUnitsDegrees,
+		ExdDataUnitsMillimeters,
+		ExdDataUnitsMeters,
+		ExdDataUnitsKilometers,
+		ExdDataUnitsFeet,
+		ExdDataUnitsYards,
+		ExdDataUnitsKilofeet,
+		ExdDataUnitsMiles,
+		ExdDataUnitsTime,
+		ExdDataUnitsEnumTurnType,
+		ExdDataUnitsPercent,
+		ExdDataUnitsWatts,
+		ExdDataUnitsWattsPerKilogram,
+		ExdDataUnitsEnumBatteryStatus,
+		ExdDataUnitsEnumBikeLightBeamAngleMode,
+		ExdDataUnitsEnumBikeLightBatteryStatus,
+		ExdDataUnitsEnumBikeLightNetworkConfigType,
+		ExdDataUnitsLights,
+		ExdDataUnitsSeconds,
+		ExdDataUnitsMinutes,
+		ExdDataUnitsHours,
+		ExdDataUnitsCalories,
+		ExdDataUnitsKilojoules,
+		ExdDataUnitsMilliseconds,
+		ExdDataUnitsSecondPerMile,
+		ExdDataUnitsSecondPerKilometer,
+		ExdDataUnitsCentimeter,
+		ExdDataUnitsEnumCoursePoint,
+		ExdDataUnitsBradians,
+		ExdDataUnitsEnumSport,
+		ExdDataUnitsInchesHg,
+		ExdDataUnitsMmHg,
+		ExdDataUnitsMbars,
+		ExdDataUnitsHectoPascals,
+		ExdDataUnitsFeetPerMin,
+		ExdDataUnitsMetersPerMin,
+		ExdDataUnitsMetersPerSec,
+		ExdDataUnitsEightCardinal,
 	}
-	return vs
 }

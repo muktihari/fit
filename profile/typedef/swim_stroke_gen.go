@@ -20,51 +20,62 @@ const (
 	SwimStrokeButterfly    SwimStroke = 3
 	SwimStrokeDrill        SwimStroke = 4
 	SwimStrokeMixed        SwimStroke = 5
-	SwimStrokeIm           SwimStroke = 6    // IM is a mixed interval containing the same number of lengths for each of: Butterfly, Backstroke, Breaststroke, Freestyle, swam in that order.
-	SwimStrokeInvalid      SwimStroke = 0xFF // INVALID
+	SwimStrokeIm           SwimStroke = 6 // IM is a mixed interval containing the same number of lengths for each of: Butterfly, Backstroke, Breaststroke, Freestyle, swam in that order.
+	SwimStrokeInvalid      SwimStroke = 0xFF
 )
 
-var swimstroketostrs = map[SwimStroke]string{
-	SwimStrokeFreestyle:    "freestyle",
-	SwimStrokeBackstroke:   "backstroke",
-	SwimStrokeBreaststroke: "breaststroke",
-	SwimStrokeButterfly:    "butterfly",
-	SwimStrokeDrill:        "drill",
-	SwimStrokeMixed:        "mixed",
-	SwimStrokeIm:           "im",
-	SwimStrokeInvalid:      "invalid",
-}
-
 func (s SwimStroke) String() string {
-	val, ok := swimstroketostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SwimStrokeFreestyle:
+		return "freestyle"
+	case SwimStrokeBackstroke:
+		return "backstroke"
+	case SwimStrokeBreaststroke:
+		return "breaststroke"
+	case SwimStrokeButterfly:
+		return "butterfly"
+	case SwimStrokeDrill:
+		return "drill"
+	case SwimStrokeMixed:
+		return "mixed"
+	case SwimStrokeIm:
+		return "im"
+	default:
+		return "SwimStrokeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtoswimstroke = func() map[string]SwimStroke {
-	m := make(map[string]SwimStroke)
-	for t, str := range swimstroketostrs {
-		m[str] = SwimStroke(t)
-	}
-	return m
-}()
 
 // FromString parse string into SwimStroke constant it's represent, return SwimStrokeInvalid if not found.
 func SwimStrokeFromString(s string) SwimStroke {
-	val, ok := strtoswimstroke[s]
-	if !ok {
-		return strtoswimstroke["invalid"]
+	switch s {
+	case "freestyle":
+		return SwimStrokeFreestyle
+	case "backstroke":
+		return SwimStrokeBackstroke
+	case "breaststroke":
+		return SwimStrokeBreaststroke
+	case "butterfly":
+		return SwimStrokeButterfly
+	case "drill":
+		return SwimStrokeDrill
+	case "mixed":
+		return SwimStrokeMixed
+	case "im":
+		return SwimStrokeIm
+	default:
+		return SwimStrokeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSwimStroke() []SwimStroke {
-	vs := make([]SwimStroke, 0, len(swimstroketostrs))
-	for i := range swimstroketostrs {
-		vs = append(vs, SwimStroke(i))
+	return []SwimStroke{
+		SwimStrokeFreestyle,
+		SwimStrokeBackstroke,
+		SwimStrokeBreaststroke,
+		SwimStrokeButterfly,
+		SwimStrokeDrill,
+		SwimStrokeMixed,
+		SwimStrokeIm,
 	}
-	return vs
 }

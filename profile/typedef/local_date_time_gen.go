@@ -15,44 +15,31 @@ type LocalDateTime uint32
 
 const (
 	LocalDateTimeMin     LocalDateTime = 0x10000000 // if date_time is < 0x10000000 then it is system time (seconds from device power on)
-	LocalDateTimeInvalid LocalDateTime = 0xFFFFFFFF // INVALID
+	LocalDateTimeInvalid LocalDateTime = 0xFFFFFFFF
 )
 
-var localdatetimetostrs = map[LocalDateTime]string{
-	LocalDateTimeMin:     "min",
-	LocalDateTimeInvalid: "invalid",
-}
-
 func (l LocalDateTime) String() string {
-	val, ok := localdatetimetostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LocalDateTimeMin:
+		return "min"
+	default:
+		return "LocalDateTimeInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolocaldatetime = func() map[string]LocalDateTime {
-	m := make(map[string]LocalDateTime)
-	for t, str := range localdatetimetostrs {
-		m[str] = LocalDateTime(t)
-	}
-	return m
-}()
 
 // FromString parse string into LocalDateTime constant it's represent, return LocalDateTimeInvalid if not found.
 func LocalDateTimeFromString(s string) LocalDateTime {
-	val, ok := strtolocaldatetime[s]
-	if !ok {
-		return strtolocaldatetime["invalid"]
+	switch s {
+	case "min":
+		return LocalDateTimeMin
+	default:
+		return LocalDateTimeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLocalDateTime() []LocalDateTime {
-	vs := make([]LocalDateTime, 0, len(localdatetimetostrs))
-	for i := range localdatetimetostrs {
-		vs = append(vs, LocalDateTime(i))
+	return []LocalDateTime{
+		LocalDateTimeMin,
 	}
-	return vs
 }

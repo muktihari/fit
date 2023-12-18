@@ -18,47 +18,46 @@ const (
 	HrZoneCalcPercentMaxHr HrZoneCalc = 1
 	HrZoneCalcPercentHrr   HrZoneCalc = 2
 	HrZoneCalcPercentLthr  HrZoneCalc = 3
-	HrZoneCalcInvalid      HrZoneCalc = 0xFF // INVALID
+	HrZoneCalcInvalid      HrZoneCalc = 0xFF
 )
 
-var hrzonecalctostrs = map[HrZoneCalc]string{
-	HrZoneCalcCustom:       "custom",
-	HrZoneCalcPercentMaxHr: "percent_max_hr",
-	HrZoneCalcPercentHrr:   "percent_hrr",
-	HrZoneCalcPercentLthr:  "percent_lthr",
-	HrZoneCalcInvalid:      "invalid",
-}
-
 func (h HrZoneCalc) String() string {
-	val, ok := hrzonecalctostrs[h]
-	if !ok {
-		return strconv.Itoa(int(h))
+	switch h {
+	case HrZoneCalcCustom:
+		return "custom"
+	case HrZoneCalcPercentMaxHr:
+		return "percent_max_hr"
+	case HrZoneCalcPercentHrr:
+		return "percent_hrr"
+	case HrZoneCalcPercentLthr:
+		return "percent_lthr"
+	default:
+		return "HrZoneCalcInvalid(" + strconv.Itoa(int(h)) + ")"
 	}
-	return val
 }
-
-var strtohrzonecalc = func() map[string]HrZoneCalc {
-	m := make(map[string]HrZoneCalc)
-	for t, str := range hrzonecalctostrs {
-		m[str] = HrZoneCalc(t)
-	}
-	return m
-}()
 
 // FromString parse string into HrZoneCalc constant it's represent, return HrZoneCalcInvalid if not found.
 func HrZoneCalcFromString(s string) HrZoneCalc {
-	val, ok := strtohrzonecalc[s]
-	if !ok {
-		return strtohrzonecalc["invalid"]
+	switch s {
+	case "custom":
+		return HrZoneCalcCustom
+	case "percent_max_hr":
+		return HrZoneCalcPercentMaxHr
+	case "percent_hrr":
+		return HrZoneCalcPercentHrr
+	case "percent_lthr":
+		return HrZoneCalcPercentLthr
+	default:
+		return HrZoneCalcInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHrZoneCalc() []HrZoneCalc {
-	vs := make([]HrZoneCalc, 0, len(hrzonecalctostrs))
-	for i := range hrzonecalctostrs {
-		vs = append(vs, HrZoneCalc(i))
+	return []HrZoneCalc{
+		HrZoneCalcCustom,
+		HrZoneCalcPercentMaxHr,
+		HrZoneCalcPercentHrr,
+		HrZoneCalcPercentLthr,
 	}
-	return vs
 }

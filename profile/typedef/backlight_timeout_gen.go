@@ -14,45 +14,32 @@ import (
 type BacklightTimeout uint8
 
 const (
-	BacklightTimeoutInfinite BacklightTimeout = 0    // Backlight stays on forever.
-	BacklightTimeoutInvalid  BacklightTimeout = 0xFF // INVALID
+	BacklightTimeoutInfinite BacklightTimeout = 0 // Backlight stays on forever.
+	BacklightTimeoutInvalid  BacklightTimeout = 0xFF
 )
 
-var backlighttimeouttostrs = map[BacklightTimeout]string{
-	BacklightTimeoutInfinite: "infinite",
-	BacklightTimeoutInvalid:  "invalid",
-}
-
 func (b BacklightTimeout) String() string {
-	val, ok := backlighttimeouttostrs[b]
-	if !ok {
-		return strconv.FormatUint(uint64(b), 10)
+	switch b {
+	case BacklightTimeoutInfinite:
+		return "infinite"
+	default:
+		return "BacklightTimeoutInvalid(" + strconv.FormatUint(uint64(b), 10) + ")"
 	}
-	return val
 }
-
-var strtobacklighttimeout = func() map[string]BacklightTimeout {
-	m := make(map[string]BacklightTimeout)
-	for t, str := range backlighttimeouttostrs {
-		m[str] = BacklightTimeout(t)
-	}
-	return m
-}()
 
 // FromString parse string into BacklightTimeout constant it's represent, return BacklightTimeoutInvalid if not found.
 func BacklightTimeoutFromString(s string) BacklightTimeout {
-	val, ok := strtobacklighttimeout[s]
-	if !ok {
-		return strtobacklighttimeout["invalid"]
+	switch s {
+	case "infinite":
+		return BacklightTimeoutInfinite
+	default:
+		return BacklightTimeoutInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBacklightTimeout() []BacklightTimeout {
-	vs := make([]BacklightTimeout, 0, len(backlighttimeouttostrs))
-	for i := range backlighttimeouttostrs {
-		vs = append(vs, BacklightTimeout(i))
+	return []BacklightTimeout{
+		BacklightTimeoutInfinite,
 	}
-	return vs
 }

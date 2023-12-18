@@ -58,87 +58,246 @@ const (
 	ExdQualifiersZone3                    ExdQualifiers = 248
 	ExdQualifiersZone2                    ExdQualifiers = 249
 	ExdQualifiersZone1                    ExdQualifiers = 250
-	ExdQualifiersInvalid                  ExdQualifiers = 0xFF // INVALID
+	ExdQualifiersInvalid                  ExdQualifiers = 0xFF
 )
 
-var exdqualifierstostrs = map[ExdQualifiers]string{
-	ExdQualifiersNoQualifier:              "no_qualifier",
-	ExdQualifiersInstantaneous:            "instantaneous",
-	ExdQualifiersAverage:                  "average",
-	ExdQualifiersLap:                      "lap",
-	ExdQualifiersMaximum:                  "maximum",
-	ExdQualifiersMaximumAverage:           "maximum_average",
-	ExdQualifiersMaximumLap:               "maximum_lap",
-	ExdQualifiersLastLap:                  "last_lap",
-	ExdQualifiersAverageLap:               "average_lap",
-	ExdQualifiersToDestination:            "to_destination",
-	ExdQualifiersToGo:                     "to_go",
-	ExdQualifiersToNext:                   "to_next",
-	ExdQualifiersNextCoursePoint:          "next_course_point",
-	ExdQualifiersTotal:                    "total",
-	ExdQualifiersThreeSecondAverage:       "three_second_average",
-	ExdQualifiersTenSecondAverage:         "ten_second_average",
-	ExdQualifiersThirtySecondAverage:      "thirty_second_average",
-	ExdQualifiersPercentMaximum:           "percent_maximum",
-	ExdQualifiersPercentMaximumAverage:    "percent_maximum_average",
-	ExdQualifiersLapPercentMaximum:        "lap_percent_maximum",
-	ExdQualifiersElapsed:                  "elapsed",
-	ExdQualifiersSunrise:                  "sunrise",
-	ExdQualifiersSunset:                   "sunset",
-	ExdQualifiersComparedToVirtualPartner: "compared_to_virtual_partner",
-	ExdQualifiersMaximum24H:               "maximum_24h",
-	ExdQualifiersMinimum24H:               "minimum_24h",
-	ExdQualifiersMinimum:                  "minimum",
-	ExdQualifiersFirst:                    "first",
-	ExdQualifiersSecond:                   "second",
-	ExdQualifiersThird:                    "third",
-	ExdQualifiersShifter:                  "shifter",
-	ExdQualifiersLastSport:                "last_sport",
-	ExdQualifiersMoving:                   "moving",
-	ExdQualifiersStopped:                  "stopped",
-	ExdQualifiersEstimatedTotal:           "estimated_total",
-	ExdQualifiersZone9:                    "zone_9",
-	ExdQualifiersZone8:                    "zone_8",
-	ExdQualifiersZone7:                    "zone_7",
-	ExdQualifiersZone6:                    "zone_6",
-	ExdQualifiersZone5:                    "zone_5",
-	ExdQualifiersZone4:                    "zone_4",
-	ExdQualifiersZone3:                    "zone_3",
-	ExdQualifiersZone2:                    "zone_2",
-	ExdQualifiersZone1:                    "zone_1",
-	ExdQualifiersInvalid:                  "invalid",
-}
-
 func (e ExdQualifiers) String() string {
-	val, ok := exdqualifierstostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case ExdQualifiersNoQualifier:
+		return "no_qualifier"
+	case ExdQualifiersInstantaneous:
+		return "instantaneous"
+	case ExdQualifiersAverage:
+		return "average"
+	case ExdQualifiersLap:
+		return "lap"
+	case ExdQualifiersMaximum:
+		return "maximum"
+	case ExdQualifiersMaximumAverage:
+		return "maximum_average"
+	case ExdQualifiersMaximumLap:
+		return "maximum_lap"
+	case ExdQualifiersLastLap:
+		return "last_lap"
+	case ExdQualifiersAverageLap:
+		return "average_lap"
+	case ExdQualifiersToDestination:
+		return "to_destination"
+	case ExdQualifiersToGo:
+		return "to_go"
+	case ExdQualifiersToNext:
+		return "to_next"
+	case ExdQualifiersNextCoursePoint:
+		return "next_course_point"
+	case ExdQualifiersTotal:
+		return "total"
+	case ExdQualifiersThreeSecondAverage:
+		return "three_second_average"
+	case ExdQualifiersTenSecondAverage:
+		return "ten_second_average"
+	case ExdQualifiersThirtySecondAverage:
+		return "thirty_second_average"
+	case ExdQualifiersPercentMaximum:
+		return "percent_maximum"
+	case ExdQualifiersPercentMaximumAverage:
+		return "percent_maximum_average"
+	case ExdQualifiersLapPercentMaximum:
+		return "lap_percent_maximum"
+	case ExdQualifiersElapsed:
+		return "elapsed"
+	case ExdQualifiersSunrise:
+		return "sunrise"
+	case ExdQualifiersSunset:
+		return "sunset"
+	case ExdQualifiersComparedToVirtualPartner:
+		return "compared_to_virtual_partner"
+	case ExdQualifiersMaximum24H:
+		return "maximum_24h"
+	case ExdQualifiersMinimum24H:
+		return "minimum_24h"
+	case ExdQualifiersMinimum:
+		return "minimum"
+	case ExdQualifiersFirst:
+		return "first"
+	case ExdQualifiersSecond:
+		return "second"
+	case ExdQualifiersThird:
+		return "third"
+	case ExdQualifiersShifter:
+		return "shifter"
+	case ExdQualifiersLastSport:
+		return "last_sport"
+	case ExdQualifiersMoving:
+		return "moving"
+	case ExdQualifiersStopped:
+		return "stopped"
+	case ExdQualifiersEstimatedTotal:
+		return "estimated_total"
+	case ExdQualifiersZone9:
+		return "zone_9"
+	case ExdQualifiersZone8:
+		return "zone_8"
+	case ExdQualifiersZone7:
+		return "zone_7"
+	case ExdQualifiersZone6:
+		return "zone_6"
+	case ExdQualifiersZone5:
+		return "zone_5"
+	case ExdQualifiersZone4:
+		return "zone_4"
+	case ExdQualifiersZone3:
+		return "zone_3"
+	case ExdQualifiersZone2:
+		return "zone_2"
+	case ExdQualifiersZone1:
+		return "zone_1"
+	default:
+		return "ExdQualifiersInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoexdqualifiers = func() map[string]ExdQualifiers {
-	m := make(map[string]ExdQualifiers)
-	for t, str := range exdqualifierstostrs {
-		m[str] = ExdQualifiers(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExdQualifiers constant it's represent, return ExdQualifiersInvalid if not found.
 func ExdQualifiersFromString(s string) ExdQualifiers {
-	val, ok := strtoexdqualifiers[s]
-	if !ok {
-		return strtoexdqualifiers["invalid"]
+	switch s {
+	case "no_qualifier":
+		return ExdQualifiersNoQualifier
+	case "instantaneous":
+		return ExdQualifiersInstantaneous
+	case "average":
+		return ExdQualifiersAverage
+	case "lap":
+		return ExdQualifiersLap
+	case "maximum":
+		return ExdQualifiersMaximum
+	case "maximum_average":
+		return ExdQualifiersMaximumAverage
+	case "maximum_lap":
+		return ExdQualifiersMaximumLap
+	case "last_lap":
+		return ExdQualifiersLastLap
+	case "average_lap":
+		return ExdQualifiersAverageLap
+	case "to_destination":
+		return ExdQualifiersToDestination
+	case "to_go":
+		return ExdQualifiersToGo
+	case "to_next":
+		return ExdQualifiersToNext
+	case "next_course_point":
+		return ExdQualifiersNextCoursePoint
+	case "total":
+		return ExdQualifiersTotal
+	case "three_second_average":
+		return ExdQualifiersThreeSecondAverage
+	case "ten_second_average":
+		return ExdQualifiersTenSecondAverage
+	case "thirty_second_average":
+		return ExdQualifiersThirtySecondAverage
+	case "percent_maximum":
+		return ExdQualifiersPercentMaximum
+	case "percent_maximum_average":
+		return ExdQualifiersPercentMaximumAverage
+	case "lap_percent_maximum":
+		return ExdQualifiersLapPercentMaximum
+	case "elapsed":
+		return ExdQualifiersElapsed
+	case "sunrise":
+		return ExdQualifiersSunrise
+	case "sunset":
+		return ExdQualifiersSunset
+	case "compared_to_virtual_partner":
+		return ExdQualifiersComparedToVirtualPartner
+	case "maximum_24h":
+		return ExdQualifiersMaximum24H
+	case "minimum_24h":
+		return ExdQualifiersMinimum24H
+	case "minimum":
+		return ExdQualifiersMinimum
+	case "first":
+		return ExdQualifiersFirst
+	case "second":
+		return ExdQualifiersSecond
+	case "third":
+		return ExdQualifiersThird
+	case "shifter":
+		return ExdQualifiersShifter
+	case "last_sport":
+		return ExdQualifiersLastSport
+	case "moving":
+		return ExdQualifiersMoving
+	case "stopped":
+		return ExdQualifiersStopped
+	case "estimated_total":
+		return ExdQualifiersEstimatedTotal
+	case "zone_9":
+		return ExdQualifiersZone9
+	case "zone_8":
+		return ExdQualifiersZone8
+	case "zone_7":
+		return ExdQualifiersZone7
+	case "zone_6":
+		return ExdQualifiersZone6
+	case "zone_5":
+		return ExdQualifiersZone5
+	case "zone_4":
+		return ExdQualifiersZone4
+	case "zone_3":
+		return ExdQualifiersZone3
+	case "zone_2":
+		return ExdQualifiersZone2
+	case "zone_1":
+		return ExdQualifiersZone1
+	default:
+		return ExdQualifiersInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExdQualifiers() []ExdQualifiers {
-	vs := make([]ExdQualifiers, 0, len(exdqualifierstostrs))
-	for i := range exdqualifierstostrs {
-		vs = append(vs, ExdQualifiers(i))
+	return []ExdQualifiers{
+		ExdQualifiersNoQualifier,
+		ExdQualifiersInstantaneous,
+		ExdQualifiersAverage,
+		ExdQualifiersLap,
+		ExdQualifiersMaximum,
+		ExdQualifiersMaximumAverage,
+		ExdQualifiersMaximumLap,
+		ExdQualifiersLastLap,
+		ExdQualifiersAverageLap,
+		ExdQualifiersToDestination,
+		ExdQualifiersToGo,
+		ExdQualifiersToNext,
+		ExdQualifiersNextCoursePoint,
+		ExdQualifiersTotal,
+		ExdQualifiersThreeSecondAverage,
+		ExdQualifiersTenSecondAverage,
+		ExdQualifiersThirtySecondAverage,
+		ExdQualifiersPercentMaximum,
+		ExdQualifiersPercentMaximumAverage,
+		ExdQualifiersLapPercentMaximum,
+		ExdQualifiersElapsed,
+		ExdQualifiersSunrise,
+		ExdQualifiersSunset,
+		ExdQualifiersComparedToVirtualPartner,
+		ExdQualifiersMaximum24H,
+		ExdQualifiersMinimum24H,
+		ExdQualifiersMinimum,
+		ExdQualifiersFirst,
+		ExdQualifiersSecond,
+		ExdQualifiersThird,
+		ExdQualifiersShifter,
+		ExdQualifiersLastSport,
+		ExdQualifiersMoving,
+		ExdQualifiersStopped,
+		ExdQualifiersEstimatedTotal,
+		ExdQualifiersZone9,
+		ExdQualifiersZone8,
+		ExdQualifiersZone7,
+		ExdQualifiersZone6,
+		ExdQualifiersZone5,
+		ExdQualifiersZone4,
+		ExdQualifiersZone3,
+		ExdQualifiersZone2,
+		ExdQualifiersZone1,
 	}
-	return vs
 }

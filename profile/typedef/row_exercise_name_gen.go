@@ -48,77 +48,196 @@ const (
 	RowExerciseNameUnderhandGripCableRow                      RowExerciseName = 31
 	RowExerciseNameVGripCableRow                              RowExerciseName = 32
 	RowExerciseNameWideGripSeatedCableRow                     RowExerciseName = 33
-	RowExerciseNameInvalid                                    RowExerciseName = 0xFFFF // INVALID
+	RowExerciseNameInvalid                                    RowExerciseName = 0xFFFF
 )
 
-var rowexercisenametostrs = map[RowExerciseName]string{
-	RowExerciseNameBarbellStraightLegDeadliftToRow:            "barbell_straight_leg_deadlift_to_row",
-	RowExerciseNameCableRowStanding:                           "cable_row_standing",
-	RowExerciseNameDumbbellRow:                                "dumbbell_row",
-	RowExerciseNameElevatedFeetInvertedRow:                    "elevated_feet_inverted_row",
-	RowExerciseNameWeightedElevatedFeetInvertedRow:            "weighted_elevated_feet_inverted_row",
-	RowExerciseNameFacePull:                                   "face_pull",
-	RowExerciseNameFacePullWithExternalRotation:               "face_pull_with_external_rotation",
-	RowExerciseNameInvertedRowWithFeetOnSwissBall:             "inverted_row_with_feet_on_swiss_ball",
-	RowExerciseNameWeightedInvertedRowWithFeetOnSwissBall:     "weighted_inverted_row_with_feet_on_swiss_ball",
-	RowExerciseNameKettlebellRow:                              "kettlebell_row",
-	RowExerciseNameModifiedInvertedRow:                        "modified_inverted_row",
-	RowExerciseNameWeightedModifiedInvertedRow:                "weighted_modified_inverted_row",
-	RowExerciseNameNeutralGripAlternatingDumbbellRow:          "neutral_grip_alternating_dumbbell_row",
-	RowExerciseNameOneArmBentOverRow:                          "one_arm_bent_over_row",
-	RowExerciseNameOneLeggedDumbbellRow:                       "one_legged_dumbbell_row",
-	RowExerciseNameRenegadeRow:                                "renegade_row",
-	RowExerciseNameReverseGripBarbellRow:                      "reverse_grip_barbell_row",
-	RowExerciseNameRopeHandleCableRow:                         "rope_handle_cable_row",
-	RowExerciseNameSeatedCableRow:                             "seated_cable_row",
-	RowExerciseNameSeatedDumbbellRow:                          "seated_dumbbell_row",
-	RowExerciseNameSingleArmCableRow:                          "single_arm_cable_row",
-	RowExerciseNameSingleArmCableRowAndRotation:               "single_arm_cable_row_and_rotation",
-	RowExerciseNameSingleArmInvertedRow:                       "single_arm_inverted_row",
-	RowExerciseNameWeightedSingleArmInvertedRow:               "weighted_single_arm_inverted_row",
-	RowExerciseNameSingleArmNeutralGripDumbbellRow:            "single_arm_neutral_grip_dumbbell_row",
-	RowExerciseNameSingleArmNeutralGripDumbbellRowAndRotation: "single_arm_neutral_grip_dumbbell_row_and_rotation",
-	RowExerciseNameSuspendedInvertedRow:                       "suspended_inverted_row",
-	RowExerciseNameWeightedSuspendedInvertedRow:               "weighted_suspended_inverted_row",
-	RowExerciseNameTBarRow:                                    "t_bar_row",
-	RowExerciseNameTowelGripInvertedRow:                       "towel_grip_inverted_row",
-	RowExerciseNameWeightedTowelGripInvertedRow:               "weighted_towel_grip_inverted_row",
-	RowExerciseNameUnderhandGripCableRow:                      "underhand_grip_cable_row",
-	RowExerciseNameVGripCableRow:                              "v_grip_cable_row",
-	RowExerciseNameWideGripSeatedCableRow:                     "wide_grip_seated_cable_row",
-	RowExerciseNameInvalid:                                    "invalid",
-}
-
 func (r RowExerciseName) String() string {
-	val, ok := rowexercisenametostrs[r]
-	if !ok {
-		return strconv.FormatUint(uint64(r), 10)
+	switch r {
+	case RowExerciseNameBarbellStraightLegDeadliftToRow:
+		return "barbell_straight_leg_deadlift_to_row"
+	case RowExerciseNameCableRowStanding:
+		return "cable_row_standing"
+	case RowExerciseNameDumbbellRow:
+		return "dumbbell_row"
+	case RowExerciseNameElevatedFeetInvertedRow:
+		return "elevated_feet_inverted_row"
+	case RowExerciseNameWeightedElevatedFeetInvertedRow:
+		return "weighted_elevated_feet_inverted_row"
+	case RowExerciseNameFacePull:
+		return "face_pull"
+	case RowExerciseNameFacePullWithExternalRotation:
+		return "face_pull_with_external_rotation"
+	case RowExerciseNameInvertedRowWithFeetOnSwissBall:
+		return "inverted_row_with_feet_on_swiss_ball"
+	case RowExerciseNameWeightedInvertedRowWithFeetOnSwissBall:
+		return "weighted_inverted_row_with_feet_on_swiss_ball"
+	case RowExerciseNameKettlebellRow:
+		return "kettlebell_row"
+	case RowExerciseNameModifiedInvertedRow:
+		return "modified_inverted_row"
+	case RowExerciseNameWeightedModifiedInvertedRow:
+		return "weighted_modified_inverted_row"
+	case RowExerciseNameNeutralGripAlternatingDumbbellRow:
+		return "neutral_grip_alternating_dumbbell_row"
+	case RowExerciseNameOneArmBentOverRow:
+		return "one_arm_bent_over_row"
+	case RowExerciseNameOneLeggedDumbbellRow:
+		return "one_legged_dumbbell_row"
+	case RowExerciseNameRenegadeRow:
+		return "renegade_row"
+	case RowExerciseNameReverseGripBarbellRow:
+		return "reverse_grip_barbell_row"
+	case RowExerciseNameRopeHandleCableRow:
+		return "rope_handle_cable_row"
+	case RowExerciseNameSeatedCableRow:
+		return "seated_cable_row"
+	case RowExerciseNameSeatedDumbbellRow:
+		return "seated_dumbbell_row"
+	case RowExerciseNameSingleArmCableRow:
+		return "single_arm_cable_row"
+	case RowExerciseNameSingleArmCableRowAndRotation:
+		return "single_arm_cable_row_and_rotation"
+	case RowExerciseNameSingleArmInvertedRow:
+		return "single_arm_inverted_row"
+	case RowExerciseNameWeightedSingleArmInvertedRow:
+		return "weighted_single_arm_inverted_row"
+	case RowExerciseNameSingleArmNeutralGripDumbbellRow:
+		return "single_arm_neutral_grip_dumbbell_row"
+	case RowExerciseNameSingleArmNeutralGripDumbbellRowAndRotation:
+		return "single_arm_neutral_grip_dumbbell_row_and_rotation"
+	case RowExerciseNameSuspendedInvertedRow:
+		return "suspended_inverted_row"
+	case RowExerciseNameWeightedSuspendedInvertedRow:
+		return "weighted_suspended_inverted_row"
+	case RowExerciseNameTBarRow:
+		return "t_bar_row"
+	case RowExerciseNameTowelGripInvertedRow:
+		return "towel_grip_inverted_row"
+	case RowExerciseNameWeightedTowelGripInvertedRow:
+		return "weighted_towel_grip_inverted_row"
+	case RowExerciseNameUnderhandGripCableRow:
+		return "underhand_grip_cable_row"
+	case RowExerciseNameVGripCableRow:
+		return "v_grip_cable_row"
+	case RowExerciseNameWideGripSeatedCableRow:
+		return "wide_grip_seated_cable_row"
+	default:
+		return "RowExerciseNameInvalid(" + strconv.FormatUint(uint64(r), 10) + ")"
 	}
-	return val
 }
-
-var strtorowexercisename = func() map[string]RowExerciseName {
-	m := make(map[string]RowExerciseName)
-	for t, str := range rowexercisenametostrs {
-		m[str] = RowExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into RowExerciseName constant it's represent, return RowExerciseNameInvalid if not found.
 func RowExerciseNameFromString(s string) RowExerciseName {
-	val, ok := strtorowexercisename[s]
-	if !ok {
-		return strtorowexercisename["invalid"]
+	switch s {
+	case "barbell_straight_leg_deadlift_to_row":
+		return RowExerciseNameBarbellStraightLegDeadliftToRow
+	case "cable_row_standing":
+		return RowExerciseNameCableRowStanding
+	case "dumbbell_row":
+		return RowExerciseNameDumbbellRow
+	case "elevated_feet_inverted_row":
+		return RowExerciseNameElevatedFeetInvertedRow
+	case "weighted_elevated_feet_inverted_row":
+		return RowExerciseNameWeightedElevatedFeetInvertedRow
+	case "face_pull":
+		return RowExerciseNameFacePull
+	case "face_pull_with_external_rotation":
+		return RowExerciseNameFacePullWithExternalRotation
+	case "inverted_row_with_feet_on_swiss_ball":
+		return RowExerciseNameInvertedRowWithFeetOnSwissBall
+	case "weighted_inverted_row_with_feet_on_swiss_ball":
+		return RowExerciseNameWeightedInvertedRowWithFeetOnSwissBall
+	case "kettlebell_row":
+		return RowExerciseNameKettlebellRow
+	case "modified_inverted_row":
+		return RowExerciseNameModifiedInvertedRow
+	case "weighted_modified_inverted_row":
+		return RowExerciseNameWeightedModifiedInvertedRow
+	case "neutral_grip_alternating_dumbbell_row":
+		return RowExerciseNameNeutralGripAlternatingDumbbellRow
+	case "one_arm_bent_over_row":
+		return RowExerciseNameOneArmBentOverRow
+	case "one_legged_dumbbell_row":
+		return RowExerciseNameOneLeggedDumbbellRow
+	case "renegade_row":
+		return RowExerciseNameRenegadeRow
+	case "reverse_grip_barbell_row":
+		return RowExerciseNameReverseGripBarbellRow
+	case "rope_handle_cable_row":
+		return RowExerciseNameRopeHandleCableRow
+	case "seated_cable_row":
+		return RowExerciseNameSeatedCableRow
+	case "seated_dumbbell_row":
+		return RowExerciseNameSeatedDumbbellRow
+	case "single_arm_cable_row":
+		return RowExerciseNameSingleArmCableRow
+	case "single_arm_cable_row_and_rotation":
+		return RowExerciseNameSingleArmCableRowAndRotation
+	case "single_arm_inverted_row":
+		return RowExerciseNameSingleArmInvertedRow
+	case "weighted_single_arm_inverted_row":
+		return RowExerciseNameWeightedSingleArmInvertedRow
+	case "single_arm_neutral_grip_dumbbell_row":
+		return RowExerciseNameSingleArmNeutralGripDumbbellRow
+	case "single_arm_neutral_grip_dumbbell_row_and_rotation":
+		return RowExerciseNameSingleArmNeutralGripDumbbellRowAndRotation
+	case "suspended_inverted_row":
+		return RowExerciseNameSuspendedInvertedRow
+	case "weighted_suspended_inverted_row":
+		return RowExerciseNameWeightedSuspendedInvertedRow
+	case "t_bar_row":
+		return RowExerciseNameTBarRow
+	case "towel_grip_inverted_row":
+		return RowExerciseNameTowelGripInvertedRow
+	case "weighted_towel_grip_inverted_row":
+		return RowExerciseNameWeightedTowelGripInvertedRow
+	case "underhand_grip_cable_row":
+		return RowExerciseNameUnderhandGripCableRow
+	case "v_grip_cable_row":
+		return RowExerciseNameVGripCableRow
+	case "wide_grip_seated_cable_row":
+		return RowExerciseNameWideGripSeatedCableRow
+	default:
+		return RowExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListRowExerciseName() []RowExerciseName {
-	vs := make([]RowExerciseName, 0, len(rowexercisenametostrs))
-	for i := range rowexercisenametostrs {
-		vs = append(vs, RowExerciseName(i))
+	return []RowExerciseName{
+		RowExerciseNameBarbellStraightLegDeadliftToRow,
+		RowExerciseNameCableRowStanding,
+		RowExerciseNameDumbbellRow,
+		RowExerciseNameElevatedFeetInvertedRow,
+		RowExerciseNameWeightedElevatedFeetInvertedRow,
+		RowExerciseNameFacePull,
+		RowExerciseNameFacePullWithExternalRotation,
+		RowExerciseNameInvertedRowWithFeetOnSwissBall,
+		RowExerciseNameWeightedInvertedRowWithFeetOnSwissBall,
+		RowExerciseNameKettlebellRow,
+		RowExerciseNameModifiedInvertedRow,
+		RowExerciseNameWeightedModifiedInvertedRow,
+		RowExerciseNameNeutralGripAlternatingDumbbellRow,
+		RowExerciseNameOneArmBentOverRow,
+		RowExerciseNameOneLeggedDumbbellRow,
+		RowExerciseNameRenegadeRow,
+		RowExerciseNameReverseGripBarbellRow,
+		RowExerciseNameRopeHandleCableRow,
+		RowExerciseNameSeatedCableRow,
+		RowExerciseNameSeatedDumbbellRow,
+		RowExerciseNameSingleArmCableRow,
+		RowExerciseNameSingleArmCableRowAndRotation,
+		RowExerciseNameSingleArmInvertedRow,
+		RowExerciseNameWeightedSingleArmInvertedRow,
+		RowExerciseNameSingleArmNeutralGripDumbbellRow,
+		RowExerciseNameSingleArmNeutralGripDumbbellRowAndRotation,
+		RowExerciseNameSuspendedInvertedRow,
+		RowExerciseNameWeightedSuspendedInvertedRow,
+		RowExerciseNameTBarRow,
+		RowExerciseNameTowelGripInvertedRow,
+		RowExerciseNameWeightedTowelGripInvertedRow,
+		RowExerciseNameUnderhandGripCableRow,
+		RowExerciseNameVGripCableRow,
+		RowExerciseNameWideGripSeatedCableRow,
 	}
-	return vs
 }

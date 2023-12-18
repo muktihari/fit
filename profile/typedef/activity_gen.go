@@ -16,45 +16,36 @@ type Activity byte
 const (
 	ActivityManual         Activity = 0
 	ActivityAutoMultiSport Activity = 1
-	ActivityInvalid        Activity = 0xFF // INVALID
+	ActivityInvalid        Activity = 0xFF
 )
 
-var activitytostrs = map[Activity]string{
-	ActivityManual:         "manual",
-	ActivityAutoMultiSport: "auto_multi_sport",
-	ActivityInvalid:        "invalid",
-}
-
 func (a Activity) String() string {
-	val, ok := activitytostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case ActivityManual:
+		return "manual"
+	case ActivityAutoMultiSport:
+		return "auto_multi_sport"
+	default:
+		return "ActivityInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoactivity = func() map[string]Activity {
-	m := make(map[string]Activity)
-	for t, str := range activitytostrs {
-		m[str] = Activity(t)
-	}
-	return m
-}()
 
 // FromString parse string into Activity constant it's represent, return ActivityInvalid if not found.
 func ActivityFromString(s string) Activity {
-	val, ok := strtoactivity[s]
-	if !ok {
-		return strtoactivity["invalid"]
+	switch s {
+	case "manual":
+		return ActivityManual
+	case "auto_multi_sport":
+		return ActivityAutoMultiSport
+	default:
+		return ActivityInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListActivity() []Activity {
-	vs := make([]Activity, 0, len(activitytostrs))
-	for i := range activitytostrs {
-		vs = append(vs, Activity(i))
+	return []Activity{
+		ActivityManual,
+		ActivityAutoMultiSport,
 	}
-	return vs
 }

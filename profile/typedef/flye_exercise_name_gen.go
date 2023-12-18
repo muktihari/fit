@@ -24,53 +24,76 @@ const (
 	FlyeExerciseNameSwissBallDumbbellFlye             FlyeExerciseName = 7
 	FlyeExerciseNameArmRotations                      FlyeExerciseName = 8
 	FlyeExerciseNameHugATree                          FlyeExerciseName = 9
-	FlyeExerciseNameInvalid                           FlyeExerciseName = 0xFFFF // INVALID
+	FlyeExerciseNameInvalid                           FlyeExerciseName = 0xFFFF
 )
 
-var flyeexercisenametostrs = map[FlyeExerciseName]string{
-	FlyeExerciseNameCableCrossover:                    "cable_crossover",
-	FlyeExerciseNameDeclineDumbbellFlye:               "decline_dumbbell_flye",
-	FlyeExerciseNameDumbbellFlye:                      "dumbbell_flye",
-	FlyeExerciseNameInclineDumbbellFlye:               "incline_dumbbell_flye",
-	FlyeExerciseNameKettlebellFlye:                    "kettlebell_flye",
-	FlyeExerciseNameKneelingRearFlye:                  "kneeling_rear_flye",
-	FlyeExerciseNameSingleArmStandingCableReverseFlye: "single_arm_standing_cable_reverse_flye",
-	FlyeExerciseNameSwissBallDumbbellFlye:             "swiss_ball_dumbbell_flye",
-	FlyeExerciseNameArmRotations:                      "arm_rotations",
-	FlyeExerciseNameHugATree:                          "hug_a_tree",
-	FlyeExerciseNameInvalid:                           "invalid",
-}
-
 func (f FlyeExerciseName) String() string {
-	val, ok := flyeexercisenametostrs[f]
-	if !ok {
-		return strconv.FormatUint(uint64(f), 10)
+	switch f {
+	case FlyeExerciseNameCableCrossover:
+		return "cable_crossover"
+	case FlyeExerciseNameDeclineDumbbellFlye:
+		return "decline_dumbbell_flye"
+	case FlyeExerciseNameDumbbellFlye:
+		return "dumbbell_flye"
+	case FlyeExerciseNameInclineDumbbellFlye:
+		return "incline_dumbbell_flye"
+	case FlyeExerciseNameKettlebellFlye:
+		return "kettlebell_flye"
+	case FlyeExerciseNameKneelingRearFlye:
+		return "kneeling_rear_flye"
+	case FlyeExerciseNameSingleArmStandingCableReverseFlye:
+		return "single_arm_standing_cable_reverse_flye"
+	case FlyeExerciseNameSwissBallDumbbellFlye:
+		return "swiss_ball_dumbbell_flye"
+	case FlyeExerciseNameArmRotations:
+		return "arm_rotations"
+	case FlyeExerciseNameHugATree:
+		return "hug_a_tree"
+	default:
+		return "FlyeExerciseNameInvalid(" + strconv.FormatUint(uint64(f), 10) + ")"
 	}
-	return val
 }
-
-var strtoflyeexercisename = func() map[string]FlyeExerciseName {
-	m := make(map[string]FlyeExerciseName)
-	for t, str := range flyeexercisenametostrs {
-		m[str] = FlyeExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into FlyeExerciseName constant it's represent, return FlyeExerciseNameInvalid if not found.
 func FlyeExerciseNameFromString(s string) FlyeExerciseName {
-	val, ok := strtoflyeexercisename[s]
-	if !ok {
-		return strtoflyeexercisename["invalid"]
+	switch s {
+	case "cable_crossover":
+		return FlyeExerciseNameCableCrossover
+	case "decline_dumbbell_flye":
+		return FlyeExerciseNameDeclineDumbbellFlye
+	case "dumbbell_flye":
+		return FlyeExerciseNameDumbbellFlye
+	case "incline_dumbbell_flye":
+		return FlyeExerciseNameInclineDumbbellFlye
+	case "kettlebell_flye":
+		return FlyeExerciseNameKettlebellFlye
+	case "kneeling_rear_flye":
+		return FlyeExerciseNameKneelingRearFlye
+	case "single_arm_standing_cable_reverse_flye":
+		return FlyeExerciseNameSingleArmStandingCableReverseFlye
+	case "swiss_ball_dumbbell_flye":
+		return FlyeExerciseNameSwissBallDumbbellFlye
+	case "arm_rotations":
+		return FlyeExerciseNameArmRotations
+	case "hug_a_tree":
+		return FlyeExerciseNameHugATree
+	default:
+		return FlyeExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListFlyeExerciseName() []FlyeExerciseName {
-	vs := make([]FlyeExerciseName, 0, len(flyeexercisenametostrs))
-	for i := range flyeexercisenametostrs {
-		vs = append(vs, FlyeExerciseName(i))
+	return []FlyeExerciseName{
+		FlyeExerciseNameCableCrossover,
+		FlyeExerciseNameDeclineDumbbellFlye,
+		FlyeExerciseNameDumbbellFlye,
+		FlyeExerciseNameInclineDumbbellFlye,
+		FlyeExerciseNameKettlebellFlye,
+		FlyeExerciseNameKneelingRearFlye,
+		FlyeExerciseNameSingleArmStandingCableReverseFlye,
+		FlyeExerciseNameSwissBallDumbbellFlye,
+		FlyeExerciseNameArmRotations,
+		FlyeExerciseNameHugATree,
 	}
-	return vs
 }

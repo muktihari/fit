@@ -19,48 +19,51 @@ const (
 	AutoSyncFrequencyFrequent     AutoSyncFrequency = 2
 	AutoSyncFrequencyOnceADay     AutoSyncFrequency = 3
 	AutoSyncFrequencyRemote       AutoSyncFrequency = 4
-	AutoSyncFrequencyInvalid      AutoSyncFrequency = 0xFF // INVALID
+	AutoSyncFrequencyInvalid      AutoSyncFrequency = 0xFF
 )
 
-var autosyncfrequencytostrs = map[AutoSyncFrequency]string{
-	AutoSyncFrequencyNever:        "never",
-	AutoSyncFrequencyOccasionally: "occasionally",
-	AutoSyncFrequencyFrequent:     "frequent",
-	AutoSyncFrequencyOnceADay:     "once_a_day",
-	AutoSyncFrequencyRemote:       "remote",
-	AutoSyncFrequencyInvalid:      "invalid",
-}
-
 func (a AutoSyncFrequency) String() string {
-	val, ok := autosyncfrequencytostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case AutoSyncFrequencyNever:
+		return "never"
+	case AutoSyncFrequencyOccasionally:
+		return "occasionally"
+	case AutoSyncFrequencyFrequent:
+		return "frequent"
+	case AutoSyncFrequencyOnceADay:
+		return "once_a_day"
+	case AutoSyncFrequencyRemote:
+		return "remote"
+	default:
+		return "AutoSyncFrequencyInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoautosyncfrequency = func() map[string]AutoSyncFrequency {
-	m := make(map[string]AutoSyncFrequency)
-	for t, str := range autosyncfrequencytostrs {
-		m[str] = AutoSyncFrequency(t)
-	}
-	return m
-}()
 
 // FromString parse string into AutoSyncFrequency constant it's represent, return AutoSyncFrequencyInvalid if not found.
 func AutoSyncFrequencyFromString(s string) AutoSyncFrequency {
-	val, ok := strtoautosyncfrequency[s]
-	if !ok {
-		return strtoautosyncfrequency["invalid"]
+	switch s {
+	case "never":
+		return AutoSyncFrequencyNever
+	case "occasionally":
+		return AutoSyncFrequencyOccasionally
+	case "frequent":
+		return AutoSyncFrequencyFrequent
+	case "once_a_day":
+		return AutoSyncFrequencyOnceADay
+	case "remote":
+		return AutoSyncFrequencyRemote
+	default:
+		return AutoSyncFrequencyInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAutoSyncFrequency() []AutoSyncFrequency {
-	vs := make([]AutoSyncFrequency, 0, len(autosyncfrequencytostrs))
-	for i := range autosyncfrequencytostrs {
-		vs = append(vs, AutoSyncFrequency(i))
+	return []AutoSyncFrequency{
+		AutoSyncFrequencyNever,
+		AutoSyncFrequencyOccasionally,
+		AutoSyncFrequencyFrequent,
+		AutoSyncFrequencyOnceADay,
+		AutoSyncFrequencyRemote,
 	}
-	return vs
 }

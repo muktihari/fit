@@ -23,52 +23,71 @@ const (
 	LapTriggerPositionMarked   LapTrigger = 6
 	LapTriggerSessionEnd       LapTrigger = 7
 	LapTriggerFitnessEquipment LapTrigger = 8
-	LapTriggerInvalid          LapTrigger = 0xFF // INVALID
+	LapTriggerInvalid          LapTrigger = 0xFF
 )
 
-var laptriggertostrs = map[LapTrigger]string{
-	LapTriggerManual:           "manual",
-	LapTriggerTime:             "time",
-	LapTriggerDistance:         "distance",
-	LapTriggerPositionStart:    "position_start",
-	LapTriggerPositionLap:      "position_lap",
-	LapTriggerPositionWaypoint: "position_waypoint",
-	LapTriggerPositionMarked:   "position_marked",
-	LapTriggerSessionEnd:       "session_end",
-	LapTriggerFitnessEquipment: "fitness_equipment",
-	LapTriggerInvalid:          "invalid",
-}
-
 func (l LapTrigger) String() string {
-	val, ok := laptriggertostrs[l]
-	if !ok {
-		return strconv.Itoa(int(l))
+	switch l {
+	case LapTriggerManual:
+		return "manual"
+	case LapTriggerTime:
+		return "time"
+	case LapTriggerDistance:
+		return "distance"
+	case LapTriggerPositionStart:
+		return "position_start"
+	case LapTriggerPositionLap:
+		return "position_lap"
+	case LapTriggerPositionWaypoint:
+		return "position_waypoint"
+	case LapTriggerPositionMarked:
+		return "position_marked"
+	case LapTriggerSessionEnd:
+		return "session_end"
+	case LapTriggerFitnessEquipment:
+		return "fitness_equipment"
+	default:
+		return "LapTriggerInvalid(" + strconv.Itoa(int(l)) + ")"
 	}
-	return val
 }
-
-var strtolaptrigger = func() map[string]LapTrigger {
-	m := make(map[string]LapTrigger)
-	for t, str := range laptriggertostrs {
-		m[str] = LapTrigger(t)
-	}
-	return m
-}()
 
 // FromString parse string into LapTrigger constant it's represent, return LapTriggerInvalid if not found.
 func LapTriggerFromString(s string) LapTrigger {
-	val, ok := strtolaptrigger[s]
-	if !ok {
-		return strtolaptrigger["invalid"]
+	switch s {
+	case "manual":
+		return LapTriggerManual
+	case "time":
+		return LapTriggerTime
+	case "distance":
+		return LapTriggerDistance
+	case "position_start":
+		return LapTriggerPositionStart
+	case "position_lap":
+		return LapTriggerPositionLap
+	case "position_waypoint":
+		return LapTriggerPositionWaypoint
+	case "position_marked":
+		return LapTriggerPositionMarked
+	case "session_end":
+		return LapTriggerSessionEnd
+	case "fitness_equipment":
+		return LapTriggerFitnessEquipment
+	default:
+		return LapTriggerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLapTrigger() []LapTrigger {
-	vs := make([]LapTrigger, 0, len(laptriggertostrs))
-	for i := range laptriggertostrs {
-		vs = append(vs, LapTrigger(i))
+	return []LapTrigger{
+		LapTriggerManual,
+		LapTriggerTime,
+		LapTriggerDistance,
+		LapTriggerPositionStart,
+		LapTriggerPositionLap,
+		LapTriggerPositionWaypoint,
+		LapTriggerPositionMarked,
+		LapTriggerSessionEnd,
+		LapTriggerFitnessEquipment,
 	}
-	return vs
 }

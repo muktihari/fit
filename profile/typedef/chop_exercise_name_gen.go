@@ -37,66 +37,141 @@ const (
 	ChopExerciseNameStandingSplitRotationalChop        ChopExerciseName = 20
 	ChopExerciseNameStandingSplitRotationalReverseChop ChopExerciseName = 21
 	ChopExerciseNameStandingStabilityReverseChop       ChopExerciseName = 22
-	ChopExerciseNameInvalid                            ChopExerciseName = 0xFFFF // INVALID
+	ChopExerciseNameInvalid                            ChopExerciseName = 0xFFFF
 )
 
-var chopexercisenametostrs = map[ChopExerciseName]string{
-	ChopExerciseNameCablePullThrough:                   "cable_pull_through",
-	ChopExerciseNameCableRotationalLift:                "cable_rotational_lift",
-	ChopExerciseNameCableWoodchop:                      "cable_woodchop",
-	ChopExerciseNameCrossChopToKnee:                    "cross_chop_to_knee",
-	ChopExerciseNameWeightedCrossChopToKnee:            "weighted_cross_chop_to_knee",
-	ChopExerciseNameDumbbellChop:                       "dumbbell_chop",
-	ChopExerciseNameHalfKneelingRotation:               "half_kneeling_rotation",
-	ChopExerciseNameWeightedHalfKneelingRotation:       "weighted_half_kneeling_rotation",
-	ChopExerciseNameHalfKneelingRotationalChop:         "half_kneeling_rotational_chop",
-	ChopExerciseNameHalfKneelingRotationalReverseChop:  "half_kneeling_rotational_reverse_chop",
-	ChopExerciseNameHalfKneelingStabilityChop:          "half_kneeling_stability_chop",
-	ChopExerciseNameHalfKneelingStabilityReverseChop:   "half_kneeling_stability_reverse_chop",
-	ChopExerciseNameKneelingRotationalChop:             "kneeling_rotational_chop",
-	ChopExerciseNameKneelingRotationalReverseChop:      "kneeling_rotational_reverse_chop",
-	ChopExerciseNameKneelingStabilityChop:              "kneeling_stability_chop",
-	ChopExerciseNameKneelingWoodchopper:                "kneeling_woodchopper",
-	ChopExerciseNameMedicineBallWoodChops:              "medicine_ball_wood_chops",
-	ChopExerciseNamePowerSquatChops:                    "power_squat_chops",
-	ChopExerciseNameWeightedPowerSquatChops:            "weighted_power_squat_chops",
-	ChopExerciseNameStandingRotationalChop:             "standing_rotational_chop",
-	ChopExerciseNameStandingSplitRotationalChop:        "standing_split_rotational_chop",
-	ChopExerciseNameStandingSplitRotationalReverseChop: "standing_split_rotational_reverse_chop",
-	ChopExerciseNameStandingStabilityReverseChop:       "standing_stability_reverse_chop",
-	ChopExerciseNameInvalid:                            "invalid",
-}
-
 func (c ChopExerciseName) String() string {
-	val, ok := chopexercisenametostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case ChopExerciseNameCablePullThrough:
+		return "cable_pull_through"
+	case ChopExerciseNameCableRotationalLift:
+		return "cable_rotational_lift"
+	case ChopExerciseNameCableWoodchop:
+		return "cable_woodchop"
+	case ChopExerciseNameCrossChopToKnee:
+		return "cross_chop_to_knee"
+	case ChopExerciseNameWeightedCrossChopToKnee:
+		return "weighted_cross_chop_to_knee"
+	case ChopExerciseNameDumbbellChop:
+		return "dumbbell_chop"
+	case ChopExerciseNameHalfKneelingRotation:
+		return "half_kneeling_rotation"
+	case ChopExerciseNameWeightedHalfKneelingRotation:
+		return "weighted_half_kneeling_rotation"
+	case ChopExerciseNameHalfKneelingRotationalChop:
+		return "half_kneeling_rotational_chop"
+	case ChopExerciseNameHalfKneelingRotationalReverseChop:
+		return "half_kneeling_rotational_reverse_chop"
+	case ChopExerciseNameHalfKneelingStabilityChop:
+		return "half_kneeling_stability_chop"
+	case ChopExerciseNameHalfKneelingStabilityReverseChop:
+		return "half_kneeling_stability_reverse_chop"
+	case ChopExerciseNameKneelingRotationalChop:
+		return "kneeling_rotational_chop"
+	case ChopExerciseNameKneelingRotationalReverseChop:
+		return "kneeling_rotational_reverse_chop"
+	case ChopExerciseNameKneelingStabilityChop:
+		return "kneeling_stability_chop"
+	case ChopExerciseNameKneelingWoodchopper:
+		return "kneeling_woodchopper"
+	case ChopExerciseNameMedicineBallWoodChops:
+		return "medicine_ball_wood_chops"
+	case ChopExerciseNamePowerSquatChops:
+		return "power_squat_chops"
+	case ChopExerciseNameWeightedPowerSquatChops:
+		return "weighted_power_squat_chops"
+	case ChopExerciseNameStandingRotationalChop:
+		return "standing_rotational_chop"
+	case ChopExerciseNameStandingSplitRotationalChop:
+		return "standing_split_rotational_chop"
+	case ChopExerciseNameStandingSplitRotationalReverseChop:
+		return "standing_split_rotational_reverse_chop"
+	case ChopExerciseNameStandingStabilityReverseChop:
+		return "standing_stability_reverse_chop"
+	default:
+		return "ChopExerciseNameInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtochopexercisename = func() map[string]ChopExerciseName {
-	m := make(map[string]ChopExerciseName)
-	for t, str := range chopexercisenametostrs {
-		m[str] = ChopExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into ChopExerciseName constant it's represent, return ChopExerciseNameInvalid if not found.
 func ChopExerciseNameFromString(s string) ChopExerciseName {
-	val, ok := strtochopexercisename[s]
-	if !ok {
-		return strtochopexercisename["invalid"]
+	switch s {
+	case "cable_pull_through":
+		return ChopExerciseNameCablePullThrough
+	case "cable_rotational_lift":
+		return ChopExerciseNameCableRotationalLift
+	case "cable_woodchop":
+		return ChopExerciseNameCableWoodchop
+	case "cross_chop_to_knee":
+		return ChopExerciseNameCrossChopToKnee
+	case "weighted_cross_chop_to_knee":
+		return ChopExerciseNameWeightedCrossChopToKnee
+	case "dumbbell_chop":
+		return ChopExerciseNameDumbbellChop
+	case "half_kneeling_rotation":
+		return ChopExerciseNameHalfKneelingRotation
+	case "weighted_half_kneeling_rotation":
+		return ChopExerciseNameWeightedHalfKneelingRotation
+	case "half_kneeling_rotational_chop":
+		return ChopExerciseNameHalfKneelingRotationalChop
+	case "half_kneeling_rotational_reverse_chop":
+		return ChopExerciseNameHalfKneelingRotationalReverseChop
+	case "half_kneeling_stability_chop":
+		return ChopExerciseNameHalfKneelingStabilityChop
+	case "half_kneeling_stability_reverse_chop":
+		return ChopExerciseNameHalfKneelingStabilityReverseChop
+	case "kneeling_rotational_chop":
+		return ChopExerciseNameKneelingRotationalChop
+	case "kneeling_rotational_reverse_chop":
+		return ChopExerciseNameKneelingRotationalReverseChop
+	case "kneeling_stability_chop":
+		return ChopExerciseNameKneelingStabilityChop
+	case "kneeling_woodchopper":
+		return ChopExerciseNameKneelingWoodchopper
+	case "medicine_ball_wood_chops":
+		return ChopExerciseNameMedicineBallWoodChops
+	case "power_squat_chops":
+		return ChopExerciseNamePowerSquatChops
+	case "weighted_power_squat_chops":
+		return ChopExerciseNameWeightedPowerSquatChops
+	case "standing_rotational_chop":
+		return ChopExerciseNameStandingRotationalChop
+	case "standing_split_rotational_chop":
+		return ChopExerciseNameStandingSplitRotationalChop
+	case "standing_split_rotational_reverse_chop":
+		return ChopExerciseNameStandingSplitRotationalReverseChop
+	case "standing_stability_reverse_chop":
+		return ChopExerciseNameStandingStabilityReverseChop
+	default:
+		return ChopExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListChopExerciseName() []ChopExerciseName {
-	vs := make([]ChopExerciseName, 0, len(chopexercisenametostrs))
-	for i := range chopexercisenametostrs {
-		vs = append(vs, ChopExerciseName(i))
+	return []ChopExerciseName{
+		ChopExerciseNameCablePullThrough,
+		ChopExerciseNameCableRotationalLift,
+		ChopExerciseNameCableWoodchop,
+		ChopExerciseNameCrossChopToKnee,
+		ChopExerciseNameWeightedCrossChopToKnee,
+		ChopExerciseNameDumbbellChop,
+		ChopExerciseNameHalfKneelingRotation,
+		ChopExerciseNameWeightedHalfKneelingRotation,
+		ChopExerciseNameHalfKneelingRotationalChop,
+		ChopExerciseNameHalfKneelingRotationalReverseChop,
+		ChopExerciseNameHalfKneelingStabilityChop,
+		ChopExerciseNameHalfKneelingStabilityReverseChop,
+		ChopExerciseNameKneelingRotationalChop,
+		ChopExerciseNameKneelingRotationalReverseChop,
+		ChopExerciseNameKneelingStabilityChop,
+		ChopExerciseNameKneelingWoodchopper,
+		ChopExerciseNameMedicineBallWoodChops,
+		ChopExerciseNamePowerSquatChops,
+		ChopExerciseNameWeightedPowerSquatChops,
+		ChopExerciseNameStandingRotationalChop,
+		ChopExerciseNameStandingSplitRotationalChop,
+		ChopExerciseNameStandingSplitRotationalReverseChop,
+		ChopExerciseNameStandingStabilityReverseChop,
 	}
-	return vs
 }

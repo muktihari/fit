@@ -16,45 +16,36 @@ type LeftRightBalance100 uint16
 const (
 	LeftRightBalance100Mask    LeftRightBalance100 = 0x3FFF // % contribution scaled by 100
 	LeftRightBalance100Right   LeftRightBalance100 = 0x8000 // data corresponds to right if set, otherwise unknown
-	LeftRightBalance100Invalid LeftRightBalance100 = 0xFFFF // INVALID
+	LeftRightBalance100Invalid LeftRightBalance100 = 0xFFFF
 )
 
-var leftrightbalance100tostrs = map[LeftRightBalance100]string{
-	LeftRightBalance100Mask:    "mask",
-	LeftRightBalance100Right:   "right",
-	LeftRightBalance100Invalid: "invalid",
-}
-
 func (l LeftRightBalance100) String() string {
-	val, ok := leftrightbalance100tostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LeftRightBalance100Mask:
+		return "mask"
+	case LeftRightBalance100Right:
+		return "right"
+	default:
+		return "LeftRightBalance100Invalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtoleftrightbalance100 = func() map[string]LeftRightBalance100 {
-	m := make(map[string]LeftRightBalance100)
-	for t, str := range leftrightbalance100tostrs {
-		m[str] = LeftRightBalance100(t)
-	}
-	return m
-}()
 
 // FromString parse string into LeftRightBalance100 constant it's represent, return LeftRightBalance100Invalid if not found.
 func LeftRightBalance100FromString(s string) LeftRightBalance100 {
-	val, ok := strtoleftrightbalance100[s]
-	if !ok {
-		return strtoleftrightbalance100["invalid"]
+	switch s {
+	case "mask":
+		return LeftRightBalance100Mask
+	case "right":
+		return LeftRightBalance100Right
+	default:
+		return LeftRightBalance100Invalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLeftRightBalance100() []LeftRightBalance100 {
-	vs := make([]LeftRightBalance100, 0, len(leftrightbalance100tostrs))
-	for i := range leftrightbalance100tostrs {
-		vs = append(vs, LeftRightBalance100(i))
+	return []LeftRightBalance100{
+		LeftRightBalance100Mask,
+		LeftRightBalance100Right,
 	}
-	return vs
 }

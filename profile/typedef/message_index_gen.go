@@ -17,46 +17,41 @@ const (
 	MessageIndexSelected MessageIndex = 0x8000 // message is selected if set
 	MessageIndexReserved MessageIndex = 0x7000 // reserved (default 0)
 	MessageIndexMask     MessageIndex = 0x0FFF // index
-	MessageIndexInvalid  MessageIndex = 0xFFFF // INVALID
+	MessageIndexInvalid  MessageIndex = 0xFFFF
 )
 
-var messageindextostrs = map[MessageIndex]string{
-	MessageIndexSelected: "selected",
-	MessageIndexReserved: "reserved",
-	MessageIndexMask:     "mask",
-	MessageIndexInvalid:  "invalid",
-}
-
 func (m MessageIndex) String() string {
-	val, ok := messageindextostrs[m]
-	if !ok {
-		return strconv.FormatUint(uint64(m), 10)
+	switch m {
+	case MessageIndexSelected:
+		return "selected"
+	case MessageIndexReserved:
+		return "reserved"
+	case MessageIndexMask:
+		return "mask"
+	default:
+		return "MessageIndexInvalid(" + strconv.FormatUint(uint64(m), 10) + ")"
 	}
-	return val
 }
-
-var strtomessageindex = func() map[string]MessageIndex {
-	m := make(map[string]MessageIndex)
-	for t, str := range messageindextostrs {
-		m[str] = MessageIndex(t)
-	}
-	return m
-}()
 
 // FromString parse string into MessageIndex constant it's represent, return MessageIndexInvalid if not found.
 func MessageIndexFromString(s string) MessageIndex {
-	val, ok := strtomessageindex[s]
-	if !ok {
-		return strtomessageindex["invalid"]
+	switch s {
+	case "selected":
+		return MessageIndexSelected
+	case "reserved":
+		return MessageIndexReserved
+	case "mask":
+		return MessageIndexMask
+	default:
+		return MessageIndexInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMessageIndex() []MessageIndex {
-	vs := make([]MessageIndex, 0, len(messageindextostrs))
-	for i := range messageindextostrs {
-		vs = append(vs, MessageIndex(i))
+	return []MessageIndex{
+		MessageIndexSelected,
+		MessageIndexReserved,
+		MessageIndexMask,
 	}
-	return vs
 }

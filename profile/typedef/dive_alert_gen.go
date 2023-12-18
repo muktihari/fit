@@ -46,89 +46,228 @@ const (
 	DiveAlertSwitchedToOpenCircuit     DiveAlert = 29
 	DiveAlertSwitchedToClosedCircuit   DiveAlert = 30
 	DiveAlertTankBatteryLow            DiveAlert = 32
-	DiveAlertPo2CcrDilLow              DiveAlert = 33   // ccr diluent has low po2
-	DiveAlertDecoStopCleared           DiveAlert = 34   // a deco stop has been cleared
-	DiveAlertApneaNeutralBuoyancy      DiveAlert = 35   // Target Depth Apnea Alarm triggered
-	DiveAlertApneaTargetDepth          DiveAlert = 36   // Neutral Buoyance Apnea Alarm triggered
-	DiveAlertApneaSurface              DiveAlert = 37   // Surface Apnea Alarm triggered
-	DiveAlertApneaHighSpeed            DiveAlert = 38   // High Speed Apnea Alarm triggered
-	DiveAlertApneaLowSpeed             DiveAlert = 39   // Low Speed Apnea Alarm triggered
-	DiveAlertInvalid                   DiveAlert = 0xFF // INVALID
+	DiveAlertPo2CcrDilLow              DiveAlert = 33 // ccr diluent has low po2
+	DiveAlertDecoStopCleared           DiveAlert = 34 // a deco stop has been cleared
+	DiveAlertApneaNeutralBuoyancy      DiveAlert = 35 // Target Depth Apnea Alarm triggered
+	DiveAlertApneaTargetDepth          DiveAlert = 36 // Neutral Buoyance Apnea Alarm triggered
+	DiveAlertApneaSurface              DiveAlert = 37 // Surface Apnea Alarm triggered
+	DiveAlertApneaHighSpeed            DiveAlert = 38 // High Speed Apnea Alarm triggered
+	DiveAlertApneaLowSpeed             DiveAlert = 39 // Low Speed Apnea Alarm triggered
+	DiveAlertInvalid                   DiveAlert = 0xFF
 )
 
-var divealerttostrs = map[DiveAlert]string{
-	DiveAlertNdlReached:                "ndl_reached",
-	DiveAlertGasSwitchPrompted:         "gas_switch_prompted",
-	DiveAlertNearSurface:               "near_surface",
-	DiveAlertApproachingNdl:            "approaching_ndl",
-	DiveAlertPo2Warn:                   "po2_warn",
-	DiveAlertPo2CritHigh:               "po2_crit_high",
-	DiveAlertPo2CritLow:                "po2_crit_low",
-	DiveAlertTimeAlert:                 "time_alert",
-	DiveAlertDepthAlert:                "depth_alert",
-	DiveAlertDecoCeilingBroken:         "deco_ceiling_broken",
-	DiveAlertDecoComplete:              "deco_complete",
-	DiveAlertSafetyStopBroken:          "safety_stop_broken",
-	DiveAlertSafetyStopComplete:        "safety_stop_complete",
-	DiveAlertCnsWarning:                "cns_warning",
-	DiveAlertCnsCritical:               "cns_critical",
-	DiveAlertOtuWarning:                "otu_warning",
-	DiveAlertOtuCritical:               "otu_critical",
-	DiveAlertAscentCritical:            "ascent_critical",
-	DiveAlertAlertDismissedByKey:       "alert_dismissed_by_key",
-	DiveAlertAlertDismissedByTimeout:   "alert_dismissed_by_timeout",
-	DiveAlertBatteryLow:                "battery_low",
-	DiveAlertBatteryCritical:           "battery_critical",
-	DiveAlertSafetyStopStarted:         "safety_stop_started",
-	DiveAlertApproachingFirstDecoStop:  "approaching_first_deco_stop",
-	DiveAlertSetpointSwitchAutoLow:     "setpoint_switch_auto_low",
-	DiveAlertSetpointSwitchAutoHigh:    "setpoint_switch_auto_high",
-	DiveAlertSetpointSwitchManualLow:   "setpoint_switch_manual_low",
-	DiveAlertSetpointSwitchManualHigh:  "setpoint_switch_manual_high",
-	DiveAlertAutoSetpointSwitchIgnored: "auto_setpoint_switch_ignored",
-	DiveAlertSwitchedToOpenCircuit:     "switched_to_open_circuit",
-	DiveAlertSwitchedToClosedCircuit:   "switched_to_closed_circuit",
-	DiveAlertTankBatteryLow:            "tank_battery_low",
-	DiveAlertPo2CcrDilLow:              "po2_ccr_dil_low",
-	DiveAlertDecoStopCleared:           "deco_stop_cleared",
-	DiveAlertApneaNeutralBuoyancy:      "apnea_neutral_buoyancy",
-	DiveAlertApneaTargetDepth:          "apnea_target_depth",
-	DiveAlertApneaSurface:              "apnea_surface",
-	DiveAlertApneaHighSpeed:            "apnea_high_speed",
-	DiveAlertApneaLowSpeed:             "apnea_low_speed",
-	DiveAlertInvalid:                   "invalid",
-}
-
 func (d DiveAlert) String() string {
-	val, ok := divealerttostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DiveAlertNdlReached:
+		return "ndl_reached"
+	case DiveAlertGasSwitchPrompted:
+		return "gas_switch_prompted"
+	case DiveAlertNearSurface:
+		return "near_surface"
+	case DiveAlertApproachingNdl:
+		return "approaching_ndl"
+	case DiveAlertPo2Warn:
+		return "po2_warn"
+	case DiveAlertPo2CritHigh:
+		return "po2_crit_high"
+	case DiveAlertPo2CritLow:
+		return "po2_crit_low"
+	case DiveAlertTimeAlert:
+		return "time_alert"
+	case DiveAlertDepthAlert:
+		return "depth_alert"
+	case DiveAlertDecoCeilingBroken:
+		return "deco_ceiling_broken"
+	case DiveAlertDecoComplete:
+		return "deco_complete"
+	case DiveAlertSafetyStopBroken:
+		return "safety_stop_broken"
+	case DiveAlertSafetyStopComplete:
+		return "safety_stop_complete"
+	case DiveAlertCnsWarning:
+		return "cns_warning"
+	case DiveAlertCnsCritical:
+		return "cns_critical"
+	case DiveAlertOtuWarning:
+		return "otu_warning"
+	case DiveAlertOtuCritical:
+		return "otu_critical"
+	case DiveAlertAscentCritical:
+		return "ascent_critical"
+	case DiveAlertAlertDismissedByKey:
+		return "alert_dismissed_by_key"
+	case DiveAlertAlertDismissedByTimeout:
+		return "alert_dismissed_by_timeout"
+	case DiveAlertBatteryLow:
+		return "battery_low"
+	case DiveAlertBatteryCritical:
+		return "battery_critical"
+	case DiveAlertSafetyStopStarted:
+		return "safety_stop_started"
+	case DiveAlertApproachingFirstDecoStop:
+		return "approaching_first_deco_stop"
+	case DiveAlertSetpointSwitchAutoLow:
+		return "setpoint_switch_auto_low"
+	case DiveAlertSetpointSwitchAutoHigh:
+		return "setpoint_switch_auto_high"
+	case DiveAlertSetpointSwitchManualLow:
+		return "setpoint_switch_manual_low"
+	case DiveAlertSetpointSwitchManualHigh:
+		return "setpoint_switch_manual_high"
+	case DiveAlertAutoSetpointSwitchIgnored:
+		return "auto_setpoint_switch_ignored"
+	case DiveAlertSwitchedToOpenCircuit:
+		return "switched_to_open_circuit"
+	case DiveAlertSwitchedToClosedCircuit:
+		return "switched_to_closed_circuit"
+	case DiveAlertTankBatteryLow:
+		return "tank_battery_low"
+	case DiveAlertPo2CcrDilLow:
+		return "po2_ccr_dil_low"
+	case DiveAlertDecoStopCleared:
+		return "deco_stop_cleared"
+	case DiveAlertApneaNeutralBuoyancy:
+		return "apnea_neutral_buoyancy"
+	case DiveAlertApneaTargetDepth:
+		return "apnea_target_depth"
+	case DiveAlertApneaSurface:
+		return "apnea_surface"
+	case DiveAlertApneaHighSpeed:
+		return "apnea_high_speed"
+	case DiveAlertApneaLowSpeed:
+		return "apnea_low_speed"
+	default:
+		return "DiveAlertInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodivealert = func() map[string]DiveAlert {
-	m := make(map[string]DiveAlert)
-	for t, str := range divealerttostrs {
-		m[str] = DiveAlert(t)
-	}
-	return m
-}()
 
 // FromString parse string into DiveAlert constant it's represent, return DiveAlertInvalid if not found.
 func DiveAlertFromString(s string) DiveAlert {
-	val, ok := strtodivealert[s]
-	if !ok {
-		return strtodivealert["invalid"]
+	switch s {
+	case "ndl_reached":
+		return DiveAlertNdlReached
+	case "gas_switch_prompted":
+		return DiveAlertGasSwitchPrompted
+	case "near_surface":
+		return DiveAlertNearSurface
+	case "approaching_ndl":
+		return DiveAlertApproachingNdl
+	case "po2_warn":
+		return DiveAlertPo2Warn
+	case "po2_crit_high":
+		return DiveAlertPo2CritHigh
+	case "po2_crit_low":
+		return DiveAlertPo2CritLow
+	case "time_alert":
+		return DiveAlertTimeAlert
+	case "depth_alert":
+		return DiveAlertDepthAlert
+	case "deco_ceiling_broken":
+		return DiveAlertDecoCeilingBroken
+	case "deco_complete":
+		return DiveAlertDecoComplete
+	case "safety_stop_broken":
+		return DiveAlertSafetyStopBroken
+	case "safety_stop_complete":
+		return DiveAlertSafetyStopComplete
+	case "cns_warning":
+		return DiveAlertCnsWarning
+	case "cns_critical":
+		return DiveAlertCnsCritical
+	case "otu_warning":
+		return DiveAlertOtuWarning
+	case "otu_critical":
+		return DiveAlertOtuCritical
+	case "ascent_critical":
+		return DiveAlertAscentCritical
+	case "alert_dismissed_by_key":
+		return DiveAlertAlertDismissedByKey
+	case "alert_dismissed_by_timeout":
+		return DiveAlertAlertDismissedByTimeout
+	case "battery_low":
+		return DiveAlertBatteryLow
+	case "battery_critical":
+		return DiveAlertBatteryCritical
+	case "safety_stop_started":
+		return DiveAlertSafetyStopStarted
+	case "approaching_first_deco_stop":
+		return DiveAlertApproachingFirstDecoStop
+	case "setpoint_switch_auto_low":
+		return DiveAlertSetpointSwitchAutoLow
+	case "setpoint_switch_auto_high":
+		return DiveAlertSetpointSwitchAutoHigh
+	case "setpoint_switch_manual_low":
+		return DiveAlertSetpointSwitchManualLow
+	case "setpoint_switch_manual_high":
+		return DiveAlertSetpointSwitchManualHigh
+	case "auto_setpoint_switch_ignored":
+		return DiveAlertAutoSetpointSwitchIgnored
+	case "switched_to_open_circuit":
+		return DiveAlertSwitchedToOpenCircuit
+	case "switched_to_closed_circuit":
+		return DiveAlertSwitchedToClosedCircuit
+	case "tank_battery_low":
+		return DiveAlertTankBatteryLow
+	case "po2_ccr_dil_low":
+		return DiveAlertPo2CcrDilLow
+	case "deco_stop_cleared":
+		return DiveAlertDecoStopCleared
+	case "apnea_neutral_buoyancy":
+		return DiveAlertApneaNeutralBuoyancy
+	case "apnea_target_depth":
+		return DiveAlertApneaTargetDepth
+	case "apnea_surface":
+		return DiveAlertApneaSurface
+	case "apnea_high_speed":
+		return DiveAlertApneaHighSpeed
+	case "apnea_low_speed":
+		return DiveAlertApneaLowSpeed
+	default:
+		return DiveAlertInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDiveAlert() []DiveAlert {
-	vs := make([]DiveAlert, 0, len(divealerttostrs))
-	for i := range divealerttostrs {
-		vs = append(vs, DiveAlert(i))
+	return []DiveAlert{
+		DiveAlertNdlReached,
+		DiveAlertGasSwitchPrompted,
+		DiveAlertNearSurface,
+		DiveAlertApproachingNdl,
+		DiveAlertPo2Warn,
+		DiveAlertPo2CritHigh,
+		DiveAlertPo2CritLow,
+		DiveAlertTimeAlert,
+		DiveAlertDepthAlert,
+		DiveAlertDecoCeilingBroken,
+		DiveAlertDecoComplete,
+		DiveAlertSafetyStopBroken,
+		DiveAlertSafetyStopComplete,
+		DiveAlertCnsWarning,
+		DiveAlertCnsCritical,
+		DiveAlertOtuWarning,
+		DiveAlertOtuCritical,
+		DiveAlertAscentCritical,
+		DiveAlertAlertDismissedByKey,
+		DiveAlertAlertDismissedByTimeout,
+		DiveAlertBatteryLow,
+		DiveAlertBatteryCritical,
+		DiveAlertSafetyStopStarted,
+		DiveAlertApproachingFirstDecoStop,
+		DiveAlertSetpointSwitchAutoLow,
+		DiveAlertSetpointSwitchAutoHigh,
+		DiveAlertSetpointSwitchManualLow,
+		DiveAlertSetpointSwitchManualHigh,
+		DiveAlertAutoSetpointSwitchIgnored,
+		DiveAlertSwitchedToOpenCircuit,
+		DiveAlertSwitchedToClosedCircuit,
+		DiveAlertTankBatteryLow,
+		DiveAlertPo2CcrDilLow,
+		DiveAlertDecoStopCleared,
+		DiveAlertApneaNeutralBuoyancy,
+		DiveAlertApneaTargetDepth,
+		DiveAlertApneaSurface,
+		DiveAlertApneaHighSpeed,
+		DiveAlertApneaLowSpeed,
 	}
-	return vs
 }

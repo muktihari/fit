@@ -14,47 +14,38 @@ import (
 type MaxMetHeartRateSource byte
 
 const (
-	MaxMetHeartRateSourceWhr     MaxMetHeartRateSource = 0    // Wrist Heart Rate Monitor
-	MaxMetHeartRateSourceHrm     MaxMetHeartRateSource = 1    // Chest Strap Heart Rate Monitor
-	MaxMetHeartRateSourceInvalid MaxMetHeartRateSource = 0xFF // INVALID
+	MaxMetHeartRateSourceWhr     MaxMetHeartRateSource = 0 // Wrist Heart Rate Monitor
+	MaxMetHeartRateSourceHrm     MaxMetHeartRateSource = 1 // Chest Strap Heart Rate Monitor
+	MaxMetHeartRateSourceInvalid MaxMetHeartRateSource = 0xFF
 )
 
-var maxmetheartratesourcetostrs = map[MaxMetHeartRateSource]string{
-	MaxMetHeartRateSourceWhr:     "whr",
-	MaxMetHeartRateSourceHrm:     "hrm",
-	MaxMetHeartRateSourceInvalid: "invalid",
-}
-
 func (m MaxMetHeartRateSource) String() string {
-	val, ok := maxmetheartratesourcetostrs[m]
-	if !ok {
-		return strconv.Itoa(int(m))
+	switch m {
+	case MaxMetHeartRateSourceWhr:
+		return "whr"
+	case MaxMetHeartRateSourceHrm:
+		return "hrm"
+	default:
+		return "MaxMetHeartRateSourceInvalid(" + strconv.Itoa(int(m)) + ")"
 	}
-	return val
 }
-
-var strtomaxmetheartratesource = func() map[string]MaxMetHeartRateSource {
-	m := make(map[string]MaxMetHeartRateSource)
-	for t, str := range maxmetheartratesourcetostrs {
-		m[str] = MaxMetHeartRateSource(t)
-	}
-	return m
-}()
 
 // FromString parse string into MaxMetHeartRateSource constant it's represent, return MaxMetHeartRateSourceInvalid if not found.
 func MaxMetHeartRateSourceFromString(s string) MaxMetHeartRateSource {
-	val, ok := strtomaxmetheartratesource[s]
-	if !ok {
-		return strtomaxmetheartratesource["invalid"]
+	switch s {
+	case "whr":
+		return MaxMetHeartRateSourceWhr
+	case "hrm":
+		return MaxMetHeartRateSourceHrm
+	default:
+		return MaxMetHeartRateSourceInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMaxMetHeartRateSource() []MaxMetHeartRateSource {
-	vs := make([]MaxMetHeartRateSource, 0, len(maxmetheartratesourcetostrs))
-	for i := range maxmetheartratesourcetostrs {
-		vs = append(vs, MaxMetHeartRateSource(i))
+	return []MaxMetHeartRateSource{
+		MaxMetHeartRateSourceWhr,
+		MaxMetHeartRateSourceHrm,
 	}
-	return vs
 }

@@ -19,48 +19,51 @@ const (
 	CarryExerciseNameFarmersWalkOnToes CarryExerciseName = 2
 	CarryExerciseNameHexDumbbellHold   CarryExerciseName = 3
 	CarryExerciseNameOverheadCarry     CarryExerciseName = 4
-	CarryExerciseNameInvalid           CarryExerciseName = 0xFFFF // INVALID
+	CarryExerciseNameInvalid           CarryExerciseName = 0xFFFF
 )
 
-var carryexercisenametostrs = map[CarryExerciseName]string{
-	CarryExerciseNameBarHolds:          "bar_holds",
-	CarryExerciseNameFarmersWalk:       "farmers_walk",
-	CarryExerciseNameFarmersWalkOnToes: "farmers_walk_on_toes",
-	CarryExerciseNameHexDumbbellHold:   "hex_dumbbell_hold",
-	CarryExerciseNameOverheadCarry:     "overhead_carry",
-	CarryExerciseNameInvalid:           "invalid",
-}
-
 func (c CarryExerciseName) String() string {
-	val, ok := carryexercisenametostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CarryExerciseNameBarHolds:
+		return "bar_holds"
+	case CarryExerciseNameFarmersWalk:
+		return "farmers_walk"
+	case CarryExerciseNameFarmersWalkOnToes:
+		return "farmers_walk_on_toes"
+	case CarryExerciseNameHexDumbbellHold:
+		return "hex_dumbbell_hold"
+	case CarryExerciseNameOverheadCarry:
+		return "overhead_carry"
+	default:
+		return "CarryExerciseNameInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocarryexercisename = func() map[string]CarryExerciseName {
-	m := make(map[string]CarryExerciseName)
-	for t, str := range carryexercisenametostrs {
-		m[str] = CarryExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into CarryExerciseName constant it's represent, return CarryExerciseNameInvalid if not found.
 func CarryExerciseNameFromString(s string) CarryExerciseName {
-	val, ok := strtocarryexercisename[s]
-	if !ok {
-		return strtocarryexercisename["invalid"]
+	switch s {
+	case "bar_holds":
+		return CarryExerciseNameBarHolds
+	case "farmers_walk":
+		return CarryExerciseNameFarmersWalk
+	case "farmers_walk_on_toes":
+		return CarryExerciseNameFarmersWalkOnToes
+	case "hex_dumbbell_hold":
+		return CarryExerciseNameHexDumbbellHold
+	case "overhead_carry":
+		return CarryExerciseNameOverheadCarry
+	default:
+		return CarryExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCarryExerciseName() []CarryExerciseName {
-	vs := make([]CarryExerciseName, 0, len(carryexercisenametostrs))
-	for i := range carryexercisenametostrs {
-		vs = append(vs, CarryExerciseName(i))
+	return []CarryExerciseName{
+		CarryExerciseNameBarHolds,
+		CarryExerciseNameFarmersWalk,
+		CarryExerciseNameFarmersWalkOnToes,
+		CarryExerciseNameHexDumbbellHold,
+		CarryExerciseNameOverheadCarry,
 	}
-	return vs
 }

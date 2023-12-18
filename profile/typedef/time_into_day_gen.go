@@ -14,43 +14,25 @@ import (
 type TimeIntoDay uint32
 
 const (
-	TimeIntoDayInvalid TimeIntoDay = 0xFFFFFFFF // INVALID
+	TimeIntoDayInvalid TimeIntoDay = 0xFFFFFFFF
 )
 
-var timeintodaytostrs = map[TimeIntoDay]string{
-	TimeIntoDayInvalid: "invalid",
-}
-
 func (t TimeIntoDay) String() string {
-	val, ok := timeintodaytostrs[t]
-	if !ok {
-		return strconv.FormatUint(uint64(t), 10)
+	switch t {
+	default:
+		return "TimeIntoDayInvalid(" + strconv.FormatUint(uint64(t), 10) + ")"
 	}
-	return val
 }
-
-var strtotimeintoday = func() map[string]TimeIntoDay {
-	m := make(map[string]TimeIntoDay)
-	for t, str := range timeintodaytostrs {
-		m[str] = TimeIntoDay(t)
-	}
-	return m
-}()
 
 // FromString parse string into TimeIntoDay constant it's represent, return TimeIntoDayInvalid if not found.
 func TimeIntoDayFromString(s string) TimeIntoDay {
-	val, ok := strtotimeintoday[s]
-	if !ok {
-		return strtotimeintoday["invalid"]
+	switch s {
+	default:
+		return TimeIntoDayInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTimeIntoDay() []TimeIntoDay {
-	vs := make([]TimeIntoDay, 0, len(timeintodaytostrs))
-	for i := range timeintodaytostrs {
-		vs = append(vs, TimeIntoDay(i))
-	}
-	return vs
+	return []TimeIntoDay{}
 }

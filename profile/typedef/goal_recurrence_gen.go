@@ -20,49 +20,56 @@ const (
 	GoalRecurrenceMonthly GoalRecurrence = 3
 	GoalRecurrenceYearly  GoalRecurrence = 4
 	GoalRecurrenceCustom  GoalRecurrence = 5
-	GoalRecurrenceInvalid GoalRecurrence = 0xFF // INVALID
+	GoalRecurrenceInvalid GoalRecurrence = 0xFF
 )
 
-var goalrecurrencetostrs = map[GoalRecurrence]string{
-	GoalRecurrenceOff:     "off",
-	GoalRecurrenceDaily:   "daily",
-	GoalRecurrenceWeekly:  "weekly",
-	GoalRecurrenceMonthly: "monthly",
-	GoalRecurrenceYearly:  "yearly",
-	GoalRecurrenceCustom:  "custom",
-	GoalRecurrenceInvalid: "invalid",
-}
-
 func (g GoalRecurrence) String() string {
-	val, ok := goalrecurrencetostrs[g]
-	if !ok {
-		return strconv.Itoa(int(g))
+	switch g {
+	case GoalRecurrenceOff:
+		return "off"
+	case GoalRecurrenceDaily:
+		return "daily"
+	case GoalRecurrenceWeekly:
+		return "weekly"
+	case GoalRecurrenceMonthly:
+		return "monthly"
+	case GoalRecurrenceYearly:
+		return "yearly"
+	case GoalRecurrenceCustom:
+		return "custom"
+	default:
+		return "GoalRecurrenceInvalid(" + strconv.Itoa(int(g)) + ")"
 	}
-	return val
 }
-
-var strtogoalrecurrence = func() map[string]GoalRecurrence {
-	m := make(map[string]GoalRecurrence)
-	for t, str := range goalrecurrencetostrs {
-		m[str] = GoalRecurrence(t)
-	}
-	return m
-}()
 
 // FromString parse string into GoalRecurrence constant it's represent, return GoalRecurrenceInvalid if not found.
 func GoalRecurrenceFromString(s string) GoalRecurrence {
-	val, ok := strtogoalrecurrence[s]
-	if !ok {
-		return strtogoalrecurrence["invalid"]
+	switch s {
+	case "off":
+		return GoalRecurrenceOff
+	case "daily":
+		return GoalRecurrenceDaily
+	case "weekly":
+		return GoalRecurrenceWeekly
+	case "monthly":
+		return GoalRecurrenceMonthly
+	case "yearly":
+		return GoalRecurrenceYearly
+	case "custom":
+		return GoalRecurrenceCustom
+	default:
+		return GoalRecurrenceInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListGoalRecurrence() []GoalRecurrence {
-	vs := make([]GoalRecurrence, 0, len(goalrecurrencetostrs))
-	for i := range goalrecurrencetostrs {
-		vs = append(vs, GoalRecurrence(i))
+	return []GoalRecurrence{
+		GoalRecurrenceOff,
+		GoalRecurrenceDaily,
+		GoalRecurrenceWeekly,
+		GoalRecurrenceMonthly,
+		GoalRecurrenceYearly,
+		GoalRecurrenceCustom,
 	}
-	return vs
 }

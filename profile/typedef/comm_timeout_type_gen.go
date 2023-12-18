@@ -14,51 +14,50 @@ import (
 type CommTimeoutType uint16
 
 const (
-	CommTimeoutTypeWildcardPairingTimeout CommTimeoutType = 0      // Timeout pairing to any device
-	CommTimeoutTypePairingTimeout         CommTimeoutType = 1      // Timeout pairing to previously paired device
-	CommTimeoutTypeConnectionLost         CommTimeoutType = 2      // Temporary loss of communications
-	CommTimeoutTypeConnectionTimeout      CommTimeoutType = 3      // Connection closed due to extended bad communications
-	CommTimeoutTypeInvalid                CommTimeoutType = 0xFFFF // INVALID
+	CommTimeoutTypeWildcardPairingTimeout CommTimeoutType = 0 // Timeout pairing to any device
+	CommTimeoutTypePairingTimeout         CommTimeoutType = 1 // Timeout pairing to previously paired device
+	CommTimeoutTypeConnectionLost         CommTimeoutType = 2 // Temporary loss of communications
+	CommTimeoutTypeConnectionTimeout      CommTimeoutType = 3 // Connection closed due to extended bad communications
+	CommTimeoutTypeInvalid                CommTimeoutType = 0xFFFF
 )
 
-var commtimeouttypetostrs = map[CommTimeoutType]string{
-	CommTimeoutTypeWildcardPairingTimeout: "wildcard_pairing_timeout",
-	CommTimeoutTypePairingTimeout:         "pairing_timeout",
-	CommTimeoutTypeConnectionLost:         "connection_lost",
-	CommTimeoutTypeConnectionTimeout:      "connection_timeout",
-	CommTimeoutTypeInvalid:                "invalid",
-}
-
 func (c CommTimeoutType) String() string {
-	val, ok := commtimeouttypetostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CommTimeoutTypeWildcardPairingTimeout:
+		return "wildcard_pairing_timeout"
+	case CommTimeoutTypePairingTimeout:
+		return "pairing_timeout"
+	case CommTimeoutTypeConnectionLost:
+		return "connection_lost"
+	case CommTimeoutTypeConnectionTimeout:
+		return "connection_timeout"
+	default:
+		return "CommTimeoutTypeInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocommtimeouttype = func() map[string]CommTimeoutType {
-	m := make(map[string]CommTimeoutType)
-	for t, str := range commtimeouttypetostrs {
-		m[str] = CommTimeoutType(t)
-	}
-	return m
-}()
 
 // FromString parse string into CommTimeoutType constant it's represent, return CommTimeoutTypeInvalid if not found.
 func CommTimeoutTypeFromString(s string) CommTimeoutType {
-	val, ok := strtocommtimeouttype[s]
-	if !ok {
-		return strtocommtimeouttype["invalid"]
+	switch s {
+	case "wildcard_pairing_timeout":
+		return CommTimeoutTypeWildcardPairingTimeout
+	case "pairing_timeout":
+		return CommTimeoutTypePairingTimeout
+	case "connection_lost":
+		return CommTimeoutTypeConnectionLost
+	case "connection_timeout":
+		return CommTimeoutTypeConnectionTimeout
+	default:
+		return CommTimeoutTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCommTimeoutType() []CommTimeoutType {
-	vs := make([]CommTimeoutType, 0, len(commtimeouttypetostrs))
-	for i := range commtimeouttypetostrs {
-		vs = append(vs, CommTimeoutType(i))
+	return []CommTimeoutType{
+		CommTimeoutTypeWildcardPairingTimeout,
+		CommTimeoutTypePairingTimeout,
+		CommTimeoutTypeConnectionLost,
+		CommTimeoutTypeConnectionTimeout,
 	}
-	return vs
 }

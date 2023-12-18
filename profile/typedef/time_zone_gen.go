@@ -120,149 +120,556 @@ const (
 	TimeZoneSantiago                 TimeZone = 103
 	TimeZoneManual                   TimeZone = 253
 	TimeZoneAutomatic                TimeZone = 254
-	TimeZoneInvalid                  TimeZone = 0xFF // INVALID
+	TimeZoneInvalid                  TimeZone = 0xFF
 )
 
-var timezonetostrs = map[TimeZone]string{
-	TimeZoneAlmaty:                   "almaty",
-	TimeZoneBangkok:                  "bangkok",
-	TimeZoneBombay:                   "bombay",
-	TimeZoneBrasilia:                 "brasilia",
-	TimeZoneCairo:                    "cairo",
-	TimeZoneCapeVerdeIs:              "cape_verde_is",
-	TimeZoneDarwin:                   "darwin",
-	TimeZoneEniwetok:                 "eniwetok",
-	TimeZoneFiji:                     "fiji",
-	TimeZoneHongKong:                 "hong_kong",
-	TimeZoneIslamabad:                "islamabad",
-	TimeZoneKabul:                    "kabul",
-	TimeZoneMagadan:                  "magadan",
-	TimeZoneMidAtlantic:              "mid_atlantic",
-	TimeZoneMoscow:                   "moscow",
-	TimeZoneMuscat:                   "muscat",
-	TimeZoneNewfoundland:             "newfoundland",
-	TimeZoneSamoa:                    "samoa",
-	TimeZoneSydney:                   "sydney",
-	TimeZoneTehran:                   "tehran",
-	TimeZoneTokyo:                    "tokyo",
-	TimeZoneUsAlaska:                 "us_alaska",
-	TimeZoneUsAtlantic:               "us_atlantic",
-	TimeZoneUsCentral:                "us_central",
-	TimeZoneUsEastern:                "us_eastern",
-	TimeZoneUsHawaii:                 "us_hawaii",
-	TimeZoneUsMountain:               "us_mountain",
-	TimeZoneUsPacific:                "us_pacific",
-	TimeZoneOther:                    "other",
-	TimeZoneAuckland:                 "auckland",
-	TimeZoneKathmandu:                "kathmandu",
-	TimeZoneEuropeWesternWet:         "europe_western_wet",
-	TimeZoneEuropeCentralCet:         "europe_central_cet",
-	TimeZoneEuropeEasternEet:         "europe_eastern_eet",
-	TimeZoneJakarta:                  "jakarta",
-	TimeZonePerth:                    "perth",
-	TimeZoneAdelaide:                 "adelaide",
-	TimeZoneBrisbane:                 "brisbane",
-	TimeZoneTasmania:                 "tasmania",
-	TimeZoneIceland:                  "iceland",
-	TimeZoneAmsterdam:                "amsterdam",
-	TimeZoneAthens:                   "athens",
-	TimeZoneBarcelona:                "barcelona",
-	TimeZoneBerlin:                   "berlin",
-	TimeZoneBrussels:                 "brussels",
-	TimeZoneBudapest:                 "budapest",
-	TimeZoneCopenhagen:               "copenhagen",
-	TimeZoneDublin:                   "dublin",
-	TimeZoneHelsinki:                 "helsinki",
-	TimeZoneLisbon:                   "lisbon",
-	TimeZoneLondon:                   "london",
-	TimeZoneMadrid:                   "madrid",
-	TimeZoneMunich:                   "munich",
-	TimeZoneOslo:                     "oslo",
-	TimeZoneParis:                    "paris",
-	TimeZonePrague:                   "prague",
-	TimeZoneReykjavik:                "reykjavik",
-	TimeZoneRome:                     "rome",
-	TimeZoneStockholm:                "stockholm",
-	TimeZoneVienna:                   "vienna",
-	TimeZoneWarsaw:                   "warsaw",
-	TimeZoneZurich:                   "zurich",
-	TimeZoneQuebec:                   "quebec",
-	TimeZoneOntario:                  "ontario",
-	TimeZoneManitoba:                 "manitoba",
-	TimeZoneSaskatchewan:             "saskatchewan",
-	TimeZoneAlberta:                  "alberta",
-	TimeZoneBritishColumbia:          "british_columbia",
-	TimeZoneBoise:                    "boise",
-	TimeZoneBoston:                   "boston",
-	TimeZoneChicago:                  "chicago",
-	TimeZoneDallas:                   "dallas",
-	TimeZoneDenver:                   "denver",
-	TimeZoneKansasCity:               "kansas_city",
-	TimeZoneLasVegas:                 "las_vegas",
-	TimeZoneLosAngeles:               "los_angeles",
-	TimeZoneMiami:                    "miami",
-	TimeZoneMinneapolis:              "minneapolis",
-	TimeZoneNewYork:                  "new_york",
-	TimeZoneNewOrleans:               "new_orleans",
-	TimeZonePhoenix:                  "phoenix",
-	TimeZoneSantaFe:                  "santa_fe",
-	TimeZoneSeattle:                  "seattle",
-	TimeZoneWashingtonDc:             "washington_dc",
-	TimeZoneUsArizona:                "us_arizona",
-	TimeZoneChita:                    "chita",
-	TimeZoneEkaterinburg:             "ekaterinburg",
-	TimeZoneIrkutsk:                  "irkutsk",
-	TimeZoneKaliningrad:              "kaliningrad",
-	TimeZoneKrasnoyarsk:              "krasnoyarsk",
-	TimeZoneNovosibirsk:              "novosibirsk",
-	TimeZonePetropavlovskKamchatskiy: "petropavlovsk_kamchatskiy",
-	TimeZoneSamara:                   "samara",
-	TimeZoneVladivostok:              "vladivostok",
-	TimeZoneMexicoCentral:            "mexico_central",
-	TimeZoneMexicoMountain:           "mexico_mountain",
-	TimeZoneMexicoPacific:            "mexico_pacific",
-	TimeZoneCapeTown:                 "cape_town",
-	TimeZoneWinkhoek:                 "winkhoek",
-	TimeZoneLagos:                    "lagos",
-	TimeZoneRiyahd:                   "riyahd",
-	TimeZoneVenezuela:                "venezuela",
-	TimeZoneAustraliaLh:              "australia_lh",
-	TimeZoneSantiago:                 "santiago",
-	TimeZoneManual:                   "manual",
-	TimeZoneAutomatic:                "automatic",
-	TimeZoneInvalid:                  "invalid",
-}
-
 func (t TimeZone) String() string {
-	val, ok := timezonetostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TimeZoneAlmaty:
+		return "almaty"
+	case TimeZoneBangkok:
+		return "bangkok"
+	case TimeZoneBombay:
+		return "bombay"
+	case TimeZoneBrasilia:
+		return "brasilia"
+	case TimeZoneCairo:
+		return "cairo"
+	case TimeZoneCapeVerdeIs:
+		return "cape_verde_is"
+	case TimeZoneDarwin:
+		return "darwin"
+	case TimeZoneEniwetok:
+		return "eniwetok"
+	case TimeZoneFiji:
+		return "fiji"
+	case TimeZoneHongKong:
+		return "hong_kong"
+	case TimeZoneIslamabad:
+		return "islamabad"
+	case TimeZoneKabul:
+		return "kabul"
+	case TimeZoneMagadan:
+		return "magadan"
+	case TimeZoneMidAtlantic:
+		return "mid_atlantic"
+	case TimeZoneMoscow:
+		return "moscow"
+	case TimeZoneMuscat:
+		return "muscat"
+	case TimeZoneNewfoundland:
+		return "newfoundland"
+	case TimeZoneSamoa:
+		return "samoa"
+	case TimeZoneSydney:
+		return "sydney"
+	case TimeZoneTehran:
+		return "tehran"
+	case TimeZoneTokyo:
+		return "tokyo"
+	case TimeZoneUsAlaska:
+		return "us_alaska"
+	case TimeZoneUsAtlantic:
+		return "us_atlantic"
+	case TimeZoneUsCentral:
+		return "us_central"
+	case TimeZoneUsEastern:
+		return "us_eastern"
+	case TimeZoneUsHawaii:
+		return "us_hawaii"
+	case TimeZoneUsMountain:
+		return "us_mountain"
+	case TimeZoneUsPacific:
+		return "us_pacific"
+	case TimeZoneOther:
+		return "other"
+	case TimeZoneAuckland:
+		return "auckland"
+	case TimeZoneKathmandu:
+		return "kathmandu"
+	case TimeZoneEuropeWesternWet:
+		return "europe_western_wet"
+	case TimeZoneEuropeCentralCet:
+		return "europe_central_cet"
+	case TimeZoneEuropeEasternEet:
+		return "europe_eastern_eet"
+	case TimeZoneJakarta:
+		return "jakarta"
+	case TimeZonePerth:
+		return "perth"
+	case TimeZoneAdelaide:
+		return "adelaide"
+	case TimeZoneBrisbane:
+		return "brisbane"
+	case TimeZoneTasmania:
+		return "tasmania"
+	case TimeZoneIceland:
+		return "iceland"
+	case TimeZoneAmsterdam:
+		return "amsterdam"
+	case TimeZoneAthens:
+		return "athens"
+	case TimeZoneBarcelona:
+		return "barcelona"
+	case TimeZoneBerlin:
+		return "berlin"
+	case TimeZoneBrussels:
+		return "brussels"
+	case TimeZoneBudapest:
+		return "budapest"
+	case TimeZoneCopenhagen:
+		return "copenhagen"
+	case TimeZoneDublin:
+		return "dublin"
+	case TimeZoneHelsinki:
+		return "helsinki"
+	case TimeZoneLisbon:
+		return "lisbon"
+	case TimeZoneLondon:
+		return "london"
+	case TimeZoneMadrid:
+		return "madrid"
+	case TimeZoneMunich:
+		return "munich"
+	case TimeZoneOslo:
+		return "oslo"
+	case TimeZoneParis:
+		return "paris"
+	case TimeZonePrague:
+		return "prague"
+	case TimeZoneReykjavik:
+		return "reykjavik"
+	case TimeZoneRome:
+		return "rome"
+	case TimeZoneStockholm:
+		return "stockholm"
+	case TimeZoneVienna:
+		return "vienna"
+	case TimeZoneWarsaw:
+		return "warsaw"
+	case TimeZoneZurich:
+		return "zurich"
+	case TimeZoneQuebec:
+		return "quebec"
+	case TimeZoneOntario:
+		return "ontario"
+	case TimeZoneManitoba:
+		return "manitoba"
+	case TimeZoneSaskatchewan:
+		return "saskatchewan"
+	case TimeZoneAlberta:
+		return "alberta"
+	case TimeZoneBritishColumbia:
+		return "british_columbia"
+	case TimeZoneBoise:
+		return "boise"
+	case TimeZoneBoston:
+		return "boston"
+	case TimeZoneChicago:
+		return "chicago"
+	case TimeZoneDallas:
+		return "dallas"
+	case TimeZoneDenver:
+		return "denver"
+	case TimeZoneKansasCity:
+		return "kansas_city"
+	case TimeZoneLasVegas:
+		return "las_vegas"
+	case TimeZoneLosAngeles:
+		return "los_angeles"
+	case TimeZoneMiami:
+		return "miami"
+	case TimeZoneMinneapolis:
+		return "minneapolis"
+	case TimeZoneNewYork:
+		return "new_york"
+	case TimeZoneNewOrleans:
+		return "new_orleans"
+	case TimeZonePhoenix:
+		return "phoenix"
+	case TimeZoneSantaFe:
+		return "santa_fe"
+	case TimeZoneSeattle:
+		return "seattle"
+	case TimeZoneWashingtonDc:
+		return "washington_dc"
+	case TimeZoneUsArizona:
+		return "us_arizona"
+	case TimeZoneChita:
+		return "chita"
+	case TimeZoneEkaterinburg:
+		return "ekaterinburg"
+	case TimeZoneIrkutsk:
+		return "irkutsk"
+	case TimeZoneKaliningrad:
+		return "kaliningrad"
+	case TimeZoneKrasnoyarsk:
+		return "krasnoyarsk"
+	case TimeZoneNovosibirsk:
+		return "novosibirsk"
+	case TimeZonePetropavlovskKamchatskiy:
+		return "petropavlovsk_kamchatskiy"
+	case TimeZoneSamara:
+		return "samara"
+	case TimeZoneVladivostok:
+		return "vladivostok"
+	case TimeZoneMexicoCentral:
+		return "mexico_central"
+	case TimeZoneMexicoMountain:
+		return "mexico_mountain"
+	case TimeZoneMexicoPacific:
+		return "mexico_pacific"
+	case TimeZoneCapeTown:
+		return "cape_town"
+	case TimeZoneWinkhoek:
+		return "winkhoek"
+	case TimeZoneLagos:
+		return "lagos"
+	case TimeZoneRiyahd:
+		return "riyahd"
+	case TimeZoneVenezuela:
+		return "venezuela"
+	case TimeZoneAustraliaLh:
+		return "australia_lh"
+	case TimeZoneSantiago:
+		return "santiago"
+	case TimeZoneManual:
+		return "manual"
+	case TimeZoneAutomatic:
+		return "automatic"
+	default:
+		return "TimeZoneInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotimezone = func() map[string]TimeZone {
-	m := make(map[string]TimeZone)
-	for t, str := range timezonetostrs {
-		m[str] = TimeZone(t)
-	}
-	return m
-}()
 
 // FromString parse string into TimeZone constant it's represent, return TimeZoneInvalid if not found.
 func TimeZoneFromString(s string) TimeZone {
-	val, ok := strtotimezone[s]
-	if !ok {
-		return strtotimezone["invalid"]
+	switch s {
+	case "almaty":
+		return TimeZoneAlmaty
+	case "bangkok":
+		return TimeZoneBangkok
+	case "bombay":
+		return TimeZoneBombay
+	case "brasilia":
+		return TimeZoneBrasilia
+	case "cairo":
+		return TimeZoneCairo
+	case "cape_verde_is":
+		return TimeZoneCapeVerdeIs
+	case "darwin":
+		return TimeZoneDarwin
+	case "eniwetok":
+		return TimeZoneEniwetok
+	case "fiji":
+		return TimeZoneFiji
+	case "hong_kong":
+		return TimeZoneHongKong
+	case "islamabad":
+		return TimeZoneIslamabad
+	case "kabul":
+		return TimeZoneKabul
+	case "magadan":
+		return TimeZoneMagadan
+	case "mid_atlantic":
+		return TimeZoneMidAtlantic
+	case "moscow":
+		return TimeZoneMoscow
+	case "muscat":
+		return TimeZoneMuscat
+	case "newfoundland":
+		return TimeZoneNewfoundland
+	case "samoa":
+		return TimeZoneSamoa
+	case "sydney":
+		return TimeZoneSydney
+	case "tehran":
+		return TimeZoneTehran
+	case "tokyo":
+		return TimeZoneTokyo
+	case "us_alaska":
+		return TimeZoneUsAlaska
+	case "us_atlantic":
+		return TimeZoneUsAtlantic
+	case "us_central":
+		return TimeZoneUsCentral
+	case "us_eastern":
+		return TimeZoneUsEastern
+	case "us_hawaii":
+		return TimeZoneUsHawaii
+	case "us_mountain":
+		return TimeZoneUsMountain
+	case "us_pacific":
+		return TimeZoneUsPacific
+	case "other":
+		return TimeZoneOther
+	case "auckland":
+		return TimeZoneAuckland
+	case "kathmandu":
+		return TimeZoneKathmandu
+	case "europe_western_wet":
+		return TimeZoneEuropeWesternWet
+	case "europe_central_cet":
+		return TimeZoneEuropeCentralCet
+	case "europe_eastern_eet":
+		return TimeZoneEuropeEasternEet
+	case "jakarta":
+		return TimeZoneJakarta
+	case "perth":
+		return TimeZonePerth
+	case "adelaide":
+		return TimeZoneAdelaide
+	case "brisbane":
+		return TimeZoneBrisbane
+	case "tasmania":
+		return TimeZoneTasmania
+	case "iceland":
+		return TimeZoneIceland
+	case "amsterdam":
+		return TimeZoneAmsterdam
+	case "athens":
+		return TimeZoneAthens
+	case "barcelona":
+		return TimeZoneBarcelona
+	case "berlin":
+		return TimeZoneBerlin
+	case "brussels":
+		return TimeZoneBrussels
+	case "budapest":
+		return TimeZoneBudapest
+	case "copenhagen":
+		return TimeZoneCopenhagen
+	case "dublin":
+		return TimeZoneDublin
+	case "helsinki":
+		return TimeZoneHelsinki
+	case "lisbon":
+		return TimeZoneLisbon
+	case "london":
+		return TimeZoneLondon
+	case "madrid":
+		return TimeZoneMadrid
+	case "munich":
+		return TimeZoneMunich
+	case "oslo":
+		return TimeZoneOslo
+	case "paris":
+		return TimeZoneParis
+	case "prague":
+		return TimeZonePrague
+	case "reykjavik":
+		return TimeZoneReykjavik
+	case "rome":
+		return TimeZoneRome
+	case "stockholm":
+		return TimeZoneStockholm
+	case "vienna":
+		return TimeZoneVienna
+	case "warsaw":
+		return TimeZoneWarsaw
+	case "zurich":
+		return TimeZoneZurich
+	case "quebec":
+		return TimeZoneQuebec
+	case "ontario":
+		return TimeZoneOntario
+	case "manitoba":
+		return TimeZoneManitoba
+	case "saskatchewan":
+		return TimeZoneSaskatchewan
+	case "alberta":
+		return TimeZoneAlberta
+	case "british_columbia":
+		return TimeZoneBritishColumbia
+	case "boise":
+		return TimeZoneBoise
+	case "boston":
+		return TimeZoneBoston
+	case "chicago":
+		return TimeZoneChicago
+	case "dallas":
+		return TimeZoneDallas
+	case "denver":
+		return TimeZoneDenver
+	case "kansas_city":
+		return TimeZoneKansasCity
+	case "las_vegas":
+		return TimeZoneLasVegas
+	case "los_angeles":
+		return TimeZoneLosAngeles
+	case "miami":
+		return TimeZoneMiami
+	case "minneapolis":
+		return TimeZoneMinneapolis
+	case "new_york":
+		return TimeZoneNewYork
+	case "new_orleans":
+		return TimeZoneNewOrleans
+	case "phoenix":
+		return TimeZonePhoenix
+	case "santa_fe":
+		return TimeZoneSantaFe
+	case "seattle":
+		return TimeZoneSeattle
+	case "washington_dc":
+		return TimeZoneWashingtonDc
+	case "us_arizona":
+		return TimeZoneUsArizona
+	case "chita":
+		return TimeZoneChita
+	case "ekaterinburg":
+		return TimeZoneEkaterinburg
+	case "irkutsk":
+		return TimeZoneIrkutsk
+	case "kaliningrad":
+		return TimeZoneKaliningrad
+	case "krasnoyarsk":
+		return TimeZoneKrasnoyarsk
+	case "novosibirsk":
+		return TimeZoneNovosibirsk
+	case "petropavlovsk_kamchatskiy":
+		return TimeZonePetropavlovskKamchatskiy
+	case "samara":
+		return TimeZoneSamara
+	case "vladivostok":
+		return TimeZoneVladivostok
+	case "mexico_central":
+		return TimeZoneMexicoCentral
+	case "mexico_mountain":
+		return TimeZoneMexicoMountain
+	case "mexico_pacific":
+		return TimeZoneMexicoPacific
+	case "cape_town":
+		return TimeZoneCapeTown
+	case "winkhoek":
+		return TimeZoneWinkhoek
+	case "lagos":
+		return TimeZoneLagos
+	case "riyahd":
+		return TimeZoneRiyahd
+	case "venezuela":
+		return TimeZoneVenezuela
+	case "australia_lh":
+		return TimeZoneAustraliaLh
+	case "santiago":
+		return TimeZoneSantiago
+	case "manual":
+		return TimeZoneManual
+	case "automatic":
+		return TimeZoneAutomatic
+	default:
+		return TimeZoneInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTimeZone() []TimeZone {
-	vs := make([]TimeZone, 0, len(timezonetostrs))
-	for i := range timezonetostrs {
-		vs = append(vs, TimeZone(i))
+	return []TimeZone{
+		TimeZoneAlmaty,
+		TimeZoneBangkok,
+		TimeZoneBombay,
+		TimeZoneBrasilia,
+		TimeZoneCairo,
+		TimeZoneCapeVerdeIs,
+		TimeZoneDarwin,
+		TimeZoneEniwetok,
+		TimeZoneFiji,
+		TimeZoneHongKong,
+		TimeZoneIslamabad,
+		TimeZoneKabul,
+		TimeZoneMagadan,
+		TimeZoneMidAtlantic,
+		TimeZoneMoscow,
+		TimeZoneMuscat,
+		TimeZoneNewfoundland,
+		TimeZoneSamoa,
+		TimeZoneSydney,
+		TimeZoneTehran,
+		TimeZoneTokyo,
+		TimeZoneUsAlaska,
+		TimeZoneUsAtlantic,
+		TimeZoneUsCentral,
+		TimeZoneUsEastern,
+		TimeZoneUsHawaii,
+		TimeZoneUsMountain,
+		TimeZoneUsPacific,
+		TimeZoneOther,
+		TimeZoneAuckland,
+		TimeZoneKathmandu,
+		TimeZoneEuropeWesternWet,
+		TimeZoneEuropeCentralCet,
+		TimeZoneEuropeEasternEet,
+		TimeZoneJakarta,
+		TimeZonePerth,
+		TimeZoneAdelaide,
+		TimeZoneBrisbane,
+		TimeZoneTasmania,
+		TimeZoneIceland,
+		TimeZoneAmsterdam,
+		TimeZoneAthens,
+		TimeZoneBarcelona,
+		TimeZoneBerlin,
+		TimeZoneBrussels,
+		TimeZoneBudapest,
+		TimeZoneCopenhagen,
+		TimeZoneDublin,
+		TimeZoneHelsinki,
+		TimeZoneLisbon,
+		TimeZoneLondon,
+		TimeZoneMadrid,
+		TimeZoneMunich,
+		TimeZoneOslo,
+		TimeZoneParis,
+		TimeZonePrague,
+		TimeZoneReykjavik,
+		TimeZoneRome,
+		TimeZoneStockholm,
+		TimeZoneVienna,
+		TimeZoneWarsaw,
+		TimeZoneZurich,
+		TimeZoneQuebec,
+		TimeZoneOntario,
+		TimeZoneManitoba,
+		TimeZoneSaskatchewan,
+		TimeZoneAlberta,
+		TimeZoneBritishColumbia,
+		TimeZoneBoise,
+		TimeZoneBoston,
+		TimeZoneChicago,
+		TimeZoneDallas,
+		TimeZoneDenver,
+		TimeZoneKansasCity,
+		TimeZoneLasVegas,
+		TimeZoneLosAngeles,
+		TimeZoneMiami,
+		TimeZoneMinneapolis,
+		TimeZoneNewYork,
+		TimeZoneNewOrleans,
+		TimeZonePhoenix,
+		TimeZoneSantaFe,
+		TimeZoneSeattle,
+		TimeZoneWashingtonDc,
+		TimeZoneUsArizona,
+		TimeZoneChita,
+		TimeZoneEkaterinburg,
+		TimeZoneIrkutsk,
+		TimeZoneKaliningrad,
+		TimeZoneKrasnoyarsk,
+		TimeZoneNovosibirsk,
+		TimeZonePetropavlovskKamchatskiy,
+		TimeZoneSamara,
+		TimeZoneVladivostok,
+		TimeZoneMexicoCentral,
+		TimeZoneMexicoMountain,
+		TimeZoneMexicoPacific,
+		TimeZoneCapeTown,
+		TimeZoneWinkhoek,
+		TimeZoneLagos,
+		TimeZoneRiyahd,
+		TimeZoneVenezuela,
+		TimeZoneAustraliaLh,
+		TimeZoneSantiago,
+		TimeZoneManual,
+		TimeZoneAutomatic,
 	}
-	return vs
 }

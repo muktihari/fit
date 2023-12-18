@@ -48,77 +48,196 @@ const (
 	HipStabilityExerciseNameWeightedStandingRearLegRaise      HipStabilityExerciseName = 31
 	HipStabilityExerciseNameSupineHipInternalRotation         HipStabilityExerciseName = 32
 	HipStabilityExerciseNameWeightedSupineHipInternalRotation HipStabilityExerciseName = 33
-	HipStabilityExerciseNameInvalid                           HipStabilityExerciseName = 0xFFFF // INVALID
+	HipStabilityExerciseNameInvalid                           HipStabilityExerciseName = 0xFFFF
 )
 
-var hipstabilityexercisenametostrs = map[HipStabilityExerciseName]string{
-	HipStabilityExerciseNameBandSideLyingLegRaise:             "band_side_lying_leg_raise",
-	HipStabilityExerciseNameDeadBug:                           "dead_bug",
-	HipStabilityExerciseNameWeightedDeadBug:                   "weighted_dead_bug",
-	HipStabilityExerciseNameExternalHipRaise:                  "external_hip_raise",
-	HipStabilityExerciseNameWeightedExternalHipRaise:          "weighted_external_hip_raise",
-	HipStabilityExerciseNameFireHydrantKicks:                  "fire_hydrant_kicks",
-	HipStabilityExerciseNameWeightedFireHydrantKicks:          "weighted_fire_hydrant_kicks",
-	HipStabilityExerciseNameHipCircles:                        "hip_circles",
-	HipStabilityExerciseNameWeightedHipCircles:                "weighted_hip_circles",
-	HipStabilityExerciseNameInnerThighLift:                    "inner_thigh_lift",
-	HipStabilityExerciseNameWeightedInnerThighLift:            "weighted_inner_thigh_lift",
-	HipStabilityExerciseNameLateralWalksWithBandAtAnkles:      "lateral_walks_with_band_at_ankles",
-	HipStabilityExerciseNamePretzelSideKick:                   "pretzel_side_kick",
-	HipStabilityExerciseNameWeightedPretzelSideKick:           "weighted_pretzel_side_kick",
-	HipStabilityExerciseNameProneHipInternalRotation:          "prone_hip_internal_rotation",
-	HipStabilityExerciseNameWeightedProneHipInternalRotation:  "weighted_prone_hip_internal_rotation",
-	HipStabilityExerciseNameQuadruped:                         "quadruped",
-	HipStabilityExerciseNameQuadrupedHipExtension:             "quadruped_hip_extension",
-	HipStabilityExerciseNameWeightedQuadrupedHipExtension:     "weighted_quadruped_hip_extension",
-	HipStabilityExerciseNameQuadrupedWithLegLift:              "quadruped_with_leg_lift",
-	HipStabilityExerciseNameWeightedQuadrupedWithLegLift:      "weighted_quadruped_with_leg_lift",
-	HipStabilityExerciseNameSideLyingLegRaise:                 "side_lying_leg_raise",
-	HipStabilityExerciseNameWeightedSideLyingLegRaise:         "weighted_side_lying_leg_raise",
-	HipStabilityExerciseNameSlidingHipAdduction:               "sliding_hip_adduction",
-	HipStabilityExerciseNameWeightedSlidingHipAdduction:       "weighted_sliding_hip_adduction",
-	HipStabilityExerciseNameStandingAdduction:                 "standing_adduction",
-	HipStabilityExerciseNameWeightedStandingAdduction:         "weighted_standing_adduction",
-	HipStabilityExerciseNameStandingCableHipAbduction:         "standing_cable_hip_abduction",
-	HipStabilityExerciseNameStandingHipAbduction:              "standing_hip_abduction",
-	HipStabilityExerciseNameWeightedStandingHipAbduction:      "weighted_standing_hip_abduction",
-	HipStabilityExerciseNameStandingRearLegRaise:              "standing_rear_leg_raise",
-	HipStabilityExerciseNameWeightedStandingRearLegRaise:      "weighted_standing_rear_leg_raise",
-	HipStabilityExerciseNameSupineHipInternalRotation:         "supine_hip_internal_rotation",
-	HipStabilityExerciseNameWeightedSupineHipInternalRotation: "weighted_supine_hip_internal_rotation",
-	HipStabilityExerciseNameInvalid:                           "invalid",
-}
-
 func (h HipStabilityExerciseName) String() string {
-	val, ok := hipstabilityexercisenametostrs[h]
-	if !ok {
-		return strconv.FormatUint(uint64(h), 10)
+	switch h {
+	case HipStabilityExerciseNameBandSideLyingLegRaise:
+		return "band_side_lying_leg_raise"
+	case HipStabilityExerciseNameDeadBug:
+		return "dead_bug"
+	case HipStabilityExerciseNameWeightedDeadBug:
+		return "weighted_dead_bug"
+	case HipStabilityExerciseNameExternalHipRaise:
+		return "external_hip_raise"
+	case HipStabilityExerciseNameWeightedExternalHipRaise:
+		return "weighted_external_hip_raise"
+	case HipStabilityExerciseNameFireHydrantKicks:
+		return "fire_hydrant_kicks"
+	case HipStabilityExerciseNameWeightedFireHydrantKicks:
+		return "weighted_fire_hydrant_kicks"
+	case HipStabilityExerciseNameHipCircles:
+		return "hip_circles"
+	case HipStabilityExerciseNameWeightedHipCircles:
+		return "weighted_hip_circles"
+	case HipStabilityExerciseNameInnerThighLift:
+		return "inner_thigh_lift"
+	case HipStabilityExerciseNameWeightedInnerThighLift:
+		return "weighted_inner_thigh_lift"
+	case HipStabilityExerciseNameLateralWalksWithBandAtAnkles:
+		return "lateral_walks_with_band_at_ankles"
+	case HipStabilityExerciseNamePretzelSideKick:
+		return "pretzel_side_kick"
+	case HipStabilityExerciseNameWeightedPretzelSideKick:
+		return "weighted_pretzel_side_kick"
+	case HipStabilityExerciseNameProneHipInternalRotation:
+		return "prone_hip_internal_rotation"
+	case HipStabilityExerciseNameWeightedProneHipInternalRotation:
+		return "weighted_prone_hip_internal_rotation"
+	case HipStabilityExerciseNameQuadruped:
+		return "quadruped"
+	case HipStabilityExerciseNameQuadrupedHipExtension:
+		return "quadruped_hip_extension"
+	case HipStabilityExerciseNameWeightedQuadrupedHipExtension:
+		return "weighted_quadruped_hip_extension"
+	case HipStabilityExerciseNameQuadrupedWithLegLift:
+		return "quadruped_with_leg_lift"
+	case HipStabilityExerciseNameWeightedQuadrupedWithLegLift:
+		return "weighted_quadruped_with_leg_lift"
+	case HipStabilityExerciseNameSideLyingLegRaise:
+		return "side_lying_leg_raise"
+	case HipStabilityExerciseNameWeightedSideLyingLegRaise:
+		return "weighted_side_lying_leg_raise"
+	case HipStabilityExerciseNameSlidingHipAdduction:
+		return "sliding_hip_adduction"
+	case HipStabilityExerciseNameWeightedSlidingHipAdduction:
+		return "weighted_sliding_hip_adduction"
+	case HipStabilityExerciseNameStandingAdduction:
+		return "standing_adduction"
+	case HipStabilityExerciseNameWeightedStandingAdduction:
+		return "weighted_standing_adduction"
+	case HipStabilityExerciseNameStandingCableHipAbduction:
+		return "standing_cable_hip_abduction"
+	case HipStabilityExerciseNameStandingHipAbduction:
+		return "standing_hip_abduction"
+	case HipStabilityExerciseNameWeightedStandingHipAbduction:
+		return "weighted_standing_hip_abduction"
+	case HipStabilityExerciseNameStandingRearLegRaise:
+		return "standing_rear_leg_raise"
+	case HipStabilityExerciseNameWeightedStandingRearLegRaise:
+		return "weighted_standing_rear_leg_raise"
+	case HipStabilityExerciseNameSupineHipInternalRotation:
+		return "supine_hip_internal_rotation"
+	case HipStabilityExerciseNameWeightedSupineHipInternalRotation:
+		return "weighted_supine_hip_internal_rotation"
+	default:
+		return "HipStabilityExerciseNameInvalid(" + strconv.FormatUint(uint64(h), 10) + ")"
 	}
-	return val
 }
-
-var strtohipstabilityexercisename = func() map[string]HipStabilityExerciseName {
-	m := make(map[string]HipStabilityExerciseName)
-	for t, str := range hipstabilityexercisenametostrs {
-		m[str] = HipStabilityExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into HipStabilityExerciseName constant it's represent, return HipStabilityExerciseNameInvalid if not found.
 func HipStabilityExerciseNameFromString(s string) HipStabilityExerciseName {
-	val, ok := strtohipstabilityexercisename[s]
-	if !ok {
-		return strtohipstabilityexercisename["invalid"]
+	switch s {
+	case "band_side_lying_leg_raise":
+		return HipStabilityExerciseNameBandSideLyingLegRaise
+	case "dead_bug":
+		return HipStabilityExerciseNameDeadBug
+	case "weighted_dead_bug":
+		return HipStabilityExerciseNameWeightedDeadBug
+	case "external_hip_raise":
+		return HipStabilityExerciseNameExternalHipRaise
+	case "weighted_external_hip_raise":
+		return HipStabilityExerciseNameWeightedExternalHipRaise
+	case "fire_hydrant_kicks":
+		return HipStabilityExerciseNameFireHydrantKicks
+	case "weighted_fire_hydrant_kicks":
+		return HipStabilityExerciseNameWeightedFireHydrantKicks
+	case "hip_circles":
+		return HipStabilityExerciseNameHipCircles
+	case "weighted_hip_circles":
+		return HipStabilityExerciseNameWeightedHipCircles
+	case "inner_thigh_lift":
+		return HipStabilityExerciseNameInnerThighLift
+	case "weighted_inner_thigh_lift":
+		return HipStabilityExerciseNameWeightedInnerThighLift
+	case "lateral_walks_with_band_at_ankles":
+		return HipStabilityExerciseNameLateralWalksWithBandAtAnkles
+	case "pretzel_side_kick":
+		return HipStabilityExerciseNamePretzelSideKick
+	case "weighted_pretzel_side_kick":
+		return HipStabilityExerciseNameWeightedPretzelSideKick
+	case "prone_hip_internal_rotation":
+		return HipStabilityExerciseNameProneHipInternalRotation
+	case "weighted_prone_hip_internal_rotation":
+		return HipStabilityExerciseNameWeightedProneHipInternalRotation
+	case "quadruped":
+		return HipStabilityExerciseNameQuadruped
+	case "quadruped_hip_extension":
+		return HipStabilityExerciseNameQuadrupedHipExtension
+	case "weighted_quadruped_hip_extension":
+		return HipStabilityExerciseNameWeightedQuadrupedHipExtension
+	case "quadruped_with_leg_lift":
+		return HipStabilityExerciseNameQuadrupedWithLegLift
+	case "weighted_quadruped_with_leg_lift":
+		return HipStabilityExerciseNameWeightedQuadrupedWithLegLift
+	case "side_lying_leg_raise":
+		return HipStabilityExerciseNameSideLyingLegRaise
+	case "weighted_side_lying_leg_raise":
+		return HipStabilityExerciseNameWeightedSideLyingLegRaise
+	case "sliding_hip_adduction":
+		return HipStabilityExerciseNameSlidingHipAdduction
+	case "weighted_sliding_hip_adduction":
+		return HipStabilityExerciseNameWeightedSlidingHipAdduction
+	case "standing_adduction":
+		return HipStabilityExerciseNameStandingAdduction
+	case "weighted_standing_adduction":
+		return HipStabilityExerciseNameWeightedStandingAdduction
+	case "standing_cable_hip_abduction":
+		return HipStabilityExerciseNameStandingCableHipAbduction
+	case "standing_hip_abduction":
+		return HipStabilityExerciseNameStandingHipAbduction
+	case "weighted_standing_hip_abduction":
+		return HipStabilityExerciseNameWeightedStandingHipAbduction
+	case "standing_rear_leg_raise":
+		return HipStabilityExerciseNameStandingRearLegRaise
+	case "weighted_standing_rear_leg_raise":
+		return HipStabilityExerciseNameWeightedStandingRearLegRaise
+	case "supine_hip_internal_rotation":
+		return HipStabilityExerciseNameSupineHipInternalRotation
+	case "weighted_supine_hip_internal_rotation":
+		return HipStabilityExerciseNameWeightedSupineHipInternalRotation
+	default:
+		return HipStabilityExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHipStabilityExerciseName() []HipStabilityExerciseName {
-	vs := make([]HipStabilityExerciseName, 0, len(hipstabilityexercisenametostrs))
-	for i := range hipstabilityexercisenametostrs {
-		vs = append(vs, HipStabilityExerciseName(i))
+	return []HipStabilityExerciseName{
+		HipStabilityExerciseNameBandSideLyingLegRaise,
+		HipStabilityExerciseNameDeadBug,
+		HipStabilityExerciseNameWeightedDeadBug,
+		HipStabilityExerciseNameExternalHipRaise,
+		HipStabilityExerciseNameWeightedExternalHipRaise,
+		HipStabilityExerciseNameFireHydrantKicks,
+		HipStabilityExerciseNameWeightedFireHydrantKicks,
+		HipStabilityExerciseNameHipCircles,
+		HipStabilityExerciseNameWeightedHipCircles,
+		HipStabilityExerciseNameInnerThighLift,
+		HipStabilityExerciseNameWeightedInnerThighLift,
+		HipStabilityExerciseNameLateralWalksWithBandAtAnkles,
+		HipStabilityExerciseNamePretzelSideKick,
+		HipStabilityExerciseNameWeightedPretzelSideKick,
+		HipStabilityExerciseNameProneHipInternalRotation,
+		HipStabilityExerciseNameWeightedProneHipInternalRotation,
+		HipStabilityExerciseNameQuadruped,
+		HipStabilityExerciseNameQuadrupedHipExtension,
+		HipStabilityExerciseNameWeightedQuadrupedHipExtension,
+		HipStabilityExerciseNameQuadrupedWithLegLift,
+		HipStabilityExerciseNameWeightedQuadrupedWithLegLift,
+		HipStabilityExerciseNameSideLyingLegRaise,
+		HipStabilityExerciseNameWeightedSideLyingLegRaise,
+		HipStabilityExerciseNameSlidingHipAdduction,
+		HipStabilityExerciseNameWeightedSlidingHipAdduction,
+		HipStabilityExerciseNameStandingAdduction,
+		HipStabilityExerciseNameWeightedStandingAdduction,
+		HipStabilityExerciseNameStandingCableHipAbduction,
+		HipStabilityExerciseNameStandingHipAbduction,
+		HipStabilityExerciseNameWeightedStandingHipAbduction,
+		HipStabilityExerciseNameStandingRearLegRaise,
+		HipStabilityExerciseNameWeightedStandingRearLegRaise,
+		HipStabilityExerciseNameSupineHipInternalRotation,
+		HipStabilityExerciseNameWeightedSupineHipInternalRotation,
 	}
-	return vs
 }

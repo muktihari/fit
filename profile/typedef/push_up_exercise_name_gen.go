@@ -93,122 +93,421 @@ const (
 	PushUpExerciseNameWeightedRingPushUp                         PushUpExerciseName = 76
 	PushUpExerciseNamePushUp                                     PushUpExerciseName = 77
 	PushUpExerciseNamePilatesPushup                              PushUpExerciseName = 78
-	PushUpExerciseNameInvalid                                    PushUpExerciseName = 0xFFFF // INVALID
+	PushUpExerciseNameInvalid                                    PushUpExerciseName = 0xFFFF
 )
 
-var pushupexercisenametostrs = map[PushUpExerciseName]string{
-	PushUpExerciseNameChestPressWithBand:                         "chest_press_with_band",
-	PushUpExerciseNameAlternatingStaggeredPushUp:                 "alternating_staggered_push_up",
-	PushUpExerciseNameWeightedAlternatingStaggeredPushUp:         "weighted_alternating_staggered_push_up",
-	PushUpExerciseNameAlternatingHandsMedicineBallPushUp:         "alternating_hands_medicine_ball_push_up",
-	PushUpExerciseNameWeightedAlternatingHandsMedicineBallPushUp: "weighted_alternating_hands_medicine_ball_push_up",
-	PushUpExerciseNameBosuBallPushUp:                             "bosu_ball_push_up",
-	PushUpExerciseNameWeightedBosuBallPushUp:                     "weighted_bosu_ball_push_up",
-	PushUpExerciseNameClappingPushUp:                             "clapping_push_up",
-	PushUpExerciseNameWeightedClappingPushUp:                     "weighted_clapping_push_up",
-	PushUpExerciseNameCloseGripMedicineBallPushUp:                "close_grip_medicine_ball_push_up",
-	PushUpExerciseNameWeightedCloseGripMedicineBallPushUp:        "weighted_close_grip_medicine_ball_push_up",
-	PushUpExerciseNameCloseHandsPushUp:                           "close_hands_push_up",
-	PushUpExerciseNameWeightedCloseHandsPushUp:                   "weighted_close_hands_push_up",
-	PushUpExerciseNameDeclinePushUp:                              "decline_push_up",
-	PushUpExerciseNameWeightedDeclinePushUp:                      "weighted_decline_push_up",
-	PushUpExerciseNameDiamondPushUp:                              "diamond_push_up",
-	PushUpExerciseNameWeightedDiamondPushUp:                      "weighted_diamond_push_up",
-	PushUpExerciseNameExplosiveCrossoverPushUp:                   "explosive_crossover_push_up",
-	PushUpExerciseNameWeightedExplosiveCrossoverPushUp:           "weighted_explosive_crossover_push_up",
-	PushUpExerciseNameExplosivePushUp:                            "explosive_push_up",
-	PushUpExerciseNameWeightedExplosivePushUp:                    "weighted_explosive_push_up",
-	PushUpExerciseNameFeetElevatedSideToSidePushUp:               "feet_elevated_side_to_side_push_up",
-	PushUpExerciseNameWeightedFeetElevatedSideToSidePushUp:       "weighted_feet_elevated_side_to_side_push_up",
-	PushUpExerciseNameHandReleasePushUp:                          "hand_release_push_up",
-	PushUpExerciseNameWeightedHandReleasePushUp:                  "weighted_hand_release_push_up",
-	PushUpExerciseNameHandstandPushUp:                            "handstand_push_up",
-	PushUpExerciseNameWeightedHandstandPushUp:                    "weighted_handstand_push_up",
-	PushUpExerciseNameInclinePushUp:                              "incline_push_up",
-	PushUpExerciseNameWeightedInclinePushUp:                      "weighted_incline_push_up",
-	PushUpExerciseNameIsometricExplosivePushUp:                   "isometric_explosive_push_up",
-	PushUpExerciseNameWeightedIsometricExplosivePushUp:           "weighted_isometric_explosive_push_up",
-	PushUpExerciseNameJudoPushUp:                                 "judo_push_up",
-	PushUpExerciseNameWeightedJudoPushUp:                         "weighted_judo_push_up",
-	PushUpExerciseNameKneelingPushUp:                             "kneeling_push_up",
-	PushUpExerciseNameWeightedKneelingPushUp:                     "weighted_kneeling_push_up",
-	PushUpExerciseNameMedicineBallChestPass:                      "medicine_ball_chest_pass",
-	PushUpExerciseNameMedicineBallPushUp:                         "medicine_ball_push_up",
-	PushUpExerciseNameWeightedMedicineBallPushUp:                 "weighted_medicine_ball_push_up",
-	PushUpExerciseNameOneArmPushUp:                               "one_arm_push_up",
-	PushUpExerciseNameWeightedOneArmPushUp:                       "weighted_one_arm_push_up",
-	PushUpExerciseNameWeightedPushUp:                             "weighted_push_up",
-	PushUpExerciseNamePushUpAndRow:                               "push_up_and_row",
-	PushUpExerciseNameWeightedPushUpAndRow:                       "weighted_push_up_and_row",
-	PushUpExerciseNamePushUpPlus:                                 "push_up_plus",
-	PushUpExerciseNameWeightedPushUpPlus:                         "weighted_push_up_plus",
-	PushUpExerciseNamePushUpWithFeetOnSwissBall:                  "push_up_with_feet_on_swiss_ball",
-	PushUpExerciseNameWeightedPushUpWithFeetOnSwissBall:          "weighted_push_up_with_feet_on_swiss_ball",
-	PushUpExerciseNamePushUpWithOneHandOnMedicineBall:            "push_up_with_one_hand_on_medicine_ball",
-	PushUpExerciseNameWeightedPushUpWithOneHandOnMedicineBall:    "weighted_push_up_with_one_hand_on_medicine_ball",
-	PushUpExerciseNameShoulderPushUp:                             "shoulder_push_up",
-	PushUpExerciseNameWeightedShoulderPushUp:                     "weighted_shoulder_push_up",
-	PushUpExerciseNameSingleArmMedicineBallPushUp:                "single_arm_medicine_ball_push_up",
-	PushUpExerciseNameWeightedSingleArmMedicineBallPushUp:        "weighted_single_arm_medicine_ball_push_up",
-	PushUpExerciseNameSpidermanPushUp:                            "spiderman_push_up",
-	PushUpExerciseNameWeightedSpidermanPushUp:                    "weighted_spiderman_push_up",
-	PushUpExerciseNameStackedFeetPushUp:                          "stacked_feet_push_up",
-	PushUpExerciseNameWeightedStackedFeetPushUp:                  "weighted_stacked_feet_push_up",
-	PushUpExerciseNameStaggeredHandsPushUp:                       "staggered_hands_push_up",
-	PushUpExerciseNameWeightedStaggeredHandsPushUp:               "weighted_staggered_hands_push_up",
-	PushUpExerciseNameSuspendedPushUp:                            "suspended_push_up",
-	PushUpExerciseNameWeightedSuspendedPushUp:                    "weighted_suspended_push_up",
-	PushUpExerciseNameSwissBallPushUp:                            "swiss_ball_push_up",
-	PushUpExerciseNameWeightedSwissBallPushUp:                    "weighted_swiss_ball_push_up",
-	PushUpExerciseNameSwissBallPushUpPlus:                        "swiss_ball_push_up_plus",
-	PushUpExerciseNameWeightedSwissBallPushUpPlus:                "weighted_swiss_ball_push_up_plus",
-	PushUpExerciseNameTPushUp:                                    "t_push_up",
-	PushUpExerciseNameWeightedTPushUp:                            "weighted_t_push_up",
-	PushUpExerciseNameTripleStopPushUp:                           "triple_stop_push_up",
-	PushUpExerciseNameWeightedTripleStopPushUp:                   "weighted_triple_stop_push_up",
-	PushUpExerciseNameWideHandsPushUp:                            "wide_hands_push_up",
-	PushUpExerciseNameWeightedWideHandsPushUp:                    "weighted_wide_hands_push_up",
-	PushUpExerciseNameParalletteHandstandPushUp:                  "parallette_handstand_push_up",
-	PushUpExerciseNameWeightedParalletteHandstandPushUp:          "weighted_parallette_handstand_push_up",
-	PushUpExerciseNameRingHandstandPushUp:                        "ring_handstand_push_up",
-	PushUpExerciseNameWeightedRingHandstandPushUp:                "weighted_ring_handstand_push_up",
-	PushUpExerciseNameRingPushUp:                                 "ring_push_up",
-	PushUpExerciseNameWeightedRingPushUp:                         "weighted_ring_push_up",
-	PushUpExerciseNamePushUp:                                     "push_up",
-	PushUpExerciseNamePilatesPushup:                              "pilates_pushup",
-	PushUpExerciseNameInvalid:                                    "invalid",
-}
-
 func (p PushUpExerciseName) String() string {
-	val, ok := pushupexercisenametostrs[p]
-	if !ok {
-		return strconv.FormatUint(uint64(p), 10)
+	switch p {
+	case PushUpExerciseNameChestPressWithBand:
+		return "chest_press_with_band"
+	case PushUpExerciseNameAlternatingStaggeredPushUp:
+		return "alternating_staggered_push_up"
+	case PushUpExerciseNameWeightedAlternatingStaggeredPushUp:
+		return "weighted_alternating_staggered_push_up"
+	case PushUpExerciseNameAlternatingHandsMedicineBallPushUp:
+		return "alternating_hands_medicine_ball_push_up"
+	case PushUpExerciseNameWeightedAlternatingHandsMedicineBallPushUp:
+		return "weighted_alternating_hands_medicine_ball_push_up"
+	case PushUpExerciseNameBosuBallPushUp:
+		return "bosu_ball_push_up"
+	case PushUpExerciseNameWeightedBosuBallPushUp:
+		return "weighted_bosu_ball_push_up"
+	case PushUpExerciseNameClappingPushUp:
+		return "clapping_push_up"
+	case PushUpExerciseNameWeightedClappingPushUp:
+		return "weighted_clapping_push_up"
+	case PushUpExerciseNameCloseGripMedicineBallPushUp:
+		return "close_grip_medicine_ball_push_up"
+	case PushUpExerciseNameWeightedCloseGripMedicineBallPushUp:
+		return "weighted_close_grip_medicine_ball_push_up"
+	case PushUpExerciseNameCloseHandsPushUp:
+		return "close_hands_push_up"
+	case PushUpExerciseNameWeightedCloseHandsPushUp:
+		return "weighted_close_hands_push_up"
+	case PushUpExerciseNameDeclinePushUp:
+		return "decline_push_up"
+	case PushUpExerciseNameWeightedDeclinePushUp:
+		return "weighted_decline_push_up"
+	case PushUpExerciseNameDiamondPushUp:
+		return "diamond_push_up"
+	case PushUpExerciseNameWeightedDiamondPushUp:
+		return "weighted_diamond_push_up"
+	case PushUpExerciseNameExplosiveCrossoverPushUp:
+		return "explosive_crossover_push_up"
+	case PushUpExerciseNameWeightedExplosiveCrossoverPushUp:
+		return "weighted_explosive_crossover_push_up"
+	case PushUpExerciseNameExplosivePushUp:
+		return "explosive_push_up"
+	case PushUpExerciseNameWeightedExplosivePushUp:
+		return "weighted_explosive_push_up"
+	case PushUpExerciseNameFeetElevatedSideToSidePushUp:
+		return "feet_elevated_side_to_side_push_up"
+	case PushUpExerciseNameWeightedFeetElevatedSideToSidePushUp:
+		return "weighted_feet_elevated_side_to_side_push_up"
+	case PushUpExerciseNameHandReleasePushUp:
+		return "hand_release_push_up"
+	case PushUpExerciseNameWeightedHandReleasePushUp:
+		return "weighted_hand_release_push_up"
+	case PushUpExerciseNameHandstandPushUp:
+		return "handstand_push_up"
+	case PushUpExerciseNameWeightedHandstandPushUp:
+		return "weighted_handstand_push_up"
+	case PushUpExerciseNameInclinePushUp:
+		return "incline_push_up"
+	case PushUpExerciseNameWeightedInclinePushUp:
+		return "weighted_incline_push_up"
+	case PushUpExerciseNameIsometricExplosivePushUp:
+		return "isometric_explosive_push_up"
+	case PushUpExerciseNameWeightedIsometricExplosivePushUp:
+		return "weighted_isometric_explosive_push_up"
+	case PushUpExerciseNameJudoPushUp:
+		return "judo_push_up"
+	case PushUpExerciseNameWeightedJudoPushUp:
+		return "weighted_judo_push_up"
+	case PushUpExerciseNameKneelingPushUp:
+		return "kneeling_push_up"
+	case PushUpExerciseNameWeightedKneelingPushUp:
+		return "weighted_kneeling_push_up"
+	case PushUpExerciseNameMedicineBallChestPass:
+		return "medicine_ball_chest_pass"
+	case PushUpExerciseNameMedicineBallPushUp:
+		return "medicine_ball_push_up"
+	case PushUpExerciseNameWeightedMedicineBallPushUp:
+		return "weighted_medicine_ball_push_up"
+	case PushUpExerciseNameOneArmPushUp:
+		return "one_arm_push_up"
+	case PushUpExerciseNameWeightedOneArmPushUp:
+		return "weighted_one_arm_push_up"
+	case PushUpExerciseNameWeightedPushUp:
+		return "weighted_push_up"
+	case PushUpExerciseNamePushUpAndRow:
+		return "push_up_and_row"
+	case PushUpExerciseNameWeightedPushUpAndRow:
+		return "weighted_push_up_and_row"
+	case PushUpExerciseNamePushUpPlus:
+		return "push_up_plus"
+	case PushUpExerciseNameWeightedPushUpPlus:
+		return "weighted_push_up_plus"
+	case PushUpExerciseNamePushUpWithFeetOnSwissBall:
+		return "push_up_with_feet_on_swiss_ball"
+	case PushUpExerciseNameWeightedPushUpWithFeetOnSwissBall:
+		return "weighted_push_up_with_feet_on_swiss_ball"
+	case PushUpExerciseNamePushUpWithOneHandOnMedicineBall:
+		return "push_up_with_one_hand_on_medicine_ball"
+	case PushUpExerciseNameWeightedPushUpWithOneHandOnMedicineBall:
+		return "weighted_push_up_with_one_hand_on_medicine_ball"
+	case PushUpExerciseNameShoulderPushUp:
+		return "shoulder_push_up"
+	case PushUpExerciseNameWeightedShoulderPushUp:
+		return "weighted_shoulder_push_up"
+	case PushUpExerciseNameSingleArmMedicineBallPushUp:
+		return "single_arm_medicine_ball_push_up"
+	case PushUpExerciseNameWeightedSingleArmMedicineBallPushUp:
+		return "weighted_single_arm_medicine_ball_push_up"
+	case PushUpExerciseNameSpidermanPushUp:
+		return "spiderman_push_up"
+	case PushUpExerciseNameWeightedSpidermanPushUp:
+		return "weighted_spiderman_push_up"
+	case PushUpExerciseNameStackedFeetPushUp:
+		return "stacked_feet_push_up"
+	case PushUpExerciseNameWeightedStackedFeetPushUp:
+		return "weighted_stacked_feet_push_up"
+	case PushUpExerciseNameStaggeredHandsPushUp:
+		return "staggered_hands_push_up"
+	case PushUpExerciseNameWeightedStaggeredHandsPushUp:
+		return "weighted_staggered_hands_push_up"
+	case PushUpExerciseNameSuspendedPushUp:
+		return "suspended_push_up"
+	case PushUpExerciseNameWeightedSuspendedPushUp:
+		return "weighted_suspended_push_up"
+	case PushUpExerciseNameSwissBallPushUp:
+		return "swiss_ball_push_up"
+	case PushUpExerciseNameWeightedSwissBallPushUp:
+		return "weighted_swiss_ball_push_up"
+	case PushUpExerciseNameSwissBallPushUpPlus:
+		return "swiss_ball_push_up_plus"
+	case PushUpExerciseNameWeightedSwissBallPushUpPlus:
+		return "weighted_swiss_ball_push_up_plus"
+	case PushUpExerciseNameTPushUp:
+		return "t_push_up"
+	case PushUpExerciseNameWeightedTPushUp:
+		return "weighted_t_push_up"
+	case PushUpExerciseNameTripleStopPushUp:
+		return "triple_stop_push_up"
+	case PushUpExerciseNameWeightedTripleStopPushUp:
+		return "weighted_triple_stop_push_up"
+	case PushUpExerciseNameWideHandsPushUp:
+		return "wide_hands_push_up"
+	case PushUpExerciseNameWeightedWideHandsPushUp:
+		return "weighted_wide_hands_push_up"
+	case PushUpExerciseNameParalletteHandstandPushUp:
+		return "parallette_handstand_push_up"
+	case PushUpExerciseNameWeightedParalletteHandstandPushUp:
+		return "weighted_parallette_handstand_push_up"
+	case PushUpExerciseNameRingHandstandPushUp:
+		return "ring_handstand_push_up"
+	case PushUpExerciseNameWeightedRingHandstandPushUp:
+		return "weighted_ring_handstand_push_up"
+	case PushUpExerciseNameRingPushUp:
+		return "ring_push_up"
+	case PushUpExerciseNameWeightedRingPushUp:
+		return "weighted_ring_push_up"
+	case PushUpExerciseNamePushUp:
+		return "push_up"
+	case PushUpExerciseNamePilatesPushup:
+		return "pilates_pushup"
+	default:
+		return "PushUpExerciseNameInvalid(" + strconv.FormatUint(uint64(p), 10) + ")"
 	}
-	return val
 }
-
-var strtopushupexercisename = func() map[string]PushUpExerciseName {
-	m := make(map[string]PushUpExerciseName)
-	for t, str := range pushupexercisenametostrs {
-		m[str] = PushUpExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into PushUpExerciseName constant it's represent, return PushUpExerciseNameInvalid if not found.
 func PushUpExerciseNameFromString(s string) PushUpExerciseName {
-	val, ok := strtopushupexercisename[s]
-	if !ok {
-		return strtopushupexercisename["invalid"]
+	switch s {
+	case "chest_press_with_band":
+		return PushUpExerciseNameChestPressWithBand
+	case "alternating_staggered_push_up":
+		return PushUpExerciseNameAlternatingStaggeredPushUp
+	case "weighted_alternating_staggered_push_up":
+		return PushUpExerciseNameWeightedAlternatingStaggeredPushUp
+	case "alternating_hands_medicine_ball_push_up":
+		return PushUpExerciseNameAlternatingHandsMedicineBallPushUp
+	case "weighted_alternating_hands_medicine_ball_push_up":
+		return PushUpExerciseNameWeightedAlternatingHandsMedicineBallPushUp
+	case "bosu_ball_push_up":
+		return PushUpExerciseNameBosuBallPushUp
+	case "weighted_bosu_ball_push_up":
+		return PushUpExerciseNameWeightedBosuBallPushUp
+	case "clapping_push_up":
+		return PushUpExerciseNameClappingPushUp
+	case "weighted_clapping_push_up":
+		return PushUpExerciseNameWeightedClappingPushUp
+	case "close_grip_medicine_ball_push_up":
+		return PushUpExerciseNameCloseGripMedicineBallPushUp
+	case "weighted_close_grip_medicine_ball_push_up":
+		return PushUpExerciseNameWeightedCloseGripMedicineBallPushUp
+	case "close_hands_push_up":
+		return PushUpExerciseNameCloseHandsPushUp
+	case "weighted_close_hands_push_up":
+		return PushUpExerciseNameWeightedCloseHandsPushUp
+	case "decline_push_up":
+		return PushUpExerciseNameDeclinePushUp
+	case "weighted_decline_push_up":
+		return PushUpExerciseNameWeightedDeclinePushUp
+	case "diamond_push_up":
+		return PushUpExerciseNameDiamondPushUp
+	case "weighted_diamond_push_up":
+		return PushUpExerciseNameWeightedDiamondPushUp
+	case "explosive_crossover_push_up":
+		return PushUpExerciseNameExplosiveCrossoverPushUp
+	case "weighted_explosive_crossover_push_up":
+		return PushUpExerciseNameWeightedExplosiveCrossoverPushUp
+	case "explosive_push_up":
+		return PushUpExerciseNameExplosivePushUp
+	case "weighted_explosive_push_up":
+		return PushUpExerciseNameWeightedExplosivePushUp
+	case "feet_elevated_side_to_side_push_up":
+		return PushUpExerciseNameFeetElevatedSideToSidePushUp
+	case "weighted_feet_elevated_side_to_side_push_up":
+		return PushUpExerciseNameWeightedFeetElevatedSideToSidePushUp
+	case "hand_release_push_up":
+		return PushUpExerciseNameHandReleasePushUp
+	case "weighted_hand_release_push_up":
+		return PushUpExerciseNameWeightedHandReleasePushUp
+	case "handstand_push_up":
+		return PushUpExerciseNameHandstandPushUp
+	case "weighted_handstand_push_up":
+		return PushUpExerciseNameWeightedHandstandPushUp
+	case "incline_push_up":
+		return PushUpExerciseNameInclinePushUp
+	case "weighted_incline_push_up":
+		return PushUpExerciseNameWeightedInclinePushUp
+	case "isometric_explosive_push_up":
+		return PushUpExerciseNameIsometricExplosivePushUp
+	case "weighted_isometric_explosive_push_up":
+		return PushUpExerciseNameWeightedIsometricExplosivePushUp
+	case "judo_push_up":
+		return PushUpExerciseNameJudoPushUp
+	case "weighted_judo_push_up":
+		return PushUpExerciseNameWeightedJudoPushUp
+	case "kneeling_push_up":
+		return PushUpExerciseNameKneelingPushUp
+	case "weighted_kneeling_push_up":
+		return PushUpExerciseNameWeightedKneelingPushUp
+	case "medicine_ball_chest_pass":
+		return PushUpExerciseNameMedicineBallChestPass
+	case "medicine_ball_push_up":
+		return PushUpExerciseNameMedicineBallPushUp
+	case "weighted_medicine_ball_push_up":
+		return PushUpExerciseNameWeightedMedicineBallPushUp
+	case "one_arm_push_up":
+		return PushUpExerciseNameOneArmPushUp
+	case "weighted_one_arm_push_up":
+		return PushUpExerciseNameWeightedOneArmPushUp
+	case "weighted_push_up":
+		return PushUpExerciseNameWeightedPushUp
+	case "push_up_and_row":
+		return PushUpExerciseNamePushUpAndRow
+	case "weighted_push_up_and_row":
+		return PushUpExerciseNameWeightedPushUpAndRow
+	case "push_up_plus":
+		return PushUpExerciseNamePushUpPlus
+	case "weighted_push_up_plus":
+		return PushUpExerciseNameWeightedPushUpPlus
+	case "push_up_with_feet_on_swiss_ball":
+		return PushUpExerciseNamePushUpWithFeetOnSwissBall
+	case "weighted_push_up_with_feet_on_swiss_ball":
+		return PushUpExerciseNameWeightedPushUpWithFeetOnSwissBall
+	case "push_up_with_one_hand_on_medicine_ball":
+		return PushUpExerciseNamePushUpWithOneHandOnMedicineBall
+	case "weighted_push_up_with_one_hand_on_medicine_ball":
+		return PushUpExerciseNameWeightedPushUpWithOneHandOnMedicineBall
+	case "shoulder_push_up":
+		return PushUpExerciseNameShoulderPushUp
+	case "weighted_shoulder_push_up":
+		return PushUpExerciseNameWeightedShoulderPushUp
+	case "single_arm_medicine_ball_push_up":
+		return PushUpExerciseNameSingleArmMedicineBallPushUp
+	case "weighted_single_arm_medicine_ball_push_up":
+		return PushUpExerciseNameWeightedSingleArmMedicineBallPushUp
+	case "spiderman_push_up":
+		return PushUpExerciseNameSpidermanPushUp
+	case "weighted_spiderman_push_up":
+		return PushUpExerciseNameWeightedSpidermanPushUp
+	case "stacked_feet_push_up":
+		return PushUpExerciseNameStackedFeetPushUp
+	case "weighted_stacked_feet_push_up":
+		return PushUpExerciseNameWeightedStackedFeetPushUp
+	case "staggered_hands_push_up":
+		return PushUpExerciseNameStaggeredHandsPushUp
+	case "weighted_staggered_hands_push_up":
+		return PushUpExerciseNameWeightedStaggeredHandsPushUp
+	case "suspended_push_up":
+		return PushUpExerciseNameSuspendedPushUp
+	case "weighted_suspended_push_up":
+		return PushUpExerciseNameWeightedSuspendedPushUp
+	case "swiss_ball_push_up":
+		return PushUpExerciseNameSwissBallPushUp
+	case "weighted_swiss_ball_push_up":
+		return PushUpExerciseNameWeightedSwissBallPushUp
+	case "swiss_ball_push_up_plus":
+		return PushUpExerciseNameSwissBallPushUpPlus
+	case "weighted_swiss_ball_push_up_plus":
+		return PushUpExerciseNameWeightedSwissBallPushUpPlus
+	case "t_push_up":
+		return PushUpExerciseNameTPushUp
+	case "weighted_t_push_up":
+		return PushUpExerciseNameWeightedTPushUp
+	case "triple_stop_push_up":
+		return PushUpExerciseNameTripleStopPushUp
+	case "weighted_triple_stop_push_up":
+		return PushUpExerciseNameWeightedTripleStopPushUp
+	case "wide_hands_push_up":
+		return PushUpExerciseNameWideHandsPushUp
+	case "weighted_wide_hands_push_up":
+		return PushUpExerciseNameWeightedWideHandsPushUp
+	case "parallette_handstand_push_up":
+		return PushUpExerciseNameParalletteHandstandPushUp
+	case "weighted_parallette_handstand_push_up":
+		return PushUpExerciseNameWeightedParalletteHandstandPushUp
+	case "ring_handstand_push_up":
+		return PushUpExerciseNameRingHandstandPushUp
+	case "weighted_ring_handstand_push_up":
+		return PushUpExerciseNameWeightedRingHandstandPushUp
+	case "ring_push_up":
+		return PushUpExerciseNameRingPushUp
+	case "weighted_ring_push_up":
+		return PushUpExerciseNameWeightedRingPushUp
+	case "push_up":
+		return PushUpExerciseNamePushUp
+	case "pilates_pushup":
+		return PushUpExerciseNamePilatesPushup
+	default:
+		return PushUpExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListPushUpExerciseName() []PushUpExerciseName {
-	vs := make([]PushUpExerciseName, 0, len(pushupexercisenametostrs))
-	for i := range pushupexercisenametostrs {
-		vs = append(vs, PushUpExerciseName(i))
+	return []PushUpExerciseName{
+		PushUpExerciseNameChestPressWithBand,
+		PushUpExerciseNameAlternatingStaggeredPushUp,
+		PushUpExerciseNameWeightedAlternatingStaggeredPushUp,
+		PushUpExerciseNameAlternatingHandsMedicineBallPushUp,
+		PushUpExerciseNameWeightedAlternatingHandsMedicineBallPushUp,
+		PushUpExerciseNameBosuBallPushUp,
+		PushUpExerciseNameWeightedBosuBallPushUp,
+		PushUpExerciseNameClappingPushUp,
+		PushUpExerciseNameWeightedClappingPushUp,
+		PushUpExerciseNameCloseGripMedicineBallPushUp,
+		PushUpExerciseNameWeightedCloseGripMedicineBallPushUp,
+		PushUpExerciseNameCloseHandsPushUp,
+		PushUpExerciseNameWeightedCloseHandsPushUp,
+		PushUpExerciseNameDeclinePushUp,
+		PushUpExerciseNameWeightedDeclinePushUp,
+		PushUpExerciseNameDiamondPushUp,
+		PushUpExerciseNameWeightedDiamondPushUp,
+		PushUpExerciseNameExplosiveCrossoverPushUp,
+		PushUpExerciseNameWeightedExplosiveCrossoverPushUp,
+		PushUpExerciseNameExplosivePushUp,
+		PushUpExerciseNameWeightedExplosivePushUp,
+		PushUpExerciseNameFeetElevatedSideToSidePushUp,
+		PushUpExerciseNameWeightedFeetElevatedSideToSidePushUp,
+		PushUpExerciseNameHandReleasePushUp,
+		PushUpExerciseNameWeightedHandReleasePushUp,
+		PushUpExerciseNameHandstandPushUp,
+		PushUpExerciseNameWeightedHandstandPushUp,
+		PushUpExerciseNameInclinePushUp,
+		PushUpExerciseNameWeightedInclinePushUp,
+		PushUpExerciseNameIsometricExplosivePushUp,
+		PushUpExerciseNameWeightedIsometricExplosivePushUp,
+		PushUpExerciseNameJudoPushUp,
+		PushUpExerciseNameWeightedJudoPushUp,
+		PushUpExerciseNameKneelingPushUp,
+		PushUpExerciseNameWeightedKneelingPushUp,
+		PushUpExerciseNameMedicineBallChestPass,
+		PushUpExerciseNameMedicineBallPushUp,
+		PushUpExerciseNameWeightedMedicineBallPushUp,
+		PushUpExerciseNameOneArmPushUp,
+		PushUpExerciseNameWeightedOneArmPushUp,
+		PushUpExerciseNameWeightedPushUp,
+		PushUpExerciseNamePushUpAndRow,
+		PushUpExerciseNameWeightedPushUpAndRow,
+		PushUpExerciseNamePushUpPlus,
+		PushUpExerciseNameWeightedPushUpPlus,
+		PushUpExerciseNamePushUpWithFeetOnSwissBall,
+		PushUpExerciseNameWeightedPushUpWithFeetOnSwissBall,
+		PushUpExerciseNamePushUpWithOneHandOnMedicineBall,
+		PushUpExerciseNameWeightedPushUpWithOneHandOnMedicineBall,
+		PushUpExerciseNameShoulderPushUp,
+		PushUpExerciseNameWeightedShoulderPushUp,
+		PushUpExerciseNameSingleArmMedicineBallPushUp,
+		PushUpExerciseNameWeightedSingleArmMedicineBallPushUp,
+		PushUpExerciseNameSpidermanPushUp,
+		PushUpExerciseNameWeightedSpidermanPushUp,
+		PushUpExerciseNameStackedFeetPushUp,
+		PushUpExerciseNameWeightedStackedFeetPushUp,
+		PushUpExerciseNameStaggeredHandsPushUp,
+		PushUpExerciseNameWeightedStaggeredHandsPushUp,
+		PushUpExerciseNameSuspendedPushUp,
+		PushUpExerciseNameWeightedSuspendedPushUp,
+		PushUpExerciseNameSwissBallPushUp,
+		PushUpExerciseNameWeightedSwissBallPushUp,
+		PushUpExerciseNameSwissBallPushUpPlus,
+		PushUpExerciseNameWeightedSwissBallPushUpPlus,
+		PushUpExerciseNameTPushUp,
+		PushUpExerciseNameWeightedTPushUp,
+		PushUpExerciseNameTripleStopPushUp,
+		PushUpExerciseNameWeightedTripleStopPushUp,
+		PushUpExerciseNameWideHandsPushUp,
+		PushUpExerciseNameWeightedWideHandsPushUp,
+		PushUpExerciseNameParalletteHandstandPushUp,
+		PushUpExerciseNameWeightedParalletteHandstandPushUp,
+		PushUpExerciseNameRingHandstandPushUp,
+		PushUpExerciseNameWeightedRingHandstandPushUp,
+		PushUpExerciseNameRingPushUp,
+		PushUpExerciseNameWeightedRingPushUp,
+		PushUpExerciseNamePushUp,
+		PushUpExerciseNamePilatesPushup,
 	}
-	return vs
 }

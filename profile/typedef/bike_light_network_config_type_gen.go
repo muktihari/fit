@@ -18,47 +18,46 @@ const (
 	BikeLightNetworkConfigTypeIndividual     BikeLightNetworkConfigType = 4
 	BikeLightNetworkConfigTypeHighVisibility BikeLightNetworkConfigType = 5
 	BikeLightNetworkConfigTypeTrail          BikeLightNetworkConfigType = 6
-	BikeLightNetworkConfigTypeInvalid        BikeLightNetworkConfigType = 0xFF // INVALID
+	BikeLightNetworkConfigTypeInvalid        BikeLightNetworkConfigType = 0xFF
 )
 
-var bikelightnetworkconfigtypetostrs = map[BikeLightNetworkConfigType]string{
-	BikeLightNetworkConfigTypeAuto:           "auto",
-	BikeLightNetworkConfigTypeIndividual:     "individual",
-	BikeLightNetworkConfigTypeHighVisibility: "high_visibility",
-	BikeLightNetworkConfigTypeTrail:          "trail",
-	BikeLightNetworkConfigTypeInvalid:        "invalid",
-}
-
 func (b BikeLightNetworkConfigType) String() string {
-	val, ok := bikelightnetworkconfigtypetostrs[b]
-	if !ok {
-		return strconv.Itoa(int(b))
+	switch b {
+	case BikeLightNetworkConfigTypeAuto:
+		return "auto"
+	case BikeLightNetworkConfigTypeIndividual:
+		return "individual"
+	case BikeLightNetworkConfigTypeHighVisibility:
+		return "high_visibility"
+	case BikeLightNetworkConfigTypeTrail:
+		return "trail"
+	default:
+		return "BikeLightNetworkConfigTypeInvalid(" + strconv.Itoa(int(b)) + ")"
 	}
-	return val
 }
-
-var strtobikelightnetworkconfigtype = func() map[string]BikeLightNetworkConfigType {
-	m := make(map[string]BikeLightNetworkConfigType)
-	for t, str := range bikelightnetworkconfigtypetostrs {
-		m[str] = BikeLightNetworkConfigType(t)
-	}
-	return m
-}()
 
 // FromString parse string into BikeLightNetworkConfigType constant it's represent, return BikeLightNetworkConfigTypeInvalid if not found.
 func BikeLightNetworkConfigTypeFromString(s string) BikeLightNetworkConfigType {
-	val, ok := strtobikelightnetworkconfigtype[s]
-	if !ok {
-		return strtobikelightnetworkconfigtype["invalid"]
+	switch s {
+	case "auto":
+		return BikeLightNetworkConfigTypeAuto
+	case "individual":
+		return BikeLightNetworkConfigTypeIndividual
+	case "high_visibility":
+		return BikeLightNetworkConfigTypeHighVisibility
+	case "trail":
+		return BikeLightNetworkConfigTypeTrail
+	default:
+		return BikeLightNetworkConfigTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBikeLightNetworkConfigType() []BikeLightNetworkConfigType {
-	vs := make([]BikeLightNetworkConfigType, 0, len(bikelightnetworkconfigtypetostrs))
-	for i := range bikelightnetworkconfigtypetostrs {
-		vs = append(vs, BikeLightNetworkConfigType(i))
+	return []BikeLightNetworkConfigType{
+		BikeLightNetworkConfigTypeAuto,
+		BikeLightNetworkConfigTypeIndividual,
+		BikeLightNetworkConfigTypeHighVisibility,
+		BikeLightNetworkConfigTypeTrail,
 	}
-	return vs
 }

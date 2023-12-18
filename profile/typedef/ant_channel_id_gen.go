@@ -18,47 +18,46 @@ const (
 	AntChannelIdAntTransmissionTypeLowerNibble     AntChannelId = 0x0F000000
 	AntChannelIdAntDeviceType                      AntChannelId = 0x00FF0000
 	AntChannelIdAntDeviceNumber                    AntChannelId = 0x0000FFFF
-	AntChannelIdInvalid                            AntChannelId = 0x0 // INVALID
+	AntChannelIdInvalid                            AntChannelId = 0x0
 )
 
-var antchannelidtostrs = map[AntChannelId]string{
-	AntChannelIdAntExtendedDeviceNumberUpperNibble: "ant_extended_device_number_upper_nibble",
-	AntChannelIdAntTransmissionTypeLowerNibble:     "ant_transmission_type_lower_nibble",
-	AntChannelIdAntDeviceType:                      "ant_device_type",
-	AntChannelIdAntDeviceNumber:                    "ant_device_number",
-	AntChannelIdInvalid:                            "invalid",
-}
-
 func (a AntChannelId) String() string {
-	val, ok := antchannelidtostrs[a]
-	if !ok {
-		return strconv.FormatUint(uint64(a), 10)
+	switch a {
+	case AntChannelIdAntExtendedDeviceNumberUpperNibble:
+		return "ant_extended_device_number_upper_nibble"
+	case AntChannelIdAntTransmissionTypeLowerNibble:
+		return "ant_transmission_type_lower_nibble"
+	case AntChannelIdAntDeviceType:
+		return "ant_device_type"
+	case AntChannelIdAntDeviceNumber:
+		return "ant_device_number"
+	default:
+		return "AntChannelIdInvalid(" + strconv.FormatUint(uint64(a), 10) + ")"
 	}
-	return val
 }
-
-var strtoantchannelid = func() map[string]AntChannelId {
-	m := make(map[string]AntChannelId)
-	for t, str := range antchannelidtostrs {
-		m[str] = AntChannelId(t)
-	}
-	return m
-}()
 
 // FromString parse string into AntChannelId constant it's represent, return AntChannelIdInvalid if not found.
 func AntChannelIdFromString(s string) AntChannelId {
-	val, ok := strtoantchannelid[s]
-	if !ok {
-		return strtoantchannelid["invalid"]
+	switch s {
+	case "ant_extended_device_number_upper_nibble":
+		return AntChannelIdAntExtendedDeviceNumberUpperNibble
+	case "ant_transmission_type_lower_nibble":
+		return AntChannelIdAntTransmissionTypeLowerNibble
+	case "ant_device_type":
+		return AntChannelIdAntDeviceType
+	case "ant_device_number":
+		return AntChannelIdAntDeviceNumber
+	default:
+		return AntChannelIdInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAntChannelId() []AntChannelId {
-	vs := make([]AntChannelId, 0, len(antchannelidtostrs))
-	for i := range antchannelidtostrs {
-		vs = append(vs, AntChannelId(i))
+	return []AntChannelId{
+		AntChannelIdAntExtendedDeviceNumberUpperNibble,
+		AntChannelIdAntTransmissionTypeLowerNibble,
+		AntChannelIdAntDeviceType,
+		AntChannelIdAntDeviceNumber,
 	}
-	return vs
 }

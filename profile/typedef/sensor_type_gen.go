@@ -18,47 +18,46 @@ const (
 	SensorTypeGyroscope     SensorType = 1
 	SensorTypeCompass       SensorType = 2 // Magnetometer
 	SensorTypeBarometer     SensorType = 3
-	SensorTypeInvalid       SensorType = 0xFF // INVALID
+	SensorTypeInvalid       SensorType = 0xFF
 )
 
-var sensortypetostrs = map[SensorType]string{
-	SensorTypeAccelerometer: "accelerometer",
-	SensorTypeGyroscope:     "gyroscope",
-	SensorTypeCompass:       "compass",
-	SensorTypeBarometer:     "barometer",
-	SensorTypeInvalid:       "invalid",
-}
-
 func (s SensorType) String() string {
-	val, ok := sensortypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SensorTypeAccelerometer:
+		return "accelerometer"
+	case SensorTypeGyroscope:
+		return "gyroscope"
+	case SensorTypeCompass:
+		return "compass"
+	case SensorTypeBarometer:
+		return "barometer"
+	default:
+		return "SensorTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosensortype = func() map[string]SensorType {
-	m := make(map[string]SensorType)
-	for t, str := range sensortypetostrs {
-		m[str] = SensorType(t)
-	}
-	return m
-}()
 
 // FromString parse string into SensorType constant it's represent, return SensorTypeInvalid if not found.
 func SensorTypeFromString(s string) SensorType {
-	val, ok := strtosensortype[s]
-	if !ok {
-		return strtosensortype["invalid"]
+	switch s {
+	case "accelerometer":
+		return SensorTypeAccelerometer
+	case "gyroscope":
+		return SensorTypeGyroscope
+	case "compass":
+		return SensorTypeCompass
+	case "barometer":
+		return SensorTypeBarometer
+	default:
+		return SensorTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSensorType() []SensorType {
-	vs := make([]SensorType, 0, len(sensortypetostrs))
-	for i := range sensortypetostrs {
-		vs = append(vs, SensorType(i))
+	return []SensorType{
+		SensorTypeAccelerometer,
+		SensorTypeGyroscope,
+		SensorTypeCompass,
+		SensorTypeBarometer,
 	}
-	return vs
 }

@@ -17,46 +17,41 @@ const (
 	HipSwingExerciseNameSingleArmKettlebellSwing HipSwingExerciseName = 0
 	HipSwingExerciseNameSingleArmDumbbellSwing   HipSwingExerciseName = 1
 	HipSwingExerciseNameStepOutSwing             HipSwingExerciseName = 2
-	HipSwingExerciseNameInvalid                  HipSwingExerciseName = 0xFFFF // INVALID
+	HipSwingExerciseNameInvalid                  HipSwingExerciseName = 0xFFFF
 )
 
-var hipswingexercisenametostrs = map[HipSwingExerciseName]string{
-	HipSwingExerciseNameSingleArmKettlebellSwing: "single_arm_kettlebell_swing",
-	HipSwingExerciseNameSingleArmDumbbellSwing:   "single_arm_dumbbell_swing",
-	HipSwingExerciseNameStepOutSwing:             "step_out_swing",
-	HipSwingExerciseNameInvalid:                  "invalid",
-}
-
 func (h HipSwingExerciseName) String() string {
-	val, ok := hipswingexercisenametostrs[h]
-	if !ok {
-		return strconv.FormatUint(uint64(h), 10)
+	switch h {
+	case HipSwingExerciseNameSingleArmKettlebellSwing:
+		return "single_arm_kettlebell_swing"
+	case HipSwingExerciseNameSingleArmDumbbellSwing:
+		return "single_arm_dumbbell_swing"
+	case HipSwingExerciseNameStepOutSwing:
+		return "step_out_swing"
+	default:
+		return "HipSwingExerciseNameInvalid(" + strconv.FormatUint(uint64(h), 10) + ")"
 	}
-	return val
 }
-
-var strtohipswingexercisename = func() map[string]HipSwingExerciseName {
-	m := make(map[string]HipSwingExerciseName)
-	for t, str := range hipswingexercisenametostrs {
-		m[str] = HipSwingExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into HipSwingExerciseName constant it's represent, return HipSwingExerciseNameInvalid if not found.
 func HipSwingExerciseNameFromString(s string) HipSwingExerciseName {
-	val, ok := strtohipswingexercisename[s]
-	if !ok {
-		return strtohipswingexercisename["invalid"]
+	switch s {
+	case "single_arm_kettlebell_swing":
+		return HipSwingExerciseNameSingleArmKettlebellSwing
+	case "single_arm_dumbbell_swing":
+		return HipSwingExerciseNameSingleArmDumbbellSwing
+	case "step_out_swing":
+		return HipSwingExerciseNameStepOutSwing
+	default:
+		return HipSwingExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHipSwingExerciseName() []HipSwingExerciseName {
-	vs := make([]HipSwingExerciseName, 0, len(hipswingexercisenametostrs))
-	for i := range hipswingexercisenametostrs {
-		vs = append(vs, HipSwingExerciseName(i))
+	return []HipSwingExerciseName{
+		HipSwingExerciseNameSingleArmKettlebellSwing,
+		HipSwingExerciseNameSingleArmDumbbellSwing,
+		HipSwingExerciseNameStepOutSwing,
 	}
-	return vs
 }

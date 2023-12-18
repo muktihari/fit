@@ -16,45 +16,36 @@ type FaveroProduct uint16
 const (
 	FaveroProductAssiomaUno FaveroProduct = 10
 	FaveroProductAssiomaDuo FaveroProduct = 12
-	FaveroProductInvalid    FaveroProduct = 0xFFFF // INVALID
+	FaveroProductInvalid    FaveroProduct = 0xFFFF
 )
 
-var faveroproducttostrs = map[FaveroProduct]string{
-	FaveroProductAssiomaUno: "assioma_uno",
-	FaveroProductAssiomaDuo: "assioma_duo",
-	FaveroProductInvalid:    "invalid",
-}
-
 func (f FaveroProduct) String() string {
-	val, ok := faveroproducttostrs[f]
-	if !ok {
-		return strconv.FormatUint(uint64(f), 10)
+	switch f {
+	case FaveroProductAssiomaUno:
+		return "assioma_uno"
+	case FaveroProductAssiomaDuo:
+		return "assioma_duo"
+	default:
+		return "FaveroProductInvalid(" + strconv.FormatUint(uint64(f), 10) + ")"
 	}
-	return val
 }
-
-var strtofaveroproduct = func() map[string]FaveroProduct {
-	m := make(map[string]FaveroProduct)
-	for t, str := range faveroproducttostrs {
-		m[str] = FaveroProduct(t)
-	}
-	return m
-}()
 
 // FromString parse string into FaveroProduct constant it's represent, return FaveroProductInvalid if not found.
 func FaveroProductFromString(s string) FaveroProduct {
-	val, ok := strtofaveroproduct[s]
-	if !ok {
-		return strtofaveroproduct["invalid"]
+	switch s {
+	case "assioma_uno":
+		return FaveroProductAssiomaUno
+	case "assioma_duo":
+		return FaveroProductAssiomaDuo
+	default:
+		return FaveroProductInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListFaveroProduct() []FaveroProduct {
-	vs := make([]FaveroProduct, 0, len(faveroproducttostrs))
-	for i := range faveroproducttostrs {
-		vs = append(vs, FaveroProduct(i))
+	return []FaveroProduct{
+		FaveroProductAssiomaUno,
+		FaveroProductAssiomaDuo,
 	}
-	return vs
 }

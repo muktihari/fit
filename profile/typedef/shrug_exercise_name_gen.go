@@ -31,60 +31,111 @@ const (
 	ShrugExerciseNameSerratusShrug                  ShrugExerciseName = 14
 	ShrugExerciseNameWeightedSerratusShrug          ShrugExerciseName = 15
 	ShrugExerciseNameWideGripJumpShrug              ShrugExerciseName = 16
-	ShrugExerciseNameInvalid                        ShrugExerciseName = 0xFFFF // INVALID
+	ShrugExerciseNameInvalid                        ShrugExerciseName = 0xFFFF
 )
 
-var shrugexercisenametostrs = map[ShrugExerciseName]string{
-	ShrugExerciseNameBarbellJumpShrug:               "barbell_jump_shrug",
-	ShrugExerciseNameBarbellShrug:                   "barbell_shrug",
-	ShrugExerciseNameBarbellUprightRow:              "barbell_upright_row",
-	ShrugExerciseNameBehindTheBackSmithMachineShrug: "behind_the_back_smith_machine_shrug",
-	ShrugExerciseNameDumbbellJumpShrug:              "dumbbell_jump_shrug",
-	ShrugExerciseNameDumbbellShrug:                  "dumbbell_shrug",
-	ShrugExerciseNameDumbbellUprightRow:             "dumbbell_upright_row",
-	ShrugExerciseNameInclineDumbbellShrug:           "incline_dumbbell_shrug",
-	ShrugExerciseNameOverheadBarbellShrug:           "overhead_barbell_shrug",
-	ShrugExerciseNameOverheadDumbbellShrug:          "overhead_dumbbell_shrug",
-	ShrugExerciseNameScaptionAndShrug:               "scaption_and_shrug",
-	ShrugExerciseNameScapularRetraction:             "scapular_retraction",
-	ShrugExerciseNameSerratusChairShrug:             "serratus_chair_shrug",
-	ShrugExerciseNameWeightedSerratusChairShrug:     "weighted_serratus_chair_shrug",
-	ShrugExerciseNameSerratusShrug:                  "serratus_shrug",
-	ShrugExerciseNameWeightedSerratusShrug:          "weighted_serratus_shrug",
-	ShrugExerciseNameWideGripJumpShrug:              "wide_grip_jump_shrug",
-	ShrugExerciseNameInvalid:                        "invalid",
-}
-
 func (s ShrugExerciseName) String() string {
-	val, ok := shrugexercisenametostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case ShrugExerciseNameBarbellJumpShrug:
+		return "barbell_jump_shrug"
+	case ShrugExerciseNameBarbellShrug:
+		return "barbell_shrug"
+	case ShrugExerciseNameBarbellUprightRow:
+		return "barbell_upright_row"
+	case ShrugExerciseNameBehindTheBackSmithMachineShrug:
+		return "behind_the_back_smith_machine_shrug"
+	case ShrugExerciseNameDumbbellJumpShrug:
+		return "dumbbell_jump_shrug"
+	case ShrugExerciseNameDumbbellShrug:
+		return "dumbbell_shrug"
+	case ShrugExerciseNameDumbbellUprightRow:
+		return "dumbbell_upright_row"
+	case ShrugExerciseNameInclineDumbbellShrug:
+		return "incline_dumbbell_shrug"
+	case ShrugExerciseNameOverheadBarbellShrug:
+		return "overhead_barbell_shrug"
+	case ShrugExerciseNameOverheadDumbbellShrug:
+		return "overhead_dumbbell_shrug"
+	case ShrugExerciseNameScaptionAndShrug:
+		return "scaption_and_shrug"
+	case ShrugExerciseNameScapularRetraction:
+		return "scapular_retraction"
+	case ShrugExerciseNameSerratusChairShrug:
+		return "serratus_chair_shrug"
+	case ShrugExerciseNameWeightedSerratusChairShrug:
+		return "weighted_serratus_chair_shrug"
+	case ShrugExerciseNameSerratusShrug:
+		return "serratus_shrug"
+	case ShrugExerciseNameWeightedSerratusShrug:
+		return "weighted_serratus_shrug"
+	case ShrugExerciseNameWideGripJumpShrug:
+		return "wide_grip_jump_shrug"
+	default:
+		return "ShrugExerciseNameInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtoshrugexercisename = func() map[string]ShrugExerciseName {
-	m := make(map[string]ShrugExerciseName)
-	for t, str := range shrugexercisenametostrs {
-		m[str] = ShrugExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into ShrugExerciseName constant it's represent, return ShrugExerciseNameInvalid if not found.
 func ShrugExerciseNameFromString(s string) ShrugExerciseName {
-	val, ok := strtoshrugexercisename[s]
-	if !ok {
-		return strtoshrugexercisename["invalid"]
+	switch s {
+	case "barbell_jump_shrug":
+		return ShrugExerciseNameBarbellJumpShrug
+	case "barbell_shrug":
+		return ShrugExerciseNameBarbellShrug
+	case "barbell_upright_row":
+		return ShrugExerciseNameBarbellUprightRow
+	case "behind_the_back_smith_machine_shrug":
+		return ShrugExerciseNameBehindTheBackSmithMachineShrug
+	case "dumbbell_jump_shrug":
+		return ShrugExerciseNameDumbbellJumpShrug
+	case "dumbbell_shrug":
+		return ShrugExerciseNameDumbbellShrug
+	case "dumbbell_upright_row":
+		return ShrugExerciseNameDumbbellUprightRow
+	case "incline_dumbbell_shrug":
+		return ShrugExerciseNameInclineDumbbellShrug
+	case "overhead_barbell_shrug":
+		return ShrugExerciseNameOverheadBarbellShrug
+	case "overhead_dumbbell_shrug":
+		return ShrugExerciseNameOverheadDumbbellShrug
+	case "scaption_and_shrug":
+		return ShrugExerciseNameScaptionAndShrug
+	case "scapular_retraction":
+		return ShrugExerciseNameScapularRetraction
+	case "serratus_chair_shrug":
+		return ShrugExerciseNameSerratusChairShrug
+	case "weighted_serratus_chair_shrug":
+		return ShrugExerciseNameWeightedSerratusChairShrug
+	case "serratus_shrug":
+		return ShrugExerciseNameSerratusShrug
+	case "weighted_serratus_shrug":
+		return ShrugExerciseNameWeightedSerratusShrug
+	case "wide_grip_jump_shrug":
+		return ShrugExerciseNameWideGripJumpShrug
+	default:
+		return ShrugExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListShrugExerciseName() []ShrugExerciseName {
-	vs := make([]ShrugExerciseName, 0, len(shrugexercisenametostrs))
-	for i := range shrugexercisenametostrs {
-		vs = append(vs, ShrugExerciseName(i))
+	return []ShrugExerciseName{
+		ShrugExerciseNameBarbellJumpShrug,
+		ShrugExerciseNameBarbellShrug,
+		ShrugExerciseNameBarbellUprightRow,
+		ShrugExerciseNameBehindTheBackSmithMachineShrug,
+		ShrugExerciseNameDumbbellJumpShrug,
+		ShrugExerciseNameDumbbellShrug,
+		ShrugExerciseNameDumbbellUprightRow,
+		ShrugExerciseNameInclineDumbbellShrug,
+		ShrugExerciseNameOverheadBarbellShrug,
+		ShrugExerciseNameOverheadDumbbellShrug,
+		ShrugExerciseNameScaptionAndShrug,
+		ShrugExerciseNameScapularRetraction,
+		ShrugExerciseNameSerratusChairShrug,
+		ShrugExerciseNameWeightedSerratusChairShrug,
+		ShrugExerciseNameSerratusShrug,
+		ShrugExerciseNameWeightedSerratusShrug,
+		ShrugExerciseNameWideGripJumpShrug,
 	}
-	return vs
 }

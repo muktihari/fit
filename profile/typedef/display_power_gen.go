@@ -16,45 +16,36 @@ type DisplayPower byte
 const (
 	DisplayPowerWatts      DisplayPower = 0
 	DisplayPowerPercentFtp DisplayPower = 1
-	DisplayPowerInvalid    DisplayPower = 0xFF // INVALID
+	DisplayPowerInvalid    DisplayPower = 0xFF
 )
 
-var displaypowertostrs = map[DisplayPower]string{
-	DisplayPowerWatts:      "watts",
-	DisplayPowerPercentFtp: "percent_ftp",
-	DisplayPowerInvalid:    "invalid",
-}
-
 func (d DisplayPower) String() string {
-	val, ok := displaypowertostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DisplayPowerWatts:
+		return "watts"
+	case DisplayPowerPercentFtp:
+		return "percent_ftp"
+	default:
+		return "DisplayPowerInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodisplaypower = func() map[string]DisplayPower {
-	m := make(map[string]DisplayPower)
-	for t, str := range displaypowertostrs {
-		m[str] = DisplayPower(t)
-	}
-	return m
-}()
 
 // FromString parse string into DisplayPower constant it's represent, return DisplayPowerInvalid if not found.
 func DisplayPowerFromString(s string) DisplayPower {
-	val, ok := strtodisplaypower[s]
-	if !ok {
-		return strtodisplaypower["invalid"]
+	switch s {
+	case "watts":
+		return DisplayPowerWatts
+	case "percent_ftp":
+		return DisplayPowerPercentFtp
+	default:
+		return DisplayPowerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDisplayPower() []DisplayPower {
-	vs := make([]DisplayPower, 0, len(displaypowertostrs))
-	for i := range displaypowertostrs {
-		vs = append(vs, DisplayPower(i))
+	return []DisplayPower{
+		DisplayPowerWatts,
+		DisplayPowerPercentFtp,
 	}
-	return vs
 }

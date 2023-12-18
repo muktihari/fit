@@ -17,46 +17,41 @@ const (
 	DisplayHeartBpm     DisplayHeart = 0
 	DisplayHeartMax     DisplayHeart = 1
 	DisplayHeartReserve DisplayHeart = 2
-	DisplayHeartInvalid DisplayHeart = 0xFF // INVALID
+	DisplayHeartInvalid DisplayHeart = 0xFF
 )
 
-var displayhearttostrs = map[DisplayHeart]string{
-	DisplayHeartBpm:     "bpm",
-	DisplayHeartMax:     "max",
-	DisplayHeartReserve: "reserve",
-	DisplayHeartInvalid: "invalid",
-}
-
 func (d DisplayHeart) String() string {
-	val, ok := displayhearttostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DisplayHeartBpm:
+		return "bpm"
+	case DisplayHeartMax:
+		return "max"
+	case DisplayHeartReserve:
+		return "reserve"
+	default:
+		return "DisplayHeartInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodisplayheart = func() map[string]DisplayHeart {
-	m := make(map[string]DisplayHeart)
-	for t, str := range displayhearttostrs {
-		m[str] = DisplayHeart(t)
-	}
-	return m
-}()
 
 // FromString parse string into DisplayHeart constant it's represent, return DisplayHeartInvalid if not found.
 func DisplayHeartFromString(s string) DisplayHeart {
-	val, ok := strtodisplayheart[s]
-	if !ok {
-		return strtodisplayheart["invalid"]
+	switch s {
+	case "bpm":
+		return DisplayHeartBpm
+	case "max":
+		return DisplayHeartMax
+	case "reserve":
+		return DisplayHeartReserve
+	default:
+		return DisplayHeartInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDisplayHeart() []DisplayHeart {
-	vs := make([]DisplayHeart, 0, len(displayhearttostrs))
-	for i := range displayhearttostrs {
-		vs = append(vs, DisplayHeart(i))
+	return []DisplayHeart{
+		DisplayHeartBpm,
+		DisplayHeartMax,
+		DisplayHeartReserve,
 	}
-	return vs
 }

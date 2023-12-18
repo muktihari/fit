@@ -111,140 +111,511 @@ const (
 	ExdDescriptorsAmbientPressure                  ExdDescriptors = 94
 	ExdDescriptorsPressure                         ExdDescriptors = 95
 	ExdDescriptorsVam                              ExdDescriptors = 96
-	ExdDescriptorsInvalid                          ExdDescriptors = 0xFF // INVALID
+	ExdDescriptorsInvalid                          ExdDescriptors = 0xFF
 )
 
-var exddescriptorstostrs = map[ExdDescriptors]string{
-	ExdDescriptorsBikeLightBatteryStatus:           "bike_light_battery_status",
-	ExdDescriptorsBeamAngleStatus:                  "beam_angle_status",
-	ExdDescriptorsBateryLevel:                      "batery_level",
-	ExdDescriptorsLightNetworkMode:                 "light_network_mode",
-	ExdDescriptorsNumberLightsConnected:            "number_lights_connected",
-	ExdDescriptorsCadence:                          "cadence",
-	ExdDescriptorsDistance:                         "distance",
-	ExdDescriptorsEstimatedTimeOfArrival:           "estimated_time_of_arrival",
-	ExdDescriptorsHeading:                          "heading",
-	ExdDescriptorsTime:                             "time",
-	ExdDescriptorsBatteryLevel:                     "battery_level",
-	ExdDescriptorsTrainerResistance:                "trainer_resistance",
-	ExdDescriptorsTrainerTargetPower:               "trainer_target_power",
-	ExdDescriptorsTimeSeated:                       "time_seated",
-	ExdDescriptorsTimeStanding:                     "time_standing",
-	ExdDescriptorsElevation:                        "elevation",
-	ExdDescriptorsGrade:                            "grade",
-	ExdDescriptorsAscent:                           "ascent",
-	ExdDescriptorsDescent:                          "descent",
-	ExdDescriptorsVerticalSpeed:                    "vertical_speed",
-	ExdDescriptorsDi2BatteryLevel:                  "di2_battery_level",
-	ExdDescriptorsFrontGear:                        "front_gear",
-	ExdDescriptorsRearGear:                         "rear_gear",
-	ExdDescriptorsGearRatio:                        "gear_ratio",
-	ExdDescriptorsHeartRate:                        "heart_rate",
-	ExdDescriptorsHeartRateZone:                    "heart_rate_zone",
-	ExdDescriptorsTimeInHeartRateZone:              "time_in_heart_rate_zone",
-	ExdDescriptorsHeartRateReserve:                 "heart_rate_reserve",
-	ExdDescriptorsCalories:                         "calories",
-	ExdDescriptorsGpsAccuracy:                      "gps_accuracy",
-	ExdDescriptorsGpsSignalStrength:                "gps_signal_strength",
-	ExdDescriptorsTemperature:                      "temperature",
-	ExdDescriptorsTimeOfDay:                        "time_of_day",
-	ExdDescriptorsBalance:                          "balance",
-	ExdDescriptorsPedalSmoothness:                  "pedal_smoothness",
-	ExdDescriptorsPower:                            "power",
-	ExdDescriptorsFunctionalThresholdPower:         "functional_threshold_power",
-	ExdDescriptorsIntensityFactor:                  "intensity_factor",
-	ExdDescriptorsWork:                             "work",
-	ExdDescriptorsPowerRatio:                       "power_ratio",
-	ExdDescriptorsNormalizedPower:                  "normalized_power",
-	ExdDescriptorsTrainingStressScore:              "training_stress_Score",
-	ExdDescriptorsTimeOnZone:                       "time_on_zone",
-	ExdDescriptorsSpeed:                            "speed",
-	ExdDescriptorsLaps:                             "laps",
-	ExdDescriptorsReps:                             "reps",
-	ExdDescriptorsWorkoutStep:                      "workout_step",
-	ExdDescriptorsCourseDistance:                   "course_distance",
-	ExdDescriptorsNavigationDistance:               "navigation_distance",
-	ExdDescriptorsCourseEstimatedTimeOfArrival:     "course_estimated_time_of_arrival",
-	ExdDescriptorsNavigationEstimatedTimeOfArrival: "navigation_estimated_time_of_arrival",
-	ExdDescriptorsCourseTime:                       "course_time",
-	ExdDescriptorsNavigationTime:                   "navigation_time",
-	ExdDescriptorsCourseHeading:                    "course_heading",
-	ExdDescriptorsNavigationHeading:                "navigation_heading",
-	ExdDescriptorsPowerZone:                        "power_zone",
-	ExdDescriptorsTorqueEffectiveness:              "torque_effectiveness",
-	ExdDescriptorsTimerTime:                        "timer_time",
-	ExdDescriptorsPowerWeightRatio:                 "power_weight_ratio",
-	ExdDescriptorsLeftPlatformCenterOffset:         "left_platform_center_offset",
-	ExdDescriptorsRightPlatformCenterOffset:        "right_platform_center_offset",
-	ExdDescriptorsLeftPowerPhaseStartAngle:         "left_power_phase_start_angle",
-	ExdDescriptorsRightPowerPhaseStartAngle:        "right_power_phase_start_angle",
-	ExdDescriptorsLeftPowerPhaseFinishAngle:        "left_power_phase_finish_angle",
-	ExdDescriptorsRightPowerPhaseFinishAngle:       "right_power_phase_finish_angle",
-	ExdDescriptorsGears:                            "gears",
-	ExdDescriptorsPace:                             "pace",
-	ExdDescriptorsTrainingEffect:                   "training_effect",
-	ExdDescriptorsVerticalOscillation:              "vertical_oscillation",
-	ExdDescriptorsVerticalRatio:                    "vertical_ratio",
-	ExdDescriptorsGroundContactTime:                "ground_contact_time",
-	ExdDescriptorsLeftGroundContactTimeBalance:     "left_ground_contact_time_balance",
-	ExdDescriptorsRightGroundContactTimeBalance:    "right_ground_contact_time_balance",
-	ExdDescriptorsStrideLength:                     "stride_length",
-	ExdDescriptorsRunningCadence:                   "running_cadence",
-	ExdDescriptorsPerformanceCondition:             "performance_condition",
-	ExdDescriptorsCourseType:                       "course_type",
-	ExdDescriptorsTimeInPowerZone:                  "time_in_power_zone",
-	ExdDescriptorsNavigationTurn:                   "navigation_turn",
-	ExdDescriptorsCourseLocation:                   "course_location",
-	ExdDescriptorsNavigationLocation:               "navigation_location",
-	ExdDescriptorsCompass:                          "compass",
-	ExdDescriptorsGearCombo:                        "gear_combo",
-	ExdDescriptorsMuscleOxygen:                     "muscle_oxygen",
-	ExdDescriptorsIcon:                             "icon",
-	ExdDescriptorsCompassHeading:                   "compass_heading",
-	ExdDescriptorsGpsHeading:                       "gps_heading",
-	ExdDescriptorsGpsElevation:                     "gps_elevation",
-	ExdDescriptorsAnaerobicTrainingEffect:          "anaerobic_training_effect",
-	ExdDescriptorsCourse:                           "course",
-	ExdDescriptorsOffCourse:                        "off_course",
-	ExdDescriptorsGlideRatio:                       "glide_ratio",
-	ExdDescriptorsVerticalDistance:                 "vertical_distance",
-	ExdDescriptorsVmg:                              "vmg",
-	ExdDescriptorsAmbientPressure:                  "ambient_pressure",
-	ExdDescriptorsPressure:                         "pressure",
-	ExdDescriptorsVam:                              "vam",
-	ExdDescriptorsInvalid:                          "invalid",
-}
-
 func (e ExdDescriptors) String() string {
-	val, ok := exddescriptorstostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case ExdDescriptorsBikeLightBatteryStatus:
+		return "bike_light_battery_status"
+	case ExdDescriptorsBeamAngleStatus:
+		return "beam_angle_status"
+	case ExdDescriptorsBateryLevel:
+		return "batery_level"
+	case ExdDescriptorsLightNetworkMode:
+		return "light_network_mode"
+	case ExdDescriptorsNumberLightsConnected:
+		return "number_lights_connected"
+	case ExdDescriptorsCadence:
+		return "cadence"
+	case ExdDescriptorsDistance:
+		return "distance"
+	case ExdDescriptorsEstimatedTimeOfArrival:
+		return "estimated_time_of_arrival"
+	case ExdDescriptorsHeading:
+		return "heading"
+	case ExdDescriptorsTime:
+		return "time"
+	case ExdDescriptorsBatteryLevel:
+		return "battery_level"
+	case ExdDescriptorsTrainerResistance:
+		return "trainer_resistance"
+	case ExdDescriptorsTrainerTargetPower:
+		return "trainer_target_power"
+	case ExdDescriptorsTimeSeated:
+		return "time_seated"
+	case ExdDescriptorsTimeStanding:
+		return "time_standing"
+	case ExdDescriptorsElevation:
+		return "elevation"
+	case ExdDescriptorsGrade:
+		return "grade"
+	case ExdDescriptorsAscent:
+		return "ascent"
+	case ExdDescriptorsDescent:
+		return "descent"
+	case ExdDescriptorsVerticalSpeed:
+		return "vertical_speed"
+	case ExdDescriptorsDi2BatteryLevel:
+		return "di2_battery_level"
+	case ExdDescriptorsFrontGear:
+		return "front_gear"
+	case ExdDescriptorsRearGear:
+		return "rear_gear"
+	case ExdDescriptorsGearRatio:
+		return "gear_ratio"
+	case ExdDescriptorsHeartRate:
+		return "heart_rate"
+	case ExdDescriptorsHeartRateZone:
+		return "heart_rate_zone"
+	case ExdDescriptorsTimeInHeartRateZone:
+		return "time_in_heart_rate_zone"
+	case ExdDescriptorsHeartRateReserve:
+		return "heart_rate_reserve"
+	case ExdDescriptorsCalories:
+		return "calories"
+	case ExdDescriptorsGpsAccuracy:
+		return "gps_accuracy"
+	case ExdDescriptorsGpsSignalStrength:
+		return "gps_signal_strength"
+	case ExdDescriptorsTemperature:
+		return "temperature"
+	case ExdDescriptorsTimeOfDay:
+		return "time_of_day"
+	case ExdDescriptorsBalance:
+		return "balance"
+	case ExdDescriptorsPedalSmoothness:
+		return "pedal_smoothness"
+	case ExdDescriptorsPower:
+		return "power"
+	case ExdDescriptorsFunctionalThresholdPower:
+		return "functional_threshold_power"
+	case ExdDescriptorsIntensityFactor:
+		return "intensity_factor"
+	case ExdDescriptorsWork:
+		return "work"
+	case ExdDescriptorsPowerRatio:
+		return "power_ratio"
+	case ExdDescriptorsNormalizedPower:
+		return "normalized_power"
+	case ExdDescriptorsTrainingStressScore:
+		return "training_stress_Score"
+	case ExdDescriptorsTimeOnZone:
+		return "time_on_zone"
+	case ExdDescriptorsSpeed:
+		return "speed"
+	case ExdDescriptorsLaps:
+		return "laps"
+	case ExdDescriptorsReps:
+		return "reps"
+	case ExdDescriptorsWorkoutStep:
+		return "workout_step"
+	case ExdDescriptorsCourseDistance:
+		return "course_distance"
+	case ExdDescriptorsNavigationDistance:
+		return "navigation_distance"
+	case ExdDescriptorsCourseEstimatedTimeOfArrival:
+		return "course_estimated_time_of_arrival"
+	case ExdDescriptorsNavigationEstimatedTimeOfArrival:
+		return "navigation_estimated_time_of_arrival"
+	case ExdDescriptorsCourseTime:
+		return "course_time"
+	case ExdDescriptorsNavigationTime:
+		return "navigation_time"
+	case ExdDescriptorsCourseHeading:
+		return "course_heading"
+	case ExdDescriptorsNavigationHeading:
+		return "navigation_heading"
+	case ExdDescriptorsPowerZone:
+		return "power_zone"
+	case ExdDescriptorsTorqueEffectiveness:
+		return "torque_effectiveness"
+	case ExdDescriptorsTimerTime:
+		return "timer_time"
+	case ExdDescriptorsPowerWeightRatio:
+		return "power_weight_ratio"
+	case ExdDescriptorsLeftPlatformCenterOffset:
+		return "left_platform_center_offset"
+	case ExdDescriptorsRightPlatformCenterOffset:
+		return "right_platform_center_offset"
+	case ExdDescriptorsLeftPowerPhaseStartAngle:
+		return "left_power_phase_start_angle"
+	case ExdDescriptorsRightPowerPhaseStartAngle:
+		return "right_power_phase_start_angle"
+	case ExdDescriptorsLeftPowerPhaseFinishAngle:
+		return "left_power_phase_finish_angle"
+	case ExdDescriptorsRightPowerPhaseFinishAngle:
+		return "right_power_phase_finish_angle"
+	case ExdDescriptorsGears:
+		return "gears"
+	case ExdDescriptorsPace:
+		return "pace"
+	case ExdDescriptorsTrainingEffect:
+		return "training_effect"
+	case ExdDescriptorsVerticalOscillation:
+		return "vertical_oscillation"
+	case ExdDescriptorsVerticalRatio:
+		return "vertical_ratio"
+	case ExdDescriptorsGroundContactTime:
+		return "ground_contact_time"
+	case ExdDescriptorsLeftGroundContactTimeBalance:
+		return "left_ground_contact_time_balance"
+	case ExdDescriptorsRightGroundContactTimeBalance:
+		return "right_ground_contact_time_balance"
+	case ExdDescriptorsStrideLength:
+		return "stride_length"
+	case ExdDescriptorsRunningCadence:
+		return "running_cadence"
+	case ExdDescriptorsPerformanceCondition:
+		return "performance_condition"
+	case ExdDescriptorsCourseType:
+		return "course_type"
+	case ExdDescriptorsTimeInPowerZone:
+		return "time_in_power_zone"
+	case ExdDescriptorsNavigationTurn:
+		return "navigation_turn"
+	case ExdDescriptorsCourseLocation:
+		return "course_location"
+	case ExdDescriptorsNavigationLocation:
+		return "navigation_location"
+	case ExdDescriptorsCompass:
+		return "compass"
+	case ExdDescriptorsGearCombo:
+		return "gear_combo"
+	case ExdDescriptorsMuscleOxygen:
+		return "muscle_oxygen"
+	case ExdDescriptorsIcon:
+		return "icon"
+	case ExdDescriptorsCompassHeading:
+		return "compass_heading"
+	case ExdDescriptorsGpsHeading:
+		return "gps_heading"
+	case ExdDescriptorsGpsElevation:
+		return "gps_elevation"
+	case ExdDescriptorsAnaerobicTrainingEffect:
+		return "anaerobic_training_effect"
+	case ExdDescriptorsCourse:
+		return "course"
+	case ExdDescriptorsOffCourse:
+		return "off_course"
+	case ExdDescriptorsGlideRatio:
+		return "glide_ratio"
+	case ExdDescriptorsVerticalDistance:
+		return "vertical_distance"
+	case ExdDescriptorsVmg:
+		return "vmg"
+	case ExdDescriptorsAmbientPressure:
+		return "ambient_pressure"
+	case ExdDescriptorsPressure:
+		return "pressure"
+	case ExdDescriptorsVam:
+		return "vam"
+	default:
+		return "ExdDescriptorsInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoexddescriptors = func() map[string]ExdDescriptors {
-	m := make(map[string]ExdDescriptors)
-	for t, str := range exddescriptorstostrs {
-		m[str] = ExdDescriptors(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExdDescriptors constant it's represent, return ExdDescriptorsInvalid if not found.
 func ExdDescriptorsFromString(s string) ExdDescriptors {
-	val, ok := strtoexddescriptors[s]
-	if !ok {
-		return strtoexddescriptors["invalid"]
+	switch s {
+	case "bike_light_battery_status":
+		return ExdDescriptorsBikeLightBatteryStatus
+	case "beam_angle_status":
+		return ExdDescriptorsBeamAngleStatus
+	case "batery_level":
+		return ExdDescriptorsBateryLevel
+	case "light_network_mode":
+		return ExdDescriptorsLightNetworkMode
+	case "number_lights_connected":
+		return ExdDescriptorsNumberLightsConnected
+	case "cadence":
+		return ExdDescriptorsCadence
+	case "distance":
+		return ExdDescriptorsDistance
+	case "estimated_time_of_arrival":
+		return ExdDescriptorsEstimatedTimeOfArrival
+	case "heading":
+		return ExdDescriptorsHeading
+	case "time":
+		return ExdDescriptorsTime
+	case "battery_level":
+		return ExdDescriptorsBatteryLevel
+	case "trainer_resistance":
+		return ExdDescriptorsTrainerResistance
+	case "trainer_target_power":
+		return ExdDescriptorsTrainerTargetPower
+	case "time_seated":
+		return ExdDescriptorsTimeSeated
+	case "time_standing":
+		return ExdDescriptorsTimeStanding
+	case "elevation":
+		return ExdDescriptorsElevation
+	case "grade":
+		return ExdDescriptorsGrade
+	case "ascent":
+		return ExdDescriptorsAscent
+	case "descent":
+		return ExdDescriptorsDescent
+	case "vertical_speed":
+		return ExdDescriptorsVerticalSpeed
+	case "di2_battery_level":
+		return ExdDescriptorsDi2BatteryLevel
+	case "front_gear":
+		return ExdDescriptorsFrontGear
+	case "rear_gear":
+		return ExdDescriptorsRearGear
+	case "gear_ratio":
+		return ExdDescriptorsGearRatio
+	case "heart_rate":
+		return ExdDescriptorsHeartRate
+	case "heart_rate_zone":
+		return ExdDescriptorsHeartRateZone
+	case "time_in_heart_rate_zone":
+		return ExdDescriptorsTimeInHeartRateZone
+	case "heart_rate_reserve":
+		return ExdDescriptorsHeartRateReserve
+	case "calories":
+		return ExdDescriptorsCalories
+	case "gps_accuracy":
+		return ExdDescriptorsGpsAccuracy
+	case "gps_signal_strength":
+		return ExdDescriptorsGpsSignalStrength
+	case "temperature":
+		return ExdDescriptorsTemperature
+	case "time_of_day":
+		return ExdDescriptorsTimeOfDay
+	case "balance":
+		return ExdDescriptorsBalance
+	case "pedal_smoothness":
+		return ExdDescriptorsPedalSmoothness
+	case "power":
+		return ExdDescriptorsPower
+	case "functional_threshold_power":
+		return ExdDescriptorsFunctionalThresholdPower
+	case "intensity_factor":
+		return ExdDescriptorsIntensityFactor
+	case "work":
+		return ExdDescriptorsWork
+	case "power_ratio":
+		return ExdDescriptorsPowerRatio
+	case "normalized_power":
+		return ExdDescriptorsNormalizedPower
+	case "training_stress_Score":
+		return ExdDescriptorsTrainingStressScore
+	case "time_on_zone":
+		return ExdDescriptorsTimeOnZone
+	case "speed":
+		return ExdDescriptorsSpeed
+	case "laps":
+		return ExdDescriptorsLaps
+	case "reps":
+		return ExdDescriptorsReps
+	case "workout_step":
+		return ExdDescriptorsWorkoutStep
+	case "course_distance":
+		return ExdDescriptorsCourseDistance
+	case "navigation_distance":
+		return ExdDescriptorsNavigationDistance
+	case "course_estimated_time_of_arrival":
+		return ExdDescriptorsCourseEstimatedTimeOfArrival
+	case "navigation_estimated_time_of_arrival":
+		return ExdDescriptorsNavigationEstimatedTimeOfArrival
+	case "course_time":
+		return ExdDescriptorsCourseTime
+	case "navigation_time":
+		return ExdDescriptorsNavigationTime
+	case "course_heading":
+		return ExdDescriptorsCourseHeading
+	case "navigation_heading":
+		return ExdDescriptorsNavigationHeading
+	case "power_zone":
+		return ExdDescriptorsPowerZone
+	case "torque_effectiveness":
+		return ExdDescriptorsTorqueEffectiveness
+	case "timer_time":
+		return ExdDescriptorsTimerTime
+	case "power_weight_ratio":
+		return ExdDescriptorsPowerWeightRatio
+	case "left_platform_center_offset":
+		return ExdDescriptorsLeftPlatformCenterOffset
+	case "right_platform_center_offset":
+		return ExdDescriptorsRightPlatformCenterOffset
+	case "left_power_phase_start_angle":
+		return ExdDescriptorsLeftPowerPhaseStartAngle
+	case "right_power_phase_start_angle":
+		return ExdDescriptorsRightPowerPhaseStartAngle
+	case "left_power_phase_finish_angle":
+		return ExdDescriptorsLeftPowerPhaseFinishAngle
+	case "right_power_phase_finish_angle":
+		return ExdDescriptorsRightPowerPhaseFinishAngle
+	case "gears":
+		return ExdDescriptorsGears
+	case "pace":
+		return ExdDescriptorsPace
+	case "training_effect":
+		return ExdDescriptorsTrainingEffect
+	case "vertical_oscillation":
+		return ExdDescriptorsVerticalOscillation
+	case "vertical_ratio":
+		return ExdDescriptorsVerticalRatio
+	case "ground_contact_time":
+		return ExdDescriptorsGroundContactTime
+	case "left_ground_contact_time_balance":
+		return ExdDescriptorsLeftGroundContactTimeBalance
+	case "right_ground_contact_time_balance":
+		return ExdDescriptorsRightGroundContactTimeBalance
+	case "stride_length":
+		return ExdDescriptorsStrideLength
+	case "running_cadence":
+		return ExdDescriptorsRunningCadence
+	case "performance_condition":
+		return ExdDescriptorsPerformanceCondition
+	case "course_type":
+		return ExdDescriptorsCourseType
+	case "time_in_power_zone":
+		return ExdDescriptorsTimeInPowerZone
+	case "navigation_turn":
+		return ExdDescriptorsNavigationTurn
+	case "course_location":
+		return ExdDescriptorsCourseLocation
+	case "navigation_location":
+		return ExdDescriptorsNavigationLocation
+	case "compass":
+		return ExdDescriptorsCompass
+	case "gear_combo":
+		return ExdDescriptorsGearCombo
+	case "muscle_oxygen":
+		return ExdDescriptorsMuscleOxygen
+	case "icon":
+		return ExdDescriptorsIcon
+	case "compass_heading":
+		return ExdDescriptorsCompassHeading
+	case "gps_heading":
+		return ExdDescriptorsGpsHeading
+	case "gps_elevation":
+		return ExdDescriptorsGpsElevation
+	case "anaerobic_training_effect":
+		return ExdDescriptorsAnaerobicTrainingEffect
+	case "course":
+		return ExdDescriptorsCourse
+	case "off_course":
+		return ExdDescriptorsOffCourse
+	case "glide_ratio":
+		return ExdDescriptorsGlideRatio
+	case "vertical_distance":
+		return ExdDescriptorsVerticalDistance
+	case "vmg":
+		return ExdDescriptorsVmg
+	case "ambient_pressure":
+		return ExdDescriptorsAmbientPressure
+	case "pressure":
+		return ExdDescriptorsPressure
+	case "vam":
+		return ExdDescriptorsVam
+	default:
+		return ExdDescriptorsInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExdDescriptors() []ExdDescriptors {
-	vs := make([]ExdDescriptors, 0, len(exddescriptorstostrs))
-	for i := range exddescriptorstostrs {
-		vs = append(vs, ExdDescriptors(i))
+	return []ExdDescriptors{
+		ExdDescriptorsBikeLightBatteryStatus,
+		ExdDescriptorsBeamAngleStatus,
+		ExdDescriptorsBateryLevel,
+		ExdDescriptorsLightNetworkMode,
+		ExdDescriptorsNumberLightsConnected,
+		ExdDescriptorsCadence,
+		ExdDescriptorsDistance,
+		ExdDescriptorsEstimatedTimeOfArrival,
+		ExdDescriptorsHeading,
+		ExdDescriptorsTime,
+		ExdDescriptorsBatteryLevel,
+		ExdDescriptorsTrainerResistance,
+		ExdDescriptorsTrainerTargetPower,
+		ExdDescriptorsTimeSeated,
+		ExdDescriptorsTimeStanding,
+		ExdDescriptorsElevation,
+		ExdDescriptorsGrade,
+		ExdDescriptorsAscent,
+		ExdDescriptorsDescent,
+		ExdDescriptorsVerticalSpeed,
+		ExdDescriptorsDi2BatteryLevel,
+		ExdDescriptorsFrontGear,
+		ExdDescriptorsRearGear,
+		ExdDescriptorsGearRatio,
+		ExdDescriptorsHeartRate,
+		ExdDescriptorsHeartRateZone,
+		ExdDescriptorsTimeInHeartRateZone,
+		ExdDescriptorsHeartRateReserve,
+		ExdDescriptorsCalories,
+		ExdDescriptorsGpsAccuracy,
+		ExdDescriptorsGpsSignalStrength,
+		ExdDescriptorsTemperature,
+		ExdDescriptorsTimeOfDay,
+		ExdDescriptorsBalance,
+		ExdDescriptorsPedalSmoothness,
+		ExdDescriptorsPower,
+		ExdDescriptorsFunctionalThresholdPower,
+		ExdDescriptorsIntensityFactor,
+		ExdDescriptorsWork,
+		ExdDescriptorsPowerRatio,
+		ExdDescriptorsNormalizedPower,
+		ExdDescriptorsTrainingStressScore,
+		ExdDescriptorsTimeOnZone,
+		ExdDescriptorsSpeed,
+		ExdDescriptorsLaps,
+		ExdDescriptorsReps,
+		ExdDescriptorsWorkoutStep,
+		ExdDescriptorsCourseDistance,
+		ExdDescriptorsNavigationDistance,
+		ExdDescriptorsCourseEstimatedTimeOfArrival,
+		ExdDescriptorsNavigationEstimatedTimeOfArrival,
+		ExdDescriptorsCourseTime,
+		ExdDescriptorsNavigationTime,
+		ExdDescriptorsCourseHeading,
+		ExdDescriptorsNavigationHeading,
+		ExdDescriptorsPowerZone,
+		ExdDescriptorsTorqueEffectiveness,
+		ExdDescriptorsTimerTime,
+		ExdDescriptorsPowerWeightRatio,
+		ExdDescriptorsLeftPlatformCenterOffset,
+		ExdDescriptorsRightPlatformCenterOffset,
+		ExdDescriptorsLeftPowerPhaseStartAngle,
+		ExdDescriptorsRightPowerPhaseStartAngle,
+		ExdDescriptorsLeftPowerPhaseFinishAngle,
+		ExdDescriptorsRightPowerPhaseFinishAngle,
+		ExdDescriptorsGears,
+		ExdDescriptorsPace,
+		ExdDescriptorsTrainingEffect,
+		ExdDescriptorsVerticalOscillation,
+		ExdDescriptorsVerticalRatio,
+		ExdDescriptorsGroundContactTime,
+		ExdDescriptorsLeftGroundContactTimeBalance,
+		ExdDescriptorsRightGroundContactTimeBalance,
+		ExdDescriptorsStrideLength,
+		ExdDescriptorsRunningCadence,
+		ExdDescriptorsPerformanceCondition,
+		ExdDescriptorsCourseType,
+		ExdDescriptorsTimeInPowerZone,
+		ExdDescriptorsNavigationTurn,
+		ExdDescriptorsCourseLocation,
+		ExdDescriptorsNavigationLocation,
+		ExdDescriptorsCompass,
+		ExdDescriptorsGearCombo,
+		ExdDescriptorsMuscleOxygen,
+		ExdDescriptorsIcon,
+		ExdDescriptorsCompassHeading,
+		ExdDescriptorsGpsHeading,
+		ExdDescriptorsGpsElevation,
+		ExdDescriptorsAnaerobicTrainingEffect,
+		ExdDescriptorsCourse,
+		ExdDescriptorsOffCourse,
+		ExdDescriptorsGlideRatio,
+		ExdDescriptorsVerticalDistance,
+		ExdDescriptorsVmg,
+		ExdDescriptorsAmbientPressure,
+		ExdDescriptorsPressure,
+		ExdDescriptorsVam,
 	}
-	return vs
 }

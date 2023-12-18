@@ -15,50 +15,49 @@ type SessionTrigger byte
 
 const (
 	SessionTriggerActivityEnd      SessionTrigger = 0
-	SessionTriggerManual           SessionTrigger = 1    // User changed sport.
-	SessionTriggerAutoMultiSport   SessionTrigger = 2    // Auto multi-sport feature is enabled and user pressed lap button to advance session.
-	SessionTriggerFitnessEquipment SessionTrigger = 3    // Auto sport change caused by user linking to fitness equipment.
-	SessionTriggerInvalid          SessionTrigger = 0xFF // INVALID
+	SessionTriggerManual           SessionTrigger = 1 // User changed sport.
+	SessionTriggerAutoMultiSport   SessionTrigger = 2 // Auto multi-sport feature is enabled and user pressed lap button to advance session.
+	SessionTriggerFitnessEquipment SessionTrigger = 3 // Auto sport change caused by user linking to fitness equipment.
+	SessionTriggerInvalid          SessionTrigger = 0xFF
 )
 
-var sessiontriggertostrs = map[SessionTrigger]string{
-	SessionTriggerActivityEnd:      "activity_end",
-	SessionTriggerManual:           "manual",
-	SessionTriggerAutoMultiSport:   "auto_multi_sport",
-	SessionTriggerFitnessEquipment: "fitness_equipment",
-	SessionTriggerInvalid:          "invalid",
-}
-
 func (s SessionTrigger) String() string {
-	val, ok := sessiontriggertostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SessionTriggerActivityEnd:
+		return "activity_end"
+	case SessionTriggerManual:
+		return "manual"
+	case SessionTriggerAutoMultiSport:
+		return "auto_multi_sport"
+	case SessionTriggerFitnessEquipment:
+		return "fitness_equipment"
+	default:
+		return "SessionTriggerInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosessiontrigger = func() map[string]SessionTrigger {
-	m := make(map[string]SessionTrigger)
-	for t, str := range sessiontriggertostrs {
-		m[str] = SessionTrigger(t)
-	}
-	return m
-}()
 
 // FromString parse string into SessionTrigger constant it's represent, return SessionTriggerInvalid if not found.
 func SessionTriggerFromString(s string) SessionTrigger {
-	val, ok := strtosessiontrigger[s]
-	if !ok {
-		return strtosessiontrigger["invalid"]
+	switch s {
+	case "activity_end":
+		return SessionTriggerActivityEnd
+	case "manual":
+		return SessionTriggerManual
+	case "auto_multi_sport":
+		return SessionTriggerAutoMultiSport
+	case "fitness_equipment":
+		return SessionTriggerFitnessEquipment
+	default:
+		return SessionTriggerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSessionTrigger() []SessionTrigger {
-	vs := make([]SessionTrigger, 0, len(sessiontriggertostrs))
-	for i := range sessiontriggertostrs {
-		vs = append(vs, SessionTrigger(i))
+	return []SessionTrigger{
+		SessionTriggerActivityEnd,
+		SessionTriggerManual,
+		SessionTriggerAutoMultiSport,
+		SessionTriggerFitnessEquipment,
 	}
-	return vs
 }

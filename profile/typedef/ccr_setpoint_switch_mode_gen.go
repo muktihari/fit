@@ -14,47 +14,38 @@ import (
 type CcrSetpointSwitchMode byte
 
 const (
-	CcrSetpointSwitchModeManual    CcrSetpointSwitchMode = 0    // User switches setpoints manually
-	CcrSetpointSwitchModeAutomatic CcrSetpointSwitchMode = 1    // Switch automatically based on depth
-	CcrSetpointSwitchModeInvalid   CcrSetpointSwitchMode = 0xFF // INVALID
+	CcrSetpointSwitchModeManual    CcrSetpointSwitchMode = 0 // User switches setpoints manually
+	CcrSetpointSwitchModeAutomatic CcrSetpointSwitchMode = 1 // Switch automatically based on depth
+	CcrSetpointSwitchModeInvalid   CcrSetpointSwitchMode = 0xFF
 )
 
-var ccrsetpointswitchmodetostrs = map[CcrSetpointSwitchMode]string{
-	CcrSetpointSwitchModeManual:    "manual",
-	CcrSetpointSwitchModeAutomatic: "automatic",
-	CcrSetpointSwitchModeInvalid:   "invalid",
-}
-
 func (c CcrSetpointSwitchMode) String() string {
-	val, ok := ccrsetpointswitchmodetostrs[c]
-	if !ok {
-		return strconv.Itoa(int(c))
+	switch c {
+	case CcrSetpointSwitchModeManual:
+		return "manual"
+	case CcrSetpointSwitchModeAutomatic:
+		return "automatic"
+	default:
+		return "CcrSetpointSwitchModeInvalid(" + strconv.Itoa(int(c)) + ")"
 	}
-	return val
 }
-
-var strtoccrsetpointswitchmode = func() map[string]CcrSetpointSwitchMode {
-	m := make(map[string]CcrSetpointSwitchMode)
-	for t, str := range ccrsetpointswitchmodetostrs {
-		m[str] = CcrSetpointSwitchMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into CcrSetpointSwitchMode constant it's represent, return CcrSetpointSwitchModeInvalid if not found.
 func CcrSetpointSwitchModeFromString(s string) CcrSetpointSwitchMode {
-	val, ok := strtoccrsetpointswitchmode[s]
-	if !ok {
-		return strtoccrsetpointswitchmode["invalid"]
+	switch s {
+	case "manual":
+		return CcrSetpointSwitchModeManual
+	case "automatic":
+		return CcrSetpointSwitchModeAutomatic
+	default:
+		return CcrSetpointSwitchModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCcrSetpointSwitchMode() []CcrSetpointSwitchMode {
-	vs := make([]CcrSetpointSwitchMode, 0, len(ccrsetpointswitchmodetostrs))
-	for i := range ccrsetpointswitchmodetostrs {
-		vs = append(vs, CcrSetpointSwitchMode(i))
+	return []CcrSetpointSwitchMode{
+		CcrSetpointSwitchModeManual,
+		CcrSetpointSwitchModeAutomatic,
 	}
-	return vs
 }

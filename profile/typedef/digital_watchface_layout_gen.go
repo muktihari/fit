@@ -17,46 +17,41 @@ const (
 	DigitalWatchfaceLayoutTraditional DigitalWatchfaceLayout = 0
 	DigitalWatchfaceLayoutModern      DigitalWatchfaceLayout = 1
 	DigitalWatchfaceLayoutBold        DigitalWatchfaceLayout = 2
-	DigitalWatchfaceLayoutInvalid     DigitalWatchfaceLayout = 0xFF // INVALID
+	DigitalWatchfaceLayoutInvalid     DigitalWatchfaceLayout = 0xFF
 )
 
-var digitalwatchfacelayouttostrs = map[DigitalWatchfaceLayout]string{
-	DigitalWatchfaceLayoutTraditional: "traditional",
-	DigitalWatchfaceLayoutModern:      "modern",
-	DigitalWatchfaceLayoutBold:        "bold",
-	DigitalWatchfaceLayoutInvalid:     "invalid",
-}
-
 func (d DigitalWatchfaceLayout) String() string {
-	val, ok := digitalwatchfacelayouttostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DigitalWatchfaceLayoutTraditional:
+		return "traditional"
+	case DigitalWatchfaceLayoutModern:
+		return "modern"
+	case DigitalWatchfaceLayoutBold:
+		return "bold"
+	default:
+		return "DigitalWatchfaceLayoutInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodigitalwatchfacelayout = func() map[string]DigitalWatchfaceLayout {
-	m := make(map[string]DigitalWatchfaceLayout)
-	for t, str := range digitalwatchfacelayouttostrs {
-		m[str] = DigitalWatchfaceLayout(t)
-	}
-	return m
-}()
 
 // FromString parse string into DigitalWatchfaceLayout constant it's represent, return DigitalWatchfaceLayoutInvalid if not found.
 func DigitalWatchfaceLayoutFromString(s string) DigitalWatchfaceLayout {
-	val, ok := strtodigitalwatchfacelayout[s]
-	if !ok {
-		return strtodigitalwatchfacelayout["invalid"]
+	switch s {
+	case "traditional":
+		return DigitalWatchfaceLayoutTraditional
+	case "modern":
+		return DigitalWatchfaceLayoutModern
+	case "bold":
+		return DigitalWatchfaceLayoutBold
+	default:
+		return DigitalWatchfaceLayoutInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDigitalWatchfaceLayout() []DigitalWatchfaceLayout {
-	vs := make([]DigitalWatchfaceLayout, 0, len(digitalwatchfacelayouttostrs))
-	for i := range digitalwatchfacelayouttostrs {
-		vs = append(vs, DigitalWatchfaceLayout(i))
+	return []DigitalWatchfaceLayout{
+		DigitalWatchfaceLayoutTraditional,
+		DigitalWatchfaceLayoutModern,
+		DigitalWatchfaceLayoutBold,
 	}
-	return vs
 }

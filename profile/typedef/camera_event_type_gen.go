@@ -27,56 +27,91 @@ const (
 	CameraEventTypeVideoSecondStreamPause      CameraEventType = 12
 	CameraEventTypeVideoResume                 CameraEventType = 13 // Mark when a video recording has been resumed
 	CameraEventTypeVideoSecondStreamResume     CameraEventType = 14
-	CameraEventTypeInvalid                     CameraEventType = 0xFF // INVALID
+	CameraEventTypeInvalid                     CameraEventType = 0xFF
 )
 
-var cameraeventtypetostrs = map[CameraEventType]string{
-	CameraEventTypeVideoStart:                  "video_start",
-	CameraEventTypeVideoSplit:                  "video_split",
-	CameraEventTypeVideoEnd:                    "video_end",
-	CameraEventTypePhotoTaken:                  "photo_taken",
-	CameraEventTypeVideoSecondStreamStart:      "video_second_stream_start",
-	CameraEventTypeVideoSecondStreamSplit:      "video_second_stream_split",
-	CameraEventTypeVideoSecondStreamEnd:        "video_second_stream_end",
-	CameraEventTypeVideoSplitStart:             "video_split_start",
-	CameraEventTypeVideoSecondStreamSplitStart: "video_second_stream_split_start",
-	CameraEventTypeVideoPause:                  "video_pause",
-	CameraEventTypeVideoSecondStreamPause:      "video_second_stream_pause",
-	CameraEventTypeVideoResume:                 "video_resume",
-	CameraEventTypeVideoSecondStreamResume:     "video_second_stream_resume",
-	CameraEventTypeInvalid:                     "invalid",
-}
-
 func (c CameraEventType) String() string {
-	val, ok := cameraeventtypetostrs[c]
-	if !ok {
-		return strconv.Itoa(int(c))
+	switch c {
+	case CameraEventTypeVideoStart:
+		return "video_start"
+	case CameraEventTypeVideoSplit:
+		return "video_split"
+	case CameraEventTypeVideoEnd:
+		return "video_end"
+	case CameraEventTypePhotoTaken:
+		return "photo_taken"
+	case CameraEventTypeVideoSecondStreamStart:
+		return "video_second_stream_start"
+	case CameraEventTypeVideoSecondStreamSplit:
+		return "video_second_stream_split"
+	case CameraEventTypeVideoSecondStreamEnd:
+		return "video_second_stream_end"
+	case CameraEventTypeVideoSplitStart:
+		return "video_split_start"
+	case CameraEventTypeVideoSecondStreamSplitStart:
+		return "video_second_stream_split_start"
+	case CameraEventTypeVideoPause:
+		return "video_pause"
+	case CameraEventTypeVideoSecondStreamPause:
+		return "video_second_stream_pause"
+	case CameraEventTypeVideoResume:
+		return "video_resume"
+	case CameraEventTypeVideoSecondStreamResume:
+		return "video_second_stream_resume"
+	default:
+		return "CameraEventTypeInvalid(" + strconv.Itoa(int(c)) + ")"
 	}
-	return val
 }
-
-var strtocameraeventtype = func() map[string]CameraEventType {
-	m := make(map[string]CameraEventType)
-	for t, str := range cameraeventtypetostrs {
-		m[str] = CameraEventType(t)
-	}
-	return m
-}()
 
 // FromString parse string into CameraEventType constant it's represent, return CameraEventTypeInvalid if not found.
 func CameraEventTypeFromString(s string) CameraEventType {
-	val, ok := strtocameraeventtype[s]
-	if !ok {
-		return strtocameraeventtype["invalid"]
+	switch s {
+	case "video_start":
+		return CameraEventTypeVideoStart
+	case "video_split":
+		return CameraEventTypeVideoSplit
+	case "video_end":
+		return CameraEventTypeVideoEnd
+	case "photo_taken":
+		return CameraEventTypePhotoTaken
+	case "video_second_stream_start":
+		return CameraEventTypeVideoSecondStreamStart
+	case "video_second_stream_split":
+		return CameraEventTypeVideoSecondStreamSplit
+	case "video_second_stream_end":
+		return CameraEventTypeVideoSecondStreamEnd
+	case "video_split_start":
+		return CameraEventTypeVideoSplitStart
+	case "video_second_stream_split_start":
+		return CameraEventTypeVideoSecondStreamSplitStart
+	case "video_pause":
+		return CameraEventTypeVideoPause
+	case "video_second_stream_pause":
+		return CameraEventTypeVideoSecondStreamPause
+	case "video_resume":
+		return CameraEventTypeVideoResume
+	case "video_second_stream_resume":
+		return CameraEventTypeVideoSecondStreamResume
+	default:
+		return CameraEventTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCameraEventType() []CameraEventType {
-	vs := make([]CameraEventType, 0, len(cameraeventtypetostrs))
-	for i := range cameraeventtypetostrs {
-		vs = append(vs, CameraEventType(i))
+	return []CameraEventType{
+		CameraEventTypeVideoStart,
+		CameraEventTypeVideoSplit,
+		CameraEventTypeVideoEnd,
+		CameraEventTypePhotoTaken,
+		CameraEventTypeVideoSecondStreamStart,
+		CameraEventTypeVideoSecondStreamSplit,
+		CameraEventTypeVideoSecondStreamEnd,
+		CameraEventTypeVideoSplitStart,
+		CameraEventTypeVideoSecondStreamSplitStart,
+		CameraEventTypeVideoPause,
+		CameraEventTypeVideoSecondStreamPause,
+		CameraEventTypeVideoResume,
+		CameraEventTypeVideoSecondStreamResume,
 	}
-	return vs
 }

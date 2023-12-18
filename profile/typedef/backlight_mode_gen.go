@@ -21,50 +21,61 @@ const (
 	BacklightModeSmartNotifications                  BacklightMode = 4
 	BacklightModeKeyAndMessagesNight                 BacklightMode = 5
 	BacklightModeKeyAndMessagesAndSmartNotifications BacklightMode = 6
-	BacklightModeInvalid                             BacklightMode = 0xFF // INVALID
+	BacklightModeInvalid                             BacklightMode = 0xFF
 )
 
-var backlightmodetostrs = map[BacklightMode]string{
-	BacklightModeOff:                                 "off",
-	BacklightModeManual:                              "manual",
-	BacklightModeKeyAndMessages:                      "key_and_messages",
-	BacklightModeAutoBrightness:                      "auto_brightness",
-	BacklightModeSmartNotifications:                  "smart_notifications",
-	BacklightModeKeyAndMessagesNight:                 "key_and_messages_night",
-	BacklightModeKeyAndMessagesAndSmartNotifications: "key_and_messages_and_smart_notifications",
-	BacklightModeInvalid:                             "invalid",
-}
-
 func (b BacklightMode) String() string {
-	val, ok := backlightmodetostrs[b]
-	if !ok {
-		return strconv.Itoa(int(b))
+	switch b {
+	case BacklightModeOff:
+		return "off"
+	case BacklightModeManual:
+		return "manual"
+	case BacklightModeKeyAndMessages:
+		return "key_and_messages"
+	case BacklightModeAutoBrightness:
+		return "auto_brightness"
+	case BacklightModeSmartNotifications:
+		return "smart_notifications"
+	case BacklightModeKeyAndMessagesNight:
+		return "key_and_messages_night"
+	case BacklightModeKeyAndMessagesAndSmartNotifications:
+		return "key_and_messages_and_smart_notifications"
+	default:
+		return "BacklightModeInvalid(" + strconv.Itoa(int(b)) + ")"
 	}
-	return val
 }
-
-var strtobacklightmode = func() map[string]BacklightMode {
-	m := make(map[string]BacklightMode)
-	for t, str := range backlightmodetostrs {
-		m[str] = BacklightMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into BacklightMode constant it's represent, return BacklightModeInvalid if not found.
 func BacklightModeFromString(s string) BacklightMode {
-	val, ok := strtobacklightmode[s]
-	if !ok {
-		return strtobacklightmode["invalid"]
+	switch s {
+	case "off":
+		return BacklightModeOff
+	case "manual":
+		return BacklightModeManual
+	case "key_and_messages":
+		return BacklightModeKeyAndMessages
+	case "auto_brightness":
+		return BacklightModeAutoBrightness
+	case "smart_notifications":
+		return BacklightModeSmartNotifications
+	case "key_and_messages_night":
+		return BacklightModeKeyAndMessagesNight
+	case "key_and_messages_and_smart_notifications":
+		return BacklightModeKeyAndMessagesAndSmartNotifications
+	default:
+		return BacklightModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBacklightMode() []BacklightMode {
-	vs := make([]BacklightMode, 0, len(backlightmodetostrs))
-	for i := range backlightmodetostrs {
-		vs = append(vs, BacklightMode(i))
+	return []BacklightMode{
+		BacklightModeOff,
+		BacklightModeManual,
+		BacklightModeKeyAndMessages,
+		BacklightModeAutoBrightness,
+		BacklightModeSmartNotifications,
+		BacklightModeKeyAndMessagesNight,
+		BacklightModeKeyAndMessagesAndSmartNotifications,
 	}
-	return vs
 }

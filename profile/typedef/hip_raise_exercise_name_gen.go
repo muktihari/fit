@@ -64,93 +64,276 @@ const (
 	HipRaiseExerciseNameLegCircles                                      HipRaiseExerciseName = 47
 	HipRaiseExerciseNameLegLift                                         HipRaiseExerciseName = 48
 	HipRaiseExerciseNameLegLiftInExternalRotation                       HipRaiseExerciseName = 49
-	HipRaiseExerciseNameInvalid                                         HipRaiseExerciseName = 0xFFFF // INVALID
+	HipRaiseExerciseNameInvalid                                         HipRaiseExerciseName = 0xFFFF
 )
 
-var hipraiseexercisenametostrs = map[HipRaiseExerciseName]string{
-	HipRaiseExerciseNameBarbellHipThrustOnFloor:                         "barbell_hip_thrust_on_floor",
-	HipRaiseExerciseNameBarbellHipThrustWithBench:                       "barbell_hip_thrust_with_bench",
-	HipRaiseExerciseNameBentKneeSwissBallReverseHipRaise:                "bent_knee_swiss_ball_reverse_hip_raise",
-	HipRaiseExerciseNameWeightedBentKneeSwissBallReverseHipRaise:        "weighted_bent_knee_swiss_ball_reverse_hip_raise",
-	HipRaiseExerciseNameBridgeWithLegExtension:                          "bridge_with_leg_extension",
-	HipRaiseExerciseNameWeightedBridgeWithLegExtension:                  "weighted_bridge_with_leg_extension",
-	HipRaiseExerciseNameClamBridge:                                      "clam_bridge",
-	HipRaiseExerciseNameFrontKickTabletop:                               "front_kick_tabletop",
-	HipRaiseExerciseNameWeightedFrontKickTabletop:                       "weighted_front_kick_tabletop",
-	HipRaiseExerciseNameHipExtensionAndCross:                            "hip_extension_and_cross",
-	HipRaiseExerciseNameWeightedHipExtensionAndCross:                    "weighted_hip_extension_and_cross",
-	HipRaiseExerciseNameHipRaise:                                        "hip_raise",
-	HipRaiseExerciseNameWeightedHipRaise:                                "weighted_hip_raise",
-	HipRaiseExerciseNameHipRaiseWithFeetOnSwissBall:                     "hip_raise_with_feet_on_swiss_ball",
-	HipRaiseExerciseNameWeightedHipRaiseWithFeetOnSwissBall:             "weighted_hip_raise_with_feet_on_swiss_ball",
-	HipRaiseExerciseNameHipRaiseWithHeadOnBosuBall:                      "hip_raise_with_head_on_bosu_ball",
-	HipRaiseExerciseNameWeightedHipRaiseWithHeadOnBosuBall:              "weighted_hip_raise_with_head_on_bosu_ball",
-	HipRaiseExerciseNameHipRaiseWithHeadOnSwissBall:                     "hip_raise_with_head_on_swiss_ball",
-	HipRaiseExerciseNameWeightedHipRaiseWithHeadOnSwissBall:             "weighted_hip_raise_with_head_on_swiss_ball",
-	HipRaiseExerciseNameHipRaiseWithKneeSqueeze:                         "hip_raise_with_knee_squeeze",
-	HipRaiseExerciseNameWeightedHipRaiseWithKneeSqueeze:                 "weighted_hip_raise_with_knee_squeeze",
-	HipRaiseExerciseNameInclineRearLegExtension:                         "incline_rear_leg_extension",
-	HipRaiseExerciseNameWeightedInclineRearLegExtension:                 "weighted_incline_rear_leg_extension",
-	HipRaiseExerciseNameKettlebellSwing:                                 "kettlebell_swing",
-	HipRaiseExerciseNameMarchingHipRaise:                                "marching_hip_raise",
-	HipRaiseExerciseNameWeightedMarchingHipRaise:                        "weighted_marching_hip_raise",
-	HipRaiseExerciseNameMarchingHipRaiseWithFeetOnASwissBall:            "marching_hip_raise_with_feet_on_a_swiss_ball",
-	HipRaiseExerciseNameWeightedMarchingHipRaiseWithFeetOnASwissBall:    "weighted_marching_hip_raise_with_feet_on_a_swiss_ball",
-	HipRaiseExerciseNameReverseHipRaise:                                 "reverse_hip_raise",
-	HipRaiseExerciseNameWeightedReverseHipRaise:                         "weighted_reverse_hip_raise",
-	HipRaiseExerciseNameSingleLegHipRaise:                               "single_leg_hip_raise",
-	HipRaiseExerciseNameWeightedSingleLegHipRaise:                       "weighted_single_leg_hip_raise",
-	HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBench:                "single_leg_hip_raise_with_foot_on_bench",
-	HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBench:        "weighted_single_leg_hip_raise_with_foot_on_bench",
-	HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBosuBall:             "single_leg_hip_raise_with_foot_on_bosu_ball",
-	HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBosuBall:     "weighted_single_leg_hip_raise_with_foot_on_bosu_ball",
-	HipRaiseExerciseNameSingleLegHipRaiseWithFootOnFoamRoller:           "single_leg_hip_raise_with_foot_on_foam_roller",
-	HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnFoamRoller:   "weighted_single_leg_hip_raise_with_foot_on_foam_roller",
-	HipRaiseExerciseNameSingleLegHipRaiseWithFootOnMedicineBall:         "single_leg_hip_raise_with_foot_on_medicine_ball",
-	HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnMedicineBall: "weighted_single_leg_hip_raise_with_foot_on_medicine_ball",
-	HipRaiseExerciseNameSingleLegHipRaiseWithHeadOnBosuBall:             "single_leg_hip_raise_with_head_on_bosu_ball",
-	HipRaiseExerciseNameWeightedSingleLegHipRaiseWithHeadOnBosuBall:     "weighted_single_leg_hip_raise_with_head_on_bosu_ball",
-	HipRaiseExerciseNameWeightedClamBridge:                              "weighted_clam_bridge",
-	HipRaiseExerciseNameSingleLegSwissBallHipRaiseAndLegCurl:            "single_leg_swiss_ball_hip_raise_and_leg_curl",
-	HipRaiseExerciseNameClams:                                           "clams",
-	HipRaiseExerciseNameInnerThighCircles:                               "inner_thigh_circles",
-	HipRaiseExerciseNameInnerThighSideLift:                              "inner_thigh_side_lift",
-	HipRaiseExerciseNameLegCircles:                                      "leg_circles",
-	HipRaiseExerciseNameLegLift:                                         "leg_lift",
-	HipRaiseExerciseNameLegLiftInExternalRotation:                       "leg_lift_in_external_rotation",
-	HipRaiseExerciseNameInvalid:                                         "invalid",
-}
-
 func (h HipRaiseExerciseName) String() string {
-	val, ok := hipraiseexercisenametostrs[h]
-	if !ok {
-		return strconv.FormatUint(uint64(h), 10)
+	switch h {
+	case HipRaiseExerciseNameBarbellHipThrustOnFloor:
+		return "barbell_hip_thrust_on_floor"
+	case HipRaiseExerciseNameBarbellHipThrustWithBench:
+		return "barbell_hip_thrust_with_bench"
+	case HipRaiseExerciseNameBentKneeSwissBallReverseHipRaise:
+		return "bent_knee_swiss_ball_reverse_hip_raise"
+	case HipRaiseExerciseNameWeightedBentKneeSwissBallReverseHipRaise:
+		return "weighted_bent_knee_swiss_ball_reverse_hip_raise"
+	case HipRaiseExerciseNameBridgeWithLegExtension:
+		return "bridge_with_leg_extension"
+	case HipRaiseExerciseNameWeightedBridgeWithLegExtension:
+		return "weighted_bridge_with_leg_extension"
+	case HipRaiseExerciseNameClamBridge:
+		return "clam_bridge"
+	case HipRaiseExerciseNameFrontKickTabletop:
+		return "front_kick_tabletop"
+	case HipRaiseExerciseNameWeightedFrontKickTabletop:
+		return "weighted_front_kick_tabletop"
+	case HipRaiseExerciseNameHipExtensionAndCross:
+		return "hip_extension_and_cross"
+	case HipRaiseExerciseNameWeightedHipExtensionAndCross:
+		return "weighted_hip_extension_and_cross"
+	case HipRaiseExerciseNameHipRaise:
+		return "hip_raise"
+	case HipRaiseExerciseNameWeightedHipRaise:
+		return "weighted_hip_raise"
+	case HipRaiseExerciseNameHipRaiseWithFeetOnSwissBall:
+		return "hip_raise_with_feet_on_swiss_ball"
+	case HipRaiseExerciseNameWeightedHipRaiseWithFeetOnSwissBall:
+		return "weighted_hip_raise_with_feet_on_swiss_ball"
+	case HipRaiseExerciseNameHipRaiseWithHeadOnBosuBall:
+		return "hip_raise_with_head_on_bosu_ball"
+	case HipRaiseExerciseNameWeightedHipRaiseWithHeadOnBosuBall:
+		return "weighted_hip_raise_with_head_on_bosu_ball"
+	case HipRaiseExerciseNameHipRaiseWithHeadOnSwissBall:
+		return "hip_raise_with_head_on_swiss_ball"
+	case HipRaiseExerciseNameWeightedHipRaiseWithHeadOnSwissBall:
+		return "weighted_hip_raise_with_head_on_swiss_ball"
+	case HipRaiseExerciseNameHipRaiseWithKneeSqueeze:
+		return "hip_raise_with_knee_squeeze"
+	case HipRaiseExerciseNameWeightedHipRaiseWithKneeSqueeze:
+		return "weighted_hip_raise_with_knee_squeeze"
+	case HipRaiseExerciseNameInclineRearLegExtension:
+		return "incline_rear_leg_extension"
+	case HipRaiseExerciseNameWeightedInclineRearLegExtension:
+		return "weighted_incline_rear_leg_extension"
+	case HipRaiseExerciseNameKettlebellSwing:
+		return "kettlebell_swing"
+	case HipRaiseExerciseNameMarchingHipRaise:
+		return "marching_hip_raise"
+	case HipRaiseExerciseNameWeightedMarchingHipRaise:
+		return "weighted_marching_hip_raise"
+	case HipRaiseExerciseNameMarchingHipRaiseWithFeetOnASwissBall:
+		return "marching_hip_raise_with_feet_on_a_swiss_ball"
+	case HipRaiseExerciseNameWeightedMarchingHipRaiseWithFeetOnASwissBall:
+		return "weighted_marching_hip_raise_with_feet_on_a_swiss_ball"
+	case HipRaiseExerciseNameReverseHipRaise:
+		return "reverse_hip_raise"
+	case HipRaiseExerciseNameWeightedReverseHipRaise:
+		return "weighted_reverse_hip_raise"
+	case HipRaiseExerciseNameSingleLegHipRaise:
+		return "single_leg_hip_raise"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaise:
+		return "weighted_single_leg_hip_raise"
+	case HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBench:
+		return "single_leg_hip_raise_with_foot_on_bench"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBench:
+		return "weighted_single_leg_hip_raise_with_foot_on_bench"
+	case HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBosuBall:
+		return "single_leg_hip_raise_with_foot_on_bosu_ball"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBosuBall:
+		return "weighted_single_leg_hip_raise_with_foot_on_bosu_ball"
+	case HipRaiseExerciseNameSingleLegHipRaiseWithFootOnFoamRoller:
+		return "single_leg_hip_raise_with_foot_on_foam_roller"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnFoamRoller:
+		return "weighted_single_leg_hip_raise_with_foot_on_foam_roller"
+	case HipRaiseExerciseNameSingleLegHipRaiseWithFootOnMedicineBall:
+		return "single_leg_hip_raise_with_foot_on_medicine_ball"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnMedicineBall:
+		return "weighted_single_leg_hip_raise_with_foot_on_medicine_ball"
+	case HipRaiseExerciseNameSingleLegHipRaiseWithHeadOnBosuBall:
+		return "single_leg_hip_raise_with_head_on_bosu_ball"
+	case HipRaiseExerciseNameWeightedSingleLegHipRaiseWithHeadOnBosuBall:
+		return "weighted_single_leg_hip_raise_with_head_on_bosu_ball"
+	case HipRaiseExerciseNameWeightedClamBridge:
+		return "weighted_clam_bridge"
+	case HipRaiseExerciseNameSingleLegSwissBallHipRaiseAndLegCurl:
+		return "single_leg_swiss_ball_hip_raise_and_leg_curl"
+	case HipRaiseExerciseNameClams:
+		return "clams"
+	case HipRaiseExerciseNameInnerThighCircles:
+		return "inner_thigh_circles"
+	case HipRaiseExerciseNameInnerThighSideLift:
+		return "inner_thigh_side_lift"
+	case HipRaiseExerciseNameLegCircles:
+		return "leg_circles"
+	case HipRaiseExerciseNameLegLift:
+		return "leg_lift"
+	case HipRaiseExerciseNameLegLiftInExternalRotation:
+		return "leg_lift_in_external_rotation"
+	default:
+		return "HipRaiseExerciseNameInvalid(" + strconv.FormatUint(uint64(h), 10) + ")"
 	}
-	return val
 }
-
-var strtohipraiseexercisename = func() map[string]HipRaiseExerciseName {
-	m := make(map[string]HipRaiseExerciseName)
-	for t, str := range hipraiseexercisenametostrs {
-		m[str] = HipRaiseExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into HipRaiseExerciseName constant it's represent, return HipRaiseExerciseNameInvalid if not found.
 func HipRaiseExerciseNameFromString(s string) HipRaiseExerciseName {
-	val, ok := strtohipraiseexercisename[s]
-	if !ok {
-		return strtohipraiseexercisename["invalid"]
+	switch s {
+	case "barbell_hip_thrust_on_floor":
+		return HipRaiseExerciseNameBarbellHipThrustOnFloor
+	case "barbell_hip_thrust_with_bench":
+		return HipRaiseExerciseNameBarbellHipThrustWithBench
+	case "bent_knee_swiss_ball_reverse_hip_raise":
+		return HipRaiseExerciseNameBentKneeSwissBallReverseHipRaise
+	case "weighted_bent_knee_swiss_ball_reverse_hip_raise":
+		return HipRaiseExerciseNameWeightedBentKneeSwissBallReverseHipRaise
+	case "bridge_with_leg_extension":
+		return HipRaiseExerciseNameBridgeWithLegExtension
+	case "weighted_bridge_with_leg_extension":
+		return HipRaiseExerciseNameWeightedBridgeWithLegExtension
+	case "clam_bridge":
+		return HipRaiseExerciseNameClamBridge
+	case "front_kick_tabletop":
+		return HipRaiseExerciseNameFrontKickTabletop
+	case "weighted_front_kick_tabletop":
+		return HipRaiseExerciseNameWeightedFrontKickTabletop
+	case "hip_extension_and_cross":
+		return HipRaiseExerciseNameHipExtensionAndCross
+	case "weighted_hip_extension_and_cross":
+		return HipRaiseExerciseNameWeightedHipExtensionAndCross
+	case "hip_raise":
+		return HipRaiseExerciseNameHipRaise
+	case "weighted_hip_raise":
+		return HipRaiseExerciseNameWeightedHipRaise
+	case "hip_raise_with_feet_on_swiss_ball":
+		return HipRaiseExerciseNameHipRaiseWithFeetOnSwissBall
+	case "weighted_hip_raise_with_feet_on_swiss_ball":
+		return HipRaiseExerciseNameWeightedHipRaiseWithFeetOnSwissBall
+	case "hip_raise_with_head_on_bosu_ball":
+		return HipRaiseExerciseNameHipRaiseWithHeadOnBosuBall
+	case "weighted_hip_raise_with_head_on_bosu_ball":
+		return HipRaiseExerciseNameWeightedHipRaiseWithHeadOnBosuBall
+	case "hip_raise_with_head_on_swiss_ball":
+		return HipRaiseExerciseNameHipRaiseWithHeadOnSwissBall
+	case "weighted_hip_raise_with_head_on_swiss_ball":
+		return HipRaiseExerciseNameWeightedHipRaiseWithHeadOnSwissBall
+	case "hip_raise_with_knee_squeeze":
+		return HipRaiseExerciseNameHipRaiseWithKneeSqueeze
+	case "weighted_hip_raise_with_knee_squeeze":
+		return HipRaiseExerciseNameWeightedHipRaiseWithKneeSqueeze
+	case "incline_rear_leg_extension":
+		return HipRaiseExerciseNameInclineRearLegExtension
+	case "weighted_incline_rear_leg_extension":
+		return HipRaiseExerciseNameWeightedInclineRearLegExtension
+	case "kettlebell_swing":
+		return HipRaiseExerciseNameKettlebellSwing
+	case "marching_hip_raise":
+		return HipRaiseExerciseNameMarchingHipRaise
+	case "weighted_marching_hip_raise":
+		return HipRaiseExerciseNameWeightedMarchingHipRaise
+	case "marching_hip_raise_with_feet_on_a_swiss_ball":
+		return HipRaiseExerciseNameMarchingHipRaiseWithFeetOnASwissBall
+	case "weighted_marching_hip_raise_with_feet_on_a_swiss_ball":
+		return HipRaiseExerciseNameWeightedMarchingHipRaiseWithFeetOnASwissBall
+	case "reverse_hip_raise":
+		return HipRaiseExerciseNameReverseHipRaise
+	case "weighted_reverse_hip_raise":
+		return HipRaiseExerciseNameWeightedReverseHipRaise
+	case "single_leg_hip_raise":
+		return HipRaiseExerciseNameSingleLegHipRaise
+	case "weighted_single_leg_hip_raise":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaise
+	case "single_leg_hip_raise_with_foot_on_bench":
+		return HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBench
+	case "weighted_single_leg_hip_raise_with_foot_on_bench":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBench
+	case "single_leg_hip_raise_with_foot_on_bosu_ball":
+		return HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBosuBall
+	case "weighted_single_leg_hip_raise_with_foot_on_bosu_ball":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBosuBall
+	case "single_leg_hip_raise_with_foot_on_foam_roller":
+		return HipRaiseExerciseNameSingleLegHipRaiseWithFootOnFoamRoller
+	case "weighted_single_leg_hip_raise_with_foot_on_foam_roller":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnFoamRoller
+	case "single_leg_hip_raise_with_foot_on_medicine_ball":
+		return HipRaiseExerciseNameSingleLegHipRaiseWithFootOnMedicineBall
+	case "weighted_single_leg_hip_raise_with_foot_on_medicine_ball":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnMedicineBall
+	case "single_leg_hip_raise_with_head_on_bosu_ball":
+		return HipRaiseExerciseNameSingleLegHipRaiseWithHeadOnBosuBall
+	case "weighted_single_leg_hip_raise_with_head_on_bosu_ball":
+		return HipRaiseExerciseNameWeightedSingleLegHipRaiseWithHeadOnBosuBall
+	case "weighted_clam_bridge":
+		return HipRaiseExerciseNameWeightedClamBridge
+	case "single_leg_swiss_ball_hip_raise_and_leg_curl":
+		return HipRaiseExerciseNameSingleLegSwissBallHipRaiseAndLegCurl
+	case "clams":
+		return HipRaiseExerciseNameClams
+	case "inner_thigh_circles":
+		return HipRaiseExerciseNameInnerThighCircles
+	case "inner_thigh_side_lift":
+		return HipRaiseExerciseNameInnerThighSideLift
+	case "leg_circles":
+		return HipRaiseExerciseNameLegCircles
+	case "leg_lift":
+		return HipRaiseExerciseNameLegLift
+	case "leg_lift_in_external_rotation":
+		return HipRaiseExerciseNameLegLiftInExternalRotation
+	default:
+		return HipRaiseExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHipRaiseExerciseName() []HipRaiseExerciseName {
-	vs := make([]HipRaiseExerciseName, 0, len(hipraiseexercisenametostrs))
-	for i := range hipraiseexercisenametostrs {
-		vs = append(vs, HipRaiseExerciseName(i))
+	return []HipRaiseExerciseName{
+		HipRaiseExerciseNameBarbellHipThrustOnFloor,
+		HipRaiseExerciseNameBarbellHipThrustWithBench,
+		HipRaiseExerciseNameBentKneeSwissBallReverseHipRaise,
+		HipRaiseExerciseNameWeightedBentKneeSwissBallReverseHipRaise,
+		HipRaiseExerciseNameBridgeWithLegExtension,
+		HipRaiseExerciseNameWeightedBridgeWithLegExtension,
+		HipRaiseExerciseNameClamBridge,
+		HipRaiseExerciseNameFrontKickTabletop,
+		HipRaiseExerciseNameWeightedFrontKickTabletop,
+		HipRaiseExerciseNameHipExtensionAndCross,
+		HipRaiseExerciseNameWeightedHipExtensionAndCross,
+		HipRaiseExerciseNameHipRaise,
+		HipRaiseExerciseNameWeightedHipRaise,
+		HipRaiseExerciseNameHipRaiseWithFeetOnSwissBall,
+		HipRaiseExerciseNameWeightedHipRaiseWithFeetOnSwissBall,
+		HipRaiseExerciseNameHipRaiseWithHeadOnBosuBall,
+		HipRaiseExerciseNameWeightedHipRaiseWithHeadOnBosuBall,
+		HipRaiseExerciseNameHipRaiseWithHeadOnSwissBall,
+		HipRaiseExerciseNameWeightedHipRaiseWithHeadOnSwissBall,
+		HipRaiseExerciseNameHipRaiseWithKneeSqueeze,
+		HipRaiseExerciseNameWeightedHipRaiseWithKneeSqueeze,
+		HipRaiseExerciseNameInclineRearLegExtension,
+		HipRaiseExerciseNameWeightedInclineRearLegExtension,
+		HipRaiseExerciseNameKettlebellSwing,
+		HipRaiseExerciseNameMarchingHipRaise,
+		HipRaiseExerciseNameWeightedMarchingHipRaise,
+		HipRaiseExerciseNameMarchingHipRaiseWithFeetOnASwissBall,
+		HipRaiseExerciseNameWeightedMarchingHipRaiseWithFeetOnASwissBall,
+		HipRaiseExerciseNameReverseHipRaise,
+		HipRaiseExerciseNameWeightedReverseHipRaise,
+		HipRaiseExerciseNameSingleLegHipRaise,
+		HipRaiseExerciseNameWeightedSingleLegHipRaise,
+		HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBench,
+		HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBench,
+		HipRaiseExerciseNameSingleLegHipRaiseWithFootOnBosuBall,
+		HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnBosuBall,
+		HipRaiseExerciseNameSingleLegHipRaiseWithFootOnFoamRoller,
+		HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnFoamRoller,
+		HipRaiseExerciseNameSingleLegHipRaiseWithFootOnMedicineBall,
+		HipRaiseExerciseNameWeightedSingleLegHipRaiseWithFootOnMedicineBall,
+		HipRaiseExerciseNameSingleLegHipRaiseWithHeadOnBosuBall,
+		HipRaiseExerciseNameWeightedSingleLegHipRaiseWithHeadOnBosuBall,
+		HipRaiseExerciseNameWeightedClamBridge,
+		HipRaiseExerciseNameSingleLegSwissBallHipRaiseAndLegCurl,
+		HipRaiseExerciseNameClams,
+		HipRaiseExerciseNameInnerThighCircles,
+		HipRaiseExerciseNameInnerThighSideLift,
+		HipRaiseExerciseNameLegCircles,
+		HipRaiseExerciseNameLegLift,
+		HipRaiseExerciseNameLegLiftInExternalRotation,
 	}
-	return vs
 }

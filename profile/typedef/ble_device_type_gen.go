@@ -21,52 +21,67 @@ const (
 	BleDeviceTypeBikeSpeed        BleDeviceType = 4
 	BleDeviceTypeBikeCadence      BleDeviceType = 5
 	BleDeviceTypeFootpod          BleDeviceType = 6
-	BleDeviceTypeBikeTrainer      BleDeviceType = 7    // Indoor-Bike FTMS protocol
-	BleDeviceTypeInvalid          BleDeviceType = 0xFF // INVALID
+	BleDeviceTypeBikeTrainer      BleDeviceType = 7 // Indoor-Bike FTMS protocol
+	BleDeviceTypeInvalid          BleDeviceType = 0xFF
 )
 
-var bledevicetypetostrs = map[BleDeviceType]string{
-	BleDeviceTypeConnectedGps:     "connected_gps",
-	BleDeviceTypeHeartRate:        "heart_rate",
-	BleDeviceTypeBikePower:        "bike_power",
-	BleDeviceTypeBikeSpeedCadence: "bike_speed_cadence",
-	BleDeviceTypeBikeSpeed:        "bike_speed",
-	BleDeviceTypeBikeCadence:      "bike_cadence",
-	BleDeviceTypeFootpod:          "footpod",
-	BleDeviceTypeBikeTrainer:      "bike_trainer",
-	BleDeviceTypeInvalid:          "invalid",
-}
-
 func (b BleDeviceType) String() string {
-	val, ok := bledevicetypetostrs[b]
-	if !ok {
-		return strconv.FormatUint(uint64(b), 10)
+	switch b {
+	case BleDeviceTypeConnectedGps:
+		return "connected_gps"
+	case BleDeviceTypeHeartRate:
+		return "heart_rate"
+	case BleDeviceTypeBikePower:
+		return "bike_power"
+	case BleDeviceTypeBikeSpeedCadence:
+		return "bike_speed_cadence"
+	case BleDeviceTypeBikeSpeed:
+		return "bike_speed"
+	case BleDeviceTypeBikeCadence:
+		return "bike_cadence"
+	case BleDeviceTypeFootpod:
+		return "footpod"
+	case BleDeviceTypeBikeTrainer:
+		return "bike_trainer"
+	default:
+		return "BleDeviceTypeInvalid(" + strconv.FormatUint(uint64(b), 10) + ")"
 	}
-	return val
 }
-
-var strtobledevicetype = func() map[string]BleDeviceType {
-	m := make(map[string]BleDeviceType)
-	for t, str := range bledevicetypetostrs {
-		m[str] = BleDeviceType(t)
-	}
-	return m
-}()
 
 // FromString parse string into BleDeviceType constant it's represent, return BleDeviceTypeInvalid if not found.
 func BleDeviceTypeFromString(s string) BleDeviceType {
-	val, ok := strtobledevicetype[s]
-	if !ok {
-		return strtobledevicetype["invalid"]
+	switch s {
+	case "connected_gps":
+		return BleDeviceTypeConnectedGps
+	case "heart_rate":
+		return BleDeviceTypeHeartRate
+	case "bike_power":
+		return BleDeviceTypeBikePower
+	case "bike_speed_cadence":
+		return BleDeviceTypeBikeSpeedCadence
+	case "bike_speed":
+		return BleDeviceTypeBikeSpeed
+	case "bike_cadence":
+		return BleDeviceTypeBikeCadence
+	case "footpod":
+		return BleDeviceTypeFootpod
+	case "bike_trainer":
+		return BleDeviceTypeBikeTrainer
+	default:
+		return BleDeviceTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBleDeviceType() []BleDeviceType {
-	vs := make([]BleDeviceType, 0, len(bledevicetypetostrs))
-	for i := range bledevicetypetostrs {
-		vs = append(vs, BleDeviceType(i))
+	return []BleDeviceType{
+		BleDeviceTypeConnectedGps,
+		BleDeviceTypeHeartRate,
+		BleDeviceTypeBikePower,
+		BleDeviceTypeBikeSpeedCadence,
+		BleDeviceTypeBikeSpeed,
+		BleDeviceTypeBikeCadence,
+		BleDeviceTypeFootpod,
+		BleDeviceTypeBikeTrainer,
 	}
-	return vs
 }

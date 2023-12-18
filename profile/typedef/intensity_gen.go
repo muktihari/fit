@@ -21,50 +21,61 @@ const (
 	IntensityRecovery Intensity = 4
 	IntensityInterval Intensity = 5
 	IntensityOther    Intensity = 6
-	IntensityInvalid  Intensity = 0xFF // INVALID
+	IntensityInvalid  Intensity = 0xFF
 )
 
-var intensitytostrs = map[Intensity]string{
-	IntensityActive:   "active",
-	IntensityRest:     "rest",
-	IntensityWarmup:   "warmup",
-	IntensityCooldown: "cooldown",
-	IntensityRecovery: "recovery",
-	IntensityInterval: "interval",
-	IntensityOther:    "other",
-	IntensityInvalid:  "invalid",
-}
-
 func (i Intensity) String() string {
-	val, ok := intensitytostrs[i]
-	if !ok {
-		return strconv.Itoa(int(i))
+	switch i {
+	case IntensityActive:
+		return "active"
+	case IntensityRest:
+		return "rest"
+	case IntensityWarmup:
+		return "warmup"
+	case IntensityCooldown:
+		return "cooldown"
+	case IntensityRecovery:
+		return "recovery"
+	case IntensityInterval:
+		return "interval"
+	case IntensityOther:
+		return "other"
+	default:
+		return "IntensityInvalid(" + strconv.Itoa(int(i)) + ")"
 	}
-	return val
 }
-
-var strtointensity = func() map[string]Intensity {
-	m := make(map[string]Intensity)
-	for t, str := range intensitytostrs {
-		m[str] = Intensity(t)
-	}
-	return m
-}()
 
 // FromString parse string into Intensity constant it's represent, return IntensityInvalid if not found.
 func IntensityFromString(s string) Intensity {
-	val, ok := strtointensity[s]
-	if !ok {
-		return strtointensity["invalid"]
+	switch s {
+	case "active":
+		return IntensityActive
+	case "rest":
+		return IntensityRest
+	case "warmup":
+		return IntensityWarmup
+	case "cooldown":
+		return IntensityCooldown
+	case "recovery":
+		return IntensityRecovery
+	case "interval":
+		return IntensityInterval
+	case "other":
+		return IntensityOther
+	default:
+		return IntensityInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListIntensity() []Intensity {
-	vs := make([]Intensity, 0, len(intensitytostrs))
-	for i := range intensitytostrs {
-		vs = append(vs, Intensity(i))
+	return []Intensity{
+		IntensityActive,
+		IntensityRest,
+		IntensityWarmup,
+		IntensityCooldown,
+		IntensityRecovery,
+		IntensityInterval,
+		IntensityOther,
 	}
-	return vs
 }

@@ -440,471 +440,2162 @@ const (
 	GarminProductTacxTrainingAppLegacy      GarminProduct = 30047
 	GarminProductConnectiqSimulator         GarminProduct = 65531
 	GarminProductAndroidAntplusPlugin       GarminProduct = 65532
-	GarminProductConnect                    GarminProduct = 65534  // Garmin Connect website
-	GarminProductInvalid                    GarminProduct = 0xFFFF // INVALID
+	GarminProductConnect                    GarminProduct = 65534 // Garmin Connect website
+	GarminProductInvalid                    GarminProduct = 0xFFFF
 )
 
-var garminproducttostrs = map[GarminProduct]string{
-	GarminProductHrm1:                       "hrm1",
-	GarminProductAxh01:                      "axh01",
-	GarminProductAxb01:                      "axb01",
-	GarminProductAxb02:                      "axb02",
-	GarminProductHrm2ss:                     "hrm2ss",
-	GarminProductDsiAlf02:                   "dsi_alf02",
-	GarminProductHrm3ss:                     "hrm3ss",
-	GarminProductHrmRunSingleByteProductId:  "hrm_run_single_byte_product_id",
-	GarminProductBsm:                        "bsm",
-	GarminProductBcm:                        "bcm",
-	GarminProductAxs01:                      "axs01",
-	GarminProductHrmTriSingleByteProductId:  "hrm_tri_single_byte_product_id",
-	GarminProductHrm4RunSingleByteProductId: "hrm4_run_single_byte_product_id",
-	GarminProductFr225SingleByteProductId:   "fr225_single_byte_product_id",
-	GarminProductGen3BsmSingleByteProductId: "gen3_bsm_single_byte_product_id",
-	GarminProductGen3BcmSingleByteProductId: "gen3_bcm_single_byte_product_id",
-	GarminProductOhr:                        "OHR",
-	GarminProductFr301China:                 "fr301_china",
-	GarminProductFr301Japan:                 "fr301_japan",
-	GarminProductFr301Korea:                 "fr301_korea",
-	GarminProductFr301Taiwan:                "fr301_taiwan",
-	GarminProductFr405:                      "fr405",
-	GarminProductFr50:                       "fr50",
-	GarminProductFr405Japan:                 "fr405_japan",
-	GarminProductFr60:                       "fr60",
-	GarminProductDsiAlf01:                   "dsi_alf01",
-	GarminProductFr310xt:                    "fr310xt",
-	GarminProductEdge500:                    "edge500",
-	GarminProductFr110:                      "fr110",
-	GarminProductEdge800:                    "edge800",
-	GarminProductEdge500Taiwan:              "edge500_taiwan",
-	GarminProductEdge500Japan:               "edge500_japan",
-	GarminProductChirp:                      "chirp",
-	GarminProductFr110Japan:                 "fr110_japan",
-	GarminProductEdge200:                    "edge200",
-	GarminProductFr910xt:                    "fr910xt",
-	GarminProductEdge800Taiwan:              "edge800_taiwan",
-	GarminProductEdge800Japan:               "edge800_japan",
-	GarminProductAlf04:                      "alf04",
-	GarminProductFr610:                      "fr610",
-	GarminProductFr210Japan:                 "fr210_japan",
-	GarminProductVectorSs:                   "vector_ss",
-	GarminProductVectorCp:                   "vector_cp",
-	GarminProductEdge800China:               "edge800_china",
-	GarminProductEdge500China:               "edge500_china",
-	GarminProductApproachG10:                "approach_g10",
-	GarminProductFr610Japan:                 "fr610_japan",
-	GarminProductEdge500Korea:               "edge500_korea",
-	GarminProductFr70:                       "fr70",
-	GarminProductFr310xt4T:                  "fr310xt_4t",
-	GarminProductAmx:                        "amx",
-	GarminProductFr10:                       "fr10",
-	GarminProductEdge800Korea:               "edge800_korea",
-	GarminProductSwim:                       "swim",
-	GarminProductFr910xtChina:               "fr910xt_china",
-	GarminProductFenix:                      "fenix",
-	GarminProductEdge200Taiwan:              "edge200_taiwan",
-	GarminProductEdge510:                    "edge510",
-	GarminProductEdge810:                    "edge810",
-	GarminProductTempe:                      "tempe",
-	GarminProductFr910xtJapan:               "fr910xt_japan",
-	GarminProductFr620:                      "fr620",
-	GarminProductFr220:                      "fr220",
-	GarminProductFr910xtKorea:               "fr910xt_korea",
-	GarminProductFr10Japan:                  "fr10_japan",
-	GarminProductEdge810Japan:               "edge810_japan",
-	GarminProductVirbElite:                  "virb_elite",
-	GarminProductEdgeTouring:                "edge_touring",
-	GarminProductEdge510Japan:               "edge510_japan",
-	GarminProductHrmTri:                     "hrm_tri",
-	GarminProductHrmRun:                     "hrm_run",
-	GarminProductFr920xt:                    "fr920xt",
-	GarminProductEdge510Asia:                "edge510_asia",
-	GarminProductEdge810China:               "edge810_china",
-	GarminProductEdge810Taiwan:              "edge810_taiwan",
-	GarminProductEdge1000:                   "edge1000",
-	GarminProductVivoFit:                    "vivo_fit",
-	GarminProductVirbRemote:                 "virb_remote",
-	GarminProductVivoKi:                     "vivo_ki",
-	GarminProductFr15:                       "fr15",
-	GarminProductVivoActive:                 "vivo_active",
-	GarminProductEdge510Korea:               "edge510_korea",
-	GarminProductFr620Japan:                 "fr620_japan",
-	GarminProductFr620China:                 "fr620_china",
-	GarminProductFr220Japan:                 "fr220_japan",
-	GarminProductFr220China:                 "fr220_china",
-	GarminProductApproachS6:                 "approach_s6",
-	GarminProductVivoSmart:                  "vivo_smart",
-	GarminProductFenix2:                     "fenix2",
-	GarminProductEpix:                       "epix",
-	GarminProductFenix3:                     "fenix3",
-	GarminProductEdge1000Taiwan:             "edge1000_taiwan",
-	GarminProductEdge1000Japan:              "edge1000_japan",
-	GarminProductFr15Japan:                  "fr15_japan",
-	GarminProductEdge520:                    "edge520",
-	GarminProductEdge1000China:              "edge1000_china",
-	GarminProductFr620Russia:                "fr620_russia",
-	GarminProductFr220Russia:                "fr220_russia",
-	GarminProductVectorS:                    "vector_s",
-	GarminProductEdge1000Korea:              "edge1000_korea",
-	GarminProductFr920xtTaiwan:              "fr920xt_taiwan",
-	GarminProductFr920xtChina:               "fr920xt_china",
-	GarminProductFr920xtJapan:               "fr920xt_japan",
-	GarminProductVirbx:                      "virbx",
-	GarminProductVivoSmartApac:              "vivo_smart_apac",
-	GarminProductEtrexTouch:                 "etrex_touch",
-	GarminProductEdge25:                     "edge25",
-	GarminProductFr25:                       "fr25",
-	GarminProductVivoFit2:                   "vivo_fit2",
-	GarminProductFr225:                      "fr225",
-	GarminProductFr630:                      "fr630",
-	GarminProductFr230:                      "fr230",
-	GarminProductFr735xt:                    "fr735xt",
-	GarminProductVivoActiveApac:             "vivo_active_apac",
-	GarminProductVector2:                    "vector_2",
-	GarminProductVector2S:                   "vector_2s",
-	GarminProductVirbxe:                     "virbxe",
-	GarminProductFr620Taiwan:                "fr620_taiwan",
-	GarminProductFr220Taiwan:                "fr220_taiwan",
-	GarminProductTruswing:                   "truswing",
-	GarminProductD2airvenu:                  "d2airvenu",
-	GarminProductFenix3China:                "fenix3_china",
-	GarminProductFenix3Twn:                  "fenix3_twn",
-	GarminProductVariaHeadlight:             "varia_headlight",
-	GarminProductVariaTaillightOld:          "varia_taillight_old",
-	GarminProductEdgeExplore1000:            "edge_explore_1000",
-	GarminProductFr225Asia:                  "fr225_asia",
-	GarminProductVariaRadarTaillight:        "varia_radar_taillight",
-	GarminProductVariaRadarDisplay:          "varia_radar_display",
-	GarminProductEdge20:                     "edge20",
-	GarminProductEdge520Asia:                "edge520_asia",
-	GarminProductEdge520Japan:               "edge520_japan",
-	GarminProductD2Bravo:                    "d2_bravo",
-	GarminProductApproachS20:                "approach_s20",
-	GarminProductVivoSmart2:                 "vivo_smart2",
-	GarminProductEdge1000Thai:               "edge1000_thai",
-	GarminProductVariaRemote:                "varia_remote",
-	GarminProductEdge25Asia:                 "edge25_asia",
-	GarminProductEdge25Jpn:                  "edge25_jpn",
-	GarminProductEdge20Asia:                 "edge20_asia",
-	GarminProductApproachX40:                "approach_x40",
-	GarminProductFenix3Japan:                "fenix3_japan",
-	GarminProductVivoSmartEmea:              "vivo_smart_emea",
-	GarminProductFr630Asia:                  "fr630_asia",
-	GarminProductFr630Jpn:                   "fr630_jpn",
-	GarminProductFr230Jpn:                   "fr230_jpn",
-	GarminProductHrm4Run:                    "hrm4_run",
-	GarminProductEpixJapan:                  "epix_japan",
-	GarminProductVivoActiveHr:               "vivo_active_hr",
-	GarminProductVivoSmartGpsHr:             "vivo_smart_gps_hr",
-	GarminProductVivoSmartHr:                "vivo_smart_hr",
-	GarminProductVivoSmartHrAsia:            "vivo_smart_hr_asia",
-	GarminProductVivoSmartGpsHrAsia:         "vivo_smart_gps_hr_asia",
-	GarminProductVivoMove:                   "vivo_move",
-	GarminProductVariaTaillight:             "varia_taillight",
-	GarminProductFr235Asia:                  "fr235_asia",
-	GarminProductFr235Japan:                 "fr235_japan",
-	GarminProductVariaVision:                "varia_vision",
-	GarminProductVivoFit3:                   "vivo_fit3",
-	GarminProductFenix3Korea:                "fenix3_korea",
-	GarminProductFenix3Sea:                  "fenix3_sea",
-	GarminProductFenix3Hr:                   "fenix3_hr",
-	GarminProductVirbUltra30:                "virb_ultra_30",
-	GarminProductIndexSmartScale:            "index_smart_scale",
-	GarminProductFr235:                      "fr235",
-	GarminProductFenix3Chronos:              "fenix3_chronos",
-	GarminProductOregon7xx:                  "oregon7xx",
-	GarminProductRino7xx:                    "rino7xx",
-	GarminProductEpixKorea:                  "epix_korea",
-	GarminProductFenix3HrChn:                "fenix3_hr_chn",
-	GarminProductFenix3HrTwn:                "fenix3_hr_twn",
-	GarminProductFenix3HrJpn:                "fenix3_hr_jpn",
-	GarminProductFenix3HrSea:                "fenix3_hr_sea",
-	GarminProductFenix3HrKor:                "fenix3_hr_kor",
-	GarminProductNautix:                     "nautix",
-	GarminProductVivoActiveHrApac:           "vivo_active_hr_apac",
-	GarminProductFr35:                       "fr35",
-	GarminProductOregon7xxWw:                "oregon7xx_ww",
-	GarminProductEdge820:                    "edge_820",
-	GarminProductEdgeExplore820:             "edge_explore_820",
-	GarminProductFr735xtApac:                "fr735xt_apac",
-	GarminProductFr735xtJapan:               "fr735xt_japan",
-	GarminProductFenix5s:                    "fenix5s",
-	GarminProductD2BravoTitanium:            "d2_bravo_titanium",
-	GarminProductVariaUt800:                 "varia_ut800",
-	GarminProductRunningDynamicsPod:         "running_dynamics_pod",
-	GarminProductEdge820China:               "edge_820_china",
-	GarminProductEdge820Japan:               "edge_820_japan",
-	GarminProductFenix5x:                    "fenix5x",
-	GarminProductVivoFitJr:                  "vivo_fit_jr",
-	GarminProductVivoSmart3:                 "vivo_smart3",
-	GarminProductVivoSport:                  "vivo_sport",
-	GarminProductEdge820Taiwan:              "edge_820_taiwan",
-	GarminProductEdge820Korea:               "edge_820_korea",
-	GarminProductEdge820Sea:                 "edge_820_sea",
-	GarminProductFr35Hebrew:                 "fr35_hebrew",
-	GarminProductApproachS60:                "approach_s60",
-	GarminProductFr35Apac:                   "fr35_apac",
-	GarminProductFr35Japan:                  "fr35_japan",
-	GarminProductFenix3ChronosAsia:          "fenix3_chronos_asia",
-	GarminProductVirb360:                    "virb_360",
-	GarminProductFr935:                      "fr935",
-	GarminProductFenix5:                     "fenix5",
-	GarminProductVivoactive3:                "vivoactive3",
-	GarminProductFr235ChinaNfc:              "fr235_china_nfc",
-	GarminProductForetrex601701:             "foretrex_601_701",
-	GarminProductVivoMoveHr:                 "vivo_move_hr",
-	GarminProductEdge1030:                   "edge_1030",
-	GarminProductFr35Sea:                    "fr35_sea",
-	GarminProductVector3:                    "vector_3",
-	GarminProductFenix5Asia:                 "fenix5_asia",
-	GarminProductFenix5sAsia:                "fenix5s_asia",
-	GarminProductFenix5xAsia:                "fenix5x_asia",
-	GarminProductApproachZ80:                "approach_z80",
-	GarminProductFr35Korea:                  "fr35_korea",
-	GarminProductD2charlie:                  "d2charlie",
-	GarminProductVivoSmart3Apac:             "vivo_smart3_apac",
-	GarminProductVivoSportApac:              "vivo_sport_apac",
-	GarminProductFr935Asia:                  "fr935_asia",
-	GarminProductDescent:                    "descent",
-	GarminProductVivoFit4:                   "vivo_fit4",
-	GarminProductFr645:                      "fr645",
-	GarminProductFr645m:                     "fr645m",
-	GarminProductFr30:                       "fr30",
-	GarminProductFenix5sPlus:                "fenix5s_plus",
-	GarminProductEdge130:                    "Edge_130",
-	GarminProductEdge1030Asia:               "edge_1030_asia",
-	GarminProductVivosmart4:                 "vivosmart_4",
-	GarminProductVivoMoveHrAsia:             "vivo_move_hr_asia",
-	GarminProductApproachX10:                "approach_x10",
-	GarminProductFr30Asia:                   "fr30_asia",
-	GarminProductVivoactive3mW:              "vivoactive3m_w",
-	GarminProductFr645Asia:                  "fr645_asia",
-	GarminProductFr645mAsia:                 "fr645m_asia",
-	GarminProductEdgeExplore:                "edge_explore",
-	GarminProductGpsmap66:                   "gpsmap66",
-	GarminProductApproachS10:                "approach_s10",
-	GarminProductVivoactive3mL:              "vivoactive3m_l",
-	GarminProductApproachG80:                "approach_g80",
-	GarminProductEdge130Asia:                "edge_130_asia",
-	GarminProductEdge1030Bontrager:          "edge_1030_bontrager",
-	GarminProductFenix5Plus:                 "fenix5_plus",
-	GarminProductFenix5xPlus:                "fenix5x_plus",
-	GarminProductEdge520Plus:                "edge_520_plus",
-	GarminProductFr945:                      "fr945",
-	GarminProductEdge530:                    "edge_530",
-	GarminProductEdge830:                    "edge_830",
-	GarminProductInstinctEsports:            "instinct_esports",
-	GarminProductFenix5sPlusApac:            "fenix5s_plus_apac",
-	GarminProductFenix5xPlusApac:            "fenix5x_plus_apac",
-	GarminProductEdge520PlusApac:            "edge_520_plus_apac",
-	GarminProductDescentT1:                  "descent_t1",
-	GarminProductFr235lAsia:                 "fr235l_asia",
-	GarminProductFr245Asia:                  "fr245_asia",
-	GarminProductVivoActive3mApac:           "vivo_active3m_apac",
-	GarminProductGen3Bsm:                    "gen3_bsm",
-	GarminProductGen3Bcm:                    "gen3_bcm",
-	GarminProductVivoSmart4Asia:             "vivo_smart4_asia",
-	GarminProductVivoactive4Small:           "vivoactive4_small",
-	GarminProductVivoactive4Large:           "vivoactive4_large",
-	GarminProductVenu:                       "venu",
-	GarminProductMarqDriver:                 "marq_driver",
-	GarminProductMarqAviator:                "marq_aviator",
-	GarminProductMarqCaptain:                "marq_captain",
-	GarminProductMarqCommander:              "marq_commander",
-	GarminProductMarqExpedition:             "marq_expedition",
-	GarminProductMarqAthlete:                "marq_athlete",
-	GarminProductDescentMk2:                 "descent_mk2",
-	GarminProductGpsmap66i:                  "gpsmap66i",
-	GarminProductFenix6sSport:               "fenix6S_sport",
-	GarminProductFenix6s:                    "fenix6S",
-	GarminProductFenix6Sport:                "fenix6_sport",
-	GarminProductFenix6:                     "fenix6",
-	GarminProductFenix6x:                    "fenix6x",
-	GarminProductHrmDual:                    "hrm_dual",
-	GarminProductHrmPro:                     "hrm_pro",
-	GarminProductVivoMove3Premium:           "vivo_move3_premium",
-	GarminProductApproachS40:                "approach_s40",
-	GarminProductFr245mAsia:                 "fr245m_asia",
-	GarminProductEdge530Apac:                "edge_530_apac",
-	GarminProductEdge830Apac:                "edge_830_apac",
-	GarminProductVivoMove3:                  "vivo_move3",
-	GarminProductVivoActive4SmallAsia:       "vivo_active4_small_asia",
-	GarminProductVivoActive4LargeAsia:       "vivo_active4_large_asia",
-	GarminProductVivoActive4OledAsia:        "vivo_active4_oled_asia",
-	GarminProductSwim2:                      "swim2",
-	GarminProductMarqDriverAsia:             "marq_driver_asia",
-	GarminProductMarqAviatorAsia:            "marq_aviator_asia",
-	GarminProductVivoMove3Asia:              "vivo_move3_asia",
-	GarminProductFr945Asia:                  "fr945_asia",
-	GarminProductVivoActive3tChn:            "vivo_active3t_chn",
-	GarminProductMarqCaptainAsia:            "marq_captain_asia",
-	GarminProductMarqCommanderAsia:          "marq_commander_asia",
-	GarminProductMarqExpeditionAsia:         "marq_expedition_asia",
-	GarminProductMarqAthleteAsia:            "marq_athlete_asia",
-	GarminProductInstinctSolar:              "instinct_solar",
-	GarminProductFr45Asia:                   "fr45_asia",
-	GarminProductVivoactive3Daimler:         "vivoactive3_daimler",
-	GarminProductLegacyRey:                  "legacy_rey",
-	GarminProductLegacyDarthVader:           "legacy_darth_vader",
-	GarminProductLegacyCaptainMarvel:        "legacy_captain_marvel",
-	GarminProductLegacyFirstAvenger:         "legacy_first_avenger",
-	GarminProductFenix6sSportAsia:           "fenix6s_sport_asia",
-	GarminProductFenix6sAsia:                "fenix6s_asia",
-	GarminProductFenix6SportAsia:            "fenix6_sport_asia",
-	GarminProductFenix6Asia:                 "fenix6_asia",
-	GarminProductFenix6xAsia:                "fenix6x_asia",
-	GarminProductLegacyCaptainMarvelAsia:    "legacy_captain_marvel_asia",
-	GarminProductLegacyFirstAvengerAsia:     "legacy_first_avenger_asia",
-	GarminProductLegacyReyAsia:              "legacy_rey_asia",
-	GarminProductLegacyDarthVaderAsia:       "legacy_darth_vader_asia",
-	GarminProductDescentMk2s:                "descent_mk2s",
-	GarminProductEdge130Plus:                "edge_130_plus",
-	GarminProductEdge1030Plus:               "edge_1030_plus",
-	GarminProductRally200:                   "rally_200",
-	GarminProductFr745:                      "fr745",
-	GarminProductVenusq:                     "venusq",
-	GarminProductLily:                       "lily",
-	GarminProductMarqAdventurer:             "marq_adventurer",
-	GarminProductEnduro:                     "enduro",
-	GarminProductSwim2Apac:                  "swim2_apac",
-	GarminProductMarqAdventurerAsia:         "marq_adventurer_asia",
-	GarminProductFr945Lte:                   "fr945_lte",
-	GarminProductDescentMk2Asia:             "descent_mk2_asia",
-	GarminProductVenu2:                      "venu2",
-	GarminProductVenu2s:                     "venu2s",
-	GarminProductVenuDaimlerAsia:            "venu_daimler_asia",
-	GarminProductMarqGolfer:                 "marq_golfer",
-	GarminProductVenuDaimler:                "venu_daimler",
-	GarminProductFr745Asia:                  "fr745_asia",
-	GarminProductVariaRct715:                "varia_rct715",
-	GarminProductLilyAsia:                   "lily_asia",
-	GarminProductEdge1030PlusAsia:           "edge_1030_plus_asia",
-	GarminProductEdge130PlusAsia:            "edge_130_plus_asia",
-	GarminProductApproachS12:                "approach_s12",
-	GarminProductEnduroAsia:                 "enduro_asia",
-	GarminProductVenusqAsia:                 "venusq_asia",
-	GarminProductEdge1040:                   "edge_1040",
-	GarminProductMarqGolferAsia:             "marq_golfer_asia",
-	GarminProductVenu2Plus:                  "venu2_plus",
-	GarminProductGnss:                       "gnss",
-	GarminProductFr55:                       "fr55",
-	GarminProductInstinct2:                  "instinct_2",
-	GarminProductFenix7s:                    "fenix7s",
-	GarminProductFenix7:                     "fenix7",
-	GarminProductFenix7x:                    "fenix7x",
-	GarminProductFenix7sApac:                "fenix7s_apac",
-	GarminProductFenix7Apac:                 "fenix7_apac",
-	GarminProductFenix7xApac:                "fenix7x_apac",
-	GarminProductApproachG12:                "approach_g12",
-	GarminProductDescentMk2sAsia:            "descent_mk2s_asia",
-	GarminProductApproachS42:                "approach_s42",
-	GarminProductEpixGen2:                   "epix_gen2",
-	GarminProductEpixGen2Apac:               "epix_gen2_apac",
-	GarminProductVenu2sAsia:                 "venu2s_asia",
-	GarminProductVenu2Asia:                  "venu2_asia",
-	GarminProductFr945LteAsia:               "fr945_lte_asia",
-	GarminProductVivoMoveSport:              "vivo_move_sport",
-	GarminProductVivomoveTrend:              "vivomove_trend",
-	GarminProductApproachS12Asia:            "approach_S12_asia",
-	GarminProductFr255Music:                 "fr255_music",
-	GarminProductFr255SmallMusic:            "fr255_small_music",
-	GarminProductFr255:                      "fr255",
-	GarminProductFr255Small:                 "fr255_small",
-	GarminProductApproachG12Asia:            "approach_g12_asia",
-	GarminProductApproachS42Asia:            "approach_s42_asia",
-	GarminProductDescentG1:                  "descent_g1",
-	GarminProductVenu2PlusAsia:              "venu2_plus_asia",
-	GarminProductFr955:                      "fr955",
-	GarminProductFr55Asia:                   "fr55_asia",
-	GarminProductEdge540:                    "edge_540",
-	GarminProductEdge840:                    "edge_840",
-	GarminProductVivosmart5:                 "vivosmart_5",
-	GarminProductInstinct2Asia:              "instinct_2_asia",
-	GarminProductMarqGen2:                   "marq_gen2",
-	GarminProductVenusq2:                    "venusq2",
-	GarminProductVenusq2music:               "venusq2music",
-	GarminProductMarqGen2Aviator:            "marq_gen2_aviator",
-	GarminProductD2AirX10:                   "d2_air_x10",
-	GarminProductHrmProPlus:                 "hrm_pro_plus",
-	GarminProductDescentG1Asia:              "descent_g1_asia",
-	GarminProductTactix7:                    "tactix7",
-	GarminProductInstinctCrossover:          "instinct_crossover",
-	GarminProductEdgeExplore2:               "edge_explore2",
-	GarminProductApproachS70:                "approach_s70",
-	GarminProductFr265Large:                 "fr265_large",
-	GarminProductFr265Small:                 "fr265_small",
-	GarminProductVenu3:                      "venu3",
-	GarminProductVenu3s:                     "venu3s",
-	GarminProductTacxNeoSmart:               "tacx_neo_smart",
-	GarminProductTacxNeo2Smart:              "tacx_neo2_smart",
-	GarminProductTacxNeo2TSmart:             "tacx_neo2_t_smart",
-	GarminProductTacxNeoSmartBike:           "tacx_neo_smart_bike",
-	GarminProductTacxSatoriSmart:            "tacx_satori_smart",
-	GarminProductTacxFlowSmart:              "tacx_flow_smart",
-	GarminProductTacxVortexSmart:            "tacx_vortex_smart",
-	GarminProductTacxBushidoSmart:           "tacx_bushido_smart",
-	GarminProductTacxGeniusSmart:            "tacx_genius_smart",
-	GarminProductTacxFluxFluxSSmart:         "tacx_flux_flux_s_smart",
-	GarminProductTacxFlux2Smart:             "tacx_flux2_smart",
-	GarminProductTacxMagnum:                 "tacx_magnum",
-	GarminProductEdge1040Asia:               "edge_1040_asia",
-	GarminProductEpixGen2Pro42:              "epix_gen2_pro_42",
-	GarminProductEpixGen2Pro47:              "epix_gen2_pro_47",
-	GarminProductEpixGen2Pro51:              "epix_gen2_pro_51",
-	GarminProductFr965:                      "fr965",
-	GarminProductEnduro2:                    "enduro2",
-	GarminProductFenix7sProSolar:            "fenix7s_pro_solar",
-	GarminProductFenix7ProSolar:             "fenix7_pro_solar",
-	GarminProductFenix7xProSolar:            "fenix7x_pro_solar",
-	GarminProductInstinct2X:                 "instinct_2x",
-	GarminProductVivoactive5:                "vivoactive5",
-	GarminProductDescentT2:                  "descent_t2",
-	GarminProductMarqGen2Commander:          "marq_gen2_commander",
-	GarminProductD2Mach1Pro:                 "d2_mach1_pro",
-	GarminProductSdm4:                       "sdm4",
-	GarminProductEdgeRemote:                 "edge_remote",
-	GarminProductTacxTrainingAppWin:         "tacx_training_app_win",
-	GarminProductTacxTrainingAppMac:         "tacx_training_app_mac",
-	GarminProductTacxTrainingAppMacCatalyst: "tacx_training_app_mac_catalyst",
-	GarminProductTrainingCenter:             "training_center",
-	GarminProductTacxTrainingAppAndroid:     "tacx_training_app_android",
-	GarminProductTacxTrainingAppIos:         "tacx_training_app_ios",
-	GarminProductTacxTrainingAppLegacy:      "tacx_training_app_legacy",
-	GarminProductConnectiqSimulator:         "connectiq_simulator",
-	GarminProductAndroidAntplusPlugin:       "android_antplus_plugin",
-	GarminProductConnect:                    "connect",
-	GarminProductInvalid:                    "invalid",
-}
-
 func (g GarminProduct) String() string {
-	val, ok := garminproducttostrs[g]
-	if !ok {
-		return strconv.FormatUint(uint64(g), 10)
+	switch g {
+	case GarminProductHrm1:
+		return "hrm1"
+	case GarminProductAxh01:
+		return "axh01"
+	case GarminProductAxb01:
+		return "axb01"
+	case GarminProductAxb02:
+		return "axb02"
+	case GarminProductHrm2ss:
+		return "hrm2ss"
+	case GarminProductDsiAlf02:
+		return "dsi_alf02"
+	case GarminProductHrm3ss:
+		return "hrm3ss"
+	case GarminProductHrmRunSingleByteProductId:
+		return "hrm_run_single_byte_product_id"
+	case GarminProductBsm:
+		return "bsm"
+	case GarminProductBcm:
+		return "bcm"
+	case GarminProductAxs01:
+		return "axs01"
+	case GarminProductHrmTriSingleByteProductId:
+		return "hrm_tri_single_byte_product_id"
+	case GarminProductHrm4RunSingleByteProductId:
+		return "hrm4_run_single_byte_product_id"
+	case GarminProductFr225SingleByteProductId:
+		return "fr225_single_byte_product_id"
+	case GarminProductGen3BsmSingleByteProductId:
+		return "gen3_bsm_single_byte_product_id"
+	case GarminProductGen3BcmSingleByteProductId:
+		return "gen3_bcm_single_byte_product_id"
+	case GarminProductOhr:
+		return "OHR"
+	case GarminProductFr301China:
+		return "fr301_china"
+	case GarminProductFr301Japan:
+		return "fr301_japan"
+	case GarminProductFr301Korea:
+		return "fr301_korea"
+	case GarminProductFr301Taiwan:
+		return "fr301_taiwan"
+	case GarminProductFr405:
+		return "fr405"
+	case GarminProductFr50:
+		return "fr50"
+	case GarminProductFr405Japan:
+		return "fr405_japan"
+	case GarminProductFr60:
+		return "fr60"
+	case GarminProductDsiAlf01:
+		return "dsi_alf01"
+	case GarminProductFr310xt:
+		return "fr310xt"
+	case GarminProductEdge500:
+		return "edge500"
+	case GarminProductFr110:
+		return "fr110"
+	case GarminProductEdge800:
+		return "edge800"
+	case GarminProductEdge500Taiwan:
+		return "edge500_taiwan"
+	case GarminProductEdge500Japan:
+		return "edge500_japan"
+	case GarminProductChirp:
+		return "chirp"
+	case GarminProductFr110Japan:
+		return "fr110_japan"
+	case GarminProductEdge200:
+		return "edge200"
+	case GarminProductFr910xt:
+		return "fr910xt"
+	case GarminProductEdge800Taiwan:
+		return "edge800_taiwan"
+	case GarminProductEdge800Japan:
+		return "edge800_japan"
+	case GarminProductAlf04:
+		return "alf04"
+	case GarminProductFr610:
+		return "fr610"
+	case GarminProductFr210Japan:
+		return "fr210_japan"
+	case GarminProductVectorSs:
+		return "vector_ss"
+	case GarminProductVectorCp:
+		return "vector_cp"
+	case GarminProductEdge800China:
+		return "edge800_china"
+	case GarminProductEdge500China:
+		return "edge500_china"
+	case GarminProductApproachG10:
+		return "approach_g10"
+	case GarminProductFr610Japan:
+		return "fr610_japan"
+	case GarminProductEdge500Korea:
+		return "edge500_korea"
+	case GarminProductFr70:
+		return "fr70"
+	case GarminProductFr310xt4T:
+		return "fr310xt_4t"
+	case GarminProductAmx:
+		return "amx"
+	case GarminProductFr10:
+		return "fr10"
+	case GarminProductEdge800Korea:
+		return "edge800_korea"
+	case GarminProductSwim:
+		return "swim"
+	case GarminProductFr910xtChina:
+		return "fr910xt_china"
+	case GarminProductFenix:
+		return "fenix"
+	case GarminProductEdge200Taiwan:
+		return "edge200_taiwan"
+	case GarminProductEdge510:
+		return "edge510"
+	case GarminProductEdge810:
+		return "edge810"
+	case GarminProductTempe:
+		return "tempe"
+	case GarminProductFr910xtJapan:
+		return "fr910xt_japan"
+	case GarminProductFr620:
+		return "fr620"
+	case GarminProductFr220:
+		return "fr220"
+	case GarminProductFr910xtKorea:
+		return "fr910xt_korea"
+	case GarminProductFr10Japan:
+		return "fr10_japan"
+	case GarminProductEdge810Japan:
+		return "edge810_japan"
+	case GarminProductVirbElite:
+		return "virb_elite"
+	case GarminProductEdgeTouring:
+		return "edge_touring"
+	case GarminProductEdge510Japan:
+		return "edge510_japan"
+	case GarminProductHrmTri:
+		return "hrm_tri"
+	case GarminProductHrmRun:
+		return "hrm_run"
+	case GarminProductFr920xt:
+		return "fr920xt"
+	case GarminProductEdge510Asia:
+		return "edge510_asia"
+	case GarminProductEdge810China:
+		return "edge810_china"
+	case GarminProductEdge810Taiwan:
+		return "edge810_taiwan"
+	case GarminProductEdge1000:
+		return "edge1000"
+	case GarminProductVivoFit:
+		return "vivo_fit"
+	case GarminProductVirbRemote:
+		return "virb_remote"
+	case GarminProductVivoKi:
+		return "vivo_ki"
+	case GarminProductFr15:
+		return "fr15"
+	case GarminProductVivoActive:
+		return "vivo_active"
+	case GarminProductEdge510Korea:
+		return "edge510_korea"
+	case GarminProductFr620Japan:
+		return "fr620_japan"
+	case GarminProductFr620China:
+		return "fr620_china"
+	case GarminProductFr220Japan:
+		return "fr220_japan"
+	case GarminProductFr220China:
+		return "fr220_china"
+	case GarminProductApproachS6:
+		return "approach_s6"
+	case GarminProductVivoSmart:
+		return "vivo_smart"
+	case GarminProductFenix2:
+		return "fenix2"
+	case GarminProductEpix:
+		return "epix"
+	case GarminProductFenix3:
+		return "fenix3"
+	case GarminProductEdge1000Taiwan:
+		return "edge1000_taiwan"
+	case GarminProductEdge1000Japan:
+		return "edge1000_japan"
+	case GarminProductFr15Japan:
+		return "fr15_japan"
+	case GarminProductEdge520:
+		return "edge520"
+	case GarminProductEdge1000China:
+		return "edge1000_china"
+	case GarminProductFr620Russia:
+		return "fr620_russia"
+	case GarminProductFr220Russia:
+		return "fr220_russia"
+	case GarminProductVectorS:
+		return "vector_s"
+	case GarminProductEdge1000Korea:
+		return "edge1000_korea"
+	case GarminProductFr920xtTaiwan:
+		return "fr920xt_taiwan"
+	case GarminProductFr920xtChina:
+		return "fr920xt_china"
+	case GarminProductFr920xtJapan:
+		return "fr920xt_japan"
+	case GarminProductVirbx:
+		return "virbx"
+	case GarminProductVivoSmartApac:
+		return "vivo_smart_apac"
+	case GarminProductEtrexTouch:
+		return "etrex_touch"
+	case GarminProductEdge25:
+		return "edge25"
+	case GarminProductFr25:
+		return "fr25"
+	case GarminProductVivoFit2:
+		return "vivo_fit2"
+	case GarminProductFr225:
+		return "fr225"
+	case GarminProductFr630:
+		return "fr630"
+	case GarminProductFr230:
+		return "fr230"
+	case GarminProductFr735xt:
+		return "fr735xt"
+	case GarminProductVivoActiveApac:
+		return "vivo_active_apac"
+	case GarminProductVector2:
+		return "vector_2"
+	case GarminProductVector2S:
+		return "vector_2s"
+	case GarminProductVirbxe:
+		return "virbxe"
+	case GarminProductFr620Taiwan:
+		return "fr620_taiwan"
+	case GarminProductFr220Taiwan:
+		return "fr220_taiwan"
+	case GarminProductTruswing:
+		return "truswing"
+	case GarminProductD2airvenu:
+		return "d2airvenu"
+	case GarminProductFenix3China:
+		return "fenix3_china"
+	case GarminProductFenix3Twn:
+		return "fenix3_twn"
+	case GarminProductVariaHeadlight:
+		return "varia_headlight"
+	case GarminProductVariaTaillightOld:
+		return "varia_taillight_old"
+	case GarminProductEdgeExplore1000:
+		return "edge_explore_1000"
+	case GarminProductFr225Asia:
+		return "fr225_asia"
+	case GarminProductVariaRadarTaillight:
+		return "varia_radar_taillight"
+	case GarminProductVariaRadarDisplay:
+		return "varia_radar_display"
+	case GarminProductEdge20:
+		return "edge20"
+	case GarminProductEdge520Asia:
+		return "edge520_asia"
+	case GarminProductEdge520Japan:
+		return "edge520_japan"
+	case GarminProductD2Bravo:
+		return "d2_bravo"
+	case GarminProductApproachS20:
+		return "approach_s20"
+	case GarminProductVivoSmart2:
+		return "vivo_smart2"
+	case GarminProductEdge1000Thai:
+		return "edge1000_thai"
+	case GarminProductVariaRemote:
+		return "varia_remote"
+	case GarminProductEdge25Asia:
+		return "edge25_asia"
+	case GarminProductEdge25Jpn:
+		return "edge25_jpn"
+	case GarminProductEdge20Asia:
+		return "edge20_asia"
+	case GarminProductApproachX40:
+		return "approach_x40"
+	case GarminProductFenix3Japan:
+		return "fenix3_japan"
+	case GarminProductVivoSmartEmea:
+		return "vivo_smart_emea"
+	case GarminProductFr630Asia:
+		return "fr630_asia"
+	case GarminProductFr630Jpn:
+		return "fr630_jpn"
+	case GarminProductFr230Jpn:
+		return "fr230_jpn"
+	case GarminProductHrm4Run:
+		return "hrm4_run"
+	case GarminProductEpixJapan:
+		return "epix_japan"
+	case GarminProductVivoActiveHr:
+		return "vivo_active_hr"
+	case GarminProductVivoSmartGpsHr:
+		return "vivo_smart_gps_hr"
+	case GarminProductVivoSmartHr:
+		return "vivo_smart_hr"
+	case GarminProductVivoSmartHrAsia:
+		return "vivo_smart_hr_asia"
+	case GarminProductVivoSmartGpsHrAsia:
+		return "vivo_smart_gps_hr_asia"
+	case GarminProductVivoMove:
+		return "vivo_move"
+	case GarminProductVariaTaillight:
+		return "varia_taillight"
+	case GarminProductFr235Asia:
+		return "fr235_asia"
+	case GarminProductFr235Japan:
+		return "fr235_japan"
+	case GarminProductVariaVision:
+		return "varia_vision"
+	case GarminProductVivoFit3:
+		return "vivo_fit3"
+	case GarminProductFenix3Korea:
+		return "fenix3_korea"
+	case GarminProductFenix3Sea:
+		return "fenix3_sea"
+	case GarminProductFenix3Hr:
+		return "fenix3_hr"
+	case GarminProductVirbUltra30:
+		return "virb_ultra_30"
+	case GarminProductIndexSmartScale:
+		return "index_smart_scale"
+	case GarminProductFr235:
+		return "fr235"
+	case GarminProductFenix3Chronos:
+		return "fenix3_chronos"
+	case GarminProductOregon7xx:
+		return "oregon7xx"
+	case GarminProductRino7xx:
+		return "rino7xx"
+	case GarminProductEpixKorea:
+		return "epix_korea"
+	case GarminProductFenix3HrChn:
+		return "fenix3_hr_chn"
+	case GarminProductFenix3HrTwn:
+		return "fenix3_hr_twn"
+	case GarminProductFenix3HrJpn:
+		return "fenix3_hr_jpn"
+	case GarminProductFenix3HrSea:
+		return "fenix3_hr_sea"
+	case GarminProductFenix3HrKor:
+		return "fenix3_hr_kor"
+	case GarminProductNautix:
+		return "nautix"
+	case GarminProductVivoActiveHrApac:
+		return "vivo_active_hr_apac"
+	case GarminProductFr35:
+		return "fr35"
+	case GarminProductOregon7xxWw:
+		return "oregon7xx_ww"
+	case GarminProductEdge820:
+		return "edge_820"
+	case GarminProductEdgeExplore820:
+		return "edge_explore_820"
+	case GarminProductFr735xtApac:
+		return "fr735xt_apac"
+	case GarminProductFr735xtJapan:
+		return "fr735xt_japan"
+	case GarminProductFenix5s:
+		return "fenix5s"
+	case GarminProductD2BravoTitanium:
+		return "d2_bravo_titanium"
+	case GarminProductVariaUt800:
+		return "varia_ut800"
+	case GarminProductRunningDynamicsPod:
+		return "running_dynamics_pod"
+	case GarminProductEdge820China:
+		return "edge_820_china"
+	case GarminProductEdge820Japan:
+		return "edge_820_japan"
+	case GarminProductFenix5x:
+		return "fenix5x"
+	case GarminProductVivoFitJr:
+		return "vivo_fit_jr"
+	case GarminProductVivoSmart3:
+		return "vivo_smart3"
+	case GarminProductVivoSport:
+		return "vivo_sport"
+	case GarminProductEdge820Taiwan:
+		return "edge_820_taiwan"
+	case GarminProductEdge820Korea:
+		return "edge_820_korea"
+	case GarminProductEdge820Sea:
+		return "edge_820_sea"
+	case GarminProductFr35Hebrew:
+		return "fr35_hebrew"
+	case GarminProductApproachS60:
+		return "approach_s60"
+	case GarminProductFr35Apac:
+		return "fr35_apac"
+	case GarminProductFr35Japan:
+		return "fr35_japan"
+	case GarminProductFenix3ChronosAsia:
+		return "fenix3_chronos_asia"
+	case GarminProductVirb360:
+		return "virb_360"
+	case GarminProductFr935:
+		return "fr935"
+	case GarminProductFenix5:
+		return "fenix5"
+	case GarminProductVivoactive3:
+		return "vivoactive3"
+	case GarminProductFr235ChinaNfc:
+		return "fr235_china_nfc"
+	case GarminProductForetrex601701:
+		return "foretrex_601_701"
+	case GarminProductVivoMoveHr:
+		return "vivo_move_hr"
+	case GarminProductEdge1030:
+		return "edge_1030"
+	case GarminProductFr35Sea:
+		return "fr35_sea"
+	case GarminProductVector3:
+		return "vector_3"
+	case GarminProductFenix5Asia:
+		return "fenix5_asia"
+	case GarminProductFenix5sAsia:
+		return "fenix5s_asia"
+	case GarminProductFenix5xAsia:
+		return "fenix5x_asia"
+	case GarminProductApproachZ80:
+		return "approach_z80"
+	case GarminProductFr35Korea:
+		return "fr35_korea"
+	case GarminProductD2charlie:
+		return "d2charlie"
+	case GarminProductVivoSmart3Apac:
+		return "vivo_smart3_apac"
+	case GarminProductVivoSportApac:
+		return "vivo_sport_apac"
+	case GarminProductFr935Asia:
+		return "fr935_asia"
+	case GarminProductDescent:
+		return "descent"
+	case GarminProductVivoFit4:
+		return "vivo_fit4"
+	case GarminProductFr645:
+		return "fr645"
+	case GarminProductFr645m:
+		return "fr645m"
+	case GarminProductFr30:
+		return "fr30"
+	case GarminProductFenix5sPlus:
+		return "fenix5s_plus"
+	case GarminProductEdge130:
+		return "Edge_130"
+	case GarminProductEdge1030Asia:
+		return "edge_1030_asia"
+	case GarminProductVivosmart4:
+		return "vivosmart_4"
+	case GarminProductVivoMoveHrAsia:
+		return "vivo_move_hr_asia"
+	case GarminProductApproachX10:
+		return "approach_x10"
+	case GarminProductFr30Asia:
+		return "fr30_asia"
+	case GarminProductVivoactive3mW:
+		return "vivoactive3m_w"
+	case GarminProductFr645Asia:
+		return "fr645_asia"
+	case GarminProductFr645mAsia:
+		return "fr645m_asia"
+	case GarminProductEdgeExplore:
+		return "edge_explore"
+	case GarminProductGpsmap66:
+		return "gpsmap66"
+	case GarminProductApproachS10:
+		return "approach_s10"
+	case GarminProductVivoactive3mL:
+		return "vivoactive3m_l"
+	case GarminProductApproachG80:
+		return "approach_g80"
+	case GarminProductEdge130Asia:
+		return "edge_130_asia"
+	case GarminProductEdge1030Bontrager:
+		return "edge_1030_bontrager"
+	case GarminProductFenix5Plus:
+		return "fenix5_plus"
+	case GarminProductFenix5xPlus:
+		return "fenix5x_plus"
+	case GarminProductEdge520Plus:
+		return "edge_520_plus"
+	case GarminProductFr945:
+		return "fr945"
+	case GarminProductEdge530:
+		return "edge_530"
+	case GarminProductEdge830:
+		return "edge_830"
+	case GarminProductInstinctEsports:
+		return "instinct_esports"
+	case GarminProductFenix5sPlusApac:
+		return "fenix5s_plus_apac"
+	case GarminProductFenix5xPlusApac:
+		return "fenix5x_plus_apac"
+	case GarminProductEdge520PlusApac:
+		return "edge_520_plus_apac"
+	case GarminProductDescentT1:
+		return "descent_t1"
+	case GarminProductFr235lAsia:
+		return "fr235l_asia"
+	case GarminProductFr245Asia:
+		return "fr245_asia"
+	case GarminProductVivoActive3mApac:
+		return "vivo_active3m_apac"
+	case GarminProductGen3Bsm:
+		return "gen3_bsm"
+	case GarminProductGen3Bcm:
+		return "gen3_bcm"
+	case GarminProductVivoSmart4Asia:
+		return "vivo_smart4_asia"
+	case GarminProductVivoactive4Small:
+		return "vivoactive4_small"
+	case GarminProductVivoactive4Large:
+		return "vivoactive4_large"
+	case GarminProductVenu:
+		return "venu"
+	case GarminProductMarqDriver:
+		return "marq_driver"
+	case GarminProductMarqAviator:
+		return "marq_aviator"
+	case GarminProductMarqCaptain:
+		return "marq_captain"
+	case GarminProductMarqCommander:
+		return "marq_commander"
+	case GarminProductMarqExpedition:
+		return "marq_expedition"
+	case GarminProductMarqAthlete:
+		return "marq_athlete"
+	case GarminProductDescentMk2:
+		return "descent_mk2"
+	case GarminProductGpsmap66i:
+		return "gpsmap66i"
+	case GarminProductFenix6sSport:
+		return "fenix6S_sport"
+	case GarminProductFenix6s:
+		return "fenix6S"
+	case GarminProductFenix6Sport:
+		return "fenix6_sport"
+	case GarminProductFenix6:
+		return "fenix6"
+	case GarminProductFenix6x:
+		return "fenix6x"
+	case GarminProductHrmDual:
+		return "hrm_dual"
+	case GarminProductHrmPro:
+		return "hrm_pro"
+	case GarminProductVivoMove3Premium:
+		return "vivo_move3_premium"
+	case GarminProductApproachS40:
+		return "approach_s40"
+	case GarminProductFr245mAsia:
+		return "fr245m_asia"
+	case GarminProductEdge530Apac:
+		return "edge_530_apac"
+	case GarminProductEdge830Apac:
+		return "edge_830_apac"
+	case GarminProductVivoMove3:
+		return "vivo_move3"
+	case GarminProductVivoActive4SmallAsia:
+		return "vivo_active4_small_asia"
+	case GarminProductVivoActive4LargeAsia:
+		return "vivo_active4_large_asia"
+	case GarminProductVivoActive4OledAsia:
+		return "vivo_active4_oled_asia"
+	case GarminProductSwim2:
+		return "swim2"
+	case GarminProductMarqDriverAsia:
+		return "marq_driver_asia"
+	case GarminProductMarqAviatorAsia:
+		return "marq_aviator_asia"
+	case GarminProductVivoMove3Asia:
+		return "vivo_move3_asia"
+	case GarminProductFr945Asia:
+		return "fr945_asia"
+	case GarminProductVivoActive3tChn:
+		return "vivo_active3t_chn"
+	case GarminProductMarqCaptainAsia:
+		return "marq_captain_asia"
+	case GarminProductMarqCommanderAsia:
+		return "marq_commander_asia"
+	case GarminProductMarqExpeditionAsia:
+		return "marq_expedition_asia"
+	case GarminProductMarqAthleteAsia:
+		return "marq_athlete_asia"
+	case GarminProductInstinctSolar:
+		return "instinct_solar"
+	case GarminProductFr45Asia:
+		return "fr45_asia"
+	case GarminProductVivoactive3Daimler:
+		return "vivoactive3_daimler"
+	case GarminProductLegacyRey:
+		return "legacy_rey"
+	case GarminProductLegacyDarthVader:
+		return "legacy_darth_vader"
+	case GarminProductLegacyCaptainMarvel:
+		return "legacy_captain_marvel"
+	case GarminProductLegacyFirstAvenger:
+		return "legacy_first_avenger"
+	case GarminProductFenix6sSportAsia:
+		return "fenix6s_sport_asia"
+	case GarminProductFenix6sAsia:
+		return "fenix6s_asia"
+	case GarminProductFenix6SportAsia:
+		return "fenix6_sport_asia"
+	case GarminProductFenix6Asia:
+		return "fenix6_asia"
+	case GarminProductFenix6xAsia:
+		return "fenix6x_asia"
+	case GarminProductLegacyCaptainMarvelAsia:
+		return "legacy_captain_marvel_asia"
+	case GarminProductLegacyFirstAvengerAsia:
+		return "legacy_first_avenger_asia"
+	case GarminProductLegacyReyAsia:
+		return "legacy_rey_asia"
+	case GarminProductLegacyDarthVaderAsia:
+		return "legacy_darth_vader_asia"
+	case GarminProductDescentMk2s:
+		return "descent_mk2s"
+	case GarminProductEdge130Plus:
+		return "edge_130_plus"
+	case GarminProductEdge1030Plus:
+		return "edge_1030_plus"
+	case GarminProductRally200:
+		return "rally_200"
+	case GarminProductFr745:
+		return "fr745"
+	case GarminProductVenusq:
+		return "venusq"
+	case GarminProductLily:
+		return "lily"
+	case GarminProductMarqAdventurer:
+		return "marq_adventurer"
+	case GarminProductEnduro:
+		return "enduro"
+	case GarminProductSwim2Apac:
+		return "swim2_apac"
+	case GarminProductMarqAdventurerAsia:
+		return "marq_adventurer_asia"
+	case GarminProductFr945Lte:
+		return "fr945_lte"
+	case GarminProductDescentMk2Asia:
+		return "descent_mk2_asia"
+	case GarminProductVenu2:
+		return "venu2"
+	case GarminProductVenu2s:
+		return "venu2s"
+	case GarminProductVenuDaimlerAsia:
+		return "venu_daimler_asia"
+	case GarminProductMarqGolfer:
+		return "marq_golfer"
+	case GarminProductVenuDaimler:
+		return "venu_daimler"
+	case GarminProductFr745Asia:
+		return "fr745_asia"
+	case GarminProductVariaRct715:
+		return "varia_rct715"
+	case GarminProductLilyAsia:
+		return "lily_asia"
+	case GarminProductEdge1030PlusAsia:
+		return "edge_1030_plus_asia"
+	case GarminProductEdge130PlusAsia:
+		return "edge_130_plus_asia"
+	case GarminProductApproachS12:
+		return "approach_s12"
+	case GarminProductEnduroAsia:
+		return "enduro_asia"
+	case GarminProductVenusqAsia:
+		return "venusq_asia"
+	case GarminProductEdge1040:
+		return "edge_1040"
+	case GarminProductMarqGolferAsia:
+		return "marq_golfer_asia"
+	case GarminProductVenu2Plus:
+		return "venu2_plus"
+	case GarminProductGnss:
+		return "gnss"
+	case GarminProductFr55:
+		return "fr55"
+	case GarminProductInstinct2:
+		return "instinct_2"
+	case GarminProductFenix7s:
+		return "fenix7s"
+	case GarminProductFenix7:
+		return "fenix7"
+	case GarminProductFenix7x:
+		return "fenix7x"
+	case GarminProductFenix7sApac:
+		return "fenix7s_apac"
+	case GarminProductFenix7Apac:
+		return "fenix7_apac"
+	case GarminProductFenix7xApac:
+		return "fenix7x_apac"
+	case GarminProductApproachG12:
+		return "approach_g12"
+	case GarminProductDescentMk2sAsia:
+		return "descent_mk2s_asia"
+	case GarminProductApproachS42:
+		return "approach_s42"
+	case GarminProductEpixGen2:
+		return "epix_gen2"
+	case GarminProductEpixGen2Apac:
+		return "epix_gen2_apac"
+	case GarminProductVenu2sAsia:
+		return "venu2s_asia"
+	case GarminProductVenu2Asia:
+		return "venu2_asia"
+	case GarminProductFr945LteAsia:
+		return "fr945_lte_asia"
+	case GarminProductVivoMoveSport:
+		return "vivo_move_sport"
+	case GarminProductVivomoveTrend:
+		return "vivomove_trend"
+	case GarminProductApproachS12Asia:
+		return "approach_S12_asia"
+	case GarminProductFr255Music:
+		return "fr255_music"
+	case GarminProductFr255SmallMusic:
+		return "fr255_small_music"
+	case GarminProductFr255:
+		return "fr255"
+	case GarminProductFr255Small:
+		return "fr255_small"
+	case GarminProductApproachG12Asia:
+		return "approach_g12_asia"
+	case GarminProductApproachS42Asia:
+		return "approach_s42_asia"
+	case GarminProductDescentG1:
+		return "descent_g1"
+	case GarminProductVenu2PlusAsia:
+		return "venu2_plus_asia"
+	case GarminProductFr955:
+		return "fr955"
+	case GarminProductFr55Asia:
+		return "fr55_asia"
+	case GarminProductEdge540:
+		return "edge_540"
+	case GarminProductEdge840:
+		return "edge_840"
+	case GarminProductVivosmart5:
+		return "vivosmart_5"
+	case GarminProductInstinct2Asia:
+		return "instinct_2_asia"
+	case GarminProductMarqGen2:
+		return "marq_gen2"
+	case GarminProductVenusq2:
+		return "venusq2"
+	case GarminProductVenusq2music:
+		return "venusq2music"
+	case GarminProductMarqGen2Aviator:
+		return "marq_gen2_aviator"
+	case GarminProductD2AirX10:
+		return "d2_air_x10"
+	case GarminProductHrmProPlus:
+		return "hrm_pro_plus"
+	case GarminProductDescentG1Asia:
+		return "descent_g1_asia"
+	case GarminProductTactix7:
+		return "tactix7"
+	case GarminProductInstinctCrossover:
+		return "instinct_crossover"
+	case GarminProductEdgeExplore2:
+		return "edge_explore2"
+	case GarminProductApproachS70:
+		return "approach_s70"
+	case GarminProductFr265Large:
+		return "fr265_large"
+	case GarminProductFr265Small:
+		return "fr265_small"
+	case GarminProductVenu3:
+		return "venu3"
+	case GarminProductVenu3s:
+		return "venu3s"
+	case GarminProductTacxNeoSmart:
+		return "tacx_neo_smart"
+	case GarminProductTacxNeo2Smart:
+		return "tacx_neo2_smart"
+	case GarminProductTacxNeo2TSmart:
+		return "tacx_neo2_t_smart"
+	case GarminProductTacxNeoSmartBike:
+		return "tacx_neo_smart_bike"
+	case GarminProductTacxSatoriSmart:
+		return "tacx_satori_smart"
+	case GarminProductTacxFlowSmart:
+		return "tacx_flow_smart"
+	case GarminProductTacxVortexSmart:
+		return "tacx_vortex_smart"
+	case GarminProductTacxBushidoSmart:
+		return "tacx_bushido_smart"
+	case GarminProductTacxGeniusSmart:
+		return "tacx_genius_smart"
+	case GarminProductTacxFluxFluxSSmart:
+		return "tacx_flux_flux_s_smart"
+	case GarminProductTacxFlux2Smart:
+		return "tacx_flux2_smart"
+	case GarminProductTacxMagnum:
+		return "tacx_magnum"
+	case GarminProductEdge1040Asia:
+		return "edge_1040_asia"
+	case GarminProductEpixGen2Pro42:
+		return "epix_gen2_pro_42"
+	case GarminProductEpixGen2Pro47:
+		return "epix_gen2_pro_47"
+	case GarminProductEpixGen2Pro51:
+		return "epix_gen2_pro_51"
+	case GarminProductFr965:
+		return "fr965"
+	case GarminProductEnduro2:
+		return "enduro2"
+	case GarminProductFenix7sProSolar:
+		return "fenix7s_pro_solar"
+	case GarminProductFenix7ProSolar:
+		return "fenix7_pro_solar"
+	case GarminProductFenix7xProSolar:
+		return "fenix7x_pro_solar"
+	case GarminProductInstinct2X:
+		return "instinct_2x"
+	case GarminProductVivoactive5:
+		return "vivoactive5"
+	case GarminProductDescentT2:
+		return "descent_t2"
+	case GarminProductMarqGen2Commander:
+		return "marq_gen2_commander"
+	case GarminProductD2Mach1Pro:
+		return "d2_mach1_pro"
+	case GarminProductSdm4:
+		return "sdm4"
+	case GarminProductEdgeRemote:
+		return "edge_remote"
+	case GarminProductTacxTrainingAppWin:
+		return "tacx_training_app_win"
+	case GarminProductTacxTrainingAppMac:
+		return "tacx_training_app_mac"
+	case GarminProductTacxTrainingAppMacCatalyst:
+		return "tacx_training_app_mac_catalyst"
+	case GarminProductTrainingCenter:
+		return "training_center"
+	case GarminProductTacxTrainingAppAndroid:
+		return "tacx_training_app_android"
+	case GarminProductTacxTrainingAppIos:
+		return "tacx_training_app_ios"
+	case GarminProductTacxTrainingAppLegacy:
+		return "tacx_training_app_legacy"
+	case GarminProductConnectiqSimulator:
+		return "connectiq_simulator"
+	case GarminProductAndroidAntplusPlugin:
+		return "android_antplus_plugin"
+	case GarminProductConnect:
+		return "connect"
+	default:
+		return "GarminProductInvalid(" + strconv.FormatUint(uint64(g), 10) + ")"
 	}
-	return val
 }
-
-var strtogarminproduct = func() map[string]GarminProduct {
-	m := make(map[string]GarminProduct)
-	for t, str := range garminproducttostrs {
-		m[str] = GarminProduct(t)
-	}
-	return m
-}()
 
 // FromString parse string into GarminProduct constant it's represent, return GarminProductInvalid if not found.
 func GarminProductFromString(s string) GarminProduct {
-	val, ok := strtogarminproduct[s]
-	if !ok {
-		return strtogarminproduct["invalid"]
+	switch s {
+	case "hrm1":
+		return GarminProductHrm1
+	case "axh01":
+		return GarminProductAxh01
+	case "axb01":
+		return GarminProductAxb01
+	case "axb02":
+		return GarminProductAxb02
+	case "hrm2ss":
+		return GarminProductHrm2ss
+	case "dsi_alf02":
+		return GarminProductDsiAlf02
+	case "hrm3ss":
+		return GarminProductHrm3ss
+	case "hrm_run_single_byte_product_id":
+		return GarminProductHrmRunSingleByteProductId
+	case "bsm":
+		return GarminProductBsm
+	case "bcm":
+		return GarminProductBcm
+	case "axs01":
+		return GarminProductAxs01
+	case "hrm_tri_single_byte_product_id":
+		return GarminProductHrmTriSingleByteProductId
+	case "hrm4_run_single_byte_product_id":
+		return GarminProductHrm4RunSingleByteProductId
+	case "fr225_single_byte_product_id":
+		return GarminProductFr225SingleByteProductId
+	case "gen3_bsm_single_byte_product_id":
+		return GarminProductGen3BsmSingleByteProductId
+	case "gen3_bcm_single_byte_product_id":
+		return GarminProductGen3BcmSingleByteProductId
+	case "OHR":
+		return GarminProductOhr
+	case "fr301_china":
+		return GarminProductFr301China
+	case "fr301_japan":
+		return GarminProductFr301Japan
+	case "fr301_korea":
+		return GarminProductFr301Korea
+	case "fr301_taiwan":
+		return GarminProductFr301Taiwan
+	case "fr405":
+		return GarminProductFr405
+	case "fr50":
+		return GarminProductFr50
+	case "fr405_japan":
+		return GarminProductFr405Japan
+	case "fr60":
+		return GarminProductFr60
+	case "dsi_alf01":
+		return GarminProductDsiAlf01
+	case "fr310xt":
+		return GarminProductFr310xt
+	case "edge500":
+		return GarminProductEdge500
+	case "fr110":
+		return GarminProductFr110
+	case "edge800":
+		return GarminProductEdge800
+	case "edge500_taiwan":
+		return GarminProductEdge500Taiwan
+	case "edge500_japan":
+		return GarminProductEdge500Japan
+	case "chirp":
+		return GarminProductChirp
+	case "fr110_japan":
+		return GarminProductFr110Japan
+	case "edge200":
+		return GarminProductEdge200
+	case "fr910xt":
+		return GarminProductFr910xt
+	case "edge800_taiwan":
+		return GarminProductEdge800Taiwan
+	case "edge800_japan":
+		return GarminProductEdge800Japan
+	case "alf04":
+		return GarminProductAlf04
+	case "fr610":
+		return GarminProductFr610
+	case "fr210_japan":
+		return GarminProductFr210Japan
+	case "vector_ss":
+		return GarminProductVectorSs
+	case "vector_cp":
+		return GarminProductVectorCp
+	case "edge800_china":
+		return GarminProductEdge800China
+	case "edge500_china":
+		return GarminProductEdge500China
+	case "approach_g10":
+		return GarminProductApproachG10
+	case "fr610_japan":
+		return GarminProductFr610Japan
+	case "edge500_korea":
+		return GarminProductEdge500Korea
+	case "fr70":
+		return GarminProductFr70
+	case "fr310xt_4t":
+		return GarminProductFr310xt4T
+	case "amx":
+		return GarminProductAmx
+	case "fr10":
+		return GarminProductFr10
+	case "edge800_korea":
+		return GarminProductEdge800Korea
+	case "swim":
+		return GarminProductSwim
+	case "fr910xt_china":
+		return GarminProductFr910xtChina
+	case "fenix":
+		return GarminProductFenix
+	case "edge200_taiwan":
+		return GarminProductEdge200Taiwan
+	case "edge510":
+		return GarminProductEdge510
+	case "edge810":
+		return GarminProductEdge810
+	case "tempe":
+		return GarminProductTempe
+	case "fr910xt_japan":
+		return GarminProductFr910xtJapan
+	case "fr620":
+		return GarminProductFr620
+	case "fr220":
+		return GarminProductFr220
+	case "fr910xt_korea":
+		return GarminProductFr910xtKorea
+	case "fr10_japan":
+		return GarminProductFr10Japan
+	case "edge810_japan":
+		return GarminProductEdge810Japan
+	case "virb_elite":
+		return GarminProductVirbElite
+	case "edge_touring":
+		return GarminProductEdgeTouring
+	case "edge510_japan":
+		return GarminProductEdge510Japan
+	case "hrm_tri":
+		return GarminProductHrmTri
+	case "hrm_run":
+		return GarminProductHrmRun
+	case "fr920xt":
+		return GarminProductFr920xt
+	case "edge510_asia":
+		return GarminProductEdge510Asia
+	case "edge810_china":
+		return GarminProductEdge810China
+	case "edge810_taiwan":
+		return GarminProductEdge810Taiwan
+	case "edge1000":
+		return GarminProductEdge1000
+	case "vivo_fit":
+		return GarminProductVivoFit
+	case "virb_remote":
+		return GarminProductVirbRemote
+	case "vivo_ki":
+		return GarminProductVivoKi
+	case "fr15":
+		return GarminProductFr15
+	case "vivo_active":
+		return GarminProductVivoActive
+	case "edge510_korea":
+		return GarminProductEdge510Korea
+	case "fr620_japan":
+		return GarminProductFr620Japan
+	case "fr620_china":
+		return GarminProductFr620China
+	case "fr220_japan":
+		return GarminProductFr220Japan
+	case "fr220_china":
+		return GarminProductFr220China
+	case "approach_s6":
+		return GarminProductApproachS6
+	case "vivo_smart":
+		return GarminProductVivoSmart
+	case "fenix2":
+		return GarminProductFenix2
+	case "epix":
+		return GarminProductEpix
+	case "fenix3":
+		return GarminProductFenix3
+	case "edge1000_taiwan":
+		return GarminProductEdge1000Taiwan
+	case "edge1000_japan":
+		return GarminProductEdge1000Japan
+	case "fr15_japan":
+		return GarminProductFr15Japan
+	case "edge520":
+		return GarminProductEdge520
+	case "edge1000_china":
+		return GarminProductEdge1000China
+	case "fr620_russia":
+		return GarminProductFr620Russia
+	case "fr220_russia":
+		return GarminProductFr220Russia
+	case "vector_s":
+		return GarminProductVectorS
+	case "edge1000_korea":
+		return GarminProductEdge1000Korea
+	case "fr920xt_taiwan":
+		return GarminProductFr920xtTaiwan
+	case "fr920xt_china":
+		return GarminProductFr920xtChina
+	case "fr920xt_japan":
+		return GarminProductFr920xtJapan
+	case "virbx":
+		return GarminProductVirbx
+	case "vivo_smart_apac":
+		return GarminProductVivoSmartApac
+	case "etrex_touch":
+		return GarminProductEtrexTouch
+	case "edge25":
+		return GarminProductEdge25
+	case "fr25":
+		return GarminProductFr25
+	case "vivo_fit2":
+		return GarminProductVivoFit2
+	case "fr225":
+		return GarminProductFr225
+	case "fr630":
+		return GarminProductFr630
+	case "fr230":
+		return GarminProductFr230
+	case "fr735xt":
+		return GarminProductFr735xt
+	case "vivo_active_apac":
+		return GarminProductVivoActiveApac
+	case "vector_2":
+		return GarminProductVector2
+	case "vector_2s":
+		return GarminProductVector2S
+	case "virbxe":
+		return GarminProductVirbxe
+	case "fr620_taiwan":
+		return GarminProductFr620Taiwan
+	case "fr220_taiwan":
+		return GarminProductFr220Taiwan
+	case "truswing":
+		return GarminProductTruswing
+	case "d2airvenu":
+		return GarminProductD2airvenu
+	case "fenix3_china":
+		return GarminProductFenix3China
+	case "fenix3_twn":
+		return GarminProductFenix3Twn
+	case "varia_headlight":
+		return GarminProductVariaHeadlight
+	case "varia_taillight_old":
+		return GarminProductVariaTaillightOld
+	case "edge_explore_1000":
+		return GarminProductEdgeExplore1000
+	case "fr225_asia":
+		return GarminProductFr225Asia
+	case "varia_radar_taillight":
+		return GarminProductVariaRadarTaillight
+	case "varia_radar_display":
+		return GarminProductVariaRadarDisplay
+	case "edge20":
+		return GarminProductEdge20
+	case "edge520_asia":
+		return GarminProductEdge520Asia
+	case "edge520_japan":
+		return GarminProductEdge520Japan
+	case "d2_bravo":
+		return GarminProductD2Bravo
+	case "approach_s20":
+		return GarminProductApproachS20
+	case "vivo_smart2":
+		return GarminProductVivoSmart2
+	case "edge1000_thai":
+		return GarminProductEdge1000Thai
+	case "varia_remote":
+		return GarminProductVariaRemote
+	case "edge25_asia":
+		return GarminProductEdge25Asia
+	case "edge25_jpn":
+		return GarminProductEdge25Jpn
+	case "edge20_asia":
+		return GarminProductEdge20Asia
+	case "approach_x40":
+		return GarminProductApproachX40
+	case "fenix3_japan":
+		return GarminProductFenix3Japan
+	case "vivo_smart_emea":
+		return GarminProductVivoSmartEmea
+	case "fr630_asia":
+		return GarminProductFr630Asia
+	case "fr630_jpn":
+		return GarminProductFr630Jpn
+	case "fr230_jpn":
+		return GarminProductFr230Jpn
+	case "hrm4_run":
+		return GarminProductHrm4Run
+	case "epix_japan":
+		return GarminProductEpixJapan
+	case "vivo_active_hr":
+		return GarminProductVivoActiveHr
+	case "vivo_smart_gps_hr":
+		return GarminProductVivoSmartGpsHr
+	case "vivo_smart_hr":
+		return GarminProductVivoSmartHr
+	case "vivo_smart_hr_asia":
+		return GarminProductVivoSmartHrAsia
+	case "vivo_smart_gps_hr_asia":
+		return GarminProductVivoSmartGpsHrAsia
+	case "vivo_move":
+		return GarminProductVivoMove
+	case "varia_taillight":
+		return GarminProductVariaTaillight
+	case "fr235_asia":
+		return GarminProductFr235Asia
+	case "fr235_japan":
+		return GarminProductFr235Japan
+	case "varia_vision":
+		return GarminProductVariaVision
+	case "vivo_fit3":
+		return GarminProductVivoFit3
+	case "fenix3_korea":
+		return GarminProductFenix3Korea
+	case "fenix3_sea":
+		return GarminProductFenix3Sea
+	case "fenix3_hr":
+		return GarminProductFenix3Hr
+	case "virb_ultra_30":
+		return GarminProductVirbUltra30
+	case "index_smart_scale":
+		return GarminProductIndexSmartScale
+	case "fr235":
+		return GarminProductFr235
+	case "fenix3_chronos":
+		return GarminProductFenix3Chronos
+	case "oregon7xx":
+		return GarminProductOregon7xx
+	case "rino7xx":
+		return GarminProductRino7xx
+	case "epix_korea":
+		return GarminProductEpixKorea
+	case "fenix3_hr_chn":
+		return GarminProductFenix3HrChn
+	case "fenix3_hr_twn":
+		return GarminProductFenix3HrTwn
+	case "fenix3_hr_jpn":
+		return GarminProductFenix3HrJpn
+	case "fenix3_hr_sea":
+		return GarminProductFenix3HrSea
+	case "fenix3_hr_kor":
+		return GarminProductFenix3HrKor
+	case "nautix":
+		return GarminProductNautix
+	case "vivo_active_hr_apac":
+		return GarminProductVivoActiveHrApac
+	case "fr35":
+		return GarminProductFr35
+	case "oregon7xx_ww":
+		return GarminProductOregon7xxWw
+	case "edge_820":
+		return GarminProductEdge820
+	case "edge_explore_820":
+		return GarminProductEdgeExplore820
+	case "fr735xt_apac":
+		return GarminProductFr735xtApac
+	case "fr735xt_japan":
+		return GarminProductFr735xtJapan
+	case "fenix5s":
+		return GarminProductFenix5s
+	case "d2_bravo_titanium":
+		return GarminProductD2BravoTitanium
+	case "varia_ut800":
+		return GarminProductVariaUt800
+	case "running_dynamics_pod":
+		return GarminProductRunningDynamicsPod
+	case "edge_820_china":
+		return GarminProductEdge820China
+	case "edge_820_japan":
+		return GarminProductEdge820Japan
+	case "fenix5x":
+		return GarminProductFenix5x
+	case "vivo_fit_jr":
+		return GarminProductVivoFitJr
+	case "vivo_smart3":
+		return GarminProductVivoSmart3
+	case "vivo_sport":
+		return GarminProductVivoSport
+	case "edge_820_taiwan":
+		return GarminProductEdge820Taiwan
+	case "edge_820_korea":
+		return GarminProductEdge820Korea
+	case "edge_820_sea":
+		return GarminProductEdge820Sea
+	case "fr35_hebrew":
+		return GarminProductFr35Hebrew
+	case "approach_s60":
+		return GarminProductApproachS60
+	case "fr35_apac":
+		return GarminProductFr35Apac
+	case "fr35_japan":
+		return GarminProductFr35Japan
+	case "fenix3_chronos_asia":
+		return GarminProductFenix3ChronosAsia
+	case "virb_360":
+		return GarminProductVirb360
+	case "fr935":
+		return GarminProductFr935
+	case "fenix5":
+		return GarminProductFenix5
+	case "vivoactive3":
+		return GarminProductVivoactive3
+	case "fr235_china_nfc":
+		return GarminProductFr235ChinaNfc
+	case "foretrex_601_701":
+		return GarminProductForetrex601701
+	case "vivo_move_hr":
+		return GarminProductVivoMoveHr
+	case "edge_1030":
+		return GarminProductEdge1030
+	case "fr35_sea":
+		return GarminProductFr35Sea
+	case "vector_3":
+		return GarminProductVector3
+	case "fenix5_asia":
+		return GarminProductFenix5Asia
+	case "fenix5s_asia":
+		return GarminProductFenix5sAsia
+	case "fenix5x_asia":
+		return GarminProductFenix5xAsia
+	case "approach_z80":
+		return GarminProductApproachZ80
+	case "fr35_korea":
+		return GarminProductFr35Korea
+	case "d2charlie":
+		return GarminProductD2charlie
+	case "vivo_smart3_apac":
+		return GarminProductVivoSmart3Apac
+	case "vivo_sport_apac":
+		return GarminProductVivoSportApac
+	case "fr935_asia":
+		return GarminProductFr935Asia
+	case "descent":
+		return GarminProductDescent
+	case "vivo_fit4":
+		return GarminProductVivoFit4
+	case "fr645":
+		return GarminProductFr645
+	case "fr645m":
+		return GarminProductFr645m
+	case "fr30":
+		return GarminProductFr30
+	case "fenix5s_plus":
+		return GarminProductFenix5sPlus
+	case "Edge_130":
+		return GarminProductEdge130
+	case "edge_1030_asia":
+		return GarminProductEdge1030Asia
+	case "vivosmart_4":
+		return GarminProductVivosmart4
+	case "vivo_move_hr_asia":
+		return GarminProductVivoMoveHrAsia
+	case "approach_x10":
+		return GarminProductApproachX10
+	case "fr30_asia":
+		return GarminProductFr30Asia
+	case "vivoactive3m_w":
+		return GarminProductVivoactive3mW
+	case "fr645_asia":
+		return GarminProductFr645Asia
+	case "fr645m_asia":
+		return GarminProductFr645mAsia
+	case "edge_explore":
+		return GarminProductEdgeExplore
+	case "gpsmap66":
+		return GarminProductGpsmap66
+	case "approach_s10":
+		return GarminProductApproachS10
+	case "vivoactive3m_l":
+		return GarminProductVivoactive3mL
+	case "approach_g80":
+		return GarminProductApproachG80
+	case "edge_130_asia":
+		return GarminProductEdge130Asia
+	case "edge_1030_bontrager":
+		return GarminProductEdge1030Bontrager
+	case "fenix5_plus":
+		return GarminProductFenix5Plus
+	case "fenix5x_plus":
+		return GarminProductFenix5xPlus
+	case "edge_520_plus":
+		return GarminProductEdge520Plus
+	case "fr945":
+		return GarminProductFr945
+	case "edge_530":
+		return GarminProductEdge530
+	case "edge_830":
+		return GarminProductEdge830
+	case "instinct_esports":
+		return GarminProductInstinctEsports
+	case "fenix5s_plus_apac":
+		return GarminProductFenix5sPlusApac
+	case "fenix5x_plus_apac":
+		return GarminProductFenix5xPlusApac
+	case "edge_520_plus_apac":
+		return GarminProductEdge520PlusApac
+	case "descent_t1":
+		return GarminProductDescentT1
+	case "fr235l_asia":
+		return GarminProductFr235lAsia
+	case "fr245_asia":
+		return GarminProductFr245Asia
+	case "vivo_active3m_apac":
+		return GarminProductVivoActive3mApac
+	case "gen3_bsm":
+		return GarminProductGen3Bsm
+	case "gen3_bcm":
+		return GarminProductGen3Bcm
+	case "vivo_smart4_asia":
+		return GarminProductVivoSmart4Asia
+	case "vivoactive4_small":
+		return GarminProductVivoactive4Small
+	case "vivoactive4_large":
+		return GarminProductVivoactive4Large
+	case "venu":
+		return GarminProductVenu
+	case "marq_driver":
+		return GarminProductMarqDriver
+	case "marq_aviator":
+		return GarminProductMarqAviator
+	case "marq_captain":
+		return GarminProductMarqCaptain
+	case "marq_commander":
+		return GarminProductMarqCommander
+	case "marq_expedition":
+		return GarminProductMarqExpedition
+	case "marq_athlete":
+		return GarminProductMarqAthlete
+	case "descent_mk2":
+		return GarminProductDescentMk2
+	case "gpsmap66i":
+		return GarminProductGpsmap66i
+	case "fenix6S_sport":
+		return GarminProductFenix6sSport
+	case "fenix6S":
+		return GarminProductFenix6s
+	case "fenix6_sport":
+		return GarminProductFenix6Sport
+	case "fenix6":
+		return GarminProductFenix6
+	case "fenix6x":
+		return GarminProductFenix6x
+	case "hrm_dual":
+		return GarminProductHrmDual
+	case "hrm_pro":
+		return GarminProductHrmPro
+	case "vivo_move3_premium":
+		return GarminProductVivoMove3Premium
+	case "approach_s40":
+		return GarminProductApproachS40
+	case "fr245m_asia":
+		return GarminProductFr245mAsia
+	case "edge_530_apac":
+		return GarminProductEdge530Apac
+	case "edge_830_apac":
+		return GarminProductEdge830Apac
+	case "vivo_move3":
+		return GarminProductVivoMove3
+	case "vivo_active4_small_asia":
+		return GarminProductVivoActive4SmallAsia
+	case "vivo_active4_large_asia":
+		return GarminProductVivoActive4LargeAsia
+	case "vivo_active4_oled_asia":
+		return GarminProductVivoActive4OledAsia
+	case "swim2":
+		return GarminProductSwim2
+	case "marq_driver_asia":
+		return GarminProductMarqDriverAsia
+	case "marq_aviator_asia":
+		return GarminProductMarqAviatorAsia
+	case "vivo_move3_asia":
+		return GarminProductVivoMove3Asia
+	case "fr945_asia":
+		return GarminProductFr945Asia
+	case "vivo_active3t_chn":
+		return GarminProductVivoActive3tChn
+	case "marq_captain_asia":
+		return GarminProductMarqCaptainAsia
+	case "marq_commander_asia":
+		return GarminProductMarqCommanderAsia
+	case "marq_expedition_asia":
+		return GarminProductMarqExpeditionAsia
+	case "marq_athlete_asia":
+		return GarminProductMarqAthleteAsia
+	case "instinct_solar":
+		return GarminProductInstinctSolar
+	case "fr45_asia":
+		return GarminProductFr45Asia
+	case "vivoactive3_daimler":
+		return GarminProductVivoactive3Daimler
+	case "legacy_rey":
+		return GarminProductLegacyRey
+	case "legacy_darth_vader":
+		return GarminProductLegacyDarthVader
+	case "legacy_captain_marvel":
+		return GarminProductLegacyCaptainMarvel
+	case "legacy_first_avenger":
+		return GarminProductLegacyFirstAvenger
+	case "fenix6s_sport_asia":
+		return GarminProductFenix6sSportAsia
+	case "fenix6s_asia":
+		return GarminProductFenix6sAsia
+	case "fenix6_sport_asia":
+		return GarminProductFenix6SportAsia
+	case "fenix6_asia":
+		return GarminProductFenix6Asia
+	case "fenix6x_asia":
+		return GarminProductFenix6xAsia
+	case "legacy_captain_marvel_asia":
+		return GarminProductLegacyCaptainMarvelAsia
+	case "legacy_first_avenger_asia":
+		return GarminProductLegacyFirstAvengerAsia
+	case "legacy_rey_asia":
+		return GarminProductLegacyReyAsia
+	case "legacy_darth_vader_asia":
+		return GarminProductLegacyDarthVaderAsia
+	case "descent_mk2s":
+		return GarminProductDescentMk2s
+	case "edge_130_plus":
+		return GarminProductEdge130Plus
+	case "edge_1030_plus":
+		return GarminProductEdge1030Plus
+	case "rally_200":
+		return GarminProductRally200
+	case "fr745":
+		return GarminProductFr745
+	case "venusq":
+		return GarminProductVenusq
+	case "lily":
+		return GarminProductLily
+	case "marq_adventurer":
+		return GarminProductMarqAdventurer
+	case "enduro":
+		return GarminProductEnduro
+	case "swim2_apac":
+		return GarminProductSwim2Apac
+	case "marq_adventurer_asia":
+		return GarminProductMarqAdventurerAsia
+	case "fr945_lte":
+		return GarminProductFr945Lte
+	case "descent_mk2_asia":
+		return GarminProductDescentMk2Asia
+	case "venu2":
+		return GarminProductVenu2
+	case "venu2s":
+		return GarminProductVenu2s
+	case "venu_daimler_asia":
+		return GarminProductVenuDaimlerAsia
+	case "marq_golfer":
+		return GarminProductMarqGolfer
+	case "venu_daimler":
+		return GarminProductVenuDaimler
+	case "fr745_asia":
+		return GarminProductFr745Asia
+	case "varia_rct715":
+		return GarminProductVariaRct715
+	case "lily_asia":
+		return GarminProductLilyAsia
+	case "edge_1030_plus_asia":
+		return GarminProductEdge1030PlusAsia
+	case "edge_130_plus_asia":
+		return GarminProductEdge130PlusAsia
+	case "approach_s12":
+		return GarminProductApproachS12
+	case "enduro_asia":
+		return GarminProductEnduroAsia
+	case "venusq_asia":
+		return GarminProductVenusqAsia
+	case "edge_1040":
+		return GarminProductEdge1040
+	case "marq_golfer_asia":
+		return GarminProductMarqGolferAsia
+	case "venu2_plus":
+		return GarminProductVenu2Plus
+	case "gnss":
+		return GarminProductGnss
+	case "fr55":
+		return GarminProductFr55
+	case "instinct_2":
+		return GarminProductInstinct2
+	case "fenix7s":
+		return GarminProductFenix7s
+	case "fenix7":
+		return GarminProductFenix7
+	case "fenix7x":
+		return GarminProductFenix7x
+	case "fenix7s_apac":
+		return GarminProductFenix7sApac
+	case "fenix7_apac":
+		return GarminProductFenix7Apac
+	case "fenix7x_apac":
+		return GarminProductFenix7xApac
+	case "approach_g12":
+		return GarminProductApproachG12
+	case "descent_mk2s_asia":
+		return GarminProductDescentMk2sAsia
+	case "approach_s42":
+		return GarminProductApproachS42
+	case "epix_gen2":
+		return GarminProductEpixGen2
+	case "epix_gen2_apac":
+		return GarminProductEpixGen2Apac
+	case "venu2s_asia":
+		return GarminProductVenu2sAsia
+	case "venu2_asia":
+		return GarminProductVenu2Asia
+	case "fr945_lte_asia":
+		return GarminProductFr945LteAsia
+	case "vivo_move_sport":
+		return GarminProductVivoMoveSport
+	case "vivomove_trend":
+		return GarminProductVivomoveTrend
+	case "approach_S12_asia":
+		return GarminProductApproachS12Asia
+	case "fr255_music":
+		return GarminProductFr255Music
+	case "fr255_small_music":
+		return GarminProductFr255SmallMusic
+	case "fr255":
+		return GarminProductFr255
+	case "fr255_small":
+		return GarminProductFr255Small
+	case "approach_g12_asia":
+		return GarminProductApproachG12Asia
+	case "approach_s42_asia":
+		return GarminProductApproachS42Asia
+	case "descent_g1":
+		return GarminProductDescentG1
+	case "venu2_plus_asia":
+		return GarminProductVenu2PlusAsia
+	case "fr955":
+		return GarminProductFr955
+	case "fr55_asia":
+		return GarminProductFr55Asia
+	case "edge_540":
+		return GarminProductEdge540
+	case "edge_840":
+		return GarminProductEdge840
+	case "vivosmart_5":
+		return GarminProductVivosmart5
+	case "instinct_2_asia":
+		return GarminProductInstinct2Asia
+	case "marq_gen2":
+		return GarminProductMarqGen2
+	case "venusq2":
+		return GarminProductVenusq2
+	case "venusq2music":
+		return GarminProductVenusq2music
+	case "marq_gen2_aviator":
+		return GarminProductMarqGen2Aviator
+	case "d2_air_x10":
+		return GarminProductD2AirX10
+	case "hrm_pro_plus":
+		return GarminProductHrmProPlus
+	case "descent_g1_asia":
+		return GarminProductDescentG1Asia
+	case "tactix7":
+		return GarminProductTactix7
+	case "instinct_crossover":
+		return GarminProductInstinctCrossover
+	case "edge_explore2":
+		return GarminProductEdgeExplore2
+	case "approach_s70":
+		return GarminProductApproachS70
+	case "fr265_large":
+		return GarminProductFr265Large
+	case "fr265_small":
+		return GarminProductFr265Small
+	case "venu3":
+		return GarminProductVenu3
+	case "venu3s":
+		return GarminProductVenu3s
+	case "tacx_neo_smart":
+		return GarminProductTacxNeoSmart
+	case "tacx_neo2_smart":
+		return GarminProductTacxNeo2Smart
+	case "tacx_neo2_t_smart":
+		return GarminProductTacxNeo2TSmart
+	case "tacx_neo_smart_bike":
+		return GarminProductTacxNeoSmartBike
+	case "tacx_satori_smart":
+		return GarminProductTacxSatoriSmart
+	case "tacx_flow_smart":
+		return GarminProductTacxFlowSmart
+	case "tacx_vortex_smart":
+		return GarminProductTacxVortexSmart
+	case "tacx_bushido_smart":
+		return GarminProductTacxBushidoSmart
+	case "tacx_genius_smart":
+		return GarminProductTacxGeniusSmart
+	case "tacx_flux_flux_s_smart":
+		return GarminProductTacxFluxFluxSSmart
+	case "tacx_flux2_smart":
+		return GarminProductTacxFlux2Smart
+	case "tacx_magnum":
+		return GarminProductTacxMagnum
+	case "edge_1040_asia":
+		return GarminProductEdge1040Asia
+	case "epix_gen2_pro_42":
+		return GarminProductEpixGen2Pro42
+	case "epix_gen2_pro_47":
+		return GarminProductEpixGen2Pro47
+	case "epix_gen2_pro_51":
+		return GarminProductEpixGen2Pro51
+	case "fr965":
+		return GarminProductFr965
+	case "enduro2":
+		return GarminProductEnduro2
+	case "fenix7s_pro_solar":
+		return GarminProductFenix7sProSolar
+	case "fenix7_pro_solar":
+		return GarminProductFenix7ProSolar
+	case "fenix7x_pro_solar":
+		return GarminProductFenix7xProSolar
+	case "instinct_2x":
+		return GarminProductInstinct2X
+	case "vivoactive5":
+		return GarminProductVivoactive5
+	case "descent_t2":
+		return GarminProductDescentT2
+	case "marq_gen2_commander":
+		return GarminProductMarqGen2Commander
+	case "d2_mach1_pro":
+		return GarminProductD2Mach1Pro
+	case "sdm4":
+		return GarminProductSdm4
+	case "edge_remote":
+		return GarminProductEdgeRemote
+	case "tacx_training_app_win":
+		return GarminProductTacxTrainingAppWin
+	case "tacx_training_app_mac":
+		return GarminProductTacxTrainingAppMac
+	case "tacx_training_app_mac_catalyst":
+		return GarminProductTacxTrainingAppMacCatalyst
+	case "training_center":
+		return GarminProductTrainingCenter
+	case "tacx_training_app_android":
+		return GarminProductTacxTrainingAppAndroid
+	case "tacx_training_app_ios":
+		return GarminProductTacxTrainingAppIos
+	case "tacx_training_app_legacy":
+		return GarminProductTacxTrainingAppLegacy
+	case "connectiq_simulator":
+		return GarminProductConnectiqSimulator
+	case "android_antplus_plugin":
+		return GarminProductAndroidAntplusPlugin
+	case "connect":
+		return GarminProductConnect
+	default:
+		return GarminProductInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListGarminProduct() []GarminProduct {
-	vs := make([]GarminProduct, 0, len(garminproducttostrs))
-	for i := range garminproducttostrs {
-		vs = append(vs, GarminProduct(i))
+	return []GarminProduct{
+		GarminProductHrm1,
+		GarminProductAxh01,
+		GarminProductAxb01,
+		GarminProductAxb02,
+		GarminProductHrm2ss,
+		GarminProductDsiAlf02,
+		GarminProductHrm3ss,
+		GarminProductHrmRunSingleByteProductId,
+		GarminProductBsm,
+		GarminProductBcm,
+		GarminProductAxs01,
+		GarminProductHrmTriSingleByteProductId,
+		GarminProductHrm4RunSingleByteProductId,
+		GarminProductFr225SingleByteProductId,
+		GarminProductGen3BsmSingleByteProductId,
+		GarminProductGen3BcmSingleByteProductId,
+		GarminProductOhr,
+		GarminProductFr301China,
+		GarminProductFr301Japan,
+		GarminProductFr301Korea,
+		GarminProductFr301Taiwan,
+		GarminProductFr405,
+		GarminProductFr50,
+		GarminProductFr405Japan,
+		GarminProductFr60,
+		GarminProductDsiAlf01,
+		GarminProductFr310xt,
+		GarminProductEdge500,
+		GarminProductFr110,
+		GarminProductEdge800,
+		GarminProductEdge500Taiwan,
+		GarminProductEdge500Japan,
+		GarminProductChirp,
+		GarminProductFr110Japan,
+		GarminProductEdge200,
+		GarminProductFr910xt,
+		GarminProductEdge800Taiwan,
+		GarminProductEdge800Japan,
+		GarminProductAlf04,
+		GarminProductFr610,
+		GarminProductFr210Japan,
+		GarminProductVectorSs,
+		GarminProductVectorCp,
+		GarminProductEdge800China,
+		GarminProductEdge500China,
+		GarminProductApproachG10,
+		GarminProductFr610Japan,
+		GarminProductEdge500Korea,
+		GarminProductFr70,
+		GarminProductFr310xt4T,
+		GarminProductAmx,
+		GarminProductFr10,
+		GarminProductEdge800Korea,
+		GarminProductSwim,
+		GarminProductFr910xtChina,
+		GarminProductFenix,
+		GarminProductEdge200Taiwan,
+		GarminProductEdge510,
+		GarminProductEdge810,
+		GarminProductTempe,
+		GarminProductFr910xtJapan,
+		GarminProductFr620,
+		GarminProductFr220,
+		GarminProductFr910xtKorea,
+		GarminProductFr10Japan,
+		GarminProductEdge810Japan,
+		GarminProductVirbElite,
+		GarminProductEdgeTouring,
+		GarminProductEdge510Japan,
+		GarminProductHrmTri,
+		GarminProductHrmRun,
+		GarminProductFr920xt,
+		GarminProductEdge510Asia,
+		GarminProductEdge810China,
+		GarminProductEdge810Taiwan,
+		GarminProductEdge1000,
+		GarminProductVivoFit,
+		GarminProductVirbRemote,
+		GarminProductVivoKi,
+		GarminProductFr15,
+		GarminProductVivoActive,
+		GarminProductEdge510Korea,
+		GarminProductFr620Japan,
+		GarminProductFr620China,
+		GarminProductFr220Japan,
+		GarminProductFr220China,
+		GarminProductApproachS6,
+		GarminProductVivoSmart,
+		GarminProductFenix2,
+		GarminProductEpix,
+		GarminProductFenix3,
+		GarminProductEdge1000Taiwan,
+		GarminProductEdge1000Japan,
+		GarminProductFr15Japan,
+		GarminProductEdge520,
+		GarminProductEdge1000China,
+		GarminProductFr620Russia,
+		GarminProductFr220Russia,
+		GarminProductVectorS,
+		GarminProductEdge1000Korea,
+		GarminProductFr920xtTaiwan,
+		GarminProductFr920xtChina,
+		GarminProductFr920xtJapan,
+		GarminProductVirbx,
+		GarminProductVivoSmartApac,
+		GarminProductEtrexTouch,
+		GarminProductEdge25,
+		GarminProductFr25,
+		GarminProductVivoFit2,
+		GarminProductFr225,
+		GarminProductFr630,
+		GarminProductFr230,
+		GarminProductFr735xt,
+		GarminProductVivoActiveApac,
+		GarminProductVector2,
+		GarminProductVector2S,
+		GarminProductVirbxe,
+		GarminProductFr620Taiwan,
+		GarminProductFr220Taiwan,
+		GarminProductTruswing,
+		GarminProductD2airvenu,
+		GarminProductFenix3China,
+		GarminProductFenix3Twn,
+		GarminProductVariaHeadlight,
+		GarminProductVariaTaillightOld,
+		GarminProductEdgeExplore1000,
+		GarminProductFr225Asia,
+		GarminProductVariaRadarTaillight,
+		GarminProductVariaRadarDisplay,
+		GarminProductEdge20,
+		GarminProductEdge520Asia,
+		GarminProductEdge520Japan,
+		GarminProductD2Bravo,
+		GarminProductApproachS20,
+		GarminProductVivoSmart2,
+		GarminProductEdge1000Thai,
+		GarminProductVariaRemote,
+		GarminProductEdge25Asia,
+		GarminProductEdge25Jpn,
+		GarminProductEdge20Asia,
+		GarminProductApproachX40,
+		GarminProductFenix3Japan,
+		GarminProductVivoSmartEmea,
+		GarminProductFr630Asia,
+		GarminProductFr630Jpn,
+		GarminProductFr230Jpn,
+		GarminProductHrm4Run,
+		GarminProductEpixJapan,
+		GarminProductVivoActiveHr,
+		GarminProductVivoSmartGpsHr,
+		GarminProductVivoSmartHr,
+		GarminProductVivoSmartHrAsia,
+		GarminProductVivoSmartGpsHrAsia,
+		GarminProductVivoMove,
+		GarminProductVariaTaillight,
+		GarminProductFr235Asia,
+		GarminProductFr235Japan,
+		GarminProductVariaVision,
+		GarminProductVivoFit3,
+		GarminProductFenix3Korea,
+		GarminProductFenix3Sea,
+		GarminProductFenix3Hr,
+		GarminProductVirbUltra30,
+		GarminProductIndexSmartScale,
+		GarminProductFr235,
+		GarminProductFenix3Chronos,
+		GarminProductOregon7xx,
+		GarminProductRino7xx,
+		GarminProductEpixKorea,
+		GarminProductFenix3HrChn,
+		GarminProductFenix3HrTwn,
+		GarminProductFenix3HrJpn,
+		GarminProductFenix3HrSea,
+		GarminProductFenix3HrKor,
+		GarminProductNautix,
+		GarminProductVivoActiveHrApac,
+		GarminProductFr35,
+		GarminProductOregon7xxWw,
+		GarminProductEdge820,
+		GarminProductEdgeExplore820,
+		GarminProductFr735xtApac,
+		GarminProductFr735xtJapan,
+		GarminProductFenix5s,
+		GarminProductD2BravoTitanium,
+		GarminProductVariaUt800,
+		GarminProductRunningDynamicsPod,
+		GarminProductEdge820China,
+		GarminProductEdge820Japan,
+		GarminProductFenix5x,
+		GarminProductVivoFitJr,
+		GarminProductVivoSmart3,
+		GarminProductVivoSport,
+		GarminProductEdge820Taiwan,
+		GarminProductEdge820Korea,
+		GarminProductEdge820Sea,
+		GarminProductFr35Hebrew,
+		GarminProductApproachS60,
+		GarminProductFr35Apac,
+		GarminProductFr35Japan,
+		GarminProductFenix3ChronosAsia,
+		GarminProductVirb360,
+		GarminProductFr935,
+		GarminProductFenix5,
+		GarminProductVivoactive3,
+		GarminProductFr235ChinaNfc,
+		GarminProductForetrex601701,
+		GarminProductVivoMoveHr,
+		GarminProductEdge1030,
+		GarminProductFr35Sea,
+		GarminProductVector3,
+		GarminProductFenix5Asia,
+		GarminProductFenix5sAsia,
+		GarminProductFenix5xAsia,
+		GarminProductApproachZ80,
+		GarminProductFr35Korea,
+		GarminProductD2charlie,
+		GarminProductVivoSmart3Apac,
+		GarminProductVivoSportApac,
+		GarminProductFr935Asia,
+		GarminProductDescent,
+		GarminProductVivoFit4,
+		GarminProductFr645,
+		GarminProductFr645m,
+		GarminProductFr30,
+		GarminProductFenix5sPlus,
+		GarminProductEdge130,
+		GarminProductEdge1030Asia,
+		GarminProductVivosmart4,
+		GarminProductVivoMoveHrAsia,
+		GarminProductApproachX10,
+		GarminProductFr30Asia,
+		GarminProductVivoactive3mW,
+		GarminProductFr645Asia,
+		GarminProductFr645mAsia,
+		GarminProductEdgeExplore,
+		GarminProductGpsmap66,
+		GarminProductApproachS10,
+		GarminProductVivoactive3mL,
+		GarminProductApproachG80,
+		GarminProductEdge130Asia,
+		GarminProductEdge1030Bontrager,
+		GarminProductFenix5Plus,
+		GarminProductFenix5xPlus,
+		GarminProductEdge520Plus,
+		GarminProductFr945,
+		GarminProductEdge530,
+		GarminProductEdge830,
+		GarminProductInstinctEsports,
+		GarminProductFenix5sPlusApac,
+		GarminProductFenix5xPlusApac,
+		GarminProductEdge520PlusApac,
+		GarminProductDescentT1,
+		GarminProductFr235lAsia,
+		GarminProductFr245Asia,
+		GarminProductVivoActive3mApac,
+		GarminProductGen3Bsm,
+		GarminProductGen3Bcm,
+		GarminProductVivoSmart4Asia,
+		GarminProductVivoactive4Small,
+		GarminProductVivoactive4Large,
+		GarminProductVenu,
+		GarminProductMarqDriver,
+		GarminProductMarqAviator,
+		GarminProductMarqCaptain,
+		GarminProductMarqCommander,
+		GarminProductMarqExpedition,
+		GarminProductMarqAthlete,
+		GarminProductDescentMk2,
+		GarminProductGpsmap66i,
+		GarminProductFenix6sSport,
+		GarminProductFenix6s,
+		GarminProductFenix6Sport,
+		GarminProductFenix6,
+		GarminProductFenix6x,
+		GarminProductHrmDual,
+		GarminProductHrmPro,
+		GarminProductVivoMove3Premium,
+		GarminProductApproachS40,
+		GarminProductFr245mAsia,
+		GarminProductEdge530Apac,
+		GarminProductEdge830Apac,
+		GarminProductVivoMove3,
+		GarminProductVivoActive4SmallAsia,
+		GarminProductVivoActive4LargeAsia,
+		GarminProductVivoActive4OledAsia,
+		GarminProductSwim2,
+		GarminProductMarqDriverAsia,
+		GarminProductMarqAviatorAsia,
+		GarminProductVivoMove3Asia,
+		GarminProductFr945Asia,
+		GarminProductVivoActive3tChn,
+		GarminProductMarqCaptainAsia,
+		GarminProductMarqCommanderAsia,
+		GarminProductMarqExpeditionAsia,
+		GarminProductMarqAthleteAsia,
+		GarminProductInstinctSolar,
+		GarminProductFr45Asia,
+		GarminProductVivoactive3Daimler,
+		GarminProductLegacyRey,
+		GarminProductLegacyDarthVader,
+		GarminProductLegacyCaptainMarvel,
+		GarminProductLegacyFirstAvenger,
+		GarminProductFenix6sSportAsia,
+		GarminProductFenix6sAsia,
+		GarminProductFenix6SportAsia,
+		GarminProductFenix6Asia,
+		GarminProductFenix6xAsia,
+		GarminProductLegacyCaptainMarvelAsia,
+		GarminProductLegacyFirstAvengerAsia,
+		GarminProductLegacyReyAsia,
+		GarminProductLegacyDarthVaderAsia,
+		GarminProductDescentMk2s,
+		GarminProductEdge130Plus,
+		GarminProductEdge1030Plus,
+		GarminProductRally200,
+		GarminProductFr745,
+		GarminProductVenusq,
+		GarminProductLily,
+		GarminProductMarqAdventurer,
+		GarminProductEnduro,
+		GarminProductSwim2Apac,
+		GarminProductMarqAdventurerAsia,
+		GarminProductFr945Lte,
+		GarminProductDescentMk2Asia,
+		GarminProductVenu2,
+		GarminProductVenu2s,
+		GarminProductVenuDaimlerAsia,
+		GarminProductMarqGolfer,
+		GarminProductVenuDaimler,
+		GarminProductFr745Asia,
+		GarminProductVariaRct715,
+		GarminProductLilyAsia,
+		GarminProductEdge1030PlusAsia,
+		GarminProductEdge130PlusAsia,
+		GarminProductApproachS12,
+		GarminProductEnduroAsia,
+		GarminProductVenusqAsia,
+		GarminProductEdge1040,
+		GarminProductMarqGolferAsia,
+		GarminProductVenu2Plus,
+		GarminProductGnss,
+		GarminProductFr55,
+		GarminProductInstinct2,
+		GarminProductFenix7s,
+		GarminProductFenix7,
+		GarminProductFenix7x,
+		GarminProductFenix7sApac,
+		GarminProductFenix7Apac,
+		GarminProductFenix7xApac,
+		GarminProductApproachG12,
+		GarminProductDescentMk2sAsia,
+		GarminProductApproachS42,
+		GarminProductEpixGen2,
+		GarminProductEpixGen2Apac,
+		GarminProductVenu2sAsia,
+		GarminProductVenu2Asia,
+		GarminProductFr945LteAsia,
+		GarminProductVivoMoveSport,
+		GarminProductVivomoveTrend,
+		GarminProductApproachS12Asia,
+		GarminProductFr255Music,
+		GarminProductFr255SmallMusic,
+		GarminProductFr255,
+		GarminProductFr255Small,
+		GarminProductApproachG12Asia,
+		GarminProductApproachS42Asia,
+		GarminProductDescentG1,
+		GarminProductVenu2PlusAsia,
+		GarminProductFr955,
+		GarminProductFr55Asia,
+		GarminProductEdge540,
+		GarminProductEdge840,
+		GarminProductVivosmart5,
+		GarminProductInstinct2Asia,
+		GarminProductMarqGen2,
+		GarminProductVenusq2,
+		GarminProductVenusq2music,
+		GarminProductMarqGen2Aviator,
+		GarminProductD2AirX10,
+		GarminProductHrmProPlus,
+		GarminProductDescentG1Asia,
+		GarminProductTactix7,
+		GarminProductInstinctCrossover,
+		GarminProductEdgeExplore2,
+		GarminProductApproachS70,
+		GarminProductFr265Large,
+		GarminProductFr265Small,
+		GarminProductVenu3,
+		GarminProductVenu3s,
+		GarminProductTacxNeoSmart,
+		GarminProductTacxNeo2Smart,
+		GarminProductTacxNeo2TSmart,
+		GarminProductTacxNeoSmartBike,
+		GarminProductTacxSatoriSmart,
+		GarminProductTacxFlowSmart,
+		GarminProductTacxVortexSmart,
+		GarminProductTacxBushidoSmart,
+		GarminProductTacxGeniusSmart,
+		GarminProductTacxFluxFluxSSmart,
+		GarminProductTacxFlux2Smart,
+		GarminProductTacxMagnum,
+		GarminProductEdge1040Asia,
+		GarminProductEpixGen2Pro42,
+		GarminProductEpixGen2Pro47,
+		GarminProductEpixGen2Pro51,
+		GarminProductFr965,
+		GarminProductEnduro2,
+		GarminProductFenix7sProSolar,
+		GarminProductFenix7ProSolar,
+		GarminProductFenix7xProSolar,
+		GarminProductInstinct2X,
+		GarminProductVivoactive5,
+		GarminProductDescentT2,
+		GarminProductMarqGen2Commander,
+		GarminProductD2Mach1Pro,
+		GarminProductSdm4,
+		GarminProductEdgeRemote,
+		GarminProductTacxTrainingAppWin,
+		GarminProductTacxTrainingAppMac,
+		GarminProductTacxTrainingAppMacCatalyst,
+		GarminProductTrainingCenter,
+		GarminProductTacxTrainingAppAndroid,
+		GarminProductTacxTrainingAppIos,
+		GarminProductTacxTrainingAppLegacy,
+		GarminProductConnectiqSimulator,
+		GarminProductAndroidAntplusPlugin,
+		GarminProductConnect,
 	}
-	return vs
 }

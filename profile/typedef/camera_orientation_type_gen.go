@@ -18,47 +18,46 @@ const (
 	CameraOrientationTypeCameraOrientation90  CameraOrientationType = 1
 	CameraOrientationTypeCameraOrientation180 CameraOrientationType = 2
 	CameraOrientationTypeCameraOrientation270 CameraOrientationType = 3
-	CameraOrientationTypeInvalid              CameraOrientationType = 0xFF // INVALID
+	CameraOrientationTypeInvalid              CameraOrientationType = 0xFF
 )
 
-var cameraorientationtypetostrs = map[CameraOrientationType]string{
-	CameraOrientationTypeCameraOrientation0:   "camera_orientation_0",
-	CameraOrientationTypeCameraOrientation90:  "camera_orientation_90",
-	CameraOrientationTypeCameraOrientation180: "camera_orientation_180",
-	CameraOrientationTypeCameraOrientation270: "camera_orientation_270",
-	CameraOrientationTypeInvalid:              "invalid",
-}
-
 func (c CameraOrientationType) String() string {
-	val, ok := cameraorientationtypetostrs[c]
-	if !ok {
-		return strconv.Itoa(int(c))
+	switch c {
+	case CameraOrientationTypeCameraOrientation0:
+		return "camera_orientation_0"
+	case CameraOrientationTypeCameraOrientation90:
+		return "camera_orientation_90"
+	case CameraOrientationTypeCameraOrientation180:
+		return "camera_orientation_180"
+	case CameraOrientationTypeCameraOrientation270:
+		return "camera_orientation_270"
+	default:
+		return "CameraOrientationTypeInvalid(" + strconv.Itoa(int(c)) + ")"
 	}
-	return val
 }
-
-var strtocameraorientationtype = func() map[string]CameraOrientationType {
-	m := make(map[string]CameraOrientationType)
-	for t, str := range cameraorientationtypetostrs {
-		m[str] = CameraOrientationType(t)
-	}
-	return m
-}()
 
 // FromString parse string into CameraOrientationType constant it's represent, return CameraOrientationTypeInvalid if not found.
 func CameraOrientationTypeFromString(s string) CameraOrientationType {
-	val, ok := strtocameraorientationtype[s]
-	if !ok {
-		return strtocameraorientationtype["invalid"]
+	switch s {
+	case "camera_orientation_0":
+		return CameraOrientationTypeCameraOrientation0
+	case "camera_orientation_90":
+		return CameraOrientationTypeCameraOrientation90
+	case "camera_orientation_180":
+		return CameraOrientationTypeCameraOrientation180
+	case "camera_orientation_270":
+		return CameraOrientationTypeCameraOrientation270
+	default:
+		return CameraOrientationTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCameraOrientationType() []CameraOrientationType {
-	vs := make([]CameraOrientationType, 0, len(cameraorientationtypetostrs))
-	for i := range cameraorientationtypetostrs {
-		vs = append(vs, CameraOrientationType(i))
+	return []CameraOrientationType{
+		CameraOrientationTypeCameraOrientation0,
+		CameraOrientationTypeCameraOrientation90,
+		CameraOrientationTypeCameraOrientation180,
+		CameraOrientationTypeCameraOrientation270,
 	}
-	return vs
 }
