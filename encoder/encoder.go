@@ -17,12 +17,14 @@ import (
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
 var (
 	ErrNilWriter     = errors.New("nil writer")
 	ErrEmptyMessages = errors.New("empty messages")
+	ErrMissingFileId = errors.New("missing file_id mesg")
 )
 
 const (
@@ -246,7 +248,7 @@ func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessages(fit.Messages); err != nil {
+	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
 		return err
 	}
 	if err := e.encodeCRC(&fit.CRC); err != nil {
@@ -266,7 +268,7 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.Fit) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessages(fit.Messages); err != nil {
+	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
 		return err
 	}
 	if err := e.encodeCRC(&fit.CRC); err != nil {
@@ -322,12 +324,9 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.
 func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
 	n := e.n
-	for i := range fit.Messages { // calculating messages actual size
-		mesg := &fit.Messages[i]
-		if err := e.encodeMessage(io.Discard, mesg); err != nil {
-			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
-				e.n, i, mesg.Num, mesg.Num.String(), err)
-		}
+
+	if err := e.encodeMessages(io.Discard, fit.Messages); err != nil {
+		return fmt.Errorf("calculate data size: %w", err)
 	}
 
 	if fit.FileHeader.Size == 0 {
@@ -371,14 +370,18 @@ func (e *Encoder) encodeHeader(header *proto.FileHeader) error {
 	return err
 }
 
-func (e *Encoder) encodeMessages(messages []proto.Message) error {
+func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
 	if len(messages) == 0 {
 		return ErrEmptyMessages
 	}
 
+	if messages[0].Num != mesgnum.FileId {
+		return ErrMissingFileId
+	}
+
 	for i := range messages {
 		mesg := &messages[i]
-		if err := e.encodeMessage(e.w, mesg); err != nil {
+		if err := e.encodeMessage(w, mesg); err != nil {
 			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
