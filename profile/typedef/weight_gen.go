@@ -15,44 +15,31 @@ type Weight uint16
 
 const (
 	WeightCalculating Weight = 0xFFFE
-	WeightInvalid     Weight = 0xFFFF // INVALID
+	WeightInvalid     Weight = 0xFFFF
 )
 
-var weighttostrs = map[Weight]string{
-	WeightCalculating: "calculating",
-	WeightInvalid:     "invalid",
-}
-
 func (w Weight) String() string {
-	val, ok := weighttostrs[w]
-	if !ok {
-		return strconv.FormatUint(uint64(w), 10)
+	switch w {
+	case WeightCalculating:
+		return "calculating"
+	default:
+		return "WeightInvalid(" + strconv.FormatUint(uint64(w), 10) + ")"
 	}
-	return val
 }
-
-var strtoweight = func() map[string]Weight {
-	m := make(map[string]Weight)
-	for t, str := range weighttostrs {
-		m[str] = Weight(t)
-	}
-	return m
-}()
 
 // FromString parse string into Weight constant it's represent, return WeightInvalid if not found.
 func WeightFromString(s string) Weight {
-	val, ok := strtoweight[s]
-	if !ok {
-		return strtoweight["invalid"]
+	switch s {
+	case "calculating":
+		return WeightCalculating
+	default:
+		return WeightInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWeight() []Weight {
-	vs := make([]Weight, 0, len(weighttostrs))
-	for i := range weighttostrs {
-		vs = append(vs, Weight(i))
+	return []Weight{
+		WeightCalculating,
 	}
-	return vs
 }

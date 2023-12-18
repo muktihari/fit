@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -43,25 +44,7 @@ func NewWeatherConditions(mesg proto.Message) *WeatherConditions {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* WeatherReport */
-		1:   nil, /* Temperature */
-		2:   nil, /* Condition */
-		3:   nil, /* WindDirection */
-		4:   nil, /* WindSpeed */
-		5:   nil, /* PrecipitationProbability */
-		6:   nil, /* TemperatureFeelsLike */
-		7:   nil, /* RelativeHumidity */
-		8:   nil, /* Location */
-		9:   nil, /* ObservedAtTime */
-		10:  nil, /* ObservedLocationLat */
-		11:  nil, /* ObservedLocationLong */
-		12:  nil, /* DayOfWeek */
-		13:  nil, /* HighTemperature */
-		14:  nil, /* LowTemperature */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -92,45 +75,147 @@ func NewWeatherConditions(mesg proto.Message) *WeatherConditions {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to WeatherConditions mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumWeatherConditions)
-func (m *WeatherConditions) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts WeatherConditions into proto.Message.
+func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherConditions)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumWeatherConditions {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToEnum[byte](m.WeatherReport),
-		1:   m.Temperature,
-		2:   typeconv.ToEnum[byte](m.Condition),
-		3:   m.WindDirection,
-		4:   m.WindSpeed,
-		5:   m.PrecipitationProbability,
-		6:   m.TemperatureFeelsLike,
-		7:   m.RelativeHumidity,
-		8:   m.Location,
-		9:   typeconv.ToUint32[uint32](m.ObservedAtTime),
-		10:  m.ObservedLocationLat,
-		11:  m.ObservedLocationLong,
-		12:  typeconv.ToEnum[byte](m.DayOfWeek),
-		13:  m.HighTemperature,
-		14:  m.LowTemperature,
+	if typeconv.ToEnum[byte](m.WeatherReport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.WeatherReport)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Temperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Temperature
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Condition) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.Condition)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WindDirection != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.WindDirection
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WindSpeed != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.WindSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PrecipitationProbability != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.PrecipitationProbability
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.TemperatureFeelsLike
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RelativeHumidity != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.RelativeHumidity
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Location != basetype.StringInvalid && m.Location != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.Location
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.ObservedAtTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = typeconv.ToUint32[uint32](m.ObservedAtTime)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ObservedLocationLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.ObservedLocationLat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ObservedLocationLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.ObservedLocationLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DayOfWeek) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = typeconv.ToEnum[byte](m.DayOfWeek)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.HighTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.HighTemperature
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LowTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.LowTemperature
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of WeatherConditions's valid fields.
+func (m *WeatherConditions) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.WeatherReport) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Temperature != basetype.Sint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Condition) != basetype.EnumInvalid {
+		size++
+	}
+	if m.WindDirection != basetype.Uint16Invalid {
+		size++
+	}
+	if m.WindSpeed != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PrecipitationProbability != basetype.Uint8Invalid {
+		size++
+	}
+	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
+		size++
+	}
+	if m.RelativeHumidity != basetype.Uint8Invalid {
+		size++
+	}
+	if m.Location != basetype.StringInvalid && m.Location != "" {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.ObservedAtTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ObservedLocationLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.ObservedLocationLong != basetype.Sint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DayOfWeek) != basetype.EnumInvalid {
+		size++
+	}
+	if m.HighTemperature != basetype.Sint8Invalid {
+		size++
+	}
+	if m.LowTemperature != basetype.Sint8Invalid {
+		size++
+	}
+	return size
 }

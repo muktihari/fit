@@ -52,9 +52,7 @@ func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
 	for _, field := range mesg.Fields {
 		size := field.Size
 		size *= typedef.Len(field.Value)
-		if _, ok := field.Value.(string); ok {
-			size += 1 // +1 utf-8 null terminator string: 0x00
-		}
+
 		fieldDefinitions = append(fieldDefinitions, FieldDefinition{
 			Num:      field.Num,
 			Size:     size,
@@ -216,18 +214,12 @@ func (m *Message) RemoveFieldByNum(num byte) {
 func (m Message) Clone() Message {
 	fields := make([]Field, 0)
 	for i := range m.Fields {
-		if m.Fields[i].FieldBase == nil { // sanitize fields.
-			continue
-		}
 		fields = append(fields, m.Fields[i].Clone())
 	}
 	m.Fields = fields
 
 	developerFields := make([]DeveloperField, 0)
 	for i := range m.DeveloperFields {
-		if m.DeveloperFields[i] == (DeveloperField{}) {
-			continue
-		}
 		developerFields = append(developerFields, m.DeveloperFields[i].Clone())
 	}
 	m.DeveloperFields = developerFields
@@ -241,6 +233,7 @@ type FieldBase struct {
 	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
 	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific number (defined by manufacturer). (255 == invalid)
 	Type       profile.ProfileType // Type is defined type that serves as an abstraction layer above base types (primitive-types), e.g. DateTime is a time representation in uint32.
+	Array      bool                // Flag whether the value of this field is an array
 	Size       byte                // Size of decoded Value in bytes.
 	Scale      float64             // A scale or offset specified in the FIT profile for binary fields (sint/uint etc.) only. the binary quantity is divided by the scale factor and then the offset is subtracted. (default: 1)
 	Offset     float64             // A scale or offset specified in the FIT profile for binary fields (sint/uint etc.) only. the binary quantity is divided by the scale factor and then the offset is subtracted. (default: 0)

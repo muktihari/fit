@@ -35,65 +35,141 @@ const (
 	FileExdConfiguration File = 40   // Read/write/erase. Single File. Directory=Settings
 	FileMfgRangeMin      File = 0xF7 // 0xF7 - 0xFE reserved for manufacturer specific file types
 	FileMfgRangeMax      File = 0xFE // 0xF7 - 0xFE reserved for manufacturer specific file types
-	FileInvalid          File = 0xFF // INVALID
+	FileInvalid          File = 0xFF
 )
 
-var filetostrs = map[File]string{
-	FileDevice:           "device",
-	FileSettings:         "settings",
-	FileSport:            "sport",
-	FileActivity:         "activity",
-	FileWorkout:          "workout",
-	FileCourse:           "course",
-	FileSchedules:        "schedules",
-	FileWeight:           "weight",
-	FileTotals:           "totals",
-	FileGoals:            "goals",
-	FileBloodPressure:    "blood_pressure",
-	FileMonitoringA:      "monitoring_a",
-	FileActivitySummary:  "activity_summary",
-	FileMonitoringDaily:  "monitoring_daily",
-	FileMonitoringB:      "monitoring_b",
-	FileSegment:          "segment",
-	FileSegmentList:      "segment_list",
-	FileExdConfiguration: "exd_configuration",
-	FileMfgRangeMin:      "mfg_range_min",
-	FileMfgRangeMax:      "mfg_range_max",
-	FileInvalid:          "invalid",
-}
+var fileToString = map[File]string{}
+var stringToFile = map[string]File{}
 
 func (f File) String() string {
-	val, ok := filetostrs[f]
-	if !ok {
-		return strconv.Itoa(int(f))
+	switch f {
+	case FileDevice:
+		return "device"
+	case FileSettings:
+		return "settings"
+	case FileSport:
+		return "sport"
+	case FileActivity:
+		return "activity"
+	case FileWorkout:
+		return "workout"
+	case FileCourse:
+		return "course"
+	case FileSchedules:
+		return "schedules"
+	case FileWeight:
+		return "weight"
+	case FileTotals:
+		return "totals"
+	case FileGoals:
+		return "goals"
+	case FileBloodPressure:
+		return "blood_pressure"
+	case FileMonitoringA:
+		return "monitoring_a"
+	case FileActivitySummary:
+		return "activity_summary"
+	case FileMonitoringDaily:
+		return "monitoring_daily"
+	case FileMonitoringB:
+		return "monitoring_b"
+	case FileSegment:
+		return "segment"
+	case FileSegmentList:
+		return "segment_list"
+	case FileExdConfiguration:
+		return "exd_configuration"
+	case FileMfgRangeMin:
+		return "mfg_range_min"
+	case FileMfgRangeMax:
+		return "mfg_range_max"
+	default:
+		if val, ok := fileToString[f]; ok {
+			return val
+		}
+		return "FileInvalid(" + strconv.Itoa(int(f)) + ")"
 	}
-	return val
 }
-
-var strtofile = func() map[string]File {
-	m := make(map[string]File)
-	for t, str := range filetostrs {
-		m[str] = File(t)
-	}
-	return m
-}()
 
 // FromString parse string into File constant it's represent, return FileInvalid if not found.
 func FileFromString(s string) File {
-	val, ok := strtofile[s]
-	if !ok {
-		return strtofile["invalid"]
+	switch s {
+	case "device":
+		return FileDevice
+	case "settings":
+		return FileSettings
+	case "sport":
+		return FileSport
+	case "activity":
+		return FileActivity
+	case "workout":
+		return FileWorkout
+	case "course":
+		return FileCourse
+	case "schedules":
+		return FileSchedules
+	case "weight":
+		return FileWeight
+	case "totals":
+		return FileTotals
+	case "goals":
+		return FileGoals
+	case "blood_pressure":
+		return FileBloodPressure
+	case "monitoring_a":
+		return FileMonitoringA
+	case "activity_summary":
+		return FileActivitySummary
+	case "monitoring_daily":
+		return FileMonitoringDaily
+	case "monitoring_b":
+		return FileMonitoringB
+	case "segment":
+		return FileSegment
+	case "segment_list":
+		return FileSegmentList
+	case "exd_configuration":
+		return FileExdConfiguration
+	case "mfg_range_min":
+		return FileMfgRangeMin
+	case "mfg_range_max":
+		return FileMfgRangeMax
+	default:
+		if val, ok := stringToFile[s]; ok {
+			return val
+		}
+		return FileInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListFile() []File {
-	vs := make([]File, 0, len(filetostrs))
-	for i := range filetostrs {
-		vs = append(vs, File(i))
+	list := []File{
+		FileDevice,
+		FileSettings,
+		FileSport,
+		FileActivity,
+		FileWorkout,
+		FileCourse,
+		FileSchedules,
+		FileWeight,
+		FileTotals,
+		FileGoals,
+		FileBloodPressure,
+		FileMonitoringA,
+		FileActivitySummary,
+		FileMonitoringDaily,
+		FileMonitoringB,
+		FileSegment,
+		FileSegmentList,
+		FileExdConfiguration,
+		FileMfgRangeMin,
+		FileMfgRangeMax,
 	}
-	return vs
+	for k := range fileToString {
+		list = append(list, k)
+	}
+	return list
 }
 
 // FileRegister registers a manufacturer specific File so that the value can be recognized.
@@ -105,12 +181,8 @@ func FileRegister(v File, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", FileInvalid)
 	}
 
-	if str, ok := filetostrs[v]; ok {
-		return fmt.Errorf("could not register to an existing File: %d (%s)", v, str)
-	}
-
-	filetostrs[v] = s
-	strtofile[s] = v
+	fileToString[v] = s
+	stringToFile[s] = v
 
 	return nil
 }

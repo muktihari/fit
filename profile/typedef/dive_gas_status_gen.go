@@ -17,46 +17,41 @@ const (
 	DiveGasStatusDisabled   DiveGasStatus = 0
 	DiveGasStatusEnabled    DiveGasStatus = 1
 	DiveGasStatusBackupOnly DiveGasStatus = 2
-	DiveGasStatusInvalid    DiveGasStatus = 0xFF // INVALID
+	DiveGasStatusInvalid    DiveGasStatus = 0xFF
 )
 
-var divegasstatustostrs = map[DiveGasStatus]string{
-	DiveGasStatusDisabled:   "disabled",
-	DiveGasStatusEnabled:    "enabled",
-	DiveGasStatusBackupOnly: "backup_only",
-	DiveGasStatusInvalid:    "invalid",
-}
-
 func (d DiveGasStatus) String() string {
-	val, ok := divegasstatustostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DiveGasStatusDisabled:
+		return "disabled"
+	case DiveGasStatusEnabled:
+		return "enabled"
+	case DiveGasStatusBackupOnly:
+		return "backup_only"
+	default:
+		return "DiveGasStatusInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodivegasstatus = func() map[string]DiveGasStatus {
-	m := make(map[string]DiveGasStatus)
-	for t, str := range divegasstatustostrs {
-		m[str] = DiveGasStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into DiveGasStatus constant it's represent, return DiveGasStatusInvalid if not found.
 func DiveGasStatusFromString(s string) DiveGasStatus {
-	val, ok := strtodivegasstatus[s]
-	if !ok {
-		return strtodivegasstatus["invalid"]
+	switch s {
+	case "disabled":
+		return DiveGasStatusDisabled
+	case "enabled":
+		return DiveGasStatusEnabled
+	case "backup_only":
+		return DiveGasStatusBackupOnly
+	default:
+		return DiveGasStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDiveGasStatus() []DiveGasStatus {
-	vs := make([]DiveGasStatus, 0, len(divegasstatustostrs))
-	for i := range divegasstatustostrs {
-		vs = append(vs, DiveGasStatus(i))
+	return []DiveGasStatus{
+		DiveGasStatusDisabled,
+		DiveGasStatusEnabled,
+		DiveGasStatusBackupOnly,
 	}
-	return vs
 }

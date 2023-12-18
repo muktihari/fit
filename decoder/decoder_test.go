@@ -310,7 +310,7 @@ func createFitForTest() (proto.Fit, []byte) {
 			factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
-				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue([]string{"Heart Rate"}),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
@@ -479,7 +479,7 @@ func TestNext(t *testing.T) {
 	}
 }
 
-func TestDecodeExported(t *testing.T) {
+func TestDecodeWithContext(t *testing.T) {
 	tt := []struct {
 		name string
 		r    io.Reader
@@ -517,7 +517,7 @@ func TestDecodeExported(t *testing.T) {
 	}
 }
 
-func TestDecodeUnexported(t *testing.T) {
+func TestDecode(t *testing.T) {
 	fit, buf := createFitForTest()
 
 	tt := []struct {
@@ -1361,7 +1361,7 @@ func TestReadValue(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			res, err := dec.readValue(tc.size, tc.baseType, tc.arch)
+			res, err := dec.readValue(tc.size, tc.baseType, false, tc.arch)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}

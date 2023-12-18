@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -29,11 +30,7 @@ func NewSleepLevel(mesg proto.Message) *SleepLevel {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* SleepLevel */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -50,31 +47,35 @@ func NewSleepLevel(mesg proto.Message) *SleepLevel {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SleepLevel mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSleepLevel)
-func (m *SleepLevel) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SleepLevel into proto.Message.
+func (m *SleepLevel) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepLevel)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSleepLevel {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToEnum[byte](m.SleepLevel),
-	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.SleepLevel) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.SleepLevel)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SleepLevel's valid fields.
+func (m *SleepLevel) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SleepLevel) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

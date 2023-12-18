@@ -45,74 +45,181 @@ const (
 	WktStepDurationRepetitionTime                     WktStepDuration = 28
 	WktStepDurationReps                               WktStepDuration = 29
 	WktStepDurationTimeOnly                           WktStepDuration = 31
-	WktStepDurationInvalid                            WktStepDuration = 0xFF // INVALID
+	WktStepDurationInvalid                            WktStepDuration = 0xFF
 )
 
-var wktstepdurationtostrs = map[WktStepDuration]string{
-	WktStepDurationTime:                               "time",
-	WktStepDurationDistance:                           "distance",
-	WktStepDurationHrLessThan:                         "hr_less_than",
-	WktStepDurationHrGreaterThan:                      "hr_greater_than",
-	WktStepDurationCalories:                           "calories",
-	WktStepDurationOpen:                               "open",
-	WktStepDurationRepeatUntilStepsCmplt:              "repeat_until_steps_cmplt",
-	WktStepDurationRepeatUntilTime:                    "repeat_until_time",
-	WktStepDurationRepeatUntilDistance:                "repeat_until_distance",
-	WktStepDurationRepeatUntilCalories:                "repeat_until_calories",
-	WktStepDurationRepeatUntilHrLessThan:              "repeat_until_hr_less_than",
-	WktStepDurationRepeatUntilHrGreaterThan:           "repeat_until_hr_greater_than",
-	WktStepDurationRepeatUntilPowerLessThan:           "repeat_until_power_less_than",
-	WktStepDurationRepeatUntilPowerGreaterThan:        "repeat_until_power_greater_than",
-	WktStepDurationPowerLessThan:                      "power_less_than",
-	WktStepDurationPowerGreaterThan:                   "power_greater_than",
-	WktStepDurationTrainingPeaksTss:                   "training_peaks_tss",
-	WktStepDurationRepeatUntilPowerLastLapLessThan:    "repeat_until_power_last_lap_less_than",
-	WktStepDurationRepeatUntilMaxPowerLastLapLessThan: "repeat_until_max_power_last_lap_less_than",
-	WktStepDurationPower3SLessThan:                    "power_3s_less_than",
-	WktStepDurationPower10SLessThan:                   "power_10s_less_than",
-	WktStepDurationPower30SLessThan:                   "power_30s_less_than",
-	WktStepDurationPower3SGreaterThan:                 "power_3s_greater_than",
-	WktStepDurationPower10SGreaterThan:                "power_10s_greater_than",
-	WktStepDurationPower30SGreaterThan:                "power_30s_greater_than",
-	WktStepDurationPowerLapLessThan:                   "power_lap_less_than",
-	WktStepDurationPowerLapGreaterThan:                "power_lap_greater_than",
-	WktStepDurationRepeatUntilTrainingPeaksTss:        "repeat_until_training_peaks_tss",
-	WktStepDurationRepetitionTime:                     "repetition_time",
-	WktStepDurationReps:                               "reps",
-	WktStepDurationTimeOnly:                           "time_only",
-	WktStepDurationInvalid:                            "invalid",
-}
-
 func (w WktStepDuration) String() string {
-	val, ok := wktstepdurationtostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WktStepDurationTime:
+		return "time"
+	case WktStepDurationDistance:
+		return "distance"
+	case WktStepDurationHrLessThan:
+		return "hr_less_than"
+	case WktStepDurationHrGreaterThan:
+		return "hr_greater_than"
+	case WktStepDurationCalories:
+		return "calories"
+	case WktStepDurationOpen:
+		return "open"
+	case WktStepDurationRepeatUntilStepsCmplt:
+		return "repeat_until_steps_cmplt"
+	case WktStepDurationRepeatUntilTime:
+		return "repeat_until_time"
+	case WktStepDurationRepeatUntilDistance:
+		return "repeat_until_distance"
+	case WktStepDurationRepeatUntilCalories:
+		return "repeat_until_calories"
+	case WktStepDurationRepeatUntilHrLessThan:
+		return "repeat_until_hr_less_than"
+	case WktStepDurationRepeatUntilHrGreaterThan:
+		return "repeat_until_hr_greater_than"
+	case WktStepDurationRepeatUntilPowerLessThan:
+		return "repeat_until_power_less_than"
+	case WktStepDurationRepeatUntilPowerGreaterThan:
+		return "repeat_until_power_greater_than"
+	case WktStepDurationPowerLessThan:
+		return "power_less_than"
+	case WktStepDurationPowerGreaterThan:
+		return "power_greater_than"
+	case WktStepDurationTrainingPeaksTss:
+		return "training_peaks_tss"
+	case WktStepDurationRepeatUntilPowerLastLapLessThan:
+		return "repeat_until_power_last_lap_less_than"
+	case WktStepDurationRepeatUntilMaxPowerLastLapLessThan:
+		return "repeat_until_max_power_last_lap_less_than"
+	case WktStepDurationPower3SLessThan:
+		return "power_3s_less_than"
+	case WktStepDurationPower10SLessThan:
+		return "power_10s_less_than"
+	case WktStepDurationPower30SLessThan:
+		return "power_30s_less_than"
+	case WktStepDurationPower3SGreaterThan:
+		return "power_3s_greater_than"
+	case WktStepDurationPower10SGreaterThan:
+		return "power_10s_greater_than"
+	case WktStepDurationPower30SGreaterThan:
+		return "power_30s_greater_than"
+	case WktStepDurationPowerLapLessThan:
+		return "power_lap_less_than"
+	case WktStepDurationPowerLapGreaterThan:
+		return "power_lap_greater_than"
+	case WktStepDurationRepeatUntilTrainingPeaksTss:
+		return "repeat_until_training_peaks_tss"
+	case WktStepDurationRepetitionTime:
+		return "repetition_time"
+	case WktStepDurationReps:
+		return "reps"
+	case WktStepDurationTimeOnly:
+		return "time_only"
+	default:
+		return "WktStepDurationInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtowktstepduration = func() map[string]WktStepDuration {
-	m := make(map[string]WktStepDuration)
-	for t, str := range wktstepdurationtostrs {
-		m[str] = WktStepDuration(t)
-	}
-	return m
-}()
 
 // FromString parse string into WktStepDuration constant it's represent, return WktStepDurationInvalid if not found.
 func WktStepDurationFromString(s string) WktStepDuration {
-	val, ok := strtowktstepduration[s]
-	if !ok {
-		return strtowktstepduration["invalid"]
+	switch s {
+	case "time":
+		return WktStepDurationTime
+	case "distance":
+		return WktStepDurationDistance
+	case "hr_less_than":
+		return WktStepDurationHrLessThan
+	case "hr_greater_than":
+		return WktStepDurationHrGreaterThan
+	case "calories":
+		return WktStepDurationCalories
+	case "open":
+		return WktStepDurationOpen
+	case "repeat_until_steps_cmplt":
+		return WktStepDurationRepeatUntilStepsCmplt
+	case "repeat_until_time":
+		return WktStepDurationRepeatUntilTime
+	case "repeat_until_distance":
+		return WktStepDurationRepeatUntilDistance
+	case "repeat_until_calories":
+		return WktStepDurationRepeatUntilCalories
+	case "repeat_until_hr_less_than":
+		return WktStepDurationRepeatUntilHrLessThan
+	case "repeat_until_hr_greater_than":
+		return WktStepDurationRepeatUntilHrGreaterThan
+	case "repeat_until_power_less_than":
+		return WktStepDurationRepeatUntilPowerLessThan
+	case "repeat_until_power_greater_than":
+		return WktStepDurationRepeatUntilPowerGreaterThan
+	case "power_less_than":
+		return WktStepDurationPowerLessThan
+	case "power_greater_than":
+		return WktStepDurationPowerGreaterThan
+	case "training_peaks_tss":
+		return WktStepDurationTrainingPeaksTss
+	case "repeat_until_power_last_lap_less_than":
+		return WktStepDurationRepeatUntilPowerLastLapLessThan
+	case "repeat_until_max_power_last_lap_less_than":
+		return WktStepDurationRepeatUntilMaxPowerLastLapLessThan
+	case "power_3s_less_than":
+		return WktStepDurationPower3SLessThan
+	case "power_10s_less_than":
+		return WktStepDurationPower10SLessThan
+	case "power_30s_less_than":
+		return WktStepDurationPower30SLessThan
+	case "power_3s_greater_than":
+		return WktStepDurationPower3SGreaterThan
+	case "power_10s_greater_than":
+		return WktStepDurationPower10SGreaterThan
+	case "power_30s_greater_than":
+		return WktStepDurationPower30SGreaterThan
+	case "power_lap_less_than":
+		return WktStepDurationPowerLapLessThan
+	case "power_lap_greater_than":
+		return WktStepDurationPowerLapGreaterThan
+	case "repeat_until_training_peaks_tss":
+		return WktStepDurationRepeatUntilTrainingPeaksTss
+	case "repetition_time":
+		return WktStepDurationRepetitionTime
+	case "reps":
+		return WktStepDurationReps
+	case "time_only":
+		return WktStepDurationTimeOnly
+	default:
+		return WktStepDurationInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWktStepDuration() []WktStepDuration {
-	vs := make([]WktStepDuration, 0, len(wktstepdurationtostrs))
-	for i := range wktstepdurationtostrs {
-		vs = append(vs, WktStepDuration(i))
+	return []WktStepDuration{
+		WktStepDurationTime,
+		WktStepDurationDistance,
+		WktStepDurationHrLessThan,
+		WktStepDurationHrGreaterThan,
+		WktStepDurationCalories,
+		WktStepDurationOpen,
+		WktStepDurationRepeatUntilStepsCmplt,
+		WktStepDurationRepeatUntilTime,
+		WktStepDurationRepeatUntilDistance,
+		WktStepDurationRepeatUntilCalories,
+		WktStepDurationRepeatUntilHrLessThan,
+		WktStepDurationRepeatUntilHrGreaterThan,
+		WktStepDurationRepeatUntilPowerLessThan,
+		WktStepDurationRepeatUntilPowerGreaterThan,
+		WktStepDurationPowerLessThan,
+		WktStepDurationPowerGreaterThan,
+		WktStepDurationTrainingPeaksTss,
+		WktStepDurationRepeatUntilPowerLastLapLessThan,
+		WktStepDurationRepeatUntilMaxPowerLastLapLessThan,
+		WktStepDurationPower3SLessThan,
+		WktStepDurationPower10SLessThan,
+		WktStepDurationPower30SLessThan,
+		WktStepDurationPower3SGreaterThan,
+		WktStepDurationPower10SGreaterThan,
+		WktStepDurationPower30SGreaterThan,
+		WktStepDurationPowerLapLessThan,
+		WktStepDurationPowerLapGreaterThan,
+		WktStepDurationRepeatUntilTrainingPeaksTss,
+		WktStepDurationRepetitionTime,
+		WktStepDurationReps,
+		WktStepDurationTimeOnly,
 	}
-	return vs
 }

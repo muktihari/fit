@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,18 +37,7 @@ func NewObdiiData(mesg proto.Message) *ObdiiData {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* TimestampMs */
-		1:   nil, /* TimeOffset */
-		2:   nil, /* Pid */
-		3:   nil, /* RawData */
-		4:   nil, /* PidDataSize */
-		5:   nil, /* SystemTime */
-		6:   nil, /* StartTimestamp */
-		7:   nil, /* StartTimestampMs */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -71,38 +61,91 @@ func NewObdiiData(mesg proto.Message) *ObdiiData {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ObdiiData mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumObdiiData)
-func (m *ObdiiData) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ObdiiData into proto.Message.
+func (m *ObdiiData) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumObdiiData)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumObdiiData {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.TimestampMs,
-		1:   m.TimeOffset,
-		2:   m.Pid,
-		3:   m.RawData,
-		4:   m.PidDataSize,
-		5:   m.SystemTime,
-		6:   typeconv.ToUint32[uint32](m.StartTimestamp),
-		7:   m.StartTimestampMs,
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.TimeOffset != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.TimeOffset
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Pid != basetype.ByteInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Pid
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RawData != nil {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.RawData
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PidDataSize != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.PidDataSize
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SystemTime != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.SystemTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = typeconv.ToUint32[uint32](m.StartTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.StartTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.StartTimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ObdiiData's valid fields.
+func (m *ObdiiData) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.TimeOffset != nil {
+		size++
+	}
+	if m.Pid != basetype.ByteInvalid {
+		size++
+	}
+	if m.RawData != nil {
+		size++
+	}
+	if m.PidDataSize != nil {
+		size++
+	}
+	if m.SystemTime != nil {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.StartTimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

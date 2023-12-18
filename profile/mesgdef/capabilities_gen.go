@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -31,13 +32,7 @@ func NewCapabilities(mesg proto.Message) *Capabilities {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0:  nil, /* Languages */
-		1:  nil, /* Sports */
-		21: nil, /* WorkoutsSupported */
-		23: nil, /* ConnectivitySupported */
-	}
-
+	vals := [24]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -56,33 +51,51 @@ func NewCapabilities(mesg proto.Message) *Capabilities {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Capabilities mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumCapabilities)
-func (m *Capabilities) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Capabilities into proto.Message.
+func (m *Capabilities) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumCapabilities)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumCapabilities {
-		return
+	if typeconv.ToSliceUint8z[uint8](m.Languages) != nil {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.Languages)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0:  typeconv.ToSliceUint8z[uint8](m.Languages),
-		1:  typeconv.ToSliceUint8z[uint8](m.Sports),
-		21: typeconv.ToUint32z[uint32](m.WorkoutsSupported),
-		23: typeconv.ToUint32z[uint32](m.ConnectivitySupported),
+	if typeconv.ToSliceUint8z[uint8](m.Sports) != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.Sports)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32z[uint32](m.WorkoutsSupported) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = typeconv.ToUint32z[uint32](m.WorkoutsSupported)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32z[uint32](m.ConnectivitySupported) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = typeconv.ToUint32z[uint32](m.ConnectivitySupported)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Capabilities's valid fields.
+func (m *Capabilities) size() byte {
+	var size byte
+	if typeconv.ToSliceUint8z[uint8](m.Languages) != nil {
+		size++
+	}
+	if typeconv.ToSliceUint8z[uint8](m.Sports) != nil {
+		size++
+	}
+	if typeconv.ToUint32z[uint32](m.WorkoutsSupported) != basetype.Uint32zInvalid {
+		size++
+	}
+	if typeconv.ToUint32z[uint32](m.ConnectivitySupported) != basetype.Uint32zInvalid {
+		size++
+	}
+	return size
 }

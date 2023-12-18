@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -40,22 +41,7 @@ func NewGoal(mesg proto.Message) *Goal {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* Sport */
-		1:   nil, /* SubSport */
-		2:   nil, /* StartDate */
-		3:   nil, /* EndDate */
-		4:   nil, /* Type */
-		5:   nil, /* Value */
-		6:   nil, /* Repeat */
-		7:   nil, /* TargetValue */
-		8:   nil, /* Recurrence */
-		9:   nil, /* RecurrenceValue */
-		10:  nil, /* Enabled */
-		11:  nil, /* Source */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -83,42 +69,123 @@ func NewGoal(mesg proto.Message) *Goal {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Goal mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumGoal)
-func (m *Goal) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Goal into proto.Message.
+func (m *Goal) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumGoal)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumGoal {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   typeconv.ToEnum[byte](m.Sport),
-		1:   typeconv.ToEnum[byte](m.SubSport),
-		2:   typeconv.ToUint32[uint32](m.StartDate),
-		3:   typeconv.ToUint32[uint32](m.EndDate),
-		4:   typeconv.ToEnum[byte](m.Type),
-		5:   m.Value,
-		6:   m.Repeat,
-		7:   m.TargetValue,
-		8:   typeconv.ToEnum[byte](m.Recurrence),
-		9:   m.RecurrenceValue,
-		10:  m.Enabled,
-		11:  typeconv.ToEnum[byte](m.Source),
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.Sport)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.StartDate) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint32[uint32](m.StartDate)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.EndDate) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint32[uint32](m.EndDate)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToEnum[byte](m.Type)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Value != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.Value
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Repeat != false {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.Repeat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TargetValue != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.TargetValue
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Recurrence) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = typeconv.ToEnum[byte](m.Recurrence)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RecurrenceValue != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.RecurrenceValue
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.Enabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Source) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = typeconv.ToEnum[byte](m.Source)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Goal's valid fields.
+func (m *Goal) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StartDate) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.EndDate) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Value != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Repeat != false {
+		size++
+	}
+	if m.TargetValue != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Recurrence) != basetype.EnumInvalid {
+		size++
+	}
+	if m.RecurrenceValue != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Enabled != false {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Source) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

@@ -14,12 +14,18 @@ import (
 // Course is a common file type used as points of courses to assist with on- and off-road navigation,
 // to provide turn by turn directions, or with virtual training applications to simulate real-world activities.
 //
-// Please note since we group the same mesgdef types in a slice, we lose the arrival order of the messages.
+// Please note since we group the same mesgdef types in slices, we lose the arrival order of the messages.
 // But for messages that have timestamp, we can reconstruct the messages by timestamp order.
 //
 // ref: https://developer.garmin.com/fit/file-types/course/
 type Course struct {
-	FileId  *mesgdef.FileId
+	FileId mesgdef.FileId // must have mesg
+
+	// Developer Data Lookup
+	DeveloperDataIds  []*mesgdef.DeveloperDataId
+	FieldDescriptions []*mesgdef.FieldDescription
+
+	// Required Messages
 	Course  *mesgdef.Course
 	Lap     *mesgdef.Lap
 	Records []*mesgdef.Record
@@ -27,10 +33,6 @@ type Course struct {
 
 	// Optional Messages
 	CoursePoints []*mesgdef.CoursePoint
-
-	// Developer Data Lookup
-	DeveloperDataIds  []*mesgdef.DeveloperDataId
-	FieldDescriptions []*mesgdef.FieldDescription
 
 	// Messages not related to Course
 	UnrelatedMessages []proto.Message
@@ -50,7 +52,11 @@ func NewCourse(mesgs ...proto.Message) *Course {
 func (f *Course) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = mesgdef.NewFileId(mesg)
+		f.FileId = *mesgdef.NewFileId(mesg)
+	case mesgnum.DeveloperDataId:
+		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
+	case mesgnum.FieldDescription:
+		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	case mesgnum.Course:
 		f.Course = mesgdef.NewCourse(mesg)
 	case mesgnum.Lap:
@@ -61,16 +67,12 @@ func (f *Course) Add(mesg proto.Message) {
 		f.Events = append(f.Events, mesgdef.NewEvent(mesg))
 	case mesgnum.CoursePoint:
 		f.CoursePoints = append(f.CoursePoints, mesgdef.NewCoursePoint(mesg))
-	case mesgnum.DeveloperDataId:
-		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
-	case mesgnum.FieldDescription:
-		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	default:
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
 
-func (f *Course) ToFit(fac Factory) proto.Fit {
+func (f *Course) ToFit(fac mesgdef.Factory) proto.Fit {
 	if fac == nil {
 		fac = factory.StandardFactory()
 	}
@@ -85,30 +87,22 @@ func (f *Course) ToFit(fac Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	if f.FileId != nil {
-		mesg := fac.CreateMesg(mesgnum.FileId)
-		f.FileId.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
-	}
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
 
-	PutMessages(fac, &fit.Messages, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	PutMessages(fac, &fit.Messages, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.Course != nil {
-		mesg := fac.CreateMesg(mesgnum.Course)
-		f.Course.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
+		fit.Messages = append(fit.Messages, f.Course.ToMesg(fac))
 	}
 
 	if f.Lap != nil {
-		mesg := fac.CreateMesg(mesgnum.Lap)
-		f.Lap.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
+		fit.Messages = append(fit.Messages, f.Lap.ToMesg(fac))
 	}
 
-	PutMessages(fac, &fit.Messages, mesgnum.Record, f.Records)
-	PutMessages(fac, &fit.Messages, mesgnum.Event, f.Events)
-	PutMessages(fac, &fit.Messages, mesgnum.CoursePoint, f.CoursePoints)
+	ToMesgs(&fit.Messages, fac, mesgnum.Record, f.Records)
+	ToMesgs(&fit.Messages, fac, mesgnum.Event, f.Events)
+	ToMesgs(&fit.Messages, fac, mesgnum.CoursePoint, f.CoursePoints)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

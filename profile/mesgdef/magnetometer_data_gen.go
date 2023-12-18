@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,18 +37,7 @@ func NewMagnetometerData(mesg proto.Message) *MagnetometerData {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* TimestampMs */
-		1:   nil, /* SampleTimeOffset */
-		2:   nil, /* MagX */
-		3:   nil, /* MagY */
-		4:   nil, /* MagZ */
-		5:   nil, /* CalibratedMagX */
-		6:   nil, /* CalibratedMagY */
-		7:   nil, /* CalibratedMagZ */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -71,38 +61,91 @@ func NewMagnetometerData(mesg proto.Message) *MagnetometerData {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to MagnetometerData mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumMagnetometerData)
-func (m *MagnetometerData) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts MagnetometerData into proto.Message.
+func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumMagnetometerData)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumMagnetometerData {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.TimestampMs,
-		1:   m.SampleTimeOffset,
-		2:   m.MagX,
-		3:   m.MagY,
-		4:   m.MagZ,
-		5:   m.CalibratedMagX,
-		6:   m.CalibratedMagY,
-		7:   m.CalibratedMagZ,
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.SampleTimeOffset != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.SampleTimeOffset
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MagX != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.MagX
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MagY != nil {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.MagY
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MagZ != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.MagZ
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedMagX != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.CalibratedMagX
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedMagY != nil {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.CalibratedMagY
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedMagZ != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.CalibratedMagZ
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of MagnetometerData's valid fields.
+func (m *MagnetometerData) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.SampleTimeOffset != nil {
+		size++
+	}
+	if m.MagX != nil {
+		size++
+	}
+	if m.MagY != nil {
+		size++
+	}
+	if m.MagZ != nil {
+		size++
+	}
+	if m.CalibratedMagX != nil {
+		size++
+	}
+	if m.CalibratedMagY != nil {
+		size++
+	}
+	if m.CalibratedMagZ != nil {
+		size++
+	}
+	return size
 }

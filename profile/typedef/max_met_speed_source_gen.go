@@ -17,46 +17,41 @@ const (
 	MaxMetSpeedSourceOnboardGps   MaxMetSpeedSource = 0
 	MaxMetSpeedSourceConnectedGps MaxMetSpeedSource = 1
 	MaxMetSpeedSourceCadence      MaxMetSpeedSource = 2
-	MaxMetSpeedSourceInvalid      MaxMetSpeedSource = 0xFF // INVALID
+	MaxMetSpeedSourceInvalid      MaxMetSpeedSource = 0xFF
 )
 
-var maxmetspeedsourcetostrs = map[MaxMetSpeedSource]string{
-	MaxMetSpeedSourceOnboardGps:   "onboard_gps",
-	MaxMetSpeedSourceConnectedGps: "connected_gps",
-	MaxMetSpeedSourceCadence:      "cadence",
-	MaxMetSpeedSourceInvalid:      "invalid",
-}
-
 func (m MaxMetSpeedSource) String() string {
-	val, ok := maxmetspeedsourcetostrs[m]
-	if !ok {
-		return strconv.Itoa(int(m))
+	switch m {
+	case MaxMetSpeedSourceOnboardGps:
+		return "onboard_gps"
+	case MaxMetSpeedSourceConnectedGps:
+		return "connected_gps"
+	case MaxMetSpeedSourceCadence:
+		return "cadence"
+	default:
+		return "MaxMetSpeedSourceInvalid(" + strconv.Itoa(int(m)) + ")"
 	}
-	return val
 }
-
-var strtomaxmetspeedsource = func() map[string]MaxMetSpeedSource {
-	m := make(map[string]MaxMetSpeedSource)
-	for t, str := range maxmetspeedsourcetostrs {
-		m[str] = MaxMetSpeedSource(t)
-	}
-	return m
-}()
 
 // FromString parse string into MaxMetSpeedSource constant it's represent, return MaxMetSpeedSourceInvalid if not found.
 func MaxMetSpeedSourceFromString(s string) MaxMetSpeedSource {
-	val, ok := strtomaxmetspeedsource[s]
-	if !ok {
-		return strtomaxmetspeedsource["invalid"]
+	switch s {
+	case "onboard_gps":
+		return MaxMetSpeedSourceOnboardGps
+	case "connected_gps":
+		return MaxMetSpeedSourceConnectedGps
+	case "cadence":
+		return MaxMetSpeedSourceCadence
+	default:
+		return MaxMetSpeedSourceInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMaxMetSpeedSource() []MaxMetSpeedSource {
-	vs := make([]MaxMetSpeedSource, 0, len(maxmetspeedsourcetostrs))
-	for i := range maxmetspeedsourcetostrs {
-		vs = append(vs, MaxMetSpeedSource(i))
+	return []MaxMetSpeedSource{
+		MaxMetSpeedSourceOnboardGps,
+		MaxMetSpeedSourceConnectedGps,
+		MaxMetSpeedSourceCadence,
 	}
-	return vs
 }

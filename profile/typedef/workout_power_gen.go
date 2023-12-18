@@ -15,44 +15,31 @@ type WorkoutPower uint32
 
 const (
 	WorkoutPowerWattsOffset WorkoutPower = 1000
-	WorkoutPowerInvalid     WorkoutPower = 0xFFFFFFFF // INVALID
+	WorkoutPowerInvalid     WorkoutPower = 0xFFFFFFFF
 )
 
-var workoutpowertostrs = map[WorkoutPower]string{
-	WorkoutPowerWattsOffset: "watts_offset",
-	WorkoutPowerInvalid:     "invalid",
-}
-
 func (w WorkoutPower) String() string {
-	val, ok := workoutpowertostrs[w]
-	if !ok {
-		return strconv.FormatUint(uint64(w), 10)
+	switch w {
+	case WorkoutPowerWattsOffset:
+		return "watts_offset"
+	default:
+		return "WorkoutPowerInvalid(" + strconv.FormatUint(uint64(w), 10) + ")"
 	}
-	return val
 }
-
-var strtoworkoutpower = func() map[string]WorkoutPower {
-	m := make(map[string]WorkoutPower)
-	for t, str := range workoutpowertostrs {
-		m[str] = WorkoutPower(t)
-	}
-	return m
-}()
 
 // FromString parse string into WorkoutPower constant it's represent, return WorkoutPowerInvalid if not found.
 func WorkoutPowerFromString(s string) WorkoutPower {
-	val, ok := strtoworkoutpower[s]
-	if !ok {
-		return strtoworkoutpower["invalid"]
+	switch s {
+	case "watts_offset":
+		return WorkoutPowerWattsOffset
+	default:
+		return WorkoutPowerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWorkoutPower() []WorkoutPower {
-	vs := make([]WorkoutPower, 0, len(workoutpowertostrs))
-	for i := range workoutpowertostrs {
-		vs = append(vs, WorkoutPower(i))
+	return []WorkoutPower{
+		WorkoutPowerWattsOffset,
 	}
-	return vs
 }

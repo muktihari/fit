@@ -22,51 +22,66 @@ const (
 	SupportedExdScreenLayoutsFullQuarterSplit          SupportedExdScreenLayouts = 0x00000020
 	SupportedExdScreenLayoutsHalfVerticalLeftSplit     SupportedExdScreenLayouts = 0x00000040
 	SupportedExdScreenLayoutsHalfHorizontalTopSplit    SupportedExdScreenLayouts = 0x00000080
-	SupportedExdScreenLayoutsInvalid                   SupportedExdScreenLayouts = 0x0 // INVALID
+	SupportedExdScreenLayoutsInvalid                   SupportedExdScreenLayouts = 0x0
 )
 
-var supportedexdscreenlayoutstostrs = map[SupportedExdScreenLayouts]string{
-	SupportedExdScreenLayoutsFullScreen:                "full_screen",
-	SupportedExdScreenLayoutsHalfVertical:              "half_vertical",
-	SupportedExdScreenLayoutsHalfHorizontal:            "half_horizontal",
-	SupportedExdScreenLayoutsHalfVerticalRightSplit:    "half_vertical_right_split",
-	SupportedExdScreenLayoutsHalfHorizontalBottomSplit: "half_horizontal_bottom_split",
-	SupportedExdScreenLayoutsFullQuarterSplit:          "full_quarter_split",
-	SupportedExdScreenLayoutsHalfVerticalLeftSplit:     "half_vertical_left_split",
-	SupportedExdScreenLayoutsHalfHorizontalTopSplit:    "half_horizontal_top_split",
-	SupportedExdScreenLayoutsInvalid:                   "invalid",
-}
-
 func (s SupportedExdScreenLayouts) String() string {
-	val, ok := supportedexdscreenlayoutstostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case SupportedExdScreenLayoutsFullScreen:
+		return "full_screen"
+	case SupportedExdScreenLayoutsHalfVertical:
+		return "half_vertical"
+	case SupportedExdScreenLayoutsHalfHorizontal:
+		return "half_horizontal"
+	case SupportedExdScreenLayoutsHalfVerticalRightSplit:
+		return "half_vertical_right_split"
+	case SupportedExdScreenLayoutsHalfHorizontalBottomSplit:
+		return "half_horizontal_bottom_split"
+	case SupportedExdScreenLayoutsFullQuarterSplit:
+		return "full_quarter_split"
+	case SupportedExdScreenLayoutsHalfVerticalLeftSplit:
+		return "half_vertical_left_split"
+	case SupportedExdScreenLayoutsHalfHorizontalTopSplit:
+		return "half_horizontal_top_split"
+	default:
+		return "SupportedExdScreenLayoutsInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtosupportedexdscreenlayouts = func() map[string]SupportedExdScreenLayouts {
-	m := make(map[string]SupportedExdScreenLayouts)
-	for t, str := range supportedexdscreenlayoutstostrs {
-		m[str] = SupportedExdScreenLayouts(t)
-	}
-	return m
-}()
 
 // FromString parse string into SupportedExdScreenLayouts constant it's represent, return SupportedExdScreenLayoutsInvalid if not found.
 func SupportedExdScreenLayoutsFromString(s string) SupportedExdScreenLayouts {
-	val, ok := strtosupportedexdscreenlayouts[s]
-	if !ok {
-		return strtosupportedexdscreenlayouts["invalid"]
+	switch s {
+	case "full_screen":
+		return SupportedExdScreenLayoutsFullScreen
+	case "half_vertical":
+		return SupportedExdScreenLayoutsHalfVertical
+	case "half_horizontal":
+		return SupportedExdScreenLayoutsHalfHorizontal
+	case "half_vertical_right_split":
+		return SupportedExdScreenLayoutsHalfVerticalRightSplit
+	case "half_horizontal_bottom_split":
+		return SupportedExdScreenLayoutsHalfHorizontalBottomSplit
+	case "full_quarter_split":
+		return SupportedExdScreenLayoutsFullQuarterSplit
+	case "half_vertical_left_split":
+		return SupportedExdScreenLayoutsHalfVerticalLeftSplit
+	case "half_horizontal_top_split":
+		return SupportedExdScreenLayoutsHalfHorizontalTopSplit
+	default:
+		return SupportedExdScreenLayoutsInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSupportedExdScreenLayouts() []SupportedExdScreenLayouts {
-	vs := make([]SupportedExdScreenLayouts, 0, len(supportedexdscreenlayoutstostrs))
-	for i := range supportedexdscreenlayoutstostrs {
-		vs = append(vs, SupportedExdScreenLayouts(i))
+	return []SupportedExdScreenLayouts{
+		SupportedExdScreenLayoutsFullScreen,
+		SupportedExdScreenLayoutsHalfVertical,
+		SupportedExdScreenLayoutsHalfHorizontal,
+		SupportedExdScreenLayoutsHalfVerticalRightSplit,
+		SupportedExdScreenLayoutsHalfHorizontalBottomSplit,
+		SupportedExdScreenLayoutsFullQuarterSplit,
+		SupportedExdScreenLayoutsHalfVerticalLeftSplit,
+		SupportedExdScreenLayoutsHalfHorizontalTopSplit,
 	}
-	return vs
 }

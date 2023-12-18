@@ -18,47 +18,46 @@ const (
 	AttitudeStageAligning AttitudeStage = 1
 	AttitudeStageDegraded AttitudeStage = 2
 	AttitudeStageValid    AttitudeStage = 3
-	AttitudeStageInvalid  AttitudeStage = 0xFF // INVALID
+	AttitudeStageInvalid  AttitudeStage = 0xFF
 )
 
-var attitudestagetostrs = map[AttitudeStage]string{
-	AttitudeStageFailed:   "failed",
-	AttitudeStageAligning: "aligning",
-	AttitudeStageDegraded: "degraded",
-	AttitudeStageValid:    "valid",
-	AttitudeStageInvalid:  "invalid",
-}
-
 func (a AttitudeStage) String() string {
-	val, ok := attitudestagetostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case AttitudeStageFailed:
+		return "failed"
+	case AttitudeStageAligning:
+		return "aligning"
+	case AttitudeStageDegraded:
+		return "degraded"
+	case AttitudeStageValid:
+		return "valid"
+	default:
+		return "AttitudeStageInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoattitudestage = func() map[string]AttitudeStage {
-	m := make(map[string]AttitudeStage)
-	for t, str := range attitudestagetostrs {
-		m[str] = AttitudeStage(t)
-	}
-	return m
-}()
 
 // FromString parse string into AttitudeStage constant it's represent, return AttitudeStageInvalid if not found.
 func AttitudeStageFromString(s string) AttitudeStage {
-	val, ok := strtoattitudestage[s]
-	if !ok {
-		return strtoattitudestage["invalid"]
+	switch s {
+	case "failed":
+		return AttitudeStageFailed
+	case "aligning":
+		return AttitudeStageAligning
+	case "degraded":
+		return AttitudeStageDegraded
+	case "valid":
+		return AttitudeStageValid
+	default:
+		return AttitudeStageInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAttitudeStage() []AttitudeStage {
-	vs := make([]AttitudeStage, 0, len(attitudestagetostrs))
-	for i := range attitudestagetostrs {
-		vs = append(vs, AttitudeStage(i))
+	return []AttitudeStage{
+		AttitudeStageFailed,
+		AttitudeStageAligning,
+		AttitudeStageDegraded,
+		AttitudeStageValid,
 	}
-	return vs
 }

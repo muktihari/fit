@@ -16,45 +16,36 @@ type MaxMetCategory byte
 const (
 	MaxMetCategoryGeneric MaxMetCategory = 0
 	MaxMetCategoryCycling MaxMetCategory = 1
-	MaxMetCategoryInvalid MaxMetCategory = 0xFF // INVALID
+	MaxMetCategoryInvalid MaxMetCategory = 0xFF
 )
 
-var maxmetcategorytostrs = map[MaxMetCategory]string{
-	MaxMetCategoryGeneric: "generic",
-	MaxMetCategoryCycling: "cycling",
-	MaxMetCategoryInvalid: "invalid",
-}
-
 func (m MaxMetCategory) String() string {
-	val, ok := maxmetcategorytostrs[m]
-	if !ok {
-		return strconv.Itoa(int(m))
+	switch m {
+	case MaxMetCategoryGeneric:
+		return "generic"
+	case MaxMetCategoryCycling:
+		return "cycling"
+	default:
+		return "MaxMetCategoryInvalid(" + strconv.Itoa(int(m)) + ")"
 	}
-	return val
 }
-
-var strtomaxmetcategory = func() map[string]MaxMetCategory {
-	m := make(map[string]MaxMetCategory)
-	for t, str := range maxmetcategorytostrs {
-		m[str] = MaxMetCategory(t)
-	}
-	return m
-}()
 
 // FromString parse string into MaxMetCategory constant it's represent, return MaxMetCategoryInvalid if not found.
 func MaxMetCategoryFromString(s string) MaxMetCategory {
-	val, ok := strtomaxmetcategory[s]
-	if !ok {
-		return strtomaxmetcategory["invalid"]
+	switch s {
+	case "generic":
+		return MaxMetCategoryGeneric
+	case "cycling":
+		return MaxMetCategoryCycling
+	default:
+		return MaxMetCategoryInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMaxMetCategory() []MaxMetCategory {
-	vs := make([]MaxMetCategory, 0, len(maxmetcategorytostrs))
-	for i := range maxmetcategorytostrs {
-		vs = append(vs, MaxMetCategory(i))
+	return []MaxMetCategory{
+		MaxMetCategoryGeneric,
+		MaxMetCategoryCycling,
 	}
-	return vs
 }

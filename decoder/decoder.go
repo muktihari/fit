@@ -522,7 +522,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			field.Type = profile.ProfileTypeFromString(fieldDef.BaseType.String())
 		}
 
-		val, err := d.readValue(fieldDef.Size, fieldDef.BaseType, mesgDef.Architecture)
+		val, err := d.readValue(fieldDef.Size, fieldDef.BaseType, field.Array, mesgDef.Architecture)
 		if err != nil {
 			return err
 		}
@@ -636,12 +636,23 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 			Size:               devFieldDef.Size,
 			NativeMesgNum:      fieldDescription.NativeMesgNum,
 			NativeFieldNum:     fieldDescription.NativeFieldNum,
-			Name:               fieldDescription.FieldName,
 			Type:               fieldDescription.FitBaseTypeId,
-			Units:              fieldDescription.Units,
 		}
 
-		val, err := d.readValue(developerField.Size, developerField.Type, mesgDef.Architecture)
+		if len(fieldDescription.FieldName) > 0 {
+			developerField.Name = fieldDescription.FieldName[0]
+		}
+
+		if len(fieldDescription.Units) > 0 {
+			developerField.Units = fieldDescription.Units[0]
+		}
+
+		var isArray bool
+		if devFieldDef.Size > developerField.Type.Size() && devFieldDef.Size%developerField.Type.Size() == 0 {
+			isArray = true
+		}
+
+		val, err := d.readValue(developerField.Size, developerField.Type, isArray, mesgDef.Architecture)
 		if err != nil {
 			return err
 		}
@@ -685,13 +696,13 @@ func (d *Decoder) readByte() (byte, error) {
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
-func (d *Decoder) readValue(size byte, baseType basetype.BaseType, arch byte) (any, error) {
+func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (any, error) {
 	b := make([]byte, size)
 	if err := d.read(b); err != nil {
 		return nil, err
 	}
 
-	val, err := typedef.Unmarshal(b, byteorder.Select(arch), baseType)
+	val, err := typedef.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
 	if err != nil {
 		return nil, err
 	}

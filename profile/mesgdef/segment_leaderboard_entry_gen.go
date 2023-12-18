@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,16 +35,7 @@ func NewSegmentLeaderboardEntry(mesg proto.Message) *SegmentLeaderboardEntry {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* Name */
-		1:   nil, /* Type */
-		2:   nil, /* GroupPrimaryKey */
-		3:   nil, /* ActivityId */
-		4:   nil, /* SegmentTime */
-		5:   nil, /* ActivityIdString */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -65,36 +57,75 @@ func NewSegmentLeaderboardEntry(mesg proto.Message) *SegmentLeaderboardEntry {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SegmentLeaderboardEntry mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSegmentLeaderboardEntry)
-func (m *SegmentLeaderboardEntry) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SegmentLeaderboardEntry into proto.Message.
+func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentLeaderboardEntry)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSegmentLeaderboardEntry {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   m.Name,
-		1:   typeconv.ToEnum[byte](m.Type),
-		2:   m.GroupPrimaryKey,
-		3:   m.ActivityId,
-		4:   m.SegmentTime,
-		5:   m.ActivityIdString,
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Name
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToEnum[byte](m.Type)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.GroupPrimaryKey != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.GroupPrimaryKey
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ActivityId != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.ActivityId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SegmentTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.SegmentTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.ActivityIdString
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SegmentLeaderboardEntry's valid fields.
+func (m *SegmentLeaderboardEntry) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		size++
+	}
+	if m.GroupPrimaryKey != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ActivityId != basetype.Uint32Invalid {
+		size++
+	}
+	if m.SegmentTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
+		size++
+	}
+	return size
 }

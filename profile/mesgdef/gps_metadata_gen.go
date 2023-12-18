@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,18 +37,7 @@ func NewGpsMetadata(mesg proto.Message) *GpsMetadata {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* TimestampMs */
-		1:   nil, /* PositionLat */
-		2:   nil, /* PositionLong */
-		3:   nil, /* EnhancedAltitude */
-		4:   nil, /* EnhancedSpeed */
-		5:   nil, /* Heading */
-		6:   nil, /* UtcTimestamp */
-		7:   nil, /* Velocity */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -71,38 +61,91 @@ func NewGpsMetadata(mesg proto.Message) *GpsMetadata {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to GpsMetadata mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumGpsMetadata)
-func (m *GpsMetadata) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts GpsMetadata into proto.Message.
+func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumGpsMetadata)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumGpsMetadata {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.TimestampMs,
-		1:   m.PositionLat,
-		2:   m.PositionLong,
-		3:   m.EnhancedAltitude,
-		4:   m.EnhancedSpeed,
-		5:   m.Heading,
-		6:   typeconv.ToUint32[uint32](m.UtcTimestamp),
-		7:   m.Velocity,
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.PositionLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.PositionLat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.PositionLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.EnhancedAltitude
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.EnhancedSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Heading != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.Heading
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.UtcTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = typeconv.ToUint32[uint32](m.UtcTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Velocity != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.Velocity
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of GpsMetadata's valid fields.
+func (m *GpsMetadata) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		size++
+	}
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		size++
+	}
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Heading != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.UtcTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Velocity != nil {
+		size++
+	}
+	return size
 }

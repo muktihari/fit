@@ -17,46 +17,41 @@ const (
 	AnalogWatchfaceLayoutMinimal     AnalogWatchfaceLayout = 0
 	AnalogWatchfaceLayoutTraditional AnalogWatchfaceLayout = 1
 	AnalogWatchfaceLayoutModern      AnalogWatchfaceLayout = 2
-	AnalogWatchfaceLayoutInvalid     AnalogWatchfaceLayout = 0xFF // INVALID
+	AnalogWatchfaceLayoutInvalid     AnalogWatchfaceLayout = 0xFF
 )
 
-var analogwatchfacelayouttostrs = map[AnalogWatchfaceLayout]string{
-	AnalogWatchfaceLayoutMinimal:     "minimal",
-	AnalogWatchfaceLayoutTraditional: "traditional",
-	AnalogWatchfaceLayoutModern:      "modern",
-	AnalogWatchfaceLayoutInvalid:     "invalid",
-}
-
 func (a AnalogWatchfaceLayout) String() string {
-	val, ok := analogwatchfacelayouttostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case AnalogWatchfaceLayoutMinimal:
+		return "minimal"
+	case AnalogWatchfaceLayoutTraditional:
+		return "traditional"
+	case AnalogWatchfaceLayoutModern:
+		return "modern"
+	default:
+		return "AnalogWatchfaceLayoutInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoanalogwatchfacelayout = func() map[string]AnalogWatchfaceLayout {
-	m := make(map[string]AnalogWatchfaceLayout)
-	for t, str := range analogwatchfacelayouttostrs {
-		m[str] = AnalogWatchfaceLayout(t)
-	}
-	return m
-}()
 
 // FromString parse string into AnalogWatchfaceLayout constant it's represent, return AnalogWatchfaceLayoutInvalid if not found.
 func AnalogWatchfaceLayoutFromString(s string) AnalogWatchfaceLayout {
-	val, ok := strtoanalogwatchfacelayout[s]
-	if !ok {
-		return strtoanalogwatchfacelayout["invalid"]
+	switch s {
+	case "minimal":
+		return AnalogWatchfaceLayoutMinimal
+	case "traditional":
+		return AnalogWatchfaceLayoutTraditional
+	case "modern":
+		return AnalogWatchfaceLayoutModern
+	default:
+		return AnalogWatchfaceLayoutInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAnalogWatchfaceLayout() []AnalogWatchfaceLayout {
-	vs := make([]AnalogWatchfaceLayout, 0, len(analogwatchfacelayouttostrs))
-	for i := range analogwatchfacelayouttostrs {
-		vs = append(vs, AnalogWatchfaceLayout(i))
+	return []AnalogWatchfaceLayout{
+		AnalogWatchfaceLayoutMinimal,
+		AnalogWatchfaceLayoutTraditional,
+		AnalogWatchfaceLayoutModern,
 	}
-	return vs
 }

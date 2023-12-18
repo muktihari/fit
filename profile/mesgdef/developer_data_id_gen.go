@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -28,14 +29,7 @@ func NewDeveloperDataId(mesg proto.Message) *DeveloperDataId {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* DeveloperId */
-		1: nil, /* ApplicationId */
-		2: nil, /* ManufacturerId */
-		3: nil, /* DeveloperDataIndex */
-		4: nil, /* ApplicationVersion */
-	}
-
+	vals := [5]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -53,33 +47,57 @@ func NewDeveloperDataId(mesg proto.Message) *DeveloperDataId {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DeveloperDataId mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDeveloperDataId)
-func (m *DeveloperDataId) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
+// ToMesg converts DeveloperDataId into proto.Message.
+func (m *DeveloperDataId) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDeveloperDataId)
+	mesg.Fields = make([]proto.Field, 0, m.size())
+
+	if m.DeveloperId != nil {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.DeveloperId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ApplicationId != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.ApplicationId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.ManufacturerId) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint16[uint16](m.ManufacturerId)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DeveloperDataIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.DeveloperDataIndex
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ApplicationVersion != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.ApplicationVersion
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
-	if mesg.Num != typedef.MesgNumDeveloperDataId {
-		return
-	}
+	return mesg
+}
 
-	vals := [...]any{
-		0: m.DeveloperId,
-		1: m.ApplicationId,
-		2: typeconv.ToUint16[uint16](m.ManufacturerId),
-		3: m.DeveloperDataIndex,
-		4: m.ApplicationVersion,
+// size returns size of DeveloperDataId's valid fields.
+func (m *DeveloperDataId) size() byte {
+	var size byte
+	if m.DeveloperId != nil {
+		size++
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.ApplicationId != nil {
+		size++
 	}
-
+	if typeconv.ToUint16[uint16](m.ManufacturerId) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.DeveloperDataIndex != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ApplicationVersion != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

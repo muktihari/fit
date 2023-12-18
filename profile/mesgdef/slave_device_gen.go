@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -29,11 +30,7 @@ func NewSlaveDevice(mesg proto.Message) *SlaveDevice {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* Manufacturer */
-		1: nil, /* Product */
-	}
-
+	vals := [2]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -50,31 +47,35 @@ func NewSlaveDevice(mesg proto.Message) *SlaveDevice {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SlaveDevice mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSlaveDevice)
-func (m *SlaveDevice) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SlaveDevice into proto.Message.
+func (m *SlaveDevice) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSlaveDevice)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSlaveDevice {
-		return
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: typeconv.ToUint16[uint16](m.Manufacturer),
-		1: m.Product,
-	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Product != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Product
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SlaveDevice's valid fields.
+func (m *SlaveDevice) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Product != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

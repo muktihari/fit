@@ -21,50 +21,61 @@ const (
 	AutoActivityDetectWalking    AutoActivityDetect = 0x00000008
 	AutoActivityDetectElliptical AutoActivityDetect = 0x00000020
 	AutoActivityDetectSedentary  AutoActivityDetect = 0x00000400
-	AutoActivityDetectInvalid    AutoActivityDetect = 0xFFFFFFFF // INVALID
+	AutoActivityDetectInvalid    AutoActivityDetect = 0xFFFFFFFF
 )
 
-var autoactivitydetecttostrs = map[AutoActivityDetect]string{
-	AutoActivityDetectNone:       "none",
-	AutoActivityDetectRunning:    "running",
-	AutoActivityDetectCycling:    "cycling",
-	AutoActivityDetectSwimming:   "swimming",
-	AutoActivityDetectWalking:    "walking",
-	AutoActivityDetectElliptical: "elliptical",
-	AutoActivityDetectSedentary:  "sedentary",
-	AutoActivityDetectInvalid:    "invalid",
-}
-
 func (a AutoActivityDetect) String() string {
-	val, ok := autoactivitydetecttostrs[a]
-	if !ok {
-		return strconv.FormatUint(uint64(a), 10)
+	switch a {
+	case AutoActivityDetectNone:
+		return "none"
+	case AutoActivityDetectRunning:
+		return "running"
+	case AutoActivityDetectCycling:
+		return "cycling"
+	case AutoActivityDetectSwimming:
+		return "swimming"
+	case AutoActivityDetectWalking:
+		return "walking"
+	case AutoActivityDetectElliptical:
+		return "elliptical"
+	case AutoActivityDetectSedentary:
+		return "sedentary"
+	default:
+		return "AutoActivityDetectInvalid(" + strconv.FormatUint(uint64(a), 10) + ")"
 	}
-	return val
 }
-
-var strtoautoactivitydetect = func() map[string]AutoActivityDetect {
-	m := make(map[string]AutoActivityDetect)
-	for t, str := range autoactivitydetecttostrs {
-		m[str] = AutoActivityDetect(t)
-	}
-	return m
-}()
 
 // FromString parse string into AutoActivityDetect constant it's represent, return AutoActivityDetectInvalid if not found.
 func AutoActivityDetectFromString(s string) AutoActivityDetect {
-	val, ok := strtoautoactivitydetect[s]
-	if !ok {
-		return strtoautoactivitydetect["invalid"]
+	switch s {
+	case "none":
+		return AutoActivityDetectNone
+	case "running":
+		return AutoActivityDetectRunning
+	case "cycling":
+		return AutoActivityDetectCycling
+	case "swimming":
+		return AutoActivityDetectSwimming
+	case "walking":
+		return AutoActivityDetectWalking
+	case "elliptical":
+		return AutoActivityDetectElliptical
+	case "sedentary":
+		return AutoActivityDetectSedentary
+	default:
+		return AutoActivityDetectInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAutoActivityDetect() []AutoActivityDetect {
-	vs := make([]AutoActivityDetect, 0, len(autoactivitydetecttostrs))
-	for i := range autoactivitydetecttostrs {
-		vs = append(vs, AutoActivityDetect(i))
+	return []AutoActivityDetect{
+		AutoActivityDetectNone,
+		AutoActivityDetectRunning,
+		AutoActivityDetectCycling,
+		AutoActivityDetectSwimming,
+		AutoActivityDetectWalking,
+		AutoActivityDetectElliptical,
+		AutoActivityDetectSedentary,
 	}
-	return vs
 }

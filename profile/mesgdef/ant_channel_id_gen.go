@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,14 +33,7 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* ChannelNumber */
-		1: nil, /* DeviceType */
-		2: nil, /* DeviceNumber */
-		3: nil, /* TransmissionType */
-		4: nil, /* DeviceIndex */
-	}
-
+	vals := [5]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -59,34 +53,59 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to AntChannelId mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumAntChannelId)
-func (m *AntChannelId) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts AntChannelId into proto.Message.
+func (m *AntChannelId) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumAntChannelId)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumAntChannelId {
-		return
+	if m.ChannelNumber != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ChannelNumber
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.ChannelNumber,
-		1: typeconv.ToUint8z[uint8](m.DeviceType),
-		2: typeconv.ToUint16z[uint16](m.DeviceNumber),
-		3: typeconv.ToUint8z[uint8](m.TransmissionType),
-		4: typeconv.ToUint8[uint8](m.DeviceIndex),
+	if typeconv.ToUint8z[uint8](m.DeviceType) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint8z[uint8](m.DeviceType)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16z[uint16](m.DeviceNumber) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint16z[uint16](m.DeviceNumber)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.TransmissionType) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint8z[uint8](m.TransmissionType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of AntChannelId's valid fields.
+func (m *AntChannelId) size() byte {
+	var size byte
+	if m.ChannelNumber != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.DeviceType) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint16z[uint16](m.DeviceNumber) != basetype.Uint16zInvalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.TransmissionType) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		size++
+	}
+	return size
 }

@@ -19,48 +19,51 @@ const (
 	HrvStatusLow        HrvStatus = 2
 	HrvStatusUnbalanced HrvStatus = 3
 	HrvStatusBalanced   HrvStatus = 4
-	HrvStatusInvalid    HrvStatus = 0xFF // INVALID
+	HrvStatusInvalid    HrvStatus = 0xFF
 )
 
-var hrvstatustostrs = map[HrvStatus]string{
-	HrvStatusNone:       "none",
-	HrvStatusPoor:       "poor",
-	HrvStatusLow:        "low",
-	HrvStatusUnbalanced: "unbalanced",
-	HrvStatusBalanced:   "balanced",
-	HrvStatusInvalid:    "invalid",
-}
-
 func (h HrvStatus) String() string {
-	val, ok := hrvstatustostrs[h]
-	if !ok {
-		return strconv.Itoa(int(h))
+	switch h {
+	case HrvStatusNone:
+		return "none"
+	case HrvStatusPoor:
+		return "poor"
+	case HrvStatusLow:
+		return "low"
+	case HrvStatusUnbalanced:
+		return "unbalanced"
+	case HrvStatusBalanced:
+		return "balanced"
+	default:
+		return "HrvStatusInvalid(" + strconv.Itoa(int(h)) + ")"
 	}
-	return val
 }
-
-var strtohrvstatus = func() map[string]HrvStatus {
-	m := make(map[string]HrvStatus)
-	for t, str := range hrvstatustostrs {
-		m[str] = HrvStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into HrvStatus constant it's represent, return HrvStatusInvalid if not found.
 func HrvStatusFromString(s string) HrvStatus {
-	val, ok := strtohrvstatus[s]
-	if !ok {
-		return strtohrvstatus["invalid"]
+	switch s {
+	case "none":
+		return HrvStatusNone
+	case "poor":
+		return HrvStatusPoor
+	case "low":
+		return HrvStatusLow
+	case "unbalanced":
+		return HrvStatusUnbalanced
+	case "balanced":
+		return HrvStatusBalanced
+	default:
+		return HrvStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHrvStatus() []HrvStatus {
-	vs := make([]HrvStatus, 0, len(hrvstatustostrs))
-	for i := range hrvstatustostrs {
-		vs = append(vs, HrvStatus(i))
+	return []HrvStatus{
+		HrvStatusNone,
+		HrvStatusPoor,
+		HrvStatusLow,
+		HrvStatusUnbalanced,
+		HrvStatusBalanced,
 	}
-	return vs
 }

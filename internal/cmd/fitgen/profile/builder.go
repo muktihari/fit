@@ -99,16 +99,23 @@ func (b *profilebuilder) buildProfile() builder.Data {
 		constants[0].Value = "iota"
 	}
 
-	constants = append(constants, shared.Constant{
-		Name:    "Invalid",
-		String:  "invalid",
-		Comment: "INVALID",
-	})
+	data := shared.ConstantData{
+		Package: "profile",
+		Imports: []string{
+			"strconv",
+			"github.com/muktihari/fit/profile/basetype",
+		},
+		SDKVersion: b.sdkVersion,
+		Type:       ProfileType,
+		Base:       "uint16",
+		Constants:  constants,
+	}
 
-	mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{
-		ConstantName: "Invalid",
-		BaseType:     fmt.Sprint(basetype.Byte.Invalid()),
-	})
+	data.Invalid = shared.Constant{
+		Name:    "Invalid",
+		String:  fmt.Sprintf("%sInvalid(%d)", ProfileType, basetype.FromString(data.Base).Invalid()),
+		Comment: "INVALID",
+	}
 
 	return builder.Data{
 		Template:     b.template,
@@ -116,18 +123,7 @@ func (b *profilebuilder) buildProfile() builder.Data {
 		Path:         b.path,
 		Filename:     "profile_gen.go",
 		Data: ProfileData{
-			ConstantData: shared.ConstantData{
-				Package: "profile",
-				Imports: []string{
-					"strconv",
-					"github.com/muktihari/fit/profile/basetype",
-				},
-				StringerMode: shared.StringerArray,
-				SDKVersion:   b.sdkVersion,
-				Type:         ProfileType,
-				Base:         "uint16",
-				Constants:    constants,
-			},
+			ConstantData:     data,
 			MappingBaseTypes: mappingToBaseTypes,
 		},
 	}

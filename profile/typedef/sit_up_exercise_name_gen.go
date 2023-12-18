@@ -52,81 +52,216 @@ const (
 	SitUpExerciseNameXAbs                                SitUpExerciseName = 35
 	SitUpExerciseNameWeightedXAbs                        SitUpExerciseName = 36
 	SitUpExerciseNameSitUp                               SitUpExerciseName = 37
-	SitUpExerciseNameInvalid                             SitUpExerciseName = 0xFFFF // INVALID
+	SitUpExerciseNameInvalid                             SitUpExerciseName = 0xFFFF
 )
 
-var situpexercisenametostrs = map[SitUpExerciseName]string{
-	SitUpExerciseNameAlternatingSitUp:                    "alternating_sit_up",
-	SitUpExerciseNameWeightedAlternatingSitUp:            "weighted_alternating_sit_up",
-	SitUpExerciseNameBentKneeVUp:                         "bent_knee_v_up",
-	SitUpExerciseNameWeightedBentKneeVUp:                 "weighted_bent_knee_v_up",
-	SitUpExerciseNameButterflySitUp:                      "butterfly_sit_up",
-	SitUpExerciseNameWeightedButterflySitup:              "weighted_butterfly_situp",
-	SitUpExerciseNameCrossPunchRollUp:                    "cross_punch_roll_up",
-	SitUpExerciseNameWeightedCrossPunchRollUp:            "weighted_cross_punch_roll_up",
-	SitUpExerciseNameCrossedArmsSitUp:                    "crossed_arms_sit_up",
-	SitUpExerciseNameWeightedCrossedArmsSitUp:            "weighted_crossed_arms_sit_up",
-	SitUpExerciseNameGetUpSitUp:                          "get_up_sit_up",
-	SitUpExerciseNameWeightedGetUpSitUp:                  "weighted_get_up_sit_up",
-	SitUpExerciseNameHoveringSitUp:                       "hovering_sit_up",
-	SitUpExerciseNameWeightedHoveringSitUp:               "weighted_hovering_sit_up",
-	SitUpExerciseNameKettlebellSitUp:                     "kettlebell_sit_up",
-	SitUpExerciseNameMedicineBallAlternatingVUp:          "medicine_ball_alternating_v_up",
-	SitUpExerciseNameMedicineBallSitUp:                   "medicine_ball_sit_up",
-	SitUpExerciseNameMedicineBallVUp:                     "medicine_ball_v_up",
-	SitUpExerciseNameModifiedSitUp:                       "modified_sit_up",
-	SitUpExerciseNameNegativeSitUp:                       "negative_sit_up",
-	SitUpExerciseNameOneArmFullSitUp:                     "one_arm_full_sit_up",
-	SitUpExerciseNameRecliningCircle:                     "reclining_circle",
-	SitUpExerciseNameWeightedRecliningCircle:             "weighted_reclining_circle",
-	SitUpExerciseNameReverseCurlUp:                       "reverse_curl_up",
-	SitUpExerciseNameWeightedReverseCurlUp:               "weighted_reverse_curl_up",
-	SitUpExerciseNameSingleLegSwissBallJackknife:         "single_leg_swiss_ball_jackknife",
-	SitUpExerciseNameWeightedSingleLegSwissBallJackknife: "weighted_single_leg_swiss_ball_jackknife",
-	SitUpExerciseNameTheTeaser:                           "the_teaser",
-	SitUpExerciseNameTheTeaserWeighted:                   "the_teaser_weighted",
-	SitUpExerciseNameThreePartRollDown:                   "three_part_roll_down",
-	SitUpExerciseNameWeightedThreePartRollDown:           "weighted_three_part_roll_down",
-	SitUpExerciseNameVUp:                                 "v_up",
-	SitUpExerciseNameWeightedVUp:                         "weighted_v_up",
-	SitUpExerciseNameWeightedRussianTwistOnSwissBall:     "weighted_russian_twist_on_swiss_ball",
-	SitUpExerciseNameWeightedSitUp:                       "weighted_sit_up",
-	SitUpExerciseNameXAbs:                                "x_abs",
-	SitUpExerciseNameWeightedXAbs:                        "weighted_x_abs",
-	SitUpExerciseNameSitUp:                               "sit_up",
-	SitUpExerciseNameInvalid:                             "invalid",
-}
-
 func (s SitUpExerciseName) String() string {
-	val, ok := situpexercisenametostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case SitUpExerciseNameAlternatingSitUp:
+		return "alternating_sit_up"
+	case SitUpExerciseNameWeightedAlternatingSitUp:
+		return "weighted_alternating_sit_up"
+	case SitUpExerciseNameBentKneeVUp:
+		return "bent_knee_v_up"
+	case SitUpExerciseNameWeightedBentKneeVUp:
+		return "weighted_bent_knee_v_up"
+	case SitUpExerciseNameButterflySitUp:
+		return "butterfly_sit_up"
+	case SitUpExerciseNameWeightedButterflySitup:
+		return "weighted_butterfly_situp"
+	case SitUpExerciseNameCrossPunchRollUp:
+		return "cross_punch_roll_up"
+	case SitUpExerciseNameWeightedCrossPunchRollUp:
+		return "weighted_cross_punch_roll_up"
+	case SitUpExerciseNameCrossedArmsSitUp:
+		return "crossed_arms_sit_up"
+	case SitUpExerciseNameWeightedCrossedArmsSitUp:
+		return "weighted_crossed_arms_sit_up"
+	case SitUpExerciseNameGetUpSitUp:
+		return "get_up_sit_up"
+	case SitUpExerciseNameWeightedGetUpSitUp:
+		return "weighted_get_up_sit_up"
+	case SitUpExerciseNameHoveringSitUp:
+		return "hovering_sit_up"
+	case SitUpExerciseNameWeightedHoveringSitUp:
+		return "weighted_hovering_sit_up"
+	case SitUpExerciseNameKettlebellSitUp:
+		return "kettlebell_sit_up"
+	case SitUpExerciseNameMedicineBallAlternatingVUp:
+		return "medicine_ball_alternating_v_up"
+	case SitUpExerciseNameMedicineBallSitUp:
+		return "medicine_ball_sit_up"
+	case SitUpExerciseNameMedicineBallVUp:
+		return "medicine_ball_v_up"
+	case SitUpExerciseNameModifiedSitUp:
+		return "modified_sit_up"
+	case SitUpExerciseNameNegativeSitUp:
+		return "negative_sit_up"
+	case SitUpExerciseNameOneArmFullSitUp:
+		return "one_arm_full_sit_up"
+	case SitUpExerciseNameRecliningCircle:
+		return "reclining_circle"
+	case SitUpExerciseNameWeightedRecliningCircle:
+		return "weighted_reclining_circle"
+	case SitUpExerciseNameReverseCurlUp:
+		return "reverse_curl_up"
+	case SitUpExerciseNameWeightedReverseCurlUp:
+		return "weighted_reverse_curl_up"
+	case SitUpExerciseNameSingleLegSwissBallJackknife:
+		return "single_leg_swiss_ball_jackknife"
+	case SitUpExerciseNameWeightedSingleLegSwissBallJackknife:
+		return "weighted_single_leg_swiss_ball_jackknife"
+	case SitUpExerciseNameTheTeaser:
+		return "the_teaser"
+	case SitUpExerciseNameTheTeaserWeighted:
+		return "the_teaser_weighted"
+	case SitUpExerciseNameThreePartRollDown:
+		return "three_part_roll_down"
+	case SitUpExerciseNameWeightedThreePartRollDown:
+		return "weighted_three_part_roll_down"
+	case SitUpExerciseNameVUp:
+		return "v_up"
+	case SitUpExerciseNameWeightedVUp:
+		return "weighted_v_up"
+	case SitUpExerciseNameWeightedRussianTwistOnSwissBall:
+		return "weighted_russian_twist_on_swiss_ball"
+	case SitUpExerciseNameWeightedSitUp:
+		return "weighted_sit_up"
+	case SitUpExerciseNameXAbs:
+		return "x_abs"
+	case SitUpExerciseNameWeightedXAbs:
+		return "weighted_x_abs"
+	case SitUpExerciseNameSitUp:
+		return "sit_up"
+	default:
+		return "SitUpExerciseNameInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtositupexercisename = func() map[string]SitUpExerciseName {
-	m := make(map[string]SitUpExerciseName)
-	for t, str := range situpexercisenametostrs {
-		m[str] = SitUpExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into SitUpExerciseName constant it's represent, return SitUpExerciseNameInvalid if not found.
 func SitUpExerciseNameFromString(s string) SitUpExerciseName {
-	val, ok := strtositupexercisename[s]
-	if !ok {
-		return strtositupexercisename["invalid"]
+	switch s {
+	case "alternating_sit_up":
+		return SitUpExerciseNameAlternatingSitUp
+	case "weighted_alternating_sit_up":
+		return SitUpExerciseNameWeightedAlternatingSitUp
+	case "bent_knee_v_up":
+		return SitUpExerciseNameBentKneeVUp
+	case "weighted_bent_knee_v_up":
+		return SitUpExerciseNameWeightedBentKneeVUp
+	case "butterfly_sit_up":
+		return SitUpExerciseNameButterflySitUp
+	case "weighted_butterfly_situp":
+		return SitUpExerciseNameWeightedButterflySitup
+	case "cross_punch_roll_up":
+		return SitUpExerciseNameCrossPunchRollUp
+	case "weighted_cross_punch_roll_up":
+		return SitUpExerciseNameWeightedCrossPunchRollUp
+	case "crossed_arms_sit_up":
+		return SitUpExerciseNameCrossedArmsSitUp
+	case "weighted_crossed_arms_sit_up":
+		return SitUpExerciseNameWeightedCrossedArmsSitUp
+	case "get_up_sit_up":
+		return SitUpExerciseNameGetUpSitUp
+	case "weighted_get_up_sit_up":
+		return SitUpExerciseNameWeightedGetUpSitUp
+	case "hovering_sit_up":
+		return SitUpExerciseNameHoveringSitUp
+	case "weighted_hovering_sit_up":
+		return SitUpExerciseNameWeightedHoveringSitUp
+	case "kettlebell_sit_up":
+		return SitUpExerciseNameKettlebellSitUp
+	case "medicine_ball_alternating_v_up":
+		return SitUpExerciseNameMedicineBallAlternatingVUp
+	case "medicine_ball_sit_up":
+		return SitUpExerciseNameMedicineBallSitUp
+	case "medicine_ball_v_up":
+		return SitUpExerciseNameMedicineBallVUp
+	case "modified_sit_up":
+		return SitUpExerciseNameModifiedSitUp
+	case "negative_sit_up":
+		return SitUpExerciseNameNegativeSitUp
+	case "one_arm_full_sit_up":
+		return SitUpExerciseNameOneArmFullSitUp
+	case "reclining_circle":
+		return SitUpExerciseNameRecliningCircle
+	case "weighted_reclining_circle":
+		return SitUpExerciseNameWeightedRecliningCircle
+	case "reverse_curl_up":
+		return SitUpExerciseNameReverseCurlUp
+	case "weighted_reverse_curl_up":
+		return SitUpExerciseNameWeightedReverseCurlUp
+	case "single_leg_swiss_ball_jackknife":
+		return SitUpExerciseNameSingleLegSwissBallJackknife
+	case "weighted_single_leg_swiss_ball_jackknife":
+		return SitUpExerciseNameWeightedSingleLegSwissBallJackknife
+	case "the_teaser":
+		return SitUpExerciseNameTheTeaser
+	case "the_teaser_weighted":
+		return SitUpExerciseNameTheTeaserWeighted
+	case "three_part_roll_down":
+		return SitUpExerciseNameThreePartRollDown
+	case "weighted_three_part_roll_down":
+		return SitUpExerciseNameWeightedThreePartRollDown
+	case "v_up":
+		return SitUpExerciseNameVUp
+	case "weighted_v_up":
+		return SitUpExerciseNameWeightedVUp
+	case "weighted_russian_twist_on_swiss_ball":
+		return SitUpExerciseNameWeightedRussianTwistOnSwissBall
+	case "weighted_sit_up":
+		return SitUpExerciseNameWeightedSitUp
+	case "x_abs":
+		return SitUpExerciseNameXAbs
+	case "weighted_x_abs":
+		return SitUpExerciseNameWeightedXAbs
+	case "sit_up":
+		return SitUpExerciseNameSitUp
+	default:
+		return SitUpExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSitUpExerciseName() []SitUpExerciseName {
-	vs := make([]SitUpExerciseName, 0, len(situpexercisenametostrs))
-	for i := range situpexercisenametostrs {
-		vs = append(vs, SitUpExerciseName(i))
+	return []SitUpExerciseName{
+		SitUpExerciseNameAlternatingSitUp,
+		SitUpExerciseNameWeightedAlternatingSitUp,
+		SitUpExerciseNameBentKneeVUp,
+		SitUpExerciseNameWeightedBentKneeVUp,
+		SitUpExerciseNameButterflySitUp,
+		SitUpExerciseNameWeightedButterflySitup,
+		SitUpExerciseNameCrossPunchRollUp,
+		SitUpExerciseNameWeightedCrossPunchRollUp,
+		SitUpExerciseNameCrossedArmsSitUp,
+		SitUpExerciseNameWeightedCrossedArmsSitUp,
+		SitUpExerciseNameGetUpSitUp,
+		SitUpExerciseNameWeightedGetUpSitUp,
+		SitUpExerciseNameHoveringSitUp,
+		SitUpExerciseNameWeightedHoveringSitUp,
+		SitUpExerciseNameKettlebellSitUp,
+		SitUpExerciseNameMedicineBallAlternatingVUp,
+		SitUpExerciseNameMedicineBallSitUp,
+		SitUpExerciseNameMedicineBallVUp,
+		SitUpExerciseNameModifiedSitUp,
+		SitUpExerciseNameNegativeSitUp,
+		SitUpExerciseNameOneArmFullSitUp,
+		SitUpExerciseNameRecliningCircle,
+		SitUpExerciseNameWeightedRecliningCircle,
+		SitUpExerciseNameReverseCurlUp,
+		SitUpExerciseNameWeightedReverseCurlUp,
+		SitUpExerciseNameSingleLegSwissBallJackknife,
+		SitUpExerciseNameWeightedSingleLegSwissBallJackknife,
+		SitUpExerciseNameTheTeaser,
+		SitUpExerciseNameTheTeaserWeighted,
+		SitUpExerciseNameThreePartRollDown,
+		SitUpExerciseNameWeightedThreePartRollDown,
+		SitUpExerciseNameVUp,
+		SitUpExerciseNameWeightedVUp,
+		SitUpExerciseNameWeightedRussianTwistOnSwissBall,
+		SitUpExerciseNameWeightedSitUp,
+		SitUpExerciseNameXAbs,
+		SitUpExerciseNameWeightedXAbs,
+		SitUpExerciseNameSitUp,
 	}
-	return vs
 }

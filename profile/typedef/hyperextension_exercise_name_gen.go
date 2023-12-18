@@ -53,84 +53,227 @@ const (
 	HyperextensionExerciseNameWeightedSwissBallOppositeArmAndLegLift          HyperextensionExerciseName = 36
 	HyperextensionExerciseNameSupermanOnSwissBall                             HyperextensionExerciseName = 37
 	HyperextensionExerciseNameCobra                                           HyperextensionExerciseName = 38
-	HyperextensionExerciseNameSupineFloorBarre                                HyperextensionExerciseName = 39     // Deprecated do not use
-	HyperextensionExerciseNameInvalid                                         HyperextensionExerciseName = 0xFFFF // INVALID
+	HyperextensionExerciseNameSupineFloorBarre                                HyperextensionExerciseName = 39 // Deprecated do not use
+	HyperextensionExerciseNameInvalid                                         HyperextensionExerciseName = 0xFFFF
 )
 
-var hyperextensionexercisenametostrs = map[HyperextensionExerciseName]string{
-	HyperextensionExerciseNameBackExtensionWithOppositeArmAndLegReach:         "back_extension_with_opposite_arm_and_leg_reach",
-	HyperextensionExerciseNameWeightedBackExtensionWithOppositeArmAndLegReach: "weighted_back_extension_with_opposite_arm_and_leg_reach",
-	HyperextensionExerciseNameBaseRotations:                                   "base_rotations",
-	HyperextensionExerciseNameWeightedBaseRotations:                           "weighted_base_rotations",
-	HyperextensionExerciseNameBentKneeReverseHyperextension:                   "bent_knee_reverse_hyperextension",
-	HyperextensionExerciseNameWeightedBentKneeReverseHyperextension:           "weighted_bent_knee_reverse_hyperextension",
-	HyperextensionExerciseNameHollowHoldAndRoll:                               "hollow_hold_and_roll",
-	HyperextensionExerciseNameWeightedHollowHoldAndRoll:                       "weighted_hollow_hold_and_roll",
-	HyperextensionExerciseNameKicks:                                           "kicks",
-	HyperextensionExerciseNameWeightedKicks:                                   "weighted_kicks",
-	HyperextensionExerciseNameKneeRaises:                                      "knee_raises",
-	HyperextensionExerciseNameWeightedKneeRaises:                              "weighted_knee_raises",
-	HyperextensionExerciseNameKneelingSuperman:                                "kneeling_superman",
-	HyperextensionExerciseNameWeightedKneelingSuperman:                        "weighted_kneeling_superman",
-	HyperextensionExerciseNameLatPullDownWithRow:                              "lat_pull_down_with_row",
-	HyperextensionExerciseNameMedicineBallDeadliftToReach:                     "medicine_ball_deadlift_to_reach",
-	HyperextensionExerciseNameOneArmOneLegRow:                                 "one_arm_one_leg_row",
-	HyperextensionExerciseNameOneArmRowWithBand:                               "one_arm_row_with_band",
-	HyperextensionExerciseNameOverheadLungeWithMedicineBall:                   "overhead_lunge_with_medicine_ball",
-	HyperextensionExerciseNamePlankKneeTucks:                                  "plank_knee_tucks",
-	HyperextensionExerciseNameWeightedPlankKneeTucks:                          "weighted_plank_knee_tucks",
-	HyperextensionExerciseNameSideStep:                                        "side_step",
-	HyperextensionExerciseNameWeightedSideStep:                                "weighted_side_step",
-	HyperextensionExerciseNameSingleLegBackExtension:                          "single_leg_back_extension",
-	HyperextensionExerciseNameWeightedSingleLegBackExtension:                  "weighted_single_leg_back_extension",
-	HyperextensionExerciseNameSpineExtension:                                  "spine_extension",
-	HyperextensionExerciseNameWeightedSpineExtension:                          "weighted_spine_extension",
-	HyperextensionExerciseNameStaticBackExtension:                             "static_back_extension",
-	HyperextensionExerciseNameWeightedStaticBackExtension:                     "weighted_static_back_extension",
-	HyperextensionExerciseNameSupermanFromFloor:                               "superman_from_floor",
-	HyperextensionExerciseNameWeightedSupermanFromFloor:                       "weighted_superman_from_floor",
-	HyperextensionExerciseNameSwissBallBackExtension:                          "swiss_ball_back_extension",
-	HyperextensionExerciseNameWeightedSwissBallBackExtension:                  "weighted_swiss_ball_back_extension",
-	HyperextensionExerciseNameSwissBallHyperextension:                         "swiss_ball_hyperextension",
-	HyperextensionExerciseNameWeightedSwissBallHyperextension:                 "weighted_swiss_ball_hyperextension",
-	HyperextensionExerciseNameSwissBallOppositeArmAndLegLift:                  "swiss_ball_opposite_arm_and_leg_lift",
-	HyperextensionExerciseNameWeightedSwissBallOppositeArmAndLegLift:          "weighted_swiss_ball_opposite_arm_and_leg_lift",
-	HyperextensionExerciseNameSupermanOnSwissBall:                             "superman_on_swiss_ball",
-	HyperextensionExerciseNameCobra:                                           "cobra",
-	HyperextensionExerciseNameSupineFloorBarre:                                "supine_floor_barre",
-	HyperextensionExerciseNameInvalid:                                         "invalid",
-}
-
 func (h HyperextensionExerciseName) String() string {
-	val, ok := hyperextensionexercisenametostrs[h]
-	if !ok {
-		return strconv.FormatUint(uint64(h), 10)
+	switch h {
+	case HyperextensionExerciseNameBackExtensionWithOppositeArmAndLegReach:
+		return "back_extension_with_opposite_arm_and_leg_reach"
+	case HyperextensionExerciseNameWeightedBackExtensionWithOppositeArmAndLegReach:
+		return "weighted_back_extension_with_opposite_arm_and_leg_reach"
+	case HyperextensionExerciseNameBaseRotations:
+		return "base_rotations"
+	case HyperextensionExerciseNameWeightedBaseRotations:
+		return "weighted_base_rotations"
+	case HyperextensionExerciseNameBentKneeReverseHyperextension:
+		return "bent_knee_reverse_hyperextension"
+	case HyperextensionExerciseNameWeightedBentKneeReverseHyperextension:
+		return "weighted_bent_knee_reverse_hyperextension"
+	case HyperextensionExerciseNameHollowHoldAndRoll:
+		return "hollow_hold_and_roll"
+	case HyperextensionExerciseNameWeightedHollowHoldAndRoll:
+		return "weighted_hollow_hold_and_roll"
+	case HyperextensionExerciseNameKicks:
+		return "kicks"
+	case HyperextensionExerciseNameWeightedKicks:
+		return "weighted_kicks"
+	case HyperextensionExerciseNameKneeRaises:
+		return "knee_raises"
+	case HyperextensionExerciseNameWeightedKneeRaises:
+		return "weighted_knee_raises"
+	case HyperextensionExerciseNameKneelingSuperman:
+		return "kneeling_superman"
+	case HyperextensionExerciseNameWeightedKneelingSuperman:
+		return "weighted_kneeling_superman"
+	case HyperextensionExerciseNameLatPullDownWithRow:
+		return "lat_pull_down_with_row"
+	case HyperextensionExerciseNameMedicineBallDeadliftToReach:
+		return "medicine_ball_deadlift_to_reach"
+	case HyperextensionExerciseNameOneArmOneLegRow:
+		return "one_arm_one_leg_row"
+	case HyperextensionExerciseNameOneArmRowWithBand:
+		return "one_arm_row_with_band"
+	case HyperextensionExerciseNameOverheadLungeWithMedicineBall:
+		return "overhead_lunge_with_medicine_ball"
+	case HyperextensionExerciseNamePlankKneeTucks:
+		return "plank_knee_tucks"
+	case HyperextensionExerciseNameWeightedPlankKneeTucks:
+		return "weighted_plank_knee_tucks"
+	case HyperextensionExerciseNameSideStep:
+		return "side_step"
+	case HyperextensionExerciseNameWeightedSideStep:
+		return "weighted_side_step"
+	case HyperextensionExerciseNameSingleLegBackExtension:
+		return "single_leg_back_extension"
+	case HyperextensionExerciseNameWeightedSingleLegBackExtension:
+		return "weighted_single_leg_back_extension"
+	case HyperextensionExerciseNameSpineExtension:
+		return "spine_extension"
+	case HyperextensionExerciseNameWeightedSpineExtension:
+		return "weighted_spine_extension"
+	case HyperextensionExerciseNameStaticBackExtension:
+		return "static_back_extension"
+	case HyperextensionExerciseNameWeightedStaticBackExtension:
+		return "weighted_static_back_extension"
+	case HyperextensionExerciseNameSupermanFromFloor:
+		return "superman_from_floor"
+	case HyperextensionExerciseNameWeightedSupermanFromFloor:
+		return "weighted_superman_from_floor"
+	case HyperextensionExerciseNameSwissBallBackExtension:
+		return "swiss_ball_back_extension"
+	case HyperextensionExerciseNameWeightedSwissBallBackExtension:
+		return "weighted_swiss_ball_back_extension"
+	case HyperextensionExerciseNameSwissBallHyperextension:
+		return "swiss_ball_hyperextension"
+	case HyperextensionExerciseNameWeightedSwissBallHyperextension:
+		return "weighted_swiss_ball_hyperextension"
+	case HyperextensionExerciseNameSwissBallOppositeArmAndLegLift:
+		return "swiss_ball_opposite_arm_and_leg_lift"
+	case HyperextensionExerciseNameWeightedSwissBallOppositeArmAndLegLift:
+		return "weighted_swiss_ball_opposite_arm_and_leg_lift"
+	case HyperextensionExerciseNameSupermanOnSwissBall:
+		return "superman_on_swiss_ball"
+	case HyperextensionExerciseNameCobra:
+		return "cobra"
+	case HyperextensionExerciseNameSupineFloorBarre:
+		return "supine_floor_barre"
+	default:
+		return "HyperextensionExerciseNameInvalid(" + strconv.FormatUint(uint64(h), 10) + ")"
 	}
-	return val
 }
-
-var strtohyperextensionexercisename = func() map[string]HyperextensionExerciseName {
-	m := make(map[string]HyperextensionExerciseName)
-	for t, str := range hyperextensionexercisenametostrs {
-		m[str] = HyperextensionExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into HyperextensionExerciseName constant it's represent, return HyperextensionExerciseNameInvalid if not found.
 func HyperextensionExerciseNameFromString(s string) HyperextensionExerciseName {
-	val, ok := strtohyperextensionexercisename[s]
-	if !ok {
-		return strtohyperextensionexercisename["invalid"]
+	switch s {
+	case "back_extension_with_opposite_arm_and_leg_reach":
+		return HyperextensionExerciseNameBackExtensionWithOppositeArmAndLegReach
+	case "weighted_back_extension_with_opposite_arm_and_leg_reach":
+		return HyperextensionExerciseNameWeightedBackExtensionWithOppositeArmAndLegReach
+	case "base_rotations":
+		return HyperextensionExerciseNameBaseRotations
+	case "weighted_base_rotations":
+		return HyperextensionExerciseNameWeightedBaseRotations
+	case "bent_knee_reverse_hyperextension":
+		return HyperextensionExerciseNameBentKneeReverseHyperextension
+	case "weighted_bent_knee_reverse_hyperextension":
+		return HyperextensionExerciseNameWeightedBentKneeReverseHyperextension
+	case "hollow_hold_and_roll":
+		return HyperextensionExerciseNameHollowHoldAndRoll
+	case "weighted_hollow_hold_and_roll":
+		return HyperextensionExerciseNameWeightedHollowHoldAndRoll
+	case "kicks":
+		return HyperextensionExerciseNameKicks
+	case "weighted_kicks":
+		return HyperextensionExerciseNameWeightedKicks
+	case "knee_raises":
+		return HyperextensionExerciseNameKneeRaises
+	case "weighted_knee_raises":
+		return HyperextensionExerciseNameWeightedKneeRaises
+	case "kneeling_superman":
+		return HyperextensionExerciseNameKneelingSuperman
+	case "weighted_kneeling_superman":
+		return HyperextensionExerciseNameWeightedKneelingSuperman
+	case "lat_pull_down_with_row":
+		return HyperextensionExerciseNameLatPullDownWithRow
+	case "medicine_ball_deadlift_to_reach":
+		return HyperextensionExerciseNameMedicineBallDeadliftToReach
+	case "one_arm_one_leg_row":
+		return HyperextensionExerciseNameOneArmOneLegRow
+	case "one_arm_row_with_band":
+		return HyperextensionExerciseNameOneArmRowWithBand
+	case "overhead_lunge_with_medicine_ball":
+		return HyperextensionExerciseNameOverheadLungeWithMedicineBall
+	case "plank_knee_tucks":
+		return HyperextensionExerciseNamePlankKneeTucks
+	case "weighted_plank_knee_tucks":
+		return HyperextensionExerciseNameWeightedPlankKneeTucks
+	case "side_step":
+		return HyperextensionExerciseNameSideStep
+	case "weighted_side_step":
+		return HyperextensionExerciseNameWeightedSideStep
+	case "single_leg_back_extension":
+		return HyperextensionExerciseNameSingleLegBackExtension
+	case "weighted_single_leg_back_extension":
+		return HyperextensionExerciseNameWeightedSingleLegBackExtension
+	case "spine_extension":
+		return HyperextensionExerciseNameSpineExtension
+	case "weighted_spine_extension":
+		return HyperextensionExerciseNameWeightedSpineExtension
+	case "static_back_extension":
+		return HyperextensionExerciseNameStaticBackExtension
+	case "weighted_static_back_extension":
+		return HyperextensionExerciseNameWeightedStaticBackExtension
+	case "superman_from_floor":
+		return HyperextensionExerciseNameSupermanFromFloor
+	case "weighted_superman_from_floor":
+		return HyperextensionExerciseNameWeightedSupermanFromFloor
+	case "swiss_ball_back_extension":
+		return HyperextensionExerciseNameSwissBallBackExtension
+	case "weighted_swiss_ball_back_extension":
+		return HyperextensionExerciseNameWeightedSwissBallBackExtension
+	case "swiss_ball_hyperextension":
+		return HyperextensionExerciseNameSwissBallHyperextension
+	case "weighted_swiss_ball_hyperextension":
+		return HyperextensionExerciseNameWeightedSwissBallHyperextension
+	case "swiss_ball_opposite_arm_and_leg_lift":
+		return HyperextensionExerciseNameSwissBallOppositeArmAndLegLift
+	case "weighted_swiss_ball_opposite_arm_and_leg_lift":
+		return HyperextensionExerciseNameWeightedSwissBallOppositeArmAndLegLift
+	case "superman_on_swiss_ball":
+		return HyperextensionExerciseNameSupermanOnSwissBall
+	case "cobra":
+		return HyperextensionExerciseNameCobra
+	case "supine_floor_barre":
+		return HyperextensionExerciseNameSupineFloorBarre
+	default:
+		return HyperextensionExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListHyperextensionExerciseName() []HyperextensionExerciseName {
-	vs := make([]HyperextensionExerciseName, 0, len(hyperextensionexercisenametostrs))
-	for i := range hyperextensionexercisenametostrs {
-		vs = append(vs, HyperextensionExerciseName(i))
+	return []HyperextensionExerciseName{
+		HyperextensionExerciseNameBackExtensionWithOppositeArmAndLegReach,
+		HyperextensionExerciseNameWeightedBackExtensionWithOppositeArmAndLegReach,
+		HyperextensionExerciseNameBaseRotations,
+		HyperextensionExerciseNameWeightedBaseRotations,
+		HyperextensionExerciseNameBentKneeReverseHyperextension,
+		HyperextensionExerciseNameWeightedBentKneeReverseHyperextension,
+		HyperextensionExerciseNameHollowHoldAndRoll,
+		HyperextensionExerciseNameWeightedHollowHoldAndRoll,
+		HyperextensionExerciseNameKicks,
+		HyperextensionExerciseNameWeightedKicks,
+		HyperextensionExerciseNameKneeRaises,
+		HyperextensionExerciseNameWeightedKneeRaises,
+		HyperextensionExerciseNameKneelingSuperman,
+		HyperextensionExerciseNameWeightedKneelingSuperman,
+		HyperextensionExerciseNameLatPullDownWithRow,
+		HyperextensionExerciseNameMedicineBallDeadliftToReach,
+		HyperextensionExerciseNameOneArmOneLegRow,
+		HyperextensionExerciseNameOneArmRowWithBand,
+		HyperextensionExerciseNameOverheadLungeWithMedicineBall,
+		HyperextensionExerciseNamePlankKneeTucks,
+		HyperextensionExerciseNameWeightedPlankKneeTucks,
+		HyperextensionExerciseNameSideStep,
+		HyperextensionExerciseNameWeightedSideStep,
+		HyperextensionExerciseNameSingleLegBackExtension,
+		HyperextensionExerciseNameWeightedSingleLegBackExtension,
+		HyperextensionExerciseNameSpineExtension,
+		HyperextensionExerciseNameWeightedSpineExtension,
+		HyperextensionExerciseNameStaticBackExtension,
+		HyperextensionExerciseNameWeightedStaticBackExtension,
+		HyperextensionExerciseNameSupermanFromFloor,
+		HyperextensionExerciseNameWeightedSupermanFromFloor,
+		HyperextensionExerciseNameSwissBallBackExtension,
+		HyperextensionExerciseNameWeightedSwissBallBackExtension,
+		HyperextensionExerciseNameSwissBallHyperextension,
+		HyperextensionExerciseNameWeightedSwissBallHyperextension,
+		HyperextensionExerciseNameSwissBallOppositeArmAndLegLift,
+		HyperextensionExerciseNameWeightedSwissBallOppositeArmAndLegLift,
+		HyperextensionExerciseNameSupermanOnSwissBall,
+		HyperextensionExerciseNameCobra,
+		HyperextensionExerciseNameSupineFloorBarre,
 	}
-	return vs
 }

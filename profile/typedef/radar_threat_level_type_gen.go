@@ -18,47 +18,46 @@ const (
 	RadarThreatLevelTypeThreatNone            RadarThreatLevelType = 1
 	RadarThreatLevelTypeThreatApproaching     RadarThreatLevelType = 2
 	RadarThreatLevelTypeThreatApproachingFast RadarThreatLevelType = 3
-	RadarThreatLevelTypeInvalid               RadarThreatLevelType = 0xFF // INVALID
+	RadarThreatLevelTypeInvalid               RadarThreatLevelType = 0xFF
 )
 
-var radarthreatleveltypetostrs = map[RadarThreatLevelType]string{
-	RadarThreatLevelTypeThreatUnknown:         "threat_unknown",
-	RadarThreatLevelTypeThreatNone:            "threat_none",
-	RadarThreatLevelTypeThreatApproaching:     "threat_approaching",
-	RadarThreatLevelTypeThreatApproachingFast: "threat_approaching_fast",
-	RadarThreatLevelTypeInvalid:               "invalid",
-}
-
 func (r RadarThreatLevelType) String() string {
-	val, ok := radarthreatleveltypetostrs[r]
-	if !ok {
-		return strconv.Itoa(int(r))
+	switch r {
+	case RadarThreatLevelTypeThreatUnknown:
+		return "threat_unknown"
+	case RadarThreatLevelTypeThreatNone:
+		return "threat_none"
+	case RadarThreatLevelTypeThreatApproaching:
+		return "threat_approaching"
+	case RadarThreatLevelTypeThreatApproachingFast:
+		return "threat_approaching_fast"
+	default:
+		return "RadarThreatLevelTypeInvalid(" + strconv.Itoa(int(r)) + ")"
 	}
-	return val
 }
-
-var strtoradarthreatleveltype = func() map[string]RadarThreatLevelType {
-	m := make(map[string]RadarThreatLevelType)
-	for t, str := range radarthreatleveltypetostrs {
-		m[str] = RadarThreatLevelType(t)
-	}
-	return m
-}()
 
 // FromString parse string into RadarThreatLevelType constant it's represent, return RadarThreatLevelTypeInvalid if not found.
 func RadarThreatLevelTypeFromString(s string) RadarThreatLevelType {
-	val, ok := strtoradarthreatleveltype[s]
-	if !ok {
-		return strtoradarthreatleveltype["invalid"]
+	switch s {
+	case "threat_unknown":
+		return RadarThreatLevelTypeThreatUnknown
+	case "threat_none":
+		return RadarThreatLevelTypeThreatNone
+	case "threat_approaching":
+		return RadarThreatLevelTypeThreatApproaching
+	case "threat_approaching_fast":
+		return RadarThreatLevelTypeThreatApproachingFast
+	default:
+		return RadarThreatLevelTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListRadarThreatLevelType() []RadarThreatLevelType {
-	vs := make([]RadarThreatLevelType, 0, len(radarthreatleveltypetostrs))
-	for i := range radarthreatleveltypetostrs {
-		vs = append(vs, RadarThreatLevelType(i))
+	return []RadarThreatLevelType{
+		RadarThreatLevelTypeThreatUnknown,
+		RadarThreatLevelTypeThreatNone,
+		RadarThreatLevelTypeThreatApproaching,
+		RadarThreatLevelTypeThreatApproachingFast,
 	}
-	return vs
 }

@@ -28,57 +28,96 @@ const (
 	WorkoutCapabilitiesGrade            WorkoutCapabilities = 0x00001000 // Grade source required for workout step.
 	WorkoutCapabilitiesResistance       WorkoutCapabilities = 0x00002000 // Resistance source required for workout step.
 	WorkoutCapabilitiesProtected        WorkoutCapabilities = 0x00004000
-	WorkoutCapabilitiesInvalid          WorkoutCapabilities = 0x0 // INVALID
+	WorkoutCapabilitiesInvalid          WorkoutCapabilities = 0x0
 )
 
-var workoutcapabilitiestostrs = map[WorkoutCapabilities]string{
-	WorkoutCapabilitiesInterval:         "interval",
-	WorkoutCapabilitiesCustom:           "custom",
-	WorkoutCapabilitiesFitnessEquipment: "fitness_equipment",
-	WorkoutCapabilitiesFirstbeat:        "firstbeat",
-	WorkoutCapabilitiesNewLeaf:          "new_leaf",
-	WorkoutCapabilitiesTcx:              "tcx",
-	WorkoutCapabilitiesSpeed:            "speed",
-	WorkoutCapabilitiesHeartRate:        "heart_rate",
-	WorkoutCapabilitiesDistance:         "distance",
-	WorkoutCapabilitiesCadence:          "cadence",
-	WorkoutCapabilitiesPower:            "power",
-	WorkoutCapabilitiesGrade:            "grade",
-	WorkoutCapabilitiesResistance:       "resistance",
-	WorkoutCapabilitiesProtected:        "protected",
-	WorkoutCapabilitiesInvalid:          "invalid",
-}
-
 func (w WorkoutCapabilities) String() string {
-	val, ok := workoutcapabilitiestostrs[w]
-	if !ok {
-		return strconv.FormatUint(uint64(w), 10)
+	switch w {
+	case WorkoutCapabilitiesInterval:
+		return "interval"
+	case WorkoutCapabilitiesCustom:
+		return "custom"
+	case WorkoutCapabilitiesFitnessEquipment:
+		return "fitness_equipment"
+	case WorkoutCapabilitiesFirstbeat:
+		return "firstbeat"
+	case WorkoutCapabilitiesNewLeaf:
+		return "new_leaf"
+	case WorkoutCapabilitiesTcx:
+		return "tcx"
+	case WorkoutCapabilitiesSpeed:
+		return "speed"
+	case WorkoutCapabilitiesHeartRate:
+		return "heart_rate"
+	case WorkoutCapabilitiesDistance:
+		return "distance"
+	case WorkoutCapabilitiesCadence:
+		return "cadence"
+	case WorkoutCapabilitiesPower:
+		return "power"
+	case WorkoutCapabilitiesGrade:
+		return "grade"
+	case WorkoutCapabilitiesResistance:
+		return "resistance"
+	case WorkoutCapabilitiesProtected:
+		return "protected"
+	default:
+		return "WorkoutCapabilitiesInvalid(" + strconv.FormatUint(uint64(w), 10) + ")"
 	}
-	return val
 }
-
-var strtoworkoutcapabilities = func() map[string]WorkoutCapabilities {
-	m := make(map[string]WorkoutCapabilities)
-	for t, str := range workoutcapabilitiestostrs {
-		m[str] = WorkoutCapabilities(t)
-	}
-	return m
-}()
 
 // FromString parse string into WorkoutCapabilities constant it's represent, return WorkoutCapabilitiesInvalid if not found.
 func WorkoutCapabilitiesFromString(s string) WorkoutCapabilities {
-	val, ok := strtoworkoutcapabilities[s]
-	if !ok {
-		return strtoworkoutcapabilities["invalid"]
+	switch s {
+	case "interval":
+		return WorkoutCapabilitiesInterval
+	case "custom":
+		return WorkoutCapabilitiesCustom
+	case "fitness_equipment":
+		return WorkoutCapabilitiesFitnessEquipment
+	case "firstbeat":
+		return WorkoutCapabilitiesFirstbeat
+	case "new_leaf":
+		return WorkoutCapabilitiesNewLeaf
+	case "tcx":
+		return WorkoutCapabilitiesTcx
+	case "speed":
+		return WorkoutCapabilitiesSpeed
+	case "heart_rate":
+		return WorkoutCapabilitiesHeartRate
+	case "distance":
+		return WorkoutCapabilitiesDistance
+	case "cadence":
+		return WorkoutCapabilitiesCadence
+	case "power":
+		return WorkoutCapabilitiesPower
+	case "grade":
+		return WorkoutCapabilitiesGrade
+	case "resistance":
+		return WorkoutCapabilitiesResistance
+	case "protected":
+		return WorkoutCapabilitiesProtected
+	default:
+		return WorkoutCapabilitiesInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWorkoutCapabilities() []WorkoutCapabilities {
-	vs := make([]WorkoutCapabilities, 0, len(workoutcapabilitiestostrs))
-	for i := range workoutcapabilitiestostrs {
-		vs = append(vs, WorkoutCapabilities(i))
+	return []WorkoutCapabilities{
+		WorkoutCapabilitiesInterval,
+		WorkoutCapabilitiesCustom,
+		WorkoutCapabilitiesFitnessEquipment,
+		WorkoutCapabilitiesFirstbeat,
+		WorkoutCapabilitiesNewLeaf,
+		WorkoutCapabilitiesTcx,
+		WorkoutCapabilitiesSpeed,
+		WorkoutCapabilitiesHeartRate,
+		WorkoutCapabilitiesDistance,
+		WorkoutCapabilitiesCadence,
+		WorkoutCapabilitiesPower,
+		WorkoutCapabilitiesGrade,
+		WorkoutCapabilitiesResistance,
+		WorkoutCapabilitiesProtected,
 	}
-	return vs
 }

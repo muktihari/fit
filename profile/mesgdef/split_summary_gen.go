@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -41,23 +42,7 @@ func NewSplitSummary(mesg proto.Message) *SplitSummary {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* SplitType */
-		3:   nil, /* NumSplits */
-		4:   nil, /* TotalTimerTime */
-		5:   nil, /* TotalDistance */
-		6:   nil, /* AvgSpeed */
-		7:   nil, /* MaxSpeed */
-		8:   nil, /* TotalAscent */
-		9:   nil, /* TotalDescent */
-		10:  nil, /* AvgHeartRate */
-		11:  nil, /* MaxHeartRate */
-		12:  nil, /* AvgVertSpeed */
-		13:  nil, /* TotalCalories */
-		77:  nil, /* TotalMovingTime */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -86,43 +71,131 @@ func NewSplitSummary(mesg proto.Message) *SplitSummary {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SplitSummary mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSplitSummary)
-func (m *SplitSummary) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SplitSummary into proto.Message.
+func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSplitSummary)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSplitSummary {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   typeconv.ToEnum[byte](m.SplitType),
-		3:   m.NumSplits,
-		4:   m.TotalTimerTime,
-		5:   m.TotalDistance,
-		6:   m.AvgSpeed,
-		7:   m.MaxSpeed,
-		8:   m.TotalAscent,
-		9:   m.TotalDescent,
-		10:  m.AvgHeartRate,
-		11:  m.MaxHeartRate,
-		12:  m.AvgVertSpeed,
-		13:  m.TotalCalories,
-		77:  m.TotalMovingTime,
+	if typeconv.ToEnum[byte](m.SplitType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.SplitType)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.NumSplits != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.NumSplits
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalTimerTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.TotalTimerTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalDistance != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.TotalDistance
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgSpeed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.AvgSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxSpeed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.MaxSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalAscent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.TotalAscent
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalDescent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.TotalDescent
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.AvgHeartRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.MaxHeartRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgVertSpeed != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.AvgVertSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalCalories != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.TotalCalories
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TotalMovingTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 77)
+		field.Value = m.TotalMovingTime
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SplitSummary's valid fields.
+func (m *SplitSummary) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SplitType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.NumSplits != basetype.Uint16Invalid {
+		size++
+	}
+	if m.TotalTimerTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TotalDistance != basetype.Uint32Invalid {
+		size++
+	}
+	if m.AvgSpeed != basetype.Uint32Invalid {
+		size++
+	}
+	if m.MaxSpeed != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TotalAscent != basetype.Uint16Invalid {
+		size++
+	}
+	if m.TotalDescent != basetype.Uint16Invalid {
+		size++
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.AvgVertSpeed != basetype.Sint32Invalid {
+		size++
+	}
+	if m.TotalCalories != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TotalMovingTime != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

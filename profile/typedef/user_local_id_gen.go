@@ -20,49 +20,56 @@ const (
 	UserLocalIdStationaryMax UserLocalId = 0x00FF
 	UserLocalIdPortableMin   UserLocalId = 0x0100
 	UserLocalIdPortableMax   UserLocalId = 0xFFFE
-	UserLocalIdInvalid       UserLocalId = 0xFFFF // INVALID
+	UserLocalIdInvalid       UserLocalId = 0xFFFF
 )
 
-var userlocalidtostrs = map[UserLocalId]string{
-	UserLocalIdLocalMin:      "local_min",
-	UserLocalIdLocalMax:      "local_max",
-	UserLocalIdStationaryMin: "stationary_min",
-	UserLocalIdStationaryMax: "stationary_max",
-	UserLocalIdPortableMin:   "portable_min",
-	UserLocalIdPortableMax:   "portable_max",
-	UserLocalIdInvalid:       "invalid",
-}
-
 func (u UserLocalId) String() string {
-	val, ok := userlocalidtostrs[u]
-	if !ok {
-		return strconv.FormatUint(uint64(u), 10)
+	switch u {
+	case UserLocalIdLocalMin:
+		return "local_min"
+	case UserLocalIdLocalMax:
+		return "local_max"
+	case UserLocalIdStationaryMin:
+		return "stationary_min"
+	case UserLocalIdStationaryMax:
+		return "stationary_max"
+	case UserLocalIdPortableMin:
+		return "portable_min"
+	case UserLocalIdPortableMax:
+		return "portable_max"
+	default:
+		return "UserLocalIdInvalid(" + strconv.FormatUint(uint64(u), 10) + ")"
 	}
-	return val
 }
-
-var strtouserlocalid = func() map[string]UserLocalId {
-	m := make(map[string]UserLocalId)
-	for t, str := range userlocalidtostrs {
-		m[str] = UserLocalId(t)
-	}
-	return m
-}()
 
 // FromString parse string into UserLocalId constant it's represent, return UserLocalIdInvalid if not found.
 func UserLocalIdFromString(s string) UserLocalId {
-	val, ok := strtouserlocalid[s]
-	if !ok {
-		return strtouserlocalid["invalid"]
+	switch s {
+	case "local_min":
+		return UserLocalIdLocalMin
+	case "local_max":
+		return UserLocalIdLocalMax
+	case "stationary_min":
+		return UserLocalIdStationaryMin
+	case "stationary_max":
+		return UserLocalIdStationaryMax
+	case "portable_min":
+		return UserLocalIdPortableMin
+	case "portable_max":
+		return UserLocalIdPortableMax
+	default:
+		return UserLocalIdInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListUserLocalId() []UserLocalId {
-	vs := make([]UserLocalId, 0, len(userlocalidtostrs))
-	for i := range userlocalidtostrs {
-		vs = append(vs, UserLocalId(i))
+	return []UserLocalId{
+		UserLocalIdLocalMin,
+		UserLocalIdLocalMax,
+		UserLocalIdStationaryMin,
+		UserLocalIdStationaryMax,
+		UserLocalIdPortableMin,
+		UserLocalIdPortableMax,
 	}
-	return vs
 }

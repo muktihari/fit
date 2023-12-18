@@ -106,135 +106,486 @@ const (
 	SquatExerciseNameSquatJumpsInNOut                                SquatExerciseName = 89
 	SquatExerciseNamePilatesPlieSquatsParallelTurnedOutFlatAndHeels  SquatExerciseName = 90
 	SquatExerciseNameReleveStraightLegAndKneeBentWithOneLegVariation SquatExerciseName = 91
-	SquatExerciseNameInvalid                                         SquatExerciseName = 0xFFFF // INVALID
+	SquatExerciseNameInvalid                                         SquatExerciseName = 0xFFFF
 )
 
-var squatexercisenametostrs = map[SquatExerciseName]string{
-	SquatExerciseNameLegPress:                                        "leg_press",
-	SquatExerciseNameBackSquatWithBodyBar:                            "back_squat_with_body_bar",
-	SquatExerciseNameBackSquats:                                      "back_squats",
-	SquatExerciseNameWeightedBackSquats:                              "weighted_back_squats",
-	SquatExerciseNameBalancingSquat:                                  "balancing_squat",
-	SquatExerciseNameWeightedBalancingSquat:                          "weighted_balancing_squat",
-	SquatExerciseNameBarbellBackSquat:                                "barbell_back_squat",
-	SquatExerciseNameBarbellBoxSquat:                                 "barbell_box_squat",
-	SquatExerciseNameBarbellFrontSquat:                               "barbell_front_squat",
-	SquatExerciseNameBarbellHackSquat:                                "barbell_hack_squat",
-	SquatExerciseNameBarbellHangSquatSnatch:                          "barbell_hang_squat_snatch",
-	SquatExerciseNameBarbellLateralStepUp:                            "barbell_lateral_step_up",
-	SquatExerciseNameBarbellQuarterSquat:                             "barbell_quarter_squat",
-	SquatExerciseNameBarbellSiffSquat:                                "barbell_siff_squat",
-	SquatExerciseNameBarbellSquatSnatch:                              "barbell_squat_snatch",
-	SquatExerciseNameBarbellSquatWithHeelsRaised:                     "barbell_squat_with_heels_raised",
-	SquatExerciseNameBarbellStepover:                                 "barbell_stepover",
-	SquatExerciseNameBarbellStepUp:                                   "barbell_step_up",
-	SquatExerciseNameBenchSquatWithRotationalChop:                    "bench_squat_with_rotational_chop",
-	SquatExerciseNameWeightedBenchSquatWithRotationalChop:            "weighted_bench_squat_with_rotational_chop",
-	SquatExerciseNameBodyWeightWallSquat:                             "body_weight_wall_squat",
-	SquatExerciseNameWeightedWallSquat:                               "weighted_wall_squat",
-	SquatExerciseNameBoxStepSquat:                                    "box_step_squat",
-	SquatExerciseNameWeightedBoxStepSquat:                            "weighted_box_step_squat",
-	SquatExerciseNameBracedSquat:                                     "braced_squat",
-	SquatExerciseNameCrossedArmBarbellFrontSquat:                     "crossed_arm_barbell_front_squat",
-	SquatExerciseNameCrossoverDumbbellStepUp:                         "crossover_dumbbell_step_up",
-	SquatExerciseNameDumbbellFrontSquat:                              "dumbbell_front_squat",
-	SquatExerciseNameDumbbellSplitSquat:                              "dumbbell_split_squat",
-	SquatExerciseNameDumbbellSquat:                                   "dumbbell_squat",
-	SquatExerciseNameDumbbellSquatClean:                              "dumbbell_squat_clean",
-	SquatExerciseNameDumbbellStepover:                                "dumbbell_stepover",
-	SquatExerciseNameDumbbellStepUp:                                  "dumbbell_step_up",
-	SquatExerciseNameElevatedSingleLegSquat:                          "elevated_single_leg_squat",
-	SquatExerciseNameWeightedElevatedSingleLegSquat:                  "weighted_elevated_single_leg_squat",
-	SquatExerciseNameFigureFourSquats:                                "figure_four_squats",
-	SquatExerciseNameWeightedFigureFourSquats:                        "weighted_figure_four_squats",
-	SquatExerciseNameGobletSquat:                                     "goblet_squat",
-	SquatExerciseNameKettlebellSquat:                                 "kettlebell_squat",
-	SquatExerciseNameKettlebellSwingOverhead:                         "kettlebell_swing_overhead",
-	SquatExerciseNameKettlebellSwingWithFlipToSquat:                  "kettlebell_swing_with_flip_to_squat",
-	SquatExerciseNameLateralDumbbellStepUp:                           "lateral_dumbbell_step_up",
-	SquatExerciseNameOneLeggedSquat:                                  "one_legged_squat",
-	SquatExerciseNameOverheadDumbbellSquat:                           "overhead_dumbbell_squat",
-	SquatExerciseNameOverheadSquat:                                   "overhead_squat",
-	SquatExerciseNamePartialSingleLegSquat:                           "partial_single_leg_squat",
-	SquatExerciseNameWeightedPartialSingleLegSquat:                   "weighted_partial_single_leg_squat",
-	SquatExerciseNamePistolSquat:                                     "pistol_squat",
-	SquatExerciseNameWeightedPistolSquat:                             "weighted_pistol_squat",
-	SquatExerciseNamePlieSlides:                                      "plie_slides",
-	SquatExerciseNameWeightedPlieSlides:                              "weighted_plie_slides",
-	SquatExerciseNamePlieSquat:                                       "plie_squat",
-	SquatExerciseNameWeightedPlieSquat:                               "weighted_plie_squat",
-	SquatExerciseNamePrisonerSquat:                                   "prisoner_squat",
-	SquatExerciseNameWeightedPrisonerSquat:                           "weighted_prisoner_squat",
-	SquatExerciseNameSingleLegBenchGetUp:                             "single_leg_bench_get_up",
-	SquatExerciseNameWeightedSingleLegBenchGetUp:                     "weighted_single_leg_bench_get_up",
-	SquatExerciseNameSingleLegBenchSquat:                             "single_leg_bench_squat",
-	SquatExerciseNameWeightedSingleLegBenchSquat:                     "weighted_single_leg_bench_squat",
-	SquatExerciseNameSingleLegSquatOnSwissBall:                       "single_leg_squat_on_swiss_ball",
-	SquatExerciseNameWeightedSingleLegSquatOnSwissBall:               "weighted_single_leg_squat_on_swiss_ball",
-	SquatExerciseNameSquat:                                           "squat",
-	SquatExerciseNameWeightedSquat:                                   "weighted_squat",
-	SquatExerciseNameSquatsWithBand:                                  "squats_with_band",
-	SquatExerciseNameStaggeredSquat:                                  "staggered_squat",
-	SquatExerciseNameWeightedStaggeredSquat:                          "weighted_staggered_squat",
-	SquatExerciseNameStepUp:                                          "step_up",
-	SquatExerciseNameWeightedStepUp:                                  "weighted_step_up",
-	SquatExerciseNameSuitcaseSquats:                                  "suitcase_squats",
-	SquatExerciseNameSumoSquat:                                       "sumo_squat",
-	SquatExerciseNameSumoSquatSlideIn:                                "sumo_squat_slide_in",
-	SquatExerciseNameWeightedSumoSquatSlideIn:                        "weighted_sumo_squat_slide_in",
-	SquatExerciseNameSumoSquatToHighPull:                             "sumo_squat_to_high_pull",
-	SquatExerciseNameSumoSquatToStand:                                "sumo_squat_to_stand",
-	SquatExerciseNameWeightedSumoSquatToStand:                        "weighted_sumo_squat_to_stand",
-	SquatExerciseNameSumoSquatWithRotation:                           "sumo_squat_with_rotation",
-	SquatExerciseNameWeightedSumoSquatWithRotation:                   "weighted_sumo_squat_with_rotation",
-	SquatExerciseNameSwissBallBodyWeightWallSquat:                    "swiss_ball_body_weight_wall_squat",
-	SquatExerciseNameWeightedSwissBallWallSquat:                      "weighted_swiss_ball_wall_squat",
-	SquatExerciseNameThrusters:                                       "thrusters",
-	SquatExerciseNameUnevenSquat:                                     "uneven_squat",
-	SquatExerciseNameWeightedUnevenSquat:                             "weighted_uneven_squat",
-	SquatExerciseNameWaistSlimmingSquat:                              "waist_slimming_squat",
-	SquatExerciseNameWallBall:                                        "wall_ball",
-	SquatExerciseNameWideStanceBarbellSquat:                          "wide_stance_barbell_squat",
-	SquatExerciseNameWideStanceGobletSquat:                           "wide_stance_goblet_squat",
-	SquatExerciseNameZercherSquat:                                    "zercher_squat",
-	SquatExerciseNameKbsOverhead:                                     "kbs_overhead",
-	SquatExerciseNameSquatAndSideKick:                                "squat_and_side_kick",
-	SquatExerciseNameSquatJumpsInNOut:                                "squat_jumps_in_n_out",
-	SquatExerciseNamePilatesPlieSquatsParallelTurnedOutFlatAndHeels:  "pilates_plie_squats_parallel_turned_out_flat_and_heels",
-	SquatExerciseNameReleveStraightLegAndKneeBentWithOneLegVariation: "releve_straight_leg_and_knee_bent_with_one_leg_variation",
-	SquatExerciseNameInvalid:                                         "invalid",
-}
-
 func (s SquatExerciseName) String() string {
-	val, ok := squatexercisenametostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case SquatExerciseNameLegPress:
+		return "leg_press"
+	case SquatExerciseNameBackSquatWithBodyBar:
+		return "back_squat_with_body_bar"
+	case SquatExerciseNameBackSquats:
+		return "back_squats"
+	case SquatExerciseNameWeightedBackSquats:
+		return "weighted_back_squats"
+	case SquatExerciseNameBalancingSquat:
+		return "balancing_squat"
+	case SquatExerciseNameWeightedBalancingSquat:
+		return "weighted_balancing_squat"
+	case SquatExerciseNameBarbellBackSquat:
+		return "barbell_back_squat"
+	case SquatExerciseNameBarbellBoxSquat:
+		return "barbell_box_squat"
+	case SquatExerciseNameBarbellFrontSquat:
+		return "barbell_front_squat"
+	case SquatExerciseNameBarbellHackSquat:
+		return "barbell_hack_squat"
+	case SquatExerciseNameBarbellHangSquatSnatch:
+		return "barbell_hang_squat_snatch"
+	case SquatExerciseNameBarbellLateralStepUp:
+		return "barbell_lateral_step_up"
+	case SquatExerciseNameBarbellQuarterSquat:
+		return "barbell_quarter_squat"
+	case SquatExerciseNameBarbellSiffSquat:
+		return "barbell_siff_squat"
+	case SquatExerciseNameBarbellSquatSnatch:
+		return "barbell_squat_snatch"
+	case SquatExerciseNameBarbellSquatWithHeelsRaised:
+		return "barbell_squat_with_heels_raised"
+	case SquatExerciseNameBarbellStepover:
+		return "barbell_stepover"
+	case SquatExerciseNameBarbellStepUp:
+		return "barbell_step_up"
+	case SquatExerciseNameBenchSquatWithRotationalChop:
+		return "bench_squat_with_rotational_chop"
+	case SquatExerciseNameWeightedBenchSquatWithRotationalChop:
+		return "weighted_bench_squat_with_rotational_chop"
+	case SquatExerciseNameBodyWeightWallSquat:
+		return "body_weight_wall_squat"
+	case SquatExerciseNameWeightedWallSquat:
+		return "weighted_wall_squat"
+	case SquatExerciseNameBoxStepSquat:
+		return "box_step_squat"
+	case SquatExerciseNameWeightedBoxStepSquat:
+		return "weighted_box_step_squat"
+	case SquatExerciseNameBracedSquat:
+		return "braced_squat"
+	case SquatExerciseNameCrossedArmBarbellFrontSquat:
+		return "crossed_arm_barbell_front_squat"
+	case SquatExerciseNameCrossoverDumbbellStepUp:
+		return "crossover_dumbbell_step_up"
+	case SquatExerciseNameDumbbellFrontSquat:
+		return "dumbbell_front_squat"
+	case SquatExerciseNameDumbbellSplitSquat:
+		return "dumbbell_split_squat"
+	case SquatExerciseNameDumbbellSquat:
+		return "dumbbell_squat"
+	case SquatExerciseNameDumbbellSquatClean:
+		return "dumbbell_squat_clean"
+	case SquatExerciseNameDumbbellStepover:
+		return "dumbbell_stepover"
+	case SquatExerciseNameDumbbellStepUp:
+		return "dumbbell_step_up"
+	case SquatExerciseNameElevatedSingleLegSquat:
+		return "elevated_single_leg_squat"
+	case SquatExerciseNameWeightedElevatedSingleLegSquat:
+		return "weighted_elevated_single_leg_squat"
+	case SquatExerciseNameFigureFourSquats:
+		return "figure_four_squats"
+	case SquatExerciseNameWeightedFigureFourSquats:
+		return "weighted_figure_four_squats"
+	case SquatExerciseNameGobletSquat:
+		return "goblet_squat"
+	case SquatExerciseNameKettlebellSquat:
+		return "kettlebell_squat"
+	case SquatExerciseNameKettlebellSwingOverhead:
+		return "kettlebell_swing_overhead"
+	case SquatExerciseNameKettlebellSwingWithFlipToSquat:
+		return "kettlebell_swing_with_flip_to_squat"
+	case SquatExerciseNameLateralDumbbellStepUp:
+		return "lateral_dumbbell_step_up"
+	case SquatExerciseNameOneLeggedSquat:
+		return "one_legged_squat"
+	case SquatExerciseNameOverheadDumbbellSquat:
+		return "overhead_dumbbell_squat"
+	case SquatExerciseNameOverheadSquat:
+		return "overhead_squat"
+	case SquatExerciseNamePartialSingleLegSquat:
+		return "partial_single_leg_squat"
+	case SquatExerciseNameWeightedPartialSingleLegSquat:
+		return "weighted_partial_single_leg_squat"
+	case SquatExerciseNamePistolSquat:
+		return "pistol_squat"
+	case SquatExerciseNameWeightedPistolSquat:
+		return "weighted_pistol_squat"
+	case SquatExerciseNamePlieSlides:
+		return "plie_slides"
+	case SquatExerciseNameWeightedPlieSlides:
+		return "weighted_plie_slides"
+	case SquatExerciseNamePlieSquat:
+		return "plie_squat"
+	case SquatExerciseNameWeightedPlieSquat:
+		return "weighted_plie_squat"
+	case SquatExerciseNamePrisonerSquat:
+		return "prisoner_squat"
+	case SquatExerciseNameWeightedPrisonerSquat:
+		return "weighted_prisoner_squat"
+	case SquatExerciseNameSingleLegBenchGetUp:
+		return "single_leg_bench_get_up"
+	case SquatExerciseNameWeightedSingleLegBenchGetUp:
+		return "weighted_single_leg_bench_get_up"
+	case SquatExerciseNameSingleLegBenchSquat:
+		return "single_leg_bench_squat"
+	case SquatExerciseNameWeightedSingleLegBenchSquat:
+		return "weighted_single_leg_bench_squat"
+	case SquatExerciseNameSingleLegSquatOnSwissBall:
+		return "single_leg_squat_on_swiss_ball"
+	case SquatExerciseNameWeightedSingleLegSquatOnSwissBall:
+		return "weighted_single_leg_squat_on_swiss_ball"
+	case SquatExerciseNameSquat:
+		return "squat"
+	case SquatExerciseNameWeightedSquat:
+		return "weighted_squat"
+	case SquatExerciseNameSquatsWithBand:
+		return "squats_with_band"
+	case SquatExerciseNameStaggeredSquat:
+		return "staggered_squat"
+	case SquatExerciseNameWeightedStaggeredSquat:
+		return "weighted_staggered_squat"
+	case SquatExerciseNameStepUp:
+		return "step_up"
+	case SquatExerciseNameWeightedStepUp:
+		return "weighted_step_up"
+	case SquatExerciseNameSuitcaseSquats:
+		return "suitcase_squats"
+	case SquatExerciseNameSumoSquat:
+		return "sumo_squat"
+	case SquatExerciseNameSumoSquatSlideIn:
+		return "sumo_squat_slide_in"
+	case SquatExerciseNameWeightedSumoSquatSlideIn:
+		return "weighted_sumo_squat_slide_in"
+	case SquatExerciseNameSumoSquatToHighPull:
+		return "sumo_squat_to_high_pull"
+	case SquatExerciseNameSumoSquatToStand:
+		return "sumo_squat_to_stand"
+	case SquatExerciseNameWeightedSumoSquatToStand:
+		return "weighted_sumo_squat_to_stand"
+	case SquatExerciseNameSumoSquatWithRotation:
+		return "sumo_squat_with_rotation"
+	case SquatExerciseNameWeightedSumoSquatWithRotation:
+		return "weighted_sumo_squat_with_rotation"
+	case SquatExerciseNameSwissBallBodyWeightWallSquat:
+		return "swiss_ball_body_weight_wall_squat"
+	case SquatExerciseNameWeightedSwissBallWallSquat:
+		return "weighted_swiss_ball_wall_squat"
+	case SquatExerciseNameThrusters:
+		return "thrusters"
+	case SquatExerciseNameUnevenSquat:
+		return "uneven_squat"
+	case SquatExerciseNameWeightedUnevenSquat:
+		return "weighted_uneven_squat"
+	case SquatExerciseNameWaistSlimmingSquat:
+		return "waist_slimming_squat"
+	case SquatExerciseNameWallBall:
+		return "wall_ball"
+	case SquatExerciseNameWideStanceBarbellSquat:
+		return "wide_stance_barbell_squat"
+	case SquatExerciseNameWideStanceGobletSquat:
+		return "wide_stance_goblet_squat"
+	case SquatExerciseNameZercherSquat:
+		return "zercher_squat"
+	case SquatExerciseNameKbsOverhead:
+		return "kbs_overhead"
+	case SquatExerciseNameSquatAndSideKick:
+		return "squat_and_side_kick"
+	case SquatExerciseNameSquatJumpsInNOut:
+		return "squat_jumps_in_n_out"
+	case SquatExerciseNamePilatesPlieSquatsParallelTurnedOutFlatAndHeels:
+		return "pilates_plie_squats_parallel_turned_out_flat_and_heels"
+	case SquatExerciseNameReleveStraightLegAndKneeBentWithOneLegVariation:
+		return "releve_straight_leg_and_knee_bent_with_one_leg_variation"
+	default:
+		return "SquatExerciseNameInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtosquatexercisename = func() map[string]SquatExerciseName {
-	m := make(map[string]SquatExerciseName)
-	for t, str := range squatexercisenametostrs {
-		m[str] = SquatExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into SquatExerciseName constant it's represent, return SquatExerciseNameInvalid if not found.
 func SquatExerciseNameFromString(s string) SquatExerciseName {
-	val, ok := strtosquatexercisename[s]
-	if !ok {
-		return strtosquatexercisename["invalid"]
+	switch s {
+	case "leg_press":
+		return SquatExerciseNameLegPress
+	case "back_squat_with_body_bar":
+		return SquatExerciseNameBackSquatWithBodyBar
+	case "back_squats":
+		return SquatExerciseNameBackSquats
+	case "weighted_back_squats":
+		return SquatExerciseNameWeightedBackSquats
+	case "balancing_squat":
+		return SquatExerciseNameBalancingSquat
+	case "weighted_balancing_squat":
+		return SquatExerciseNameWeightedBalancingSquat
+	case "barbell_back_squat":
+		return SquatExerciseNameBarbellBackSquat
+	case "barbell_box_squat":
+		return SquatExerciseNameBarbellBoxSquat
+	case "barbell_front_squat":
+		return SquatExerciseNameBarbellFrontSquat
+	case "barbell_hack_squat":
+		return SquatExerciseNameBarbellHackSquat
+	case "barbell_hang_squat_snatch":
+		return SquatExerciseNameBarbellHangSquatSnatch
+	case "barbell_lateral_step_up":
+		return SquatExerciseNameBarbellLateralStepUp
+	case "barbell_quarter_squat":
+		return SquatExerciseNameBarbellQuarterSquat
+	case "barbell_siff_squat":
+		return SquatExerciseNameBarbellSiffSquat
+	case "barbell_squat_snatch":
+		return SquatExerciseNameBarbellSquatSnatch
+	case "barbell_squat_with_heels_raised":
+		return SquatExerciseNameBarbellSquatWithHeelsRaised
+	case "barbell_stepover":
+		return SquatExerciseNameBarbellStepover
+	case "barbell_step_up":
+		return SquatExerciseNameBarbellStepUp
+	case "bench_squat_with_rotational_chop":
+		return SquatExerciseNameBenchSquatWithRotationalChop
+	case "weighted_bench_squat_with_rotational_chop":
+		return SquatExerciseNameWeightedBenchSquatWithRotationalChop
+	case "body_weight_wall_squat":
+		return SquatExerciseNameBodyWeightWallSquat
+	case "weighted_wall_squat":
+		return SquatExerciseNameWeightedWallSquat
+	case "box_step_squat":
+		return SquatExerciseNameBoxStepSquat
+	case "weighted_box_step_squat":
+		return SquatExerciseNameWeightedBoxStepSquat
+	case "braced_squat":
+		return SquatExerciseNameBracedSquat
+	case "crossed_arm_barbell_front_squat":
+		return SquatExerciseNameCrossedArmBarbellFrontSquat
+	case "crossover_dumbbell_step_up":
+		return SquatExerciseNameCrossoverDumbbellStepUp
+	case "dumbbell_front_squat":
+		return SquatExerciseNameDumbbellFrontSquat
+	case "dumbbell_split_squat":
+		return SquatExerciseNameDumbbellSplitSquat
+	case "dumbbell_squat":
+		return SquatExerciseNameDumbbellSquat
+	case "dumbbell_squat_clean":
+		return SquatExerciseNameDumbbellSquatClean
+	case "dumbbell_stepover":
+		return SquatExerciseNameDumbbellStepover
+	case "dumbbell_step_up":
+		return SquatExerciseNameDumbbellStepUp
+	case "elevated_single_leg_squat":
+		return SquatExerciseNameElevatedSingleLegSquat
+	case "weighted_elevated_single_leg_squat":
+		return SquatExerciseNameWeightedElevatedSingleLegSquat
+	case "figure_four_squats":
+		return SquatExerciseNameFigureFourSquats
+	case "weighted_figure_four_squats":
+		return SquatExerciseNameWeightedFigureFourSquats
+	case "goblet_squat":
+		return SquatExerciseNameGobletSquat
+	case "kettlebell_squat":
+		return SquatExerciseNameKettlebellSquat
+	case "kettlebell_swing_overhead":
+		return SquatExerciseNameKettlebellSwingOverhead
+	case "kettlebell_swing_with_flip_to_squat":
+		return SquatExerciseNameKettlebellSwingWithFlipToSquat
+	case "lateral_dumbbell_step_up":
+		return SquatExerciseNameLateralDumbbellStepUp
+	case "one_legged_squat":
+		return SquatExerciseNameOneLeggedSquat
+	case "overhead_dumbbell_squat":
+		return SquatExerciseNameOverheadDumbbellSquat
+	case "overhead_squat":
+		return SquatExerciseNameOverheadSquat
+	case "partial_single_leg_squat":
+		return SquatExerciseNamePartialSingleLegSquat
+	case "weighted_partial_single_leg_squat":
+		return SquatExerciseNameWeightedPartialSingleLegSquat
+	case "pistol_squat":
+		return SquatExerciseNamePistolSquat
+	case "weighted_pistol_squat":
+		return SquatExerciseNameWeightedPistolSquat
+	case "plie_slides":
+		return SquatExerciseNamePlieSlides
+	case "weighted_plie_slides":
+		return SquatExerciseNameWeightedPlieSlides
+	case "plie_squat":
+		return SquatExerciseNamePlieSquat
+	case "weighted_plie_squat":
+		return SquatExerciseNameWeightedPlieSquat
+	case "prisoner_squat":
+		return SquatExerciseNamePrisonerSquat
+	case "weighted_prisoner_squat":
+		return SquatExerciseNameWeightedPrisonerSquat
+	case "single_leg_bench_get_up":
+		return SquatExerciseNameSingleLegBenchGetUp
+	case "weighted_single_leg_bench_get_up":
+		return SquatExerciseNameWeightedSingleLegBenchGetUp
+	case "single_leg_bench_squat":
+		return SquatExerciseNameSingleLegBenchSquat
+	case "weighted_single_leg_bench_squat":
+		return SquatExerciseNameWeightedSingleLegBenchSquat
+	case "single_leg_squat_on_swiss_ball":
+		return SquatExerciseNameSingleLegSquatOnSwissBall
+	case "weighted_single_leg_squat_on_swiss_ball":
+		return SquatExerciseNameWeightedSingleLegSquatOnSwissBall
+	case "squat":
+		return SquatExerciseNameSquat
+	case "weighted_squat":
+		return SquatExerciseNameWeightedSquat
+	case "squats_with_band":
+		return SquatExerciseNameSquatsWithBand
+	case "staggered_squat":
+		return SquatExerciseNameStaggeredSquat
+	case "weighted_staggered_squat":
+		return SquatExerciseNameWeightedStaggeredSquat
+	case "step_up":
+		return SquatExerciseNameStepUp
+	case "weighted_step_up":
+		return SquatExerciseNameWeightedStepUp
+	case "suitcase_squats":
+		return SquatExerciseNameSuitcaseSquats
+	case "sumo_squat":
+		return SquatExerciseNameSumoSquat
+	case "sumo_squat_slide_in":
+		return SquatExerciseNameSumoSquatSlideIn
+	case "weighted_sumo_squat_slide_in":
+		return SquatExerciseNameWeightedSumoSquatSlideIn
+	case "sumo_squat_to_high_pull":
+		return SquatExerciseNameSumoSquatToHighPull
+	case "sumo_squat_to_stand":
+		return SquatExerciseNameSumoSquatToStand
+	case "weighted_sumo_squat_to_stand":
+		return SquatExerciseNameWeightedSumoSquatToStand
+	case "sumo_squat_with_rotation":
+		return SquatExerciseNameSumoSquatWithRotation
+	case "weighted_sumo_squat_with_rotation":
+		return SquatExerciseNameWeightedSumoSquatWithRotation
+	case "swiss_ball_body_weight_wall_squat":
+		return SquatExerciseNameSwissBallBodyWeightWallSquat
+	case "weighted_swiss_ball_wall_squat":
+		return SquatExerciseNameWeightedSwissBallWallSquat
+	case "thrusters":
+		return SquatExerciseNameThrusters
+	case "uneven_squat":
+		return SquatExerciseNameUnevenSquat
+	case "weighted_uneven_squat":
+		return SquatExerciseNameWeightedUnevenSquat
+	case "waist_slimming_squat":
+		return SquatExerciseNameWaistSlimmingSquat
+	case "wall_ball":
+		return SquatExerciseNameWallBall
+	case "wide_stance_barbell_squat":
+		return SquatExerciseNameWideStanceBarbellSquat
+	case "wide_stance_goblet_squat":
+		return SquatExerciseNameWideStanceGobletSquat
+	case "zercher_squat":
+		return SquatExerciseNameZercherSquat
+	case "kbs_overhead":
+		return SquatExerciseNameKbsOverhead
+	case "squat_and_side_kick":
+		return SquatExerciseNameSquatAndSideKick
+	case "squat_jumps_in_n_out":
+		return SquatExerciseNameSquatJumpsInNOut
+	case "pilates_plie_squats_parallel_turned_out_flat_and_heels":
+		return SquatExerciseNamePilatesPlieSquatsParallelTurnedOutFlatAndHeels
+	case "releve_straight_leg_and_knee_bent_with_one_leg_variation":
+		return SquatExerciseNameReleveStraightLegAndKneeBentWithOneLegVariation
+	default:
+		return SquatExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSquatExerciseName() []SquatExerciseName {
-	vs := make([]SquatExerciseName, 0, len(squatexercisenametostrs))
-	for i := range squatexercisenametostrs {
-		vs = append(vs, SquatExerciseName(i))
+	return []SquatExerciseName{
+		SquatExerciseNameLegPress,
+		SquatExerciseNameBackSquatWithBodyBar,
+		SquatExerciseNameBackSquats,
+		SquatExerciseNameWeightedBackSquats,
+		SquatExerciseNameBalancingSquat,
+		SquatExerciseNameWeightedBalancingSquat,
+		SquatExerciseNameBarbellBackSquat,
+		SquatExerciseNameBarbellBoxSquat,
+		SquatExerciseNameBarbellFrontSquat,
+		SquatExerciseNameBarbellHackSquat,
+		SquatExerciseNameBarbellHangSquatSnatch,
+		SquatExerciseNameBarbellLateralStepUp,
+		SquatExerciseNameBarbellQuarterSquat,
+		SquatExerciseNameBarbellSiffSquat,
+		SquatExerciseNameBarbellSquatSnatch,
+		SquatExerciseNameBarbellSquatWithHeelsRaised,
+		SquatExerciseNameBarbellStepover,
+		SquatExerciseNameBarbellStepUp,
+		SquatExerciseNameBenchSquatWithRotationalChop,
+		SquatExerciseNameWeightedBenchSquatWithRotationalChop,
+		SquatExerciseNameBodyWeightWallSquat,
+		SquatExerciseNameWeightedWallSquat,
+		SquatExerciseNameBoxStepSquat,
+		SquatExerciseNameWeightedBoxStepSquat,
+		SquatExerciseNameBracedSquat,
+		SquatExerciseNameCrossedArmBarbellFrontSquat,
+		SquatExerciseNameCrossoverDumbbellStepUp,
+		SquatExerciseNameDumbbellFrontSquat,
+		SquatExerciseNameDumbbellSplitSquat,
+		SquatExerciseNameDumbbellSquat,
+		SquatExerciseNameDumbbellSquatClean,
+		SquatExerciseNameDumbbellStepover,
+		SquatExerciseNameDumbbellStepUp,
+		SquatExerciseNameElevatedSingleLegSquat,
+		SquatExerciseNameWeightedElevatedSingleLegSquat,
+		SquatExerciseNameFigureFourSquats,
+		SquatExerciseNameWeightedFigureFourSquats,
+		SquatExerciseNameGobletSquat,
+		SquatExerciseNameKettlebellSquat,
+		SquatExerciseNameKettlebellSwingOverhead,
+		SquatExerciseNameKettlebellSwingWithFlipToSquat,
+		SquatExerciseNameLateralDumbbellStepUp,
+		SquatExerciseNameOneLeggedSquat,
+		SquatExerciseNameOverheadDumbbellSquat,
+		SquatExerciseNameOverheadSquat,
+		SquatExerciseNamePartialSingleLegSquat,
+		SquatExerciseNameWeightedPartialSingleLegSquat,
+		SquatExerciseNamePistolSquat,
+		SquatExerciseNameWeightedPistolSquat,
+		SquatExerciseNamePlieSlides,
+		SquatExerciseNameWeightedPlieSlides,
+		SquatExerciseNamePlieSquat,
+		SquatExerciseNameWeightedPlieSquat,
+		SquatExerciseNamePrisonerSquat,
+		SquatExerciseNameWeightedPrisonerSquat,
+		SquatExerciseNameSingleLegBenchGetUp,
+		SquatExerciseNameWeightedSingleLegBenchGetUp,
+		SquatExerciseNameSingleLegBenchSquat,
+		SquatExerciseNameWeightedSingleLegBenchSquat,
+		SquatExerciseNameSingleLegSquatOnSwissBall,
+		SquatExerciseNameWeightedSingleLegSquatOnSwissBall,
+		SquatExerciseNameSquat,
+		SquatExerciseNameWeightedSquat,
+		SquatExerciseNameSquatsWithBand,
+		SquatExerciseNameStaggeredSquat,
+		SquatExerciseNameWeightedStaggeredSquat,
+		SquatExerciseNameStepUp,
+		SquatExerciseNameWeightedStepUp,
+		SquatExerciseNameSuitcaseSquats,
+		SquatExerciseNameSumoSquat,
+		SquatExerciseNameSumoSquatSlideIn,
+		SquatExerciseNameWeightedSumoSquatSlideIn,
+		SquatExerciseNameSumoSquatToHighPull,
+		SquatExerciseNameSumoSquatToStand,
+		SquatExerciseNameWeightedSumoSquatToStand,
+		SquatExerciseNameSumoSquatWithRotation,
+		SquatExerciseNameWeightedSumoSquatWithRotation,
+		SquatExerciseNameSwissBallBodyWeightWallSquat,
+		SquatExerciseNameWeightedSwissBallWallSquat,
+		SquatExerciseNameThrusters,
+		SquatExerciseNameUnevenSquat,
+		SquatExerciseNameWeightedUnevenSquat,
+		SquatExerciseNameWaistSlimmingSquat,
+		SquatExerciseNameWallBall,
+		SquatExerciseNameWideStanceBarbellSquat,
+		SquatExerciseNameWideStanceGobletSquat,
+		SquatExerciseNameZercherSquat,
+		SquatExerciseNameKbsOverhead,
+		SquatExerciseNameSquatAndSideKick,
+		SquatExerciseNameSquatJumpsInNOut,
+		SquatExerciseNamePilatesPlieSquatsParallelTurnedOutFlatAndHeels,
+		SquatExerciseNameReleveStraightLegAndKneeBentWithOneLegVariation,
 	}
-	return vs
 }

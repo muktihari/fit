@@ -35,64 +35,131 @@ const (
 	SplitTypeTransition       SplitType = 23 // Marks the time going from ascent_split to descent_split/used in backcountry ski
 	SplitTypeSkiLiftSplit     SplitType = 28
 	SplitTypeSkiRunSplit      SplitType = 29
-	SplitTypeInvalid          SplitType = 0xFF // INVALID
+	SplitTypeInvalid          SplitType = 0xFF
 )
 
-var splittypetostrs = map[SplitType]string{
-	SplitTypeAscentSplit:      "ascent_split",
-	SplitTypeDescentSplit:     "descent_split",
-	SplitTypeIntervalActive:   "interval_active",
-	SplitTypeIntervalRest:     "interval_rest",
-	SplitTypeIntervalWarmup:   "interval_warmup",
-	SplitTypeIntervalCooldown: "interval_cooldown",
-	SplitTypeIntervalRecovery: "interval_recovery",
-	SplitTypeIntervalOther:    "interval_other",
-	SplitTypeClimbActive:      "climb_active",
-	SplitTypeClimbRest:        "climb_rest",
-	SplitTypeSurfActive:       "surf_active",
-	SplitTypeRunActive:        "run_active",
-	SplitTypeRunRest:          "run_rest",
-	SplitTypeWorkoutRound:     "workout_round",
-	SplitTypeRwdRun:           "rwd_run",
-	SplitTypeRwdWalk:          "rwd_walk",
-	SplitTypeWindsurfActive:   "windsurf_active",
-	SplitTypeRwdStand:         "rwd_stand",
-	SplitTypeTransition:       "transition",
-	SplitTypeSkiLiftSplit:     "ski_lift_split",
-	SplitTypeSkiRunSplit:      "ski_run_split",
-	SplitTypeInvalid:          "invalid",
-}
-
 func (s SplitType) String() string {
-	val, ok := splittypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SplitTypeAscentSplit:
+		return "ascent_split"
+	case SplitTypeDescentSplit:
+		return "descent_split"
+	case SplitTypeIntervalActive:
+		return "interval_active"
+	case SplitTypeIntervalRest:
+		return "interval_rest"
+	case SplitTypeIntervalWarmup:
+		return "interval_warmup"
+	case SplitTypeIntervalCooldown:
+		return "interval_cooldown"
+	case SplitTypeIntervalRecovery:
+		return "interval_recovery"
+	case SplitTypeIntervalOther:
+		return "interval_other"
+	case SplitTypeClimbActive:
+		return "climb_active"
+	case SplitTypeClimbRest:
+		return "climb_rest"
+	case SplitTypeSurfActive:
+		return "surf_active"
+	case SplitTypeRunActive:
+		return "run_active"
+	case SplitTypeRunRest:
+		return "run_rest"
+	case SplitTypeWorkoutRound:
+		return "workout_round"
+	case SplitTypeRwdRun:
+		return "rwd_run"
+	case SplitTypeRwdWalk:
+		return "rwd_walk"
+	case SplitTypeWindsurfActive:
+		return "windsurf_active"
+	case SplitTypeRwdStand:
+		return "rwd_stand"
+	case SplitTypeTransition:
+		return "transition"
+	case SplitTypeSkiLiftSplit:
+		return "ski_lift_split"
+	case SplitTypeSkiRunSplit:
+		return "ski_run_split"
+	default:
+		return "SplitTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosplittype = func() map[string]SplitType {
-	m := make(map[string]SplitType)
-	for t, str := range splittypetostrs {
-		m[str] = SplitType(t)
-	}
-	return m
-}()
 
 // FromString parse string into SplitType constant it's represent, return SplitTypeInvalid if not found.
 func SplitTypeFromString(s string) SplitType {
-	val, ok := strtosplittype[s]
-	if !ok {
-		return strtosplittype["invalid"]
+	switch s {
+	case "ascent_split":
+		return SplitTypeAscentSplit
+	case "descent_split":
+		return SplitTypeDescentSplit
+	case "interval_active":
+		return SplitTypeIntervalActive
+	case "interval_rest":
+		return SplitTypeIntervalRest
+	case "interval_warmup":
+		return SplitTypeIntervalWarmup
+	case "interval_cooldown":
+		return SplitTypeIntervalCooldown
+	case "interval_recovery":
+		return SplitTypeIntervalRecovery
+	case "interval_other":
+		return SplitTypeIntervalOther
+	case "climb_active":
+		return SplitTypeClimbActive
+	case "climb_rest":
+		return SplitTypeClimbRest
+	case "surf_active":
+		return SplitTypeSurfActive
+	case "run_active":
+		return SplitTypeRunActive
+	case "run_rest":
+		return SplitTypeRunRest
+	case "workout_round":
+		return SplitTypeWorkoutRound
+	case "rwd_run":
+		return SplitTypeRwdRun
+	case "rwd_walk":
+		return SplitTypeRwdWalk
+	case "windsurf_active":
+		return SplitTypeWindsurfActive
+	case "rwd_stand":
+		return SplitTypeRwdStand
+	case "transition":
+		return SplitTypeTransition
+	case "ski_lift_split":
+		return SplitTypeSkiLiftSplit
+	case "ski_run_split":
+		return SplitTypeSkiRunSplit
+	default:
+		return SplitTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSplitType() []SplitType {
-	vs := make([]SplitType, 0, len(splittypetostrs))
-	for i := range splittypetostrs {
-		vs = append(vs, SplitType(i))
+	return []SplitType{
+		SplitTypeAscentSplit,
+		SplitTypeDescentSplit,
+		SplitTypeIntervalActive,
+		SplitTypeIntervalRest,
+		SplitTypeIntervalWarmup,
+		SplitTypeIntervalCooldown,
+		SplitTypeIntervalRecovery,
+		SplitTypeIntervalOther,
+		SplitTypeClimbActive,
+		SplitTypeClimbRest,
+		SplitTypeSurfActive,
+		SplitTypeRunActive,
+		SplitTypeRunRest,
+		SplitTypeWorkoutRound,
+		SplitTypeRwdRun,
+		SplitTypeRwdWalk,
+		SplitTypeWindsurfActive,
+		SplitTypeRwdStand,
+		SplitTypeTransition,
+		SplitTypeSkiLiftSplit,
+		SplitTypeSkiRunSplit,
 	}
-	return vs
 }

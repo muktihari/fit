@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -40,22 +41,7 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0:  nil, /* BluetoothEnabled */
-		1:  nil, /* BluetoothLeEnabled */
-		2:  nil, /* AntEnabled */
-		3:  nil, /* Name */
-		4:  nil, /* LiveTrackingEnabled */
-		5:  nil, /* WeatherConditionsEnabled */
-		6:  nil, /* WeatherAlertsEnabled */
-		7:  nil, /* AutoActivityUploadEnabled */
-		8:  nil, /* CourseDownloadEnabled */
-		9:  nil, /* WorkoutDownloadEnabled */
-		10: nil, /* GpsEphemerisDownloadEnabled */
-		11: nil, /* IncidentDetectionEnabled */
-		12: nil, /* GrouptrackEnabled */
-	}
-
+	vals := [13]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -83,42 +69,123 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Connectivity mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumConnectivity)
-func (m *Connectivity) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Connectivity into proto.Message.
+func (m *Connectivity) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumConnectivity)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumConnectivity {
-		return
+	if m.BluetoothEnabled != false {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.BluetoothEnabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0:  m.BluetoothEnabled,
-		1:  m.BluetoothLeEnabled,
-		2:  m.AntEnabled,
-		3:  m.Name,
-		4:  m.LiveTrackingEnabled,
-		5:  m.WeatherConditionsEnabled,
-		6:  m.WeatherAlertsEnabled,
-		7:  m.AutoActivityUploadEnabled,
-		8:  m.CourseDownloadEnabled,
-		9:  m.WorkoutDownloadEnabled,
-		10: m.GpsEphemerisDownloadEnabled,
-		11: m.IncidentDetectionEnabled,
-		12: m.GrouptrackEnabled,
+	if m.BluetoothLeEnabled != false {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.BluetoothLeEnabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.AntEnabled != false {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.AntEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Name
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LiveTrackingEnabled != false {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.LiveTrackingEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WeatherConditionsEnabled != false {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.WeatherConditionsEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WeatherAlertsEnabled != false {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.WeatherAlertsEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AutoActivityUploadEnabled != false {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.AutoActivityUploadEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CourseDownloadEnabled != false {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.CourseDownloadEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WorkoutDownloadEnabled != false {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.WorkoutDownloadEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.GpsEphemerisDownloadEnabled != false {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.GpsEphemerisDownloadEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.IncidentDetectionEnabled != false {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.IncidentDetectionEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.GrouptrackEnabled != false {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.GrouptrackEnabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Connectivity's valid fields.
+func (m *Connectivity) size() byte {
+	var size byte
+	if m.BluetoothEnabled != false {
+		size++
+	}
+	if m.BluetoothLeEnabled != false {
+		size++
+	}
+	if m.AntEnabled != false {
+		size++
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		size++
+	}
+	if m.LiveTrackingEnabled != false {
+		size++
+	}
+	if m.WeatherConditionsEnabled != false {
+		size++
+	}
+	if m.WeatherAlertsEnabled != false {
+		size++
+	}
+	if m.AutoActivityUploadEnabled != false {
+		size++
+	}
+	if m.CourseDownloadEnabled != false {
+		size++
+	}
+	if m.WorkoutDownloadEnabled != false {
+		size++
+	}
+	if m.GpsEphemerisDownloadEnabled != false {
+		size++
+	}
+	if m.IncidentDetectionEnabled != false {
+		size++
+	}
+	if m.GrouptrackEnabled != false {
+		size++
+	}
+	return size
 }

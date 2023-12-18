@@ -17,46 +17,41 @@ const (
 	ActivityClassLevel    ActivityClass = 0x7F // 0 to 100
 	ActivityClassLevelMax ActivityClass = 100
 	ActivityClassAthlete  ActivityClass = 0x80
-	ActivityClassInvalid  ActivityClass = 0xFF // INVALID
+	ActivityClassInvalid  ActivityClass = 0xFF
 )
 
-var activityclasstostrs = map[ActivityClass]string{
-	ActivityClassLevel:    "level",
-	ActivityClassLevelMax: "level_max",
-	ActivityClassAthlete:  "athlete",
-	ActivityClassInvalid:  "invalid",
-}
-
 func (a ActivityClass) String() string {
-	val, ok := activityclasstostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case ActivityClassLevel:
+		return "level"
+	case ActivityClassLevelMax:
+		return "level_max"
+	case ActivityClassAthlete:
+		return "athlete"
+	default:
+		return "ActivityClassInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoactivityclass = func() map[string]ActivityClass {
-	m := make(map[string]ActivityClass)
-	for t, str := range activityclasstostrs {
-		m[str] = ActivityClass(t)
-	}
-	return m
-}()
 
 // FromString parse string into ActivityClass constant it's represent, return ActivityClassInvalid if not found.
 func ActivityClassFromString(s string) ActivityClass {
-	val, ok := strtoactivityclass[s]
-	if !ok {
-		return strtoactivityclass["invalid"]
+	switch s {
+	case "level":
+		return ActivityClassLevel
+	case "level_max":
+		return ActivityClassLevelMax
+	case "athlete":
+		return ActivityClassAthlete
+	default:
+		return ActivityClassInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListActivityClass() []ActivityClass {
-	vs := make([]ActivityClass, 0, len(activityclasstostrs))
-	for i := range activityclasstostrs {
-		vs = append(vs, ActivityClass(i))
+	return []ActivityClass{
+		ActivityClassLevel,
+		ActivityClassLevelMax,
+		ActivityClassAthlete,
 	}
-	return vs
 }

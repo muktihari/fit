@@ -15,13 +15,15 @@ import (
 //
 // ref: https://developer.garmin.com/fit/file-types/workout/
 type Workout struct {
-	FileId       *mesgdef.FileId
-	Workout      *mesgdef.Workout
-	WorkoutSteps []*mesgdef.WorkoutStep
+	FileId mesgdef.FileId // must have mesg
 
 	// Developer Data Lookup
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
+
+	// Required Messages
+	Workout      *mesgdef.Workout
+	WorkoutSteps []*mesgdef.WorkoutStep
 
 	// Messages not related to Workout
 	UnrelatedMessages []proto.Message
@@ -41,21 +43,21 @@ func NewWorkout(mesgs ...proto.Message) *Workout {
 func (f *Workout) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = mesgdef.NewFileId(mesg)
-	case mesgnum.Workout:
-		f.Workout = mesgdef.NewWorkout(mesg)
-	case mesgnum.WorkoutStep:
-		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(mesg))
+		f.FileId = *mesgdef.NewFileId(mesg)
 	case mesgnum.DeveloperDataId:
 		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
 	case mesgnum.FieldDescription:
 		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
+	case mesgnum.Workout:
+		f.Workout = mesgdef.NewWorkout(mesg)
+	case mesgnum.WorkoutStep:
+		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(mesg))
 	default:
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
 
-func (f *Workout) ToFit(fac Factory) proto.Fit {
+func (f *Workout) ToFit(fac mesgdef.Factory) proto.Fit {
 	if fac == nil {
 		fac = factory.StandardFactory()
 	}
@@ -69,16 +71,16 @@ func (f *Workout) ToFit(fac Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	if f.FileId != nil {
-		mesg := fac.CreateMesg(mesgnum.FileId)
-		f.FileId.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+
+	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+
+	if f.Workout != nil {
+		fit.Messages = append(fit.Messages, f.Workout.ToMesg(fac))
 	}
 
-	PutMessages(fac, &fit.Messages, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	PutMessages(fac, &fit.Messages, mesgnum.FieldDescription, f.FieldDescriptions)
-
-	PutMessages(fac, &fit.Messages, mesgnum.WorkoutStep, f.WorkoutSteps)
+	ToMesgs(&fit.Messages, fac, mesgnum.WorkoutStep, f.WorkoutSteps)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

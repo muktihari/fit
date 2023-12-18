@@ -21,50 +21,61 @@ const (
 	BatteryStatusCritical BatteryStatus = 5
 	BatteryStatusCharging BatteryStatus = 6
 	BatteryStatusUnknown  BatteryStatus = 7
-	BatteryStatusInvalid  BatteryStatus = 0xFF // INVALID
+	BatteryStatusInvalid  BatteryStatus = 0xFF
 )
 
-var batterystatustostrs = map[BatteryStatus]string{
-	BatteryStatusNew:      "new",
-	BatteryStatusGood:     "good",
-	BatteryStatusOk:       "ok",
-	BatteryStatusLow:      "low",
-	BatteryStatusCritical: "critical",
-	BatteryStatusCharging: "charging",
-	BatteryStatusUnknown:  "unknown",
-	BatteryStatusInvalid:  "invalid",
-}
-
 func (b BatteryStatus) String() string {
-	val, ok := batterystatustostrs[b]
-	if !ok {
-		return strconv.FormatUint(uint64(b), 10)
+	switch b {
+	case BatteryStatusNew:
+		return "new"
+	case BatteryStatusGood:
+		return "good"
+	case BatteryStatusOk:
+		return "ok"
+	case BatteryStatusLow:
+		return "low"
+	case BatteryStatusCritical:
+		return "critical"
+	case BatteryStatusCharging:
+		return "charging"
+	case BatteryStatusUnknown:
+		return "unknown"
+	default:
+		return "BatteryStatusInvalid(" + strconv.FormatUint(uint64(b), 10) + ")"
 	}
-	return val
 }
-
-var strtobatterystatus = func() map[string]BatteryStatus {
-	m := make(map[string]BatteryStatus)
-	for t, str := range batterystatustostrs {
-		m[str] = BatteryStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into BatteryStatus constant it's represent, return BatteryStatusInvalid if not found.
 func BatteryStatusFromString(s string) BatteryStatus {
-	val, ok := strtobatterystatus[s]
-	if !ok {
-		return strtobatterystatus["invalid"]
+	switch s {
+	case "new":
+		return BatteryStatusNew
+	case "good":
+		return BatteryStatusGood
+	case "ok":
+		return BatteryStatusOk
+	case "low":
+		return BatteryStatusLow
+	case "critical":
+		return BatteryStatusCritical
+	case "charging":
+		return BatteryStatusCharging
+	case "unknown":
+		return BatteryStatusUnknown
+	default:
+		return BatteryStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBatteryStatus() []BatteryStatus {
-	vs := make([]BatteryStatus, 0, len(batterystatustostrs))
-	for i := range batterystatustostrs {
-		vs = append(vs, BatteryStatus(i))
+	return []BatteryStatus{
+		BatteryStatusNew,
+		BatteryStatusGood,
+		BatteryStatusOk,
+		BatteryStatusLow,
+		BatteryStatusCritical,
+		BatteryStatusCharging,
+		BatteryStatusUnknown,
 	}
-	return vs
 }

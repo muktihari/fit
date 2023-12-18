@@ -71,7 +71,9 @@ func TestMarshal(t *testing.T) {
 		{value: []int32{819293429}},
 		{value: []int32{-8979123}},
 		{value: []uint32{9929}},
-		{value: []string{"not supported"}, err: ErrTypeNotSupported},
+		{value: []string{"supported"}},
+		{value: []string{""}},
+		{value: []string{string([]byte{'\x00'})}},
 		{value: []int64{819293429}},
 		{value: []int64{-8979123}},
 		{value: []uint64{9929}},
@@ -136,7 +138,12 @@ func TestMarshal(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			if len(b) == 0 && len(buf.Bytes()) == 0 {
+				return
+			}
+
 			if diff := cmp.Diff(b, buf.Bytes()); diff != "" {
+				fmt.Printf("value: %v, b: %v, buf: %v\n", tc.value, b, buf.Bytes())
 				t.Fatal(diff)
 			}
 
@@ -154,19 +161,35 @@ func marshalWithReflectionForTest(w io.Writer, value any) error {
 		return fmt.Errorf("can't interface '%T': %w", value, ErrTypeNotSupported)
 	}
 
-	if rv.Type().Kind() == reflect.Slice || rv.Type().Kind() == reflect.String {
+	if rv.Type().Kind() == reflect.Slice {
 		for i := 0; i < rv.Len(); i++ {
 			if !rv.Index(i).CanInterface() || rv.Index(i).Interface() == nil {
 				continue
+			}
+			if rv.Index(i).Kind() == reflect.String {
+				value := rv.Index(i).String()
+				if len(value) == 0 {
+					continue
+				}
+				if value[len(value)-1] == '\x00' {
+					continue
+				}
 			}
 			if err := marshalWithReflectionForTest(w, rv.Index(i).Interface()); err != nil {
 				return err
 			}
 		}
-		if rv.Type().Kind() == reflect.String {
-			w.Write([]byte{0x00}) // utf-8 null terminator
-		}
 		return nil
+	}
+
+	if rv.Kind() == reflect.String {
+		b := []byte(rv.String())
+		if len(b) == 0 {
+			b = []byte{0x0}
+		} else if b[len(b)-1] != '\x00' {
+			b = append([]byte(b), '\x00')
+		}
+		return binary.Write(w, binary.LittleEndian, b)
 	}
 
 	return binary.Write(w, binary.LittleEndian, rv.Interface())

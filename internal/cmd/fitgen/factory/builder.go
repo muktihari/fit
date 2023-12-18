@@ -137,19 +137,13 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
 
 	strbuf := new(strings.Builder)
-	strbuf.WriteString("[]proto.Message{\n")
+	strbuf.WriteString("[...]proto.Message{\n")
 	for _, message := range b.messages {
 		strbuf.WriteString(b.transformMesgnum(message.Name) + ": {\n") // indexed to create fixed-size slice.
 		strbuf.WriteString(fmt.Sprintf("Num: %s, /* %s */\n", b.transformMesgnum(message.Name), message.Name))
 		strbuf.WriteString(fmt.Sprintf("Fields: %s,\n", b.makeFields(message)))
-		strbuf.WriteString("DeveloperFields: nil,\n") // default nil
 		strbuf.WriteString("},\n")
 	}
-
-	strbuf.WriteString(fmt.Sprintf("{Num: %s /* mfg_range_min */},{Num: %s /* mfg_range_min */} %s,\n",
-		b.valueMapByProfileTypeByValueName["mesg_num"]["mfg_range_min"].Value,
-		b.valueMapByProfileTypeByValueName["mesg_num"]["mfg_range_max"].Value,
-		"/* 0xFF00 - 0xFFFE reserved for manufacturer specific messages */"))
 
 	strbuf.WriteString("}")
 
@@ -186,7 +180,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 	strbuf := new(strings.Builder)
 	strbuf.WriteString("[]proto.Field{\n")
 	for _, field := range message.Fields {
-		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
+		strbuf.WriteString("{\n")
 		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
 		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))
@@ -194,9 +188,9 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 			b.transformProfileType(field.Type),
 			b.transformBaseType(field.Type),
 		))
-		strbuf.WriteString(fmt.Sprintf("Size: %d, %s\n",
+		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
+		strbuf.WriteString(fmt.Sprintf("Size: %d,\n",
 			basetype.FromString(b.baseTypeMapByProfileType[field.Type]).Size(),
-			makeArrayComment(field.Array),
 		))
 		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(field, message.Name)))
 		strbuf.WriteString(fmt.Sprintf("Scale: %g,\n", scaleOrDefault(field.Scales, 0)))    // first index or default
@@ -291,10 +285,6 @@ func (b *factoryBuilder) transformMesgnum(s string) string {
 }
 
 func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
-	if b.baseTypeMapByProfileType[fieldType] == "string" {
-		return "basetype.StringInvalid"
-	}
-
 	if fieldType == "bool" {
 		return "false"
 	}
@@ -352,5 +342,5 @@ func makeArrayComment(arr string) string {
 	if arr == "" {
 		return ""
 	}
-	return fmt.Sprintf("/* Array %s */", arr)
+	return fmt.Sprintf("/* Array Size %s */", arr)
 }

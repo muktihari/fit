@@ -14,49 +14,44 @@ import (
 type DiveAlarmType byte
 
 const (
-	DiveAlarmTypeDepth   DiveAlarmType = 0    // Alarm when a certain depth is crossed
-	DiveAlarmTypeTime    DiveAlarmType = 1    // Alarm when a certain time has transpired
-	DiveAlarmTypeSpeed   DiveAlarmType = 2    // Alarm when a certain ascent or descent rate is exceeded
-	DiveAlarmTypeInvalid DiveAlarmType = 0xFF // INVALID
+	DiveAlarmTypeDepth   DiveAlarmType = 0 // Alarm when a certain depth is crossed
+	DiveAlarmTypeTime    DiveAlarmType = 1 // Alarm when a certain time has transpired
+	DiveAlarmTypeSpeed   DiveAlarmType = 2 // Alarm when a certain ascent or descent rate is exceeded
+	DiveAlarmTypeInvalid DiveAlarmType = 0xFF
 )
 
-var divealarmtypetostrs = map[DiveAlarmType]string{
-	DiveAlarmTypeDepth:   "depth",
-	DiveAlarmTypeTime:    "time",
-	DiveAlarmTypeSpeed:   "speed",
-	DiveAlarmTypeInvalid: "invalid",
-}
-
 func (d DiveAlarmType) String() string {
-	val, ok := divealarmtypetostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DiveAlarmTypeDepth:
+		return "depth"
+	case DiveAlarmTypeTime:
+		return "time"
+	case DiveAlarmTypeSpeed:
+		return "speed"
+	default:
+		return "DiveAlarmTypeInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodivealarmtype = func() map[string]DiveAlarmType {
-	m := make(map[string]DiveAlarmType)
-	for t, str := range divealarmtypetostrs {
-		m[str] = DiveAlarmType(t)
-	}
-	return m
-}()
 
 // FromString parse string into DiveAlarmType constant it's represent, return DiveAlarmTypeInvalid if not found.
 func DiveAlarmTypeFromString(s string) DiveAlarmType {
-	val, ok := strtodivealarmtype[s]
-	if !ok {
-		return strtodivealarmtype["invalid"]
+	switch s {
+	case "depth":
+		return DiveAlarmTypeDepth
+	case "time":
+		return DiveAlarmTypeTime
+	case "speed":
+		return DiveAlarmTypeSpeed
+	default:
+		return DiveAlarmTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDiveAlarmType() []DiveAlarmType {
-	vs := make([]DiveAlarmType, 0, len(divealarmtypetostrs))
-	for i := range divealarmtypetostrs {
-		vs = append(vs, DiveAlarmType(i))
+	return []DiveAlarmType{
+		DiveAlarmTypeDepth,
+		DiveAlarmTypeTime,
+		DiveAlarmTypeSpeed,
 	}
-	return vs
 }

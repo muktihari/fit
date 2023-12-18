@@ -25,54 +25,81 @@ const (
 	ExdDisplayTypeString            ExdDisplayType = 8
 	ExdDisplayTypeSimpleDynamicIcon ExdDisplayType = 9
 	ExdDisplayTypeGauge             ExdDisplayType = 10
-	ExdDisplayTypeInvalid           ExdDisplayType = 0xFF // INVALID
+	ExdDisplayTypeInvalid           ExdDisplayType = 0xFF
 )
 
-var exddisplaytypetostrs = map[ExdDisplayType]string{
-	ExdDisplayTypeNumerical:         "numerical",
-	ExdDisplayTypeSimple:            "simple",
-	ExdDisplayTypeGraph:             "graph",
-	ExdDisplayTypeBar:               "bar",
-	ExdDisplayTypeCircleGraph:       "circle_graph",
-	ExdDisplayTypeVirtualPartner:    "virtual_partner",
-	ExdDisplayTypeBalance:           "balance",
-	ExdDisplayTypeStringList:        "string_list",
-	ExdDisplayTypeString:            "string",
-	ExdDisplayTypeSimpleDynamicIcon: "simple_dynamic_icon",
-	ExdDisplayTypeGauge:             "gauge",
-	ExdDisplayTypeInvalid:           "invalid",
-}
-
 func (e ExdDisplayType) String() string {
-	val, ok := exddisplaytypetostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case ExdDisplayTypeNumerical:
+		return "numerical"
+	case ExdDisplayTypeSimple:
+		return "simple"
+	case ExdDisplayTypeGraph:
+		return "graph"
+	case ExdDisplayTypeBar:
+		return "bar"
+	case ExdDisplayTypeCircleGraph:
+		return "circle_graph"
+	case ExdDisplayTypeVirtualPartner:
+		return "virtual_partner"
+	case ExdDisplayTypeBalance:
+		return "balance"
+	case ExdDisplayTypeStringList:
+		return "string_list"
+	case ExdDisplayTypeString:
+		return "string"
+	case ExdDisplayTypeSimpleDynamicIcon:
+		return "simple_dynamic_icon"
+	case ExdDisplayTypeGauge:
+		return "gauge"
+	default:
+		return "ExdDisplayTypeInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoexddisplaytype = func() map[string]ExdDisplayType {
-	m := make(map[string]ExdDisplayType)
-	for t, str := range exddisplaytypetostrs {
-		m[str] = ExdDisplayType(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExdDisplayType constant it's represent, return ExdDisplayTypeInvalid if not found.
 func ExdDisplayTypeFromString(s string) ExdDisplayType {
-	val, ok := strtoexddisplaytype[s]
-	if !ok {
-		return strtoexddisplaytype["invalid"]
+	switch s {
+	case "numerical":
+		return ExdDisplayTypeNumerical
+	case "simple":
+		return ExdDisplayTypeSimple
+	case "graph":
+		return ExdDisplayTypeGraph
+	case "bar":
+		return ExdDisplayTypeBar
+	case "circle_graph":
+		return ExdDisplayTypeCircleGraph
+	case "virtual_partner":
+		return ExdDisplayTypeVirtualPartner
+	case "balance":
+		return ExdDisplayTypeBalance
+	case "string_list":
+		return ExdDisplayTypeStringList
+	case "string":
+		return ExdDisplayTypeString
+	case "simple_dynamic_icon":
+		return ExdDisplayTypeSimpleDynamicIcon
+	case "gauge":
+		return ExdDisplayTypeGauge
+	default:
+		return ExdDisplayTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExdDisplayType() []ExdDisplayType {
-	vs := make([]ExdDisplayType, 0, len(exddisplaytypetostrs))
-	for i := range exddisplaytypetostrs {
-		vs = append(vs, ExdDisplayType(i))
+	return []ExdDisplayType{
+		ExdDisplayTypeNumerical,
+		ExdDisplayTypeSimple,
+		ExdDisplayTypeGraph,
+		ExdDisplayTypeBar,
+		ExdDisplayTypeCircleGraph,
+		ExdDisplayTypeVirtualPartner,
+		ExdDisplayTypeBalance,
+		ExdDisplayTypeStringList,
+		ExdDisplayTypeString,
+		ExdDisplayTypeSimpleDynamicIcon,
+		ExdDisplayTypeGauge,
 	}
-	return vs
 }

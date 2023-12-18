@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,16 +35,7 @@ func NewTimestampCorrelation(mesg proto.Message) *TimestampCorrelation {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* FractionalTimestamp */
-		1:   nil, /* SystemTimestamp */
-		2:   nil, /* FractionalSystemTimestamp */
-		3:   nil, /* LocalTimestamp */
-		4:   nil, /* TimestampMs */
-		5:   nil, /* SystemTimestampMs */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -65,36 +57,75 @@ func NewTimestampCorrelation(mesg proto.Message) *TimestampCorrelation {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to TimestampCorrelation mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumTimestampCorrelation)
-func (m *TimestampCorrelation) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts TimestampCorrelation into proto.Message.
+func (m *TimestampCorrelation) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumTimestampCorrelation)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumTimestampCorrelation {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.FractionalTimestamp,
-		1:   typeconv.ToUint32[uint32](m.SystemTimestamp),
-		2:   m.FractionalSystemTimestamp,
-		3:   typeconv.ToUint32[uint32](m.LocalTimestamp),
-		4:   m.TimestampMs,
-		5:   m.SystemTimestampMs,
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.FractionalTimestamp
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32[uint32](m.SystemTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint32[uint32](m.SystemTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.FractionalSystemTimestamp
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint32[uint32](m.LocalTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.TimestampMs
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SystemTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.SystemTimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of TimestampCorrelation's valid fields.
+func (m *TimestampCorrelation) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.SystemTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.SystemTimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

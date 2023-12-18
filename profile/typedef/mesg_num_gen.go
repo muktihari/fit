@@ -121,151 +121,571 @@ const (
 	MesgNumDiveApneaAlarm              MesgNum = 393
 	MesgNumMfgRangeMin                 MesgNum = 0xFF00 // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
 	MesgNumMfgRangeMax                 MesgNum = 0xFFFE // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
-	MesgNumInvalid                     MesgNum = 0xFFFF // INVALID
+	MesgNumInvalid                     MesgNum = 0xFFFF
 )
 
-var mesgnumtostrs = map[MesgNum]string{
-	MesgNumFileId:                      "file_id",
-	MesgNumCapabilities:                "capabilities",
-	MesgNumDeviceSettings:              "device_settings",
-	MesgNumUserProfile:                 "user_profile",
-	MesgNumHrmProfile:                  "hrm_profile",
-	MesgNumSdmProfile:                  "sdm_profile",
-	MesgNumBikeProfile:                 "bike_profile",
-	MesgNumZonesTarget:                 "zones_target",
-	MesgNumHrZone:                      "hr_zone",
-	MesgNumPowerZone:                   "power_zone",
-	MesgNumMetZone:                     "met_zone",
-	MesgNumSport:                       "sport",
-	MesgNumGoal:                        "goal",
-	MesgNumSession:                     "session",
-	MesgNumLap:                         "lap",
-	MesgNumRecord:                      "record",
-	MesgNumEvent:                       "event",
-	MesgNumDeviceInfo:                  "device_info",
-	MesgNumWorkout:                     "workout",
-	MesgNumWorkoutStep:                 "workout_step",
-	MesgNumSchedule:                    "schedule",
-	MesgNumWeightScale:                 "weight_scale",
-	MesgNumCourse:                      "course",
-	MesgNumCoursePoint:                 "course_point",
-	MesgNumTotals:                      "totals",
-	MesgNumActivity:                    "activity",
-	MesgNumSoftware:                    "software",
-	MesgNumFileCapabilities:            "file_capabilities",
-	MesgNumMesgCapabilities:            "mesg_capabilities",
-	MesgNumFieldCapabilities:           "field_capabilities",
-	MesgNumFileCreator:                 "file_creator",
-	MesgNumBloodPressure:               "blood_pressure",
-	MesgNumSpeedZone:                   "speed_zone",
-	MesgNumMonitoring:                  "monitoring",
-	MesgNumTrainingFile:                "training_file",
-	MesgNumHrv:                         "hrv",
-	MesgNumAntRx:                       "ant_rx",
-	MesgNumAntTx:                       "ant_tx",
-	MesgNumAntChannelId:                "ant_channel_id",
-	MesgNumLength:                      "length",
-	MesgNumMonitoringInfo:              "monitoring_info",
-	MesgNumPad:                         "pad",
-	MesgNumSlaveDevice:                 "slave_device",
-	MesgNumConnectivity:                "connectivity",
-	MesgNumWeatherConditions:           "weather_conditions",
-	MesgNumWeatherAlert:                "weather_alert",
-	MesgNumCadenceZone:                 "cadence_zone",
-	MesgNumHr:                          "hr",
-	MesgNumSegmentLap:                  "segment_lap",
-	MesgNumMemoGlob:                    "memo_glob",
-	MesgNumSegmentId:                   "segment_id",
-	MesgNumSegmentLeaderboardEntry:     "segment_leaderboard_entry",
-	MesgNumSegmentPoint:                "segment_point",
-	MesgNumSegmentFile:                 "segment_file",
-	MesgNumWorkoutSession:              "workout_session",
-	MesgNumWatchfaceSettings:           "watchface_settings",
-	MesgNumGpsMetadata:                 "gps_metadata",
-	MesgNumCameraEvent:                 "camera_event",
-	MesgNumTimestampCorrelation:        "timestamp_correlation",
-	MesgNumGyroscopeData:               "gyroscope_data",
-	MesgNumAccelerometerData:           "accelerometer_data",
-	MesgNumThreeDSensorCalibration:     "three_d_sensor_calibration",
-	MesgNumVideoFrame:                  "video_frame",
-	MesgNumObdiiData:                   "obdii_data",
-	MesgNumNmeaSentence:                "nmea_sentence",
-	MesgNumAviationAttitude:            "aviation_attitude",
-	MesgNumVideo:                       "video",
-	MesgNumVideoTitle:                  "video_title",
-	MesgNumVideoDescription:            "video_description",
-	MesgNumVideoClip:                   "video_clip",
-	MesgNumOhrSettings:                 "ohr_settings",
-	MesgNumExdScreenConfiguration:      "exd_screen_configuration",
-	MesgNumExdDataFieldConfiguration:   "exd_data_field_configuration",
-	MesgNumExdDataConceptConfiguration: "exd_data_concept_configuration",
-	MesgNumFieldDescription:            "field_description",
-	MesgNumDeveloperDataId:             "developer_data_id",
-	MesgNumMagnetometerData:            "magnetometer_data",
-	MesgNumBarometerData:               "barometer_data",
-	MesgNumOneDSensorCalibration:       "one_d_sensor_calibration",
-	MesgNumMonitoringHrData:            "monitoring_hr_data",
-	MesgNumTimeInZone:                  "time_in_zone",
-	MesgNumSet:                         "set",
-	MesgNumStressLevel:                 "stress_level",
-	MesgNumMaxMetData:                  "max_met_data",
-	MesgNumDiveSettings:                "dive_settings",
-	MesgNumDiveGas:                     "dive_gas",
-	MesgNumDiveAlarm:                   "dive_alarm",
-	MesgNumExerciseTitle:               "exercise_title",
-	MesgNumDiveSummary:                 "dive_summary",
-	MesgNumSpo2Data:                    "spo2_data",
-	MesgNumSleepLevel:                  "sleep_level",
-	MesgNumJump:                        "jump",
-	MesgNumBeatIntervals:               "beat_intervals",
-	MesgNumRespirationRate:             "respiration_rate",
-	MesgNumSplit:                       "split",
-	MesgNumSplitSummary:                "split_summary",
-	MesgNumClimbPro:                    "climb_pro",
-	MesgNumTankUpdate:                  "tank_update",
-	MesgNumTankSummary:                 "tank_summary",
-	MesgNumSleepAssessment:             "sleep_assessment",
-	MesgNumHrvStatusSummary:            "hrv_status_summary",
-	MesgNumHrvValue:                    "hrv_value",
-	MesgNumDeviceAuxBatteryInfo:        "device_aux_battery_info",
-	MesgNumDiveApneaAlarm:              "dive_apnea_alarm",
-	MesgNumMfgRangeMin:                 "mfg_range_min",
-	MesgNumMfgRangeMax:                 "mfg_range_max",
-	MesgNumInvalid:                     "invalid",
-}
+var mesgnumToString = map[MesgNum]string{}
+var stringToMesgNum = map[string]MesgNum{}
 
 func (m MesgNum) String() string {
-	val, ok := mesgnumtostrs[m]
-	if !ok {
-		return strconv.FormatUint(uint64(m), 10)
+	switch m {
+	case MesgNumFileId:
+		return "file_id"
+	case MesgNumCapabilities:
+		return "capabilities"
+	case MesgNumDeviceSettings:
+		return "device_settings"
+	case MesgNumUserProfile:
+		return "user_profile"
+	case MesgNumHrmProfile:
+		return "hrm_profile"
+	case MesgNumSdmProfile:
+		return "sdm_profile"
+	case MesgNumBikeProfile:
+		return "bike_profile"
+	case MesgNumZonesTarget:
+		return "zones_target"
+	case MesgNumHrZone:
+		return "hr_zone"
+	case MesgNumPowerZone:
+		return "power_zone"
+	case MesgNumMetZone:
+		return "met_zone"
+	case MesgNumSport:
+		return "sport"
+	case MesgNumGoal:
+		return "goal"
+	case MesgNumSession:
+		return "session"
+	case MesgNumLap:
+		return "lap"
+	case MesgNumRecord:
+		return "record"
+	case MesgNumEvent:
+		return "event"
+	case MesgNumDeviceInfo:
+		return "device_info"
+	case MesgNumWorkout:
+		return "workout"
+	case MesgNumWorkoutStep:
+		return "workout_step"
+	case MesgNumSchedule:
+		return "schedule"
+	case MesgNumWeightScale:
+		return "weight_scale"
+	case MesgNumCourse:
+		return "course"
+	case MesgNumCoursePoint:
+		return "course_point"
+	case MesgNumTotals:
+		return "totals"
+	case MesgNumActivity:
+		return "activity"
+	case MesgNumSoftware:
+		return "software"
+	case MesgNumFileCapabilities:
+		return "file_capabilities"
+	case MesgNumMesgCapabilities:
+		return "mesg_capabilities"
+	case MesgNumFieldCapabilities:
+		return "field_capabilities"
+	case MesgNumFileCreator:
+		return "file_creator"
+	case MesgNumBloodPressure:
+		return "blood_pressure"
+	case MesgNumSpeedZone:
+		return "speed_zone"
+	case MesgNumMonitoring:
+		return "monitoring"
+	case MesgNumTrainingFile:
+		return "training_file"
+	case MesgNumHrv:
+		return "hrv"
+	case MesgNumAntRx:
+		return "ant_rx"
+	case MesgNumAntTx:
+		return "ant_tx"
+	case MesgNumAntChannelId:
+		return "ant_channel_id"
+	case MesgNumLength:
+		return "length"
+	case MesgNumMonitoringInfo:
+		return "monitoring_info"
+	case MesgNumPad:
+		return "pad"
+	case MesgNumSlaveDevice:
+		return "slave_device"
+	case MesgNumConnectivity:
+		return "connectivity"
+	case MesgNumWeatherConditions:
+		return "weather_conditions"
+	case MesgNumWeatherAlert:
+		return "weather_alert"
+	case MesgNumCadenceZone:
+		return "cadence_zone"
+	case MesgNumHr:
+		return "hr"
+	case MesgNumSegmentLap:
+		return "segment_lap"
+	case MesgNumMemoGlob:
+		return "memo_glob"
+	case MesgNumSegmentId:
+		return "segment_id"
+	case MesgNumSegmentLeaderboardEntry:
+		return "segment_leaderboard_entry"
+	case MesgNumSegmentPoint:
+		return "segment_point"
+	case MesgNumSegmentFile:
+		return "segment_file"
+	case MesgNumWorkoutSession:
+		return "workout_session"
+	case MesgNumWatchfaceSettings:
+		return "watchface_settings"
+	case MesgNumGpsMetadata:
+		return "gps_metadata"
+	case MesgNumCameraEvent:
+		return "camera_event"
+	case MesgNumTimestampCorrelation:
+		return "timestamp_correlation"
+	case MesgNumGyroscopeData:
+		return "gyroscope_data"
+	case MesgNumAccelerometerData:
+		return "accelerometer_data"
+	case MesgNumThreeDSensorCalibration:
+		return "three_d_sensor_calibration"
+	case MesgNumVideoFrame:
+		return "video_frame"
+	case MesgNumObdiiData:
+		return "obdii_data"
+	case MesgNumNmeaSentence:
+		return "nmea_sentence"
+	case MesgNumAviationAttitude:
+		return "aviation_attitude"
+	case MesgNumVideo:
+		return "video"
+	case MesgNumVideoTitle:
+		return "video_title"
+	case MesgNumVideoDescription:
+		return "video_description"
+	case MesgNumVideoClip:
+		return "video_clip"
+	case MesgNumOhrSettings:
+		return "ohr_settings"
+	case MesgNumExdScreenConfiguration:
+		return "exd_screen_configuration"
+	case MesgNumExdDataFieldConfiguration:
+		return "exd_data_field_configuration"
+	case MesgNumExdDataConceptConfiguration:
+		return "exd_data_concept_configuration"
+	case MesgNumFieldDescription:
+		return "field_description"
+	case MesgNumDeveloperDataId:
+		return "developer_data_id"
+	case MesgNumMagnetometerData:
+		return "magnetometer_data"
+	case MesgNumBarometerData:
+		return "barometer_data"
+	case MesgNumOneDSensorCalibration:
+		return "one_d_sensor_calibration"
+	case MesgNumMonitoringHrData:
+		return "monitoring_hr_data"
+	case MesgNumTimeInZone:
+		return "time_in_zone"
+	case MesgNumSet:
+		return "set"
+	case MesgNumStressLevel:
+		return "stress_level"
+	case MesgNumMaxMetData:
+		return "max_met_data"
+	case MesgNumDiveSettings:
+		return "dive_settings"
+	case MesgNumDiveGas:
+		return "dive_gas"
+	case MesgNumDiveAlarm:
+		return "dive_alarm"
+	case MesgNumExerciseTitle:
+		return "exercise_title"
+	case MesgNumDiveSummary:
+		return "dive_summary"
+	case MesgNumSpo2Data:
+		return "spo2_data"
+	case MesgNumSleepLevel:
+		return "sleep_level"
+	case MesgNumJump:
+		return "jump"
+	case MesgNumBeatIntervals:
+		return "beat_intervals"
+	case MesgNumRespirationRate:
+		return "respiration_rate"
+	case MesgNumSplit:
+		return "split"
+	case MesgNumSplitSummary:
+		return "split_summary"
+	case MesgNumClimbPro:
+		return "climb_pro"
+	case MesgNumTankUpdate:
+		return "tank_update"
+	case MesgNumTankSummary:
+		return "tank_summary"
+	case MesgNumSleepAssessment:
+		return "sleep_assessment"
+	case MesgNumHrvStatusSummary:
+		return "hrv_status_summary"
+	case MesgNumHrvValue:
+		return "hrv_value"
+	case MesgNumDeviceAuxBatteryInfo:
+		return "device_aux_battery_info"
+	case MesgNumDiveApneaAlarm:
+		return "dive_apnea_alarm"
+	case MesgNumMfgRangeMin:
+		return "mfg_range_min"
+	case MesgNumMfgRangeMax:
+		return "mfg_range_max"
+	default:
+		if val, ok := mesgnumToString[m]; ok {
+			return val
+		}
+		return "MesgNumInvalid(" + strconv.FormatUint(uint64(m), 10) + ")"
 	}
-	return val
 }
-
-var strtomesgnum = func() map[string]MesgNum {
-	m := make(map[string]MesgNum)
-	for t, str := range mesgnumtostrs {
-		m[str] = MesgNum(t)
-	}
-	return m
-}()
 
 // FromString parse string into MesgNum constant it's represent, return MesgNumInvalid if not found.
 func MesgNumFromString(s string) MesgNum {
-	val, ok := strtomesgnum[s]
-	if !ok {
-		return strtomesgnum["invalid"]
+	switch s {
+	case "file_id":
+		return MesgNumFileId
+	case "capabilities":
+		return MesgNumCapabilities
+	case "device_settings":
+		return MesgNumDeviceSettings
+	case "user_profile":
+		return MesgNumUserProfile
+	case "hrm_profile":
+		return MesgNumHrmProfile
+	case "sdm_profile":
+		return MesgNumSdmProfile
+	case "bike_profile":
+		return MesgNumBikeProfile
+	case "zones_target":
+		return MesgNumZonesTarget
+	case "hr_zone":
+		return MesgNumHrZone
+	case "power_zone":
+		return MesgNumPowerZone
+	case "met_zone":
+		return MesgNumMetZone
+	case "sport":
+		return MesgNumSport
+	case "goal":
+		return MesgNumGoal
+	case "session":
+		return MesgNumSession
+	case "lap":
+		return MesgNumLap
+	case "record":
+		return MesgNumRecord
+	case "event":
+		return MesgNumEvent
+	case "device_info":
+		return MesgNumDeviceInfo
+	case "workout":
+		return MesgNumWorkout
+	case "workout_step":
+		return MesgNumWorkoutStep
+	case "schedule":
+		return MesgNumSchedule
+	case "weight_scale":
+		return MesgNumWeightScale
+	case "course":
+		return MesgNumCourse
+	case "course_point":
+		return MesgNumCoursePoint
+	case "totals":
+		return MesgNumTotals
+	case "activity":
+		return MesgNumActivity
+	case "software":
+		return MesgNumSoftware
+	case "file_capabilities":
+		return MesgNumFileCapabilities
+	case "mesg_capabilities":
+		return MesgNumMesgCapabilities
+	case "field_capabilities":
+		return MesgNumFieldCapabilities
+	case "file_creator":
+		return MesgNumFileCreator
+	case "blood_pressure":
+		return MesgNumBloodPressure
+	case "speed_zone":
+		return MesgNumSpeedZone
+	case "monitoring":
+		return MesgNumMonitoring
+	case "training_file":
+		return MesgNumTrainingFile
+	case "hrv":
+		return MesgNumHrv
+	case "ant_rx":
+		return MesgNumAntRx
+	case "ant_tx":
+		return MesgNumAntTx
+	case "ant_channel_id":
+		return MesgNumAntChannelId
+	case "length":
+		return MesgNumLength
+	case "monitoring_info":
+		return MesgNumMonitoringInfo
+	case "pad":
+		return MesgNumPad
+	case "slave_device":
+		return MesgNumSlaveDevice
+	case "connectivity":
+		return MesgNumConnectivity
+	case "weather_conditions":
+		return MesgNumWeatherConditions
+	case "weather_alert":
+		return MesgNumWeatherAlert
+	case "cadence_zone":
+		return MesgNumCadenceZone
+	case "hr":
+		return MesgNumHr
+	case "segment_lap":
+		return MesgNumSegmentLap
+	case "memo_glob":
+		return MesgNumMemoGlob
+	case "segment_id":
+		return MesgNumSegmentId
+	case "segment_leaderboard_entry":
+		return MesgNumSegmentLeaderboardEntry
+	case "segment_point":
+		return MesgNumSegmentPoint
+	case "segment_file":
+		return MesgNumSegmentFile
+	case "workout_session":
+		return MesgNumWorkoutSession
+	case "watchface_settings":
+		return MesgNumWatchfaceSettings
+	case "gps_metadata":
+		return MesgNumGpsMetadata
+	case "camera_event":
+		return MesgNumCameraEvent
+	case "timestamp_correlation":
+		return MesgNumTimestampCorrelation
+	case "gyroscope_data":
+		return MesgNumGyroscopeData
+	case "accelerometer_data":
+		return MesgNumAccelerometerData
+	case "three_d_sensor_calibration":
+		return MesgNumThreeDSensorCalibration
+	case "video_frame":
+		return MesgNumVideoFrame
+	case "obdii_data":
+		return MesgNumObdiiData
+	case "nmea_sentence":
+		return MesgNumNmeaSentence
+	case "aviation_attitude":
+		return MesgNumAviationAttitude
+	case "video":
+		return MesgNumVideo
+	case "video_title":
+		return MesgNumVideoTitle
+	case "video_description":
+		return MesgNumVideoDescription
+	case "video_clip":
+		return MesgNumVideoClip
+	case "ohr_settings":
+		return MesgNumOhrSettings
+	case "exd_screen_configuration":
+		return MesgNumExdScreenConfiguration
+	case "exd_data_field_configuration":
+		return MesgNumExdDataFieldConfiguration
+	case "exd_data_concept_configuration":
+		return MesgNumExdDataConceptConfiguration
+	case "field_description":
+		return MesgNumFieldDescription
+	case "developer_data_id":
+		return MesgNumDeveloperDataId
+	case "magnetometer_data":
+		return MesgNumMagnetometerData
+	case "barometer_data":
+		return MesgNumBarometerData
+	case "one_d_sensor_calibration":
+		return MesgNumOneDSensorCalibration
+	case "monitoring_hr_data":
+		return MesgNumMonitoringHrData
+	case "time_in_zone":
+		return MesgNumTimeInZone
+	case "set":
+		return MesgNumSet
+	case "stress_level":
+		return MesgNumStressLevel
+	case "max_met_data":
+		return MesgNumMaxMetData
+	case "dive_settings":
+		return MesgNumDiveSettings
+	case "dive_gas":
+		return MesgNumDiveGas
+	case "dive_alarm":
+		return MesgNumDiveAlarm
+	case "exercise_title":
+		return MesgNumExerciseTitle
+	case "dive_summary":
+		return MesgNumDiveSummary
+	case "spo2_data":
+		return MesgNumSpo2Data
+	case "sleep_level":
+		return MesgNumSleepLevel
+	case "jump":
+		return MesgNumJump
+	case "beat_intervals":
+		return MesgNumBeatIntervals
+	case "respiration_rate":
+		return MesgNumRespirationRate
+	case "split":
+		return MesgNumSplit
+	case "split_summary":
+		return MesgNumSplitSummary
+	case "climb_pro":
+		return MesgNumClimbPro
+	case "tank_update":
+		return MesgNumTankUpdate
+	case "tank_summary":
+		return MesgNumTankSummary
+	case "sleep_assessment":
+		return MesgNumSleepAssessment
+	case "hrv_status_summary":
+		return MesgNumHrvStatusSummary
+	case "hrv_value":
+		return MesgNumHrvValue
+	case "device_aux_battery_info":
+		return MesgNumDeviceAuxBatteryInfo
+	case "dive_apnea_alarm":
+		return MesgNumDiveApneaAlarm
+	case "mfg_range_min":
+		return MesgNumMfgRangeMin
+	case "mfg_range_max":
+		return MesgNumMfgRangeMax
+	default:
+		if val, ok := stringToMesgNum[s]; ok {
+			return val
+		}
+		return MesgNumInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListMesgNum() []MesgNum {
-	vs := make([]MesgNum, 0, len(mesgnumtostrs))
-	for i := range mesgnumtostrs {
-		vs = append(vs, MesgNum(i))
+	list := []MesgNum{
+		MesgNumFileId,
+		MesgNumCapabilities,
+		MesgNumDeviceSettings,
+		MesgNumUserProfile,
+		MesgNumHrmProfile,
+		MesgNumSdmProfile,
+		MesgNumBikeProfile,
+		MesgNumZonesTarget,
+		MesgNumHrZone,
+		MesgNumPowerZone,
+		MesgNumMetZone,
+		MesgNumSport,
+		MesgNumGoal,
+		MesgNumSession,
+		MesgNumLap,
+		MesgNumRecord,
+		MesgNumEvent,
+		MesgNumDeviceInfo,
+		MesgNumWorkout,
+		MesgNumWorkoutStep,
+		MesgNumSchedule,
+		MesgNumWeightScale,
+		MesgNumCourse,
+		MesgNumCoursePoint,
+		MesgNumTotals,
+		MesgNumActivity,
+		MesgNumSoftware,
+		MesgNumFileCapabilities,
+		MesgNumMesgCapabilities,
+		MesgNumFieldCapabilities,
+		MesgNumFileCreator,
+		MesgNumBloodPressure,
+		MesgNumSpeedZone,
+		MesgNumMonitoring,
+		MesgNumTrainingFile,
+		MesgNumHrv,
+		MesgNumAntRx,
+		MesgNumAntTx,
+		MesgNumAntChannelId,
+		MesgNumLength,
+		MesgNumMonitoringInfo,
+		MesgNumPad,
+		MesgNumSlaveDevice,
+		MesgNumConnectivity,
+		MesgNumWeatherConditions,
+		MesgNumWeatherAlert,
+		MesgNumCadenceZone,
+		MesgNumHr,
+		MesgNumSegmentLap,
+		MesgNumMemoGlob,
+		MesgNumSegmentId,
+		MesgNumSegmentLeaderboardEntry,
+		MesgNumSegmentPoint,
+		MesgNumSegmentFile,
+		MesgNumWorkoutSession,
+		MesgNumWatchfaceSettings,
+		MesgNumGpsMetadata,
+		MesgNumCameraEvent,
+		MesgNumTimestampCorrelation,
+		MesgNumGyroscopeData,
+		MesgNumAccelerometerData,
+		MesgNumThreeDSensorCalibration,
+		MesgNumVideoFrame,
+		MesgNumObdiiData,
+		MesgNumNmeaSentence,
+		MesgNumAviationAttitude,
+		MesgNumVideo,
+		MesgNumVideoTitle,
+		MesgNumVideoDescription,
+		MesgNumVideoClip,
+		MesgNumOhrSettings,
+		MesgNumExdScreenConfiguration,
+		MesgNumExdDataFieldConfiguration,
+		MesgNumExdDataConceptConfiguration,
+		MesgNumFieldDescription,
+		MesgNumDeveloperDataId,
+		MesgNumMagnetometerData,
+		MesgNumBarometerData,
+		MesgNumOneDSensorCalibration,
+		MesgNumMonitoringHrData,
+		MesgNumTimeInZone,
+		MesgNumSet,
+		MesgNumStressLevel,
+		MesgNumMaxMetData,
+		MesgNumDiveSettings,
+		MesgNumDiveGas,
+		MesgNumDiveAlarm,
+		MesgNumExerciseTitle,
+		MesgNumDiveSummary,
+		MesgNumSpo2Data,
+		MesgNumSleepLevel,
+		MesgNumJump,
+		MesgNumBeatIntervals,
+		MesgNumRespirationRate,
+		MesgNumSplit,
+		MesgNumSplitSummary,
+		MesgNumClimbPro,
+		MesgNumTankUpdate,
+		MesgNumTankSummary,
+		MesgNumSleepAssessment,
+		MesgNumHrvStatusSummary,
+		MesgNumHrvValue,
+		MesgNumDeviceAuxBatteryInfo,
+		MesgNumDiveApneaAlarm,
+		MesgNumMfgRangeMin,
+		MesgNumMfgRangeMax,
 	}
-	return vs
+	for k := range mesgnumToString {
+		list = append(list, k)
+	}
+	return list
 }
 
 // MesgNumRegister registers a manufacturer specific MesgNum so that the value can be recognized.
@@ -277,12 +697,8 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", MesgNumInvalid)
 	}
 
-	if str, ok := mesgnumtostrs[v]; ok {
-		return fmt.Errorf("could not register to an existing MesgNum: %d (%s)", v, str)
-	}
-
-	mesgnumtostrs[v] = s
-	strtomesgnum[s] = v
+	mesgnumToString[v] = s
+	stringToMesgNum[s] = v
 
 	return nil
 }

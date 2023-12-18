@@ -17,50 +17,53 @@ const (
 	DisplayOrientationAuto             DisplayOrientation = 0 // automatic if the device supports it
 	DisplayOrientationPortrait         DisplayOrientation = 1
 	DisplayOrientationLandscape        DisplayOrientation = 2
-	DisplayOrientationPortraitFlipped  DisplayOrientation = 3    // portrait mode but rotated 180 degrees
-	DisplayOrientationLandscapeFlipped DisplayOrientation = 4    // landscape mode but rotated 180 degrees
-	DisplayOrientationInvalid          DisplayOrientation = 0xFF // INVALID
+	DisplayOrientationPortraitFlipped  DisplayOrientation = 3 // portrait mode but rotated 180 degrees
+	DisplayOrientationLandscapeFlipped DisplayOrientation = 4 // landscape mode but rotated 180 degrees
+	DisplayOrientationInvalid          DisplayOrientation = 0xFF
 )
 
-var displayorientationtostrs = map[DisplayOrientation]string{
-	DisplayOrientationAuto:             "auto",
-	DisplayOrientationPortrait:         "portrait",
-	DisplayOrientationLandscape:        "landscape",
-	DisplayOrientationPortraitFlipped:  "portrait_flipped",
-	DisplayOrientationLandscapeFlipped: "landscape_flipped",
-	DisplayOrientationInvalid:          "invalid",
-}
-
 func (d DisplayOrientation) String() string {
-	val, ok := displayorientationtostrs[d]
-	if !ok {
-		return strconv.Itoa(int(d))
+	switch d {
+	case DisplayOrientationAuto:
+		return "auto"
+	case DisplayOrientationPortrait:
+		return "portrait"
+	case DisplayOrientationLandscape:
+		return "landscape"
+	case DisplayOrientationPortraitFlipped:
+		return "portrait_flipped"
+	case DisplayOrientationLandscapeFlipped:
+		return "landscape_flipped"
+	default:
+		return "DisplayOrientationInvalid(" + strconv.Itoa(int(d)) + ")"
 	}
-	return val
 }
-
-var strtodisplayorientation = func() map[string]DisplayOrientation {
-	m := make(map[string]DisplayOrientation)
-	for t, str := range displayorientationtostrs {
-		m[str] = DisplayOrientation(t)
-	}
-	return m
-}()
 
 // FromString parse string into DisplayOrientation constant it's represent, return DisplayOrientationInvalid if not found.
 func DisplayOrientationFromString(s string) DisplayOrientation {
-	val, ok := strtodisplayorientation[s]
-	if !ok {
-		return strtodisplayorientation["invalid"]
+	switch s {
+	case "auto":
+		return DisplayOrientationAuto
+	case "portrait":
+		return DisplayOrientationPortrait
+	case "landscape":
+		return DisplayOrientationLandscape
+	case "portrait_flipped":
+		return DisplayOrientationPortraitFlipped
+	case "landscape_flipped":
+		return DisplayOrientationLandscapeFlipped
+	default:
+		return DisplayOrientationInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDisplayOrientation() []DisplayOrientation {
-	vs := make([]DisplayOrientation, 0, len(displayorientationtostrs))
-	for i := range displayorientationtostrs {
-		vs = append(vs, DisplayOrientation(i))
+	return []DisplayOrientation{
+		DisplayOrientationAuto,
+		DisplayOrientationPortrait,
+		DisplayOrientationLandscape,
+		DisplayOrientationPortraitFlipped,
+		DisplayOrientationLandscapeFlipped,
 	}
-	return vs
 }

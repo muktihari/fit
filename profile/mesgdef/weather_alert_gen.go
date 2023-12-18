@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,15 +34,7 @@ func NewWeatherAlert(mesg proto.Message) *WeatherAlert {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* ReportId */
-		1:   nil, /* IssueTime */
-		2:   nil, /* ExpireTime */
-		3:   nil, /* Severity */
-		4:   nil, /* Type */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -62,35 +55,67 @@ func NewWeatherAlert(mesg proto.Message) *WeatherAlert {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to WeatherAlert mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumWeatherAlert)
-func (m *WeatherAlert) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts WeatherAlert into proto.Message.
+func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherAlert)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumWeatherAlert {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.ReportId,
-		1:   typeconv.ToUint32[uint32](m.IssueTime),
-		2:   typeconv.ToUint32[uint32](m.ExpireTime),
-		3:   typeconv.ToEnum[byte](m.Severity),
-		4:   typeconv.ToEnum[byte](m.Type),
+	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ReportId
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32[uint32](m.IssueTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint32[uint32](m.IssueTime)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.ExpireTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint32[uint32](m.ExpireTime)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToEnum[byte](m.Severity)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToEnum[byte](m.Type)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of WeatherAlert's valid fields.
+func (m *WeatherAlert) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.IssueTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.ExpireTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

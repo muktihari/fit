@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,15 +34,7 @@ func NewTrainingFile(mesg proto.Message) *TrainingFile {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* Type */
-		1:   nil, /* Manufacturer */
-		2:   nil, /* Product */
-		3:   nil, /* SerialNumber */
-		4:   nil, /* TimeCreated */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -62,35 +55,67 @@ func NewTrainingFile(mesg proto.Message) *TrainingFile {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to TrainingFile mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumTrainingFile)
-func (m *TrainingFile) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts TrainingFile into proto.Message.
+func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumTrainingFile)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumTrainingFile {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToEnum[byte](m.Type),
-		1:   typeconv.ToUint16[uint16](m.Manufacturer),
-		2:   m.Product,
-		3:   typeconv.ToUint32z[uint32](m.SerialNumber),
-		4:   typeconv.ToUint32[uint32](m.TimeCreated),
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.Type)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Product != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Product
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToUint32[uint32](m.TimeCreated)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of TrainingFile's valid fields.
+func (m *TrainingFile) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Product != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

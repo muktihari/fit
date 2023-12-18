@@ -99,128 +99,451 @@ const (
 	SubSportFlyVfr               SubSport = 118 // Flying
 	SubSportFlyIfr               SubSport = 119 // Flying
 	SubSportAll                  SubSport = 254
-	SubSportInvalid              SubSport = 0xFF // INVALID
+	SubSportInvalid              SubSport = 0xFF
 )
 
-var subsporttostrs = map[SubSport]string{
-	SubSportGeneric:              "generic",
-	SubSportTreadmill:            "treadmill",
-	SubSportStreet:               "street",
-	SubSportTrail:                "trail",
-	SubSportTrack:                "track",
-	SubSportSpin:                 "spin",
-	SubSportIndoorCycling:        "indoor_cycling",
-	SubSportRoad:                 "road",
-	SubSportMountain:             "mountain",
-	SubSportDownhill:             "downhill",
-	SubSportRecumbent:            "recumbent",
-	SubSportCyclocross:           "cyclocross",
-	SubSportHandCycling:          "hand_cycling",
-	SubSportTrackCycling:         "track_cycling",
-	SubSportIndoorRowing:         "indoor_rowing",
-	SubSportElliptical:           "elliptical",
-	SubSportStairClimbing:        "stair_climbing",
-	SubSportLapSwimming:          "lap_swimming",
-	SubSportOpenWater:            "open_water",
-	SubSportFlexibilityTraining:  "flexibility_training",
-	SubSportStrengthTraining:     "strength_training",
-	SubSportWarmUp:               "warm_up",
-	SubSportMatch:                "match",
-	SubSportExercise:             "exercise",
-	SubSportChallenge:            "challenge",
-	SubSportIndoorSkiing:         "indoor_skiing",
-	SubSportCardioTraining:       "cardio_training",
-	SubSportIndoorWalking:        "indoor_walking",
-	SubSportEBikeFitness:         "e_bike_fitness",
-	SubSportBmx:                  "bmx",
-	SubSportCasualWalking:        "casual_walking",
-	SubSportSpeedWalking:         "speed_walking",
-	SubSportBikeToRunTransition:  "bike_to_run_transition",
-	SubSportRunToBikeTransition:  "run_to_bike_transition",
-	SubSportSwimToBikeTransition: "swim_to_bike_transition",
-	SubSportAtv:                  "atv",
-	SubSportMotocross:            "motocross",
-	SubSportBackcountry:          "backcountry",
-	SubSportResort:               "resort",
-	SubSportRcDrone:              "rc_drone",
-	SubSportWingsuit:             "wingsuit",
-	SubSportWhitewater:           "whitewater",
-	SubSportSkateSkiing:          "skate_skiing",
-	SubSportYoga:                 "yoga",
-	SubSportPilates:              "pilates",
-	SubSportIndoorRunning:        "indoor_running",
-	SubSportGravelCycling:        "gravel_cycling",
-	SubSportEBikeMountain:        "e_bike_mountain",
-	SubSportCommuting:            "commuting",
-	SubSportMixedSurface:         "mixed_surface",
-	SubSportNavigate:             "navigate",
-	SubSportTrackMe:              "track_me",
-	SubSportMap:                  "map",
-	SubSportSingleGasDiving:      "single_gas_diving",
-	SubSportMultiGasDiving:       "multi_gas_diving",
-	SubSportGaugeDiving:          "gauge_diving",
-	SubSportApneaDiving:          "apnea_diving",
-	SubSportApneaHunting:         "apnea_hunting",
-	SubSportVirtualActivity:      "virtual_activity",
-	SubSportObstacle:             "obstacle",
-	SubSportBreathing:            "breathing",
-	SubSportSailRace:             "sail_race",
-	SubSportUltra:                "ultra",
-	SubSportIndoorClimbing:       "indoor_climbing",
-	SubSportBouldering:           "bouldering",
-	SubSportHiit:                 "hiit",
-	SubSportAmrap:                "amrap",
-	SubSportEmom:                 "emom",
-	SubSportTabata:               "tabata",
-	SubSportPickleball:           "pickleball",
-	SubSportPadel:                "padel",
-	SubSportIndoorWheelchairWalk: "indoor_wheelchair_walk",
-	SubSportIndoorWheelchairRun:  "indoor_wheelchair_run",
-	SubSportIndoorHandCycling:    "indoor_hand_cycling",
-	SubSportFlyCanopy:            "fly_canopy",
-	SubSportFlyParaglide:         "fly_paraglide",
-	SubSportFlyParamotor:         "fly_paramotor",
-	SubSportFlyPressurized:       "fly_pressurized",
-	SubSportFlyNavigate:          "fly_navigate",
-	SubSportFlyTimer:             "fly_timer",
-	SubSportFlyAltimeter:         "fly_altimeter",
-	SubSportFlyWx:                "fly_wx",
-	SubSportFlyVfr:               "fly_vfr",
-	SubSportFlyIfr:               "fly_ifr",
-	SubSportAll:                  "all",
-	SubSportInvalid:              "invalid",
-}
-
 func (s SubSport) String() string {
-	val, ok := subsporttostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SubSportGeneric:
+		return "generic"
+	case SubSportTreadmill:
+		return "treadmill"
+	case SubSportStreet:
+		return "street"
+	case SubSportTrail:
+		return "trail"
+	case SubSportTrack:
+		return "track"
+	case SubSportSpin:
+		return "spin"
+	case SubSportIndoorCycling:
+		return "indoor_cycling"
+	case SubSportRoad:
+		return "road"
+	case SubSportMountain:
+		return "mountain"
+	case SubSportDownhill:
+		return "downhill"
+	case SubSportRecumbent:
+		return "recumbent"
+	case SubSportCyclocross:
+		return "cyclocross"
+	case SubSportHandCycling:
+		return "hand_cycling"
+	case SubSportTrackCycling:
+		return "track_cycling"
+	case SubSportIndoorRowing:
+		return "indoor_rowing"
+	case SubSportElliptical:
+		return "elliptical"
+	case SubSportStairClimbing:
+		return "stair_climbing"
+	case SubSportLapSwimming:
+		return "lap_swimming"
+	case SubSportOpenWater:
+		return "open_water"
+	case SubSportFlexibilityTraining:
+		return "flexibility_training"
+	case SubSportStrengthTraining:
+		return "strength_training"
+	case SubSportWarmUp:
+		return "warm_up"
+	case SubSportMatch:
+		return "match"
+	case SubSportExercise:
+		return "exercise"
+	case SubSportChallenge:
+		return "challenge"
+	case SubSportIndoorSkiing:
+		return "indoor_skiing"
+	case SubSportCardioTraining:
+		return "cardio_training"
+	case SubSportIndoorWalking:
+		return "indoor_walking"
+	case SubSportEBikeFitness:
+		return "e_bike_fitness"
+	case SubSportBmx:
+		return "bmx"
+	case SubSportCasualWalking:
+		return "casual_walking"
+	case SubSportSpeedWalking:
+		return "speed_walking"
+	case SubSportBikeToRunTransition:
+		return "bike_to_run_transition"
+	case SubSportRunToBikeTransition:
+		return "run_to_bike_transition"
+	case SubSportSwimToBikeTransition:
+		return "swim_to_bike_transition"
+	case SubSportAtv:
+		return "atv"
+	case SubSportMotocross:
+		return "motocross"
+	case SubSportBackcountry:
+		return "backcountry"
+	case SubSportResort:
+		return "resort"
+	case SubSportRcDrone:
+		return "rc_drone"
+	case SubSportWingsuit:
+		return "wingsuit"
+	case SubSportWhitewater:
+		return "whitewater"
+	case SubSportSkateSkiing:
+		return "skate_skiing"
+	case SubSportYoga:
+		return "yoga"
+	case SubSportPilates:
+		return "pilates"
+	case SubSportIndoorRunning:
+		return "indoor_running"
+	case SubSportGravelCycling:
+		return "gravel_cycling"
+	case SubSportEBikeMountain:
+		return "e_bike_mountain"
+	case SubSportCommuting:
+		return "commuting"
+	case SubSportMixedSurface:
+		return "mixed_surface"
+	case SubSportNavigate:
+		return "navigate"
+	case SubSportTrackMe:
+		return "track_me"
+	case SubSportMap:
+		return "map"
+	case SubSportSingleGasDiving:
+		return "single_gas_diving"
+	case SubSportMultiGasDiving:
+		return "multi_gas_diving"
+	case SubSportGaugeDiving:
+		return "gauge_diving"
+	case SubSportApneaDiving:
+		return "apnea_diving"
+	case SubSportApneaHunting:
+		return "apnea_hunting"
+	case SubSportVirtualActivity:
+		return "virtual_activity"
+	case SubSportObstacle:
+		return "obstacle"
+	case SubSportBreathing:
+		return "breathing"
+	case SubSportSailRace:
+		return "sail_race"
+	case SubSportUltra:
+		return "ultra"
+	case SubSportIndoorClimbing:
+		return "indoor_climbing"
+	case SubSportBouldering:
+		return "bouldering"
+	case SubSportHiit:
+		return "hiit"
+	case SubSportAmrap:
+		return "amrap"
+	case SubSportEmom:
+		return "emom"
+	case SubSportTabata:
+		return "tabata"
+	case SubSportPickleball:
+		return "pickleball"
+	case SubSportPadel:
+		return "padel"
+	case SubSportIndoorWheelchairWalk:
+		return "indoor_wheelchair_walk"
+	case SubSportIndoorWheelchairRun:
+		return "indoor_wheelchair_run"
+	case SubSportIndoorHandCycling:
+		return "indoor_hand_cycling"
+	case SubSportFlyCanopy:
+		return "fly_canopy"
+	case SubSportFlyParaglide:
+		return "fly_paraglide"
+	case SubSportFlyParamotor:
+		return "fly_paramotor"
+	case SubSportFlyPressurized:
+		return "fly_pressurized"
+	case SubSportFlyNavigate:
+		return "fly_navigate"
+	case SubSportFlyTimer:
+		return "fly_timer"
+	case SubSportFlyAltimeter:
+		return "fly_altimeter"
+	case SubSportFlyWx:
+		return "fly_wx"
+	case SubSportFlyVfr:
+		return "fly_vfr"
+	case SubSportFlyIfr:
+		return "fly_ifr"
+	case SubSportAll:
+		return "all"
+	default:
+		return "SubSportInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosubsport = func() map[string]SubSport {
-	m := make(map[string]SubSport)
-	for t, str := range subsporttostrs {
-		m[str] = SubSport(t)
-	}
-	return m
-}()
 
 // FromString parse string into SubSport constant it's represent, return SubSportInvalid if not found.
 func SubSportFromString(s string) SubSport {
-	val, ok := strtosubsport[s]
-	if !ok {
-		return strtosubsport["invalid"]
+	switch s {
+	case "generic":
+		return SubSportGeneric
+	case "treadmill":
+		return SubSportTreadmill
+	case "street":
+		return SubSportStreet
+	case "trail":
+		return SubSportTrail
+	case "track":
+		return SubSportTrack
+	case "spin":
+		return SubSportSpin
+	case "indoor_cycling":
+		return SubSportIndoorCycling
+	case "road":
+		return SubSportRoad
+	case "mountain":
+		return SubSportMountain
+	case "downhill":
+		return SubSportDownhill
+	case "recumbent":
+		return SubSportRecumbent
+	case "cyclocross":
+		return SubSportCyclocross
+	case "hand_cycling":
+		return SubSportHandCycling
+	case "track_cycling":
+		return SubSportTrackCycling
+	case "indoor_rowing":
+		return SubSportIndoorRowing
+	case "elliptical":
+		return SubSportElliptical
+	case "stair_climbing":
+		return SubSportStairClimbing
+	case "lap_swimming":
+		return SubSportLapSwimming
+	case "open_water":
+		return SubSportOpenWater
+	case "flexibility_training":
+		return SubSportFlexibilityTraining
+	case "strength_training":
+		return SubSportStrengthTraining
+	case "warm_up":
+		return SubSportWarmUp
+	case "match":
+		return SubSportMatch
+	case "exercise":
+		return SubSportExercise
+	case "challenge":
+		return SubSportChallenge
+	case "indoor_skiing":
+		return SubSportIndoorSkiing
+	case "cardio_training":
+		return SubSportCardioTraining
+	case "indoor_walking":
+		return SubSportIndoorWalking
+	case "e_bike_fitness":
+		return SubSportEBikeFitness
+	case "bmx":
+		return SubSportBmx
+	case "casual_walking":
+		return SubSportCasualWalking
+	case "speed_walking":
+		return SubSportSpeedWalking
+	case "bike_to_run_transition":
+		return SubSportBikeToRunTransition
+	case "run_to_bike_transition":
+		return SubSportRunToBikeTransition
+	case "swim_to_bike_transition":
+		return SubSportSwimToBikeTransition
+	case "atv":
+		return SubSportAtv
+	case "motocross":
+		return SubSportMotocross
+	case "backcountry":
+		return SubSportBackcountry
+	case "resort":
+		return SubSportResort
+	case "rc_drone":
+		return SubSportRcDrone
+	case "wingsuit":
+		return SubSportWingsuit
+	case "whitewater":
+		return SubSportWhitewater
+	case "skate_skiing":
+		return SubSportSkateSkiing
+	case "yoga":
+		return SubSportYoga
+	case "pilates":
+		return SubSportPilates
+	case "indoor_running":
+		return SubSportIndoorRunning
+	case "gravel_cycling":
+		return SubSportGravelCycling
+	case "e_bike_mountain":
+		return SubSportEBikeMountain
+	case "commuting":
+		return SubSportCommuting
+	case "mixed_surface":
+		return SubSportMixedSurface
+	case "navigate":
+		return SubSportNavigate
+	case "track_me":
+		return SubSportTrackMe
+	case "map":
+		return SubSportMap
+	case "single_gas_diving":
+		return SubSportSingleGasDiving
+	case "multi_gas_diving":
+		return SubSportMultiGasDiving
+	case "gauge_diving":
+		return SubSportGaugeDiving
+	case "apnea_diving":
+		return SubSportApneaDiving
+	case "apnea_hunting":
+		return SubSportApneaHunting
+	case "virtual_activity":
+		return SubSportVirtualActivity
+	case "obstacle":
+		return SubSportObstacle
+	case "breathing":
+		return SubSportBreathing
+	case "sail_race":
+		return SubSportSailRace
+	case "ultra":
+		return SubSportUltra
+	case "indoor_climbing":
+		return SubSportIndoorClimbing
+	case "bouldering":
+		return SubSportBouldering
+	case "hiit":
+		return SubSportHiit
+	case "amrap":
+		return SubSportAmrap
+	case "emom":
+		return SubSportEmom
+	case "tabata":
+		return SubSportTabata
+	case "pickleball":
+		return SubSportPickleball
+	case "padel":
+		return SubSportPadel
+	case "indoor_wheelchair_walk":
+		return SubSportIndoorWheelchairWalk
+	case "indoor_wheelchair_run":
+		return SubSportIndoorWheelchairRun
+	case "indoor_hand_cycling":
+		return SubSportIndoorHandCycling
+	case "fly_canopy":
+		return SubSportFlyCanopy
+	case "fly_paraglide":
+		return SubSportFlyParaglide
+	case "fly_paramotor":
+		return SubSportFlyParamotor
+	case "fly_pressurized":
+		return SubSportFlyPressurized
+	case "fly_navigate":
+		return SubSportFlyNavigate
+	case "fly_timer":
+		return SubSportFlyTimer
+	case "fly_altimeter":
+		return SubSportFlyAltimeter
+	case "fly_wx":
+		return SubSportFlyWx
+	case "fly_vfr":
+		return SubSportFlyVfr
+	case "fly_ifr":
+		return SubSportFlyIfr
+	case "all":
+		return SubSportAll
+	default:
+		return SubSportInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSubSport() []SubSport {
-	vs := make([]SubSport, 0, len(subsporttostrs))
-	for i := range subsporttostrs {
-		vs = append(vs, SubSport(i))
+	return []SubSport{
+		SubSportGeneric,
+		SubSportTreadmill,
+		SubSportStreet,
+		SubSportTrail,
+		SubSportTrack,
+		SubSportSpin,
+		SubSportIndoorCycling,
+		SubSportRoad,
+		SubSportMountain,
+		SubSportDownhill,
+		SubSportRecumbent,
+		SubSportCyclocross,
+		SubSportHandCycling,
+		SubSportTrackCycling,
+		SubSportIndoorRowing,
+		SubSportElliptical,
+		SubSportStairClimbing,
+		SubSportLapSwimming,
+		SubSportOpenWater,
+		SubSportFlexibilityTraining,
+		SubSportStrengthTraining,
+		SubSportWarmUp,
+		SubSportMatch,
+		SubSportExercise,
+		SubSportChallenge,
+		SubSportIndoorSkiing,
+		SubSportCardioTraining,
+		SubSportIndoorWalking,
+		SubSportEBikeFitness,
+		SubSportBmx,
+		SubSportCasualWalking,
+		SubSportSpeedWalking,
+		SubSportBikeToRunTransition,
+		SubSportRunToBikeTransition,
+		SubSportSwimToBikeTransition,
+		SubSportAtv,
+		SubSportMotocross,
+		SubSportBackcountry,
+		SubSportResort,
+		SubSportRcDrone,
+		SubSportWingsuit,
+		SubSportWhitewater,
+		SubSportSkateSkiing,
+		SubSportYoga,
+		SubSportPilates,
+		SubSportIndoorRunning,
+		SubSportGravelCycling,
+		SubSportEBikeMountain,
+		SubSportCommuting,
+		SubSportMixedSurface,
+		SubSportNavigate,
+		SubSportTrackMe,
+		SubSportMap,
+		SubSportSingleGasDiving,
+		SubSportMultiGasDiving,
+		SubSportGaugeDiving,
+		SubSportApneaDiving,
+		SubSportApneaHunting,
+		SubSportVirtualActivity,
+		SubSportObstacle,
+		SubSportBreathing,
+		SubSportSailRace,
+		SubSportUltra,
+		SubSportIndoorClimbing,
+		SubSportBouldering,
+		SubSportHiit,
+		SubSportAmrap,
+		SubSportEmom,
+		SubSportTabata,
+		SubSportPickleball,
+		SubSportPadel,
+		SubSportIndoorWheelchairWalk,
+		SubSportIndoorWheelchairRun,
+		SubSportIndoorHandCycling,
+		SubSportFlyCanopy,
+		SubSportFlyParaglide,
+		SubSportFlyParamotor,
+		SubSportFlyPressurized,
+		SubSportFlyNavigate,
+		SubSportFlyTimer,
+		SubSportFlyAltimeter,
+		SubSportFlyWx,
+		SubSportFlyVfr,
+		SubSportFlyIfr,
+		SubSportAll,
 	}
-	return vs
 }

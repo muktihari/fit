@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,15 +34,7 @@ func NewHr(mesg proto.Message) *Hr {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* FractionalTimestamp */
-		1:   nil, /* Time256 */
-		6:   nil, /* FilteredBpm */
-		9:   nil, /* EventTimestamp */
-		10:  nil, /* EventTimestamp12 */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -62,35 +55,67 @@ func NewHr(mesg proto.Message) *Hr {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Hr mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumHr)
-func (m *Hr) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Hr into proto.Message.
+func (m *Hr) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumHr)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumHr {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.FractionalTimestamp,
-		1:   m.Time256,
-		6:   m.FilteredBpm,
-		9:   m.EventTimestamp,
-		10:  m.EventTimestamp12,
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.FractionalTimestamp
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Time256 != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Time256
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.FilteredBpm != nil {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.FilteredBpm
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EventTimestamp != nil {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.EventTimestamp
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EventTimestamp12 != nil {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.EventTimestamp12
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Hr's valid fields.
+func (m *Hr) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Time256 != basetype.Uint8Invalid {
+		size++
+	}
+	if m.FilteredBpm != nil {
+		size++
+	}
+	if m.EventTimestamp != nil {
+		size++
+	}
+	if m.EventTimestamp12 != nil {
+		size++
+	}
+	return size
 }

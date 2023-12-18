@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -18,7 +19,7 @@ type ExerciseTitle struct {
 	MessageIndex     typedef.MessageIndex
 	ExerciseCategory typedef.ExerciseCategory
 	ExerciseName     uint16
-	WktStepName      string
+	WktStepName      []string // Array: [N];
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -31,13 +32,7 @@ func NewExerciseTitle(mesg proto.Message) *ExerciseTitle {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* ExerciseCategory */
-		1:   nil, /* ExerciseName */
-		2:   nil, /* WktStepName */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -50,39 +45,57 @@ func NewExerciseTitle(mesg proto.Message) *ExerciseTitle {
 		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		ExerciseCategory: typeconv.ToUint16[typedef.ExerciseCategory](vals[0]),
 		ExerciseName:     typeconv.ToUint16[uint16](vals[1]),
-		WktStepName:      typeconv.ToString[string](vals[2]),
+		WktStepName:      typeconv.ToSliceString[string](vals[2]),
 
 		DeveloperFields: mesg.DeveloperFields,
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ExerciseTitle mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumExerciseTitle)
-func (m *ExerciseTitle) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ExerciseTitle into proto.Message.
+func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumExerciseTitle)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumExerciseTitle {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   typeconv.ToUint16[uint16](m.ExerciseCategory),
-		1:   m.ExerciseName,
-		2:   m.WktStepName,
+	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint16[uint16](m.ExerciseCategory)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.ExerciseName != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.ExerciseName
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WktStepName != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.WktStepName
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ExerciseTitle's valid fields.
+func (m *ExerciseTitle) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.ExerciseName != basetype.Uint16Invalid {
+		size++
+	}
+	if m.WktStepName != nil {
+		size++
+	}
+	return size
 }

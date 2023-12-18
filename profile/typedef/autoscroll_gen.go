@@ -18,47 +18,46 @@ const (
 	AutoscrollSlow    Autoscroll = 1
 	AutoscrollMedium  Autoscroll = 2
 	AutoscrollFast    Autoscroll = 3
-	AutoscrollInvalid Autoscroll = 0xFF // INVALID
+	AutoscrollInvalid Autoscroll = 0xFF
 )
 
-var autoscrolltostrs = map[Autoscroll]string{
-	AutoscrollNone:    "none",
-	AutoscrollSlow:    "slow",
-	AutoscrollMedium:  "medium",
-	AutoscrollFast:    "fast",
-	AutoscrollInvalid: "invalid",
-}
-
 func (a Autoscroll) String() string {
-	val, ok := autoscrolltostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case AutoscrollNone:
+		return "none"
+	case AutoscrollSlow:
+		return "slow"
+	case AutoscrollMedium:
+		return "medium"
+	case AutoscrollFast:
+		return "fast"
+	default:
+		return "AutoscrollInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoautoscroll = func() map[string]Autoscroll {
-	m := make(map[string]Autoscroll)
-	for t, str := range autoscrolltostrs {
-		m[str] = Autoscroll(t)
-	}
-	return m
-}()
 
 // FromString parse string into Autoscroll constant it's represent, return AutoscrollInvalid if not found.
 func AutoscrollFromString(s string) Autoscroll {
-	val, ok := strtoautoscroll[s]
-	if !ok {
-		return strtoautoscroll["invalid"]
+	switch s {
+	case "none":
+		return AutoscrollNone
+	case "slow":
+		return AutoscrollSlow
+	case "medium":
+		return AutoscrollMedium
+	case "fast":
+		return AutoscrollFast
+	default:
+		return AutoscrollInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAutoscroll() []Autoscroll {
-	vs := make([]Autoscroll, 0, len(autoscrolltostrs))
-	for i := range autoscrolltostrs {
-		vs = append(vs, Autoscroll(i))
+	return []Autoscroll{
+		AutoscrollNone,
+		AutoscrollSlow,
+		AutoscrollMedium,
+		AutoscrollFast,
 	}
-	return vs
 }

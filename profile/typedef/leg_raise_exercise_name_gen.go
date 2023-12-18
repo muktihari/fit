@@ -36,65 +36,136 @@ const (
 	LegRaiseExerciseNameWeightedHangingKneeRaise           LegRaiseExerciseName = 19
 	LegRaiseExerciseNameLateralStepover                    LegRaiseExerciseName = 20
 	LegRaiseExerciseNameWeightedLateralStepover            LegRaiseExerciseName = 21
-	LegRaiseExerciseNameInvalid                            LegRaiseExerciseName = 0xFFFF // INVALID
+	LegRaiseExerciseNameInvalid                            LegRaiseExerciseName = 0xFFFF
 )
 
-var legraiseexercisenametostrs = map[LegRaiseExerciseName]string{
-	LegRaiseExerciseNameHangingKneeRaise:                   "hanging_knee_raise",
-	LegRaiseExerciseNameHangingLegRaise:                    "hanging_leg_raise",
-	LegRaiseExerciseNameWeightedHangingLegRaise:            "weighted_hanging_leg_raise",
-	LegRaiseExerciseNameHangingSingleLegRaise:              "hanging_single_leg_raise",
-	LegRaiseExerciseNameWeightedHangingSingleLegRaise:      "weighted_hanging_single_leg_raise",
-	LegRaiseExerciseNameKettlebellLegRaises:                "kettlebell_leg_raises",
-	LegRaiseExerciseNameLegLoweringDrill:                   "leg_lowering_drill",
-	LegRaiseExerciseNameWeightedLegLoweringDrill:           "weighted_leg_lowering_drill",
-	LegRaiseExerciseNameLyingStraightLegRaise:              "lying_straight_leg_raise",
-	LegRaiseExerciseNameWeightedLyingStraightLegRaise:      "weighted_lying_straight_leg_raise",
-	LegRaiseExerciseNameMedicineBallLegDrops:               "medicine_ball_leg_drops",
-	LegRaiseExerciseNameQuadrupedLegRaise:                  "quadruped_leg_raise",
-	LegRaiseExerciseNameWeightedQuadrupedLegRaise:          "weighted_quadruped_leg_raise",
-	LegRaiseExerciseNameReverseLegRaise:                    "reverse_leg_raise",
-	LegRaiseExerciseNameWeightedReverseLegRaise:            "weighted_reverse_leg_raise",
-	LegRaiseExerciseNameReverseLegRaiseOnSwissBall:         "reverse_leg_raise_on_swiss_ball",
-	LegRaiseExerciseNameWeightedReverseLegRaiseOnSwissBall: "weighted_reverse_leg_raise_on_swiss_ball",
-	LegRaiseExerciseNameSingleLegLoweringDrill:             "single_leg_lowering_drill",
-	LegRaiseExerciseNameWeightedSingleLegLoweringDrill:     "weighted_single_leg_lowering_drill",
-	LegRaiseExerciseNameWeightedHangingKneeRaise:           "weighted_hanging_knee_raise",
-	LegRaiseExerciseNameLateralStepover:                    "lateral_stepover",
-	LegRaiseExerciseNameWeightedLateralStepover:            "weighted_lateral_stepover",
-	LegRaiseExerciseNameInvalid:                            "invalid",
-}
-
 func (l LegRaiseExerciseName) String() string {
-	val, ok := legraiseexercisenametostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LegRaiseExerciseNameHangingKneeRaise:
+		return "hanging_knee_raise"
+	case LegRaiseExerciseNameHangingLegRaise:
+		return "hanging_leg_raise"
+	case LegRaiseExerciseNameWeightedHangingLegRaise:
+		return "weighted_hanging_leg_raise"
+	case LegRaiseExerciseNameHangingSingleLegRaise:
+		return "hanging_single_leg_raise"
+	case LegRaiseExerciseNameWeightedHangingSingleLegRaise:
+		return "weighted_hanging_single_leg_raise"
+	case LegRaiseExerciseNameKettlebellLegRaises:
+		return "kettlebell_leg_raises"
+	case LegRaiseExerciseNameLegLoweringDrill:
+		return "leg_lowering_drill"
+	case LegRaiseExerciseNameWeightedLegLoweringDrill:
+		return "weighted_leg_lowering_drill"
+	case LegRaiseExerciseNameLyingStraightLegRaise:
+		return "lying_straight_leg_raise"
+	case LegRaiseExerciseNameWeightedLyingStraightLegRaise:
+		return "weighted_lying_straight_leg_raise"
+	case LegRaiseExerciseNameMedicineBallLegDrops:
+		return "medicine_ball_leg_drops"
+	case LegRaiseExerciseNameQuadrupedLegRaise:
+		return "quadruped_leg_raise"
+	case LegRaiseExerciseNameWeightedQuadrupedLegRaise:
+		return "weighted_quadruped_leg_raise"
+	case LegRaiseExerciseNameReverseLegRaise:
+		return "reverse_leg_raise"
+	case LegRaiseExerciseNameWeightedReverseLegRaise:
+		return "weighted_reverse_leg_raise"
+	case LegRaiseExerciseNameReverseLegRaiseOnSwissBall:
+		return "reverse_leg_raise_on_swiss_ball"
+	case LegRaiseExerciseNameWeightedReverseLegRaiseOnSwissBall:
+		return "weighted_reverse_leg_raise_on_swiss_ball"
+	case LegRaiseExerciseNameSingleLegLoweringDrill:
+		return "single_leg_lowering_drill"
+	case LegRaiseExerciseNameWeightedSingleLegLoweringDrill:
+		return "weighted_single_leg_lowering_drill"
+	case LegRaiseExerciseNameWeightedHangingKneeRaise:
+		return "weighted_hanging_knee_raise"
+	case LegRaiseExerciseNameLateralStepover:
+		return "lateral_stepover"
+	case LegRaiseExerciseNameWeightedLateralStepover:
+		return "weighted_lateral_stepover"
+	default:
+		return "LegRaiseExerciseNameInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolegraiseexercisename = func() map[string]LegRaiseExerciseName {
-	m := make(map[string]LegRaiseExerciseName)
-	for t, str := range legraiseexercisenametostrs {
-		m[str] = LegRaiseExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into LegRaiseExerciseName constant it's represent, return LegRaiseExerciseNameInvalid if not found.
 func LegRaiseExerciseNameFromString(s string) LegRaiseExerciseName {
-	val, ok := strtolegraiseexercisename[s]
-	if !ok {
-		return strtolegraiseexercisename["invalid"]
+	switch s {
+	case "hanging_knee_raise":
+		return LegRaiseExerciseNameHangingKneeRaise
+	case "hanging_leg_raise":
+		return LegRaiseExerciseNameHangingLegRaise
+	case "weighted_hanging_leg_raise":
+		return LegRaiseExerciseNameWeightedHangingLegRaise
+	case "hanging_single_leg_raise":
+		return LegRaiseExerciseNameHangingSingleLegRaise
+	case "weighted_hanging_single_leg_raise":
+		return LegRaiseExerciseNameWeightedHangingSingleLegRaise
+	case "kettlebell_leg_raises":
+		return LegRaiseExerciseNameKettlebellLegRaises
+	case "leg_lowering_drill":
+		return LegRaiseExerciseNameLegLoweringDrill
+	case "weighted_leg_lowering_drill":
+		return LegRaiseExerciseNameWeightedLegLoweringDrill
+	case "lying_straight_leg_raise":
+		return LegRaiseExerciseNameLyingStraightLegRaise
+	case "weighted_lying_straight_leg_raise":
+		return LegRaiseExerciseNameWeightedLyingStraightLegRaise
+	case "medicine_ball_leg_drops":
+		return LegRaiseExerciseNameMedicineBallLegDrops
+	case "quadruped_leg_raise":
+		return LegRaiseExerciseNameQuadrupedLegRaise
+	case "weighted_quadruped_leg_raise":
+		return LegRaiseExerciseNameWeightedQuadrupedLegRaise
+	case "reverse_leg_raise":
+		return LegRaiseExerciseNameReverseLegRaise
+	case "weighted_reverse_leg_raise":
+		return LegRaiseExerciseNameWeightedReverseLegRaise
+	case "reverse_leg_raise_on_swiss_ball":
+		return LegRaiseExerciseNameReverseLegRaiseOnSwissBall
+	case "weighted_reverse_leg_raise_on_swiss_ball":
+		return LegRaiseExerciseNameWeightedReverseLegRaiseOnSwissBall
+	case "single_leg_lowering_drill":
+		return LegRaiseExerciseNameSingleLegLoweringDrill
+	case "weighted_single_leg_lowering_drill":
+		return LegRaiseExerciseNameWeightedSingleLegLoweringDrill
+	case "weighted_hanging_knee_raise":
+		return LegRaiseExerciseNameWeightedHangingKneeRaise
+	case "lateral_stepover":
+		return LegRaiseExerciseNameLateralStepover
+	case "weighted_lateral_stepover":
+		return LegRaiseExerciseNameWeightedLateralStepover
+	default:
+		return LegRaiseExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLegRaiseExerciseName() []LegRaiseExerciseName {
-	vs := make([]LegRaiseExerciseName, 0, len(legraiseexercisenametostrs))
-	for i := range legraiseexercisenametostrs {
-		vs = append(vs, LegRaiseExerciseName(i))
+	return []LegRaiseExerciseName{
+		LegRaiseExerciseNameHangingKneeRaise,
+		LegRaiseExerciseNameHangingLegRaise,
+		LegRaiseExerciseNameWeightedHangingLegRaise,
+		LegRaiseExerciseNameHangingSingleLegRaise,
+		LegRaiseExerciseNameWeightedHangingSingleLegRaise,
+		LegRaiseExerciseNameKettlebellLegRaises,
+		LegRaiseExerciseNameLegLoweringDrill,
+		LegRaiseExerciseNameWeightedLegLoweringDrill,
+		LegRaiseExerciseNameLyingStraightLegRaise,
+		LegRaiseExerciseNameWeightedLyingStraightLegRaise,
+		LegRaiseExerciseNameMedicineBallLegDrops,
+		LegRaiseExerciseNameQuadrupedLegRaise,
+		LegRaiseExerciseNameWeightedQuadrupedLegRaise,
+		LegRaiseExerciseNameReverseLegRaise,
+		LegRaiseExerciseNameWeightedReverseLegRaise,
+		LegRaiseExerciseNameReverseLegRaiseOnSwissBall,
+		LegRaiseExerciseNameWeightedReverseLegRaiseOnSwissBall,
+		LegRaiseExerciseNameSingleLegLoweringDrill,
+		LegRaiseExerciseNameWeightedSingleLegLoweringDrill,
+		LegRaiseExerciseNameWeightedHangingKneeRaise,
+		LegRaiseExerciseNameLateralStepover,
+		LegRaiseExerciseNameWeightedLateralStepover,
 	}
-	return vs
 }

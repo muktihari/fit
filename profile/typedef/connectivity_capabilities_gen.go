@@ -46,75 +46,186 @@ const (
 	ConnectivityCapabilitiesLiveTrackAutoStart              ConnectivityCapabilities = 0x20000000 // Device supports LiveTrack auto start
 	ConnectivityCapabilitiesLiveTrackMessaging              ConnectivityCapabilities = 0x40000000 // Device supports LiveTrack Messaging
 	ConnectivityCapabilitiesInstantInput                    ConnectivityCapabilities = 0x80000000 // Device supports instant input feature
-	ConnectivityCapabilitiesInvalid                         ConnectivityCapabilities = 0x0        // INVALID
+	ConnectivityCapabilitiesInvalid                         ConnectivityCapabilities = 0x0
 )
 
-var connectivitycapabilitiestostrs = map[ConnectivityCapabilities]string{
-	ConnectivityCapabilitiesBluetooth:                       "bluetooth",
-	ConnectivityCapabilitiesBluetoothLe:                     "bluetooth_le",
-	ConnectivityCapabilitiesAnt:                             "ant",
-	ConnectivityCapabilitiesActivityUpload:                  "activity_upload",
-	ConnectivityCapabilitiesCourseDownload:                  "course_download",
-	ConnectivityCapabilitiesWorkoutDownload:                 "workout_download",
-	ConnectivityCapabilitiesLiveTrack:                       "live_track",
-	ConnectivityCapabilitiesWeatherConditions:               "weather_conditions",
-	ConnectivityCapabilitiesWeatherAlerts:                   "weather_alerts",
-	ConnectivityCapabilitiesGpsEphemerisDownload:            "gps_ephemeris_download",
-	ConnectivityCapabilitiesExplicitArchive:                 "explicit_archive",
-	ConnectivityCapabilitiesSetupIncomplete:                 "setup_incomplete",
-	ConnectivityCapabilitiesContinueSyncAfterSoftwareUpdate: "continue_sync_after_software_update",
-	ConnectivityCapabilitiesConnectIqAppDownload:            "connect_iq_app_download",
-	ConnectivityCapabilitiesGolfCourseDownload:              "golf_course_download",
-	ConnectivityCapabilitiesDeviceInitiatesSync:             "device_initiates_sync",
-	ConnectivityCapabilitiesConnectIqWatchAppDownload:       "connect_iq_watch_app_download",
-	ConnectivityCapabilitiesConnectIqWidgetDownload:         "connect_iq_widget_download",
-	ConnectivityCapabilitiesConnectIqWatchFaceDownload:      "connect_iq_watch_face_download",
-	ConnectivityCapabilitiesConnectIqDataFieldDownload:      "connect_iq_data_field_download",
-	ConnectivityCapabilitiesConnectIqAppManagment:           "connect_iq_app_managment",
-	ConnectivityCapabilitiesSwingSensor:                     "swing_sensor",
-	ConnectivityCapabilitiesSwingSensorRemote:               "swing_sensor_remote",
-	ConnectivityCapabilitiesIncidentDetection:               "incident_detection",
-	ConnectivityCapabilitiesAudioPrompts:                    "audio_prompts",
-	ConnectivityCapabilitiesWifiVerification:                "wifi_verification",
-	ConnectivityCapabilitiesTrueUp:                          "true_up",
-	ConnectivityCapabilitiesFindMyWatch:                     "find_my_watch",
-	ConnectivityCapabilitiesRemoteManualSync:                "remote_manual_sync",
-	ConnectivityCapabilitiesLiveTrackAutoStart:              "live_track_auto_start",
-	ConnectivityCapabilitiesLiveTrackMessaging:              "live_track_messaging",
-	ConnectivityCapabilitiesInstantInput:                    "instant_input",
-	ConnectivityCapabilitiesInvalid:                         "invalid",
-}
-
 func (c ConnectivityCapabilities) String() string {
-	val, ok := connectivitycapabilitiestostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case ConnectivityCapabilitiesBluetooth:
+		return "bluetooth"
+	case ConnectivityCapabilitiesBluetoothLe:
+		return "bluetooth_le"
+	case ConnectivityCapabilitiesAnt:
+		return "ant"
+	case ConnectivityCapabilitiesActivityUpload:
+		return "activity_upload"
+	case ConnectivityCapabilitiesCourseDownload:
+		return "course_download"
+	case ConnectivityCapabilitiesWorkoutDownload:
+		return "workout_download"
+	case ConnectivityCapabilitiesLiveTrack:
+		return "live_track"
+	case ConnectivityCapabilitiesWeatherConditions:
+		return "weather_conditions"
+	case ConnectivityCapabilitiesWeatherAlerts:
+		return "weather_alerts"
+	case ConnectivityCapabilitiesGpsEphemerisDownload:
+		return "gps_ephemeris_download"
+	case ConnectivityCapabilitiesExplicitArchive:
+		return "explicit_archive"
+	case ConnectivityCapabilitiesSetupIncomplete:
+		return "setup_incomplete"
+	case ConnectivityCapabilitiesContinueSyncAfterSoftwareUpdate:
+		return "continue_sync_after_software_update"
+	case ConnectivityCapabilitiesConnectIqAppDownload:
+		return "connect_iq_app_download"
+	case ConnectivityCapabilitiesGolfCourseDownload:
+		return "golf_course_download"
+	case ConnectivityCapabilitiesDeviceInitiatesSync:
+		return "device_initiates_sync"
+	case ConnectivityCapabilitiesConnectIqWatchAppDownload:
+		return "connect_iq_watch_app_download"
+	case ConnectivityCapabilitiesConnectIqWidgetDownload:
+		return "connect_iq_widget_download"
+	case ConnectivityCapabilitiesConnectIqWatchFaceDownload:
+		return "connect_iq_watch_face_download"
+	case ConnectivityCapabilitiesConnectIqDataFieldDownload:
+		return "connect_iq_data_field_download"
+	case ConnectivityCapabilitiesConnectIqAppManagment:
+		return "connect_iq_app_managment"
+	case ConnectivityCapabilitiesSwingSensor:
+		return "swing_sensor"
+	case ConnectivityCapabilitiesSwingSensorRemote:
+		return "swing_sensor_remote"
+	case ConnectivityCapabilitiesIncidentDetection:
+		return "incident_detection"
+	case ConnectivityCapabilitiesAudioPrompts:
+		return "audio_prompts"
+	case ConnectivityCapabilitiesWifiVerification:
+		return "wifi_verification"
+	case ConnectivityCapabilitiesTrueUp:
+		return "true_up"
+	case ConnectivityCapabilitiesFindMyWatch:
+		return "find_my_watch"
+	case ConnectivityCapabilitiesRemoteManualSync:
+		return "remote_manual_sync"
+	case ConnectivityCapabilitiesLiveTrackAutoStart:
+		return "live_track_auto_start"
+	case ConnectivityCapabilitiesLiveTrackMessaging:
+		return "live_track_messaging"
+	case ConnectivityCapabilitiesInstantInput:
+		return "instant_input"
+	default:
+		return "ConnectivityCapabilitiesInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtoconnectivitycapabilities = func() map[string]ConnectivityCapabilities {
-	m := make(map[string]ConnectivityCapabilities)
-	for t, str := range connectivitycapabilitiestostrs {
-		m[str] = ConnectivityCapabilities(t)
-	}
-	return m
-}()
 
 // FromString parse string into ConnectivityCapabilities constant it's represent, return ConnectivityCapabilitiesInvalid if not found.
 func ConnectivityCapabilitiesFromString(s string) ConnectivityCapabilities {
-	val, ok := strtoconnectivitycapabilities[s]
-	if !ok {
-		return strtoconnectivitycapabilities["invalid"]
+	switch s {
+	case "bluetooth":
+		return ConnectivityCapabilitiesBluetooth
+	case "bluetooth_le":
+		return ConnectivityCapabilitiesBluetoothLe
+	case "ant":
+		return ConnectivityCapabilitiesAnt
+	case "activity_upload":
+		return ConnectivityCapabilitiesActivityUpload
+	case "course_download":
+		return ConnectivityCapabilitiesCourseDownload
+	case "workout_download":
+		return ConnectivityCapabilitiesWorkoutDownload
+	case "live_track":
+		return ConnectivityCapabilitiesLiveTrack
+	case "weather_conditions":
+		return ConnectivityCapabilitiesWeatherConditions
+	case "weather_alerts":
+		return ConnectivityCapabilitiesWeatherAlerts
+	case "gps_ephemeris_download":
+		return ConnectivityCapabilitiesGpsEphemerisDownload
+	case "explicit_archive":
+		return ConnectivityCapabilitiesExplicitArchive
+	case "setup_incomplete":
+		return ConnectivityCapabilitiesSetupIncomplete
+	case "continue_sync_after_software_update":
+		return ConnectivityCapabilitiesContinueSyncAfterSoftwareUpdate
+	case "connect_iq_app_download":
+		return ConnectivityCapabilitiesConnectIqAppDownload
+	case "golf_course_download":
+		return ConnectivityCapabilitiesGolfCourseDownload
+	case "device_initiates_sync":
+		return ConnectivityCapabilitiesDeviceInitiatesSync
+	case "connect_iq_watch_app_download":
+		return ConnectivityCapabilitiesConnectIqWatchAppDownload
+	case "connect_iq_widget_download":
+		return ConnectivityCapabilitiesConnectIqWidgetDownload
+	case "connect_iq_watch_face_download":
+		return ConnectivityCapabilitiesConnectIqWatchFaceDownload
+	case "connect_iq_data_field_download":
+		return ConnectivityCapabilitiesConnectIqDataFieldDownload
+	case "connect_iq_app_managment":
+		return ConnectivityCapabilitiesConnectIqAppManagment
+	case "swing_sensor":
+		return ConnectivityCapabilitiesSwingSensor
+	case "swing_sensor_remote":
+		return ConnectivityCapabilitiesSwingSensorRemote
+	case "incident_detection":
+		return ConnectivityCapabilitiesIncidentDetection
+	case "audio_prompts":
+		return ConnectivityCapabilitiesAudioPrompts
+	case "wifi_verification":
+		return ConnectivityCapabilitiesWifiVerification
+	case "true_up":
+		return ConnectivityCapabilitiesTrueUp
+	case "find_my_watch":
+		return ConnectivityCapabilitiesFindMyWatch
+	case "remote_manual_sync":
+		return ConnectivityCapabilitiesRemoteManualSync
+	case "live_track_auto_start":
+		return ConnectivityCapabilitiesLiveTrackAutoStart
+	case "live_track_messaging":
+		return ConnectivityCapabilitiesLiveTrackMessaging
+	case "instant_input":
+		return ConnectivityCapabilitiesInstantInput
+	default:
+		return ConnectivityCapabilitiesInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListConnectivityCapabilities() []ConnectivityCapabilities {
-	vs := make([]ConnectivityCapabilities, 0, len(connectivitycapabilitiestostrs))
-	for i := range connectivitycapabilitiestostrs {
-		vs = append(vs, ConnectivityCapabilities(i))
+	return []ConnectivityCapabilities{
+		ConnectivityCapabilitiesBluetooth,
+		ConnectivityCapabilitiesBluetoothLe,
+		ConnectivityCapabilitiesAnt,
+		ConnectivityCapabilitiesActivityUpload,
+		ConnectivityCapabilitiesCourseDownload,
+		ConnectivityCapabilitiesWorkoutDownload,
+		ConnectivityCapabilitiesLiveTrack,
+		ConnectivityCapabilitiesWeatherConditions,
+		ConnectivityCapabilitiesWeatherAlerts,
+		ConnectivityCapabilitiesGpsEphemerisDownload,
+		ConnectivityCapabilitiesExplicitArchive,
+		ConnectivityCapabilitiesSetupIncomplete,
+		ConnectivityCapabilitiesContinueSyncAfterSoftwareUpdate,
+		ConnectivityCapabilitiesConnectIqAppDownload,
+		ConnectivityCapabilitiesGolfCourseDownload,
+		ConnectivityCapabilitiesDeviceInitiatesSync,
+		ConnectivityCapabilitiesConnectIqWatchAppDownload,
+		ConnectivityCapabilitiesConnectIqWidgetDownload,
+		ConnectivityCapabilitiesConnectIqWatchFaceDownload,
+		ConnectivityCapabilitiesConnectIqDataFieldDownload,
+		ConnectivityCapabilitiesConnectIqAppManagment,
+		ConnectivityCapabilitiesSwingSensor,
+		ConnectivityCapabilitiesSwingSensorRemote,
+		ConnectivityCapabilitiesIncidentDetection,
+		ConnectivityCapabilitiesAudioPrompts,
+		ConnectivityCapabilitiesWifiVerification,
+		ConnectivityCapabilitiesTrueUp,
+		ConnectivityCapabilitiesFindMyWatch,
+		ConnectivityCapabilitiesRemoteManualSync,
+		ConnectivityCapabilitiesLiveTrackAutoStart,
+		ConnectivityCapabilitiesLiveTrackMessaging,
+		ConnectivityCapabilitiesInstantInput,
 	}
-	return vs
 }

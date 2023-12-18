@@ -22,51 +22,66 @@ const (
 	SportBits5Tactical    SportBits5 = 0x20
 	SportBits5Jumpmaster  SportBits5 = 0x40
 	SportBits5Boxing      SportBits5 = 0x80
-	SportBits5Invalid     SportBits5 = 0x0 // INVALID
+	SportBits5Invalid     SportBits5 = 0x0
 )
 
-var sportbits5tostrs = map[SportBits5]string{
-	SportBits5WaterSkiing: "water_skiing",
-	SportBits5Kayaking:    "kayaking",
-	SportBits5Rafting:     "rafting",
-	SportBits5Windsurfing: "windsurfing",
-	SportBits5Kitesurfing: "kitesurfing",
-	SportBits5Tactical:    "tactical",
-	SportBits5Jumpmaster:  "jumpmaster",
-	SportBits5Boxing:      "boxing",
-	SportBits5Invalid:     "invalid",
-}
-
 func (s SportBits5) String() string {
-	val, ok := sportbits5tostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case SportBits5WaterSkiing:
+		return "water_skiing"
+	case SportBits5Kayaking:
+		return "kayaking"
+	case SportBits5Rafting:
+		return "rafting"
+	case SportBits5Windsurfing:
+		return "windsurfing"
+	case SportBits5Kitesurfing:
+		return "kitesurfing"
+	case SportBits5Tactical:
+		return "tactical"
+	case SportBits5Jumpmaster:
+		return "jumpmaster"
+	case SportBits5Boxing:
+		return "boxing"
+	default:
+		return "SportBits5Invalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtosportbits5 = func() map[string]SportBits5 {
-	m := make(map[string]SportBits5)
-	for t, str := range sportbits5tostrs {
-		m[str] = SportBits5(t)
-	}
-	return m
-}()
 
 // FromString parse string into SportBits5 constant it's represent, return SportBits5Invalid if not found.
 func SportBits5FromString(s string) SportBits5 {
-	val, ok := strtosportbits5[s]
-	if !ok {
-		return strtosportbits5["invalid"]
+	switch s {
+	case "water_skiing":
+		return SportBits5WaterSkiing
+	case "kayaking":
+		return SportBits5Kayaking
+	case "rafting":
+		return SportBits5Rafting
+	case "windsurfing":
+		return SportBits5Windsurfing
+	case "kitesurfing":
+		return SportBits5Kitesurfing
+	case "tactical":
+		return SportBits5Tactical
+	case "jumpmaster":
+		return SportBits5Jumpmaster
+	case "boxing":
+		return SportBits5Boxing
+	default:
+		return SportBits5Invalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSportBits5() []SportBits5 {
-	vs := make([]SportBits5, 0, len(sportbits5tostrs))
-	for i := range sportbits5tostrs {
-		vs = append(vs, SportBits5(i))
+	return []SportBits5{
+		SportBits5WaterSkiing,
+		SportBits5Kayaking,
+		SportBits5Rafting,
+		SportBits5Windsurfing,
+		SportBits5Kitesurfing,
+		SportBits5Tactical,
+		SportBits5Jumpmaster,
+		SportBits5Boxing,
 	}
-	return vs
 }

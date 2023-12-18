@@ -54,83 +54,226 @@ const (
 	BodyLocationWaistFront            BodyLocation = 37
 	BodyLocationWaistLeft             BodyLocation = 38
 	BodyLocationWaistRight            BodyLocation = 39
-	BodyLocationInvalid               BodyLocation = 0xFF // INVALID
+	BodyLocationInvalid               BodyLocation = 0xFF
 )
 
-var bodylocationtostrs = map[BodyLocation]string{
-	BodyLocationLeftLeg:               "left_leg",
-	BodyLocationLeftCalf:              "left_calf",
-	BodyLocationLeftShin:              "left_shin",
-	BodyLocationLeftHamstring:         "left_hamstring",
-	BodyLocationLeftQuad:              "left_quad",
-	BodyLocationLeftGlute:             "left_glute",
-	BodyLocationRightLeg:              "right_leg",
-	BodyLocationRightCalf:             "right_calf",
-	BodyLocationRightShin:             "right_shin",
-	BodyLocationRightHamstring:        "right_hamstring",
-	BodyLocationRightQuad:             "right_quad",
-	BodyLocationRightGlute:            "right_glute",
-	BodyLocationTorsoBack:             "torso_back",
-	BodyLocationLeftLowerBack:         "left_lower_back",
-	BodyLocationLeftUpperBack:         "left_upper_back",
-	BodyLocationRightLowerBack:        "right_lower_back",
-	BodyLocationRightUpperBack:        "right_upper_back",
-	BodyLocationTorsoFront:            "torso_front",
-	BodyLocationLeftAbdomen:           "left_abdomen",
-	BodyLocationLeftChest:             "left_chest",
-	BodyLocationRightAbdomen:          "right_abdomen",
-	BodyLocationRightChest:            "right_chest",
-	BodyLocationLeftArm:               "left_arm",
-	BodyLocationLeftShoulder:          "left_shoulder",
-	BodyLocationLeftBicep:             "left_bicep",
-	BodyLocationLeftTricep:            "left_tricep",
-	BodyLocationLeftBrachioradialis:   "left_brachioradialis",
-	BodyLocationLeftForearmExtensors:  "left_forearm_extensors",
-	BodyLocationRightArm:              "right_arm",
-	BodyLocationRightShoulder:         "right_shoulder",
-	BodyLocationRightBicep:            "right_bicep",
-	BodyLocationRightTricep:           "right_tricep",
-	BodyLocationRightBrachioradialis:  "right_brachioradialis",
-	BodyLocationRightForearmExtensors: "right_forearm_extensors",
-	BodyLocationNeck:                  "neck",
-	BodyLocationThroat:                "throat",
-	BodyLocationWaistMidBack:          "waist_mid_back",
-	BodyLocationWaistFront:            "waist_front",
-	BodyLocationWaistLeft:             "waist_left",
-	BodyLocationWaistRight:            "waist_right",
-	BodyLocationInvalid:               "invalid",
-}
-
 func (b BodyLocation) String() string {
-	val, ok := bodylocationtostrs[b]
-	if !ok {
-		return strconv.Itoa(int(b))
+	switch b {
+	case BodyLocationLeftLeg:
+		return "left_leg"
+	case BodyLocationLeftCalf:
+		return "left_calf"
+	case BodyLocationLeftShin:
+		return "left_shin"
+	case BodyLocationLeftHamstring:
+		return "left_hamstring"
+	case BodyLocationLeftQuad:
+		return "left_quad"
+	case BodyLocationLeftGlute:
+		return "left_glute"
+	case BodyLocationRightLeg:
+		return "right_leg"
+	case BodyLocationRightCalf:
+		return "right_calf"
+	case BodyLocationRightShin:
+		return "right_shin"
+	case BodyLocationRightHamstring:
+		return "right_hamstring"
+	case BodyLocationRightQuad:
+		return "right_quad"
+	case BodyLocationRightGlute:
+		return "right_glute"
+	case BodyLocationTorsoBack:
+		return "torso_back"
+	case BodyLocationLeftLowerBack:
+		return "left_lower_back"
+	case BodyLocationLeftUpperBack:
+		return "left_upper_back"
+	case BodyLocationRightLowerBack:
+		return "right_lower_back"
+	case BodyLocationRightUpperBack:
+		return "right_upper_back"
+	case BodyLocationTorsoFront:
+		return "torso_front"
+	case BodyLocationLeftAbdomen:
+		return "left_abdomen"
+	case BodyLocationLeftChest:
+		return "left_chest"
+	case BodyLocationRightAbdomen:
+		return "right_abdomen"
+	case BodyLocationRightChest:
+		return "right_chest"
+	case BodyLocationLeftArm:
+		return "left_arm"
+	case BodyLocationLeftShoulder:
+		return "left_shoulder"
+	case BodyLocationLeftBicep:
+		return "left_bicep"
+	case BodyLocationLeftTricep:
+		return "left_tricep"
+	case BodyLocationLeftBrachioradialis:
+		return "left_brachioradialis"
+	case BodyLocationLeftForearmExtensors:
+		return "left_forearm_extensors"
+	case BodyLocationRightArm:
+		return "right_arm"
+	case BodyLocationRightShoulder:
+		return "right_shoulder"
+	case BodyLocationRightBicep:
+		return "right_bicep"
+	case BodyLocationRightTricep:
+		return "right_tricep"
+	case BodyLocationRightBrachioradialis:
+		return "right_brachioradialis"
+	case BodyLocationRightForearmExtensors:
+		return "right_forearm_extensors"
+	case BodyLocationNeck:
+		return "neck"
+	case BodyLocationThroat:
+		return "throat"
+	case BodyLocationWaistMidBack:
+		return "waist_mid_back"
+	case BodyLocationWaistFront:
+		return "waist_front"
+	case BodyLocationWaistLeft:
+		return "waist_left"
+	case BodyLocationWaistRight:
+		return "waist_right"
+	default:
+		return "BodyLocationInvalid(" + strconv.Itoa(int(b)) + ")"
 	}
-	return val
 }
-
-var strtobodylocation = func() map[string]BodyLocation {
-	m := make(map[string]BodyLocation)
-	for t, str := range bodylocationtostrs {
-		m[str] = BodyLocation(t)
-	}
-	return m
-}()
 
 // FromString parse string into BodyLocation constant it's represent, return BodyLocationInvalid if not found.
 func BodyLocationFromString(s string) BodyLocation {
-	val, ok := strtobodylocation[s]
-	if !ok {
-		return strtobodylocation["invalid"]
+	switch s {
+	case "left_leg":
+		return BodyLocationLeftLeg
+	case "left_calf":
+		return BodyLocationLeftCalf
+	case "left_shin":
+		return BodyLocationLeftShin
+	case "left_hamstring":
+		return BodyLocationLeftHamstring
+	case "left_quad":
+		return BodyLocationLeftQuad
+	case "left_glute":
+		return BodyLocationLeftGlute
+	case "right_leg":
+		return BodyLocationRightLeg
+	case "right_calf":
+		return BodyLocationRightCalf
+	case "right_shin":
+		return BodyLocationRightShin
+	case "right_hamstring":
+		return BodyLocationRightHamstring
+	case "right_quad":
+		return BodyLocationRightQuad
+	case "right_glute":
+		return BodyLocationRightGlute
+	case "torso_back":
+		return BodyLocationTorsoBack
+	case "left_lower_back":
+		return BodyLocationLeftLowerBack
+	case "left_upper_back":
+		return BodyLocationLeftUpperBack
+	case "right_lower_back":
+		return BodyLocationRightLowerBack
+	case "right_upper_back":
+		return BodyLocationRightUpperBack
+	case "torso_front":
+		return BodyLocationTorsoFront
+	case "left_abdomen":
+		return BodyLocationLeftAbdomen
+	case "left_chest":
+		return BodyLocationLeftChest
+	case "right_abdomen":
+		return BodyLocationRightAbdomen
+	case "right_chest":
+		return BodyLocationRightChest
+	case "left_arm":
+		return BodyLocationLeftArm
+	case "left_shoulder":
+		return BodyLocationLeftShoulder
+	case "left_bicep":
+		return BodyLocationLeftBicep
+	case "left_tricep":
+		return BodyLocationLeftTricep
+	case "left_brachioradialis":
+		return BodyLocationLeftBrachioradialis
+	case "left_forearm_extensors":
+		return BodyLocationLeftForearmExtensors
+	case "right_arm":
+		return BodyLocationRightArm
+	case "right_shoulder":
+		return BodyLocationRightShoulder
+	case "right_bicep":
+		return BodyLocationRightBicep
+	case "right_tricep":
+		return BodyLocationRightTricep
+	case "right_brachioradialis":
+		return BodyLocationRightBrachioradialis
+	case "right_forearm_extensors":
+		return BodyLocationRightForearmExtensors
+	case "neck":
+		return BodyLocationNeck
+	case "throat":
+		return BodyLocationThroat
+	case "waist_mid_back":
+		return BodyLocationWaistMidBack
+	case "waist_front":
+		return BodyLocationWaistFront
+	case "waist_left":
+		return BodyLocationWaistLeft
+	case "waist_right":
+		return BodyLocationWaistRight
+	default:
+		return BodyLocationInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBodyLocation() []BodyLocation {
-	vs := make([]BodyLocation, 0, len(bodylocationtostrs))
-	for i := range bodylocationtostrs {
-		vs = append(vs, BodyLocation(i))
+	return []BodyLocation{
+		BodyLocationLeftLeg,
+		BodyLocationLeftCalf,
+		BodyLocationLeftShin,
+		BodyLocationLeftHamstring,
+		BodyLocationLeftQuad,
+		BodyLocationLeftGlute,
+		BodyLocationRightLeg,
+		BodyLocationRightCalf,
+		BodyLocationRightShin,
+		BodyLocationRightHamstring,
+		BodyLocationRightQuad,
+		BodyLocationRightGlute,
+		BodyLocationTorsoBack,
+		BodyLocationLeftLowerBack,
+		BodyLocationLeftUpperBack,
+		BodyLocationRightLowerBack,
+		BodyLocationRightUpperBack,
+		BodyLocationTorsoFront,
+		BodyLocationLeftAbdomen,
+		BodyLocationLeftChest,
+		BodyLocationRightAbdomen,
+		BodyLocationRightChest,
+		BodyLocationLeftArm,
+		BodyLocationLeftShoulder,
+		BodyLocationLeftBicep,
+		BodyLocationLeftTricep,
+		BodyLocationLeftBrachioradialis,
+		BodyLocationLeftForearmExtensors,
+		BodyLocationRightArm,
+		BodyLocationRightShoulder,
+		BodyLocationRightBicep,
+		BodyLocationRightTricep,
+		BodyLocationRightBrachioradialis,
+		BodyLocationRightForearmExtensors,
+		BodyLocationNeck,
+		BodyLocationThroat,
+		BodyLocationWaistMidBack,
+		BodyLocationWaistFront,
+		BodyLocationWaistLeft,
+		BodyLocationWaistRight,
 	}
-	return vs
 }

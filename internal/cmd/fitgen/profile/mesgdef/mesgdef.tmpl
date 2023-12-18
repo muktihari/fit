@@ -9,9 +9,9 @@
 package {{ .Package }}
 
 import (
-	"github.com/muktihari/fit/proto"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/proto"
 	{{- if .Imports -}}
         {{ range $_, $v := .Imports }}
             {{ printf "%q" $v -}}
@@ -38,12 +38,7 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		{{ range .Fields -}}
-			{{ .Num }}: nil, /* {{ .Name }} */
-		{{ end -}}
-	}
-
+    vals := [{{ .MaxFieldNum }}]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -63,35 +58,35 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to {{ .Name }} mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory: 
-//  
-//  factory.CreateMesg(typedef.MesgNum{{ .Name }})
-func (m *{{ .Name }}) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts {{ .Name }} into proto.Message.
+func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
+    mesg := fac.CreateMesgOnly(typedef.MesgNum{{ .Name }})
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNum{{ .Name }} {
-		return
-	}
-
-	vals := [...]any{
-		{{ range .Fields -}}
-			{{ .Num }}: {{ .PrimitiveValue }},
-		{{ end -}}
-	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
-	}
+    {{ range .Fields -}}
+        if {{ .ComparableValue }} != {{ .InvalidValue }} {
+            field := fac.CreateField(mesg.Num, {{ .Num }})
+            field.Value = {{ .PrimitiveValue }}
+            mesg.Fields = append(mesg.Fields, field)
+        }
+	{{ end }}
 
 	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 	mesg.DeveloperFields = m.DeveloperFields
-	{{ end -}}
+	{{ end }}
+
+	return mesg
 }
+
+// size returns size of {{ .Name }}'s valid fields.
+func (m *{{ .Name }}) size() byte {
+    var size byte
+    {{ range .Fields -}}
+        if {{ .ComparableValue }} != {{ .InvalidValue }} {
+            size++
+        }
+	{{ end -}}
+    return size
+}
+
 {{ end }}

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -41,23 +42,7 @@ func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0:  nil, /* CombinedAwakeScore */
-		1:  nil, /* AwakeTimeScore */
-		2:  nil, /* AwakeningsCountScore */
-		3:  nil, /* DeepSleepScore */
-		4:  nil, /* SleepDurationScore */
-		5:  nil, /* LightSleepScore */
-		6:  nil, /* OverallSleepScore */
-		7:  nil, /* SleepQualityScore */
-		8:  nil, /* SleepRecoveryScore */
-		9:  nil, /* RemSleepScore */
-		10: nil, /* SleepRestlessnessScore */
-		11: nil, /* AwakeningsCount */
-		14: nil, /* InterruptionsScore */
-		15: nil, /* AverageStressDuringSleep */
-	}
-
+	vals := [16]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -86,43 +71,131 @@ func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SleepAssessment mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSleepAssessment)
-func (m *SleepAssessment) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SleepAssessment into proto.Message.
+func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepAssessment)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSleepAssessment {
-		return
+	if m.CombinedAwakeScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.CombinedAwakeScore
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0:  m.CombinedAwakeScore,
-		1:  m.AwakeTimeScore,
-		2:  m.AwakeningsCountScore,
-		3:  m.DeepSleepScore,
-		4:  m.SleepDurationScore,
-		5:  m.LightSleepScore,
-		6:  m.OverallSleepScore,
-		7:  m.SleepQualityScore,
-		8:  m.SleepRecoveryScore,
-		9:  m.RemSleepScore,
-		10: m.SleepRestlessnessScore,
-		11: m.AwakeningsCount,
-		14: m.InterruptionsScore,
-		15: m.AverageStressDuringSleep,
+	if m.AwakeTimeScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.AwakeTimeScore
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.AwakeningsCountScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.AwakeningsCountScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DeepSleepScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.DeepSleepScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SleepDurationScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.SleepDurationScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LightSleepScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.LightSleepScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.OverallSleepScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.OverallSleepScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SleepQualityScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.SleepQualityScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SleepRecoveryScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.SleepRecoveryScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RemSleepScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.RemSleepScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SleepRestlessnessScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.SleepRestlessnessScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AwakeningsCount != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.AwakeningsCount
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.InterruptionsScore != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.InterruptionsScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.AverageStressDuringSleep
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SleepAssessment's valid fields.
+func (m *SleepAssessment) size() byte {
+	var size byte
+	if m.CombinedAwakeScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.AwakeTimeScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.AwakeningsCountScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.DeepSleepScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.SleepDurationScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.LightSleepScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.OverallSleepScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.SleepQualityScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.SleepRecoveryScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.RemSleepScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.SleepRestlessnessScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.AwakeningsCount != basetype.Uint8Invalid {
+		size++
+	}
+	if m.InterruptionsScore != basetype.Uint8Invalid {
+		size++
+	}
+	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

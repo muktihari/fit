@@ -20,49 +20,56 @@ const (
 	WorkoutEquipmentSwimPaddles   WorkoutEquipment = 3
 	WorkoutEquipmentSwimPullBuoy  WorkoutEquipment = 4
 	WorkoutEquipmentSwimSnorkel   WorkoutEquipment = 5
-	WorkoutEquipmentInvalid       WorkoutEquipment = 0xFF // INVALID
+	WorkoutEquipmentInvalid       WorkoutEquipment = 0xFF
 )
 
-var workoutequipmenttostrs = map[WorkoutEquipment]string{
-	WorkoutEquipmentNone:          "none",
-	WorkoutEquipmentSwimFins:      "swim_fins",
-	WorkoutEquipmentSwimKickboard: "swim_kickboard",
-	WorkoutEquipmentSwimPaddles:   "swim_paddles",
-	WorkoutEquipmentSwimPullBuoy:  "swim_pull_buoy",
-	WorkoutEquipmentSwimSnorkel:   "swim_snorkel",
-	WorkoutEquipmentInvalid:       "invalid",
-}
-
 func (w WorkoutEquipment) String() string {
-	val, ok := workoutequipmenttostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WorkoutEquipmentNone:
+		return "none"
+	case WorkoutEquipmentSwimFins:
+		return "swim_fins"
+	case WorkoutEquipmentSwimKickboard:
+		return "swim_kickboard"
+	case WorkoutEquipmentSwimPaddles:
+		return "swim_paddles"
+	case WorkoutEquipmentSwimPullBuoy:
+		return "swim_pull_buoy"
+	case WorkoutEquipmentSwimSnorkel:
+		return "swim_snorkel"
+	default:
+		return "WorkoutEquipmentInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtoworkoutequipment = func() map[string]WorkoutEquipment {
-	m := make(map[string]WorkoutEquipment)
-	for t, str := range workoutequipmenttostrs {
-		m[str] = WorkoutEquipment(t)
-	}
-	return m
-}()
 
 // FromString parse string into WorkoutEquipment constant it's represent, return WorkoutEquipmentInvalid if not found.
 func WorkoutEquipmentFromString(s string) WorkoutEquipment {
-	val, ok := strtoworkoutequipment[s]
-	if !ok {
-		return strtoworkoutequipment["invalid"]
+	switch s {
+	case "none":
+		return WorkoutEquipmentNone
+	case "swim_fins":
+		return WorkoutEquipmentSwimFins
+	case "swim_kickboard":
+		return WorkoutEquipmentSwimKickboard
+	case "swim_paddles":
+		return WorkoutEquipmentSwimPaddles
+	case "swim_pull_buoy":
+		return WorkoutEquipmentSwimPullBuoy
+	case "swim_snorkel":
+		return WorkoutEquipmentSwimSnorkel
+	default:
+		return WorkoutEquipmentInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWorkoutEquipment() []WorkoutEquipment {
-	vs := make([]WorkoutEquipment, 0, len(workoutequipmenttostrs))
-	for i := range workoutequipmenttostrs {
-		vs = append(vs, WorkoutEquipment(i))
+	return []WorkoutEquipment{
+		WorkoutEquipmentNone,
+		WorkoutEquipmentSwimFins,
+		WorkoutEquipmentSwimKickboard,
+		WorkoutEquipmentSwimPaddles,
+		WorkoutEquipmentSwimPullBuoy,
+		WorkoutEquipmentSwimSnorkel,
 	}
-	return vs
 }

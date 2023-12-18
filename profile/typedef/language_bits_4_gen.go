@@ -20,49 +20,56 @@ const (
 	LanguageBits4Vietnamese          LanguageBits4 = 0x08
 	LanguageBits4Burmese             LanguageBits4 = 0x10
 	LanguageBits4Mongolian           LanguageBits4 = 0x20
-	LanguageBits4Invalid             LanguageBits4 = 0x0 // INVALID
+	LanguageBits4Invalid             LanguageBits4 = 0x0
 )
 
-var languagebits4tostrs = map[LanguageBits4]string{
-	LanguageBits4BrazilianPortuguese: "brazilian_portuguese",
-	LanguageBits4Indonesian:          "indonesian",
-	LanguageBits4Malaysian:           "malaysian",
-	LanguageBits4Vietnamese:          "vietnamese",
-	LanguageBits4Burmese:             "burmese",
-	LanguageBits4Mongolian:           "mongolian",
-	LanguageBits4Invalid:             "invalid",
-}
-
 func (l LanguageBits4) String() string {
-	val, ok := languagebits4tostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LanguageBits4BrazilianPortuguese:
+		return "brazilian_portuguese"
+	case LanguageBits4Indonesian:
+		return "indonesian"
+	case LanguageBits4Malaysian:
+		return "malaysian"
+	case LanguageBits4Vietnamese:
+		return "vietnamese"
+	case LanguageBits4Burmese:
+		return "burmese"
+	case LanguageBits4Mongolian:
+		return "mongolian"
+	default:
+		return "LanguageBits4Invalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolanguagebits4 = func() map[string]LanguageBits4 {
-	m := make(map[string]LanguageBits4)
-	for t, str := range languagebits4tostrs {
-		m[str] = LanguageBits4(t)
-	}
-	return m
-}()
 
 // FromString parse string into LanguageBits4 constant it's represent, return LanguageBits4Invalid if not found.
 func LanguageBits4FromString(s string) LanguageBits4 {
-	val, ok := strtolanguagebits4[s]
-	if !ok {
-		return strtolanguagebits4["invalid"]
+	switch s {
+	case "brazilian_portuguese":
+		return LanguageBits4BrazilianPortuguese
+	case "indonesian":
+		return LanguageBits4Indonesian
+	case "malaysian":
+		return LanguageBits4Malaysian
+	case "vietnamese":
+		return LanguageBits4Vietnamese
+	case "burmese":
+		return LanguageBits4Burmese
+	case "mongolian":
+		return LanguageBits4Mongolian
+	default:
+		return LanguageBits4Invalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLanguageBits4() []LanguageBits4 {
-	vs := make([]LanguageBits4, 0, len(languagebits4tostrs))
-	for i := range languagebits4tostrs {
-		vs = append(vs, LanguageBits4(i))
+	return []LanguageBits4{
+		LanguageBits4BrazilianPortuguese,
+		LanguageBits4Indonesian,
+		LanguageBits4Malaysian,
+		LanguageBits4Vietnamese,
+		LanguageBits4Burmese,
+		LanguageBits4Mongolian,
 	}
-	return vs
 }

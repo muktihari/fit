@@ -16,45 +16,36 @@ type BikeLightBeamAngleMode uint8
 const (
 	BikeLightBeamAngleModeManual  BikeLightBeamAngleMode = 0
 	BikeLightBeamAngleModeAuto    BikeLightBeamAngleMode = 1
-	BikeLightBeamAngleModeInvalid BikeLightBeamAngleMode = 0xFF // INVALID
+	BikeLightBeamAngleModeInvalid BikeLightBeamAngleMode = 0xFF
 )
 
-var bikelightbeamanglemodetostrs = map[BikeLightBeamAngleMode]string{
-	BikeLightBeamAngleModeManual:  "manual",
-	BikeLightBeamAngleModeAuto:    "auto",
-	BikeLightBeamAngleModeInvalid: "invalid",
-}
-
 func (b BikeLightBeamAngleMode) String() string {
-	val, ok := bikelightbeamanglemodetostrs[b]
-	if !ok {
-		return strconv.FormatUint(uint64(b), 10)
+	switch b {
+	case BikeLightBeamAngleModeManual:
+		return "manual"
+	case BikeLightBeamAngleModeAuto:
+		return "auto"
+	default:
+		return "BikeLightBeamAngleModeInvalid(" + strconv.FormatUint(uint64(b), 10) + ")"
 	}
-	return val
 }
-
-var strtobikelightbeamanglemode = func() map[string]BikeLightBeamAngleMode {
-	m := make(map[string]BikeLightBeamAngleMode)
-	for t, str := range bikelightbeamanglemodetostrs {
-		m[str] = BikeLightBeamAngleMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into BikeLightBeamAngleMode constant it's represent, return BikeLightBeamAngleModeInvalid if not found.
 func BikeLightBeamAngleModeFromString(s string) BikeLightBeamAngleMode {
-	val, ok := strtobikelightbeamanglemode[s]
-	if !ok {
-		return strtobikelightbeamanglemode["invalid"]
+	switch s {
+	case "manual":
+		return BikeLightBeamAngleModeManual
+	case "auto":
+		return BikeLightBeamAngleModeAuto
+	default:
+		return BikeLightBeamAngleModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListBikeLightBeamAngleMode() []BikeLightBeamAngleMode {
-	vs := make([]BikeLightBeamAngleMode, 0, len(bikelightbeamanglemodetostrs))
-	for i := range bikelightbeamanglemodetostrs {
-		vs = append(vs, BikeLightBeamAngleMode(i))
+	return []BikeLightBeamAngleMode{
+		BikeLightBeamAngleModeManual,
+		BikeLightBeamAngleModeAuto,
 	}
-	return vs
 }

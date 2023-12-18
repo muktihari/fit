@@ -16,45 +16,36 @@ type LeftRightBalance uint8
 const (
 	LeftRightBalanceMask    LeftRightBalance = 0x7F // % contribution
 	LeftRightBalanceRight   LeftRightBalance = 0x80 // data corresponds to right if set, otherwise unknown
-	LeftRightBalanceInvalid LeftRightBalance = 0xFF // INVALID
+	LeftRightBalanceInvalid LeftRightBalance = 0xFF
 )
 
-var leftrightbalancetostrs = map[LeftRightBalance]string{
-	LeftRightBalanceMask:    "mask",
-	LeftRightBalanceRight:   "right",
-	LeftRightBalanceInvalid: "invalid",
-}
-
 func (l LeftRightBalance) String() string {
-	val, ok := leftrightbalancetostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LeftRightBalanceMask:
+		return "mask"
+	case LeftRightBalanceRight:
+		return "right"
+	default:
+		return "LeftRightBalanceInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtoleftrightbalance = func() map[string]LeftRightBalance {
-	m := make(map[string]LeftRightBalance)
-	for t, str := range leftrightbalancetostrs {
-		m[str] = LeftRightBalance(t)
-	}
-	return m
-}()
 
 // FromString parse string into LeftRightBalance constant it's represent, return LeftRightBalanceInvalid if not found.
 func LeftRightBalanceFromString(s string) LeftRightBalance {
-	val, ok := strtoleftrightbalance[s]
-	if !ok {
-		return strtoleftrightbalance["invalid"]
+	switch s {
+	case "mask":
+		return LeftRightBalanceMask
+	case "right":
+		return LeftRightBalanceRight
+	default:
+		return LeftRightBalanceInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLeftRightBalance() []LeftRightBalance {
-	vs := make([]LeftRightBalance, 0, len(leftrightbalancetostrs))
-	for i := range leftrightbalancetostrs {
-		vs = append(vs, LeftRightBalance(i))
+	return []LeftRightBalance{
+		LeftRightBalanceMask,
+		LeftRightBalanceRight,
 	}
-	return vs
 }

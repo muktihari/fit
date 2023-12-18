@@ -13,6 +13,20 @@ func Len(val any) byte {
 	switch vs := val.(type) { // Fast Path
 	case int8, uint8, int16, uint16, int32, uint32, float32, float64, int64, uint64:
 		return 1
+	case string:
+		return byte(len(vs)) + 1
+	case []string:
+		var size byte
+		for i := range vs {
+			if len(vs[i]) == 0 {
+				continue
+			}
+			if len(vs[i]) == 1 && vs[i][len(vs[i])-1] == '\x00' {
+				continue
+			}
+			size += byte(len(vs[i])) + 1
+		}
+		return size
 	case []int8:
 		return byte(len(vs))
 	case []uint8:
@@ -24,8 +38,6 @@ func Len(val any) byte {
 	case []int32:
 		return byte(len(vs))
 	case []uint32:
-		return byte(len(vs))
-	case string:
 		return byte(len(vs))
 	case []float32:
 		return byte(len(vs))

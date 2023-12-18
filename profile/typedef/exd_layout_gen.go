@@ -22,53 +22,72 @@ const (
 	ExdLayoutFullQuarterSplit          ExdLayout = 5
 	ExdLayoutHalfVerticalLeftSplit     ExdLayout = 6
 	ExdLayoutHalfHorizontalTopSplit    ExdLayout = 7
-	ExdLayoutDynamic                   ExdLayout = 8    // The EXD may display the configured concepts in any layout it sees fit.
-	ExdLayoutInvalid                   ExdLayout = 0xFF // INVALID
+	ExdLayoutDynamic                   ExdLayout = 8 // The EXD may display the configured concepts in any layout it sees fit.
+	ExdLayoutInvalid                   ExdLayout = 0xFF
 )
 
-var exdlayouttostrs = map[ExdLayout]string{
-	ExdLayoutFullScreen:                "full_screen",
-	ExdLayoutHalfVertical:              "half_vertical",
-	ExdLayoutHalfHorizontal:            "half_horizontal",
-	ExdLayoutHalfVerticalRightSplit:    "half_vertical_right_split",
-	ExdLayoutHalfHorizontalBottomSplit: "half_horizontal_bottom_split",
-	ExdLayoutFullQuarterSplit:          "full_quarter_split",
-	ExdLayoutHalfVerticalLeftSplit:     "half_vertical_left_split",
-	ExdLayoutHalfHorizontalTopSplit:    "half_horizontal_top_split",
-	ExdLayoutDynamic:                   "dynamic",
-	ExdLayoutInvalid:                   "invalid",
-}
-
 func (e ExdLayout) String() string {
-	val, ok := exdlayouttostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case ExdLayoutFullScreen:
+		return "full_screen"
+	case ExdLayoutHalfVertical:
+		return "half_vertical"
+	case ExdLayoutHalfHorizontal:
+		return "half_horizontal"
+	case ExdLayoutHalfVerticalRightSplit:
+		return "half_vertical_right_split"
+	case ExdLayoutHalfHorizontalBottomSplit:
+		return "half_horizontal_bottom_split"
+	case ExdLayoutFullQuarterSplit:
+		return "full_quarter_split"
+	case ExdLayoutHalfVerticalLeftSplit:
+		return "half_vertical_left_split"
+	case ExdLayoutHalfHorizontalTopSplit:
+		return "half_horizontal_top_split"
+	case ExdLayoutDynamic:
+		return "dynamic"
+	default:
+		return "ExdLayoutInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoexdlayout = func() map[string]ExdLayout {
-	m := make(map[string]ExdLayout)
-	for t, str := range exdlayouttostrs {
-		m[str] = ExdLayout(t)
-	}
-	return m
-}()
 
 // FromString parse string into ExdLayout constant it's represent, return ExdLayoutInvalid if not found.
 func ExdLayoutFromString(s string) ExdLayout {
-	val, ok := strtoexdlayout[s]
-	if !ok {
-		return strtoexdlayout["invalid"]
+	switch s {
+	case "full_screen":
+		return ExdLayoutFullScreen
+	case "half_vertical":
+		return ExdLayoutHalfVertical
+	case "half_horizontal":
+		return ExdLayoutHalfHorizontal
+	case "half_vertical_right_split":
+		return ExdLayoutHalfVerticalRightSplit
+	case "half_horizontal_bottom_split":
+		return ExdLayoutHalfHorizontalBottomSplit
+	case "full_quarter_split":
+		return ExdLayoutFullQuarterSplit
+	case "half_vertical_left_split":
+		return ExdLayoutHalfVerticalLeftSplit
+	case "half_horizontal_top_split":
+		return ExdLayoutHalfHorizontalTopSplit
+	case "dynamic":
+		return ExdLayoutDynamic
+	default:
+		return ExdLayoutInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListExdLayout() []ExdLayout {
-	vs := make([]ExdLayout, 0, len(exdlayouttostrs))
-	for i := range exdlayouttostrs {
-		vs = append(vs, ExdLayout(i))
+	return []ExdLayout{
+		ExdLayoutFullScreen,
+		ExdLayoutHalfVertical,
+		ExdLayoutHalfHorizontal,
+		ExdLayoutHalfVerticalRightSplit,
+		ExdLayoutHalfHorizontalBottomSplit,
+		ExdLayoutFullQuarterSplit,
+		ExdLayoutHalfVerticalLeftSplit,
+		ExdLayoutHalfHorizontalTopSplit,
+		ExdLayoutDynamic,
 	}
-	return vs
 }

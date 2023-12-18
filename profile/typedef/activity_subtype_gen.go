@@ -34,63 +34,126 @@ const (
 	ActivitySubtypeLapSwimming   ActivitySubtype = 17 // Swimming
 	ActivitySubtypeOpenWater     ActivitySubtype = 18 // Swimming
 	ActivitySubtypeAll           ActivitySubtype = 254
-	ActivitySubtypeInvalid       ActivitySubtype = 0xFF // INVALID
+	ActivitySubtypeInvalid       ActivitySubtype = 0xFF
 )
 
-var activitysubtypetostrs = map[ActivitySubtype]string{
-	ActivitySubtypeGeneric:       "generic",
-	ActivitySubtypeTreadmill:     "treadmill",
-	ActivitySubtypeStreet:        "street",
-	ActivitySubtypeTrail:         "trail",
-	ActivitySubtypeTrack:         "track",
-	ActivitySubtypeSpin:          "spin",
-	ActivitySubtypeIndoorCycling: "indoor_cycling",
-	ActivitySubtypeRoad:          "road",
-	ActivitySubtypeMountain:      "mountain",
-	ActivitySubtypeDownhill:      "downhill",
-	ActivitySubtypeRecumbent:     "recumbent",
-	ActivitySubtypeCyclocross:    "cyclocross",
-	ActivitySubtypeHandCycling:   "hand_cycling",
-	ActivitySubtypeTrackCycling:  "track_cycling",
-	ActivitySubtypeIndoorRowing:  "indoor_rowing",
-	ActivitySubtypeElliptical:    "elliptical",
-	ActivitySubtypeStairClimbing: "stair_climbing",
-	ActivitySubtypeLapSwimming:   "lap_swimming",
-	ActivitySubtypeOpenWater:     "open_water",
-	ActivitySubtypeAll:           "all",
-	ActivitySubtypeInvalid:       "invalid",
-}
-
 func (a ActivitySubtype) String() string {
-	val, ok := activitysubtypetostrs[a]
-	if !ok {
-		return strconv.Itoa(int(a))
+	switch a {
+	case ActivitySubtypeGeneric:
+		return "generic"
+	case ActivitySubtypeTreadmill:
+		return "treadmill"
+	case ActivitySubtypeStreet:
+		return "street"
+	case ActivitySubtypeTrail:
+		return "trail"
+	case ActivitySubtypeTrack:
+		return "track"
+	case ActivitySubtypeSpin:
+		return "spin"
+	case ActivitySubtypeIndoorCycling:
+		return "indoor_cycling"
+	case ActivitySubtypeRoad:
+		return "road"
+	case ActivitySubtypeMountain:
+		return "mountain"
+	case ActivitySubtypeDownhill:
+		return "downhill"
+	case ActivitySubtypeRecumbent:
+		return "recumbent"
+	case ActivitySubtypeCyclocross:
+		return "cyclocross"
+	case ActivitySubtypeHandCycling:
+		return "hand_cycling"
+	case ActivitySubtypeTrackCycling:
+		return "track_cycling"
+	case ActivitySubtypeIndoorRowing:
+		return "indoor_rowing"
+	case ActivitySubtypeElliptical:
+		return "elliptical"
+	case ActivitySubtypeStairClimbing:
+		return "stair_climbing"
+	case ActivitySubtypeLapSwimming:
+		return "lap_swimming"
+	case ActivitySubtypeOpenWater:
+		return "open_water"
+	case ActivitySubtypeAll:
+		return "all"
+	default:
+		return "ActivitySubtypeInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
-	return val
 }
-
-var strtoactivitysubtype = func() map[string]ActivitySubtype {
-	m := make(map[string]ActivitySubtype)
-	for t, str := range activitysubtypetostrs {
-		m[str] = ActivitySubtype(t)
-	}
-	return m
-}()
 
 // FromString parse string into ActivitySubtype constant it's represent, return ActivitySubtypeInvalid if not found.
 func ActivitySubtypeFromString(s string) ActivitySubtype {
-	val, ok := strtoactivitysubtype[s]
-	if !ok {
-		return strtoactivitysubtype["invalid"]
+	switch s {
+	case "generic":
+		return ActivitySubtypeGeneric
+	case "treadmill":
+		return ActivitySubtypeTreadmill
+	case "street":
+		return ActivitySubtypeStreet
+	case "trail":
+		return ActivitySubtypeTrail
+	case "track":
+		return ActivitySubtypeTrack
+	case "spin":
+		return ActivitySubtypeSpin
+	case "indoor_cycling":
+		return ActivitySubtypeIndoorCycling
+	case "road":
+		return ActivitySubtypeRoad
+	case "mountain":
+		return ActivitySubtypeMountain
+	case "downhill":
+		return ActivitySubtypeDownhill
+	case "recumbent":
+		return ActivitySubtypeRecumbent
+	case "cyclocross":
+		return ActivitySubtypeCyclocross
+	case "hand_cycling":
+		return ActivitySubtypeHandCycling
+	case "track_cycling":
+		return ActivitySubtypeTrackCycling
+	case "indoor_rowing":
+		return ActivitySubtypeIndoorRowing
+	case "elliptical":
+		return ActivitySubtypeElliptical
+	case "stair_climbing":
+		return ActivitySubtypeStairClimbing
+	case "lap_swimming":
+		return ActivitySubtypeLapSwimming
+	case "open_water":
+		return ActivitySubtypeOpenWater
+	case "all":
+		return ActivitySubtypeAll
+	default:
+		return ActivitySubtypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListActivitySubtype() []ActivitySubtype {
-	vs := make([]ActivitySubtype, 0, len(activitysubtypetostrs))
-	for i := range activitysubtypetostrs {
-		vs = append(vs, ActivitySubtype(i))
+	return []ActivitySubtype{
+		ActivitySubtypeGeneric,
+		ActivitySubtypeTreadmill,
+		ActivitySubtypeStreet,
+		ActivitySubtypeTrail,
+		ActivitySubtypeTrack,
+		ActivitySubtypeSpin,
+		ActivitySubtypeIndoorCycling,
+		ActivitySubtypeRoad,
+		ActivitySubtypeMountain,
+		ActivitySubtypeDownhill,
+		ActivitySubtypeRecumbent,
+		ActivitySubtypeCyclocross,
+		ActivitySubtypeHandCycling,
+		ActivitySubtypeTrackCycling,
+		ActivitySubtypeIndoorRowing,
+		ActivitySubtypeElliptical,
+		ActivitySubtypeStairClimbing,
+		ActivitySubtypeLapSwimming,
+		ActivitySubtypeOpenWater,
+		ActivitySubtypeAll,
 	}
-	return vs
 }

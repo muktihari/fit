@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -29,11 +30,7 @@ func NewStressLevel(mesg proto.Message) *StressLevel {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* StressLevelValue */
-		1: nil, /* StressLevelTime */
-	}
-
+	vals := [2]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -50,31 +47,35 @@ func NewStressLevel(mesg proto.Message) *StressLevel {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to StressLevel mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumStressLevel)
-func (m *StressLevel) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts StressLevel into proto.Message.
+func (m *StressLevel) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumStressLevel)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumStressLevel {
-		return
+	if m.StressLevelValue != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.StressLevelValue
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.StressLevelValue,
-		1: typeconv.ToUint32[uint32](m.StressLevelTime),
-	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32[uint32](m.StressLevelTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint32[uint32](m.StressLevelTime)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of StressLevel's valid fields.
+func (m *StressLevel) size() byte {
+	var size byte
+	if m.StressLevelValue != basetype.Sint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StressLevelTime) != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

@@ -17,48 +17,47 @@ const (
 	FitnessEquipmentStateReady   FitnessEquipmentState = 0
 	FitnessEquipmentStateInUse   FitnessEquipmentState = 1
 	FitnessEquipmentStatePaused  FitnessEquipmentState = 2
-	FitnessEquipmentStateUnknown FitnessEquipmentState = 3    // lost connection to fitness equipment
-	FitnessEquipmentStateInvalid FitnessEquipmentState = 0xFF // INVALID
+	FitnessEquipmentStateUnknown FitnessEquipmentState = 3 // lost connection to fitness equipment
+	FitnessEquipmentStateInvalid FitnessEquipmentState = 0xFF
 )
 
-var fitnessequipmentstatetostrs = map[FitnessEquipmentState]string{
-	FitnessEquipmentStateReady:   "ready",
-	FitnessEquipmentStateInUse:   "in_use",
-	FitnessEquipmentStatePaused:  "paused",
-	FitnessEquipmentStateUnknown: "unknown",
-	FitnessEquipmentStateInvalid: "invalid",
-}
-
 func (f FitnessEquipmentState) String() string {
-	val, ok := fitnessequipmentstatetostrs[f]
-	if !ok {
-		return strconv.Itoa(int(f))
+	switch f {
+	case FitnessEquipmentStateReady:
+		return "ready"
+	case FitnessEquipmentStateInUse:
+		return "in_use"
+	case FitnessEquipmentStatePaused:
+		return "paused"
+	case FitnessEquipmentStateUnknown:
+		return "unknown"
+	default:
+		return "FitnessEquipmentStateInvalid(" + strconv.Itoa(int(f)) + ")"
 	}
-	return val
 }
-
-var strtofitnessequipmentstate = func() map[string]FitnessEquipmentState {
-	m := make(map[string]FitnessEquipmentState)
-	for t, str := range fitnessequipmentstatetostrs {
-		m[str] = FitnessEquipmentState(t)
-	}
-	return m
-}()
 
 // FromString parse string into FitnessEquipmentState constant it's represent, return FitnessEquipmentStateInvalid if not found.
 func FitnessEquipmentStateFromString(s string) FitnessEquipmentState {
-	val, ok := strtofitnessequipmentstate[s]
-	if !ok {
-		return strtofitnessequipmentstate["invalid"]
+	switch s {
+	case "ready":
+		return FitnessEquipmentStateReady
+	case "in_use":
+		return FitnessEquipmentStateInUse
+	case "paused":
+		return FitnessEquipmentStatePaused
+	case "unknown":
+		return FitnessEquipmentStateUnknown
+	default:
+		return FitnessEquipmentStateInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListFitnessEquipmentState() []FitnessEquipmentState {
-	vs := make([]FitnessEquipmentState, 0, len(fitnessequipmentstatetostrs))
-	for i := range fitnessequipmentstatetostrs {
-		vs = append(vs, FitnessEquipmentState(i))
+	return []FitnessEquipmentState{
+		FitnessEquipmentStateReady,
+		FitnessEquipmentStateInUse,
+		FitnessEquipmentStatePaused,
+		FitnessEquipmentStateUnknown,
 	}
-	return vs
 }

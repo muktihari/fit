@@ -20,49 +20,56 @@ const (
 	TimeModeHour12WithSeconds TimeMode = 3
 	TimeModeHour24WithSeconds TimeMode = 4
 	TimeModeUtc               TimeMode = 5
-	TimeModeInvalid           TimeMode = 0xFF // INVALID
+	TimeModeInvalid           TimeMode = 0xFF
 )
 
-var timemodetostrs = map[TimeMode]string{
-	TimeModeHour12:            "hour12",
-	TimeModeHour24:            "hour24",
-	TimeModeMilitary:          "military",
-	TimeModeHour12WithSeconds: "hour_12_with_seconds",
-	TimeModeHour24WithSeconds: "hour_24_with_seconds",
-	TimeModeUtc:               "utc",
-	TimeModeInvalid:           "invalid",
-}
-
 func (t TimeMode) String() string {
-	val, ok := timemodetostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TimeModeHour12:
+		return "hour12"
+	case TimeModeHour24:
+		return "hour24"
+	case TimeModeMilitary:
+		return "military"
+	case TimeModeHour12WithSeconds:
+		return "hour_12_with_seconds"
+	case TimeModeHour24WithSeconds:
+		return "hour_24_with_seconds"
+	case TimeModeUtc:
+		return "utc"
+	default:
+		return "TimeModeInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotimemode = func() map[string]TimeMode {
-	m := make(map[string]TimeMode)
-	for t, str := range timemodetostrs {
-		m[str] = TimeMode(t)
-	}
-	return m
-}()
 
 // FromString parse string into TimeMode constant it's represent, return TimeModeInvalid if not found.
 func TimeModeFromString(s string) TimeMode {
-	val, ok := strtotimemode[s]
-	if !ok {
-		return strtotimemode["invalid"]
+	switch s {
+	case "hour12":
+		return TimeModeHour12
+	case "hour24":
+		return TimeModeHour24
+	case "military":
+		return TimeModeMilitary
+	case "hour_12_with_seconds":
+		return TimeModeHour12WithSeconds
+	case "hour_24_with_seconds":
+		return TimeModeHour24WithSeconds
+	case "utc":
+		return TimeModeUtc
+	default:
+		return TimeModeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTimeMode() []TimeMode {
-	vs := make([]TimeMode, 0, len(timemodetostrs))
-	for i := range timemodetostrs {
-		vs = append(vs, TimeMode(i))
+	return []TimeMode{
+		TimeModeHour12,
+		TimeModeHour24,
+		TimeModeMilitary,
+		TimeModeHour12WithSeconds,
+		TimeModeHour24WithSeconds,
+		TimeModeUtc,
 	}
-	return vs
 }

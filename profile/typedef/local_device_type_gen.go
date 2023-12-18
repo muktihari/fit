@@ -14,59 +14,74 @@ import (
 type LocalDeviceType uint8
 
 const (
-	LocalDeviceTypeGps           LocalDeviceType = 0    // Onboard gps receiver
-	LocalDeviceTypeGlonass       LocalDeviceType = 1    // Onboard glonass receiver
-	LocalDeviceTypeGpsGlonass    LocalDeviceType = 2    // Onboard gps glonass receiver
-	LocalDeviceTypeAccelerometer LocalDeviceType = 3    // Onboard sensor
-	LocalDeviceTypeBarometer     LocalDeviceType = 4    // Onboard sensor
-	LocalDeviceTypeTemperature   LocalDeviceType = 5    // Onboard sensor
-	LocalDeviceTypeWhr           LocalDeviceType = 10   // Onboard wrist HR sensor
-	LocalDeviceTypeSensorHub     LocalDeviceType = 12   // Onboard software package
-	LocalDeviceTypeInvalid       LocalDeviceType = 0xFF // INVALID
+	LocalDeviceTypeGps           LocalDeviceType = 0  // Onboard gps receiver
+	LocalDeviceTypeGlonass       LocalDeviceType = 1  // Onboard glonass receiver
+	LocalDeviceTypeGpsGlonass    LocalDeviceType = 2  // Onboard gps glonass receiver
+	LocalDeviceTypeAccelerometer LocalDeviceType = 3  // Onboard sensor
+	LocalDeviceTypeBarometer     LocalDeviceType = 4  // Onboard sensor
+	LocalDeviceTypeTemperature   LocalDeviceType = 5  // Onboard sensor
+	LocalDeviceTypeWhr           LocalDeviceType = 10 // Onboard wrist HR sensor
+	LocalDeviceTypeSensorHub     LocalDeviceType = 12 // Onboard software package
+	LocalDeviceTypeInvalid       LocalDeviceType = 0xFF
 )
 
-var localdevicetypetostrs = map[LocalDeviceType]string{
-	LocalDeviceTypeGps:           "gps",
-	LocalDeviceTypeGlonass:       "glonass",
-	LocalDeviceTypeGpsGlonass:    "gps_glonass",
-	LocalDeviceTypeAccelerometer: "accelerometer",
-	LocalDeviceTypeBarometer:     "barometer",
-	LocalDeviceTypeTemperature:   "temperature",
-	LocalDeviceTypeWhr:           "whr",
-	LocalDeviceTypeSensorHub:     "sensor_hub",
-	LocalDeviceTypeInvalid:       "invalid",
-}
-
 func (l LocalDeviceType) String() string {
-	val, ok := localdevicetypetostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LocalDeviceTypeGps:
+		return "gps"
+	case LocalDeviceTypeGlonass:
+		return "glonass"
+	case LocalDeviceTypeGpsGlonass:
+		return "gps_glonass"
+	case LocalDeviceTypeAccelerometer:
+		return "accelerometer"
+	case LocalDeviceTypeBarometer:
+		return "barometer"
+	case LocalDeviceTypeTemperature:
+		return "temperature"
+	case LocalDeviceTypeWhr:
+		return "whr"
+	case LocalDeviceTypeSensorHub:
+		return "sensor_hub"
+	default:
+		return "LocalDeviceTypeInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolocaldevicetype = func() map[string]LocalDeviceType {
-	m := make(map[string]LocalDeviceType)
-	for t, str := range localdevicetypetostrs {
-		m[str] = LocalDeviceType(t)
-	}
-	return m
-}()
 
 // FromString parse string into LocalDeviceType constant it's represent, return LocalDeviceTypeInvalid if not found.
 func LocalDeviceTypeFromString(s string) LocalDeviceType {
-	val, ok := strtolocaldevicetype[s]
-	if !ok {
-		return strtolocaldevicetype["invalid"]
+	switch s {
+	case "gps":
+		return LocalDeviceTypeGps
+	case "glonass":
+		return LocalDeviceTypeGlonass
+	case "gps_glonass":
+		return LocalDeviceTypeGpsGlonass
+	case "accelerometer":
+		return LocalDeviceTypeAccelerometer
+	case "barometer":
+		return LocalDeviceTypeBarometer
+	case "temperature":
+		return LocalDeviceTypeTemperature
+	case "whr":
+		return LocalDeviceTypeWhr
+	case "sensor_hub":
+		return LocalDeviceTypeSensorHub
+	default:
+		return LocalDeviceTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLocalDeviceType() []LocalDeviceType {
-	vs := make([]LocalDeviceType, 0, len(localdevicetypetostrs))
-	for i := range localdevicetypetostrs {
-		vs = append(vs, LocalDeviceType(i))
+	return []LocalDeviceType{
+		LocalDeviceTypeGps,
+		LocalDeviceTypeGlonass,
+		LocalDeviceTypeGpsGlonass,
+		LocalDeviceTypeAccelerometer,
+		LocalDeviceTypeBarometer,
+		LocalDeviceTypeTemperature,
+		LocalDeviceTypeWhr,
+		LocalDeviceTypeSensorHub,
 	}
-	return vs
 }

@@ -67,96 +67,291 @@ const (
 	CoursePointTransport       CoursePoint = 51
 	CoursePointAlert           CoursePoint = 52
 	CoursePointInfo            CoursePoint = 53
-	CoursePointInvalid         CoursePoint = 0xFF // INVALID
+	CoursePointInvalid         CoursePoint = 0xFF
 )
 
-var coursepointtostrs = map[CoursePoint]string{
-	CoursePointGeneric:         "generic",
-	CoursePointSummit:          "summit",
-	CoursePointValley:          "valley",
-	CoursePointWater:           "water",
-	CoursePointFood:            "food",
-	CoursePointDanger:          "danger",
-	CoursePointLeft:            "left",
-	CoursePointRight:           "right",
-	CoursePointStraight:        "straight",
-	CoursePointFirstAid:        "first_aid",
-	CoursePointFourthCategory:  "fourth_category",
-	CoursePointThirdCategory:   "third_category",
-	CoursePointSecondCategory:  "second_category",
-	CoursePointFirstCategory:   "first_category",
-	CoursePointHorsCategory:    "hors_category",
-	CoursePointSprint:          "sprint",
-	CoursePointLeftFork:        "left_fork",
-	CoursePointRightFork:       "right_fork",
-	CoursePointMiddleFork:      "middle_fork",
-	CoursePointSlightLeft:      "slight_left",
-	CoursePointSharpLeft:       "sharp_left",
-	CoursePointSlightRight:     "slight_right",
-	CoursePointSharpRight:      "sharp_right",
-	CoursePointUTurn:           "u_turn",
-	CoursePointSegmentStart:    "segment_start",
-	CoursePointSegmentEnd:      "segment_end",
-	CoursePointCampsite:        "campsite",
-	CoursePointAidStation:      "aid_station",
-	CoursePointRestArea:        "rest_area",
-	CoursePointGeneralDistance: "general_distance",
-	CoursePointService:         "service",
-	CoursePointEnergyGel:       "energy_gel",
-	CoursePointSportsDrink:     "sports_drink",
-	CoursePointMileMarker:      "mile_marker",
-	CoursePointCheckpoint:      "checkpoint",
-	CoursePointShelter:         "shelter",
-	CoursePointMeetingSpot:     "meeting_spot",
-	CoursePointOverlook:        "overlook",
-	CoursePointToilet:          "toilet",
-	CoursePointShower:          "shower",
-	CoursePointGear:            "gear",
-	CoursePointSharpCurve:      "sharp_curve",
-	CoursePointSteepIncline:    "steep_incline",
-	CoursePointTunnel:          "tunnel",
-	CoursePointBridge:          "bridge",
-	CoursePointObstacle:        "obstacle",
-	CoursePointCrossing:        "crossing",
-	CoursePointStore:           "store",
-	CoursePointTransition:      "transition",
-	CoursePointNavaid:          "navaid",
-	CoursePointTransport:       "transport",
-	CoursePointAlert:           "alert",
-	CoursePointInfo:            "info",
-	CoursePointInvalid:         "invalid",
-}
-
 func (c CoursePoint) String() string {
-	val, ok := coursepointtostrs[c]
-	if !ok {
-		return strconv.Itoa(int(c))
+	switch c {
+	case CoursePointGeneric:
+		return "generic"
+	case CoursePointSummit:
+		return "summit"
+	case CoursePointValley:
+		return "valley"
+	case CoursePointWater:
+		return "water"
+	case CoursePointFood:
+		return "food"
+	case CoursePointDanger:
+		return "danger"
+	case CoursePointLeft:
+		return "left"
+	case CoursePointRight:
+		return "right"
+	case CoursePointStraight:
+		return "straight"
+	case CoursePointFirstAid:
+		return "first_aid"
+	case CoursePointFourthCategory:
+		return "fourth_category"
+	case CoursePointThirdCategory:
+		return "third_category"
+	case CoursePointSecondCategory:
+		return "second_category"
+	case CoursePointFirstCategory:
+		return "first_category"
+	case CoursePointHorsCategory:
+		return "hors_category"
+	case CoursePointSprint:
+		return "sprint"
+	case CoursePointLeftFork:
+		return "left_fork"
+	case CoursePointRightFork:
+		return "right_fork"
+	case CoursePointMiddleFork:
+		return "middle_fork"
+	case CoursePointSlightLeft:
+		return "slight_left"
+	case CoursePointSharpLeft:
+		return "sharp_left"
+	case CoursePointSlightRight:
+		return "slight_right"
+	case CoursePointSharpRight:
+		return "sharp_right"
+	case CoursePointUTurn:
+		return "u_turn"
+	case CoursePointSegmentStart:
+		return "segment_start"
+	case CoursePointSegmentEnd:
+		return "segment_end"
+	case CoursePointCampsite:
+		return "campsite"
+	case CoursePointAidStation:
+		return "aid_station"
+	case CoursePointRestArea:
+		return "rest_area"
+	case CoursePointGeneralDistance:
+		return "general_distance"
+	case CoursePointService:
+		return "service"
+	case CoursePointEnergyGel:
+		return "energy_gel"
+	case CoursePointSportsDrink:
+		return "sports_drink"
+	case CoursePointMileMarker:
+		return "mile_marker"
+	case CoursePointCheckpoint:
+		return "checkpoint"
+	case CoursePointShelter:
+		return "shelter"
+	case CoursePointMeetingSpot:
+		return "meeting_spot"
+	case CoursePointOverlook:
+		return "overlook"
+	case CoursePointToilet:
+		return "toilet"
+	case CoursePointShower:
+		return "shower"
+	case CoursePointGear:
+		return "gear"
+	case CoursePointSharpCurve:
+		return "sharp_curve"
+	case CoursePointSteepIncline:
+		return "steep_incline"
+	case CoursePointTunnel:
+		return "tunnel"
+	case CoursePointBridge:
+		return "bridge"
+	case CoursePointObstacle:
+		return "obstacle"
+	case CoursePointCrossing:
+		return "crossing"
+	case CoursePointStore:
+		return "store"
+	case CoursePointTransition:
+		return "transition"
+	case CoursePointNavaid:
+		return "navaid"
+	case CoursePointTransport:
+		return "transport"
+	case CoursePointAlert:
+		return "alert"
+	case CoursePointInfo:
+		return "info"
+	default:
+		return "CoursePointInvalid(" + strconv.Itoa(int(c)) + ")"
 	}
-	return val
 }
-
-var strtocoursepoint = func() map[string]CoursePoint {
-	m := make(map[string]CoursePoint)
-	for t, str := range coursepointtostrs {
-		m[str] = CoursePoint(t)
-	}
-	return m
-}()
 
 // FromString parse string into CoursePoint constant it's represent, return CoursePointInvalid if not found.
 func CoursePointFromString(s string) CoursePoint {
-	val, ok := strtocoursepoint[s]
-	if !ok {
-		return strtocoursepoint["invalid"]
+	switch s {
+	case "generic":
+		return CoursePointGeneric
+	case "summit":
+		return CoursePointSummit
+	case "valley":
+		return CoursePointValley
+	case "water":
+		return CoursePointWater
+	case "food":
+		return CoursePointFood
+	case "danger":
+		return CoursePointDanger
+	case "left":
+		return CoursePointLeft
+	case "right":
+		return CoursePointRight
+	case "straight":
+		return CoursePointStraight
+	case "first_aid":
+		return CoursePointFirstAid
+	case "fourth_category":
+		return CoursePointFourthCategory
+	case "third_category":
+		return CoursePointThirdCategory
+	case "second_category":
+		return CoursePointSecondCategory
+	case "first_category":
+		return CoursePointFirstCategory
+	case "hors_category":
+		return CoursePointHorsCategory
+	case "sprint":
+		return CoursePointSprint
+	case "left_fork":
+		return CoursePointLeftFork
+	case "right_fork":
+		return CoursePointRightFork
+	case "middle_fork":
+		return CoursePointMiddleFork
+	case "slight_left":
+		return CoursePointSlightLeft
+	case "sharp_left":
+		return CoursePointSharpLeft
+	case "slight_right":
+		return CoursePointSlightRight
+	case "sharp_right":
+		return CoursePointSharpRight
+	case "u_turn":
+		return CoursePointUTurn
+	case "segment_start":
+		return CoursePointSegmentStart
+	case "segment_end":
+		return CoursePointSegmentEnd
+	case "campsite":
+		return CoursePointCampsite
+	case "aid_station":
+		return CoursePointAidStation
+	case "rest_area":
+		return CoursePointRestArea
+	case "general_distance":
+		return CoursePointGeneralDistance
+	case "service":
+		return CoursePointService
+	case "energy_gel":
+		return CoursePointEnergyGel
+	case "sports_drink":
+		return CoursePointSportsDrink
+	case "mile_marker":
+		return CoursePointMileMarker
+	case "checkpoint":
+		return CoursePointCheckpoint
+	case "shelter":
+		return CoursePointShelter
+	case "meeting_spot":
+		return CoursePointMeetingSpot
+	case "overlook":
+		return CoursePointOverlook
+	case "toilet":
+		return CoursePointToilet
+	case "shower":
+		return CoursePointShower
+	case "gear":
+		return CoursePointGear
+	case "sharp_curve":
+		return CoursePointSharpCurve
+	case "steep_incline":
+		return CoursePointSteepIncline
+	case "tunnel":
+		return CoursePointTunnel
+	case "bridge":
+		return CoursePointBridge
+	case "obstacle":
+		return CoursePointObstacle
+	case "crossing":
+		return CoursePointCrossing
+	case "store":
+		return CoursePointStore
+	case "transition":
+		return CoursePointTransition
+	case "navaid":
+		return CoursePointNavaid
+	case "transport":
+		return CoursePointTransport
+	case "alert":
+		return CoursePointAlert
+	case "info":
+		return CoursePointInfo
+	default:
+		return CoursePointInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCoursePoint() []CoursePoint {
-	vs := make([]CoursePoint, 0, len(coursepointtostrs))
-	for i := range coursepointtostrs {
-		vs = append(vs, CoursePoint(i))
+	return []CoursePoint{
+		CoursePointGeneric,
+		CoursePointSummit,
+		CoursePointValley,
+		CoursePointWater,
+		CoursePointFood,
+		CoursePointDanger,
+		CoursePointLeft,
+		CoursePointRight,
+		CoursePointStraight,
+		CoursePointFirstAid,
+		CoursePointFourthCategory,
+		CoursePointThirdCategory,
+		CoursePointSecondCategory,
+		CoursePointFirstCategory,
+		CoursePointHorsCategory,
+		CoursePointSprint,
+		CoursePointLeftFork,
+		CoursePointRightFork,
+		CoursePointMiddleFork,
+		CoursePointSlightLeft,
+		CoursePointSharpLeft,
+		CoursePointSlightRight,
+		CoursePointSharpRight,
+		CoursePointUTurn,
+		CoursePointSegmentStart,
+		CoursePointSegmentEnd,
+		CoursePointCampsite,
+		CoursePointAidStation,
+		CoursePointRestArea,
+		CoursePointGeneralDistance,
+		CoursePointService,
+		CoursePointEnergyGel,
+		CoursePointSportsDrink,
+		CoursePointMileMarker,
+		CoursePointCheckpoint,
+		CoursePointShelter,
+		CoursePointMeetingSpot,
+		CoursePointOverlook,
+		CoursePointToilet,
+		CoursePointShower,
+		CoursePointGear,
+		CoursePointSharpCurve,
+		CoursePointSteepIncline,
+		CoursePointTunnel,
+		CoursePointBridge,
+		CoursePointObstacle,
+		CoursePointCrossing,
+		CoursePointStore,
+		CoursePointTransition,
+		CoursePointNavaid,
+		CoursePointTransport,
+		CoursePointAlert,
+		CoursePointInfo,
 	}
-	return vs
 }

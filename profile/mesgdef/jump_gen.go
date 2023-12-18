@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -37,19 +38,7 @@ func NewJump(mesg proto.Message) *Jump {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* Distance */
-		1:   nil, /* Height */
-		2:   nil, /* Rotations */
-		3:   nil, /* HangTime */
-		4:   nil, /* Score */
-		5:   nil, /* PositionLat */
-		6:   nil, /* PositionLong */
-		7:   nil, /* Speed */
-		8:   nil, /* EnhancedSpeed */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -74,39 +63,99 @@ func NewJump(mesg proto.Message) *Jump {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Jump mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumJump)
-func (m *Jump) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Jump into proto.Message.
+func (m *Jump) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumJump)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumJump {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.Distance,
-		1:   m.Height,
-		2:   m.Rotations,
-		3:   m.HangTime,
-		4:   m.Score,
-		5:   m.PositionLat,
-		6:   m.PositionLong,
-		7:   m.Speed,
-		8:   m.EnhancedSpeed,
+	if typeconv.ToUint32[uint32](m.Distance) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Distance
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32[uint32](m.Height) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Height
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Rotations != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Rotations
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.HangTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.HangTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.Score) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Score
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.PositionLat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.PositionLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Speed != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.Speed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.EnhancedSpeed
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Jump's valid fields.
+func (m *Jump) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.Distance) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.Height) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Rotations != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.HangTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.Score) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		size++
+	}
+	if m.Speed != basetype.Uint16Invalid {
+		size++
+	}
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

@@ -17,46 +17,41 @@ const (
 	TapSensitivityHigh    TapSensitivity = 0
 	TapSensitivityMedium  TapSensitivity = 1
 	TapSensitivityLow     TapSensitivity = 2
-	TapSensitivityInvalid TapSensitivity = 0xFF // INVALID
+	TapSensitivityInvalid TapSensitivity = 0xFF
 )
 
-var tapsensitivitytostrs = map[TapSensitivity]string{
-	TapSensitivityHigh:    "high",
-	TapSensitivityMedium:  "medium",
-	TapSensitivityLow:     "low",
-	TapSensitivityInvalid: "invalid",
-}
-
 func (t TapSensitivity) String() string {
-	val, ok := tapsensitivitytostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TapSensitivityHigh:
+		return "high"
+	case TapSensitivityMedium:
+		return "medium"
+	case TapSensitivityLow:
+		return "low"
+	default:
+		return "TapSensitivityInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotapsensitivity = func() map[string]TapSensitivity {
-	m := make(map[string]TapSensitivity)
-	for t, str := range tapsensitivitytostrs {
-		m[str] = TapSensitivity(t)
-	}
-	return m
-}()
 
 // FromString parse string into TapSensitivity constant it's represent, return TapSensitivityInvalid if not found.
 func TapSensitivityFromString(s string) TapSensitivity {
-	val, ok := strtotapsensitivity[s]
-	if !ok {
-		return strtotapsensitivity["invalid"]
+	switch s {
+	case "high":
+		return TapSensitivityHigh
+	case "medium":
+		return TapSensitivityMedium
+	case "low":
+		return TapSensitivityLow
+	default:
+		return TapSensitivityInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTapSensitivity() []TapSensitivity {
-	vs := make([]TapSensitivity, 0, len(tapsensitivitytostrs))
-	for i := range tapsensitivitytostrs {
-		vs = append(vs, TapSensitivity(i))
+	return []TapSensitivity{
+		TapSensitivityHigh,
+		TapSensitivityMedium,
+		TapSensitivityLow,
 	}
-	return vs
 }

@@ -18,11 +18,14 @@ var std = New()
 func StandardFactory() *Factory { return std }
 
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns new message with "unknown" name.
+//
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except fot the unknown field).
+// If you want a deep copy of the mesg, create it by calling mesg.Clone().
 func CreateMesg(num typedef.MesgNum) proto.Message {
 	return std.CreateMesg(num)
 }
 
-// CreateMesgOnly is similar to CreateMesg, but it sets Fields and DeveloperFields to nil. This is useful when we plan to fill these values ourselves
+// CreateMesgOnly is similar to CreateMesg, but it sets Fields to nil. This is useful when we plan to fill these values ourselves
 // to avoid unnecessary malloc when cloning them, as they will be removed anyway. For example, the decoding process will populate them with decoded data.
 func CreateMesgOnly(num typedef.MesgNum) proto.Message {
 	return std.CreateMesgOnly(num)
@@ -30,8 +33,9 @@ func CreateMesgOnly(num typedef.MesgNum) proto.Message {
 
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 //
-// Returned Field's FieldBase is a pointer, referencing a value in this factory to reduce unnecessary malloc or runtime duffcopy
-// since the content should not be changed.
+// Field's FieldBase is a pointer struct embedded, and this will only create a shallow copy of the field, so changing any value declared in
+// FieldBase is prohibited (except fot the unknown field) since it still referencing the same struct. If you want a deep copy of the Field,
+// create it by calling field.Clone().
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return std.CreateField(mesgNum, num)
 }

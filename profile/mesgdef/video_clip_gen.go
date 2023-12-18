@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,16 +35,7 @@ func NewVideoClip(mesg proto.Message) *VideoClip {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* ClipNumber */
-		1: nil, /* StartTimestamp */
-		2: nil, /* StartTimestampMs */
-		3: nil, /* EndTimestamp */
-		4: nil, /* EndTimestampMs */
-		6: nil, /* ClipStart */
-		7: nil, /* ClipEnd */
-	}
-
+	vals := [8]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -65,36 +57,75 @@ func NewVideoClip(mesg proto.Message) *VideoClip {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to VideoClip mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumVideoClip)
-func (m *VideoClip) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts VideoClip into proto.Message.
+func (m *VideoClip) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoClip)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumVideoClip {
-		return
+	if m.ClipNumber != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ClipNumber
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.ClipNumber,
-		1: typeconv.ToUint32[uint32](m.StartTimestamp),
-		2: m.StartTimestampMs,
-		3: typeconv.ToUint32[uint32](m.EndTimestamp),
-		4: m.EndTimestampMs,
-		6: m.ClipStart,
-		7: m.ClipEnd,
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint32[uint32](m.StartTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.StartTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.StartTimestampMs
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.EndTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint32[uint32](m.EndTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EndTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.EndTimestampMs
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ClipStart != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.ClipStart
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ClipEnd != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.ClipEnd
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of VideoClip's valid fields.
+func (m *VideoClip) size() byte {
+	var size byte
+	if m.ClipNumber != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.StartTimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.EndTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.EndTimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.ClipStart != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ClipEnd != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

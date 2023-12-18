@@ -16,45 +16,36 @@ type Gender byte
 const (
 	GenderFemale  Gender = 0
 	GenderMale    Gender = 1
-	GenderInvalid Gender = 0xFF // INVALID
+	GenderInvalid Gender = 0xFF
 )
 
-var gendertostrs = map[Gender]string{
-	GenderFemale:  "female",
-	GenderMale:    "male",
-	GenderInvalid: "invalid",
-}
-
 func (g Gender) String() string {
-	val, ok := gendertostrs[g]
-	if !ok {
-		return strconv.Itoa(int(g))
+	switch g {
+	case GenderFemale:
+		return "female"
+	case GenderMale:
+		return "male"
+	default:
+		return "GenderInvalid(" + strconv.Itoa(int(g)) + ")"
 	}
-	return val
 }
-
-var strtogender = func() map[string]Gender {
-	m := make(map[string]Gender)
-	for t, str := range gendertostrs {
-		m[str] = Gender(t)
-	}
-	return m
-}()
 
 // FromString parse string into Gender constant it's represent, return GenderInvalid if not found.
 func GenderFromString(s string) Gender {
-	val, ok := strtogender[s]
-	if !ok {
-		return strtogender["invalid"]
+	switch s {
+	case "female":
+		return GenderFemale
+	case "male":
+		return GenderMale
+	default:
+		return GenderInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListGender() []Gender {
-	vs := make([]Gender, 0, len(gendertostrs))
-	for i := range gendertostrs {
-		vs = append(vs, Gender(i))
+	return []Gender{
+		GenderFemale,
+		GenderMale,
 	}
-	return vs
 }

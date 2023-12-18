@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -36,18 +37,7 @@ func NewSegmentId(mesg proto.Message) *SegmentId {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* Name */
-		1: nil, /* Uuid */
-		2: nil, /* Sport */
-		3: nil, /* Enabled */
-		4: nil, /* UserProfilePrimaryKey */
-		5: nil, /* DeviceId */
-		6: nil, /* DefaultRaceLeader */
-		7: nil, /* DeleteStatus */
-		8: nil, /* SelectionType */
-	}
-
+	vals := [9]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -71,38 +61,91 @@ func NewSegmentId(mesg proto.Message) *SegmentId {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SegmentId mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSegmentId)
-func (m *SegmentId) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SegmentId into proto.Message.
+func (m *SegmentId) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentId)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSegmentId {
-		return
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Name
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.Name,
-		1: m.Uuid,
-		2: typeconv.ToEnum[byte](m.Sport),
-		3: m.Enabled,
-		4: m.UserProfilePrimaryKey,
-		5: m.DeviceId,
-		6: m.DefaultRaceLeader,
-		7: typeconv.ToEnum[byte](m.DeleteStatus),
-		8: typeconv.ToEnum[byte](m.SelectionType),
+	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Uuid
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.Sport)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Enabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.UserProfilePrimaryKey
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DeviceId != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.DeviceId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DefaultRaceLeader != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.DefaultRaceLeader
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DeleteStatus) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = typeconv.ToEnum[byte](m.DeleteStatus)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.SelectionType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = typeconv.ToEnum[byte](m.SelectionType)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SegmentId's valid fields.
+func (m *SegmentId) size() byte {
+	var size byte
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		size++
+	}
+	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Enabled != false {
+		size++
+	}
+	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
+		size++
+	}
+	if m.DeviceId != basetype.Uint32Invalid {
+		size++
+	}
+	if m.DefaultRaceLeader != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DeleteStatus) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SelectionType) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

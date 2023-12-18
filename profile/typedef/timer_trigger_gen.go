@@ -17,46 +17,41 @@ const (
 	TimerTriggerManual           TimerTrigger = 0
 	TimerTriggerAuto             TimerTrigger = 1
 	TimerTriggerFitnessEquipment TimerTrigger = 2
-	TimerTriggerInvalid          TimerTrigger = 0xFF // INVALID
+	TimerTriggerInvalid          TimerTrigger = 0xFF
 )
 
-var timertriggertostrs = map[TimerTrigger]string{
-	TimerTriggerManual:           "manual",
-	TimerTriggerAuto:             "auto",
-	TimerTriggerFitnessEquipment: "fitness_equipment",
-	TimerTriggerInvalid:          "invalid",
-}
-
 func (t TimerTrigger) String() string {
-	val, ok := timertriggertostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case TimerTriggerManual:
+		return "manual"
+	case TimerTriggerAuto:
+		return "auto"
+	case TimerTriggerFitnessEquipment:
+		return "fitness_equipment"
+	default:
+		return "TimerTriggerInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotimertrigger = func() map[string]TimerTrigger {
-	m := make(map[string]TimerTrigger)
-	for t, str := range timertriggertostrs {
-		m[str] = TimerTrigger(t)
-	}
-	return m
-}()
 
 // FromString parse string into TimerTrigger constant it's represent, return TimerTriggerInvalid if not found.
 func TimerTriggerFromString(s string) TimerTrigger {
-	val, ok := strtotimertrigger[s]
-	if !ok {
-		return strtotimertrigger["invalid"]
+	switch s {
+	case "manual":
+		return TimerTriggerManual
+	case "auto":
+		return TimerTriggerAuto
+	case "fitness_equipment":
+		return TimerTriggerFitnessEquipment
+	default:
+		return TimerTriggerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTimerTrigger() []TimerTrigger {
-	vs := make([]TimerTrigger, 0, len(timertriggertostrs))
-	for i := range timertriggertostrs {
-		vs = append(vs, TimerTrigger(i))
+	return []TimerTrigger{
+		TimerTriggerManual,
+		TimerTriggerAuto,
+		TimerTriggerFitnessEquipment,
 	}
-	return vs
 }

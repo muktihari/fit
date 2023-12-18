@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,15 +34,7 @@ func NewMemoGlob(mesg proto.Message) *MemoGlob {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		250: nil, /* PartIndex */
-		0:   nil, /* Memo */
-		1:   nil, /* MesgNum */
-		2:   nil, /* ParentIndex */
-		3:   nil, /* FieldNum */
-		4:   nil, /* Data */
-	}
-
+	vals := [251]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -62,35 +55,67 @@ func NewMemoGlob(mesg proto.Message) *MemoGlob {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to MemoGlob mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumMemoGlob)
-func (m *MemoGlob) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts MemoGlob into proto.Message.
+func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumMemoGlob)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumMemoGlob {
-		return
+	if m.PartIndex != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 250)
+		field.Value = m.PartIndex
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		250: m.PartIndex,
-		0:   m.Memo,
-		1:   typeconv.ToUint16[uint16](m.MesgNum),
-		2:   typeconv.ToUint16[uint16](m.ParentIndex),
-		3:   m.FieldNum,
-		4:   typeconv.ToSliceUint8z[uint8](m.Data),
+	if m.Memo != nil {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Memo
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16[uint16](m.MesgNum)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.ParentIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint16[uint16](m.ParentIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.FieldNum != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.FieldNum
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToSliceUint8z[uint8](m.Data) != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.Data)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of MemoGlob's valid fields.
+func (m *MemoGlob) size() byte {
+	var size byte
+	if m.PartIndex != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Memo != nil {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ParentIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.FieldNum != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToSliceUint8z[uint8](m.Data) != nil {
+		size++
+	}
+	return size
 }

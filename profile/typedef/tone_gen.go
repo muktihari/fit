@@ -18,47 +18,46 @@ const (
 	ToneTone           Tone = 1
 	ToneVibrate        Tone = 2
 	ToneToneAndVibrate Tone = 3
-	ToneInvalid        Tone = 0xFF // INVALID
+	ToneInvalid        Tone = 0xFF
 )
 
-var tonetostrs = map[Tone]string{
-	ToneOff:            "off",
-	ToneTone:           "tone",
-	ToneVibrate:        "vibrate",
-	ToneToneAndVibrate: "tone_and_vibrate",
-	ToneInvalid:        "invalid",
-}
-
 func (t Tone) String() string {
-	val, ok := tonetostrs[t]
-	if !ok {
-		return strconv.Itoa(int(t))
+	switch t {
+	case ToneOff:
+		return "off"
+	case ToneTone:
+		return "tone"
+	case ToneVibrate:
+		return "vibrate"
+	case ToneToneAndVibrate:
+		return "tone_and_vibrate"
+	default:
+		return "ToneInvalid(" + strconv.Itoa(int(t)) + ")"
 	}
-	return val
 }
-
-var strtotone = func() map[string]Tone {
-	m := make(map[string]Tone)
-	for t, str := range tonetostrs {
-		m[str] = Tone(t)
-	}
-	return m
-}()
 
 // FromString parse string into Tone constant it's represent, return ToneInvalid if not found.
 func ToneFromString(s string) Tone {
-	val, ok := strtotone[s]
-	if !ok {
-		return strtotone["invalid"]
+	switch s {
+	case "off":
+		return ToneOff
+	case "tone":
+		return ToneTone
+	case "vibrate":
+		return ToneVibrate
+	case "tone_and_vibrate":
+		return ToneToneAndVibrate
+	default:
+		return ToneInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTone() []Tone {
-	vs := make([]Tone, 0, len(tonetostrs))
-	for i := range tonetostrs {
-		vs = append(vs, Tone(i))
+	return []Tone{
+		ToneOff,
+		ToneTone,
+		ToneVibrate,
+		ToneToneAndVibrate,
 	}
-	return vs
 }

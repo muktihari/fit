@@ -27,56 +27,91 @@ const (
 	TotalBodyExerciseNameWeightedSquatPlankPushUp         TotalBodyExerciseName = 10
 	TotalBodyExerciseNameStandingTRotationBalance         TotalBodyExerciseName = 11
 	TotalBodyExerciseNameWeightedStandingTRotationBalance TotalBodyExerciseName = 12
-	TotalBodyExerciseNameInvalid                          TotalBodyExerciseName = 0xFFFF // INVALID
+	TotalBodyExerciseNameInvalid                          TotalBodyExerciseName = 0xFFFF
 )
 
-var totalbodyexercisenametostrs = map[TotalBodyExerciseName]string{
-	TotalBodyExerciseNameBurpee:                           "burpee",
-	TotalBodyExerciseNameWeightedBurpee:                   "weighted_burpee",
-	TotalBodyExerciseNameBurpeeBoxJump:                    "burpee_box_jump",
-	TotalBodyExerciseNameWeightedBurpeeBoxJump:            "weighted_burpee_box_jump",
-	TotalBodyExerciseNameHighPullBurpee:                   "high_pull_burpee",
-	TotalBodyExerciseNameManMakers:                        "man_makers",
-	TotalBodyExerciseNameOneArmBurpee:                     "one_arm_burpee",
-	TotalBodyExerciseNameSquatThrusts:                     "squat_thrusts",
-	TotalBodyExerciseNameWeightedSquatThrusts:             "weighted_squat_thrusts",
-	TotalBodyExerciseNameSquatPlankPushUp:                 "squat_plank_push_up",
-	TotalBodyExerciseNameWeightedSquatPlankPushUp:         "weighted_squat_plank_push_up",
-	TotalBodyExerciseNameStandingTRotationBalance:         "standing_t_rotation_balance",
-	TotalBodyExerciseNameWeightedStandingTRotationBalance: "weighted_standing_t_rotation_balance",
-	TotalBodyExerciseNameInvalid:                          "invalid",
-}
-
 func (t TotalBodyExerciseName) String() string {
-	val, ok := totalbodyexercisenametostrs[t]
-	if !ok {
-		return strconv.FormatUint(uint64(t), 10)
+	switch t {
+	case TotalBodyExerciseNameBurpee:
+		return "burpee"
+	case TotalBodyExerciseNameWeightedBurpee:
+		return "weighted_burpee"
+	case TotalBodyExerciseNameBurpeeBoxJump:
+		return "burpee_box_jump"
+	case TotalBodyExerciseNameWeightedBurpeeBoxJump:
+		return "weighted_burpee_box_jump"
+	case TotalBodyExerciseNameHighPullBurpee:
+		return "high_pull_burpee"
+	case TotalBodyExerciseNameManMakers:
+		return "man_makers"
+	case TotalBodyExerciseNameOneArmBurpee:
+		return "one_arm_burpee"
+	case TotalBodyExerciseNameSquatThrusts:
+		return "squat_thrusts"
+	case TotalBodyExerciseNameWeightedSquatThrusts:
+		return "weighted_squat_thrusts"
+	case TotalBodyExerciseNameSquatPlankPushUp:
+		return "squat_plank_push_up"
+	case TotalBodyExerciseNameWeightedSquatPlankPushUp:
+		return "weighted_squat_plank_push_up"
+	case TotalBodyExerciseNameStandingTRotationBalance:
+		return "standing_t_rotation_balance"
+	case TotalBodyExerciseNameWeightedStandingTRotationBalance:
+		return "weighted_standing_t_rotation_balance"
+	default:
+		return "TotalBodyExerciseNameInvalid(" + strconv.FormatUint(uint64(t), 10) + ")"
 	}
-	return val
 }
-
-var strtototalbodyexercisename = func() map[string]TotalBodyExerciseName {
-	m := make(map[string]TotalBodyExerciseName)
-	for t, str := range totalbodyexercisenametostrs {
-		m[str] = TotalBodyExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into TotalBodyExerciseName constant it's represent, return TotalBodyExerciseNameInvalid if not found.
 func TotalBodyExerciseNameFromString(s string) TotalBodyExerciseName {
-	val, ok := strtototalbodyexercisename[s]
-	if !ok {
-		return strtototalbodyexercisename["invalid"]
+	switch s {
+	case "burpee":
+		return TotalBodyExerciseNameBurpee
+	case "weighted_burpee":
+		return TotalBodyExerciseNameWeightedBurpee
+	case "burpee_box_jump":
+		return TotalBodyExerciseNameBurpeeBoxJump
+	case "weighted_burpee_box_jump":
+		return TotalBodyExerciseNameWeightedBurpeeBoxJump
+	case "high_pull_burpee":
+		return TotalBodyExerciseNameHighPullBurpee
+	case "man_makers":
+		return TotalBodyExerciseNameManMakers
+	case "one_arm_burpee":
+		return TotalBodyExerciseNameOneArmBurpee
+	case "squat_thrusts":
+		return TotalBodyExerciseNameSquatThrusts
+	case "weighted_squat_thrusts":
+		return TotalBodyExerciseNameWeightedSquatThrusts
+	case "squat_plank_push_up":
+		return TotalBodyExerciseNameSquatPlankPushUp
+	case "weighted_squat_plank_push_up":
+		return TotalBodyExerciseNameWeightedSquatPlankPushUp
+	case "standing_t_rotation_balance":
+		return TotalBodyExerciseNameStandingTRotationBalance
+	case "weighted_standing_t_rotation_balance":
+		return TotalBodyExerciseNameWeightedStandingTRotationBalance
+	default:
+		return TotalBodyExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListTotalBodyExerciseName() []TotalBodyExerciseName {
-	vs := make([]TotalBodyExerciseName, 0, len(totalbodyexercisenametostrs))
-	for i := range totalbodyexercisenametostrs {
-		vs = append(vs, TotalBodyExerciseName(i))
+	return []TotalBodyExerciseName{
+		TotalBodyExerciseNameBurpee,
+		TotalBodyExerciseNameWeightedBurpee,
+		TotalBodyExerciseNameBurpeeBoxJump,
+		TotalBodyExerciseNameWeightedBurpeeBoxJump,
+		TotalBodyExerciseNameHighPullBurpee,
+		TotalBodyExerciseNameManMakers,
+		TotalBodyExerciseNameOneArmBurpee,
+		TotalBodyExerciseNameSquatThrusts,
+		TotalBodyExerciseNameWeightedSquatThrusts,
+		TotalBodyExerciseNameSquatPlankPushUp,
+		TotalBodyExerciseNameWeightedSquatPlankPushUp,
+		TotalBodyExerciseNameStandingTRotationBalance,
+		TotalBodyExerciseNameWeightedStandingTRotationBalance,
 	}
-	return vs
 }

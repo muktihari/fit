@@ -14,49 +14,44 @@ import (
 type GoalSource byte
 
 const (
-	GoalSourceAuto      GoalSource = 0    // Device generated
-	GoalSourceCommunity GoalSource = 1    // Social network sourced goal
-	GoalSourceUser      GoalSource = 2    // Manually generated
-	GoalSourceInvalid   GoalSource = 0xFF // INVALID
+	GoalSourceAuto      GoalSource = 0 // Device generated
+	GoalSourceCommunity GoalSource = 1 // Social network sourced goal
+	GoalSourceUser      GoalSource = 2 // Manually generated
+	GoalSourceInvalid   GoalSource = 0xFF
 )
 
-var goalsourcetostrs = map[GoalSource]string{
-	GoalSourceAuto:      "auto",
-	GoalSourceCommunity: "community",
-	GoalSourceUser:      "user",
-	GoalSourceInvalid:   "invalid",
-}
-
 func (g GoalSource) String() string {
-	val, ok := goalsourcetostrs[g]
-	if !ok {
-		return strconv.Itoa(int(g))
+	switch g {
+	case GoalSourceAuto:
+		return "auto"
+	case GoalSourceCommunity:
+		return "community"
+	case GoalSourceUser:
+		return "user"
+	default:
+		return "GoalSourceInvalid(" + strconv.Itoa(int(g)) + ")"
 	}
-	return val
 }
-
-var strtogoalsource = func() map[string]GoalSource {
-	m := make(map[string]GoalSource)
-	for t, str := range goalsourcetostrs {
-		m[str] = GoalSource(t)
-	}
-	return m
-}()
 
 // FromString parse string into GoalSource constant it's represent, return GoalSourceInvalid if not found.
 func GoalSourceFromString(s string) GoalSource {
-	val, ok := strtogoalsource[s]
-	if !ok {
-		return strtogoalsource["invalid"]
+	switch s {
+	case "auto":
+		return GoalSourceAuto
+	case "community":
+		return GoalSourceCommunity
+	case "user":
+		return GoalSourceUser
+	default:
+		return GoalSourceInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListGoalSource() []GoalSource {
-	vs := make([]GoalSource, 0, len(goalsourcetostrs))
-	for i := range goalsourcetostrs {
-		vs = append(vs, GoalSource(i))
+	return []GoalSource{
+		GoalSourceAuto,
+		GoalSourceCommunity,
+		GoalSourceUser,
 	}
-	return vs
 }

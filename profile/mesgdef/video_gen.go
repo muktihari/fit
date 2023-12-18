@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -30,12 +31,7 @@ func NewVideo(mesg proto.Message) *Video {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* Url */
-		1: nil, /* HostingProvider */
-		2: nil, /* Duration */
-	}
-
+	vals := [3]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -53,32 +49,43 @@ func NewVideo(mesg proto.Message) *Video {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Video mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumVideo)
-func (m *Video) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Video into proto.Message.
+func (m *Video) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumVideo)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumVideo {
-		return
+	if m.Url != basetype.StringInvalid && m.Url != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Url
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.Url,
-		1: m.HostingProvider,
-		2: m.Duration,
+	if m.HostingProvider != basetype.StringInvalid && m.HostingProvider != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.HostingProvider
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Duration != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Duration
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Video's valid fields.
+func (m *Video) size() byte {
+	var size byte
+	if m.Url != basetype.StringInvalid && m.Url != "" {
+		size++
+	}
+	if m.HostingProvider != basetype.StringInvalid && m.HostingProvider != "" {
+		size++
+	}
+	if m.Duration != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

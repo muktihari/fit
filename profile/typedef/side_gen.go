@@ -16,45 +16,36 @@ type Side byte
 const (
 	SideRight   Side = 0
 	SideLeft    Side = 1
-	SideInvalid Side = 0xFF // INVALID
+	SideInvalid Side = 0xFF
 )
 
-var sidetostrs = map[Side]string{
-	SideRight:   "right",
-	SideLeft:    "left",
-	SideInvalid: "invalid",
-}
-
 func (s Side) String() string {
-	val, ok := sidetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SideRight:
+		return "right"
+	case SideLeft:
+		return "left"
+	default:
+		return "SideInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtoside = func() map[string]Side {
-	m := make(map[string]Side)
-	for t, str := range sidetostrs {
-		m[str] = Side(t)
-	}
-	return m
-}()
 
 // FromString parse string into Side constant it's represent, return SideInvalid if not found.
 func SideFromString(s string) Side {
-	val, ok := strtoside[s]
-	if !ok {
-		return strtoside["invalid"]
+	switch s {
+	case "right":
+		return SideRight
+	case "left":
+		return SideLeft
+	default:
+		return SideInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSide() []Side {
-	vs := make([]Side, 0, len(sidetostrs))
-	for i := range sidetostrs {
-		vs = append(vs, Side(i))
+	return []Side{
+		SideRight,
+		SideLeft,
 	}
-	return vs
 }

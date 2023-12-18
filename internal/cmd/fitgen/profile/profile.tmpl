@@ -11,18 +11,15 @@
 {{ define "profile" }}
 {{ template "constant" .ConstantData -}}
 
-var mappingtobasetypes = [...]basetype.BaseType {
+func (p ProfileType) BaseType() basetype.BaseType {
+	switch p {
 	{{ range .MappingBaseTypes -}}
-		{{ .ConstantName }}: {{ .BaseType }},
-	{{ end }}
-}
-
-func (p *ProfileType) BaseType() basetype.BaseType {
-	if *p > ProfileType(len(mappingtobasetypes)) {
-		return mappingtobasetypes[Invalid]
+	case {{ .ConstantName }}:
+		return {{ .BaseType }}
+	{{ end -}}
 	}
 	
-	return mappingtobasetypes[*p]
+	return 255
 }
 {{ end }}
 

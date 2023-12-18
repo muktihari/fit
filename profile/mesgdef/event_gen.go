@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -46,28 +47,7 @@ func NewEvent(mesg proto.Message) *Event {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* Event */
-		1:   nil, /* EventType */
-		2:   nil, /* Data16 */
-		3:   nil, /* Data */
-		4:   nil, /* EventGroup */
-		7:   nil, /* Score */
-		8:   nil, /* OpponentScore */
-		9:   nil, /* FrontGearNum */
-		10:  nil, /* FrontGear */
-		11:  nil, /* RearGearNum */
-		12:  nil, /* RearGear */
-		13:  nil, /* DeviceIndex */
-		14:  nil, /* ActivityType */
-		15:  nil, /* StartTimestamp */
-		21:  nil, /* RadarThreatLevelMax */
-		22:  nil, /* RadarThreatCount */
-		23:  nil, /* RadarThreatAvgApproachSpeed */
-		24:  nil, /* RadarThreatMaxApproachSpeed */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -101,48 +81,171 @@ func NewEvent(mesg proto.Message) *Event {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Event mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumEvent)
-func (m *Event) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Event into proto.Message.
+func (m *Event) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumEvent)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumEvent {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToEnum[byte](m.Event),
-		1:   typeconv.ToEnum[byte](m.EventType),
-		2:   m.Data16,
-		3:   m.Data,
-		4:   m.EventGroup,
-		7:   m.Score,
-		8:   m.OpponentScore,
-		9:   typeconv.ToUint8z[uint8](m.FrontGearNum),
-		10:  typeconv.ToUint8z[uint8](m.FrontGear),
-		11:  typeconv.ToUint8z[uint8](m.RearGearNum),
-		12:  typeconv.ToUint8z[uint8](m.RearGear),
-		13:  typeconv.ToUint8[uint8](m.DeviceIndex),
-		14:  typeconv.ToEnum[byte](m.ActivityType),
-		15:  typeconv.ToUint32[uint32](m.StartTimestamp),
-		21:  typeconv.ToEnum[byte](m.RadarThreatLevelMax),
-		22:  m.RadarThreatCount,
-		23:  m.RadarThreatAvgApproachSpeed,
-		24:  m.RadarThreatMaxApproachSpeed,
+	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.Event)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToEnum[byte](m.EventType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Data16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Data16
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Data != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Data
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EventGroup != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.EventGroup
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Score != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.Score
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.OpponentScore != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.OpponentScore
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = typeconv.ToUint8z[uint8](m.FrontGearNum)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.FrontGear) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = typeconv.ToUint8z[uint8](m.FrontGear)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = typeconv.ToUint8z[uint8](m.RearGearNum)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.RearGear) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = typeconv.ToUint8z[uint8](m.RearGear)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = typeconv.ToEnum[byte](m.ActivityType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = typeconv.ToUint32[uint32](m.StartTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.RadarThreatLevelMax) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = typeconv.ToEnum[byte](m.RadarThreatLevelMax)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RadarThreatCount != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = m.RadarThreatCount
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = m.RadarThreatAvgApproachSpeed
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = m.RadarThreatMaxApproachSpeed
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Event's valid fields.
+func (m *Event) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Data16 != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Data != basetype.Uint32Invalid {
+		size++
+	}
+	if m.EventGroup != basetype.Uint8Invalid {
+		size++
+	}
+	if m.Score != basetype.Uint16Invalid {
+		size++
+	}
+	if m.OpponentScore != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.FrontGear) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.RearGear) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.RadarThreatLevelMax) != basetype.EnumInvalid {
+		size++
+	}
+	if m.RadarThreatCount != basetype.Uint8Invalid {
+		size++
+	}
+	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid {
+		size++
+	}
+	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid {
+		size++
+	}
+	return size
 }

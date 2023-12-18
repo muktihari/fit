@@ -26,55 +26,86 @@ const (
 	LegCurlExerciseNameStaggeredStanceGoodMorning  LegCurlExerciseName = 9
 	LegCurlExerciseNameSwissBallHipRaiseAndLegCurl LegCurlExerciseName = 10
 	LegCurlExerciseNameZercherGoodMorning          LegCurlExerciseName = 11
-	LegCurlExerciseNameInvalid                     LegCurlExerciseName = 0xFFFF // INVALID
+	LegCurlExerciseNameInvalid                     LegCurlExerciseName = 0xFFFF
 )
 
-var legcurlexercisenametostrs = map[LegCurlExerciseName]string{
-	LegCurlExerciseNameLegCurl:                     "leg_curl",
-	LegCurlExerciseNameWeightedLegCurl:             "weighted_leg_curl",
-	LegCurlExerciseNameGoodMorning:                 "good_morning",
-	LegCurlExerciseNameSeatedBarbellGoodMorning:    "seated_barbell_good_morning",
-	LegCurlExerciseNameSingleLegBarbellGoodMorning: "single_leg_barbell_good_morning",
-	LegCurlExerciseNameSingleLegSlidingLegCurl:     "single_leg_sliding_leg_curl",
-	LegCurlExerciseNameSlidingLegCurl:              "sliding_leg_curl",
-	LegCurlExerciseNameSplitBarbellGoodMorning:     "split_barbell_good_morning",
-	LegCurlExerciseNameSplitStanceExtension:        "split_stance_extension",
-	LegCurlExerciseNameStaggeredStanceGoodMorning:  "staggered_stance_good_morning",
-	LegCurlExerciseNameSwissBallHipRaiseAndLegCurl: "swiss_ball_hip_raise_and_leg_curl",
-	LegCurlExerciseNameZercherGoodMorning:          "zercher_good_morning",
-	LegCurlExerciseNameInvalid:                     "invalid",
-}
-
 func (l LegCurlExerciseName) String() string {
-	val, ok := legcurlexercisenametostrs[l]
-	if !ok {
-		return strconv.FormatUint(uint64(l), 10)
+	switch l {
+	case LegCurlExerciseNameLegCurl:
+		return "leg_curl"
+	case LegCurlExerciseNameWeightedLegCurl:
+		return "weighted_leg_curl"
+	case LegCurlExerciseNameGoodMorning:
+		return "good_morning"
+	case LegCurlExerciseNameSeatedBarbellGoodMorning:
+		return "seated_barbell_good_morning"
+	case LegCurlExerciseNameSingleLegBarbellGoodMorning:
+		return "single_leg_barbell_good_morning"
+	case LegCurlExerciseNameSingleLegSlidingLegCurl:
+		return "single_leg_sliding_leg_curl"
+	case LegCurlExerciseNameSlidingLegCurl:
+		return "sliding_leg_curl"
+	case LegCurlExerciseNameSplitBarbellGoodMorning:
+		return "split_barbell_good_morning"
+	case LegCurlExerciseNameSplitStanceExtension:
+		return "split_stance_extension"
+	case LegCurlExerciseNameStaggeredStanceGoodMorning:
+		return "staggered_stance_good_morning"
+	case LegCurlExerciseNameSwissBallHipRaiseAndLegCurl:
+		return "swiss_ball_hip_raise_and_leg_curl"
+	case LegCurlExerciseNameZercherGoodMorning:
+		return "zercher_good_morning"
+	default:
+		return "LegCurlExerciseNameInvalid(" + strconv.FormatUint(uint64(l), 10) + ")"
 	}
-	return val
 }
-
-var strtolegcurlexercisename = func() map[string]LegCurlExerciseName {
-	m := make(map[string]LegCurlExerciseName)
-	for t, str := range legcurlexercisenametostrs {
-		m[str] = LegCurlExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into LegCurlExerciseName constant it's represent, return LegCurlExerciseNameInvalid if not found.
 func LegCurlExerciseNameFromString(s string) LegCurlExerciseName {
-	val, ok := strtolegcurlexercisename[s]
-	if !ok {
-		return strtolegcurlexercisename["invalid"]
+	switch s {
+	case "leg_curl":
+		return LegCurlExerciseNameLegCurl
+	case "weighted_leg_curl":
+		return LegCurlExerciseNameWeightedLegCurl
+	case "good_morning":
+		return LegCurlExerciseNameGoodMorning
+	case "seated_barbell_good_morning":
+		return LegCurlExerciseNameSeatedBarbellGoodMorning
+	case "single_leg_barbell_good_morning":
+		return LegCurlExerciseNameSingleLegBarbellGoodMorning
+	case "single_leg_sliding_leg_curl":
+		return LegCurlExerciseNameSingleLegSlidingLegCurl
+	case "sliding_leg_curl":
+		return LegCurlExerciseNameSlidingLegCurl
+	case "split_barbell_good_morning":
+		return LegCurlExerciseNameSplitBarbellGoodMorning
+	case "split_stance_extension":
+		return LegCurlExerciseNameSplitStanceExtension
+	case "staggered_stance_good_morning":
+		return LegCurlExerciseNameStaggeredStanceGoodMorning
+	case "swiss_ball_hip_raise_and_leg_curl":
+		return LegCurlExerciseNameSwissBallHipRaiseAndLegCurl
+	case "zercher_good_morning":
+		return LegCurlExerciseNameZercherGoodMorning
+	default:
+		return LegCurlExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListLegCurlExerciseName() []LegCurlExerciseName {
-	vs := make([]LegCurlExerciseName, 0, len(legcurlexercisenametostrs))
-	for i := range legcurlexercisenametostrs {
-		vs = append(vs, LegCurlExerciseName(i))
+	return []LegCurlExerciseName{
+		LegCurlExerciseNameLegCurl,
+		LegCurlExerciseNameWeightedLegCurl,
+		LegCurlExerciseNameGoodMorning,
+		LegCurlExerciseNameSeatedBarbellGoodMorning,
+		LegCurlExerciseNameSingleLegBarbellGoodMorning,
+		LegCurlExerciseNameSingleLegSlidingLegCurl,
+		LegCurlExerciseNameSlidingLegCurl,
+		LegCurlExerciseNameSplitBarbellGoodMorning,
+		LegCurlExerciseNameSplitStanceExtension,
+		LegCurlExerciseNameStaggeredStanceGoodMorning,
+		LegCurlExerciseNameSwissBallHipRaiseAndLegCurl,
+		LegCurlExerciseNameZercherGoodMorning,
 	}
-	return vs
 }

@@ -47,76 +47,191 @@ const (
 	ShoulderStabilityExerciseNameWeightedSwissBallWRaise                ShoulderStabilityExerciseName = 30
 	ShoulderStabilityExerciseNameSwissBallYRaise                        ShoulderStabilityExerciseName = 31
 	ShoulderStabilityExerciseNameWeightedSwissBallYRaise                ShoulderStabilityExerciseName = 32
-	ShoulderStabilityExerciseNameInvalid                                ShoulderStabilityExerciseName = 0xFFFF // INVALID
+	ShoulderStabilityExerciseNameInvalid                                ShoulderStabilityExerciseName = 0xFFFF
 )
 
-var shoulderstabilityexercisenametostrs = map[ShoulderStabilityExerciseName]string{
-	ShoulderStabilityExerciseName90DegreeCableExternalRotation:          "90_degree_cable_external_rotation",
-	ShoulderStabilityExerciseNameBandExternalRotation:                   "band_external_rotation",
-	ShoulderStabilityExerciseNameBandInternalRotation:                   "band_internal_rotation",
-	ShoulderStabilityExerciseNameBentArmLateralRaiseAndExternalRotation: "bent_arm_lateral_raise_and_external_rotation",
-	ShoulderStabilityExerciseNameCableExternalRotation:                  "cable_external_rotation",
-	ShoulderStabilityExerciseNameDumbbellFacePullWithExternalRotation:   "dumbbell_face_pull_with_external_rotation",
-	ShoulderStabilityExerciseNameFloorIRaise:                            "floor_i_raise",
-	ShoulderStabilityExerciseNameWeightedFloorIRaise:                    "weighted_floor_i_raise",
-	ShoulderStabilityExerciseNameFloorTRaise:                            "floor_t_raise",
-	ShoulderStabilityExerciseNameWeightedFloorTRaise:                    "weighted_floor_t_raise",
-	ShoulderStabilityExerciseNameFloorYRaise:                            "floor_y_raise",
-	ShoulderStabilityExerciseNameWeightedFloorYRaise:                    "weighted_floor_y_raise",
-	ShoulderStabilityExerciseNameInclineIRaise:                          "incline_i_raise",
-	ShoulderStabilityExerciseNameWeightedInclineIRaise:                  "weighted_incline_i_raise",
-	ShoulderStabilityExerciseNameInclineLRaise:                          "incline_l_raise",
-	ShoulderStabilityExerciseNameWeightedInclineLRaise:                  "weighted_incline_l_raise",
-	ShoulderStabilityExerciseNameInclineTRaise:                          "incline_t_raise",
-	ShoulderStabilityExerciseNameWeightedInclineTRaise:                  "weighted_incline_t_raise",
-	ShoulderStabilityExerciseNameInclineWRaise:                          "incline_w_raise",
-	ShoulderStabilityExerciseNameWeightedInclineWRaise:                  "weighted_incline_w_raise",
-	ShoulderStabilityExerciseNameInclineYRaise:                          "incline_y_raise",
-	ShoulderStabilityExerciseNameWeightedInclineYRaise:                  "weighted_incline_y_raise",
-	ShoulderStabilityExerciseNameLyingExternalRotation:                  "lying_external_rotation",
-	ShoulderStabilityExerciseNameSeatedDumbbellExternalRotation:         "seated_dumbbell_external_rotation",
-	ShoulderStabilityExerciseNameStandingLRaise:                         "standing_l_raise",
-	ShoulderStabilityExerciseNameSwissBallIRaise:                        "swiss_ball_i_raise",
-	ShoulderStabilityExerciseNameWeightedSwissBallIRaise:                "weighted_swiss_ball_i_raise",
-	ShoulderStabilityExerciseNameSwissBallTRaise:                        "swiss_ball_t_raise",
-	ShoulderStabilityExerciseNameWeightedSwissBallTRaise:                "weighted_swiss_ball_t_raise",
-	ShoulderStabilityExerciseNameSwissBallWRaise:                        "swiss_ball_w_raise",
-	ShoulderStabilityExerciseNameWeightedSwissBallWRaise:                "weighted_swiss_ball_w_raise",
-	ShoulderStabilityExerciseNameSwissBallYRaise:                        "swiss_ball_y_raise",
-	ShoulderStabilityExerciseNameWeightedSwissBallYRaise:                "weighted_swiss_ball_y_raise",
-	ShoulderStabilityExerciseNameInvalid:                                "invalid",
-}
-
 func (s ShoulderStabilityExerciseName) String() string {
-	val, ok := shoulderstabilityexercisenametostrs[s]
-	if !ok {
-		return strconv.FormatUint(uint64(s), 10)
+	switch s {
+	case ShoulderStabilityExerciseName90DegreeCableExternalRotation:
+		return "90_degree_cable_external_rotation"
+	case ShoulderStabilityExerciseNameBandExternalRotation:
+		return "band_external_rotation"
+	case ShoulderStabilityExerciseNameBandInternalRotation:
+		return "band_internal_rotation"
+	case ShoulderStabilityExerciseNameBentArmLateralRaiseAndExternalRotation:
+		return "bent_arm_lateral_raise_and_external_rotation"
+	case ShoulderStabilityExerciseNameCableExternalRotation:
+		return "cable_external_rotation"
+	case ShoulderStabilityExerciseNameDumbbellFacePullWithExternalRotation:
+		return "dumbbell_face_pull_with_external_rotation"
+	case ShoulderStabilityExerciseNameFloorIRaise:
+		return "floor_i_raise"
+	case ShoulderStabilityExerciseNameWeightedFloorIRaise:
+		return "weighted_floor_i_raise"
+	case ShoulderStabilityExerciseNameFloorTRaise:
+		return "floor_t_raise"
+	case ShoulderStabilityExerciseNameWeightedFloorTRaise:
+		return "weighted_floor_t_raise"
+	case ShoulderStabilityExerciseNameFloorYRaise:
+		return "floor_y_raise"
+	case ShoulderStabilityExerciseNameWeightedFloorYRaise:
+		return "weighted_floor_y_raise"
+	case ShoulderStabilityExerciseNameInclineIRaise:
+		return "incline_i_raise"
+	case ShoulderStabilityExerciseNameWeightedInclineIRaise:
+		return "weighted_incline_i_raise"
+	case ShoulderStabilityExerciseNameInclineLRaise:
+		return "incline_l_raise"
+	case ShoulderStabilityExerciseNameWeightedInclineLRaise:
+		return "weighted_incline_l_raise"
+	case ShoulderStabilityExerciseNameInclineTRaise:
+		return "incline_t_raise"
+	case ShoulderStabilityExerciseNameWeightedInclineTRaise:
+		return "weighted_incline_t_raise"
+	case ShoulderStabilityExerciseNameInclineWRaise:
+		return "incline_w_raise"
+	case ShoulderStabilityExerciseNameWeightedInclineWRaise:
+		return "weighted_incline_w_raise"
+	case ShoulderStabilityExerciseNameInclineYRaise:
+		return "incline_y_raise"
+	case ShoulderStabilityExerciseNameWeightedInclineYRaise:
+		return "weighted_incline_y_raise"
+	case ShoulderStabilityExerciseNameLyingExternalRotation:
+		return "lying_external_rotation"
+	case ShoulderStabilityExerciseNameSeatedDumbbellExternalRotation:
+		return "seated_dumbbell_external_rotation"
+	case ShoulderStabilityExerciseNameStandingLRaise:
+		return "standing_l_raise"
+	case ShoulderStabilityExerciseNameSwissBallIRaise:
+		return "swiss_ball_i_raise"
+	case ShoulderStabilityExerciseNameWeightedSwissBallIRaise:
+		return "weighted_swiss_ball_i_raise"
+	case ShoulderStabilityExerciseNameSwissBallTRaise:
+		return "swiss_ball_t_raise"
+	case ShoulderStabilityExerciseNameWeightedSwissBallTRaise:
+		return "weighted_swiss_ball_t_raise"
+	case ShoulderStabilityExerciseNameSwissBallWRaise:
+		return "swiss_ball_w_raise"
+	case ShoulderStabilityExerciseNameWeightedSwissBallWRaise:
+		return "weighted_swiss_ball_w_raise"
+	case ShoulderStabilityExerciseNameSwissBallYRaise:
+		return "swiss_ball_y_raise"
+	case ShoulderStabilityExerciseNameWeightedSwissBallYRaise:
+		return "weighted_swiss_ball_y_raise"
+	default:
+		return "ShoulderStabilityExerciseNameInvalid(" + strconv.FormatUint(uint64(s), 10) + ")"
 	}
-	return val
 }
-
-var strtoshoulderstabilityexercisename = func() map[string]ShoulderStabilityExerciseName {
-	m := make(map[string]ShoulderStabilityExerciseName)
-	for t, str := range shoulderstabilityexercisenametostrs {
-		m[str] = ShoulderStabilityExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into ShoulderStabilityExerciseName constant it's represent, return ShoulderStabilityExerciseNameInvalid if not found.
 func ShoulderStabilityExerciseNameFromString(s string) ShoulderStabilityExerciseName {
-	val, ok := strtoshoulderstabilityexercisename[s]
-	if !ok {
-		return strtoshoulderstabilityexercisename["invalid"]
+	switch s {
+	case "90_degree_cable_external_rotation":
+		return ShoulderStabilityExerciseName90DegreeCableExternalRotation
+	case "band_external_rotation":
+		return ShoulderStabilityExerciseNameBandExternalRotation
+	case "band_internal_rotation":
+		return ShoulderStabilityExerciseNameBandInternalRotation
+	case "bent_arm_lateral_raise_and_external_rotation":
+		return ShoulderStabilityExerciseNameBentArmLateralRaiseAndExternalRotation
+	case "cable_external_rotation":
+		return ShoulderStabilityExerciseNameCableExternalRotation
+	case "dumbbell_face_pull_with_external_rotation":
+		return ShoulderStabilityExerciseNameDumbbellFacePullWithExternalRotation
+	case "floor_i_raise":
+		return ShoulderStabilityExerciseNameFloorIRaise
+	case "weighted_floor_i_raise":
+		return ShoulderStabilityExerciseNameWeightedFloorIRaise
+	case "floor_t_raise":
+		return ShoulderStabilityExerciseNameFloorTRaise
+	case "weighted_floor_t_raise":
+		return ShoulderStabilityExerciseNameWeightedFloorTRaise
+	case "floor_y_raise":
+		return ShoulderStabilityExerciseNameFloorYRaise
+	case "weighted_floor_y_raise":
+		return ShoulderStabilityExerciseNameWeightedFloorYRaise
+	case "incline_i_raise":
+		return ShoulderStabilityExerciseNameInclineIRaise
+	case "weighted_incline_i_raise":
+		return ShoulderStabilityExerciseNameWeightedInclineIRaise
+	case "incline_l_raise":
+		return ShoulderStabilityExerciseNameInclineLRaise
+	case "weighted_incline_l_raise":
+		return ShoulderStabilityExerciseNameWeightedInclineLRaise
+	case "incline_t_raise":
+		return ShoulderStabilityExerciseNameInclineTRaise
+	case "weighted_incline_t_raise":
+		return ShoulderStabilityExerciseNameWeightedInclineTRaise
+	case "incline_w_raise":
+		return ShoulderStabilityExerciseNameInclineWRaise
+	case "weighted_incline_w_raise":
+		return ShoulderStabilityExerciseNameWeightedInclineWRaise
+	case "incline_y_raise":
+		return ShoulderStabilityExerciseNameInclineYRaise
+	case "weighted_incline_y_raise":
+		return ShoulderStabilityExerciseNameWeightedInclineYRaise
+	case "lying_external_rotation":
+		return ShoulderStabilityExerciseNameLyingExternalRotation
+	case "seated_dumbbell_external_rotation":
+		return ShoulderStabilityExerciseNameSeatedDumbbellExternalRotation
+	case "standing_l_raise":
+		return ShoulderStabilityExerciseNameStandingLRaise
+	case "swiss_ball_i_raise":
+		return ShoulderStabilityExerciseNameSwissBallIRaise
+	case "weighted_swiss_ball_i_raise":
+		return ShoulderStabilityExerciseNameWeightedSwissBallIRaise
+	case "swiss_ball_t_raise":
+		return ShoulderStabilityExerciseNameSwissBallTRaise
+	case "weighted_swiss_ball_t_raise":
+		return ShoulderStabilityExerciseNameWeightedSwissBallTRaise
+	case "swiss_ball_w_raise":
+		return ShoulderStabilityExerciseNameSwissBallWRaise
+	case "weighted_swiss_ball_w_raise":
+		return ShoulderStabilityExerciseNameWeightedSwissBallWRaise
+	case "swiss_ball_y_raise":
+		return ShoulderStabilityExerciseNameSwissBallYRaise
+	case "weighted_swiss_ball_y_raise":
+		return ShoulderStabilityExerciseNameWeightedSwissBallYRaise
+	default:
+		return ShoulderStabilityExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListShoulderStabilityExerciseName() []ShoulderStabilityExerciseName {
-	vs := make([]ShoulderStabilityExerciseName, 0, len(shoulderstabilityexercisenametostrs))
-	for i := range shoulderstabilityexercisenametostrs {
-		vs = append(vs, ShoulderStabilityExerciseName(i))
+	return []ShoulderStabilityExerciseName{
+		ShoulderStabilityExerciseName90DegreeCableExternalRotation,
+		ShoulderStabilityExerciseNameBandExternalRotation,
+		ShoulderStabilityExerciseNameBandInternalRotation,
+		ShoulderStabilityExerciseNameBentArmLateralRaiseAndExternalRotation,
+		ShoulderStabilityExerciseNameCableExternalRotation,
+		ShoulderStabilityExerciseNameDumbbellFacePullWithExternalRotation,
+		ShoulderStabilityExerciseNameFloorIRaise,
+		ShoulderStabilityExerciseNameWeightedFloorIRaise,
+		ShoulderStabilityExerciseNameFloorTRaise,
+		ShoulderStabilityExerciseNameWeightedFloorTRaise,
+		ShoulderStabilityExerciseNameFloorYRaise,
+		ShoulderStabilityExerciseNameWeightedFloorYRaise,
+		ShoulderStabilityExerciseNameInclineIRaise,
+		ShoulderStabilityExerciseNameWeightedInclineIRaise,
+		ShoulderStabilityExerciseNameInclineLRaise,
+		ShoulderStabilityExerciseNameWeightedInclineLRaise,
+		ShoulderStabilityExerciseNameInclineTRaise,
+		ShoulderStabilityExerciseNameWeightedInclineTRaise,
+		ShoulderStabilityExerciseNameInclineWRaise,
+		ShoulderStabilityExerciseNameWeightedInclineWRaise,
+		ShoulderStabilityExerciseNameInclineYRaise,
+		ShoulderStabilityExerciseNameWeightedInclineYRaise,
+		ShoulderStabilityExerciseNameLyingExternalRotation,
+		ShoulderStabilityExerciseNameSeatedDumbbellExternalRotation,
+		ShoulderStabilityExerciseNameStandingLRaise,
+		ShoulderStabilityExerciseNameSwissBallIRaise,
+		ShoulderStabilityExerciseNameWeightedSwissBallIRaise,
+		ShoulderStabilityExerciseNameSwissBallTRaise,
+		ShoulderStabilityExerciseNameWeightedSwissBallTRaise,
+		ShoulderStabilityExerciseNameSwissBallWRaise,
+		ShoulderStabilityExerciseNameWeightedSwissBallWRaise,
+		ShoulderStabilityExerciseNameSwissBallYRaise,
+		ShoulderStabilityExerciseNameWeightedSwissBallYRaise,
 	}
-	return vs
 }

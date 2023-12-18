@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -44,26 +45,7 @@ func NewTimeInZone(mesg proto.Message) *TimeInZone {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* ReferenceMesg */
-		1:   nil, /* ReferenceIndex */
-		2:   nil, /* TimeInHrZone */
-		3:   nil, /* TimeInSpeedZone */
-		4:   nil, /* TimeInCadenceZone */
-		5:   nil, /* TimeInPowerZone */
-		6:   nil, /* HrZoneHighBoundary */
-		7:   nil, /* SpeedZoneHighBoundary */
-		8:   nil, /* CadenceZoneHighBondary */
-		9:   nil, /* PowerZoneHighBoundary */
-		10:  nil, /* HrCalcType */
-		11:  nil, /* MaxHeartRate */
-		12:  nil, /* RestingHeartRate */
-		13:  nil, /* ThresholdHeartRate */
-		14:  nil, /* PwrCalcType */
-		15:  nil, /* FunctionalThresholdPower */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -95,46 +77,155 @@ func NewTimeInZone(mesg proto.Message) *TimeInZone {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to TimeInZone mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumTimeInZone)
-func (m *TimeInZone) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts TimeInZone into proto.Message.
+func (m *TimeInZone) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumTimeInZone)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumTimeInZone {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToUint16[uint16](m.ReferenceMesg),
-		1:   typeconv.ToUint16[uint16](m.ReferenceIndex),
-		2:   m.TimeInHrZone,
-		3:   m.TimeInSpeedZone,
-		4:   m.TimeInCadenceZone,
-		5:   m.TimeInPowerZone,
-		6:   m.HrZoneHighBoundary,
-		7:   m.SpeedZoneHighBoundary,
-		8:   m.CadenceZoneHighBondary,
-		9:   m.PowerZoneHighBoundary,
-		10:  typeconv.ToEnum[byte](m.HrCalcType),
-		11:  m.MaxHeartRate,
-		12:  m.RestingHeartRate,
-		13:  m.ThresholdHeartRate,
-		14:  typeconv.ToEnum[byte](m.PwrCalcType),
-		15:  m.FunctionalThresholdPower,
+	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint16[uint16](m.ReferenceMesg)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16[uint16](m.ReferenceIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimeInHrZone != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.TimeInHrZone
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimeInSpeedZone != nil {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.TimeInSpeedZone
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimeInCadenceZone != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.TimeInCadenceZone
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimeInPowerZone != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.TimeInPowerZone
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.HrZoneHighBoundary != nil {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.HrZoneHighBoundary
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SpeedZoneHighBoundary != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.SpeedZoneHighBoundary
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CadenceZoneHighBondary != nil {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.CadenceZoneHighBondary
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PowerZoneHighBoundary != nil {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.PowerZoneHighBoundary
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = typeconv.ToEnum[byte](m.HrCalcType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.MaxHeartRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RestingHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.RestingHeartRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ThresholdHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.ThresholdHeartRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = typeconv.ToEnum[byte](m.PwrCalcType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.FunctionalThresholdPower
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of TimeInZone's valid fields.
+func (m *TimeInZone) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.TimeInHrZone != nil {
+		size++
+	}
+	if m.TimeInSpeedZone != nil {
+		size++
+	}
+	if m.TimeInCadenceZone != nil {
+		size++
+	}
+	if m.TimeInPowerZone != nil {
+		size++
+	}
+	if m.HrZoneHighBoundary != nil {
+		size++
+	}
+	if m.SpeedZoneHighBoundary != nil {
+		size++
+	}
+	if m.CadenceZoneHighBondary != nil {
+		size++
+	}
+	if m.PowerZoneHighBoundary != nil {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.RestingHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ThresholdHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

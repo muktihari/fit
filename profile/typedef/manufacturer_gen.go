@@ -235,264 +235,1131 @@ const (
 	ManufacturerNike                   Manufacturer = 326
 	ManufacturerMagicshine             Manufacturer = 327
 	ManufacturerActigraphcorp          Manufacturer = 5759
-	ManufacturerInvalid                Manufacturer = 0xFFFF // INVALID
+	ManufacturerInvalid                Manufacturer = 0xFFFF
 )
 
-var manufacturertostrs = map[Manufacturer]string{
-	ManufacturerGarmin:                 "garmin",
-	ManufacturerGarminFr405Antfs:       "garmin_fr405_antfs",
-	ManufacturerZephyr:                 "zephyr",
-	ManufacturerDayton:                 "dayton",
-	ManufacturerIdt:                    "idt",
-	ManufacturerSrm:                    "srm",
-	ManufacturerQuarq:                  "quarq",
-	ManufacturerIbike:                  "ibike",
-	ManufacturerSaris:                  "saris",
-	ManufacturerSparkHk:                "spark_hk",
-	ManufacturerTanita:                 "tanita",
-	ManufacturerEchowell:               "echowell",
-	ManufacturerDynastreamOem:          "dynastream_oem",
-	ManufacturerNautilus:               "nautilus",
-	ManufacturerDynastream:             "dynastream",
-	ManufacturerTimex:                  "timex",
-	ManufacturerMetrigear:              "metrigear",
-	ManufacturerXelic:                  "xelic",
-	ManufacturerBeurer:                 "beurer",
-	ManufacturerCardiosport:            "cardiosport",
-	ManufacturerAAndD:                  "a_and_d",
-	ManufacturerHmm:                    "hmm",
-	ManufacturerSuunto:                 "suunto",
-	ManufacturerThitaElektronik:        "thita_elektronik",
-	ManufacturerGpulse:                 "gpulse",
-	ManufacturerCleanMobile:            "clean_mobile",
-	ManufacturerPedalBrain:             "pedal_brain",
-	ManufacturerPeaksware:              "peaksware",
-	ManufacturerSaxonar:                "saxonar",
-	ManufacturerLemondFitness:          "lemond_fitness",
-	ManufacturerDexcom:                 "dexcom",
-	ManufacturerWahooFitness:           "wahoo_fitness",
-	ManufacturerOctaneFitness:          "octane_fitness",
-	ManufacturerArchinoetics:           "archinoetics",
-	ManufacturerTheHurtBox:             "the_hurt_box",
-	ManufacturerCitizenSystems:         "citizen_systems",
-	ManufacturerMagellan:               "magellan",
-	ManufacturerOsynce:                 "osynce",
-	ManufacturerHolux:                  "holux",
-	ManufacturerConcept2:               "concept2",
-	ManufacturerShimano:                "shimano",
-	ManufacturerOneGiantLeap:           "one_giant_leap",
-	ManufacturerAceSensor:              "ace_sensor",
-	ManufacturerBrimBrothers:           "brim_brothers",
-	ManufacturerXplova:                 "xplova",
-	ManufacturerPerceptionDigital:      "perception_digital",
-	ManufacturerBf1systems:             "bf1systems",
-	ManufacturerPioneer:                "pioneer",
-	ManufacturerSpantec:                "spantec",
-	ManufacturerMetalogics:             "metalogics",
-	Manufacturer4Iiiis:                 "4iiiis",
-	ManufacturerSeikoEpson:             "seiko_epson",
-	ManufacturerSeikoEpsonOem:          "seiko_epson_oem",
-	ManufacturerIforPowell:             "ifor_powell",
-	ManufacturerMaxwellGuider:          "maxwell_guider",
-	ManufacturerStarTrac:               "star_trac",
-	ManufacturerBreakaway:              "breakaway",
-	ManufacturerAlatechTechnologyLtd:   "alatech_technology_ltd",
-	ManufacturerMioTechnologyEurope:    "mio_technology_europe",
-	ManufacturerRotor:                  "rotor",
-	ManufacturerGeonaute:               "geonaute",
-	ManufacturerIdBike:                 "id_bike",
-	ManufacturerSpecialized:            "specialized",
-	ManufacturerWtek:                   "wtek",
-	ManufacturerPhysicalEnterprises:    "physical_enterprises",
-	ManufacturerNorthPoleEngineering:   "north_pole_engineering",
-	ManufacturerBkool:                  "bkool",
-	ManufacturerCateye:                 "cateye",
-	ManufacturerStagesCycling:          "stages_cycling",
-	ManufacturerSigmasport:             "sigmasport",
-	ManufacturerTomtom:                 "tomtom",
-	ManufacturerPeripedal:              "peripedal",
-	ManufacturerWattbike:               "wattbike",
-	ManufacturerMoxy:                   "moxy",
-	ManufacturerCiclosport:             "ciclosport",
-	ManufacturerPowerbahn:              "powerbahn",
-	ManufacturerAcornProjectsAps:       "acorn_projects_aps",
-	ManufacturerLifebeam:               "lifebeam",
-	ManufacturerBontrager:              "bontrager",
-	ManufacturerWellgo:                 "wellgo",
-	ManufacturerScosche:                "scosche",
-	ManufacturerMagura:                 "magura",
-	ManufacturerWoodway:                "woodway",
-	ManufacturerElite:                  "elite",
-	ManufacturerNielsenKellerman:       "nielsen_kellerman",
-	ManufacturerDkCity:                 "dk_city",
-	ManufacturerTacx:                   "tacx",
-	ManufacturerDirectionTechnology:    "direction_technology",
-	ManufacturerMagtonic:               "magtonic",
-	Manufacturer1Partcarbon:            "1partcarbon",
-	ManufacturerInsideRideTechnologies: "inside_ride_technologies",
-	ManufacturerSoundOfMotion:          "sound_of_motion",
-	ManufacturerStryd:                  "stryd",
-	ManufacturerIcg:                    "icg",
-	ManufacturerMipulse:                "MiPulse",
-	ManufacturerBsxAthletics:           "bsx_athletics",
-	ManufacturerLook:                   "look",
-	ManufacturerCampagnoloSrl:          "campagnolo_srl",
-	ManufacturerBodyBikeSmart:          "body_bike_smart",
-	ManufacturerPraxisworks:            "praxisworks",
-	ManufacturerLimitsTechnology:       "limits_technology",
-	ManufacturerTopactionTechnology:    "topaction_technology",
-	ManufacturerCosinuss:               "cosinuss",
-	ManufacturerFitcare:                "fitcare",
-	ManufacturerMagene:                 "magene",
-	ManufacturerGiantManufacturingCo:   "giant_manufacturing_co",
-	ManufacturerTigrasport:             "tigrasport",
-	ManufacturerSalutron:               "salutron",
-	ManufacturerTechnogym:              "technogym",
-	ManufacturerBrytonSensors:          "bryton_sensors",
-	ManufacturerLatitudeLimited:        "latitude_limited",
-	ManufacturerSoaringTechnology:      "soaring_technology",
-	ManufacturerIgpsport:               "igpsport",
-	ManufacturerThinkrider:             "thinkrider",
-	ManufacturerGopherSport:            "gopher_sport",
-	ManufacturerWaterrower:             "waterrower",
-	ManufacturerOrangetheory:           "orangetheory",
-	ManufacturerInpeak:                 "inpeak",
-	ManufacturerKinetic:                "kinetic",
-	ManufacturerJohnsonHealthTech:      "johnson_health_tech",
-	ManufacturerPolarElectro:           "polar_electro",
-	ManufacturerSeesense:               "seesense",
-	ManufacturerNciTechnology:          "nci_technology",
-	ManufacturerIqsquare:               "iqsquare",
-	ManufacturerLeomo:                  "leomo",
-	ManufacturerIfitCom:                "ifit_com",
-	ManufacturerCorosByte:              "coros_byte",
-	ManufacturerVersaDesign:            "versa_design",
-	ManufacturerChileaf:                "chileaf",
-	ManufacturerCycplus:                "cycplus",
-	ManufacturerGravaaByte:             "gravaa_byte",
-	ManufacturerSigeyi:                 "sigeyi",
-	ManufacturerCoospo:                 "coospo",
-	ManufacturerGeoid:                  "geoid",
-	ManufacturerBosch:                  "bosch",
-	ManufacturerKyto:                   "kyto",
-	ManufacturerKineticSports:          "kinetic_sports",
-	ManufacturerDecathlonByte:          "decathlon_byte",
-	ManufacturerTqSystems:              "tq_systems",
-	ManufacturerTagHeuer:               "tag_heuer",
-	ManufacturerKeiserFitness:          "keiser_fitness",
-	ManufacturerZwiftByte:              "zwift_byte",
-	ManufacturerPorscheEp:              "porsche_ep",
-	ManufacturerBlackbird:              "blackbird",
-	ManufacturerMeilanByte:             "meilan_byte",
-	ManufacturerEzon:                   "ezon",
-	ManufacturerLaisi:                  "laisi",
-	ManufacturerMyzone:                 "myzone",
-	ManufacturerDevelopment:            "development",
-	ManufacturerHealthandlife:          "healthandlife",
-	ManufacturerLezyne:                 "lezyne",
-	ManufacturerScribeLabs:             "scribe_labs",
-	ManufacturerZwift:                  "zwift",
-	ManufacturerWatteam:                "watteam",
-	ManufacturerRecon:                  "recon",
-	ManufacturerFaveroElectronics:      "favero_electronics",
-	ManufacturerDynovelo:               "dynovelo",
-	ManufacturerStrava:                 "strava",
-	ManufacturerPrecor:                 "precor",
-	ManufacturerBryton:                 "bryton",
-	ManufacturerSram:                   "sram",
-	ManufacturerNavman:                 "navman",
-	ManufacturerCobi:                   "cobi",
-	ManufacturerSpivi:                  "spivi",
-	ManufacturerMioMagellan:            "mio_magellan",
-	ManufacturerEvesports:              "evesports",
-	ManufacturerSensitivusGauge:        "sensitivus_gauge",
-	ManufacturerPodoon:                 "podoon",
-	ManufacturerLifeTimeFitness:        "life_time_fitness",
-	ManufacturerFalcoEMotors:           "falco_e_motors",
-	ManufacturerMinoura:                "minoura",
-	ManufacturerCycliq:                 "cycliq",
-	ManufacturerLuxottica:              "luxottica",
-	ManufacturerTrainerRoad:            "trainer_road",
-	ManufacturerTheSufferfest:          "the_sufferfest",
-	ManufacturerFullspeedahead:         "fullspeedahead",
-	ManufacturerVirtualtraining:        "virtualtraining",
-	ManufacturerFeedbacksports:         "feedbacksports",
-	ManufacturerOmata:                  "omata",
-	ManufacturerVdo:                    "vdo",
-	ManufacturerMagneticdays:           "magneticdays",
-	ManufacturerHammerhead:             "hammerhead",
-	ManufacturerKineticByKurt:          "kinetic_by_kurt",
-	ManufacturerShapelog:               "shapelog",
-	ManufacturerDabuziduo:              "dabuziduo",
-	ManufacturerJetblack:               "jetblack",
-	ManufacturerCoros:                  "coros",
-	ManufacturerVirtugo:                "virtugo",
-	ManufacturerVelosense:              "velosense",
-	ManufacturerCycligentinc:           "cycligentinc",
-	ManufacturerTrailforks:             "trailforks",
-	ManufacturerMahleEbikemotion:       "mahle_ebikemotion",
-	ManufacturerNurvv:                  "nurvv",
-	ManufacturerMicroprogram:           "microprogram",
-	ManufacturerZone5cloud:             "zone5cloud",
-	ManufacturerGreenteg:               "greenteg",
-	ManufacturerYamahaMotors:           "yamaha_motors",
-	ManufacturerWhoop:                  "whoop",
-	ManufacturerGravaa:                 "gravaa",
-	ManufacturerOnelap:                 "onelap",
-	ManufacturerMonarkExercise:         "monark_exercise",
-	ManufacturerForm:                   "form",
-	ManufacturerDecathlon:              "decathlon",
-	ManufacturerSyncros:                "syncros",
-	ManufacturerHeatup:                 "heatup",
-	ManufacturerCannondale:             "cannondale",
-	ManufacturerTrueFitness:            "true_fitness",
-	ManufacturerRgtCycling:             "RGT_cycling",
-	ManufacturerVasa:                   "vasa",
-	ManufacturerRaceRepublic:           "race_republic",
-	ManufacturerFazua:                  "fazua",
-	ManufacturerOrekaTraining:          "oreka_training",
-	ManufacturerLsec:                   "lsec",
-	ManufacturerLululemonStudio:        "lululemon_studio",
-	ManufacturerShanyue:                "shanyue",
-	ManufacturerSpinningMda:            "spinning_mda",
-	ManufacturerHilldating:             "hilldating",
-	ManufacturerAeroSensor:             "aero_sensor",
-	ManufacturerNike:                   "nike",
-	ManufacturerMagicshine:             "magicshine",
-	ManufacturerActigraphcorp:          "actigraphcorp",
-	ManufacturerInvalid:                "invalid",
-}
-
 func (m Manufacturer) String() string {
-	val, ok := manufacturertostrs[m]
-	if !ok {
-		return strconv.FormatUint(uint64(m), 10)
+	switch m {
+	case ManufacturerGarmin:
+		return "garmin"
+	case ManufacturerGarminFr405Antfs:
+		return "garmin_fr405_antfs"
+	case ManufacturerZephyr:
+		return "zephyr"
+	case ManufacturerDayton:
+		return "dayton"
+	case ManufacturerIdt:
+		return "idt"
+	case ManufacturerSrm:
+		return "srm"
+	case ManufacturerQuarq:
+		return "quarq"
+	case ManufacturerIbike:
+		return "ibike"
+	case ManufacturerSaris:
+		return "saris"
+	case ManufacturerSparkHk:
+		return "spark_hk"
+	case ManufacturerTanita:
+		return "tanita"
+	case ManufacturerEchowell:
+		return "echowell"
+	case ManufacturerDynastreamOem:
+		return "dynastream_oem"
+	case ManufacturerNautilus:
+		return "nautilus"
+	case ManufacturerDynastream:
+		return "dynastream"
+	case ManufacturerTimex:
+		return "timex"
+	case ManufacturerMetrigear:
+		return "metrigear"
+	case ManufacturerXelic:
+		return "xelic"
+	case ManufacturerBeurer:
+		return "beurer"
+	case ManufacturerCardiosport:
+		return "cardiosport"
+	case ManufacturerAAndD:
+		return "a_and_d"
+	case ManufacturerHmm:
+		return "hmm"
+	case ManufacturerSuunto:
+		return "suunto"
+	case ManufacturerThitaElektronik:
+		return "thita_elektronik"
+	case ManufacturerGpulse:
+		return "gpulse"
+	case ManufacturerCleanMobile:
+		return "clean_mobile"
+	case ManufacturerPedalBrain:
+		return "pedal_brain"
+	case ManufacturerPeaksware:
+		return "peaksware"
+	case ManufacturerSaxonar:
+		return "saxonar"
+	case ManufacturerLemondFitness:
+		return "lemond_fitness"
+	case ManufacturerDexcom:
+		return "dexcom"
+	case ManufacturerWahooFitness:
+		return "wahoo_fitness"
+	case ManufacturerOctaneFitness:
+		return "octane_fitness"
+	case ManufacturerArchinoetics:
+		return "archinoetics"
+	case ManufacturerTheHurtBox:
+		return "the_hurt_box"
+	case ManufacturerCitizenSystems:
+		return "citizen_systems"
+	case ManufacturerMagellan:
+		return "magellan"
+	case ManufacturerOsynce:
+		return "osynce"
+	case ManufacturerHolux:
+		return "holux"
+	case ManufacturerConcept2:
+		return "concept2"
+	case ManufacturerShimano:
+		return "shimano"
+	case ManufacturerOneGiantLeap:
+		return "one_giant_leap"
+	case ManufacturerAceSensor:
+		return "ace_sensor"
+	case ManufacturerBrimBrothers:
+		return "brim_brothers"
+	case ManufacturerXplova:
+		return "xplova"
+	case ManufacturerPerceptionDigital:
+		return "perception_digital"
+	case ManufacturerBf1systems:
+		return "bf1systems"
+	case ManufacturerPioneer:
+		return "pioneer"
+	case ManufacturerSpantec:
+		return "spantec"
+	case ManufacturerMetalogics:
+		return "metalogics"
+	case Manufacturer4Iiiis:
+		return "4iiiis"
+	case ManufacturerSeikoEpson:
+		return "seiko_epson"
+	case ManufacturerSeikoEpsonOem:
+		return "seiko_epson_oem"
+	case ManufacturerIforPowell:
+		return "ifor_powell"
+	case ManufacturerMaxwellGuider:
+		return "maxwell_guider"
+	case ManufacturerStarTrac:
+		return "star_trac"
+	case ManufacturerBreakaway:
+		return "breakaway"
+	case ManufacturerAlatechTechnologyLtd:
+		return "alatech_technology_ltd"
+	case ManufacturerMioTechnologyEurope:
+		return "mio_technology_europe"
+	case ManufacturerRotor:
+		return "rotor"
+	case ManufacturerGeonaute:
+		return "geonaute"
+	case ManufacturerIdBike:
+		return "id_bike"
+	case ManufacturerSpecialized:
+		return "specialized"
+	case ManufacturerWtek:
+		return "wtek"
+	case ManufacturerPhysicalEnterprises:
+		return "physical_enterprises"
+	case ManufacturerNorthPoleEngineering:
+		return "north_pole_engineering"
+	case ManufacturerBkool:
+		return "bkool"
+	case ManufacturerCateye:
+		return "cateye"
+	case ManufacturerStagesCycling:
+		return "stages_cycling"
+	case ManufacturerSigmasport:
+		return "sigmasport"
+	case ManufacturerTomtom:
+		return "tomtom"
+	case ManufacturerPeripedal:
+		return "peripedal"
+	case ManufacturerWattbike:
+		return "wattbike"
+	case ManufacturerMoxy:
+		return "moxy"
+	case ManufacturerCiclosport:
+		return "ciclosport"
+	case ManufacturerPowerbahn:
+		return "powerbahn"
+	case ManufacturerAcornProjectsAps:
+		return "acorn_projects_aps"
+	case ManufacturerLifebeam:
+		return "lifebeam"
+	case ManufacturerBontrager:
+		return "bontrager"
+	case ManufacturerWellgo:
+		return "wellgo"
+	case ManufacturerScosche:
+		return "scosche"
+	case ManufacturerMagura:
+		return "magura"
+	case ManufacturerWoodway:
+		return "woodway"
+	case ManufacturerElite:
+		return "elite"
+	case ManufacturerNielsenKellerman:
+		return "nielsen_kellerman"
+	case ManufacturerDkCity:
+		return "dk_city"
+	case ManufacturerTacx:
+		return "tacx"
+	case ManufacturerDirectionTechnology:
+		return "direction_technology"
+	case ManufacturerMagtonic:
+		return "magtonic"
+	case Manufacturer1Partcarbon:
+		return "1partcarbon"
+	case ManufacturerInsideRideTechnologies:
+		return "inside_ride_technologies"
+	case ManufacturerSoundOfMotion:
+		return "sound_of_motion"
+	case ManufacturerStryd:
+		return "stryd"
+	case ManufacturerIcg:
+		return "icg"
+	case ManufacturerMipulse:
+		return "MiPulse"
+	case ManufacturerBsxAthletics:
+		return "bsx_athletics"
+	case ManufacturerLook:
+		return "look"
+	case ManufacturerCampagnoloSrl:
+		return "campagnolo_srl"
+	case ManufacturerBodyBikeSmart:
+		return "body_bike_smart"
+	case ManufacturerPraxisworks:
+		return "praxisworks"
+	case ManufacturerLimitsTechnology:
+		return "limits_technology"
+	case ManufacturerTopactionTechnology:
+		return "topaction_technology"
+	case ManufacturerCosinuss:
+		return "cosinuss"
+	case ManufacturerFitcare:
+		return "fitcare"
+	case ManufacturerMagene:
+		return "magene"
+	case ManufacturerGiantManufacturingCo:
+		return "giant_manufacturing_co"
+	case ManufacturerTigrasport:
+		return "tigrasport"
+	case ManufacturerSalutron:
+		return "salutron"
+	case ManufacturerTechnogym:
+		return "technogym"
+	case ManufacturerBrytonSensors:
+		return "bryton_sensors"
+	case ManufacturerLatitudeLimited:
+		return "latitude_limited"
+	case ManufacturerSoaringTechnology:
+		return "soaring_technology"
+	case ManufacturerIgpsport:
+		return "igpsport"
+	case ManufacturerThinkrider:
+		return "thinkrider"
+	case ManufacturerGopherSport:
+		return "gopher_sport"
+	case ManufacturerWaterrower:
+		return "waterrower"
+	case ManufacturerOrangetheory:
+		return "orangetheory"
+	case ManufacturerInpeak:
+		return "inpeak"
+	case ManufacturerKinetic:
+		return "kinetic"
+	case ManufacturerJohnsonHealthTech:
+		return "johnson_health_tech"
+	case ManufacturerPolarElectro:
+		return "polar_electro"
+	case ManufacturerSeesense:
+		return "seesense"
+	case ManufacturerNciTechnology:
+		return "nci_technology"
+	case ManufacturerIqsquare:
+		return "iqsquare"
+	case ManufacturerLeomo:
+		return "leomo"
+	case ManufacturerIfitCom:
+		return "ifit_com"
+	case ManufacturerCorosByte:
+		return "coros_byte"
+	case ManufacturerVersaDesign:
+		return "versa_design"
+	case ManufacturerChileaf:
+		return "chileaf"
+	case ManufacturerCycplus:
+		return "cycplus"
+	case ManufacturerGravaaByte:
+		return "gravaa_byte"
+	case ManufacturerSigeyi:
+		return "sigeyi"
+	case ManufacturerCoospo:
+		return "coospo"
+	case ManufacturerGeoid:
+		return "geoid"
+	case ManufacturerBosch:
+		return "bosch"
+	case ManufacturerKyto:
+		return "kyto"
+	case ManufacturerKineticSports:
+		return "kinetic_sports"
+	case ManufacturerDecathlonByte:
+		return "decathlon_byte"
+	case ManufacturerTqSystems:
+		return "tq_systems"
+	case ManufacturerTagHeuer:
+		return "tag_heuer"
+	case ManufacturerKeiserFitness:
+		return "keiser_fitness"
+	case ManufacturerZwiftByte:
+		return "zwift_byte"
+	case ManufacturerPorscheEp:
+		return "porsche_ep"
+	case ManufacturerBlackbird:
+		return "blackbird"
+	case ManufacturerMeilanByte:
+		return "meilan_byte"
+	case ManufacturerEzon:
+		return "ezon"
+	case ManufacturerLaisi:
+		return "laisi"
+	case ManufacturerMyzone:
+		return "myzone"
+	case ManufacturerDevelopment:
+		return "development"
+	case ManufacturerHealthandlife:
+		return "healthandlife"
+	case ManufacturerLezyne:
+		return "lezyne"
+	case ManufacturerScribeLabs:
+		return "scribe_labs"
+	case ManufacturerZwift:
+		return "zwift"
+	case ManufacturerWatteam:
+		return "watteam"
+	case ManufacturerRecon:
+		return "recon"
+	case ManufacturerFaveroElectronics:
+		return "favero_electronics"
+	case ManufacturerDynovelo:
+		return "dynovelo"
+	case ManufacturerStrava:
+		return "strava"
+	case ManufacturerPrecor:
+		return "precor"
+	case ManufacturerBryton:
+		return "bryton"
+	case ManufacturerSram:
+		return "sram"
+	case ManufacturerNavman:
+		return "navman"
+	case ManufacturerCobi:
+		return "cobi"
+	case ManufacturerSpivi:
+		return "spivi"
+	case ManufacturerMioMagellan:
+		return "mio_magellan"
+	case ManufacturerEvesports:
+		return "evesports"
+	case ManufacturerSensitivusGauge:
+		return "sensitivus_gauge"
+	case ManufacturerPodoon:
+		return "podoon"
+	case ManufacturerLifeTimeFitness:
+		return "life_time_fitness"
+	case ManufacturerFalcoEMotors:
+		return "falco_e_motors"
+	case ManufacturerMinoura:
+		return "minoura"
+	case ManufacturerCycliq:
+		return "cycliq"
+	case ManufacturerLuxottica:
+		return "luxottica"
+	case ManufacturerTrainerRoad:
+		return "trainer_road"
+	case ManufacturerTheSufferfest:
+		return "the_sufferfest"
+	case ManufacturerFullspeedahead:
+		return "fullspeedahead"
+	case ManufacturerVirtualtraining:
+		return "virtualtraining"
+	case ManufacturerFeedbacksports:
+		return "feedbacksports"
+	case ManufacturerOmata:
+		return "omata"
+	case ManufacturerVdo:
+		return "vdo"
+	case ManufacturerMagneticdays:
+		return "magneticdays"
+	case ManufacturerHammerhead:
+		return "hammerhead"
+	case ManufacturerKineticByKurt:
+		return "kinetic_by_kurt"
+	case ManufacturerShapelog:
+		return "shapelog"
+	case ManufacturerDabuziduo:
+		return "dabuziduo"
+	case ManufacturerJetblack:
+		return "jetblack"
+	case ManufacturerCoros:
+		return "coros"
+	case ManufacturerVirtugo:
+		return "virtugo"
+	case ManufacturerVelosense:
+		return "velosense"
+	case ManufacturerCycligentinc:
+		return "cycligentinc"
+	case ManufacturerTrailforks:
+		return "trailforks"
+	case ManufacturerMahleEbikemotion:
+		return "mahle_ebikemotion"
+	case ManufacturerNurvv:
+		return "nurvv"
+	case ManufacturerMicroprogram:
+		return "microprogram"
+	case ManufacturerZone5cloud:
+		return "zone5cloud"
+	case ManufacturerGreenteg:
+		return "greenteg"
+	case ManufacturerYamahaMotors:
+		return "yamaha_motors"
+	case ManufacturerWhoop:
+		return "whoop"
+	case ManufacturerGravaa:
+		return "gravaa"
+	case ManufacturerOnelap:
+		return "onelap"
+	case ManufacturerMonarkExercise:
+		return "monark_exercise"
+	case ManufacturerForm:
+		return "form"
+	case ManufacturerDecathlon:
+		return "decathlon"
+	case ManufacturerSyncros:
+		return "syncros"
+	case ManufacturerHeatup:
+		return "heatup"
+	case ManufacturerCannondale:
+		return "cannondale"
+	case ManufacturerTrueFitness:
+		return "true_fitness"
+	case ManufacturerRgtCycling:
+		return "RGT_cycling"
+	case ManufacturerVasa:
+		return "vasa"
+	case ManufacturerRaceRepublic:
+		return "race_republic"
+	case ManufacturerFazua:
+		return "fazua"
+	case ManufacturerOrekaTraining:
+		return "oreka_training"
+	case ManufacturerLsec:
+		return "lsec"
+	case ManufacturerLululemonStudio:
+		return "lululemon_studio"
+	case ManufacturerShanyue:
+		return "shanyue"
+	case ManufacturerSpinningMda:
+		return "spinning_mda"
+	case ManufacturerHilldating:
+		return "hilldating"
+	case ManufacturerAeroSensor:
+		return "aero_sensor"
+	case ManufacturerNike:
+		return "nike"
+	case ManufacturerMagicshine:
+		return "magicshine"
+	case ManufacturerActigraphcorp:
+		return "actigraphcorp"
+	default:
+		return "ManufacturerInvalid(" + strconv.FormatUint(uint64(m), 10) + ")"
 	}
-	return val
 }
-
-var strtomanufacturer = func() map[string]Manufacturer {
-	m := make(map[string]Manufacturer)
-	for t, str := range manufacturertostrs {
-		m[str] = Manufacturer(t)
-	}
-	return m
-}()
 
 // FromString parse string into Manufacturer constant it's represent, return ManufacturerInvalid if not found.
 func ManufacturerFromString(s string) Manufacturer {
-	val, ok := strtomanufacturer[s]
-	if !ok {
-		return strtomanufacturer["invalid"]
+	switch s {
+	case "garmin":
+		return ManufacturerGarmin
+	case "garmin_fr405_antfs":
+		return ManufacturerGarminFr405Antfs
+	case "zephyr":
+		return ManufacturerZephyr
+	case "dayton":
+		return ManufacturerDayton
+	case "idt":
+		return ManufacturerIdt
+	case "srm":
+		return ManufacturerSrm
+	case "quarq":
+		return ManufacturerQuarq
+	case "ibike":
+		return ManufacturerIbike
+	case "saris":
+		return ManufacturerSaris
+	case "spark_hk":
+		return ManufacturerSparkHk
+	case "tanita":
+		return ManufacturerTanita
+	case "echowell":
+		return ManufacturerEchowell
+	case "dynastream_oem":
+		return ManufacturerDynastreamOem
+	case "nautilus":
+		return ManufacturerNautilus
+	case "dynastream":
+		return ManufacturerDynastream
+	case "timex":
+		return ManufacturerTimex
+	case "metrigear":
+		return ManufacturerMetrigear
+	case "xelic":
+		return ManufacturerXelic
+	case "beurer":
+		return ManufacturerBeurer
+	case "cardiosport":
+		return ManufacturerCardiosport
+	case "a_and_d":
+		return ManufacturerAAndD
+	case "hmm":
+		return ManufacturerHmm
+	case "suunto":
+		return ManufacturerSuunto
+	case "thita_elektronik":
+		return ManufacturerThitaElektronik
+	case "gpulse":
+		return ManufacturerGpulse
+	case "clean_mobile":
+		return ManufacturerCleanMobile
+	case "pedal_brain":
+		return ManufacturerPedalBrain
+	case "peaksware":
+		return ManufacturerPeaksware
+	case "saxonar":
+		return ManufacturerSaxonar
+	case "lemond_fitness":
+		return ManufacturerLemondFitness
+	case "dexcom":
+		return ManufacturerDexcom
+	case "wahoo_fitness":
+		return ManufacturerWahooFitness
+	case "octane_fitness":
+		return ManufacturerOctaneFitness
+	case "archinoetics":
+		return ManufacturerArchinoetics
+	case "the_hurt_box":
+		return ManufacturerTheHurtBox
+	case "citizen_systems":
+		return ManufacturerCitizenSystems
+	case "magellan":
+		return ManufacturerMagellan
+	case "osynce":
+		return ManufacturerOsynce
+	case "holux":
+		return ManufacturerHolux
+	case "concept2":
+		return ManufacturerConcept2
+	case "shimano":
+		return ManufacturerShimano
+	case "one_giant_leap":
+		return ManufacturerOneGiantLeap
+	case "ace_sensor":
+		return ManufacturerAceSensor
+	case "brim_brothers":
+		return ManufacturerBrimBrothers
+	case "xplova":
+		return ManufacturerXplova
+	case "perception_digital":
+		return ManufacturerPerceptionDigital
+	case "bf1systems":
+		return ManufacturerBf1systems
+	case "pioneer":
+		return ManufacturerPioneer
+	case "spantec":
+		return ManufacturerSpantec
+	case "metalogics":
+		return ManufacturerMetalogics
+	case "4iiiis":
+		return Manufacturer4Iiiis
+	case "seiko_epson":
+		return ManufacturerSeikoEpson
+	case "seiko_epson_oem":
+		return ManufacturerSeikoEpsonOem
+	case "ifor_powell":
+		return ManufacturerIforPowell
+	case "maxwell_guider":
+		return ManufacturerMaxwellGuider
+	case "star_trac":
+		return ManufacturerStarTrac
+	case "breakaway":
+		return ManufacturerBreakaway
+	case "alatech_technology_ltd":
+		return ManufacturerAlatechTechnologyLtd
+	case "mio_technology_europe":
+		return ManufacturerMioTechnologyEurope
+	case "rotor":
+		return ManufacturerRotor
+	case "geonaute":
+		return ManufacturerGeonaute
+	case "id_bike":
+		return ManufacturerIdBike
+	case "specialized":
+		return ManufacturerSpecialized
+	case "wtek":
+		return ManufacturerWtek
+	case "physical_enterprises":
+		return ManufacturerPhysicalEnterprises
+	case "north_pole_engineering":
+		return ManufacturerNorthPoleEngineering
+	case "bkool":
+		return ManufacturerBkool
+	case "cateye":
+		return ManufacturerCateye
+	case "stages_cycling":
+		return ManufacturerStagesCycling
+	case "sigmasport":
+		return ManufacturerSigmasport
+	case "tomtom":
+		return ManufacturerTomtom
+	case "peripedal":
+		return ManufacturerPeripedal
+	case "wattbike":
+		return ManufacturerWattbike
+	case "moxy":
+		return ManufacturerMoxy
+	case "ciclosport":
+		return ManufacturerCiclosport
+	case "powerbahn":
+		return ManufacturerPowerbahn
+	case "acorn_projects_aps":
+		return ManufacturerAcornProjectsAps
+	case "lifebeam":
+		return ManufacturerLifebeam
+	case "bontrager":
+		return ManufacturerBontrager
+	case "wellgo":
+		return ManufacturerWellgo
+	case "scosche":
+		return ManufacturerScosche
+	case "magura":
+		return ManufacturerMagura
+	case "woodway":
+		return ManufacturerWoodway
+	case "elite":
+		return ManufacturerElite
+	case "nielsen_kellerman":
+		return ManufacturerNielsenKellerman
+	case "dk_city":
+		return ManufacturerDkCity
+	case "tacx":
+		return ManufacturerTacx
+	case "direction_technology":
+		return ManufacturerDirectionTechnology
+	case "magtonic":
+		return ManufacturerMagtonic
+	case "1partcarbon":
+		return Manufacturer1Partcarbon
+	case "inside_ride_technologies":
+		return ManufacturerInsideRideTechnologies
+	case "sound_of_motion":
+		return ManufacturerSoundOfMotion
+	case "stryd":
+		return ManufacturerStryd
+	case "icg":
+		return ManufacturerIcg
+	case "MiPulse":
+		return ManufacturerMipulse
+	case "bsx_athletics":
+		return ManufacturerBsxAthletics
+	case "look":
+		return ManufacturerLook
+	case "campagnolo_srl":
+		return ManufacturerCampagnoloSrl
+	case "body_bike_smart":
+		return ManufacturerBodyBikeSmart
+	case "praxisworks":
+		return ManufacturerPraxisworks
+	case "limits_technology":
+		return ManufacturerLimitsTechnology
+	case "topaction_technology":
+		return ManufacturerTopactionTechnology
+	case "cosinuss":
+		return ManufacturerCosinuss
+	case "fitcare":
+		return ManufacturerFitcare
+	case "magene":
+		return ManufacturerMagene
+	case "giant_manufacturing_co":
+		return ManufacturerGiantManufacturingCo
+	case "tigrasport":
+		return ManufacturerTigrasport
+	case "salutron":
+		return ManufacturerSalutron
+	case "technogym":
+		return ManufacturerTechnogym
+	case "bryton_sensors":
+		return ManufacturerBrytonSensors
+	case "latitude_limited":
+		return ManufacturerLatitudeLimited
+	case "soaring_technology":
+		return ManufacturerSoaringTechnology
+	case "igpsport":
+		return ManufacturerIgpsport
+	case "thinkrider":
+		return ManufacturerThinkrider
+	case "gopher_sport":
+		return ManufacturerGopherSport
+	case "waterrower":
+		return ManufacturerWaterrower
+	case "orangetheory":
+		return ManufacturerOrangetheory
+	case "inpeak":
+		return ManufacturerInpeak
+	case "kinetic":
+		return ManufacturerKinetic
+	case "johnson_health_tech":
+		return ManufacturerJohnsonHealthTech
+	case "polar_electro":
+		return ManufacturerPolarElectro
+	case "seesense":
+		return ManufacturerSeesense
+	case "nci_technology":
+		return ManufacturerNciTechnology
+	case "iqsquare":
+		return ManufacturerIqsquare
+	case "leomo":
+		return ManufacturerLeomo
+	case "ifit_com":
+		return ManufacturerIfitCom
+	case "coros_byte":
+		return ManufacturerCorosByte
+	case "versa_design":
+		return ManufacturerVersaDesign
+	case "chileaf":
+		return ManufacturerChileaf
+	case "cycplus":
+		return ManufacturerCycplus
+	case "gravaa_byte":
+		return ManufacturerGravaaByte
+	case "sigeyi":
+		return ManufacturerSigeyi
+	case "coospo":
+		return ManufacturerCoospo
+	case "geoid":
+		return ManufacturerGeoid
+	case "bosch":
+		return ManufacturerBosch
+	case "kyto":
+		return ManufacturerKyto
+	case "kinetic_sports":
+		return ManufacturerKineticSports
+	case "decathlon_byte":
+		return ManufacturerDecathlonByte
+	case "tq_systems":
+		return ManufacturerTqSystems
+	case "tag_heuer":
+		return ManufacturerTagHeuer
+	case "keiser_fitness":
+		return ManufacturerKeiserFitness
+	case "zwift_byte":
+		return ManufacturerZwiftByte
+	case "porsche_ep":
+		return ManufacturerPorscheEp
+	case "blackbird":
+		return ManufacturerBlackbird
+	case "meilan_byte":
+		return ManufacturerMeilanByte
+	case "ezon":
+		return ManufacturerEzon
+	case "laisi":
+		return ManufacturerLaisi
+	case "myzone":
+		return ManufacturerMyzone
+	case "development":
+		return ManufacturerDevelopment
+	case "healthandlife":
+		return ManufacturerHealthandlife
+	case "lezyne":
+		return ManufacturerLezyne
+	case "scribe_labs":
+		return ManufacturerScribeLabs
+	case "zwift":
+		return ManufacturerZwift
+	case "watteam":
+		return ManufacturerWatteam
+	case "recon":
+		return ManufacturerRecon
+	case "favero_electronics":
+		return ManufacturerFaveroElectronics
+	case "dynovelo":
+		return ManufacturerDynovelo
+	case "strava":
+		return ManufacturerStrava
+	case "precor":
+		return ManufacturerPrecor
+	case "bryton":
+		return ManufacturerBryton
+	case "sram":
+		return ManufacturerSram
+	case "navman":
+		return ManufacturerNavman
+	case "cobi":
+		return ManufacturerCobi
+	case "spivi":
+		return ManufacturerSpivi
+	case "mio_magellan":
+		return ManufacturerMioMagellan
+	case "evesports":
+		return ManufacturerEvesports
+	case "sensitivus_gauge":
+		return ManufacturerSensitivusGauge
+	case "podoon":
+		return ManufacturerPodoon
+	case "life_time_fitness":
+		return ManufacturerLifeTimeFitness
+	case "falco_e_motors":
+		return ManufacturerFalcoEMotors
+	case "minoura":
+		return ManufacturerMinoura
+	case "cycliq":
+		return ManufacturerCycliq
+	case "luxottica":
+		return ManufacturerLuxottica
+	case "trainer_road":
+		return ManufacturerTrainerRoad
+	case "the_sufferfest":
+		return ManufacturerTheSufferfest
+	case "fullspeedahead":
+		return ManufacturerFullspeedahead
+	case "virtualtraining":
+		return ManufacturerVirtualtraining
+	case "feedbacksports":
+		return ManufacturerFeedbacksports
+	case "omata":
+		return ManufacturerOmata
+	case "vdo":
+		return ManufacturerVdo
+	case "magneticdays":
+		return ManufacturerMagneticdays
+	case "hammerhead":
+		return ManufacturerHammerhead
+	case "kinetic_by_kurt":
+		return ManufacturerKineticByKurt
+	case "shapelog":
+		return ManufacturerShapelog
+	case "dabuziduo":
+		return ManufacturerDabuziduo
+	case "jetblack":
+		return ManufacturerJetblack
+	case "coros":
+		return ManufacturerCoros
+	case "virtugo":
+		return ManufacturerVirtugo
+	case "velosense":
+		return ManufacturerVelosense
+	case "cycligentinc":
+		return ManufacturerCycligentinc
+	case "trailforks":
+		return ManufacturerTrailforks
+	case "mahle_ebikemotion":
+		return ManufacturerMahleEbikemotion
+	case "nurvv":
+		return ManufacturerNurvv
+	case "microprogram":
+		return ManufacturerMicroprogram
+	case "zone5cloud":
+		return ManufacturerZone5cloud
+	case "greenteg":
+		return ManufacturerGreenteg
+	case "yamaha_motors":
+		return ManufacturerYamahaMotors
+	case "whoop":
+		return ManufacturerWhoop
+	case "gravaa":
+		return ManufacturerGravaa
+	case "onelap":
+		return ManufacturerOnelap
+	case "monark_exercise":
+		return ManufacturerMonarkExercise
+	case "form":
+		return ManufacturerForm
+	case "decathlon":
+		return ManufacturerDecathlon
+	case "syncros":
+		return ManufacturerSyncros
+	case "heatup":
+		return ManufacturerHeatup
+	case "cannondale":
+		return ManufacturerCannondale
+	case "true_fitness":
+		return ManufacturerTrueFitness
+	case "RGT_cycling":
+		return ManufacturerRgtCycling
+	case "vasa":
+		return ManufacturerVasa
+	case "race_republic":
+		return ManufacturerRaceRepublic
+	case "fazua":
+		return ManufacturerFazua
+	case "oreka_training":
+		return ManufacturerOrekaTraining
+	case "lsec":
+		return ManufacturerLsec
+	case "lululemon_studio":
+		return ManufacturerLululemonStudio
+	case "shanyue":
+		return ManufacturerShanyue
+	case "spinning_mda":
+		return ManufacturerSpinningMda
+	case "hilldating":
+		return ManufacturerHilldating
+	case "aero_sensor":
+		return ManufacturerAeroSensor
+	case "nike":
+		return ManufacturerNike
+	case "magicshine":
+		return ManufacturerMagicshine
+	case "actigraphcorp":
+		return ManufacturerActigraphcorp
+	default:
+		return ManufacturerInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListManufacturer() []Manufacturer {
-	vs := make([]Manufacturer, 0, len(manufacturertostrs))
-	for i := range manufacturertostrs {
-		vs = append(vs, Manufacturer(i))
+	return []Manufacturer{
+		ManufacturerGarmin,
+		ManufacturerGarminFr405Antfs,
+		ManufacturerZephyr,
+		ManufacturerDayton,
+		ManufacturerIdt,
+		ManufacturerSrm,
+		ManufacturerQuarq,
+		ManufacturerIbike,
+		ManufacturerSaris,
+		ManufacturerSparkHk,
+		ManufacturerTanita,
+		ManufacturerEchowell,
+		ManufacturerDynastreamOem,
+		ManufacturerNautilus,
+		ManufacturerDynastream,
+		ManufacturerTimex,
+		ManufacturerMetrigear,
+		ManufacturerXelic,
+		ManufacturerBeurer,
+		ManufacturerCardiosport,
+		ManufacturerAAndD,
+		ManufacturerHmm,
+		ManufacturerSuunto,
+		ManufacturerThitaElektronik,
+		ManufacturerGpulse,
+		ManufacturerCleanMobile,
+		ManufacturerPedalBrain,
+		ManufacturerPeaksware,
+		ManufacturerSaxonar,
+		ManufacturerLemondFitness,
+		ManufacturerDexcom,
+		ManufacturerWahooFitness,
+		ManufacturerOctaneFitness,
+		ManufacturerArchinoetics,
+		ManufacturerTheHurtBox,
+		ManufacturerCitizenSystems,
+		ManufacturerMagellan,
+		ManufacturerOsynce,
+		ManufacturerHolux,
+		ManufacturerConcept2,
+		ManufacturerShimano,
+		ManufacturerOneGiantLeap,
+		ManufacturerAceSensor,
+		ManufacturerBrimBrothers,
+		ManufacturerXplova,
+		ManufacturerPerceptionDigital,
+		ManufacturerBf1systems,
+		ManufacturerPioneer,
+		ManufacturerSpantec,
+		ManufacturerMetalogics,
+		Manufacturer4Iiiis,
+		ManufacturerSeikoEpson,
+		ManufacturerSeikoEpsonOem,
+		ManufacturerIforPowell,
+		ManufacturerMaxwellGuider,
+		ManufacturerStarTrac,
+		ManufacturerBreakaway,
+		ManufacturerAlatechTechnologyLtd,
+		ManufacturerMioTechnologyEurope,
+		ManufacturerRotor,
+		ManufacturerGeonaute,
+		ManufacturerIdBike,
+		ManufacturerSpecialized,
+		ManufacturerWtek,
+		ManufacturerPhysicalEnterprises,
+		ManufacturerNorthPoleEngineering,
+		ManufacturerBkool,
+		ManufacturerCateye,
+		ManufacturerStagesCycling,
+		ManufacturerSigmasport,
+		ManufacturerTomtom,
+		ManufacturerPeripedal,
+		ManufacturerWattbike,
+		ManufacturerMoxy,
+		ManufacturerCiclosport,
+		ManufacturerPowerbahn,
+		ManufacturerAcornProjectsAps,
+		ManufacturerLifebeam,
+		ManufacturerBontrager,
+		ManufacturerWellgo,
+		ManufacturerScosche,
+		ManufacturerMagura,
+		ManufacturerWoodway,
+		ManufacturerElite,
+		ManufacturerNielsenKellerman,
+		ManufacturerDkCity,
+		ManufacturerTacx,
+		ManufacturerDirectionTechnology,
+		ManufacturerMagtonic,
+		Manufacturer1Partcarbon,
+		ManufacturerInsideRideTechnologies,
+		ManufacturerSoundOfMotion,
+		ManufacturerStryd,
+		ManufacturerIcg,
+		ManufacturerMipulse,
+		ManufacturerBsxAthletics,
+		ManufacturerLook,
+		ManufacturerCampagnoloSrl,
+		ManufacturerBodyBikeSmart,
+		ManufacturerPraxisworks,
+		ManufacturerLimitsTechnology,
+		ManufacturerTopactionTechnology,
+		ManufacturerCosinuss,
+		ManufacturerFitcare,
+		ManufacturerMagene,
+		ManufacturerGiantManufacturingCo,
+		ManufacturerTigrasport,
+		ManufacturerSalutron,
+		ManufacturerTechnogym,
+		ManufacturerBrytonSensors,
+		ManufacturerLatitudeLimited,
+		ManufacturerSoaringTechnology,
+		ManufacturerIgpsport,
+		ManufacturerThinkrider,
+		ManufacturerGopherSport,
+		ManufacturerWaterrower,
+		ManufacturerOrangetheory,
+		ManufacturerInpeak,
+		ManufacturerKinetic,
+		ManufacturerJohnsonHealthTech,
+		ManufacturerPolarElectro,
+		ManufacturerSeesense,
+		ManufacturerNciTechnology,
+		ManufacturerIqsquare,
+		ManufacturerLeomo,
+		ManufacturerIfitCom,
+		ManufacturerCorosByte,
+		ManufacturerVersaDesign,
+		ManufacturerChileaf,
+		ManufacturerCycplus,
+		ManufacturerGravaaByte,
+		ManufacturerSigeyi,
+		ManufacturerCoospo,
+		ManufacturerGeoid,
+		ManufacturerBosch,
+		ManufacturerKyto,
+		ManufacturerKineticSports,
+		ManufacturerDecathlonByte,
+		ManufacturerTqSystems,
+		ManufacturerTagHeuer,
+		ManufacturerKeiserFitness,
+		ManufacturerZwiftByte,
+		ManufacturerPorscheEp,
+		ManufacturerBlackbird,
+		ManufacturerMeilanByte,
+		ManufacturerEzon,
+		ManufacturerLaisi,
+		ManufacturerMyzone,
+		ManufacturerDevelopment,
+		ManufacturerHealthandlife,
+		ManufacturerLezyne,
+		ManufacturerScribeLabs,
+		ManufacturerZwift,
+		ManufacturerWatteam,
+		ManufacturerRecon,
+		ManufacturerFaveroElectronics,
+		ManufacturerDynovelo,
+		ManufacturerStrava,
+		ManufacturerPrecor,
+		ManufacturerBryton,
+		ManufacturerSram,
+		ManufacturerNavman,
+		ManufacturerCobi,
+		ManufacturerSpivi,
+		ManufacturerMioMagellan,
+		ManufacturerEvesports,
+		ManufacturerSensitivusGauge,
+		ManufacturerPodoon,
+		ManufacturerLifeTimeFitness,
+		ManufacturerFalcoEMotors,
+		ManufacturerMinoura,
+		ManufacturerCycliq,
+		ManufacturerLuxottica,
+		ManufacturerTrainerRoad,
+		ManufacturerTheSufferfest,
+		ManufacturerFullspeedahead,
+		ManufacturerVirtualtraining,
+		ManufacturerFeedbacksports,
+		ManufacturerOmata,
+		ManufacturerVdo,
+		ManufacturerMagneticdays,
+		ManufacturerHammerhead,
+		ManufacturerKineticByKurt,
+		ManufacturerShapelog,
+		ManufacturerDabuziduo,
+		ManufacturerJetblack,
+		ManufacturerCoros,
+		ManufacturerVirtugo,
+		ManufacturerVelosense,
+		ManufacturerCycligentinc,
+		ManufacturerTrailforks,
+		ManufacturerMahleEbikemotion,
+		ManufacturerNurvv,
+		ManufacturerMicroprogram,
+		ManufacturerZone5cloud,
+		ManufacturerGreenteg,
+		ManufacturerYamahaMotors,
+		ManufacturerWhoop,
+		ManufacturerGravaa,
+		ManufacturerOnelap,
+		ManufacturerMonarkExercise,
+		ManufacturerForm,
+		ManufacturerDecathlon,
+		ManufacturerSyncros,
+		ManufacturerHeatup,
+		ManufacturerCannondale,
+		ManufacturerTrueFitness,
+		ManufacturerRgtCycling,
+		ManufacturerVasa,
+		ManufacturerRaceRepublic,
+		ManufacturerFazua,
+		ManufacturerOrekaTraining,
+		ManufacturerLsec,
+		ManufacturerLululemonStudio,
+		ManufacturerShanyue,
+		ManufacturerSpinningMda,
+		ManufacturerHilldating,
+		ManufacturerAeroSensor,
+		ManufacturerNike,
+		ManufacturerMagicshine,
+		ManufacturerActigraphcorp,
 	}
-	return vs
 }

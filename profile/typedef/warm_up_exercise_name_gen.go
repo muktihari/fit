@@ -45,74 +45,181 @@ const (
 	WarmUpExerciseNameWalkingLegCradles           WarmUpExerciseName = 28
 	WarmUpExerciseNameWalkout                     WarmUpExerciseName = 29
 	WarmUpExerciseNameWalkoutFromPushUpPosition   WarmUpExerciseName = 30
-	WarmUpExerciseNameInvalid                     WarmUpExerciseName = 0xFFFF // INVALID
+	WarmUpExerciseNameInvalid                     WarmUpExerciseName = 0xFFFF
 )
 
-var warmupexercisenametostrs = map[WarmUpExerciseName]string{
-	WarmUpExerciseNameQuadrupedRocking:            "quadruped_rocking",
-	WarmUpExerciseNameNeckTilts:                   "neck_tilts",
-	WarmUpExerciseNameAnkleCircles:                "ankle_circles",
-	WarmUpExerciseNameAnkleDorsiflexionWithBand:   "ankle_dorsiflexion_with_band",
-	WarmUpExerciseNameAnkleInternalRotation:       "ankle_internal_rotation",
-	WarmUpExerciseNameArmCircles:                  "arm_circles",
-	WarmUpExerciseNameBentOverReachToSky:          "bent_over_reach_to_sky",
-	WarmUpExerciseNameCatCamel:                    "cat_camel",
-	WarmUpExerciseNameElbowToFootLunge:            "elbow_to_foot_lunge",
-	WarmUpExerciseNameForwardAndBackwardLegSwings: "forward_and_backward_leg_swings",
-	WarmUpExerciseNameGroiners:                    "groiners",
-	WarmUpExerciseNameInvertedHamstringStretch:    "inverted_hamstring_stretch",
-	WarmUpExerciseNameLateralDuckUnder:            "lateral_duck_under",
-	WarmUpExerciseNameNeckRotations:               "neck_rotations",
-	WarmUpExerciseNameOppositeArmAndLegBalance:    "opposite_arm_and_leg_balance",
-	WarmUpExerciseNameReachRollAndLift:            "reach_roll_and_lift",
-	WarmUpExerciseNameScorpion:                    "scorpion",
-	WarmUpExerciseNameShoulderCircles:             "shoulder_circles",
-	WarmUpExerciseNameSideToSideLegSwings:         "side_to_side_leg_swings",
-	WarmUpExerciseNameSleeperStretch:              "sleeper_stretch",
-	WarmUpExerciseNameSlideOut:                    "slide_out",
-	WarmUpExerciseNameSwissBallHipCrossover:       "swiss_ball_hip_crossover",
-	WarmUpExerciseNameSwissBallReachRollAndLift:   "swiss_ball_reach_roll_and_lift",
-	WarmUpExerciseNameSwissBallWindshieldWipers:   "swiss_ball_windshield_wipers",
-	WarmUpExerciseNameThoracicRotation:            "thoracic_rotation",
-	WarmUpExerciseNameWalkingHighKicks:            "walking_high_kicks",
-	WarmUpExerciseNameWalkingHighKnees:            "walking_high_knees",
-	WarmUpExerciseNameWalkingKneeHugs:             "walking_knee_hugs",
-	WarmUpExerciseNameWalkingLegCradles:           "walking_leg_cradles",
-	WarmUpExerciseNameWalkout:                     "walkout",
-	WarmUpExerciseNameWalkoutFromPushUpPosition:   "walkout_from_push_up_position",
-	WarmUpExerciseNameInvalid:                     "invalid",
-}
-
 func (w WarmUpExerciseName) String() string {
-	val, ok := warmupexercisenametostrs[w]
-	if !ok {
-		return strconv.FormatUint(uint64(w), 10)
+	switch w {
+	case WarmUpExerciseNameQuadrupedRocking:
+		return "quadruped_rocking"
+	case WarmUpExerciseNameNeckTilts:
+		return "neck_tilts"
+	case WarmUpExerciseNameAnkleCircles:
+		return "ankle_circles"
+	case WarmUpExerciseNameAnkleDorsiflexionWithBand:
+		return "ankle_dorsiflexion_with_band"
+	case WarmUpExerciseNameAnkleInternalRotation:
+		return "ankle_internal_rotation"
+	case WarmUpExerciseNameArmCircles:
+		return "arm_circles"
+	case WarmUpExerciseNameBentOverReachToSky:
+		return "bent_over_reach_to_sky"
+	case WarmUpExerciseNameCatCamel:
+		return "cat_camel"
+	case WarmUpExerciseNameElbowToFootLunge:
+		return "elbow_to_foot_lunge"
+	case WarmUpExerciseNameForwardAndBackwardLegSwings:
+		return "forward_and_backward_leg_swings"
+	case WarmUpExerciseNameGroiners:
+		return "groiners"
+	case WarmUpExerciseNameInvertedHamstringStretch:
+		return "inverted_hamstring_stretch"
+	case WarmUpExerciseNameLateralDuckUnder:
+		return "lateral_duck_under"
+	case WarmUpExerciseNameNeckRotations:
+		return "neck_rotations"
+	case WarmUpExerciseNameOppositeArmAndLegBalance:
+		return "opposite_arm_and_leg_balance"
+	case WarmUpExerciseNameReachRollAndLift:
+		return "reach_roll_and_lift"
+	case WarmUpExerciseNameScorpion:
+		return "scorpion"
+	case WarmUpExerciseNameShoulderCircles:
+		return "shoulder_circles"
+	case WarmUpExerciseNameSideToSideLegSwings:
+		return "side_to_side_leg_swings"
+	case WarmUpExerciseNameSleeperStretch:
+		return "sleeper_stretch"
+	case WarmUpExerciseNameSlideOut:
+		return "slide_out"
+	case WarmUpExerciseNameSwissBallHipCrossover:
+		return "swiss_ball_hip_crossover"
+	case WarmUpExerciseNameSwissBallReachRollAndLift:
+		return "swiss_ball_reach_roll_and_lift"
+	case WarmUpExerciseNameSwissBallWindshieldWipers:
+		return "swiss_ball_windshield_wipers"
+	case WarmUpExerciseNameThoracicRotation:
+		return "thoracic_rotation"
+	case WarmUpExerciseNameWalkingHighKicks:
+		return "walking_high_kicks"
+	case WarmUpExerciseNameWalkingHighKnees:
+		return "walking_high_knees"
+	case WarmUpExerciseNameWalkingKneeHugs:
+		return "walking_knee_hugs"
+	case WarmUpExerciseNameWalkingLegCradles:
+		return "walking_leg_cradles"
+	case WarmUpExerciseNameWalkout:
+		return "walkout"
+	case WarmUpExerciseNameWalkoutFromPushUpPosition:
+		return "walkout_from_push_up_position"
+	default:
+		return "WarmUpExerciseNameInvalid(" + strconv.FormatUint(uint64(w), 10) + ")"
 	}
-	return val
 }
-
-var strtowarmupexercisename = func() map[string]WarmUpExerciseName {
-	m := make(map[string]WarmUpExerciseName)
-	for t, str := range warmupexercisenametostrs {
-		m[str] = WarmUpExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into WarmUpExerciseName constant it's represent, return WarmUpExerciseNameInvalid if not found.
 func WarmUpExerciseNameFromString(s string) WarmUpExerciseName {
-	val, ok := strtowarmupexercisename[s]
-	if !ok {
-		return strtowarmupexercisename["invalid"]
+	switch s {
+	case "quadruped_rocking":
+		return WarmUpExerciseNameQuadrupedRocking
+	case "neck_tilts":
+		return WarmUpExerciseNameNeckTilts
+	case "ankle_circles":
+		return WarmUpExerciseNameAnkleCircles
+	case "ankle_dorsiflexion_with_band":
+		return WarmUpExerciseNameAnkleDorsiflexionWithBand
+	case "ankle_internal_rotation":
+		return WarmUpExerciseNameAnkleInternalRotation
+	case "arm_circles":
+		return WarmUpExerciseNameArmCircles
+	case "bent_over_reach_to_sky":
+		return WarmUpExerciseNameBentOverReachToSky
+	case "cat_camel":
+		return WarmUpExerciseNameCatCamel
+	case "elbow_to_foot_lunge":
+		return WarmUpExerciseNameElbowToFootLunge
+	case "forward_and_backward_leg_swings":
+		return WarmUpExerciseNameForwardAndBackwardLegSwings
+	case "groiners":
+		return WarmUpExerciseNameGroiners
+	case "inverted_hamstring_stretch":
+		return WarmUpExerciseNameInvertedHamstringStretch
+	case "lateral_duck_under":
+		return WarmUpExerciseNameLateralDuckUnder
+	case "neck_rotations":
+		return WarmUpExerciseNameNeckRotations
+	case "opposite_arm_and_leg_balance":
+		return WarmUpExerciseNameOppositeArmAndLegBalance
+	case "reach_roll_and_lift":
+		return WarmUpExerciseNameReachRollAndLift
+	case "scorpion":
+		return WarmUpExerciseNameScorpion
+	case "shoulder_circles":
+		return WarmUpExerciseNameShoulderCircles
+	case "side_to_side_leg_swings":
+		return WarmUpExerciseNameSideToSideLegSwings
+	case "sleeper_stretch":
+		return WarmUpExerciseNameSleeperStretch
+	case "slide_out":
+		return WarmUpExerciseNameSlideOut
+	case "swiss_ball_hip_crossover":
+		return WarmUpExerciseNameSwissBallHipCrossover
+	case "swiss_ball_reach_roll_and_lift":
+		return WarmUpExerciseNameSwissBallReachRollAndLift
+	case "swiss_ball_windshield_wipers":
+		return WarmUpExerciseNameSwissBallWindshieldWipers
+	case "thoracic_rotation":
+		return WarmUpExerciseNameThoracicRotation
+	case "walking_high_kicks":
+		return WarmUpExerciseNameWalkingHighKicks
+	case "walking_high_knees":
+		return WarmUpExerciseNameWalkingHighKnees
+	case "walking_knee_hugs":
+		return WarmUpExerciseNameWalkingKneeHugs
+	case "walking_leg_cradles":
+		return WarmUpExerciseNameWalkingLegCradles
+	case "walkout":
+		return WarmUpExerciseNameWalkout
+	case "walkout_from_push_up_position":
+		return WarmUpExerciseNameWalkoutFromPushUpPosition
+	default:
+		return WarmUpExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWarmUpExerciseName() []WarmUpExerciseName {
-	vs := make([]WarmUpExerciseName, 0, len(warmupexercisenametostrs))
-	for i := range warmupexercisenametostrs {
-		vs = append(vs, WarmUpExerciseName(i))
+	return []WarmUpExerciseName{
+		WarmUpExerciseNameQuadrupedRocking,
+		WarmUpExerciseNameNeckTilts,
+		WarmUpExerciseNameAnkleCircles,
+		WarmUpExerciseNameAnkleDorsiflexionWithBand,
+		WarmUpExerciseNameAnkleInternalRotation,
+		WarmUpExerciseNameArmCircles,
+		WarmUpExerciseNameBentOverReachToSky,
+		WarmUpExerciseNameCatCamel,
+		WarmUpExerciseNameElbowToFootLunge,
+		WarmUpExerciseNameForwardAndBackwardLegSwings,
+		WarmUpExerciseNameGroiners,
+		WarmUpExerciseNameInvertedHamstringStretch,
+		WarmUpExerciseNameLateralDuckUnder,
+		WarmUpExerciseNameNeckRotations,
+		WarmUpExerciseNameOppositeArmAndLegBalance,
+		WarmUpExerciseNameReachRollAndLift,
+		WarmUpExerciseNameScorpion,
+		WarmUpExerciseNameShoulderCircles,
+		WarmUpExerciseNameSideToSideLegSwings,
+		WarmUpExerciseNameSleeperStretch,
+		WarmUpExerciseNameSlideOut,
+		WarmUpExerciseNameSwissBallHipCrossover,
+		WarmUpExerciseNameSwissBallReachRollAndLift,
+		WarmUpExerciseNameSwissBallWindshieldWipers,
+		WarmUpExerciseNameThoracicRotation,
+		WarmUpExerciseNameWalkingHighKicks,
+		WarmUpExerciseNameWalkingHighKnees,
+		WarmUpExerciseNameWalkingKneeHugs,
+		WarmUpExerciseNameWalkingLegCradles,
+		WarmUpExerciseNameWalkout,
+		WarmUpExerciseNameWalkoutFromPushUpPosition,
 	}
-	return vs
 }

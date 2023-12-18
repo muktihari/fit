@@ -24,53 +24,76 @@ const (
 	EventTypeEndAllDepreciated      EventType = 7
 	EventTypeStopDisable            EventType = 8
 	EventTypeStopDisableAll         EventType = 9
-	EventTypeInvalid                EventType = 0xFF // INVALID
+	EventTypeInvalid                EventType = 0xFF
 )
 
-var eventtypetostrs = map[EventType]string{
-	EventTypeStart:                  "start",
-	EventTypeStop:                   "stop",
-	EventTypeConsecutiveDepreciated: "consecutive_depreciated",
-	EventTypeMarker:                 "marker",
-	EventTypeStopAll:                "stop_all",
-	EventTypeBeginDepreciated:       "begin_depreciated",
-	EventTypeEndDepreciated:         "end_depreciated",
-	EventTypeEndAllDepreciated:      "end_all_depreciated",
-	EventTypeStopDisable:            "stop_disable",
-	EventTypeStopDisableAll:         "stop_disable_all",
-	EventTypeInvalid:                "invalid",
-}
-
 func (e EventType) String() string {
-	val, ok := eventtypetostrs[e]
-	if !ok {
-		return strconv.Itoa(int(e))
+	switch e {
+	case EventTypeStart:
+		return "start"
+	case EventTypeStop:
+		return "stop"
+	case EventTypeConsecutiveDepreciated:
+		return "consecutive_depreciated"
+	case EventTypeMarker:
+		return "marker"
+	case EventTypeStopAll:
+		return "stop_all"
+	case EventTypeBeginDepreciated:
+		return "begin_depreciated"
+	case EventTypeEndDepreciated:
+		return "end_depreciated"
+	case EventTypeEndAllDepreciated:
+		return "end_all_depreciated"
+	case EventTypeStopDisable:
+		return "stop_disable"
+	case EventTypeStopDisableAll:
+		return "stop_disable_all"
+	default:
+		return "EventTypeInvalid(" + strconv.Itoa(int(e)) + ")"
 	}
-	return val
 }
-
-var strtoeventtype = func() map[string]EventType {
-	m := make(map[string]EventType)
-	for t, str := range eventtypetostrs {
-		m[str] = EventType(t)
-	}
-	return m
-}()
 
 // FromString parse string into EventType constant it's represent, return EventTypeInvalid if not found.
 func EventTypeFromString(s string) EventType {
-	val, ok := strtoeventtype[s]
-	if !ok {
-		return strtoeventtype["invalid"]
+	switch s {
+	case "start":
+		return EventTypeStart
+	case "stop":
+		return EventTypeStop
+	case "consecutive_depreciated":
+		return EventTypeConsecutiveDepreciated
+	case "marker":
+		return EventTypeMarker
+	case "stop_all":
+		return EventTypeStopAll
+	case "begin_depreciated":
+		return EventTypeBeginDepreciated
+	case "end_depreciated":
+		return EventTypeEndDepreciated
+	case "end_all_depreciated":
+		return EventTypeEndAllDepreciated
+	case "stop_disable":
+		return EventTypeStopDisable
+	case "stop_disable_all":
+		return EventTypeStopDisableAll
+	default:
+		return EventTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListEventType() []EventType {
-	vs := make([]EventType, 0, len(eventtypetostrs))
-	for i := range eventtypetostrs {
-		vs = append(vs, EventType(i))
+	return []EventType{
+		EventTypeStart,
+		EventTypeStop,
+		EventTypeConsecutiveDepreciated,
+		EventTypeMarker,
+		EventTypeStopAll,
+		EventTypeBeginDepreciated,
+		EventTypeEndDepreciated,
+		EventTypeEndAllDepreciated,
+		EventTypeStopDisable,
+		EventTypeStopDisableAll,
 	}
-	return vs
 }

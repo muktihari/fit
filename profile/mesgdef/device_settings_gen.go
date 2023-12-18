@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -51,33 +52,7 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0:   nil, /* ActiveTimeZone */
-		1:   nil, /* UtcOffset */
-		2:   nil, /* TimeOffset */
-		4:   nil, /* TimeMode */
-		5:   nil, /* TimeZoneOffset */
-		12:  nil, /* BacklightMode */
-		36:  nil, /* ActivityTrackerEnabled */
-		39:  nil, /* ClockTime */
-		40:  nil, /* PagesEnabled */
-		46:  nil, /* MoveAlertEnabled */
-		47:  nil, /* DateMode */
-		55:  nil, /* DisplayOrientation */
-		56:  nil, /* MountingSide */
-		57:  nil, /* DefaultPage */
-		58:  nil, /* AutosyncMinSteps */
-		59:  nil, /* AutosyncMinTime */
-		80:  nil, /* LactateThresholdAutodetectEnabled */
-		86:  nil, /* BleAutoUploadEnabled */
-		89:  nil, /* AutoSyncFrequency */
-		90:  nil, /* AutoActivityDetect */
-		94:  nil, /* NumberOfScreens */
-		95:  nil, /* SmartNotificationDisplayOrientation */
-		134: nil, /* TapInterface */
-		174: nil, /* TapSensitivity */
-	}
-
+	vals := [175]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -116,53 +91,211 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DeviceSettings mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDeviceSettings)
-func (m *DeviceSettings) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts DeviceSettings into proto.Message.
+func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceSettings)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumDeviceSettings {
-		return
+	if m.ActiveTimeZone != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ActiveTimeZone
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0:   m.ActiveTimeZone,
-		1:   m.UtcOffset,
-		2:   m.TimeOffset,
-		4:   typeconv.ToSliceEnum[byte](m.TimeMode),
-		5:   m.TimeZoneOffset,
-		12:  typeconv.ToEnum[byte](m.BacklightMode),
-		36:  m.ActivityTrackerEnabled,
-		39:  typeconv.ToUint32[uint32](m.ClockTime),
-		40:  m.PagesEnabled,
-		46:  m.MoveAlertEnabled,
-		47:  typeconv.ToEnum[byte](m.DateMode),
-		55:  typeconv.ToEnum[byte](m.DisplayOrientation),
-		56:  typeconv.ToEnum[byte](m.MountingSide),
-		57:  m.DefaultPage,
-		58:  m.AutosyncMinSteps,
-		59:  m.AutosyncMinTime,
-		80:  m.LactateThresholdAutodetectEnabled,
-		86:  m.BleAutoUploadEnabled,
-		89:  typeconv.ToEnum[byte](m.AutoSyncFrequency),
-		90:  typeconv.ToUint32[uint32](m.AutoActivityDetect),
-		94:  m.NumberOfScreens,
-		95:  typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation),
-		134: typeconv.ToEnum[byte](m.TapInterface),
-		174: typeconv.ToEnum[byte](m.TapSensitivity),
+	if m.UtcOffset != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.UtcOffset
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.TimeOffset != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.TimeOffset
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToSliceEnum[byte](m.TimeMode) != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToSliceEnum[byte](m.TimeMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.TimeZoneOffset != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.TimeZoneOffset
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = typeconv.ToEnum[byte](m.BacklightMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ActivityTrackerEnabled != false {
+		field := fac.CreateField(mesg.Num, 36)
+		field.Value = m.ActivityTrackerEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.ClockTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 39)
+		field.Value = typeconv.ToUint32[uint32](m.ClockTime)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PagesEnabled != nil {
+		field := fac.CreateField(mesg.Num, 40)
+		field.Value = m.PagesEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MoveAlertEnabled != false {
+		field := fac.CreateField(mesg.Num, 46)
+		field.Value = m.MoveAlertEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DateMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 47)
+		field.Value = typeconv.ToEnum[byte](m.DateMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DisplayOrientation) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 55)
+		field.Value = typeconv.ToEnum[byte](m.DisplayOrientation)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.MountingSide) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 56)
+		field.Value = typeconv.ToEnum[byte](m.MountingSide)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DefaultPage != nil {
+		field := fac.CreateField(mesg.Num, 57)
+		field.Value = m.DefaultPage
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AutosyncMinSteps != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 58)
+		field.Value = m.AutosyncMinSteps
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AutosyncMinTime != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 59)
+		field.Value = m.AutosyncMinTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LactateThresholdAutodetectEnabled != false {
+		field := fac.CreateField(mesg.Num, 80)
+		field.Value = m.LactateThresholdAutodetectEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BleAutoUploadEnabled != false {
+		field := fac.CreateField(mesg.Num, 86)
+		field.Value = m.BleAutoUploadEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.AutoSyncFrequency) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 89)
+		field.Value = typeconv.ToEnum[byte](m.AutoSyncFrequency)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.AutoActivityDetect) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 90)
+		field.Value = typeconv.ToUint32[uint32](m.AutoActivityDetect)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.NumberOfScreens != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 94)
+		field.Value = m.NumberOfScreens
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 95)
+		field.Value = typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.TapInterface) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 134)
+		field.Value = typeconv.ToEnum[byte](m.TapInterface)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.TapSensitivity) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 174)
+		field.Value = typeconv.ToEnum[byte](m.TapSensitivity)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of DeviceSettings's valid fields.
+func (m *DeviceSettings) size() byte {
+	var size byte
+	if m.ActiveTimeZone != basetype.Uint8Invalid {
+		size++
+	}
+	if m.UtcOffset != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimeOffset != nil {
+		size++
+	}
+	if typeconv.ToSliceEnum[byte](m.TimeMode) != nil {
+		size++
+	}
+	if m.TimeZoneOffset != nil {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+		size++
+	}
+	if m.ActivityTrackerEnabled != false {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.ClockTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.PagesEnabled != nil {
+		size++
+	}
+	if m.MoveAlertEnabled != false {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DateMode) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DisplayOrientation) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.MountingSide) != basetype.EnumInvalid {
+		size++
+	}
+	if m.DefaultPage != nil {
+		size++
+	}
+	if m.AutosyncMinSteps != basetype.Uint16Invalid {
+		size++
+	}
+	if m.AutosyncMinTime != basetype.Uint16Invalid {
+		size++
+	}
+	if m.LactateThresholdAutodetectEnabled != false {
+		size++
+	}
+	if m.BleAutoUploadEnabled != false {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.AutoSyncFrequency) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.AutoActivityDetect) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.NumberOfScreens != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.TapInterface) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.TapSensitivity) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

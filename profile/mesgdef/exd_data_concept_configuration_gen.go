@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -38,20 +39,7 @@ func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfigura
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0:  nil, /* ScreenIndex */
-		1:  nil, /* ConceptField */
-		2:  nil, /* FieldId */
-		3:  nil, /* ConceptIndex */
-		4:  nil, /* DataPage */
-		5:  nil, /* ConceptKey */
-		6:  nil, /* Scaling */
-		8:  nil, /* DataUnits */
-		9:  nil, /* Qualifier */
-		10: nil, /* Descriptor */
-		11: nil, /* IsSigned */
-	}
-
+	vals := [12]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -77,40 +65,107 @@ func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfigura
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ExdDataConceptConfiguration mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumExdDataConceptConfiguration)
-func (m *ExdDataConceptConfiguration) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ExdDataConceptConfiguration into proto.Message.
+func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumExdDataConceptConfiguration)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumExdDataConceptConfiguration {
-		return
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ScreenIndex
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0:  m.ScreenIndex,
-		1:  m.ConceptField,
-		2:  m.FieldId,
-		3:  m.ConceptIndex,
-		4:  m.DataPage,
-		5:  m.ConceptKey,
-		6:  m.Scaling,
-		8:  typeconv.ToEnum[byte](m.DataUnits),
-		9:  typeconv.ToEnum[byte](m.Qualifier),
-		10: typeconv.ToEnum[byte](m.Descriptor),
-		11: m.IsSigned,
+	if m.ConceptField != basetype.ByteInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.ConceptField
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.FieldId != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.FieldId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ConceptIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.ConceptIndex
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DataPage != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.DataPage
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ConceptKey != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.ConceptKey
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Scaling != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.Scaling
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DataUnits) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = typeconv.ToEnum[byte](m.DataUnits)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Qualifier) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = typeconv.ToEnum[byte](m.Qualifier)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Descriptor) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = typeconv.ToEnum[byte](m.Descriptor)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.IsSigned != false {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.IsSigned
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ExdDataConceptConfiguration's valid fields.
+func (m *ExdDataConceptConfiguration) size() byte {
+	var size byte
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ConceptField != basetype.ByteInvalid {
+		size++
+	}
+	if m.FieldId != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ConceptIndex != basetype.Uint8Invalid {
+		size++
+	}
+	if m.DataPage != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ConceptKey != basetype.Uint8Invalid {
+		size++
+	}
+	if m.Scaling != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DataUnits) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Qualifier) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Descriptor) != basetype.EnumInvalid {
+		size++
+	}
+	if m.IsSigned != false {
+		size++
+	}
+	return size
 }

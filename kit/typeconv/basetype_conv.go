@@ -132,6 +132,8 @@ func ToUint32[T ~uint32](val any) T {
 		return v
 	case uint32:
 		return T(v)
+	case float32:
+		return T(math.Float32bits(v))
 	}
 
 	if rv := reflect.ValueOf(val); rv.Kind() == reflect.Uint32 {
@@ -166,6 +168,8 @@ func ToFloat32[T ~float32](val any) T {
 	}
 
 	switch v := val.(type) {
+	case T:
+		return v
 	case uint32:
 		return T(math.Float32frombits(v))
 	case float32:
@@ -189,6 +193,8 @@ func ToFloat64[T ~float64](val any) T {
 	}
 
 	switch v := val.(type) {
+	case T:
+		return v
 	case uint64:
 		return T(math.Float64frombits(v))
 	case float64:
@@ -263,6 +269,8 @@ func ToUint64[T ~uint64](val any) T {
 		return v
 	case uint64:
 		return T(v)
+	case float64:
+		return T(math.Float64bits(v))
 	}
 
 	if rv := reflect.ValueOf(val); rv.Kind() == reflect.Uint64 {
@@ -512,6 +520,41 @@ func ToSliceUint32[T ~uint32](val any) []T {
 		vs = append(vs, T(rv.Index(i).Uint()))
 	}
 
+	return vs
+}
+
+func ToSliceString[T ~string](val any) []T {
+	if val == nil {
+		return nil
+	}
+
+	switch v := val.(type) {
+	case []T:
+		return v
+	case []string:
+		vs := make([]T, 0, len(v))
+		for i := range v {
+			vs = append(vs, T(v[i]))
+		}
+		return vs
+	}
+
+	rv := reflect.ValueOf(val)
+	if rv.Kind() != reflect.Slice {
+		return nil
+	}
+
+	if rv.Len() == 0 {
+		return nil
+	}
+
+	vs := make([]T, 0, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		switch rv.Index(i).Kind() {
+		case reflect.String:
+			vs = append(vs, T(rv.Index(i).String()))
+		}
+	}
 	return vs
 }
 

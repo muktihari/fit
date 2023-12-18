@@ -58,87 +58,246 @@ const (
 	CurlExerciseNameSwissBallEzBarPreacherCurl                CurlExerciseName = 41
 	CurlExerciseNameTwistingStandingDumbbellBicepsCurl        CurlExerciseName = 42
 	CurlExerciseNameWideGripEzBarBicepsCurl                   CurlExerciseName = 43
-	CurlExerciseNameInvalid                                   CurlExerciseName = 0xFFFF // INVALID
+	CurlExerciseNameInvalid                                   CurlExerciseName = 0xFFFF
 )
 
-var curlexercisenametostrs = map[CurlExerciseName]string{
-	CurlExerciseNameAlternatingDumbbellBicepsCurl:             "alternating_dumbbell_biceps_curl",
-	CurlExerciseNameAlternatingDumbbellBicepsCurlOnSwissBall:  "alternating_dumbbell_biceps_curl_on_swiss_ball",
-	CurlExerciseNameAlternatingInclineDumbbellBicepsCurl:      "alternating_incline_dumbbell_biceps_curl",
-	CurlExerciseNameBarbellBicepsCurl:                         "barbell_biceps_curl",
-	CurlExerciseNameBarbellReverseWristCurl:                   "barbell_reverse_wrist_curl",
-	CurlExerciseNameBarbellWristCurl:                          "barbell_wrist_curl",
-	CurlExerciseNameBehindTheBackBarbellReverseWristCurl:      "behind_the_back_barbell_reverse_wrist_curl",
-	CurlExerciseNameBehindTheBackOneArmCableCurl:              "behind_the_back_one_arm_cable_curl",
-	CurlExerciseNameCableBicepsCurl:                           "cable_biceps_curl",
-	CurlExerciseNameCableHammerCurl:                           "cable_hammer_curl",
-	CurlExerciseNameCheatingBarbellBicepsCurl:                 "cheating_barbell_biceps_curl",
-	CurlExerciseNameCloseGripEzBarBicepsCurl:                  "close_grip_ez_bar_biceps_curl",
-	CurlExerciseNameCrossBodyDumbbellHammerCurl:               "cross_body_dumbbell_hammer_curl",
-	CurlExerciseNameDeadHangBicepsCurl:                        "dead_hang_biceps_curl",
-	CurlExerciseNameDeclineHammerCurl:                         "decline_hammer_curl",
-	CurlExerciseNameDumbbellBicepsCurlWithStaticHold:          "dumbbell_biceps_curl_with_static_hold",
-	CurlExerciseNameDumbbellHammerCurl:                        "dumbbell_hammer_curl",
-	CurlExerciseNameDumbbellReverseWristCurl:                  "dumbbell_reverse_wrist_curl",
-	CurlExerciseNameDumbbellWristCurl:                         "dumbbell_wrist_curl",
-	CurlExerciseNameEzBarPreacherCurl:                         "ez_bar_preacher_curl",
-	CurlExerciseNameForwardBendBicepsCurl:                     "forward_bend_biceps_curl",
-	CurlExerciseNameHammerCurlToPress:                         "hammer_curl_to_press",
-	CurlExerciseNameInclineDumbbellBicepsCurl:                 "incline_dumbbell_biceps_curl",
-	CurlExerciseNameInclineOffsetThumbDumbbellCurl:            "incline_offset_thumb_dumbbell_curl",
-	CurlExerciseNameKettlebellBicepsCurl:                      "kettlebell_biceps_curl",
-	CurlExerciseNameLyingConcentrationCableCurl:               "lying_concentration_cable_curl",
-	CurlExerciseNameOneArmPreacherCurl:                        "one_arm_preacher_curl",
-	CurlExerciseNamePlatePinchCurl:                            "plate_pinch_curl",
-	CurlExerciseNamePreacherCurlWithCable:                     "preacher_curl_with_cable",
-	CurlExerciseNameReverseEzBarCurl:                          "reverse_ez_bar_curl",
-	CurlExerciseNameReverseGripWristCurl:                      "reverse_grip_wrist_curl",
-	CurlExerciseNameReverseGripBarbellBicepsCurl:              "reverse_grip_barbell_biceps_curl",
-	CurlExerciseNameSeatedAlternatingDumbbellBicepsCurl:       "seated_alternating_dumbbell_biceps_curl",
-	CurlExerciseNameSeatedDumbbellBicepsCurl:                  "seated_dumbbell_biceps_curl",
-	CurlExerciseNameSeatedReverseDumbbellCurl:                 "seated_reverse_dumbbell_curl",
-	CurlExerciseNameSplitStanceOffsetPinkyDumbbellCurl:        "split_stance_offset_pinky_dumbbell_curl",
-	CurlExerciseNameStandingAlternatingDumbbellCurls:          "standing_alternating_dumbbell_curls",
-	CurlExerciseNameStandingDumbbellBicepsCurl:                "standing_dumbbell_biceps_curl",
-	CurlExerciseNameStandingEzBarBicepsCurl:                   "standing_ez_bar_biceps_curl",
-	CurlExerciseNameStaticCurl:                                "static_curl",
-	CurlExerciseNameSwissBallDumbbellOverheadTricepsExtension: "swiss_ball_dumbbell_overhead_triceps_extension",
-	CurlExerciseNameSwissBallEzBarPreacherCurl:                "swiss_ball_ez_bar_preacher_curl",
-	CurlExerciseNameTwistingStandingDumbbellBicepsCurl:        "twisting_standing_dumbbell_biceps_curl",
-	CurlExerciseNameWideGripEzBarBicepsCurl:                   "wide_grip_ez_bar_biceps_curl",
-	CurlExerciseNameInvalid:                                   "invalid",
-}
-
 func (c CurlExerciseName) String() string {
-	val, ok := curlexercisenametostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CurlExerciseNameAlternatingDumbbellBicepsCurl:
+		return "alternating_dumbbell_biceps_curl"
+	case CurlExerciseNameAlternatingDumbbellBicepsCurlOnSwissBall:
+		return "alternating_dumbbell_biceps_curl_on_swiss_ball"
+	case CurlExerciseNameAlternatingInclineDumbbellBicepsCurl:
+		return "alternating_incline_dumbbell_biceps_curl"
+	case CurlExerciseNameBarbellBicepsCurl:
+		return "barbell_biceps_curl"
+	case CurlExerciseNameBarbellReverseWristCurl:
+		return "barbell_reverse_wrist_curl"
+	case CurlExerciseNameBarbellWristCurl:
+		return "barbell_wrist_curl"
+	case CurlExerciseNameBehindTheBackBarbellReverseWristCurl:
+		return "behind_the_back_barbell_reverse_wrist_curl"
+	case CurlExerciseNameBehindTheBackOneArmCableCurl:
+		return "behind_the_back_one_arm_cable_curl"
+	case CurlExerciseNameCableBicepsCurl:
+		return "cable_biceps_curl"
+	case CurlExerciseNameCableHammerCurl:
+		return "cable_hammer_curl"
+	case CurlExerciseNameCheatingBarbellBicepsCurl:
+		return "cheating_barbell_biceps_curl"
+	case CurlExerciseNameCloseGripEzBarBicepsCurl:
+		return "close_grip_ez_bar_biceps_curl"
+	case CurlExerciseNameCrossBodyDumbbellHammerCurl:
+		return "cross_body_dumbbell_hammer_curl"
+	case CurlExerciseNameDeadHangBicepsCurl:
+		return "dead_hang_biceps_curl"
+	case CurlExerciseNameDeclineHammerCurl:
+		return "decline_hammer_curl"
+	case CurlExerciseNameDumbbellBicepsCurlWithStaticHold:
+		return "dumbbell_biceps_curl_with_static_hold"
+	case CurlExerciseNameDumbbellHammerCurl:
+		return "dumbbell_hammer_curl"
+	case CurlExerciseNameDumbbellReverseWristCurl:
+		return "dumbbell_reverse_wrist_curl"
+	case CurlExerciseNameDumbbellWristCurl:
+		return "dumbbell_wrist_curl"
+	case CurlExerciseNameEzBarPreacherCurl:
+		return "ez_bar_preacher_curl"
+	case CurlExerciseNameForwardBendBicepsCurl:
+		return "forward_bend_biceps_curl"
+	case CurlExerciseNameHammerCurlToPress:
+		return "hammer_curl_to_press"
+	case CurlExerciseNameInclineDumbbellBicepsCurl:
+		return "incline_dumbbell_biceps_curl"
+	case CurlExerciseNameInclineOffsetThumbDumbbellCurl:
+		return "incline_offset_thumb_dumbbell_curl"
+	case CurlExerciseNameKettlebellBicepsCurl:
+		return "kettlebell_biceps_curl"
+	case CurlExerciseNameLyingConcentrationCableCurl:
+		return "lying_concentration_cable_curl"
+	case CurlExerciseNameOneArmPreacherCurl:
+		return "one_arm_preacher_curl"
+	case CurlExerciseNamePlatePinchCurl:
+		return "plate_pinch_curl"
+	case CurlExerciseNamePreacherCurlWithCable:
+		return "preacher_curl_with_cable"
+	case CurlExerciseNameReverseEzBarCurl:
+		return "reverse_ez_bar_curl"
+	case CurlExerciseNameReverseGripWristCurl:
+		return "reverse_grip_wrist_curl"
+	case CurlExerciseNameReverseGripBarbellBicepsCurl:
+		return "reverse_grip_barbell_biceps_curl"
+	case CurlExerciseNameSeatedAlternatingDumbbellBicepsCurl:
+		return "seated_alternating_dumbbell_biceps_curl"
+	case CurlExerciseNameSeatedDumbbellBicepsCurl:
+		return "seated_dumbbell_biceps_curl"
+	case CurlExerciseNameSeatedReverseDumbbellCurl:
+		return "seated_reverse_dumbbell_curl"
+	case CurlExerciseNameSplitStanceOffsetPinkyDumbbellCurl:
+		return "split_stance_offset_pinky_dumbbell_curl"
+	case CurlExerciseNameStandingAlternatingDumbbellCurls:
+		return "standing_alternating_dumbbell_curls"
+	case CurlExerciseNameStandingDumbbellBicepsCurl:
+		return "standing_dumbbell_biceps_curl"
+	case CurlExerciseNameStandingEzBarBicepsCurl:
+		return "standing_ez_bar_biceps_curl"
+	case CurlExerciseNameStaticCurl:
+		return "static_curl"
+	case CurlExerciseNameSwissBallDumbbellOverheadTricepsExtension:
+		return "swiss_ball_dumbbell_overhead_triceps_extension"
+	case CurlExerciseNameSwissBallEzBarPreacherCurl:
+		return "swiss_ball_ez_bar_preacher_curl"
+	case CurlExerciseNameTwistingStandingDumbbellBicepsCurl:
+		return "twisting_standing_dumbbell_biceps_curl"
+	case CurlExerciseNameWideGripEzBarBicepsCurl:
+		return "wide_grip_ez_bar_biceps_curl"
+	default:
+		return "CurlExerciseNameInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocurlexercisename = func() map[string]CurlExerciseName {
-	m := make(map[string]CurlExerciseName)
-	for t, str := range curlexercisenametostrs {
-		m[str] = CurlExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into CurlExerciseName constant it's represent, return CurlExerciseNameInvalid if not found.
 func CurlExerciseNameFromString(s string) CurlExerciseName {
-	val, ok := strtocurlexercisename[s]
-	if !ok {
-		return strtocurlexercisename["invalid"]
+	switch s {
+	case "alternating_dumbbell_biceps_curl":
+		return CurlExerciseNameAlternatingDumbbellBicepsCurl
+	case "alternating_dumbbell_biceps_curl_on_swiss_ball":
+		return CurlExerciseNameAlternatingDumbbellBicepsCurlOnSwissBall
+	case "alternating_incline_dumbbell_biceps_curl":
+		return CurlExerciseNameAlternatingInclineDumbbellBicepsCurl
+	case "barbell_biceps_curl":
+		return CurlExerciseNameBarbellBicepsCurl
+	case "barbell_reverse_wrist_curl":
+		return CurlExerciseNameBarbellReverseWristCurl
+	case "barbell_wrist_curl":
+		return CurlExerciseNameBarbellWristCurl
+	case "behind_the_back_barbell_reverse_wrist_curl":
+		return CurlExerciseNameBehindTheBackBarbellReverseWristCurl
+	case "behind_the_back_one_arm_cable_curl":
+		return CurlExerciseNameBehindTheBackOneArmCableCurl
+	case "cable_biceps_curl":
+		return CurlExerciseNameCableBicepsCurl
+	case "cable_hammer_curl":
+		return CurlExerciseNameCableHammerCurl
+	case "cheating_barbell_biceps_curl":
+		return CurlExerciseNameCheatingBarbellBicepsCurl
+	case "close_grip_ez_bar_biceps_curl":
+		return CurlExerciseNameCloseGripEzBarBicepsCurl
+	case "cross_body_dumbbell_hammer_curl":
+		return CurlExerciseNameCrossBodyDumbbellHammerCurl
+	case "dead_hang_biceps_curl":
+		return CurlExerciseNameDeadHangBicepsCurl
+	case "decline_hammer_curl":
+		return CurlExerciseNameDeclineHammerCurl
+	case "dumbbell_biceps_curl_with_static_hold":
+		return CurlExerciseNameDumbbellBicepsCurlWithStaticHold
+	case "dumbbell_hammer_curl":
+		return CurlExerciseNameDumbbellHammerCurl
+	case "dumbbell_reverse_wrist_curl":
+		return CurlExerciseNameDumbbellReverseWristCurl
+	case "dumbbell_wrist_curl":
+		return CurlExerciseNameDumbbellWristCurl
+	case "ez_bar_preacher_curl":
+		return CurlExerciseNameEzBarPreacherCurl
+	case "forward_bend_biceps_curl":
+		return CurlExerciseNameForwardBendBicepsCurl
+	case "hammer_curl_to_press":
+		return CurlExerciseNameHammerCurlToPress
+	case "incline_dumbbell_biceps_curl":
+		return CurlExerciseNameInclineDumbbellBicepsCurl
+	case "incline_offset_thumb_dumbbell_curl":
+		return CurlExerciseNameInclineOffsetThumbDumbbellCurl
+	case "kettlebell_biceps_curl":
+		return CurlExerciseNameKettlebellBicepsCurl
+	case "lying_concentration_cable_curl":
+		return CurlExerciseNameLyingConcentrationCableCurl
+	case "one_arm_preacher_curl":
+		return CurlExerciseNameOneArmPreacherCurl
+	case "plate_pinch_curl":
+		return CurlExerciseNamePlatePinchCurl
+	case "preacher_curl_with_cable":
+		return CurlExerciseNamePreacherCurlWithCable
+	case "reverse_ez_bar_curl":
+		return CurlExerciseNameReverseEzBarCurl
+	case "reverse_grip_wrist_curl":
+		return CurlExerciseNameReverseGripWristCurl
+	case "reverse_grip_barbell_biceps_curl":
+		return CurlExerciseNameReverseGripBarbellBicepsCurl
+	case "seated_alternating_dumbbell_biceps_curl":
+		return CurlExerciseNameSeatedAlternatingDumbbellBicepsCurl
+	case "seated_dumbbell_biceps_curl":
+		return CurlExerciseNameSeatedDumbbellBicepsCurl
+	case "seated_reverse_dumbbell_curl":
+		return CurlExerciseNameSeatedReverseDumbbellCurl
+	case "split_stance_offset_pinky_dumbbell_curl":
+		return CurlExerciseNameSplitStanceOffsetPinkyDumbbellCurl
+	case "standing_alternating_dumbbell_curls":
+		return CurlExerciseNameStandingAlternatingDumbbellCurls
+	case "standing_dumbbell_biceps_curl":
+		return CurlExerciseNameStandingDumbbellBicepsCurl
+	case "standing_ez_bar_biceps_curl":
+		return CurlExerciseNameStandingEzBarBicepsCurl
+	case "static_curl":
+		return CurlExerciseNameStaticCurl
+	case "swiss_ball_dumbbell_overhead_triceps_extension":
+		return CurlExerciseNameSwissBallDumbbellOverheadTricepsExtension
+	case "swiss_ball_ez_bar_preacher_curl":
+		return CurlExerciseNameSwissBallEzBarPreacherCurl
+	case "twisting_standing_dumbbell_biceps_curl":
+		return CurlExerciseNameTwistingStandingDumbbellBicepsCurl
+	case "wide_grip_ez_bar_biceps_curl":
+		return CurlExerciseNameWideGripEzBarBicepsCurl
+	default:
+		return CurlExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCurlExerciseName() []CurlExerciseName {
-	vs := make([]CurlExerciseName, 0, len(curlexercisenametostrs))
-	for i := range curlexercisenametostrs {
-		vs = append(vs, CurlExerciseName(i))
+	return []CurlExerciseName{
+		CurlExerciseNameAlternatingDumbbellBicepsCurl,
+		CurlExerciseNameAlternatingDumbbellBicepsCurlOnSwissBall,
+		CurlExerciseNameAlternatingInclineDumbbellBicepsCurl,
+		CurlExerciseNameBarbellBicepsCurl,
+		CurlExerciseNameBarbellReverseWristCurl,
+		CurlExerciseNameBarbellWristCurl,
+		CurlExerciseNameBehindTheBackBarbellReverseWristCurl,
+		CurlExerciseNameBehindTheBackOneArmCableCurl,
+		CurlExerciseNameCableBicepsCurl,
+		CurlExerciseNameCableHammerCurl,
+		CurlExerciseNameCheatingBarbellBicepsCurl,
+		CurlExerciseNameCloseGripEzBarBicepsCurl,
+		CurlExerciseNameCrossBodyDumbbellHammerCurl,
+		CurlExerciseNameDeadHangBicepsCurl,
+		CurlExerciseNameDeclineHammerCurl,
+		CurlExerciseNameDumbbellBicepsCurlWithStaticHold,
+		CurlExerciseNameDumbbellHammerCurl,
+		CurlExerciseNameDumbbellReverseWristCurl,
+		CurlExerciseNameDumbbellWristCurl,
+		CurlExerciseNameEzBarPreacherCurl,
+		CurlExerciseNameForwardBendBicepsCurl,
+		CurlExerciseNameHammerCurlToPress,
+		CurlExerciseNameInclineDumbbellBicepsCurl,
+		CurlExerciseNameInclineOffsetThumbDumbbellCurl,
+		CurlExerciseNameKettlebellBicepsCurl,
+		CurlExerciseNameLyingConcentrationCableCurl,
+		CurlExerciseNameOneArmPreacherCurl,
+		CurlExerciseNamePlatePinchCurl,
+		CurlExerciseNamePreacherCurlWithCable,
+		CurlExerciseNameReverseEzBarCurl,
+		CurlExerciseNameReverseGripWristCurl,
+		CurlExerciseNameReverseGripBarbellBicepsCurl,
+		CurlExerciseNameSeatedAlternatingDumbbellBicepsCurl,
+		CurlExerciseNameSeatedDumbbellBicepsCurl,
+		CurlExerciseNameSeatedReverseDumbbellCurl,
+		CurlExerciseNameSplitStanceOffsetPinkyDumbbellCurl,
+		CurlExerciseNameStandingAlternatingDumbbellCurls,
+		CurlExerciseNameStandingDumbbellBicepsCurl,
+		CurlExerciseNameStandingEzBarBicepsCurl,
+		CurlExerciseNameStaticCurl,
+		CurlExerciseNameSwissBallDumbbellOverheadTricepsExtension,
+		CurlExerciseNameSwissBallEzBarPreacherCurl,
+		CurlExerciseNameTwistingStandingDumbbellBicepsCurl,
+		CurlExerciseNameWideGripEzBarBicepsCurl,
 	}
-	return vs
 }

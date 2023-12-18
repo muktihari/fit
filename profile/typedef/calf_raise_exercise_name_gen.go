@@ -35,64 +35,131 @@ const (
 	CalfRaiseExerciseNameStandingCalfRaise                  CalfRaiseExerciseName = 18
 	CalfRaiseExerciseNameWeightedStandingCalfRaise          CalfRaiseExerciseName = 19
 	CalfRaiseExerciseNameStandingDumbbellCalfRaise          CalfRaiseExerciseName = 20
-	CalfRaiseExerciseNameInvalid                            CalfRaiseExerciseName = 0xFFFF // INVALID
+	CalfRaiseExerciseNameInvalid                            CalfRaiseExerciseName = 0xFFFF
 )
 
-var calfraiseexercisenametostrs = map[CalfRaiseExerciseName]string{
-	CalfRaiseExerciseName3WayCalfRaise:                      "3_way_calf_raise",
-	CalfRaiseExerciseName3WayWeightedCalfRaise:              "3_way_weighted_calf_raise",
-	CalfRaiseExerciseName3WaySingleLegCalfRaise:             "3_way_single_leg_calf_raise",
-	CalfRaiseExerciseName3WayWeightedSingleLegCalfRaise:     "3_way_weighted_single_leg_calf_raise",
-	CalfRaiseExerciseNameDonkeyCalfRaise:                    "donkey_calf_raise",
-	CalfRaiseExerciseNameWeightedDonkeyCalfRaise:            "weighted_donkey_calf_raise",
-	CalfRaiseExerciseNameSeatedCalfRaise:                    "seated_calf_raise",
-	CalfRaiseExerciseNameWeightedSeatedCalfRaise:            "weighted_seated_calf_raise",
-	CalfRaiseExerciseNameSeatedDumbbellToeRaise:             "seated_dumbbell_toe_raise",
-	CalfRaiseExerciseNameSingleLegBentKneeCalfRaise:         "single_leg_bent_knee_calf_raise",
-	CalfRaiseExerciseNameWeightedSingleLegBentKneeCalfRaise: "weighted_single_leg_bent_knee_calf_raise",
-	CalfRaiseExerciseNameSingleLegDeclinePushUp:             "single_leg_decline_push_up",
-	CalfRaiseExerciseNameSingleLegDonkeyCalfRaise:           "single_leg_donkey_calf_raise",
-	CalfRaiseExerciseNameWeightedSingleLegDonkeyCalfRaise:   "weighted_single_leg_donkey_calf_raise",
-	CalfRaiseExerciseNameSingleLegHipRaiseWithKneeHold:      "single_leg_hip_raise_with_knee_hold",
-	CalfRaiseExerciseNameSingleLegStandingCalfRaise:         "single_leg_standing_calf_raise",
-	CalfRaiseExerciseNameSingleLegStandingDumbbellCalfRaise: "single_leg_standing_dumbbell_calf_raise",
-	CalfRaiseExerciseNameStandingBarbellCalfRaise:           "standing_barbell_calf_raise",
-	CalfRaiseExerciseNameStandingCalfRaise:                  "standing_calf_raise",
-	CalfRaiseExerciseNameWeightedStandingCalfRaise:          "weighted_standing_calf_raise",
-	CalfRaiseExerciseNameStandingDumbbellCalfRaise:          "standing_dumbbell_calf_raise",
-	CalfRaiseExerciseNameInvalid:                            "invalid",
-}
-
 func (c CalfRaiseExerciseName) String() string {
-	val, ok := calfraiseexercisenametostrs[c]
-	if !ok {
-		return strconv.FormatUint(uint64(c), 10)
+	switch c {
+	case CalfRaiseExerciseName3WayCalfRaise:
+		return "3_way_calf_raise"
+	case CalfRaiseExerciseName3WayWeightedCalfRaise:
+		return "3_way_weighted_calf_raise"
+	case CalfRaiseExerciseName3WaySingleLegCalfRaise:
+		return "3_way_single_leg_calf_raise"
+	case CalfRaiseExerciseName3WayWeightedSingleLegCalfRaise:
+		return "3_way_weighted_single_leg_calf_raise"
+	case CalfRaiseExerciseNameDonkeyCalfRaise:
+		return "donkey_calf_raise"
+	case CalfRaiseExerciseNameWeightedDonkeyCalfRaise:
+		return "weighted_donkey_calf_raise"
+	case CalfRaiseExerciseNameSeatedCalfRaise:
+		return "seated_calf_raise"
+	case CalfRaiseExerciseNameWeightedSeatedCalfRaise:
+		return "weighted_seated_calf_raise"
+	case CalfRaiseExerciseNameSeatedDumbbellToeRaise:
+		return "seated_dumbbell_toe_raise"
+	case CalfRaiseExerciseNameSingleLegBentKneeCalfRaise:
+		return "single_leg_bent_knee_calf_raise"
+	case CalfRaiseExerciseNameWeightedSingleLegBentKneeCalfRaise:
+		return "weighted_single_leg_bent_knee_calf_raise"
+	case CalfRaiseExerciseNameSingleLegDeclinePushUp:
+		return "single_leg_decline_push_up"
+	case CalfRaiseExerciseNameSingleLegDonkeyCalfRaise:
+		return "single_leg_donkey_calf_raise"
+	case CalfRaiseExerciseNameWeightedSingleLegDonkeyCalfRaise:
+		return "weighted_single_leg_donkey_calf_raise"
+	case CalfRaiseExerciseNameSingleLegHipRaiseWithKneeHold:
+		return "single_leg_hip_raise_with_knee_hold"
+	case CalfRaiseExerciseNameSingleLegStandingCalfRaise:
+		return "single_leg_standing_calf_raise"
+	case CalfRaiseExerciseNameSingleLegStandingDumbbellCalfRaise:
+		return "single_leg_standing_dumbbell_calf_raise"
+	case CalfRaiseExerciseNameStandingBarbellCalfRaise:
+		return "standing_barbell_calf_raise"
+	case CalfRaiseExerciseNameStandingCalfRaise:
+		return "standing_calf_raise"
+	case CalfRaiseExerciseNameWeightedStandingCalfRaise:
+		return "weighted_standing_calf_raise"
+	case CalfRaiseExerciseNameStandingDumbbellCalfRaise:
+		return "standing_dumbbell_calf_raise"
+	default:
+		return "CalfRaiseExerciseNameInvalid(" + strconv.FormatUint(uint64(c), 10) + ")"
 	}
-	return val
 }
-
-var strtocalfraiseexercisename = func() map[string]CalfRaiseExerciseName {
-	m := make(map[string]CalfRaiseExerciseName)
-	for t, str := range calfraiseexercisenametostrs {
-		m[str] = CalfRaiseExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into CalfRaiseExerciseName constant it's represent, return CalfRaiseExerciseNameInvalid if not found.
 func CalfRaiseExerciseNameFromString(s string) CalfRaiseExerciseName {
-	val, ok := strtocalfraiseexercisename[s]
-	if !ok {
-		return strtocalfraiseexercisename["invalid"]
+	switch s {
+	case "3_way_calf_raise":
+		return CalfRaiseExerciseName3WayCalfRaise
+	case "3_way_weighted_calf_raise":
+		return CalfRaiseExerciseName3WayWeightedCalfRaise
+	case "3_way_single_leg_calf_raise":
+		return CalfRaiseExerciseName3WaySingleLegCalfRaise
+	case "3_way_weighted_single_leg_calf_raise":
+		return CalfRaiseExerciseName3WayWeightedSingleLegCalfRaise
+	case "donkey_calf_raise":
+		return CalfRaiseExerciseNameDonkeyCalfRaise
+	case "weighted_donkey_calf_raise":
+		return CalfRaiseExerciseNameWeightedDonkeyCalfRaise
+	case "seated_calf_raise":
+		return CalfRaiseExerciseNameSeatedCalfRaise
+	case "weighted_seated_calf_raise":
+		return CalfRaiseExerciseNameWeightedSeatedCalfRaise
+	case "seated_dumbbell_toe_raise":
+		return CalfRaiseExerciseNameSeatedDumbbellToeRaise
+	case "single_leg_bent_knee_calf_raise":
+		return CalfRaiseExerciseNameSingleLegBentKneeCalfRaise
+	case "weighted_single_leg_bent_knee_calf_raise":
+		return CalfRaiseExerciseNameWeightedSingleLegBentKneeCalfRaise
+	case "single_leg_decline_push_up":
+		return CalfRaiseExerciseNameSingleLegDeclinePushUp
+	case "single_leg_donkey_calf_raise":
+		return CalfRaiseExerciseNameSingleLegDonkeyCalfRaise
+	case "weighted_single_leg_donkey_calf_raise":
+		return CalfRaiseExerciseNameWeightedSingleLegDonkeyCalfRaise
+	case "single_leg_hip_raise_with_knee_hold":
+		return CalfRaiseExerciseNameSingleLegHipRaiseWithKneeHold
+	case "single_leg_standing_calf_raise":
+		return CalfRaiseExerciseNameSingleLegStandingCalfRaise
+	case "single_leg_standing_dumbbell_calf_raise":
+		return CalfRaiseExerciseNameSingleLegStandingDumbbellCalfRaise
+	case "standing_barbell_calf_raise":
+		return CalfRaiseExerciseNameStandingBarbellCalfRaise
+	case "standing_calf_raise":
+		return CalfRaiseExerciseNameStandingCalfRaise
+	case "weighted_standing_calf_raise":
+		return CalfRaiseExerciseNameWeightedStandingCalfRaise
+	case "standing_dumbbell_calf_raise":
+		return CalfRaiseExerciseNameStandingDumbbellCalfRaise
+	default:
+		return CalfRaiseExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListCalfRaiseExerciseName() []CalfRaiseExerciseName {
-	vs := make([]CalfRaiseExerciseName, 0, len(calfraiseexercisenametostrs))
-	for i := range calfraiseexercisenametostrs {
-		vs = append(vs, CalfRaiseExerciseName(i))
+	return []CalfRaiseExerciseName{
+		CalfRaiseExerciseName3WayCalfRaise,
+		CalfRaiseExerciseName3WayWeightedCalfRaise,
+		CalfRaiseExerciseName3WaySingleLegCalfRaise,
+		CalfRaiseExerciseName3WayWeightedSingleLegCalfRaise,
+		CalfRaiseExerciseNameDonkeyCalfRaise,
+		CalfRaiseExerciseNameWeightedDonkeyCalfRaise,
+		CalfRaiseExerciseNameSeatedCalfRaise,
+		CalfRaiseExerciseNameWeightedSeatedCalfRaise,
+		CalfRaiseExerciseNameSeatedDumbbellToeRaise,
+		CalfRaiseExerciseNameSingleLegBentKneeCalfRaise,
+		CalfRaiseExerciseNameWeightedSingleLegBentKneeCalfRaise,
+		CalfRaiseExerciseNameSingleLegDeclinePushUp,
+		CalfRaiseExerciseNameSingleLegDonkeyCalfRaise,
+		CalfRaiseExerciseNameWeightedSingleLegDonkeyCalfRaise,
+		CalfRaiseExerciseNameSingleLegHipRaiseWithKneeHold,
+		CalfRaiseExerciseNameSingleLegStandingCalfRaise,
+		CalfRaiseExerciseNameSingleLegStandingDumbbellCalfRaise,
+		CalfRaiseExerciseNameStandingBarbellCalfRaise,
+		CalfRaiseExerciseNameStandingCalfRaise,
+		CalfRaiseExerciseNameWeightedStandingCalfRaise,
+		CalfRaiseExerciseNameStandingDumbbellCalfRaise,
 	}
-	return vs
 }

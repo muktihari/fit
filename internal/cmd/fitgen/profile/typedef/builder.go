@@ -55,12 +55,20 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 		}
 		var hasMfgRangeMin, hashasMfgRangeMax bool
 		data := shared.ConstantData{
-			Package:      "typedef",
-			SDKVersion:   b.sdkVersion,
-			Imports:      []string{"strconv"},
-			Type:         strutil.ToTitle(t.Name),
-			Base:         basetype.FromString(t.BaseType).GoType(),
-			StringerMode: shared.StringerMap,
+			Package:    "typedef",
+			SDKVersion: b.sdkVersion,
+			Imports:    []string{"strconv"},
+			Type:       strutil.ToTitle(t.Name),
+			Base:       basetype.FromString(t.BaseType).GoType(),
+		}
+
+		data.Invalid = shared.Constant{
+			Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
+			Type:    data.Type,
+			Op:      "=",
+			Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
+			String:  fmt.Sprintf("%sInvalid(%d)", data.Type, basetype.FromString(t.BaseType).Invalid()),
+			Comment: "INVALID",
 		}
 
 		duplicates := make(map[string][]shared.Constant)
@@ -90,15 +98,6 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 				data.AllowRegister = true
 			}
 		}
-
-		data.Constants = append(data.Constants, shared.Constant{
-			Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
-			Type:    data.Type,
-			Op:      "=",
-			Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
-			String:  "invalid",
-			Comment: "INVALID",
-		})
 
 		// handling duplicate values caused by deprecated
 		for cvalue, constant := range duplicates {

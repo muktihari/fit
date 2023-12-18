@@ -18,47 +18,46 @@ const (
 	RiderPositionTypeStanding             RiderPositionType = 1
 	RiderPositionTypeTransitionToSeated   RiderPositionType = 2
 	RiderPositionTypeTransitionToStanding RiderPositionType = 3
-	RiderPositionTypeInvalid              RiderPositionType = 0xFF // INVALID
+	RiderPositionTypeInvalid              RiderPositionType = 0xFF
 )
 
-var riderpositiontypetostrs = map[RiderPositionType]string{
-	RiderPositionTypeSeated:               "seated",
-	RiderPositionTypeStanding:             "standing",
-	RiderPositionTypeTransitionToSeated:   "transition_to_seated",
-	RiderPositionTypeTransitionToStanding: "transition_to_standing",
-	RiderPositionTypeInvalid:              "invalid",
-}
-
 func (r RiderPositionType) String() string {
-	val, ok := riderpositiontypetostrs[r]
-	if !ok {
-		return strconv.Itoa(int(r))
+	switch r {
+	case RiderPositionTypeSeated:
+		return "seated"
+	case RiderPositionTypeStanding:
+		return "standing"
+	case RiderPositionTypeTransitionToSeated:
+		return "transition_to_seated"
+	case RiderPositionTypeTransitionToStanding:
+		return "transition_to_standing"
+	default:
+		return "RiderPositionTypeInvalid(" + strconv.Itoa(int(r)) + ")"
 	}
-	return val
 }
-
-var strtoriderpositiontype = func() map[string]RiderPositionType {
-	m := make(map[string]RiderPositionType)
-	for t, str := range riderpositiontypetostrs {
-		m[str] = RiderPositionType(t)
-	}
-	return m
-}()
 
 // FromString parse string into RiderPositionType constant it's represent, return RiderPositionTypeInvalid if not found.
 func RiderPositionTypeFromString(s string) RiderPositionType {
-	val, ok := strtoriderpositiontype[s]
-	if !ok {
-		return strtoriderpositiontype["invalid"]
+	switch s {
+	case "seated":
+		return RiderPositionTypeSeated
+	case "standing":
+		return RiderPositionTypeStanding
+	case "transition_to_seated":
+		return RiderPositionTypeTransitionToSeated
+	case "transition_to_standing":
+		return RiderPositionTypeTransitionToStanding
+	default:
+		return RiderPositionTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListRiderPositionType() []RiderPositionType {
-	vs := make([]RiderPositionType, 0, len(riderpositiontypetostrs))
-	for i := range riderpositiontypetostrs {
-		vs = append(vs, RiderPositionType(i))
+	return []RiderPositionType{
+		RiderPositionTypeSeated,
+		RiderPositionTypeStanding,
+		RiderPositionTypeTransitionToSeated,
+		RiderPositionTypeTransitionToStanding,
 	}
-	return vs
 }

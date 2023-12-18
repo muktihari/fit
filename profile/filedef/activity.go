@@ -13,12 +13,18 @@ import (
 
 // Activity is a common file type that most wearable device or cycling computer uses to record activities.
 //
-// Please note since we group the same mesgdef types in a slice, we lose the arrival order of the messages.
+// Please note since we group the same mesgdef types in slices, we lose the arrival order of the messages.
 // But for messages that have timestamp, we can reconstruct the messages by timestamp order.
 //
 // ref: https://developer.garmin.com/fit/file-types/activity/
 type Activity struct {
-	FileId   *mesgdef.FileId
+	FileId mesgdef.FileId // must have mesg
+
+	// Developer Data Lookup
+	DeveloperDataIds  []*mesgdef.DeveloperDataId
+	FieldDescriptions []*mesgdef.FieldDescription
+
+	// Required Messages
 	Activity *mesgdef.Activity
 	Sessions []*mesgdef.Session
 	Laps     []*mesgdef.Lap
@@ -30,15 +36,11 @@ type Activity struct {
 	Events       []*mesgdef.Event
 	Lengths      []*mesgdef.Length
 	SegmentLap   []*mesgdef.SegmentLap
-	ZoneTargets  []*mesgdef.ZonesTarget
+	ZonesTargets []*mesgdef.ZonesTarget
 	Workouts     []*mesgdef.Workout
 	WorkoutSteps []*mesgdef.WorkoutStep
 	HRs          []*mesgdef.Hr
 	HRVs         []*mesgdef.Hrv
-
-	// Developer Data Lookup
-	DeveloperDataIds  []*mesgdef.DeveloperDataId
-	FieldDescriptions []*mesgdef.FieldDescription
 
 	// Messages not related to Activity
 	UnrelatedMessages []proto.Message
@@ -58,7 +60,11 @@ func NewActivity(mesgs ...proto.Message) *Activity {
 func (f *Activity) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = mesgdef.NewFileId(mesg)
+		f.FileId = *mesgdef.NewFileId(mesg)
+	case mesgnum.DeveloperDataId:
+		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
+	case mesgnum.FieldDescription:
+		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	case mesgnum.Activity:
 		f.Activity = mesgdef.NewActivity(mesg)
 	case mesgnum.Session:
@@ -78,23 +84,21 @@ func (f *Activity) Add(mesg proto.Message) {
 	case mesgnum.SegmentLap:
 		f.SegmentLap = append(f.SegmentLap, mesgdef.NewSegmentLap(mesg))
 	case mesgnum.ZonesTarget:
-		f.ZoneTargets = append(f.ZoneTargets, mesgdef.NewZonesTarget(mesg))
+		f.ZonesTargets = append(f.ZonesTargets, mesgdef.NewZonesTarget(mesg))
 	case mesgnum.Workout:
 		f.Workouts = append(f.Workouts, mesgdef.NewWorkout(mesg))
+	case mesgnum.WorkoutStep:
+		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(mesg))
 	case mesgnum.Hr:
 		f.HRs = append(f.HRs, mesgdef.NewHr(mesg))
 	case mesgnum.Hrv:
 		f.HRVs = append(f.HRVs, mesgdef.NewHrv(mesg))
-	case mesgnum.DeveloperDataId:
-		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
-	case mesgnum.FieldDescription:
-		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	default:
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
 
-func (f *Activity) ToFit(fac Factory) proto.Fit {
+func (f *Activity) ToFit(fac mesgdef.Factory) proto.Fit {
 	if fac == nil {
 		fac = factory.StandardFactory()
 	}
@@ -102,7 +106,7 @@ func (f *Activity) ToFit(fac Factory) proto.Fit {
 	var size = 3 // non slice fields
 
 	size += len(f.Sessions) + len(f.Laps) + len(f.Records) + len(f.DeviceInfos) +
-		len(f.Events) + len(f.Lengths) + len(f.SegmentLap) + len(f.ZoneTargets) +
+		len(f.Events) + len(f.Lengths) + len(f.SegmentLap) + len(f.ZonesTargets) +
 		len(f.Workouts) + len(f.WorkoutSteps) + len(f.HRs) + len(f.HRVs) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
@@ -111,40 +115,32 @@ func (f *Activity) ToFit(fac Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	if f.FileId != nil {
-		mesg := fac.CreateMesg(mesgnum.FileId)
-		f.FileId.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
-	}
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
 
-	PutMessages(fac, &fit.Messages, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	PutMessages(fac, &fit.Messages, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	PutMessages(fac, &fit.Messages, mesgnum.DeviceInfo, f.DeviceInfos)
+	ToMesgs(&fit.Messages, fac, mesgnum.DeviceInfo, f.DeviceInfos)
 
 	if f.UserProfile != nil {
-		mesg := fac.CreateMesg(mesgnum.UserProfile)
-		f.UserProfile.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
+		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(fac))
 	}
 
 	if f.Activity != nil {
-		mesg := fac.CreateMesg(mesgnum.Activity)
-		f.Activity.PutMessage(&mesg)
-		fit.Messages = append(fit.Messages, mesg)
+		fit.Messages = append(fit.Messages, f.Activity.ToMesg(fac))
 	}
 
-	PutMessages(fac, &fit.Messages, mesgnum.Session, f.Sessions)
-	PutMessages(fac, &fit.Messages, mesgnum.Lap, f.Laps)
-	PutMessages(fac, &fit.Messages, mesgnum.Record, f.Records)
-	PutMessages(fac, &fit.Messages, mesgnum.Event, f.Events)
-	PutMessages(fac, &fit.Messages, mesgnum.Length, f.Lengths)
-	PutMessages(fac, &fit.Messages, mesgnum.SegmentLap, f.SegmentLap)
-	PutMessages(fac, &fit.Messages, mesgnum.ZonesTarget, f.ZoneTargets)
-	PutMessages(fac, &fit.Messages, mesgnum.Workout, f.Workouts)
-	PutMessages(fac, &fit.Messages, mesgnum.WorkoutStep, f.WorkoutSteps)
-	PutMessages(fac, &fit.Messages, mesgnum.Hr, f.HRs)
-	PutMessages(fac, &fit.Messages, mesgnum.Hrv, f.HRVs)
+	ToMesgs(&fit.Messages, fac, mesgnum.Session, f.Sessions)
+	ToMesgs(&fit.Messages, fac, mesgnum.Lap, f.Laps)
+	ToMesgs(&fit.Messages, fac, mesgnum.Record, f.Records)
+	ToMesgs(&fit.Messages, fac, mesgnum.Event, f.Events)
+	ToMesgs(&fit.Messages, fac, mesgnum.Length, f.Lengths)
+	ToMesgs(&fit.Messages, fac, mesgnum.SegmentLap, f.SegmentLap)
+	ToMesgs(&fit.Messages, fac, mesgnum.ZonesTarget, f.ZonesTargets)
+	ToMesgs(&fit.Messages, fac, mesgnum.Workout, f.Workouts)
+	ToMesgs(&fit.Messages, fac, mesgnum.WorkoutStep, f.WorkoutSteps)
+	ToMesgs(&fit.Messages, fac, mesgnum.Hr, f.HRs)
+	ToMesgs(&fit.Messages, fac, mesgnum.Hrv, f.HRVs)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

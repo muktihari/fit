@@ -25,54 +25,81 @@ const (
 	SegmentLeaderboardTypeGoal         SegmentLeaderboardType = 8
 	SegmentLeaderboardTypeRival        SegmentLeaderboardType = 9
 	SegmentLeaderboardTypeClubLeader   SegmentLeaderboardType = 10
-	SegmentLeaderboardTypeInvalid      SegmentLeaderboardType = 0xFF // INVALID
+	SegmentLeaderboardTypeInvalid      SegmentLeaderboardType = 0xFF
 )
 
-var segmentleaderboardtypetostrs = map[SegmentLeaderboardType]string{
-	SegmentLeaderboardTypeOverall:      "overall",
-	SegmentLeaderboardTypePersonalBest: "personal_best",
-	SegmentLeaderboardTypeConnections:  "connections",
-	SegmentLeaderboardTypeGroup:        "group",
-	SegmentLeaderboardTypeChallenger:   "challenger",
-	SegmentLeaderboardTypeKom:          "kom",
-	SegmentLeaderboardTypeQom:          "qom",
-	SegmentLeaderboardTypePr:           "pr",
-	SegmentLeaderboardTypeGoal:         "goal",
-	SegmentLeaderboardTypeRival:        "rival",
-	SegmentLeaderboardTypeClubLeader:   "club_leader",
-	SegmentLeaderboardTypeInvalid:      "invalid",
-}
-
 func (s SegmentLeaderboardType) String() string {
-	val, ok := segmentleaderboardtypetostrs[s]
-	if !ok {
-		return strconv.Itoa(int(s))
+	switch s {
+	case SegmentLeaderboardTypeOverall:
+		return "overall"
+	case SegmentLeaderboardTypePersonalBest:
+		return "personal_best"
+	case SegmentLeaderboardTypeConnections:
+		return "connections"
+	case SegmentLeaderboardTypeGroup:
+		return "group"
+	case SegmentLeaderboardTypeChallenger:
+		return "challenger"
+	case SegmentLeaderboardTypeKom:
+		return "kom"
+	case SegmentLeaderboardTypeQom:
+		return "qom"
+	case SegmentLeaderboardTypePr:
+		return "pr"
+	case SegmentLeaderboardTypeGoal:
+		return "goal"
+	case SegmentLeaderboardTypeRival:
+		return "rival"
+	case SegmentLeaderboardTypeClubLeader:
+		return "club_leader"
+	default:
+		return "SegmentLeaderboardTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
-	return val
 }
-
-var strtosegmentleaderboardtype = func() map[string]SegmentLeaderboardType {
-	m := make(map[string]SegmentLeaderboardType)
-	for t, str := range segmentleaderboardtypetostrs {
-		m[str] = SegmentLeaderboardType(t)
-	}
-	return m
-}()
 
 // FromString parse string into SegmentLeaderboardType constant it's represent, return SegmentLeaderboardTypeInvalid if not found.
 func SegmentLeaderboardTypeFromString(s string) SegmentLeaderboardType {
-	val, ok := strtosegmentleaderboardtype[s]
-	if !ok {
-		return strtosegmentleaderboardtype["invalid"]
+	switch s {
+	case "overall":
+		return SegmentLeaderboardTypeOverall
+	case "personal_best":
+		return SegmentLeaderboardTypePersonalBest
+	case "connections":
+		return SegmentLeaderboardTypeConnections
+	case "group":
+		return SegmentLeaderboardTypeGroup
+	case "challenger":
+		return SegmentLeaderboardTypeChallenger
+	case "kom":
+		return SegmentLeaderboardTypeKom
+	case "qom":
+		return SegmentLeaderboardTypeQom
+	case "pr":
+		return SegmentLeaderboardTypePr
+	case "goal":
+		return SegmentLeaderboardTypeGoal
+	case "rival":
+		return SegmentLeaderboardTypeRival
+	case "club_leader":
+		return SegmentLeaderboardTypeClubLeader
+	default:
+		return SegmentLeaderboardTypeInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListSegmentLeaderboardType() []SegmentLeaderboardType {
-	vs := make([]SegmentLeaderboardType, 0, len(segmentleaderboardtypetostrs))
-	for i := range segmentleaderboardtypetostrs {
-		vs = append(vs, SegmentLeaderboardType(i))
+	return []SegmentLeaderboardType{
+		SegmentLeaderboardTypeOverall,
+		SegmentLeaderboardTypePersonalBest,
+		SegmentLeaderboardTypeConnections,
+		SegmentLeaderboardTypeGroup,
+		SegmentLeaderboardTypeChallenger,
+		SegmentLeaderboardTypeKom,
+		SegmentLeaderboardTypeQom,
+		SegmentLeaderboardTypePr,
+		SegmentLeaderboardTypeGoal,
+		SegmentLeaderboardTypeRival,
+		SegmentLeaderboardTypeClubLeader,
 	}
-	return vs
 }

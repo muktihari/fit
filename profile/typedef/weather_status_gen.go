@@ -35,64 +35,131 @@ const (
 	WeatherStatusLightRainSnow          WeatherStatus = 20
 	WeatherStatusHeavyRainSnow          WeatherStatus = 21
 	WeatherStatusCloudy                 WeatherStatus = 22
-	WeatherStatusInvalid                WeatherStatus = 0xFF // INVALID
+	WeatherStatusInvalid                WeatherStatus = 0xFF
 )
 
-var weatherstatustostrs = map[WeatherStatus]string{
-	WeatherStatusClear:                  "clear",
-	WeatherStatusPartlyCloudy:           "partly_cloudy",
-	WeatherStatusMostlyCloudy:           "mostly_cloudy",
-	WeatherStatusRain:                   "rain",
-	WeatherStatusSnow:                   "snow",
-	WeatherStatusWindy:                  "windy",
-	WeatherStatusThunderstorms:          "thunderstorms",
-	WeatherStatusWintryMix:              "wintry_mix",
-	WeatherStatusFog:                    "fog",
-	WeatherStatusHazy:                   "hazy",
-	WeatherStatusHail:                   "hail",
-	WeatherStatusScatteredShowers:       "scattered_showers",
-	WeatherStatusScatteredThunderstorms: "scattered_thunderstorms",
-	WeatherStatusUnknownPrecipitation:   "unknown_precipitation",
-	WeatherStatusLightRain:              "light_rain",
-	WeatherStatusHeavyRain:              "heavy_rain",
-	WeatherStatusLightSnow:              "light_snow",
-	WeatherStatusHeavySnow:              "heavy_snow",
-	WeatherStatusLightRainSnow:          "light_rain_snow",
-	WeatherStatusHeavyRainSnow:          "heavy_rain_snow",
-	WeatherStatusCloudy:                 "cloudy",
-	WeatherStatusInvalid:                "invalid",
-}
-
 func (w WeatherStatus) String() string {
-	val, ok := weatherstatustostrs[w]
-	if !ok {
-		return strconv.Itoa(int(w))
+	switch w {
+	case WeatherStatusClear:
+		return "clear"
+	case WeatherStatusPartlyCloudy:
+		return "partly_cloudy"
+	case WeatherStatusMostlyCloudy:
+		return "mostly_cloudy"
+	case WeatherStatusRain:
+		return "rain"
+	case WeatherStatusSnow:
+		return "snow"
+	case WeatherStatusWindy:
+		return "windy"
+	case WeatherStatusThunderstorms:
+		return "thunderstorms"
+	case WeatherStatusWintryMix:
+		return "wintry_mix"
+	case WeatherStatusFog:
+		return "fog"
+	case WeatherStatusHazy:
+		return "hazy"
+	case WeatherStatusHail:
+		return "hail"
+	case WeatherStatusScatteredShowers:
+		return "scattered_showers"
+	case WeatherStatusScatteredThunderstorms:
+		return "scattered_thunderstorms"
+	case WeatherStatusUnknownPrecipitation:
+		return "unknown_precipitation"
+	case WeatherStatusLightRain:
+		return "light_rain"
+	case WeatherStatusHeavyRain:
+		return "heavy_rain"
+	case WeatherStatusLightSnow:
+		return "light_snow"
+	case WeatherStatusHeavySnow:
+		return "heavy_snow"
+	case WeatherStatusLightRainSnow:
+		return "light_rain_snow"
+	case WeatherStatusHeavyRainSnow:
+		return "heavy_rain_snow"
+	case WeatherStatusCloudy:
+		return "cloudy"
+	default:
+		return "WeatherStatusInvalid(" + strconv.Itoa(int(w)) + ")"
 	}
-	return val
 }
-
-var strtoweatherstatus = func() map[string]WeatherStatus {
-	m := make(map[string]WeatherStatus)
-	for t, str := range weatherstatustostrs {
-		m[str] = WeatherStatus(t)
-	}
-	return m
-}()
 
 // FromString parse string into WeatherStatus constant it's represent, return WeatherStatusInvalid if not found.
 func WeatherStatusFromString(s string) WeatherStatus {
-	val, ok := strtoweatherstatus[s]
-	if !ok {
-		return strtoweatherstatus["invalid"]
+	switch s {
+	case "clear":
+		return WeatherStatusClear
+	case "partly_cloudy":
+		return WeatherStatusPartlyCloudy
+	case "mostly_cloudy":
+		return WeatherStatusMostlyCloudy
+	case "rain":
+		return WeatherStatusRain
+	case "snow":
+		return WeatherStatusSnow
+	case "windy":
+		return WeatherStatusWindy
+	case "thunderstorms":
+		return WeatherStatusThunderstorms
+	case "wintry_mix":
+		return WeatherStatusWintryMix
+	case "fog":
+		return WeatherStatusFog
+	case "hazy":
+		return WeatherStatusHazy
+	case "hail":
+		return WeatherStatusHail
+	case "scattered_showers":
+		return WeatherStatusScatteredShowers
+	case "scattered_thunderstorms":
+		return WeatherStatusScatteredThunderstorms
+	case "unknown_precipitation":
+		return WeatherStatusUnknownPrecipitation
+	case "light_rain":
+		return WeatherStatusLightRain
+	case "heavy_rain":
+		return WeatherStatusHeavyRain
+	case "light_snow":
+		return WeatherStatusLightSnow
+	case "heavy_snow":
+		return WeatherStatusHeavySnow
+	case "light_rain_snow":
+		return WeatherStatusLightRainSnow
+	case "heavy_rain_snow":
+		return WeatherStatusHeavyRainSnow
+	case "cloudy":
+		return WeatherStatusCloudy
+	default:
+		return WeatherStatusInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListWeatherStatus() []WeatherStatus {
-	vs := make([]WeatherStatus, 0, len(weatherstatustostrs))
-	for i := range weatherstatustostrs {
-		vs = append(vs, WeatherStatus(i))
+	return []WeatherStatus{
+		WeatherStatusClear,
+		WeatherStatusPartlyCloudy,
+		WeatherStatusMostlyCloudy,
+		WeatherStatusRain,
+		WeatherStatusSnow,
+		WeatherStatusWindy,
+		WeatherStatusThunderstorms,
+		WeatherStatusWintryMix,
+		WeatherStatusFog,
+		WeatherStatusHazy,
+		WeatherStatusHail,
+		WeatherStatusScatteredShowers,
+		WeatherStatusScatteredThunderstorms,
+		WeatherStatusUnknownPrecipitation,
+		WeatherStatusLightRain,
+		WeatherStatusHeavyRain,
+		WeatherStatusLightSnow,
+		WeatherStatusHeavySnow,
+		WeatherStatusLightRainSnow,
+		WeatherStatusHeavyRainSnow,
+		WeatherStatusCloudy,
 	}
-	return vs
 }

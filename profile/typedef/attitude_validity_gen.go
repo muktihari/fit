@@ -27,56 +27,91 @@ const (
 	AttitudeValiditySolutionCoasting       AttitudeValidity = 0x0400
 	AttitudeValidityTrueTrackAngle         AttitudeValidity = 0x0800
 	AttitudeValidityMagneticHeading        AttitudeValidity = 0x1000
-	AttitudeValidityInvalid                AttitudeValidity = 0xFFFF // INVALID
+	AttitudeValidityInvalid                AttitudeValidity = 0xFFFF
 )
 
-var attitudevaliditytostrs = map[AttitudeValidity]string{
-	AttitudeValidityTrackAngleHeadingValid: "track_angle_heading_valid",
-	AttitudeValidityPitchValid:             "pitch_valid",
-	AttitudeValidityRollValid:              "roll_valid",
-	AttitudeValidityLateralBodyAccelValid:  "lateral_body_accel_valid",
-	AttitudeValidityNormalBodyAccelValid:   "normal_body_accel_valid",
-	AttitudeValidityTurnRateValid:          "turn_rate_valid",
-	AttitudeValidityHwFail:                 "hw_fail",
-	AttitudeValidityMagInvalid:             "mag_invalid",
-	AttitudeValidityNoGps:                  "no_gps",
-	AttitudeValidityGpsInvalid:             "gps_invalid",
-	AttitudeValiditySolutionCoasting:       "solution_coasting",
-	AttitudeValidityTrueTrackAngle:         "true_track_angle",
-	AttitudeValidityMagneticHeading:        "magnetic_heading",
-	AttitudeValidityInvalid:                "invalid",
-}
-
 func (a AttitudeValidity) String() string {
-	val, ok := attitudevaliditytostrs[a]
-	if !ok {
-		return strconv.FormatUint(uint64(a), 10)
+	switch a {
+	case AttitudeValidityTrackAngleHeadingValid:
+		return "track_angle_heading_valid"
+	case AttitudeValidityPitchValid:
+		return "pitch_valid"
+	case AttitudeValidityRollValid:
+		return "roll_valid"
+	case AttitudeValidityLateralBodyAccelValid:
+		return "lateral_body_accel_valid"
+	case AttitudeValidityNormalBodyAccelValid:
+		return "normal_body_accel_valid"
+	case AttitudeValidityTurnRateValid:
+		return "turn_rate_valid"
+	case AttitudeValidityHwFail:
+		return "hw_fail"
+	case AttitudeValidityMagInvalid:
+		return "mag_invalid"
+	case AttitudeValidityNoGps:
+		return "no_gps"
+	case AttitudeValidityGpsInvalid:
+		return "gps_invalid"
+	case AttitudeValiditySolutionCoasting:
+		return "solution_coasting"
+	case AttitudeValidityTrueTrackAngle:
+		return "true_track_angle"
+	case AttitudeValidityMagneticHeading:
+		return "magnetic_heading"
+	default:
+		return "AttitudeValidityInvalid(" + strconv.FormatUint(uint64(a), 10) + ")"
 	}
-	return val
 }
-
-var strtoattitudevalidity = func() map[string]AttitudeValidity {
-	m := make(map[string]AttitudeValidity)
-	for t, str := range attitudevaliditytostrs {
-		m[str] = AttitudeValidity(t)
-	}
-	return m
-}()
 
 // FromString parse string into AttitudeValidity constant it's represent, return AttitudeValidityInvalid if not found.
 func AttitudeValidityFromString(s string) AttitudeValidity {
-	val, ok := strtoattitudevalidity[s]
-	if !ok {
-		return strtoattitudevalidity["invalid"]
+	switch s {
+	case "track_angle_heading_valid":
+		return AttitudeValidityTrackAngleHeadingValid
+	case "pitch_valid":
+		return AttitudeValidityPitchValid
+	case "roll_valid":
+		return AttitudeValidityRollValid
+	case "lateral_body_accel_valid":
+		return AttitudeValidityLateralBodyAccelValid
+	case "normal_body_accel_valid":
+		return AttitudeValidityNormalBodyAccelValid
+	case "turn_rate_valid":
+		return AttitudeValidityTurnRateValid
+	case "hw_fail":
+		return AttitudeValidityHwFail
+	case "mag_invalid":
+		return AttitudeValidityMagInvalid
+	case "no_gps":
+		return AttitudeValidityNoGps
+	case "gps_invalid":
+		return AttitudeValidityGpsInvalid
+	case "solution_coasting":
+		return AttitudeValiditySolutionCoasting
+	case "true_track_angle":
+		return AttitudeValidityTrueTrackAngle
+	case "magnetic_heading":
+		return AttitudeValidityMagneticHeading
+	default:
+		return AttitudeValidityInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListAttitudeValidity() []AttitudeValidity {
-	vs := make([]AttitudeValidity, 0, len(attitudevaliditytostrs))
-	for i := range attitudevaliditytostrs {
-		vs = append(vs, AttitudeValidity(i))
+	return []AttitudeValidity{
+		AttitudeValidityTrackAngleHeadingValid,
+		AttitudeValidityPitchValid,
+		AttitudeValidityRollValid,
+		AttitudeValidityLateralBodyAccelValid,
+		AttitudeValidityNormalBodyAccelValid,
+		AttitudeValidityTurnRateValid,
+		AttitudeValidityHwFail,
+		AttitudeValidityMagInvalid,
+		AttitudeValidityNoGps,
+		AttitudeValidityGpsInvalid,
+		AttitudeValiditySolutionCoasting,
+		AttitudeValidityTrueTrackAngle,
+		AttitudeValidityMagneticHeading,
 	}
-	return vs
 }

@@ -33,62 +33,121 @@ const (
 	DeadliftExerciseNameSumoDeadliftHighPull                  DeadliftExerciseName = 16
 	DeadliftExerciseNameTrapBarDeadlift                       DeadliftExerciseName = 17
 	DeadliftExerciseNameWideGripBarbellDeadlift               DeadliftExerciseName = 18
-	DeadliftExerciseNameInvalid                               DeadliftExerciseName = 0xFFFF // INVALID
+	DeadliftExerciseNameInvalid                               DeadliftExerciseName = 0xFFFF
 )
 
-var deadliftexercisenametostrs = map[DeadliftExerciseName]string{
-	DeadliftExerciseNameBarbellDeadlift:                       "barbell_deadlift",
-	DeadliftExerciseNameBarbellStraightLegDeadlift:            "barbell_straight_leg_deadlift",
-	DeadliftExerciseNameDumbbellDeadlift:                      "dumbbell_deadlift",
-	DeadliftExerciseNameDumbbellSingleLegDeadliftToRow:        "dumbbell_single_leg_deadlift_to_row",
-	DeadliftExerciseNameDumbbellStraightLegDeadlift:           "dumbbell_straight_leg_deadlift",
-	DeadliftExerciseNameKettlebellFloorToShelf:                "kettlebell_floor_to_shelf",
-	DeadliftExerciseNameOneArmOneLegDeadlift:                  "one_arm_one_leg_deadlift",
-	DeadliftExerciseNameRackPull:                              "rack_pull",
-	DeadliftExerciseNameRotationalDumbbellStraightLegDeadlift: "rotational_dumbbell_straight_leg_deadlift",
-	DeadliftExerciseNameSingleArmDeadlift:                     "single_arm_deadlift",
-	DeadliftExerciseNameSingleLegBarbellDeadlift:              "single_leg_barbell_deadlift",
-	DeadliftExerciseNameSingleLegBarbellStraightLegDeadlift:   "single_leg_barbell_straight_leg_deadlift",
-	DeadliftExerciseNameSingleLegDeadliftWithBarbell:          "single_leg_deadlift_with_barbell",
-	DeadliftExerciseNameSingleLegRdlCircuit:                   "single_leg_rdl_circuit",
-	DeadliftExerciseNameSingleLegRomanianDeadliftWithDumbbell: "single_leg_romanian_deadlift_with_dumbbell",
-	DeadliftExerciseNameSumoDeadlift:                          "sumo_deadlift",
-	DeadliftExerciseNameSumoDeadliftHighPull:                  "sumo_deadlift_high_pull",
-	DeadliftExerciseNameTrapBarDeadlift:                       "trap_bar_deadlift",
-	DeadliftExerciseNameWideGripBarbellDeadlift:               "wide_grip_barbell_deadlift",
-	DeadliftExerciseNameInvalid:                               "invalid",
-}
-
 func (d DeadliftExerciseName) String() string {
-	val, ok := deadliftexercisenametostrs[d]
-	if !ok {
-		return strconv.FormatUint(uint64(d), 10)
+	switch d {
+	case DeadliftExerciseNameBarbellDeadlift:
+		return "barbell_deadlift"
+	case DeadliftExerciseNameBarbellStraightLegDeadlift:
+		return "barbell_straight_leg_deadlift"
+	case DeadliftExerciseNameDumbbellDeadlift:
+		return "dumbbell_deadlift"
+	case DeadliftExerciseNameDumbbellSingleLegDeadliftToRow:
+		return "dumbbell_single_leg_deadlift_to_row"
+	case DeadliftExerciseNameDumbbellStraightLegDeadlift:
+		return "dumbbell_straight_leg_deadlift"
+	case DeadliftExerciseNameKettlebellFloorToShelf:
+		return "kettlebell_floor_to_shelf"
+	case DeadliftExerciseNameOneArmOneLegDeadlift:
+		return "one_arm_one_leg_deadlift"
+	case DeadliftExerciseNameRackPull:
+		return "rack_pull"
+	case DeadliftExerciseNameRotationalDumbbellStraightLegDeadlift:
+		return "rotational_dumbbell_straight_leg_deadlift"
+	case DeadliftExerciseNameSingleArmDeadlift:
+		return "single_arm_deadlift"
+	case DeadliftExerciseNameSingleLegBarbellDeadlift:
+		return "single_leg_barbell_deadlift"
+	case DeadliftExerciseNameSingleLegBarbellStraightLegDeadlift:
+		return "single_leg_barbell_straight_leg_deadlift"
+	case DeadliftExerciseNameSingleLegDeadliftWithBarbell:
+		return "single_leg_deadlift_with_barbell"
+	case DeadliftExerciseNameSingleLegRdlCircuit:
+		return "single_leg_rdl_circuit"
+	case DeadliftExerciseNameSingleLegRomanianDeadliftWithDumbbell:
+		return "single_leg_romanian_deadlift_with_dumbbell"
+	case DeadliftExerciseNameSumoDeadlift:
+		return "sumo_deadlift"
+	case DeadliftExerciseNameSumoDeadliftHighPull:
+		return "sumo_deadlift_high_pull"
+	case DeadliftExerciseNameTrapBarDeadlift:
+		return "trap_bar_deadlift"
+	case DeadliftExerciseNameWideGripBarbellDeadlift:
+		return "wide_grip_barbell_deadlift"
+	default:
+		return "DeadliftExerciseNameInvalid(" + strconv.FormatUint(uint64(d), 10) + ")"
 	}
-	return val
 }
-
-var strtodeadliftexercisename = func() map[string]DeadliftExerciseName {
-	m := make(map[string]DeadliftExerciseName)
-	for t, str := range deadliftexercisenametostrs {
-		m[str] = DeadliftExerciseName(t)
-	}
-	return m
-}()
 
 // FromString parse string into DeadliftExerciseName constant it's represent, return DeadliftExerciseNameInvalid if not found.
 func DeadliftExerciseNameFromString(s string) DeadliftExerciseName {
-	val, ok := strtodeadliftexercisename[s]
-	if !ok {
-		return strtodeadliftexercisename["invalid"]
+	switch s {
+	case "barbell_deadlift":
+		return DeadliftExerciseNameBarbellDeadlift
+	case "barbell_straight_leg_deadlift":
+		return DeadliftExerciseNameBarbellStraightLegDeadlift
+	case "dumbbell_deadlift":
+		return DeadliftExerciseNameDumbbellDeadlift
+	case "dumbbell_single_leg_deadlift_to_row":
+		return DeadliftExerciseNameDumbbellSingleLegDeadliftToRow
+	case "dumbbell_straight_leg_deadlift":
+		return DeadliftExerciseNameDumbbellStraightLegDeadlift
+	case "kettlebell_floor_to_shelf":
+		return DeadliftExerciseNameKettlebellFloorToShelf
+	case "one_arm_one_leg_deadlift":
+		return DeadliftExerciseNameOneArmOneLegDeadlift
+	case "rack_pull":
+		return DeadliftExerciseNameRackPull
+	case "rotational_dumbbell_straight_leg_deadlift":
+		return DeadliftExerciseNameRotationalDumbbellStraightLegDeadlift
+	case "single_arm_deadlift":
+		return DeadliftExerciseNameSingleArmDeadlift
+	case "single_leg_barbell_deadlift":
+		return DeadliftExerciseNameSingleLegBarbellDeadlift
+	case "single_leg_barbell_straight_leg_deadlift":
+		return DeadliftExerciseNameSingleLegBarbellStraightLegDeadlift
+	case "single_leg_deadlift_with_barbell":
+		return DeadliftExerciseNameSingleLegDeadliftWithBarbell
+	case "single_leg_rdl_circuit":
+		return DeadliftExerciseNameSingleLegRdlCircuit
+	case "single_leg_romanian_deadlift_with_dumbbell":
+		return DeadliftExerciseNameSingleLegRomanianDeadliftWithDumbbell
+	case "sumo_deadlift":
+		return DeadliftExerciseNameSumoDeadlift
+	case "sumo_deadlift_high_pull":
+		return DeadliftExerciseNameSumoDeadliftHighPull
+	case "trap_bar_deadlift":
+		return DeadliftExerciseNameTrapBarDeadlift
+	case "wide_grip_barbell_deadlift":
+		return DeadliftExerciseNameWideGripBarbellDeadlift
+	default:
+		return DeadliftExerciseNameInvalid
 	}
-	return val
 }
 
-// List returns all constants. The result might be unsorted (depend on stringer is in array or map), it's up to the caller to sort.
+// List returns all constants.
 func ListDeadliftExerciseName() []DeadliftExerciseName {
-	vs := make([]DeadliftExerciseName, 0, len(deadliftexercisenametostrs))
-	for i := range deadliftexercisenametostrs {
-		vs = append(vs, DeadliftExerciseName(i))
+	return []DeadliftExerciseName{
+		DeadliftExerciseNameBarbellDeadlift,
+		DeadliftExerciseNameBarbellStraightLegDeadlift,
+		DeadliftExerciseNameDumbbellDeadlift,
+		DeadliftExerciseNameDumbbellSingleLegDeadliftToRow,
+		DeadliftExerciseNameDumbbellStraightLegDeadlift,
+		DeadliftExerciseNameKettlebellFloorToShelf,
+		DeadliftExerciseNameOneArmOneLegDeadlift,
+		DeadliftExerciseNameRackPull,
+		DeadliftExerciseNameRotationalDumbbellStraightLegDeadlift,
+		DeadliftExerciseNameSingleArmDeadlift,
+		DeadliftExerciseNameSingleLegBarbellDeadlift,
+		DeadliftExerciseNameSingleLegBarbellStraightLegDeadlift,
+		DeadliftExerciseNameSingleLegDeadliftWithBarbell,
+		DeadliftExerciseNameSingleLegRdlCircuit,
+		DeadliftExerciseNameSingleLegRomanianDeadliftWithDumbbell,
+		DeadliftExerciseNameSumoDeadlift,
+		DeadliftExerciseNameSumoDeadliftHighPull,
+		DeadliftExerciseNameTrapBarDeadlift,
+		DeadliftExerciseNameWideGripBarbellDeadlift,
 	}
-	return vs
 }
