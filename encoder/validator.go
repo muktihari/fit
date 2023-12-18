@@ -79,7 +79,7 @@ type messageValidator struct {
 func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
-	fields := make([]proto.Field, 0, len(mesg.Fields))
+	fields := make([]proto.Field, 0, v.size(mesg.Fields))
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 
@@ -163,6 +163,23 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	}
 
 	return nil
+}
+
+// size return the size of valid fields.
+// This is method ensure we just do 1 alloc on creating new slice of fields.
+func (v *messageValidator) size(fields []proto.Field) byte {
+	var size byte
+	for i := range fields {
+		field := &fields[i]
+		if field.FieldBase == nil || field.IsExpandedField {
+			continue
+		}
+		if v.options.omitInvalidValues && !hasValidValue(field.Value) {
+			continue
+		}
+		size++
+	}
+	return size
 }
 
 // isValueTypeAligned checks whether the value is aligned with type. The value should be a concrete type not pointer to a value.
@@ -296,6 +313,14 @@ func hasValidValue(val any) bool {
 			}
 		}
 		return invalidcounter != len(v)
+	case []string:
+		invalidcounter := 0
+		for i := range v {
+			if v[i] == basetype.StringInvalid || v[i] == "" {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(v)
 	case []float32:
 		invalidcounter := 0
 		for i := range v {
@@ -386,7 +411,9 @@ func hasValidValue(val any) bool {
 					invalidcounter++
 				}
 			case reflect.String:
-				return false // we have no []string values
+				if str := rve.String(); str == basetype.StringInvalid || str == "" {
+					invalidcounter++
+				}
 			case reflect.Float32:
 				if math.Float32bits(float32(rve.Float())) == basetype.Float32Invalid {
 					invalidcounter++

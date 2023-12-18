@@ -37,7 +37,7 @@ var (
 
 // Factory handles creation and registration for Fit's message and field.
 type Factory struct {
-	mesgs []proto.Message
+	registeredMesgs []proto.Message
 }
 
 // New creates new Factory with predefined messages.
@@ -46,36 +46,49 @@ type Factory struct {
 // 
 // New is not receiving messages on purpose: to comply with Fit term and conditions which is not allowing edit on existing messages. 
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
-func New() *Factory { return &Factory{mesgs: predefinedMessages()} }
+func New() *Factory { return &Factory{ registeredMesgs: make([]proto.Message, 0) } }
 
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	if num >= typedef.MesgNum(len(f.mesgs)) {
-		return createUnknownMesg(num)
-	}
-	
-	if f.mesgs[num].Num != num {
-		return createUnknownMesg(num)
+	mesg := f.createMesg(num)
+
+	if mesg.Fields == nil { // Unknown message
+		return mesg
 	}
 
-	return f.mesgs[num].Clone() // dereference any pointer values
+	mesg.Fields = make([]proto.Field, len(mesg.Fields))
+	copy(mesg.Fields, mesgs[num].Fields) // shallow copy
+
+	return mesg
 }
 
 {{ template "create_mesg_only_doc" -}}
 func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
-	if num >= typedef.MesgNum(len(f.mesgs)) {
-		return createUnknownMesg(num)
-	}
+	mesg := f.createMesg(num)
 
-	if f.mesgs[num].Num != num {
-		return createUnknownMesg(num)
-	}
-
-	mesg := f.mesgs[num]       // shallow copy
-	mesg.Fields = nil 	       // zeroed
-	mesg.DeveloperFields = nil // zeroed
+	mesg.Fields = nil
 
 	return mesg
+}
+
+func (f *Factory) createMesg(num typedef.MesgNum) proto.Message {
+	if num < typedef.MesgNum(len(mesgs)) {
+		if mesgs[num].Num == num {
+			mesg := mesgs[num]
+			return mesg
+		}
+	}
+
+	if num >= typedef.MesgNum(len(mesgs)) {
+		for i := range f.registeredMesgs {
+			if f.registeredMesgs[i].Num == num {
+				mesg := f.registeredMesgs[i]
+				return mesg
+			}
+		}
+	}
+	
+	return createUnknownMesg(num)
 }
 
 func createUnknownMesg(num typedef.MesgNum) proto.Message {
@@ -84,23 +97,28 @@ func createUnknownMesg(num typedef.MesgNum) proto.Message {
 
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
-	if mesgNum >= typedef.MesgNum(len(f.mesgs)) {
+	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
+		for i := range mesgs[mesgNum].Fields {
+			if mesgs[mesgNum].Fields[i].Num == num {
+				return mesgs[mesgNum].Fields[i]
+			}
+		}
 		return createUnknownField(mesgNum, num)
 	}
 
-	if f.mesgs[mesgNum].Num != mesgNum {
-		return createUnknownField(mesgNum, num)
+	for i := range f.registeredMesgs {
+		mesg := &f.registeredMesgs[i]
+		if mesg.Num == mesgNum {
+			for i := range mesg.Fields {
+				if mesg.Fields[i].Num == num {
+					return mesg.Fields[i]
+				}
+			}
+			return createUnknownField(mesgNum, num)
+		}
 	}
 
-	if num >= byte(len(f.mesgs[mesgNum].Fields)) {
-		return createUnknownField(mesgNum, num)
-	}
-
-	if f.mesgs[mesgNum].Fields[num].FieldBase == nil {
-		return createUnknownField(mesgNum, num)
-	}
-
-	return f.mesgs[mesgNum].Fields[num]
+	return createUnknownField(mesgNum, num)
 }
 
 func createUnknownField(mesgNum typedef.MesgNum, num byte) proto.Field {
@@ -113,19 +131,24 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 		return fmt.Errorf("could not register outside max range: %d", typedef.MesgNumMfgRangeMax)
 	}
 
-	if f.mesgs[mesg.Num].Num == mesg.Num {
-		return fmt.Errorf("could not register to an existing message: %d (%s)", mesg.Num, mesg.Num)
+	if mesg.Num < typedef.MesgNum(len(mesgs)) {
+		return fmt.Errorf("could not register on reserved predefined message, mesg.Num < %d", len(mesgs))
 	}
-	
-	mesg = mesg.Clone()
-	f.mesgs[mesg.Num] = mesg
+
+	for i := range f.registeredMesgs {
+		if f.registeredMesgs[i].Num == mesg.Num {
+			return fmt.Errorf("could not register to an existing message: %d (%s)", mesg.Num, mesg.Num)
+		}
+	}
+
+	f.registeredMesgs = append(f.registeredMesgs, mesg)
 
 	return nil
 }
 
-func predefinedMessages() []proto.Message { // Use slice to ensure O(1) lookup
-	return {{ .Messages }}
-}
+// Use array to ensure O(1) lookup
+var mesgs = {{ .Messages }} 
+
 {{ end }} // end of "factory"
 
 // Template definition for [exported.go] 
@@ -169,18 +192,22 @@ func RegisterMesg(mesg proto.Message) error {
 // Funcs & Methods Shared Documentations:
 {{ define "create_mesg_doc" }}
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns new message with "unknown" name.
+//
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except fot the unknown field).
+// If you want a deep copy of the mesg, create it by calling mesg.Clone().
 {{ end }}
 
 {{ define "create_mesg_only_doc" }}
-// CreateMesgOnly is similar to CreateMesg, but it sets Fields and DeveloperFields to nil. This is useful when we plan to fill these values ourselves
+// CreateMesgOnly is similar to CreateMesg, but it sets Fields to nil. This is useful when we plan to fill these values ourselves
 // to avoid unnecessary malloc when cloning them, as they will be removed anyway. For example, the decoding process will populate them with decoded data.
 {{ end }}
 
 {{ define "create_field_doc" }}
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 // 
-// Returned Field's FieldBase is a pointer, referencing a value in this factory to reduce unnecessary malloc or runtime duffcopy
-// since the content should not be changed.
+// Field's FieldBase is a pointer struct embedded, and this will only create a shallow copy of the field, so changing any value declared in 
+// FieldBase is prohibited (except fot the unknown field) since it still referencing the same struct. If you want a deep copy of the Field, 
+// create it by calling field.Clone().
 {{ end }}
 
 {{ define "register_mesg_doc" }}

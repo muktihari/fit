@@ -246,6 +246,7 @@ func TestToUint32(t *testing.T) {
 	}{
 		{value: nil, result: basetype.Uint32Invalid},
 		{value: uint32(10), result: 10},
+		{value: float32(math.Float32frombits(100)), result: 100},
 		{value: Uint32(10), result: 10},
 		{value: int8(10), result: basetype.Uint32Invalid},
 	}
@@ -420,6 +421,7 @@ func TestToUint64(t *testing.T) {
 	}{
 		{value: nil, result: basetype.Uint64Invalid},
 		{value: uint64(10), result: 10},
+		{value: float64(math.Float64frombits(100)), result: 100},
 		{value: Uint64(10), result: 10},
 		{value: int8(10), result: basetype.Uint64Invalid},
 	}
@@ -708,6 +710,45 @@ func TestToSliceUint32(t *testing.T) {
 			var expected []Uint32
 			for _, v := range tc.result {
 				expected = append(expected, Uint32(v))
+			}
+			if diff := cmp.Diff(result, expected); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestToSliceString(t *testing.T) {
+	tt := []struct {
+		value  any
+		result []string
+	}{
+		{value: nil, result: nil},
+		{value: []string{"a", "b"}, result: []string{"a", "b"}},
+		{value: string(""), result: nil},
+		{value: []String{"a", "b"}, result: []string{"a", "b"}},
+		{value: []String{}, result: nil},
+	}
+
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("%T(%#v)", tc.value, tc.value), func(t *testing.T) {
+			result := typeconv.ToSliceString[string](tc.value)
+			if len(result) == 0 && len(tc.result) == 0 {
+				return
+			}
+			if diff := cmp.Diff(result, tc.result); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+
+		t.Run("[]Float32", func(t *testing.T) {
+			result := typeconv.ToSliceString[String](tc.value)
+			if len(result) == 0 && len(tc.result) == 0 {
+				return
+			}
+			var expected []String
+			for _, v := range tc.result {
+				expected = append(expected, String(v))
 			}
 			if diff := cmp.Diff(result, expected); diff != "" {
 				t.Fatal(diff)

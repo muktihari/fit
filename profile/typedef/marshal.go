@@ -60,7 +60,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint16(b, uint16(val))
 		return b, nil
 	case []int16:
-		n, cur := 2, 0
+		const n = 2
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint16(b[cur:cur+n], uint16(val[i]))
@@ -72,7 +73,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint16(b, val)
 		return b, nil
 	case []uint16:
-		n, cur := 2, 0
+		const n = 2
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint16(b[cur:cur+n], val[i])
@@ -84,7 +86,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint32(b, uint32(val))
 		return b, nil
 	case []int32:
-		n, cur := 4, 0
+		const n = 4
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint32(b[cur:cur+n], uint32(val[i]))
@@ -96,7 +99,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint32(b, val)
 		return b, nil
 	case []uint32:
-		n, cur := 4, 0
+		const n = 4
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint32(b[cur:cur+n], val[i])
@@ -108,7 +112,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint64(b, uint64(val))
 		return b, nil
 	case []int64:
-		n, cur := 8, 0
+		const n = 8
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint64(b[cur:cur+n], uint64(val[i]))
@@ -120,7 +125,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint64(b, val)
 		return b, nil
 	case []uint64:
-		n, cur := 8, 0
+		const n = 8
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint64(b[cur:cur+n], val[i])
@@ -133,7 +139,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint32(b, v)
 		return b, nil
 	case []float32:
-		n, cur := 4, 0
+		const n = 4
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint32(b[cur:cur+n], math.Float32bits(val[i]))
@@ -146,7 +153,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 		bo.PutUint64(b, v)
 		return b, nil
 	case []float64:
-		n, cur := 8, 0
+		const n = 8
+		cur := 0
 		b := make([]byte, len(val)*n)
 		for i := range val {
 			bo.PutUint64(b[cur:cur+n], math.Float64bits(val[i]))
@@ -162,7 +170,35 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 			b = append(b, '\x00') // add utf-8 null-terminated string
 		}
 		return b, nil
-	case []string, []any:
+	case []string:
+		var size int
+		for i := range val {
+			if len(val[i]) == 0 {
+				continue
+			}
+			if len(val[i]) == 1 && val[i][0] == '\x00' {
+				continue
+			}
+			size += len(val[i])
+			if val[i][len(val[i])-1] != '\x00' {
+				size += 1 // plus utf-8 null-terminated string
+			}
+		}
+		b := make([]byte, 0, size)
+		for i := range val {
+			if len(val[i]) == 0 {
+				continue
+			}
+			if len(val[i]) == 1 && val[i][0] == '\x00' {
+				continue
+			}
+			b = append(b, []byte(val[i])...)
+			if val[i][len(val[i])-1] != '\x00' {
+				b = append(b, '\x00')
+			}
+		}
+		return b, nil
+	case []any:
 		return nil, fmt.Errorf("type %T is not supported: %w", val, ErrTypeNotSupported)
 	}
 
@@ -237,8 +273,8 @@ func Marshal(v any, bo binary.ByteOrder) ([]byte, error) {
 				index = index.Elem()
 			}
 
-			if index.Kind() == reflect.Slice || index.Kind() == reflect.String {
-				return nil, fmt.Errorf("nested slice or []string is not supported: %w", ErrTypeNotSupported)
+			if index.Kind() == reflect.Slice {
+				return nil, fmt.Errorf("nested slice is not supported: %w", ErrTypeNotSupported)
 			}
 
 			if !index.IsValid() {
