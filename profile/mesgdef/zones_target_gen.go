@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,14 +33,7 @@ func NewZonesTarget(mesg proto.Message) *ZonesTarget {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		1: nil, /* MaxHeartRate */
-		2: nil, /* ThresholdHeartRate */
-		3: nil, /* FunctionalThresholdPower */
-		5: nil, /* HrCalcType */
-		7: nil, /* PwrCalcType */
-	}
-
+	vals := [8]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -59,34 +53,59 @@ func NewZonesTarget(mesg proto.Message) *ZonesTarget {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ZonesTarget mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumZonesTarget)
-func (m *ZonesTarget) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ZonesTarget into proto.Message.
+func (m *ZonesTarget) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumZonesTarget)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumZonesTarget {
-		return
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.MaxHeartRate
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		1: m.MaxHeartRate,
-		2: m.ThresholdHeartRate,
-		3: m.FunctionalThresholdPower,
-		5: typeconv.ToEnum[byte](m.HrCalcType),
-		7: typeconv.ToEnum[byte](m.PwrCalcType),
+	if m.ThresholdHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.ThresholdHeartRate
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.FunctionalThresholdPower
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = typeconv.ToEnum[byte](m.HrCalcType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = typeconv.ToEnum[byte](m.PwrCalcType)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ZonesTarget's valid fields.
+func (m *ZonesTarget) size() byte {
+	var size byte
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ThresholdHeartRate != basetype.Uint8Invalid {
+		size++
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

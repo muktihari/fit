@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -39,21 +40,7 @@ func NewAccelerometerData(mesg proto.Message) *AccelerometerData {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* TimestampMs */
-		1:   nil, /* SampleTimeOffset */
-		2:   nil, /* AccelX */
-		3:   nil, /* AccelY */
-		4:   nil, /* AccelZ */
-		5:   nil, /* CalibratedAccelX */
-		6:   nil, /* CalibratedAccelY */
-		7:   nil, /* CalibratedAccelZ */
-		8:   nil, /* CompressedCalibratedAccelX */
-		9:   nil, /* CompressedCalibratedAccelY */
-		10:  nil, /* CompressedCalibratedAccelZ */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -80,41 +67,115 @@ func NewAccelerometerData(mesg proto.Message) *AccelerometerData {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to AccelerometerData mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumAccelerometerData)
-func (m *AccelerometerData) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts AccelerometerData into proto.Message.
+func (m *AccelerometerData) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumAccelerometerData)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumAccelerometerData {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.TimestampMs,
-		1:   m.SampleTimeOffset,
-		2:   m.AccelX,
-		3:   m.AccelY,
-		4:   m.AccelZ,
-		5:   m.CalibratedAccelX,
-		6:   m.CalibratedAccelY,
-		7:   m.CalibratedAccelZ,
-		8:   m.CompressedCalibratedAccelX,
-		9:   m.CompressedCalibratedAccelY,
-		10:  m.CompressedCalibratedAccelZ,
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.SampleTimeOffset != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.SampleTimeOffset
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AccelX != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.AccelX
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AccelY != nil {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.AccelY
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AccelZ != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.AccelZ
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedAccelX != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.CalibratedAccelX
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedAccelY != nil {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.CalibratedAccelY
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CalibratedAccelZ != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.CalibratedAccelZ
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CompressedCalibratedAccelX != nil {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.CompressedCalibratedAccelX
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CompressedCalibratedAccelY != nil {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.CompressedCalibratedAccelY
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CompressedCalibratedAccelZ != nil {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.CompressedCalibratedAccelZ
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of AccelerometerData's valid fields.
+func (m *AccelerometerData) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		size++
+	}
+	if m.SampleTimeOffset != nil {
+		size++
+	}
+	if m.AccelX != nil {
+		size++
+	}
+	if m.AccelY != nil {
+		size++
+	}
+	if m.AccelZ != nil {
+		size++
+	}
+	if m.CalibratedAccelX != nil {
+		size++
+	}
+	if m.CalibratedAccelY != nil {
+		size++
+	}
+	if m.CalibratedAccelZ != nil {
+		size++
+	}
+	if m.CompressedCalibratedAccelX != nil {
+		size++
+	}
+	if m.CompressedCalibratedAccelY != nil {
+		size++
+	}
+	if m.CompressedCalibratedAccelZ != nil {
+		size++
+	}
+	return size
 }

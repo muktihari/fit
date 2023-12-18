@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -38,20 +39,7 @@ func NewSet(mesg proto.Message) *Set {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* Timestamp */
-		0:   nil, /* Duration */
-		3:   nil, /* Repetitions */
-		4:   nil, /* Weight */
-		5:   nil, /* SetType */
-		6:   nil, /* StartTime */
-		7:   nil, /* Category */
-		8:   nil, /* CategorySubtype */
-		9:   nil, /* WeightDisplayUnit */
-		10:  nil, /* MessageIndex */
-		11:  nil, /* WktStepIndex */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -77,40 +65,107 @@ func NewSet(mesg proto.Message) *Set {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Set mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSet)
-func (m *Set) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Set into proto.Message.
+func (m *Set) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSet)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSet {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.Duration,
-		3:   m.Repetitions,
-		4:   m.Weight,
-		5:   typeconv.ToUint8[uint8](m.SetType),
-		6:   typeconv.ToUint32[uint32](m.StartTime),
-		7:   typeconv.ToSliceUint16[uint16](m.Category),
-		8:   m.CategorySubtype,
-		9:   typeconv.ToUint16[uint16](m.WeightDisplayUnit),
-		10:  typeconv.ToUint16[uint16](m.MessageIndex),
-		11:  typeconv.ToUint16[uint16](m.WktStepIndex),
+	if m.Duration != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Duration
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Repetitions != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Repetitions
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Weight != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Weight
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8[uint8](m.SetType) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = typeconv.ToUint8[uint8](m.SetType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = typeconv.ToUint32[uint32](m.StartTime)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToSliceUint16[uint16](m.Category) != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = typeconv.ToSliceUint16[uint16](m.Category)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CategorySubtype != nil {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.CategorySubtype
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.WeightDisplayUnit) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = typeconv.ToUint16[uint16](m.WeightDisplayUnit)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.WktStepIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = typeconv.ToUint16[uint16](m.WktStepIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Set's valid fields.
+func (m *Set) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Duration != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Repetitions != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Weight != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.SetType) != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToSliceUint16[uint16](m.Category) != nil {
+		size++
+	}
+	if m.CategorySubtype != nil {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.WeightDisplayUnit) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.WktStepIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

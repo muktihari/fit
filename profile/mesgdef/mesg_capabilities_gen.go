@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,14 +33,7 @@ func NewMesgCapabilities(mesg proto.Message) *MesgCapabilities {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* File */
-		1:   nil, /* MesgNum */
-		2:   nil, /* CountType */
-		3:   nil, /* Count */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -59,34 +53,59 @@ func NewMesgCapabilities(mesg proto.Message) *MesgCapabilities {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to MesgCapabilities mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumMesgCapabilities)
-func (m *MesgCapabilities) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts MesgCapabilities into proto.Message.
+func (m *MesgCapabilities) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumMesgCapabilities)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumMesgCapabilities {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   typeconv.ToEnum[byte](m.File),
-		1:   typeconv.ToUint16[uint16](m.MesgNum),
-		2:   typeconv.ToEnum[byte](m.CountType),
-		3:   m.Count,
+	if typeconv.ToEnum[byte](m.File) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToEnum[byte](m.File)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16[uint16](m.MesgNum)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.CountType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.CountType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Count != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Count
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of MesgCapabilities's valid fields.
+func (m *MesgCapabilities) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.File) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.CountType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Count != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

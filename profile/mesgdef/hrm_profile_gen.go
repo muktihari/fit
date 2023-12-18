@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,14 +33,7 @@ func NewHrmProfile(mesg proto.Message) *HrmProfile {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* Enabled */
-		1:   nil, /* HrmAntId */
-		2:   nil, /* LogHrv */
-		3:   nil, /* HrmAntIdTransType */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -59,34 +53,59 @@ func NewHrmProfile(mesg proto.Message) *HrmProfile {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to HrmProfile mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumHrmProfile)
-func (m *HrmProfile) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts HrmProfile into proto.Message.
+func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumHrmProfile)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumHrmProfile {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   m.Enabled,
-		1:   typeconv.ToUint16z[uint16](m.HrmAntId),
-		2:   m.LogHrv,
-		3:   typeconv.ToUint8z[uint8](m.HrmAntIdTransType),
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Enabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16z[uint16](m.HrmAntId) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16z[uint16](m.HrmAntId)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LogHrv != false {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.LogHrv
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.HrmAntIdTransType) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint8z[uint8](m.HrmAntIdTransType)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of HrmProfile's valid fields.
+func (m *HrmProfile) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Enabled != false {
+		size++
+	}
+	if typeconv.ToUint16z[uint16](m.HrmAntId) != basetype.Uint16zInvalid {
+		size++
+	}
+	if m.LogHrv != false {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.HrmAntIdTransType) != basetype.Uint8zInvalid {
+		size++
+	}
+	return size
 }

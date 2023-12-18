@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -31,13 +32,7 @@ func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* ScreenIndex */
-		1: nil, /* FieldCount */
-		2: nil, /* Layout */
-		3: nil, /* ScreenEnabled */
-	}
-
+	vals := [4]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -56,33 +51,51 @@ func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ExdScreenConfiguration mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumExdScreenConfiguration)
-func (m *ExdScreenConfiguration) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ExdScreenConfiguration into proto.Message.
+func (m *ExdScreenConfiguration) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumExdScreenConfiguration)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumExdScreenConfiguration {
-		return
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ScreenIndex
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.ScreenIndex,
-		1: m.FieldCount,
-		2: typeconv.ToEnum[byte](m.Layout),
-		3: m.ScreenEnabled,
+	if m.FieldCount != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.FieldCount
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToEnum[byte](m.Layout) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.Layout)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ScreenEnabled != false {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.ScreenEnabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ExdScreenConfiguration's valid fields.
+func (m *ExdScreenConfiguration) size() byte {
+	var size byte
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		size++
+	}
+	if m.FieldCount != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Layout) != basetype.EnumInvalid {
+		size++
+	}
+	if m.ScreenEnabled != false {
+		size++
+	}
+	return size
 }

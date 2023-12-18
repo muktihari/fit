@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -41,23 +42,7 @@ func NewWeightScale(mesg proto.Message) *WeightScale {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* Weight */
-		1:   nil, /* PercentFat */
-		2:   nil, /* PercentHydration */
-		3:   nil, /* VisceralFatMass */
-		4:   nil, /* BoneMass */
-		5:   nil, /* MuscleMass */
-		7:   nil, /* BasalMet */
-		8:   nil, /* PhysiqueRating */
-		9:   nil, /* ActiveMet */
-		10:  nil, /* MetabolicAge */
-		11:  nil, /* VisceralFatRating */
-		12:  nil, /* UserProfileIndex */
-		13:  nil, /* Bmi */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -86,43 +71,131 @@ func NewWeightScale(mesg proto.Message) *WeightScale {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to WeightScale mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumWeightScale)
-func (m *WeightScale) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts WeightScale into proto.Message.
+func (m *WeightScale) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumWeightScale)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumWeightScale {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToUint16[uint16](m.Weight),
-		1:   m.PercentFat,
-		2:   m.PercentHydration,
-		3:   m.VisceralFatMass,
-		4:   m.BoneMass,
-		5:   m.MuscleMass,
-		7:   m.BasalMet,
-		8:   m.PhysiqueRating,
-		9:   m.ActiveMet,
-		10:  m.MetabolicAge,
-		11:  m.VisceralFatRating,
-		12:  typeconv.ToUint16[uint16](m.UserProfileIndex),
-		13:  m.Bmi,
+	if typeconv.ToUint16[uint16](m.Weight) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint16[uint16](m.Weight)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.PercentFat != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.PercentFat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PercentHydration != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.PercentHydration
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.VisceralFatMass != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.VisceralFatMass
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BoneMass != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.BoneMass
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MuscleMass != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.MuscleMass
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BasalMet != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.BasalMet
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PhysiqueRating != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.PhysiqueRating
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ActiveMet != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.ActiveMet
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MetabolicAge != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.MetabolicAge
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.VisceralFatRating != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.VisceralFatRating
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = typeconv.ToUint16[uint16](m.UserProfileIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Bmi != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.Bmi
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of WeightScale's valid fields.
+func (m *WeightScale) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.Weight) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PercentFat != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PercentHydration != basetype.Uint16Invalid {
+		size++
+	}
+	if m.VisceralFatMass != basetype.Uint16Invalid {
+		size++
+	}
+	if m.BoneMass != basetype.Uint16Invalid {
+		size++
+	}
+	if m.MuscleMass != basetype.Uint16Invalid {
+		size++
+	}
+	if m.BasalMet != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PhysiqueRating != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ActiveMet != basetype.Uint16Invalid {
+		size++
+	}
+	if m.MetabolicAge != basetype.Uint8Invalid {
+		size++
+	}
+	if m.VisceralFatRating != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Bmi != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

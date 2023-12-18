@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,16 +35,7 @@ func NewClimbPro(mesg proto.Message) *ClimbPro {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* PositionLat */
-		1:   nil, /* PositionLong */
-		2:   nil, /* ClimbProEvent */
-		3:   nil, /* ClimbNumber */
-		4:   nil, /* ClimbCategory */
-		5:   nil, /* CurrentDist */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -65,36 +57,75 @@ func NewClimbPro(mesg proto.Message) *ClimbPro {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ClimbPro mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumClimbPro)
-func (m *ClimbPro) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ClimbPro into proto.Message.
+func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumClimbPro)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumClimbPro {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.PositionLat,
-		1:   m.PositionLong,
-		2:   typeconv.ToEnum[byte](m.ClimbProEvent),
-		3:   m.ClimbNumber,
-		4:   m.ClimbCategory,
-		5:   m.CurrentDist,
+	if m.PositionLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.PositionLat
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.PositionLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.PositionLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.ClimbProEvent) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.ClimbProEvent)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ClimbNumber != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.ClimbNumber
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ClimbCategory != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.ClimbCategory
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.CurrentDist
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ClimbPro's valid fields.
+func (m *ClimbPro) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.ClimbProEvent) != basetype.EnumInvalid {
+		size++
+	}
+	if m.ClimbNumber != basetype.Uint16Invalid {
+		size++
+	}
+	if m.ClimbCategory != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

@@ -28,10 +28,7 @@ func NewHrv(mesg proto.Message) *Hrv {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* Time */
-	}
-
+	vals := [1]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -47,30 +44,27 @@ func NewHrv(mesg proto.Message) *Hrv {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Hrv mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumHrv)
-func (m *Hrv) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Hrv into proto.Message.
+func (m *Hrv) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumHrv)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumHrv {
-		return
-	}
-
-	vals := [...]any{
-		0: m.Time,
-	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Time != nil {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Time
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Hrv's valid fields.
+func (m *Hrv) size() byte {
+	var size byte
+	if m.Time != nil {
+		size++
+	}
+	return size
 }

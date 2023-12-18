@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -20,7 +21,7 @@ type ExdDataFieldConfiguration struct {
 	FieldId      uint8
 	ConceptCount uint8
 	DisplayType  typedef.ExdDisplayType
-	Title        string
+	Title        []string // Array: [32];
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -33,15 +34,7 @@ func NewExdDataFieldConfiguration(mesg proto.Message) *ExdDataFieldConfiguration
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		0: nil, /* ScreenIndex */
-		1: nil, /* ConceptField */
-		2: nil, /* FieldId */
-		3: nil, /* ConceptCount */
-		4: nil, /* DisplayType */
-		5: nil, /* Title */
-	}
-
+	vals := [6]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -56,41 +49,73 @@ func NewExdDataFieldConfiguration(mesg proto.Message) *ExdDataFieldConfiguration
 		FieldId:      typeconv.ToUint8[uint8](vals[2]),
 		ConceptCount: typeconv.ToUint8[uint8](vals[3]),
 		DisplayType:  typeconv.ToEnum[typedef.ExdDisplayType](vals[4]),
-		Title:        typeconv.ToString[string](vals[5]),
+		Title:        typeconv.ToSliceString[string](vals[5]),
 
 		DeveloperFields: mesg.DeveloperFields,
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to ExdDataFieldConfiguration mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumExdDataFieldConfiguration)
-func (m *ExdDataFieldConfiguration) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts ExdDataFieldConfiguration into proto.Message.
+func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumExdDataFieldConfiguration)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumExdDataFieldConfiguration {
-		return
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ScreenIndex
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		0: m.ScreenIndex,
-		1: m.ConceptField,
-		2: m.FieldId,
-		3: m.ConceptCount,
-		4: typeconv.ToEnum[byte](m.DisplayType),
-		5: m.Title,
+	if m.ConceptField != basetype.ByteInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.ConceptField
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.FieldId != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.FieldId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ConceptCount != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.ConceptCount
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DisplayType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToEnum[byte](m.DisplayType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Title != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.Title
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of ExdDataFieldConfiguration's valid fields.
+func (m *ExdDataFieldConfiguration) size() byte {
+	var size byte
+	if m.ScreenIndex != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ConceptField != basetype.ByteInvalid {
+		size++
+	}
+	if m.FieldId != basetype.Uint8Invalid {
+		size++
+	}
+	if m.ConceptCount != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DisplayType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Title != nil {
+		size++
+	}
+	return size
 }

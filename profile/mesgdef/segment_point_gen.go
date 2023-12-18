@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -34,16 +35,7 @@ func NewSegmentPoint(mesg proto.Message) *SegmentPoint {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		1:   nil, /* PositionLat */
-		2:   nil, /* PositionLong */
-		3:   nil, /* Distance */
-		4:   nil, /* Altitude */
-		5:   nil, /* LeaderTime */
-		6:   nil, /* EnhancedAltitude */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -65,36 +57,75 @@ func NewSegmentPoint(mesg proto.Message) *SegmentPoint {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SegmentPoint mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSegmentPoint)
-func (m *SegmentPoint) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SegmentPoint into proto.Message.
+func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentPoint)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSegmentPoint {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		1:   m.PositionLat,
-		2:   m.PositionLong,
-		3:   m.Distance,
-		4:   m.Altitude,
-		5:   m.LeaderTime,
-		6:   m.EnhancedAltitude,
+	if m.PositionLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.PositionLat
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.PositionLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.PositionLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Distance != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Distance
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Altitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Altitude
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LeaderTime != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.LeaderTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.EnhancedAltitude
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SegmentPoint's valid fields.
+func (m *SegmentPoint) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		size++
+	}
+	if m.Distance != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Altitude != basetype.Uint16Invalid {
+		size++
+	}
+	if m.LeaderTime != nil {
+		size++
+	}
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

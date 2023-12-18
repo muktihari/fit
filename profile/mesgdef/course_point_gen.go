@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,17 +36,7 @@ func NewCoursePoint(mesg proto.Message) *CoursePoint {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		1:   nil, /* Timestamp */
-		2:   nil, /* PositionLat */
-		3:   nil, /* PositionLong */
-		4:   nil, /* Distance */
-		5:   nil, /* Type */
-		6:   nil, /* Name */
-		8:   nil, /* Favorite */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -68,37 +59,83 @@ func NewCoursePoint(mesg proto.Message) *CoursePoint {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to CoursePoint mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumCoursePoint)
-func (m *CoursePoint) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts CoursePoint into proto.Message.
+func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumCoursePoint)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumCoursePoint {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		1:   typeconv.ToUint32[uint32](m.Timestamp),
-		2:   m.PositionLat,
-		3:   m.PositionLong,
-		4:   m.Distance,
-		5:   typeconv.ToEnum[byte](m.Type),
-		6:   m.Name,
-		8:   m.Favorite,
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.PositionLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.PositionLat
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.PositionLong
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Distance != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Distance
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = typeconv.ToEnum[byte](m.Type)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.Name
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Favorite != false {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.Favorite
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of CoursePoint's valid fields.
+func (m *CoursePoint) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.PositionLat != basetype.Sint32Invalid {
+		size++
+	}
+	if m.PositionLong != basetype.Sint32Invalid {
+		size++
+	}
+	if m.Distance != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		size++
+	}
+	if m.Favorite != false {
+		size++
+	}
+	return size
 }

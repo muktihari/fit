@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,17 +36,7 @@ func NewWorkout(mesg proto.Message) *Workout {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		4:   nil, /* Sport */
-		5:   nil, /* Capabilities */
-		6:   nil, /* NumValidSteps */
-		8:   nil, /* WktName */
-		11:  nil, /* SubSport */
-		14:  nil, /* PoolLength */
-		15:  nil, /* PoolLengthUnit */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -68,37 +59,83 @@ func NewWorkout(mesg proto.Message) *Workout {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to Workout mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumWorkout)
-func (m *Workout) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts Workout into proto.Message.
+func (m *Workout) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkout)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumWorkout {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		4:   typeconv.ToEnum[byte](m.Sport),
-		5:   typeconv.ToUint32z[uint32](m.Capabilities),
-		6:   m.NumValidSteps,
-		8:   m.WktName,
-		11:  typeconv.ToEnum[byte](m.SubSport),
-		14:  m.PoolLength,
-		15:  typeconv.ToEnum[byte](m.PoolLengthUnit),
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToEnum[byte](m.Sport)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint32z[uint32](m.Capabilities) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = typeconv.ToUint32z[uint32](m.Capabilities)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.NumValidSteps != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.NumValidSteps
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.WktName != basetype.StringInvalid && m.WktName != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.WktName
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.PoolLength != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.PoolLength
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.PoolLengthUnit) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = typeconv.ToEnum[byte](m.PoolLengthUnit)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of Workout's valid fields.
+func (m *Workout) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint32z[uint32](m.Capabilities) != basetype.Uint32zInvalid {
+		size++
+	}
+	if m.NumValidSteps != basetype.Uint16Invalid {
+		size++
+	}
+	if m.WktName != basetype.StringInvalid && m.WktName != "" {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+		size++
+	}
+	if m.PoolLength != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.PoolLengthUnit) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

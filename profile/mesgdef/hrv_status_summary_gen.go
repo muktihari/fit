@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,17 +36,7 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* WeeklyAverage */
-		1:   nil, /* LastNightAverage */
-		2:   nil, /* LastNight5MinHigh */
-		3:   nil, /* BaselineLowUpper */
-		4:   nil, /* BaselineBalancedLower */
-		5:   nil, /* BaselineBalancedUpper */
-		6:   nil, /* Status */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -68,37 +59,83 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to HrvStatusSummary mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumHrvStatusSummary)
-func (m *HrvStatusSummary) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts HrvStatusSummary into proto.Message.
+func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumHrvStatusSummary)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumHrvStatusSummary {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   m.WeeklyAverage,
-		1:   m.LastNightAverage,
-		2:   m.LastNight5MinHigh,
-		3:   m.BaselineLowUpper,
-		4:   m.BaselineBalancedLower,
-		5:   m.BaselineBalancedUpper,
-		6:   typeconv.ToEnum[byte](m.Status),
+	if m.WeeklyAverage != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.WeeklyAverage
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.LastNightAverage != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.LastNightAverage
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LastNight5MinHigh != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.LastNight5MinHigh
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BaselineLowUpper != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.BaselineLowUpper
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BaselineBalancedLower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.BaselineBalancedLower
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BaselineBalancedUpper != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.BaselineBalancedUpper
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = typeconv.ToEnum[byte](m.Status)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of HrvStatusSummary's valid fields.
+func (m *HrvStatusSummary) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.WeeklyAverage != basetype.Uint16Invalid {
+		size++
+	}
+	if m.LastNightAverage != basetype.Uint16Invalid {
+		size++
+	}
+	if m.LastNight5MinHigh != basetype.Uint16Invalid {
+		size++
+	}
+	if m.BaselineLowUpper != basetype.Uint16Invalid {
+		size++
+	}
+	if m.BaselineBalancedLower != basetype.Uint16Invalid {
+		size++
+	}
+	if m.BaselineBalancedUpper != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

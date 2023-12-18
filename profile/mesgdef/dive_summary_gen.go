@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -50,32 +51,7 @@ func NewDiveSummary(mesg proto.Message) *DiveSummary {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* ReferenceMesg */
-		1:   nil, /* ReferenceIndex */
-		2:   nil, /* AvgDepth */
-		3:   nil, /* MaxDepth */
-		4:   nil, /* SurfaceInterval */
-		5:   nil, /* StartCns */
-		6:   nil, /* EndCns */
-		7:   nil, /* StartN2 */
-		8:   nil, /* EndN2 */
-		9:   nil, /* O2Toxicity */
-		10:  nil, /* DiveNumber */
-		11:  nil, /* BottomTime */
-		12:  nil, /* AvgPressureSac */
-		13:  nil, /* AvgVolumeSac */
-		14:  nil, /* AvgRmv */
-		15:  nil, /* DescentTime */
-		16:  nil, /* AscentTime */
-		17:  nil, /* AvgAscentRate */
-		22:  nil, /* AvgDescentRate */
-		23:  nil, /* MaxAscentRate */
-		24:  nil, /* MaxDescentRate */
-		25:  nil, /* HangTime */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -113,52 +89,203 @@ func NewDiveSummary(mesg proto.Message) *DiveSummary {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DiveSummary mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDiveSummary)
-func (m *DiveSummary) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts DiveSummary into proto.Message.
+func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveSummary)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumDiveSummary {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToUint16[uint16](m.ReferenceMesg),
-		1:   typeconv.ToUint16[uint16](m.ReferenceIndex),
-		2:   m.AvgDepth,
-		3:   m.MaxDepth,
-		4:   m.SurfaceInterval,
-		5:   m.StartCns,
-		6:   m.EndCns,
-		7:   m.StartN2,
-		8:   m.EndN2,
-		9:   m.O2Toxicity,
-		10:  m.DiveNumber,
-		11:  m.BottomTime,
-		12:  m.AvgPressureSac,
-		13:  m.AvgVolumeSac,
-		14:  m.AvgRmv,
-		15:  m.DescentTime,
-		16:  m.AscentTime,
-		17:  m.AvgAscentRate,
-		22:  m.AvgDescentRate,
-		23:  m.MaxAscentRate,
-		24:  m.MaxDescentRate,
-		25:  m.HangTime,
+	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint16[uint16](m.ReferenceMesg)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16[uint16](m.ReferenceIndex)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.AvgDepth
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.MaxDepth
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SurfaceInterval != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.SurfaceInterval
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.StartCns != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.StartCns
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EndCns != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.EndCns
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.StartN2 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.StartN2
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.EndN2 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.EndN2
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.O2Toxicity != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.O2Toxicity
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DiveNumber != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.DiveNumber
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BottomTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.BottomTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgPressureSac != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.AvgPressureSac
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgVolumeSac != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.AvgVolumeSac
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgRmv != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.AvgRmv
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DescentTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.DescentTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AscentTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = m.AscentTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgAscentRate != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = m.AvgAscentRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.AvgDescentRate != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = m.AvgDescentRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxAscentRate != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = m.MaxAscentRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.MaxDescentRate != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = m.MaxDescentRate
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.HangTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 25)
+		field.Value = m.HangTime
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of DiveSummary's valid fields.
+func (m *DiveSummary) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.AvgDepth != basetype.Uint32Invalid {
+		size++
+	}
+	if m.MaxDepth != basetype.Uint32Invalid {
+		size++
+	}
+	if m.SurfaceInterval != basetype.Uint32Invalid {
+		size++
+	}
+	if m.StartCns != basetype.Uint8Invalid {
+		size++
+	}
+	if m.EndCns != basetype.Uint8Invalid {
+		size++
+	}
+	if m.StartN2 != basetype.Uint16Invalid {
+		size++
+	}
+	if m.EndN2 != basetype.Uint16Invalid {
+		size++
+	}
+	if m.O2Toxicity != basetype.Uint16Invalid {
+		size++
+	}
+	if m.DiveNumber != basetype.Uint32Invalid {
+		size++
+	}
+	if m.BottomTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.AvgPressureSac != basetype.Uint16Invalid {
+		size++
+	}
+	if m.AvgVolumeSac != basetype.Uint16Invalid {
+		size++
+	}
+	if m.AvgRmv != basetype.Uint16Invalid {
+		size++
+	}
+	if m.DescentTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.AscentTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.AvgAscentRate != basetype.Sint32Invalid {
+		size++
+	}
+	if m.AvgDescentRate != basetype.Uint32Invalid {
+		size++
+	}
+	if m.MaxAscentRate != basetype.Uint32Invalid {
+		size++
+	}
+	if m.MaxDescentRate != basetype.Uint32Invalid {
+		size++
+	}
+	if m.HangTime != basetype.Uint32Invalid {
+		size++
+	}
+	return size
 }

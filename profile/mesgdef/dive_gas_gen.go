@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -32,14 +33,7 @@ func NewDiveGas(mesg proto.Message) *DiveGas {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* HeliumContent */
-		1:   nil, /* OxygenContent */
-		2:   nil, /* Status */
-		3:   nil, /* Mode */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -59,34 +53,59 @@ func NewDiveGas(mesg proto.Message) *DiveGas {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DiveGas mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDiveGas)
-func (m *DiveGas) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts DiveGas into proto.Message.
+func (m *DiveGas) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveGas)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumDiveGas {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   m.HeliumContent,
-		1:   m.OxygenContent,
-		2:   typeconv.ToEnum[byte](m.Status),
-		3:   typeconv.ToEnum[byte](m.Mode),
+	if m.HeliumContent != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.HeliumContent
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.OxygenContent != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.OxygenContent
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToEnum[byte](m.Status)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToEnum[byte](m.Mode)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of DiveGas's valid fields.
+func (m *DiveGas) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.HeliumContent != basetype.Uint8Invalid {
+		size++
+	}
+	if m.OxygenContent != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

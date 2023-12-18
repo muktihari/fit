@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -62,44 +63,7 @@ func NewDiveSettings(mesg proto.Message) *DiveSettings {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		254: nil, /* MessageIndex */
-		0:   nil, /* Name */
-		1:   nil, /* Model */
-		2:   nil, /* GfLow */
-		3:   nil, /* GfHigh */
-		4:   nil, /* WaterType */
-		5:   nil, /* WaterDensity */
-		6:   nil, /* Po2Warn */
-		7:   nil, /* Po2Critical */
-		8:   nil, /* Po2Deco */
-		9:   nil, /* SafetyStopEnabled */
-		10:  nil, /* BottomDepth */
-		11:  nil, /* BottomTime */
-		12:  nil, /* ApneaCountdownEnabled */
-		13:  nil, /* ApneaCountdownTime */
-		14:  nil, /* BacklightMode */
-		15:  nil, /* BacklightBrightness */
-		16:  nil, /* BacklightTimeout */
-		17:  nil, /* RepeatDiveInterval */
-		18:  nil, /* SafetyStopTime */
-		19:  nil, /* HeartRateSourceType */
-		20:  nil, /* HeartRateSource */
-		21:  nil, /* TravelGas */
-		22:  nil, /* CcrLowSetpointSwitchMode */
-		23:  nil, /* CcrLowSetpoint */
-		24:  nil, /* CcrLowSetpointDepth */
-		25:  nil, /* CcrHighSetpointSwitchMode */
-		26:  nil, /* CcrHighSetpoint */
-		27:  nil, /* CcrHighSetpointDepth */
-		29:  nil, /* GasConsumptionDisplay */
-		30:  nil, /* UpKeyEnabled */
-		35:  nil, /* DiveSounds */
-		36:  nil, /* LastStopMultiple */
-		37:  nil, /* NoFlyTimeMode */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -149,64 +113,299 @@ func NewDiveSettings(mesg proto.Message) *DiveSettings {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DiveSettings mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDiveSettings)
-func (m *DiveSettings) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts DiveSettings into proto.Message.
+func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveSettings)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumDiveSettings {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   m.Name,
-		1:   typeconv.ToEnum[byte](m.Model),
-		2:   m.GfLow,
-		3:   m.GfHigh,
-		4:   typeconv.ToEnum[byte](m.WaterType),
-		5:   m.WaterDensity,
-		6:   m.Po2Warn,
-		7:   m.Po2Critical,
-		8:   m.Po2Deco,
-		9:   m.SafetyStopEnabled,
-		10:  m.BottomDepth,
-		11:  m.BottomTime,
-		12:  m.ApneaCountdownEnabled,
-		13:  m.ApneaCountdownTime,
-		14:  typeconv.ToEnum[byte](m.BacklightMode),
-		15:  m.BacklightBrightness,
-		16:  typeconv.ToUint8[uint8](m.BacklightTimeout),
-		17:  m.RepeatDiveInterval,
-		18:  m.SafetyStopTime,
-		19:  typeconv.ToEnum[byte](m.HeartRateSourceType),
-		20:  m.HeartRateSource,
-		21:  typeconv.ToUint16[uint16](m.TravelGas),
-		22:  typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode),
-		23:  m.CcrLowSetpoint,
-		24:  m.CcrLowSetpointDepth,
-		25:  typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode),
-		26:  m.CcrHighSetpoint,
-		27:  m.CcrHighSetpointDepth,
-		29:  typeconv.ToEnum[byte](m.GasConsumptionDisplay),
-		30:  m.UpKeyEnabled,
-		35:  typeconv.ToEnum[byte](m.DiveSounds),
-		36:  m.LastStopMultiple,
-		37:  typeconv.ToEnum[byte](m.NoFlyTimeMode),
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Name
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.Model) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToEnum[byte](m.Model)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.GfLow != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.GfLow
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.GfHigh != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.GfHigh
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.WaterType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToEnum[byte](m.WaterType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.WaterDensity) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.WaterDensity
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Po2Warn != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.Po2Warn
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Po2Critical != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.Po2Critical
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Po2Deco != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.Po2Deco
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SafetyStopEnabled != false {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.SafetyStopEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32[uint32](m.BottomDepth) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.BottomDepth
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BottomTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.BottomTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ApneaCountdownEnabled != false {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.ApneaCountdownEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ApneaCountdownTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.ApneaCountdownTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = typeconv.ToEnum[byte](m.BacklightMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BacklightBrightness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.BacklightBrightness
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8[uint8](m.BacklightTimeout) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = typeconv.ToUint8[uint8](m.BacklightTimeout)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RepeatDiveInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = m.RepeatDiveInterval
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SafetyStopTime != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = m.SafetyStopTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.HeartRateSourceType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 19)
+		field.Value = typeconv.ToEnum[byte](m.HeartRateSourceType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.HeartRateSource != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = m.HeartRateSource
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.TravelGas) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = typeconv.ToUint16[uint16](m.TravelGas)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CcrLowSetpoint != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = m.CcrLowSetpoint
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CcrLowSetpointDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = m.CcrLowSetpointDepth
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 25)
+		field.Value = typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CcrHighSetpoint != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 26)
+		field.Value = m.CcrHighSetpoint
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CcrHighSetpointDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 27)
+		field.Value = m.CcrHighSetpointDepth
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.GasConsumptionDisplay) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 29)
+		field.Value = typeconv.ToEnum[byte](m.GasConsumptionDisplay)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.UpKeyEnabled != false {
+		field := fac.CreateField(mesg.Num, 30)
+		field.Value = m.UpKeyEnabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.DiveSounds) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 35)
+		field.Value = typeconv.ToEnum[byte](m.DiveSounds)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LastStopMultiple != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 36)
+		field.Value = m.LastStopMultiple
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.NoFlyTimeMode) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 37)
+		field.Value = typeconv.ToEnum[byte](m.NoFlyTimeMode)
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of DiveSettings's valid fields.
+func (m *DiveSettings) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.Model) != basetype.EnumInvalid {
+		size++
+	}
+	if m.GfLow != basetype.Uint8Invalid {
+		size++
+	}
+	if m.GfHigh != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.WaterType) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.WaterDensity) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.Po2Warn != basetype.Uint8Invalid {
+		size++
+	}
+	if m.Po2Critical != basetype.Uint8Invalid {
+		size++
+	}
+	if m.Po2Deco != basetype.Uint8Invalid {
+		size++
+	}
+	if m.SafetyStopEnabled != false {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.BottomDepth) != basetype.Uint32Invalid {
+		size++
+	}
+	if m.BottomTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.ApneaCountdownEnabled != false {
+		size++
+	}
+	if m.ApneaCountdownTime != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+		size++
+	}
+	if m.BacklightBrightness != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.BacklightTimeout) != basetype.Uint8Invalid {
+		size++
+	}
+	if m.RepeatDiveInterval != basetype.Uint16Invalid {
+		size++
+	}
+	if m.SafetyStopTime != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.HeartRateSourceType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.HeartRateSource != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.TravelGas) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
+		size++
+	}
+	if m.CcrLowSetpoint != basetype.Uint8Invalid {
+		size++
+	}
+	if m.CcrLowSetpointDepth != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
+		size++
+	}
+	if m.CcrHighSetpoint != basetype.Uint8Invalid {
+		size++
+	}
+	if m.CcrHighSetpointDepth != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.GasConsumptionDisplay) != basetype.EnumInvalid {
+		size++
+	}
+	if m.UpKeyEnabled != false {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.DiveSounds) != basetype.EnumInvalid {
+		size++
+	}
+	if m.LastStopMultiple != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.NoFlyTimeMode) != basetype.EnumInvalid {
+		size++
+	}
+	return size
 }

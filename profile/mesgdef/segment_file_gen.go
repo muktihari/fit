@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -22,7 +23,7 @@ type SegmentFile struct {
 	LeaderType             []typedef.SegmentLeaderboardType // Array: [N]; Leader type of each leader in the segment file
 	LeaderGroupPrimaryKey  []uint32                         // Array: [N]; Group primary key of each leader in the segment file
 	LeaderActivityId       []uint32                         // Array: [N]; Activity ID of each leader in the segment file
-	LeaderActivityIdString string                           // String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
+	LeaderActivityIdString []string                         // Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
 	DefaultRaceLeader      uint8                            // Index for the Leader Board entry selected as the default race participant
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -36,18 +37,7 @@ func NewSegmentFile(mesg proto.Message) *SegmentFile {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		1:   nil, /* FileUuid */
-		3:   nil, /* Enabled */
-		4:   nil, /* UserProfilePrimaryKey */
-		7:   nil, /* LeaderType */
-		8:   nil, /* LeaderGroupPrimaryKey */
-		9:   nil, /* LeaderActivityId */
-		10:  nil, /* LeaderActivityIdString */
-		11:  nil, /* DefaultRaceLeader */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -64,45 +54,98 @@ func NewSegmentFile(mesg proto.Message) *SegmentFile {
 		LeaderType:             typeconv.ToSliceEnum[typedef.SegmentLeaderboardType](vals[7]),
 		LeaderGroupPrimaryKey:  typeconv.ToSliceUint32[uint32](vals[8]),
 		LeaderActivityId:       typeconv.ToSliceUint32[uint32](vals[9]),
-		LeaderActivityIdString: typeconv.ToString[string](vals[10]),
+		LeaderActivityIdString: typeconv.ToSliceString[string](vals[10]),
 		DefaultRaceLeader:      typeconv.ToUint8[uint8](vals[11]),
 
 		DeveloperFields: mesg.DeveloperFields,
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SegmentFile mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSegmentFile)
-func (m *SegmentFile) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SegmentFile into proto.Message.
+func (m *SegmentFile) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentFile)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSegmentFile {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		1:   m.FileUuid,
-		3:   m.Enabled,
-		4:   m.UserProfilePrimaryKey,
-		7:   typeconv.ToSliceEnum[byte](m.LeaderType),
-		8:   m.LeaderGroupPrimaryKey,
-		9:   m.LeaderActivityId,
-		10:  m.LeaderActivityIdString,
-		11:  m.DefaultRaceLeader,
+	if m.FileUuid != basetype.StringInvalid && m.FileUuid != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.FileUuid
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Enabled
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.UserProfilePrimaryKey
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToSliceEnum[byte](m.LeaderType) != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = typeconv.ToSliceEnum[byte](m.LeaderType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LeaderGroupPrimaryKey != nil {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.LeaderGroupPrimaryKey
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LeaderActivityId != nil {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.LeaderActivityId
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.LeaderActivityIdString != nil {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.LeaderActivityIdString
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.DefaultRaceLeader != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.DefaultRaceLeader
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SegmentFile's valid fields.
+func (m *SegmentFile) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.FileUuid != basetype.StringInvalid && m.FileUuid != "" {
+		size++
+	}
+	if m.Enabled != false {
+		size++
+	}
+	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToSliceEnum[byte](m.LeaderType) != nil {
+		size++
+	}
+	if m.LeaderGroupPrimaryKey != nil {
+		size++
+	}
+	if m.LeaderActivityId != nil {
+		size++
+	}
+	if m.LeaderActivityIdString != nil {
+		size++
+	}
+	if m.DefaultRaceLeader != basetype.Uint8Invalid {
+		size++
+	}
+	return size
 }

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -35,17 +36,7 @@ func NewSdmProfile(mesg proto.Message) *SdmProfile {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		254: nil, /* MessageIndex */
-		0:   nil, /* Enabled */
-		1:   nil, /* SdmAntId */
-		2:   nil, /* SdmCalFactor */
-		3:   nil, /* Odometer */
-		4:   nil, /* SpeedSource */
-		5:   nil, /* SdmAntIdTransType */
-		7:   nil, /* OdometerRollover */
-	}
-
+	vals := [255]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -68,37 +59,83 @@ func NewSdmProfile(mesg proto.Message) *SdmProfile {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to SdmProfile mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumSdmProfile)
-func (m *SdmProfile) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts SdmProfile into proto.Message.
+func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumSdmProfile)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumSdmProfile {
-		return
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		254: typeconv.ToUint16[uint16](m.MessageIndex),
-		0:   m.Enabled,
-		1:   typeconv.ToUint16z[uint16](m.SdmAntId),
-		2:   m.SdmCalFactor,
-		3:   m.Odometer,
-		4:   m.SpeedSource,
-		5:   typeconv.ToUint8z[uint8](m.SdmAntIdTransType),
-		7:   m.OdometerRollover,
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Enabled
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToUint16z[uint16](m.SdmAntId) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToUint16z[uint16](m.SdmAntId)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SdmCalFactor != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.SdmCalFactor
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Odometer != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Odometer
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SpeedSource != false {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.SpeedSource
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.SdmAntIdTransType) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = typeconv.ToUint8z[uint8](m.SdmAntIdTransType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.OdometerRollover != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.OdometerRollover
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of SdmProfile's valid fields.
+func (m *SdmProfile) size() byte {
+	var size byte
+	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Enabled != false {
+		size++
+	}
+	if typeconv.ToUint16z[uint16](m.SdmAntId) != basetype.Uint16zInvalid {
+		size++
+	}
+	if m.SdmCalFactor != basetype.Uint16Invalid {
+		size++
+	}
+	if m.Odometer != basetype.Uint32Invalid {
+		size++
+	}
+	if m.SpeedSource != false {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.SdmAntIdTransType) != basetype.Uint8zInvalid {
+		size++
+	}
+	if m.OdometerRollover != basetype.Uint8Invalid {
+		size++
+	}
+	return size
 }

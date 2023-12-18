@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -33,15 +34,7 @@ func NewMonitoringInfo(mesg proto.Message) *MonitoringInfo {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* LocalTimestamp */
-		1:   nil, /* ActivityType */
-		3:   nil, /* CyclesToDistance */
-		4:   nil, /* CyclesToCalories */
-		5:   nil, /* RestingMetabolicRate */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -62,35 +55,67 @@ func NewMonitoringInfo(mesg proto.Message) *MonitoringInfo {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to MonitoringInfo mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumMonitoringInfo)
-func (m *MonitoringInfo) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts MonitoringInfo into proto.Message.
+func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringInfo)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumMonitoringInfo {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToUint32[uint32](m.LocalTimestamp),
-		1:   typeconv.ToSliceEnum[byte](m.ActivityType),
-		3:   m.CyclesToDistance,
-		4:   m.CyclesToCalories,
-		5:   m.RestingMetabolicRate,
+	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint32[uint32](m.LocalTimestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = typeconv.ToSliceEnum[byte](m.ActivityType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CyclesToDistance != nil {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.CyclesToDistance
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CyclesToCalories != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.CyclesToCalories
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.RestingMetabolicRate != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.RestingMetabolicRate
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of MonitoringInfo's valid fields.
+func (m *MonitoringInfo) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
+		size++
+	}
+	if m.CyclesToDistance != nil {
+		size++
+	}
+	if m.CyclesToCalories != nil {
+		size++
+	}
+	if m.RestingMetabolicRate != basetype.Uint16Invalid {
+		size++
+	}
+	return size
 }

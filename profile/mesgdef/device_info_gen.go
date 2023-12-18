@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -46,28 +47,7 @@ func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
 		return nil
 	}
 
-	vals := [...]any{ // nil value will be converted to its corresponding invalid value by typeconv.
-		253: nil, /* Timestamp */
-		0:   nil, /* DeviceIndex */
-		1:   nil, /* DeviceType */
-		2:   nil, /* Manufacturer */
-		3:   nil, /* SerialNumber */
-		4:   nil, /* Product */
-		5:   nil, /* SoftwareVersion */
-		6:   nil, /* HardwareVersion */
-		7:   nil, /* CumOperatingTime */
-		10:  nil, /* BatteryVoltage */
-		11:  nil, /* BatteryStatus */
-		18:  nil, /* SensorPosition */
-		19:  nil, /* Descriptor */
-		20:  nil, /* AntTransmissionType */
-		21:  nil, /* AntDeviceNumber */
-		22:  nil, /* AntNetwork */
-		25:  nil, /* SourceType */
-		27:  nil, /* ProductName */
-		32:  nil, /* BatteryLevel */
-	}
-
+	vals := [254]any{}
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		if field.Num >= byte(len(vals)) {
@@ -101,48 +81,171 @@ func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
 	}
 }
 
-// PutMessage puts fields's value into mesg. If mesg is nil or mesg.Num is not equal to DeviceInfo mesg number, it will return nil.
-// It is the caller responsibility to provide the appropriate mesg, it's recommended to create mesg using factory:
-//
-//	factory.CreateMesg(typedef.MesgNumDeviceInfo)
-func (m *DeviceInfo) PutMessage(mesg *proto.Message) {
-	if mesg == nil {
-		return
-	}
+// ToMesg converts DeviceInfo into proto.Message.
+func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
+	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceInfo)
+	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if mesg.Num != typedef.MesgNumDeviceInfo {
-		return
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 253)
+		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	vals := [...]any{
-		253: typeconv.ToUint32[uint32](m.Timestamp),
-		0:   typeconv.ToUint8[uint8](m.DeviceIndex),
-		1:   m.DeviceType,
-		2:   typeconv.ToUint16[uint16](m.Manufacturer),
-		3:   typeconv.ToUint32z[uint32](m.SerialNumber),
-		4:   m.Product,
-		5:   m.SoftwareVersion,
-		6:   m.HardwareVersion,
-		7:   m.CumOperatingTime,
-		10:  m.BatteryVoltage,
-		11:  typeconv.ToUint8[uint8](m.BatteryStatus),
-		18:  typeconv.ToEnum[byte](m.SensorPosition),
-		19:  m.Descriptor,
-		20:  typeconv.ToUint8z[uint8](m.AntTransmissionType),
-		21:  typeconv.ToUint16z[uint16](m.AntDeviceNumber),
-		22:  typeconv.ToEnum[byte](m.AntNetwork),
-		25:  typeconv.ToEnum[byte](m.SourceType),
-		27:  m.ProductName,
-		32:  m.BatteryLevel,
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		mesg.Fields = append(mesg.Fields, field)
 	}
-
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		field.Value = vals[field.Num]
+	if m.DeviceType != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.DeviceType
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Product != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Product
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.SoftwareVersion != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.SoftwareVersion
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.HardwareVersion != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.HardwareVersion
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.CumOperatingTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.CumOperatingTime
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BatteryVoltage != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.BatteryVoltage
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = typeconv.ToUint8[uint8](m.BatteryStatus)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.SensorPosition) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = typeconv.ToEnum[byte](m.SensorPosition)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
+		field := fac.CreateField(mesg.Num, 19)
+		field.Value = m.Descriptor
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint8z[uint8](m.AntTransmissionType) != basetype.Uint8zInvalid {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = typeconv.ToUint8z[uint8](m.AntTransmissionType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToUint16z[uint16](m.AntDeviceNumber) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = typeconv.ToUint16z[uint16](m.AntDeviceNumber)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.AntNetwork) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = typeconv.ToEnum[byte](m.AntNetwork)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if typeconv.ToEnum[byte](m.SourceType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 25)
+		field.Value = typeconv.ToEnum[byte](m.SourceType)
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
+		field := fac.CreateField(mesg.Num, 27)
+		field.Value = m.ProductName
+		mesg.Fields = append(mesg.Fields, field)
+	}
+	if m.BatteryLevel != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 32)
+		field.Value = m.BatteryLevel
+		mesg.Fields = append(mesg.Fields, field)
 	}
 
 	mesg.DeveloperFields = m.DeveloperFields
+
+	return mesg
+}
+
+// size returns size of DeviceInfo's valid fields.
+func (m *DeviceInfo) size() byte {
+	var size byte
+	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+		size++
+	}
+	if m.DeviceType != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+		size++
+	}
+	if m.Product != basetype.Uint16Invalid {
+		size++
+	}
+	if m.SoftwareVersion != basetype.Uint16Invalid {
+		size++
+	}
+	if m.HardwareVersion != basetype.Uint8Invalid {
+		size++
+	}
+	if m.CumOperatingTime != basetype.Uint32Invalid {
+		size++
+	}
+	if m.BatteryVoltage != basetype.Uint16Invalid {
+		size++
+	}
+	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SensorPosition) != basetype.EnumInvalid {
+		size++
+	}
+	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
+		size++
+	}
+	if typeconv.ToUint8z[uint8](m.AntTransmissionType) != basetype.Uint8zInvalid {
+		size++
+	}
+	if typeconv.ToUint16z[uint16](m.AntDeviceNumber) != basetype.Uint16zInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.AntNetwork) != basetype.EnumInvalid {
+		size++
+	}
+	if typeconv.ToEnum[byte](m.SourceType) != basetype.EnumInvalid {
+		size++
+	}
+	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
+		size++
+	}
+	if m.BatteryLevel != basetype.Uint8Invalid {
+		size++
+	}
+	return size
 }
