@@ -17,50 +17,50 @@ import (
 
 func newCourseMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-			fieldnum.FileIdType:        uint8(typedef.FileCourse),
-			fieldnum.FileIdTimeCreated: datetime.ToUint32(now),
-		}),
-		factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-			fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-			fieldnum.FieldDescriptionDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.Course).WithFieldValues(map[byte]any{
-			fieldnum.CourseSport: uint8(typedef.SportRunning),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-			fieldnum.EventEvent:     uint8(typedef.EventActivity),
-			fieldnum.EventEventType: uint8(typedef.EventTypeStart),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Lap).WithFieldValues(map[byte]any{
-			fieldnum.LapTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileCourse)),
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+		),
+		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.Course).WithFields(
+			factory.CreateField(mesgnum.Course, fieldnum.CourseSport).WithValue(uint8(typedef.SportRunning)),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+			factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
+			factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
+			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 		// Unordered optional Messages
-		factory.CreateMesg(mesgnum.CoursePoint).WithFieldValues(map[byte]any{
-			fieldnum.CoursePointTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 		// Unrelated messages
-		factory.CreateMesg(mesgnum.BarometerData).WithFieldValues(map[byte]any{
-			fieldnum.BarometerDataTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 	}
 }
 

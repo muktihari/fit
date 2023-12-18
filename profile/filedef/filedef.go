@@ -6,7 +6,7 @@ package filedef
 
 import (
 	"github.com/muktihari/fit/kit/typeconv"
-	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"golang.org/x/exp/slices"
@@ -18,26 +18,19 @@ type File interface {
 	// Add adds message into file structure.
 	Add(mesg proto.Message)
 	// ToFit converts file back to proto.Fit structure.
-	ToFit(fac Factory) proto.Fit
+	ToFit(fac mesgdef.Factory) proto.Fit
 }
 
-// Factory is factory interface used in filedef package to convert a common type file back to its proto.Fit representation.
-type Factory interface {
-	CreateMesg(num typedef.MesgNum) proto.Message
-}
-
-// PutMessages bulks put messages
-func PutMessages[S []E, E PutMessage](factory Factory, messages *[]proto.Message, mesgNum typedef.MesgNum, s S) {
+// ToMesgs bulks convert mesgdef into proto.Message and append it to messages
+func ToMesgs[S []E, E PutMessage](messages *[]proto.Message, fac mesgdef.Factory, mesgNum typedef.MesgNum, s S) {
 	for i := range s {
-		mesg := factory.CreateMesg(mesgNum)
-		s[i].PutMessage(&mesg)
-		*messages = append(*messages, mesg)
+		*messages = append(*messages, s[i].ToMesg(fac))
 	}
 }
 
 // PutMessage is a type constraint to retrieve all mesgdef structures which implement PutMessage method.
 type PutMessage interface {
-	PutMessage(mesg *proto.Message)
+	ToMesg(fac mesgdef.Factory) proto.Message
 }
 
 // SortMessagesByTimestamp sorts messages by timestamp only if the message has timestamp field.
@@ -56,10 +49,6 @@ func SortMessagesByTimestamp(messages []proto.Message) {
 
 		timestamp1 := typeconv.ToUint32[uint32](value1)
 		timestamp2 := typeconv.ToUint32[uint32](value2)
-
-		if timestamp1 == basetype.Uint32Invalid || timestamp2 == basetype.Uint32Invalid {
-			return 0
-		}
 
 		if timestamp1 <= timestamp2 {
 			return -1

@@ -17,32 +17,32 @@ import (
 
 func newWorkoutMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-			fieldnum.FileIdType:        uint8(typedef.FileWorkout),
-			fieldnum.FileIdTimeCreated: datetime.ToUint32(now),
-		}),
-		factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-			fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-			fieldnum.FieldDescriptionDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.Workout).WithFieldValues(map[byte]any{
-			fieldnum.WorkoutSessionSport: uint8(typedef.SportSwimming),
-		}),
-		factory.CreateMesg(mesgnum.WorkoutStep).WithFieldValues(map[byte]any{
-			fieldnum.WorkoutStepEquipment: uint8(typedef.WorkoutEquipmentSwimFins),
-		}),
-		factory.CreateMesg(mesgnum.WorkoutStep).WithFieldValues(map[byte]any{
-			fieldnum.WorkoutStepEquipment: uint8(typedef.WorkoutEquipmentSwimSnorkel),
-		}),
+		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileWorkout)),
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+		),
+		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.Workout).WithFields(
+			factory.CreateField(mesgnum.Workout, fieldnum.WorkoutSport).WithValue(uint8(typedef.SportSwimming)),
+		),
+		factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
+			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepEquipment).WithValue(uint8(typedef.WorkoutEquipmentSwimFins)),
+		),
+		factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
+			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepEquipment).WithValue(uint8(typedef.WorkoutEquipmentSwimSnorkel)),
+		),
 		// Unrelated messages
-		factory.CreateMesg(mesgnum.CoursePoint).WithFieldValues(map[byte]any{
-			fieldnum.CoursePointTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.BarometerData).WithFieldValues(map[byte]any{
-			fieldnum.BarometerDataTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 	}
 }
 

@@ -45,81 +45,81 @@ func incrementSecond(v *time.Time) time.Time {
 
 func newActivityMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-			fieldnum.FileIdType:        uint8(typedef.FileActivity),
-			fieldnum.FileIdTimeCreated: datetime.ToUint32(now),
-		}),
-		factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-			fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-			fieldnum.FieldDescriptionDeveloperDataIndex: uint8(0),
-		}),
-		factory.CreateMesg(mesgnum.DeviceInfo).WithFieldValues(map[byte]any{
-			fieldnum.DeviceInfoManufacturer: uint16(typedef.ManufacturerGarmin),
-		}),
-		factory.CreateMesg(mesgnum.UserProfile).WithFieldValues(map[byte]any{
-			fieldnum.UserProfileFriendlyName: "Mary Jane",
-			fieldnum.UserProfileAge:          uint8(21),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-			fieldnum.EventEvent:     uint8(typedef.EventActivity),
-			fieldnum.EventEventType: uint8(typedef.EventTypeStart),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Event).WithFieldValues(map[byte]any{
-			fieldnum.EventTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Lap).WithFieldValues(map[byte]any{
-			fieldnum.LapTimestamp: datetime.ToUint32(now), // intentionally using same timestamp as last message
-		}),
-		factory.CreateMesg(mesgnum.Session).WithFieldValues(map[byte]any{
-			fieldnum.SessionTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Activity).WithFieldValues(map[byte]any{
-			fieldnum.ActivityTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+		),
+		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+		),
+		factory.CreateMesgOnly(mesgnum.DeviceInfo).WithFields(
+			factory.CreateField(mesgnum.DeviceInfo, fieldnum.DeviceInfoManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
+		),
+		factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileFriendlyName).WithValue("Mary Jane"),
+			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileAge).WithValue(uint8(21)),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+			factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
+			factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
+			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)), // intentionally using same timestamp as last messag)e
+		),
+		factory.CreateMesgOnly(mesgnum.Session).WithFields(
+			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Activity).WithFields(
+			factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 		// Unordered pptional Messages
-		factory.CreateMesg(mesgnum.Length).WithFieldValues(map[byte]any{
-			fieldnum.LengthAvgSpeed: uint16(1000),
-		}),
-		factory.CreateMesg(mesgnum.SegmentLap).WithFieldValues(map[byte]any{
-			fieldnum.SegmentLapAvgCadence: uint8(100),
-		}),
-		factory.CreateMesg(mesgnum.ZonesTarget).WithFieldValues(map[byte]any{
-			fieldnum.SegmentLapAvgCadence: uint8(100),
-		}),
-		factory.CreateMesg(mesgnum.Workout).WithFieldValues(map[byte]any{
-			fieldnum.WorkoutSessionSport: uint8(typedef.SportCycling),
-		}),
-		factory.CreateMesg(mesgnum.WorkoutStep).WithFieldValues(map[byte]any{
-			fieldnum.WorkoutStepIntensity: uint8(typedef.IntensityActive),
-		}),
-		factory.CreateMesg(mesgnum.Hr).WithFieldValues(map[byte]any{
-			fieldnum.HrTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.Hrv).WithFieldValues(map[byte]any{
-			fieldnum.HrvStatusSummaryStatus: uint8(typedef.HrvStatusBalanced),
-		}),
+		factory.CreateMesgOnly(mesgnum.Length).WithFields(
+			factory.CreateField(mesgnum.Length, fieldnum.LengthAvgSpeed).WithValue(uint16(1000)),
+		),
+		factory.CreateMesgOnly(mesgnum.SegmentLap).WithFields(
+			factory.CreateField(mesgnum.SegmentLap, fieldnum.SegmentLapAvgCadence).WithValue(uint8(100)),
+		),
+		factory.CreateMesgOnly(mesgnum.ZonesTarget).WithFields(
+			factory.CreateField(mesgnum.ZonesTarget, fieldnum.ZonesTargetMaxHeartRate).WithValue(uint8(190)),
+		),
+		factory.CreateMesgOnly(mesgnum.Workout).WithFields(
+			factory.CreateField(mesgnum.Workout, fieldnum.WorkoutSport).WithValue(uint8(typedef.SportCycling)),
+		),
+		factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
+			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepIntensity).WithValue(uint8(typedef.IntensityActive)),
+		),
+		factory.CreateMesgOnly(mesgnum.Hr).WithFields(
+			factory.CreateField(mesgnum.Hr, fieldnum.HrTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.Hrv).WithFields(
+			factory.CreateField(mesgnum.Hrv, fieldnum.HrvTime).WithValue([]uint16{uint16(1000)}),
+		),
 		// Unrelated messages
-		factory.CreateMesg(mesgnum.BarometerData).WithFieldValues(map[byte]any{
-			fieldnum.BarometerDataTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
-		factory.CreateMesg(mesgnum.CoursePoint).WithFieldValues(map[byte]any{
-			fieldnum.CoursePointTimestamp: datetime.ToUint32(incrementSecond(&now)),
-		}),
+		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
 	}
 }
 
