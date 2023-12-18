@@ -118,17 +118,23 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 	case basetype.String:
 		if isArray {
 			var size byte
+			last := 0
 			for i := range b {
 				if b[i] == '\x00' {
-					size++
+					if last != i { // only if not an invalid string
+						size++
+					}
+					last = i + 1
 				}
 			}
-			last := 0
+			last = 0
 			vs := make([]string, 0, size)
 			for i := range b {
 				if b[i] == '\x00' {
-					vs = append(vs, string(b[last:i]))
-					last = i + i
+					if last != i { // only if not an invalid string
+						vs = append(vs, string(b[last:i]))
+					}
+					last = i + 1
 				}
 			}
 			return vs, nil

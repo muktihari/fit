@@ -17,10 +17,11 @@ import (
 
 func TestUnmarshal(t *testing.T) {
 	tt := []struct {
-		value   any
-		ref     basetype.BaseType
-		isArray bool
-		err     error
+		value    any
+		ref      basetype.BaseType
+		isArray  bool
+		expected any // if nil, expected = value
+		err      error
 	}{
 		{value: byte(1), ref: basetype.Enum},
 		{value: byte(2), ref: basetype.Byte},
@@ -69,8 +70,15 @@ func TestUnmarshal(t *testing.T) {
 		{value: []float64{1, 1.1}, ref: basetype.Float64, isArray: true},
 		{value: []float64{1, -5.1}, ref: basetype.Float64, isArray: true},
 		{value: []string{"a", "b"}, ref: basetype.String, isArray: true},
+		{
+			value:    stringsToBytes([]string{"mobile_app_version", "\x00", "\x00"}...),
+			expected: []string{"mobile_app_version"},
+			ref:      basetype.String,
+			isArray:  true,
+		},
 		{value: int8(0), ref: basetype.FromString("invalid"), err: typedef.ErrTypeNotSupported},
 	}
+
 	for _, tc := range tt {
 		t.Run(fmt.Sprintf("%T(%v)", tc.value, tc.value), func(t *testing.T) {
 			b, err := typedef.Marshal(tc.value, binary.LittleEndian)
@@ -85,9 +93,21 @@ func TestUnmarshal(t *testing.T) {
 				}
 				return
 			}
-			if diff := cmp.Diff(v, tc.value); diff != "" {
+
+			if tc.expected == nil {
+				tc.expected = tc.value
+			}
+			if diff := cmp.Diff(v, tc.expected); diff != "" {
 				t.Fatal(diff)
 			}
 		})
 	}
+}
+
+func stringsToBytes(vals ...string) []byte {
+	b := []byte{}
+	for i := range vals {
+		b = append(b, vals[i]...)
+	}
+	return b
 }
