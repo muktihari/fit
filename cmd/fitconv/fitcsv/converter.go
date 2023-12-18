@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
@@ -209,7 +210,7 @@ func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	c.buf.WriteString("Definition,")
 	c.buf.WriteString(strconv.Itoa(int(proto.LocalMesgNum(mesgDef.Header))) + ",")
 	mesgName := mesgDef.MesgNum.String()
-	if mesgName == strconv.FormatInt(int64(mesgDef.MesgNum), 10) {
+	if strings.Contains(strings.ToLower(mesgName), "invalid") {
 		mesgName = factory.NameUnknown
 		if c.options.unknownNumber {
 			mesgName = formatUnknown(int(mesgDef.MesgNum))
@@ -289,7 +290,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 	c.buf.WriteString("Data,")
 	c.buf.WriteString(strconv.Itoa(int(proto.LocalMesgNum(mesg.Header))) + ",")
 	mesgName := mesg.Num.String()
-	if mesgName == strconv.FormatInt(int64(mesg.Num), 10) {
+	if strings.Contains(strings.ToLower(mesgName), "invalid") {
 		mesgName = factory.NameUnknown
 		if c.options.unknownNumber {
 			mesgName = formatUnknown(int(mesg.Num))
