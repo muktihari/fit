@@ -5,19 +5,22 @@
 package mesgdef
 
 type Data struct {
-	SDKVersion string
-	Package    string
-	Imports    []string
-	Name       string
-	Fields     []Field
+	SDKVersion  string
+	Package     string
+	Imports     []string
+	Name        string
+	Fields      []Field
+	MaxFieldNum byte
 }
 
 type Field struct {
-	Num            byte
-	Name           string
-	String         string
-	Type           string
-	TypedValue     string
-	PrimitiveValue string
-	Comment        string
+	Num             byte
+	Name            string
+	String          string
+	Type            string
+	TypedValue      string
+	PrimitiveValue  string
+	ComparableValue string
+	InvalidValue    string
+	Comment         string
 }

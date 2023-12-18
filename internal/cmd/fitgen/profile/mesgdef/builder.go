@@ -83,17 +83,31 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		}
 
 		imports := map[string]struct{}{}
+
+		var maxFieldNum byte
 		fields := make([]Field, 0, len(mesg.Fields))
 		for i := range mesg.Fields {
 			field := &mesg.Fields[i]
+
+			if field.Num > maxFieldNum {
+				maxFieldNum = field.Num
+			}
+
 			f := Field{
 				Num:            field.Num,
 				Name:           strutil.ToTitle(mesg.Fields[i].Name),
 				String:         field.Name,
 				Type:           b.transformType(field.Type, field.Array),
-				TypedValue:     b.transformAssignedValue(field.Num, field.Type, field.Array),
-				PrimitiveValue: b.transformUnassignedValue(strutil.ToTitle(field.Name), field.Type, field.Array),
+				TypedValue:     b.transformTypedValue(field.Num, field.Type, field.Array),
+				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
+				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
 				Comment:        field.Comment,
+			}
+
+			f.ComparableValue = b.transformComparableValue(field.Type, field.Array, f.PrimitiveValue)
+
+			if field.Array == "" && b.baseTypeMapByProfileType[field.Type] == "string" {
+				f.InvalidValue += fmt.Sprintf("&& %s != \"\"", f.ComparableValue)
 			}
 
 			if field.Units != "" {
@@ -116,17 +130,18 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			}
 
 			fields = append(fields, f)
-			if strings.HasPrefix(f.Type, "basetype") {
+			if strings.HasPrefix(f.Type, "basetype") || strings.HasPrefix(f.InvalidValue, "basetype") {
 				imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
 			}
 		}
 
 		data := Data{
-			SDKVersion: b.sdkVersion,
-			Package:    "mesgdef",
-			Imports:    []string{},
-			Name:       strutil.ToTitle(mesg.Name),
-			Fields:     fields,
+			SDKVersion:  b.sdkVersion,
+			Package:     "mesgdef",
+			Imports:     []string{},
+			Name:        strutil.ToTitle(mesg.Name),
+			Fields:      fields,
+			MaxFieldNum: maxFieldNum + 1,
 		}
 
 		for k := range imports {
@@ -148,14 +163,14 @@ func (b *mesgdefBuilder) transformType(name, array string) string {
 		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(name))
 	}
 
-	if array == "" || _type == "string" {
+	if array == "" {
 		return _type
 	}
 
 	return fmt.Sprintf("[]%s", _type)
 }
 
-func (b *mesgdefBuilder) transformUnassignedValue(fieldName, fieldType, array string) string {
+func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array string) string {
 	if !strings.HasSuffix(fieldType, "z") && b.baseTypeMapByProfileType[fieldType] == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
@@ -169,8 +184,9 @@ func (b *mesgdefBuilder) transformUnassignedValue(fieldName, fieldType, array st
 		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), b.goTypesByProfileTypes[fieldType], fieldName)
 }
 
-func (b *mesgdefBuilder) transformAssignedValue(num byte, fieldType, array string) string {
+func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) string {
 	if fieldType == "fit_base_type" {
+		// return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](mesg.FieldValueByNum(%d))", num)
 		return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](vals[%d])", num)
 	}
 
@@ -182,12 +198,47 @@ func (b *mesgdefBuilder) transformAssignedValue(num byte, fieldType, array strin
 	}
 
 	slicePrefix := ""
-	if array != "" && _type != "string" {
+	if array != "" {
 		slicePrefix = "Slice"
 	}
 
+	// return fmt.Sprintf("typeconv.To%s%s[%s](mesg.FieldValueByNum(%d))",
 	return fmt.Sprintf("typeconv.To%s%s[%s](vals[%d])",
 		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), _type, num)
+}
+
+func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveValue string) string {
+	if array == "" {
+		switch b.baseTypeMapByProfileType[fieldType] {
+		case "float32":
+			return fmt.Sprintf("typeconv.ToUint32[uint32](%s)", primitiveValue)
+		case "float64":
+			return fmt.Sprintf("typeconv.ToUint64[uint64](%s)", primitiveValue)
+		}
+	}
+
+	return primitiveValue
+}
+
+func (b *mesgdefBuilder) invalidValueOf(fieldType, array string) string {
+	if fieldType == "bool" {
+		return "false"
+	}
+
+	if array != "" {
+		return "nil"
+	}
+
+	if b.baseTypeMapByProfileType[fieldType] == "float32" {
+		return "basetype.Uint32Invalid"
+	}
+
+	if b.baseTypeMapByProfileType[fieldType] == "float64" {
+		return "basetype.Uint64Invalid"
+	}
+
+	bt := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).String()
+	return fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(bt))
 }
 
 // Profile.xlsx says unless otherwise specified, scale of 1 is assumed.
