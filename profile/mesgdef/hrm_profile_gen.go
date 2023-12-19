@@ -27,19 +27,20 @@ type HrmProfile struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewHrmProfile creates new HrmProfile struct based on given mesg. If mesg is nil or mesg.Num is not equal to HrmProfile mesg number, it will return nil.
-func NewHrmProfile(mesg proto.Message) *HrmProfile {
-	if mesg.Num != typedef.MesgNumHrmProfile {
-		return nil
-	}
-
+// NewHrmProfile creates new HrmProfile struct based on given mesg.
+// If mesg is nil, it will return HrmProfile with all fields being set to its corresponding invalid value.
+func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &HrmProfile{
@@ -49,7 +50,7 @@ func NewHrmProfile(mesg proto.Message) *HrmProfile {
 		LogHrv:            typeconv.ToBool[bool](vals[2]),
 		HrmAntIdTransType: typeconv.ToUint8z[uint8](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,40 @@ func (m *HrmProfile) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets HrmProfile value.
+func (m *HrmProfile) SetMessageIndex(v typedef.MessageIndex) *HrmProfile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetEnabled sets HrmProfile value.
+func (m *HrmProfile) SetEnabled(v bool) *HrmProfile {
+	m.Enabled = v
+	return m
+}
+
+// SetHrmAntId sets HrmProfile value.
+func (m *HrmProfile) SetHrmAntId(v uint16) *HrmProfile {
+	m.HrmAntId = v
+	return m
+}
+
+// SetLogHrv sets HrmProfile value.
+func (m *HrmProfile) SetLogHrv(v bool) *HrmProfile {
+	m.LogHrv = v
+	return m
+}
+
+// SetHrmAntIdTransType sets HrmProfile value.
+func (m *HrmProfile) SetHrmAntIdTransType(v uint8) *HrmProfile {
+	m.HrmAntIdTransType = v
+	return m
+}
+
+// SetDeveloperFields HrmProfile's DeveloperFields.
+func (m *HrmProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrmProfile {
+	m.DeveloperFields = developerFields
+	return m
 }

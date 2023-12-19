@@ -35,19 +35,20 @@ type DiveApneaAlarm struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDiveApneaAlarm creates new DiveApneaAlarm struct based on given mesg. If mesg is nil or mesg.Num is not equal to DiveApneaAlarm mesg number, it will return nil.
-func NewDiveApneaAlarm(mesg proto.Message) *DiveApneaAlarm {
-	if mesg.Num != typedef.MesgNumDiveApneaAlarm {
-		return nil
-	}
-
+// NewDiveApneaAlarm creates new DiveApneaAlarm struct based on given mesg.
+// If mesg is nil, it will return DiveApneaAlarm with all fields being set to its corresponding invalid value.
+func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DiveApneaAlarm{
@@ -65,7 +66,7 @@ func NewDiveApneaAlarm(mesg proto.Message) *DiveApneaAlarm {
 		Repeating:        typeconv.ToBool[bool](vals[10]),
 		Speed:            typeconv.ToSint32[int32](vals[11]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -188,4 +189,114 @@ func (m *DiveApneaAlarm) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets DiveApneaAlarm value.
+//
+// Index of the alarm
+func (m *DiveApneaAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveApneaAlarm {
+	m.MessageIndex = v
+	return m
+}
+
+// SetDepth sets DiveApneaAlarm value.
+//
+// Scale: 1000; Units: m; Depth setting (m) for depth type alarms
+func (m *DiveApneaAlarm) SetDepth(v uint32) *DiveApneaAlarm {
+	m.Depth = v
+	return m
+}
+
+// SetTime sets DiveApneaAlarm value.
+//
+// Units: s; Time setting (s) for time type alarms
+func (m *DiveApneaAlarm) SetTime(v int32) *DiveApneaAlarm {
+	m.Time = v
+	return m
+}
+
+// SetEnabled sets DiveApneaAlarm value.
+//
+// Enablement flag
+func (m *DiveApneaAlarm) SetEnabled(v bool) *DiveApneaAlarm {
+	m.Enabled = v
+	return m
+}
+
+// SetAlarmType sets DiveApneaAlarm value.
+//
+// Alarm type setting
+func (m *DiveApneaAlarm) SetAlarmType(v typedef.DiveAlarmType) *DiveApneaAlarm {
+	m.AlarmType = v
+	return m
+}
+
+// SetSound sets DiveApneaAlarm value.
+//
+// Tone and Vibe setting for the alarm.
+func (m *DiveApneaAlarm) SetSound(v typedef.Tone) *DiveApneaAlarm {
+	m.Sound = v
+	return m
+}
+
+// SetDiveTypes sets DiveApneaAlarm value.
+//
+// Array: [N]; Dive types the alarm will trigger on
+func (m *DiveApneaAlarm) SetDiveTypes(v []typedef.SubSport) *DiveApneaAlarm {
+	m.DiveTypes = v
+	return m
+}
+
+// SetId sets DiveApneaAlarm value.
+//
+// Alarm ID
+func (m *DiveApneaAlarm) SetId(v uint32) *DiveApneaAlarm {
+	m.Id = v
+	return m
+}
+
+// SetPopupEnabled sets DiveApneaAlarm value.
+//
+// Show a visible pop-up for this alarm
+func (m *DiveApneaAlarm) SetPopupEnabled(v bool) *DiveApneaAlarm {
+	m.PopupEnabled = v
+	return m
+}
+
+// SetTriggerOnDescent sets DiveApneaAlarm value.
+//
+// Trigger the alarm on descent
+func (m *DiveApneaAlarm) SetTriggerOnDescent(v bool) *DiveApneaAlarm {
+	m.TriggerOnDescent = v
+	return m
+}
+
+// SetTriggerOnAscent sets DiveApneaAlarm value.
+//
+// Trigger the alarm on ascent
+func (m *DiveApneaAlarm) SetTriggerOnAscent(v bool) *DiveApneaAlarm {
+	m.TriggerOnAscent = v
+	return m
+}
+
+// SetRepeating sets DiveApneaAlarm value.
+//
+// Repeat alarm each time threshold is crossed?
+func (m *DiveApneaAlarm) SetRepeating(v bool) *DiveApneaAlarm {
+	m.Repeating = v
+	return m
+}
+
+// SetSpeed sets DiveApneaAlarm value.
+//
+// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
+func (m *DiveApneaAlarm) SetSpeed(v int32) *DiveApneaAlarm {
+	m.Speed = v
+	return m
+}
+
+// SetDeveloperFields DiveApneaAlarm's DeveloperFields.
+func (m *DiveApneaAlarm) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveApneaAlarm {
+	m.DeveloperFields = developerFields
+	return m
 }

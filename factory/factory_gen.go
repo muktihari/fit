@@ -29,7 +29,7 @@ var (
 
 // Factory handles creation and registration for Fit's message and field.
 type Factory struct {
-	registeredMesgs []proto.Message
+	registeredMesgs map[typedef.MesgNum]proto.Message
 }
 
 // New creates new Factory with predefined messages.
@@ -38,7 +38,7 @@ type Factory struct {
 //
 // New is not receiving messages on purpose: to comply with Fit term and conditions which is not allowing edit on existing messages.
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
-func New() *Factory { return &Factory{registeredMesgs: make([]proto.Message, 0)} }
+func New() *Factory { return &Factory{} }
 
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns new message with "unknown" name.
 //
@@ -68,20 +68,17 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 }
 
 func (f *Factory) createMesg(num typedef.MesgNum) proto.Message {
-	if num < typedef.MesgNum(len(mesgs)) {
-		if mesgs[num].Num == num {
-			mesg := mesgs[num]
-			return mesg
-		}
+	if num < typedef.MesgNum(len(mesgs)) && mesgs[num].Num == num {
+		mesg := mesgs[num]
+		return mesg
 	}
 
-	if num >= typedef.MesgNum(len(mesgs)) {
-		for i := range f.registeredMesgs {
-			if f.registeredMesgs[i].Num == num {
-				mesg := f.registeredMesgs[i]
-				return mesg
-			}
-		}
+	if f.registeredMesgs == nil {
+		return createUnknownMesg(num)
+	}
+
+	if mesg, ok := f.registeredMesgs[num]; ok {
+		return mesg
 	}
 
 	return createUnknownMesg(num)
@@ -106,15 +103,15 @@ func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 		return createUnknownField(mesgNum, num)
 	}
 
-	for i := range f.registeredMesgs {
-		mesg := &f.registeredMesgs[i]
-		if mesg.Num == mesgNum {
-			for i := range mesg.Fields {
-				if mesg.Fields[i].Num == num {
-					return mesg.Fields[i]
-				}
+	if f.registeredMesgs == nil {
+		return createUnknownField(mesgNum, num)
+	}
+
+	if mesg, ok := f.registeredMesgs[mesgNum]; ok {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num == num {
+				return mesg.Fields[i]
 			}
-			return createUnknownField(mesgNum, num)
 		}
 	}
 
@@ -126,26 +123,30 @@ func createUnknownField(mesgNum typedef.MesgNum, num byte) proto.Field {
 }
 
 // RegisterMesg registers a new message that is not defined in the profile.xlsx.
-// You can not edit or replace existing message in the factory, including the messages you have registered.
-// If you intend to edit your own messages, create a new factory instance using New() and define the new message definitions on it.
+// You can not edit or replace existing predefined messages in the factory, you can only edit the messages you have registered.
+// However, we don't create a lock for efficiency, since this is intended to be used on instantiation. If you want to
+// change something without triggering data race, you can create a new instance of Factory using New().
 //
 // By registering, any Fit file containing these messages can be recognized instead of returning "unknown" message.
 func (f *Factory) RegisterMesg(mesg proto.Message) error {
+	if f.registeredMesgs == nil {
+		f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
+	}
+
 	if mesg.Num > typedef.MesgNumMfgRangeMax {
 		return fmt.Errorf("could not register outside max range: %d", typedef.MesgNumMfgRangeMax)
 	}
 
-	if mesg.Num < typedef.MesgNum(len(mesgs)) {
-		return fmt.Errorf("could not register on reserved predefined message, mesg.Num < %d", len(mesgs))
+	if mesg.Num < typedef.MesgNum(len(mesgs)) && mesgs[mesg.Num].Num == mesg.Num {
+		return fmt.Errorf("could not register on reserved predefined message, mesg.Num %d is already exist", mesg.Num)
 	}
 
-	for i := range f.registeredMesgs {
-		if f.registeredMesgs[i].Num == mesg.Num {
-			return fmt.Errorf("could not register to an existing message: %d (%s)", mesg.Num, mesg.Num)
-		}
+	if _, ok := f.registeredMesgs[mesg.Num]; ok {
+		f.registeredMesgs[mesg.Num] = mesg // replace
+		return nil
 	}
 
-	f.registeredMesgs = append(f.registeredMesgs, mesg)
+	f.registeredMesgs[mesg.Num] = mesg
 
 	return nil
 }

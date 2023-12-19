@@ -8,16 +8,18 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // CameraEvent is a CameraEvent message.
 type CameraEvent struct {
-	Timestamp         typedef.DateTime // Units: s; Whole second part of the timestamp.
-	TimestampMs       uint16           // Units: ms; Millisecond part of the timestamp.
+	Timestamp         time.Time // Units: s; Whole second part of the timestamp.
+	TimestampMs       uint16    // Units: ms; Millisecond part of the timestamp.
 	CameraEventType   typedef.CameraEventType
 	CameraFileUuid    string
 	CameraOrientation typedef.CameraOrientationType
@@ -27,29 +29,30 @@ type CameraEvent struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewCameraEvent creates new CameraEvent struct based on given mesg. If mesg is nil or mesg.Num is not equal to CameraEvent mesg number, it will return nil.
-func NewCameraEvent(mesg proto.Message) *CameraEvent {
-	if mesg.Num != typedef.MesgNumCameraEvent {
-		return nil
-	}
-
+// NewCameraEvent creates new CameraEvent struct based on given mesg.
+// If mesg is nil, it will return CameraEvent with all fields being set to its corresponding invalid value.
+func NewCameraEvent(mesg *proto.Message) *CameraEvent {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &CameraEvent{
-		Timestamp:         typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:         datetime.ToTime(vals[253]),
 		TimestampMs:       typeconv.ToUint16[uint16](vals[0]),
 		CameraEventType:   typeconv.ToEnum[typedef.CameraEventType](vals[1]),
 		CameraFileUuid:    typeconv.ToString[string](vals[2]),
 		CameraOrientation: typeconv.ToEnum[typedef.CameraOrientationType](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -58,9 +61,9 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCameraEvent)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -92,7 +95,7 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 // size returns size of CameraEvent's valid fields.
 func (m *CameraEvent) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -108,4 +111,44 @@ func (m *CameraEvent) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets CameraEvent value.
+//
+// Units: s; Whole second part of the timestamp.
+func (m *CameraEvent) SetTimestamp(v time.Time) *CameraEvent {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets CameraEvent value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *CameraEvent) SetTimestampMs(v uint16) *CameraEvent {
+	m.TimestampMs = v
+	return m
+}
+
+// SetCameraEventType sets CameraEvent value.
+func (m *CameraEvent) SetCameraEventType(v typedef.CameraEventType) *CameraEvent {
+	m.CameraEventType = v
+	return m
+}
+
+// SetCameraFileUuid sets CameraEvent value.
+func (m *CameraEvent) SetCameraFileUuid(v string) *CameraEvent {
+	m.CameraFileUuid = v
+	return m
+}
+
+// SetCameraOrientation sets CameraEvent value.
+func (m *CameraEvent) SetCameraOrientation(v typedef.CameraOrientationType) *CameraEvent {
+	m.CameraOrientation = v
+	return m
+}
+
+// SetDeveloperFields CameraEvent's DeveloperFields.
+func (m *CameraEvent) SetDeveloperFields(developerFields ...proto.DeveloperField) *CameraEvent {
+	m.DeveloperFields = developerFields
+	return m
 }

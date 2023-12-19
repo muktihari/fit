@@ -24,26 +24,27 @@ type FileCreator struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewFileCreator creates new FileCreator struct based on given mesg. If mesg is nil or mesg.Num is not equal to FileCreator mesg number, it will return nil.
-func NewFileCreator(mesg proto.Message) *FileCreator {
-	if mesg.Num != typedef.MesgNumFileCreator {
-		return nil
-	}
-
+// NewFileCreator creates new FileCreator struct based on given mesg.
+// If mesg is nil, it will return FileCreator with all fields being set to its corresponding invalid value.
+func NewFileCreator(mesg *proto.Message) *FileCreator {
 	vals := [2]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &FileCreator{
 		SoftwareVersion: typeconv.ToUint16[uint16](vals[0]),
 		HardwareVersion: typeconv.ToUint8[uint8](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -78,4 +79,22 @@ func (m *FileCreator) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetSoftwareVersion sets FileCreator value.
+func (m *FileCreator) SetSoftwareVersion(v uint16) *FileCreator {
+	m.SoftwareVersion = v
+	return m
+}
+
+// SetHardwareVersion sets FileCreator value.
+func (m *FileCreator) SetHardwareVersion(v uint8) *FileCreator {
+	m.HardwareVersion = v
+	return m
+}
+
+// SetDeveloperFields FileCreator's DeveloperFields.
+func (m *FileCreator) SetDeveloperFields(developerFields ...proto.DeveloperField) *FileCreator {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -32,20 +32,26 @@ type {{ .Name }} struct {
 	{{- end -}}
 }
 
-// New{{ .Name }} creates new {{ .Name }} struct based on given mesg. If mesg is nil or mesg.Num is not equal to {{ .Name }} mesg number, it will return nil.
-func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
-	if mesg.Num != typedef.MesgNum{{ .Name }} {
-		return nil
-	}
-
+// New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
+// If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
+func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
     vals := [{{ .MaxFieldNum }}]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
-		}
-		vals[field.Num] = field.Value
-	}
+
+    {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
+        var developerFields []proto.DeveloperField
+    {{ end -}}
+    if mesg != nil {
+        for i := range mesg.Fields {
+            if mesg.Fields[i].Num >= byte(len(vals)) {
+                continue
+            }
+            vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+        }
+        {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+            developerFields = mesg.DeveloperFields
+        {{ end -}}
+    }
+
 
 	return &{{ .Name }}{
 		{{ range .Fields -}}
@@ -53,8 +59,8 @@ func New{{ .Name }}(mesg proto.Message) *{{ .Name }} {
 		{{ end -}}
 
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-		DeveloperFields: mesg.DeveloperFields,
-		{{ end }}
+		DeveloperFields: developerFields,
+		{{ end -}}
 	}
 }
 
@@ -88,5 +94,24 @@ func (m *{{ .Name }}) size() byte {
 	{{ end -}}
     return size
 }
+
+{{ range .Fields -}}
+// Set{{ .Name }} sets {{ $.Name }} value.
+//
+// {{ .Comment }}
+func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
+    m.{{ .Name }} = v
+    return m
+}
+{{ end }}
+
+
+{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
+// SetDeveloperFields {{ $.Name }}'s DeveloperFields.
+func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperField) *{{ $.Name }} {
+    m.DeveloperFields = developerFields
+    return m
+}
+{{ end }}
 
 {{ end }}

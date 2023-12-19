@@ -8,46 +8,49 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // BarometerData is a BarometerData message.
 type BarometerData struct {
-	Timestamp        typedef.DateTime // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16           // Units: ms; Millisecond part of the timestamp.
-	SampleTimeOffset []uint16         // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
-	BaroPres         []uint32         // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewBarometerData creates new BarometerData struct based on given mesg. If mesg is nil or mesg.Num is not equal to BarometerData mesg number, it will return nil.
-func NewBarometerData(mesg proto.Message) *BarometerData {
-	if mesg.Num != typedef.MesgNumBarometerData {
-		return nil
-	}
-
+// NewBarometerData creates new BarometerData struct based on given mesg.
+// If mesg is nil, it will return BarometerData with all fields being set to its corresponding invalid value.
+func NewBarometerData(mesg *proto.Message) *BarometerData {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &BarometerData{
-		Timestamp:        typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:        datetime.ToTime(vals[253]),
 		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		BaroPres:         typeconv.ToSliceUint32[uint32](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -56,9 +59,9 @@ func (m *BarometerData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBarometerData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -85,7 +88,7 @@ func (m *BarometerData) ToMesg(fac Factory) proto.Message {
 // size returns size of BarometerData's valid fields.
 func (m *BarometerData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -98,4 +101,42 @@ func (m *BarometerData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets BarometerData value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *BarometerData) SetTimestamp(v time.Time) *BarometerData {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets BarometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSampleTimeOffset sets BarometerData value.
+//
+// Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
+	m.SampleTimeOffset = v
+	return m
+}
+
+// SetBaroPres sets BarometerData value.
+//
+// Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
+	m.BaroPres = v
+	return m
+}
+
+// SetDeveloperFields BarometerData's DeveloperFields.
+func (m *BarometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *BarometerData {
+	m.DeveloperFields = developerFields
+	return m
 }

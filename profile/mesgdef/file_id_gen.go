@@ -8,10 +8,12 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // FileId is a FileId message.
@@ -20,24 +22,23 @@ type FileId struct {
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	SerialNumber uint32
-	TimeCreated  typedef.DateTime // Only set for files that are can be created/erased.
-	Number       uint16           // Only set for files that are not created/erased.
-	ProductName  string           // Optional free form string to indicate the devices name or model
+	TimeCreated  time.Time // Only set for files that are can be created/erased.
+	Number       uint16    // Only set for files that are not created/erased.
+	ProductName  string    // Optional free form string to indicate the devices name or model
 }
 
-// NewFileId creates new FileId struct based on given mesg. If mesg is nil or mesg.Num is not equal to FileId mesg number, it will return nil.
-func NewFileId(mesg proto.Message) *FileId {
-	if mesg.Num != typedef.MesgNumFileId {
-		return nil
-	}
-
+// NewFileId creates new FileId struct based on given mesg.
+// If mesg is nil, it will return FileId with all fields being set to its corresponding invalid value.
+func NewFileId(mesg *proto.Message) *FileId {
 	vals := [9]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
 	}
 
 	return &FileId{
@@ -45,7 +46,7 @@ func NewFileId(mesg proto.Message) *FileId {
 		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[1]),
 		Product:      typeconv.ToUint16[uint16](vals[2]),
 		SerialNumber: typeconv.ToUint32z[uint32](vals[3]),
-		TimeCreated:  typeconv.ToUint32[typedef.DateTime](vals[4]),
+		TimeCreated:  datetime.ToTime(vals[4]),
 		Number:       typeconv.ToUint16[uint16](vals[5]),
 		ProductName:  typeconv.ToString[string](vals[8]),
 	}
@@ -76,9 +77,9 @@ func (m *FileId) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToUint32[uint32](m.TimeCreated)
+		field.Value = datetime.ToUint32(m.TimeCreated)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Number != basetype.Uint16Invalid {
@@ -110,7 +111,7 @@ func (m *FileId) size() byte {
 	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Number != basetype.Uint16Invalid {
@@ -120,4 +121,52 @@ func (m *FileId) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetType sets FileId value.
+func (m *FileId) SetType(v typedef.File) *FileId {
+	m.Type = v
+	return m
+}
+
+// SetManufacturer sets FileId value.
+func (m *FileId) SetManufacturer(v typedef.Manufacturer) *FileId {
+	m.Manufacturer = v
+	return m
+}
+
+// SetProduct sets FileId value.
+func (m *FileId) SetProduct(v uint16) *FileId {
+	m.Product = v
+	return m
+}
+
+// SetSerialNumber sets FileId value.
+func (m *FileId) SetSerialNumber(v uint32) *FileId {
+	m.SerialNumber = v
+	return m
+}
+
+// SetTimeCreated sets FileId value.
+//
+// Only set for files that are can be created/erased.
+func (m *FileId) SetTimeCreated(v time.Time) *FileId {
+	m.TimeCreated = v
+	return m
+}
+
+// SetNumber sets FileId value.
+//
+// Only set for files that are not created/erased.
+func (m *FileId) SetNumber(v uint16) *FileId {
+	m.Number = v
+	return m
+}
+
+// SetProductName sets FileId value.
+//
+// Optional free form string to indicate the devices name or model
+func (m *FileId) SetProductName(v string) *FileId {
+	m.ProductName = v
+	return m
 }

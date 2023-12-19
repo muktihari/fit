@@ -8,25 +8,27 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // AviationAttitude is a AviationAttitude message.
 type AviationAttitude struct {
-	Timestamp             typedef.DateTime           // Units: s; Timestamp message was output
+	Timestamp             time.Time                  // Units: s; Timestamp message was output
 	TimestampMs           uint16                     // Units: ms; Fractional part of timestamp, added to timestamp
 	SystemTime            []uint32                   // Array: [N]; Units: ms; System time associated with sample expressed in ms.
-	Pitch                 []int16                    // Scale: 10430.38; Array: [N]; Units: radians; Range -PI/2 to +PI/2
-	Roll                  []int16                    // Scale: 10430.38; Array: [N]; Units: radians; Range -PI to +PI
-	AccelLateral          []int16                    // Scale: 100; Array: [N]; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
-	AccelNormal           []int16                    // Scale: 100; Array: [N]; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
-	TurnRate              []int16                    // Scale: 1024; Array: [N]; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
+	Pitch                 []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
+	Roll                  []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
+	AccelLateral          []int16                    // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+	AccelNormal           []int16                    // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+	TurnRate              []int16                    // Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
 	Stage                 []typedef.AttitudeStage    // Array: [N];
 	AttitudeStageComplete []uint8                    // Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
-	Track                 []uint16                   // Scale: 10430.38; Array: [N]; Units: radians; Track Angle/Heading Range 0 - 2pi
+	Track                 []uint16                   // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 	Validity              []typedef.AttitudeValidity // Array: [N];
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -34,23 +36,24 @@ type AviationAttitude struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewAviationAttitude creates new AviationAttitude struct based on given mesg. If mesg is nil or mesg.Num is not equal to AviationAttitude mesg number, it will return nil.
-func NewAviationAttitude(mesg proto.Message) *AviationAttitude {
-	if mesg.Num != typedef.MesgNumAviationAttitude {
-		return nil
-	}
-
+// NewAviationAttitude creates new AviationAttitude struct based on given mesg.
+// If mesg is nil, it will return AviationAttitude with all fields being set to its corresponding invalid value.
+func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &AviationAttitude{
-		Timestamp:             typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:             datetime.ToTime(vals[253]),
 		TimestampMs:           typeconv.ToUint16[uint16](vals[0]),
 		SystemTime:            typeconv.ToSliceUint32[uint32](vals[1]),
 		Pitch:                 typeconv.ToSliceSint16[int16](vals[2]),
@@ -63,7 +66,7 @@ func NewAviationAttitude(mesg proto.Message) *AviationAttitude {
 		Track:                 typeconv.ToSliceUint16[uint16](vals[9]),
 		Validity:              typeconv.ToSliceUint16[typedef.AttitudeValidity](vals[10]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -72,9 +75,9 @@ func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAviationAttitude)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -141,7 +144,7 @@ func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
 // size returns size of AviationAttitude's valid fields.
 func (m *AviationAttitude) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -178,4 +181,106 @@ func (m *AviationAttitude) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets AviationAttitude value.
+//
+// Units: s; Timestamp message was output
+func (m *AviationAttitude) SetTimestamp(v time.Time) *AviationAttitude {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets AviationAttitude value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSystemTime sets AviationAttitude value.
+//
+// Array: [N]; Units: ms; System time associated with sample expressed in ms.
+func (m *AviationAttitude) SetSystemTime(v []uint32) *AviationAttitude {
+	m.SystemTime = v
+	return m
+}
+
+// SetPitch sets AviationAttitude value.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
+func (m *AviationAttitude) SetPitch(v []int16) *AviationAttitude {
+	m.Pitch = v
+	return m
+}
+
+// SetRoll sets AviationAttitude value.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
+func (m *AviationAttitude) SetRoll(v []int16) *AviationAttitude {
+	m.Roll = v
+	return m
+}
+
+// SetAccelLateral sets AviationAttitude value.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+func (m *AviationAttitude) SetAccelLateral(v []int16) *AviationAttitude {
+	m.AccelLateral = v
+	return m
+}
+
+// SetAccelNormal sets AviationAttitude value.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+func (m *AviationAttitude) SetAccelNormal(v []int16) *AviationAttitude {
+	m.AccelNormal = v
+	return m
+}
+
+// SetTurnRate sets AviationAttitude value.
+//
+// Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
+func (m *AviationAttitude) SetTurnRate(v []int16) *AviationAttitude {
+	m.TurnRate = v
+	return m
+}
+
+// SetStage sets AviationAttitude value.
+//
+// Array: [N];
+func (m *AviationAttitude) SetStage(v []typedef.AttitudeStage) *AviationAttitude {
+	m.Stage = v
+	return m
+}
+
+// SetAttitudeStageComplete sets AviationAttitude value.
+//
+// Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
+func (m *AviationAttitude) SetAttitudeStageComplete(v []uint8) *AviationAttitude {
+	m.AttitudeStageComplete = v
+	return m
+}
+
+// SetTrack sets AviationAttitude value.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
+func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
+	m.Track = v
+	return m
+}
+
+// SetValidity sets AviationAttitude value.
+//
+// Array: [N];
+func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAttitude {
+	m.Validity = v
+	return m
+}
+
+// SetDeveloperFields AviationAttitude's DeveloperFields.
+func (m *AviationAttitude) SetDeveloperFields(developerFields ...proto.DeveloperField) *AviationAttitude {
+	m.DeveloperFields = developerFields
+	return m
 }

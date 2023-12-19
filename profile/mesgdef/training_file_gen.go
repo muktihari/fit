@@ -8,50 +8,53 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // TrainingFile is a TrainingFile message.
 type TrainingFile struct {
-	Timestamp    typedef.DateTime
+	Timestamp    time.Time
 	Type         typedef.File
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	SerialNumber uint32
-	TimeCreated  typedef.DateTime
+	TimeCreated  time.Time
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewTrainingFile creates new TrainingFile struct based on given mesg. If mesg is nil or mesg.Num is not equal to TrainingFile mesg number, it will return nil.
-func NewTrainingFile(mesg proto.Message) *TrainingFile {
-	if mesg.Num != typedef.MesgNumTrainingFile {
-		return nil
-	}
-
+// NewTrainingFile creates new TrainingFile struct based on given mesg.
+// If mesg is nil, it will return TrainingFile with all fields being set to its corresponding invalid value.
+func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &TrainingFile{
-		Timestamp:    typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:    datetime.ToTime(vals[253]),
 		Type:         typeconv.ToEnum[typedef.File](vals[0]),
 		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[1]),
 		Product:      typeconv.ToUint16[uint16](vals[2]),
 		SerialNumber: typeconv.ToUint32z[uint32](vals[3]),
-		TimeCreated:  typeconv.ToUint32[typedef.DateTime](vals[4]),
+		TimeCreated:  datetime.ToTime(vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -60,9 +63,9 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTrainingFile)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
@@ -85,9 +88,9 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToUint32[uint32](m.TimeCreated)
+		field.Value = datetime.ToUint32(m.TimeCreated)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 
@@ -99,7 +102,7 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 // size returns size of TrainingFile's valid fields.
 func (m *TrainingFile) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
@@ -114,8 +117,50 @@ func (m *TrainingFile) size() byte {
 	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets TrainingFile value.
+func (m *TrainingFile) SetTimestamp(v time.Time) *TrainingFile {
+	m.Timestamp = v
+	return m
+}
+
+// SetType sets TrainingFile value.
+func (m *TrainingFile) SetType(v typedef.File) *TrainingFile {
+	m.Type = v
+	return m
+}
+
+// SetManufacturer sets TrainingFile value.
+func (m *TrainingFile) SetManufacturer(v typedef.Manufacturer) *TrainingFile {
+	m.Manufacturer = v
+	return m
+}
+
+// SetProduct sets TrainingFile value.
+func (m *TrainingFile) SetProduct(v uint16) *TrainingFile {
+	m.Product = v
+	return m
+}
+
+// SetSerialNumber sets TrainingFile value.
+func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
+	m.SerialNumber = v
+	return m
+}
+
+// SetTimeCreated sets TrainingFile value.
+func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
+	m.TimeCreated = v
+	return m
+}
+
+// SetDeveloperFields TrainingFile's DeveloperFields.
+func (m *TrainingFile) SetDeveloperFields(developerFields ...proto.DeveloperField) *TrainingFile {
+	m.DeveloperFields = developerFields
+	return m
 }

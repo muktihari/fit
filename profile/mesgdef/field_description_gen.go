@@ -32,19 +32,18 @@ type FieldDescription struct {
 	NativeFieldNum        uint8
 }
 
-// NewFieldDescription creates new FieldDescription struct based on given mesg. If mesg is nil or mesg.Num is not equal to FieldDescription mesg number, it will return nil.
-func NewFieldDescription(mesg proto.Message) *FieldDescription {
-	if mesg.Num != typedef.MesgNumFieldDescription {
-		return nil
-	}
-
+// NewFieldDescription creates new FieldDescription struct based on given mesg.
+// If mesg is nil, it will return FieldDescription with all fields being set to its corresponding invalid value.
+func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 	vals := [16]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
 	}
 
 	return &FieldDescription{
@@ -190,4 +189,92 @@ func (m *FieldDescription) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetDeveloperDataIndex sets FieldDescription value.
+func (m *FieldDescription) SetDeveloperDataIndex(v uint8) *FieldDescription {
+	m.DeveloperDataIndex = v
+	return m
+}
+
+// SetFieldDefinitionNumber sets FieldDescription value.
+func (m *FieldDescription) SetFieldDefinitionNumber(v uint8) *FieldDescription {
+	m.FieldDefinitionNumber = v
+	return m
+}
+
+// SetFitBaseTypeId sets FieldDescription value.
+func (m *FieldDescription) SetFitBaseTypeId(v basetype.BaseType) *FieldDescription {
+	m.FitBaseTypeId = v
+	return m
+}
+
+// SetFieldName sets FieldDescription value.
+//
+// Array: [N];
+func (m *FieldDescription) SetFieldName(v []string) *FieldDescription {
+	m.FieldName = v
+	return m
+}
+
+// SetArray sets FieldDescription value.
+func (m *FieldDescription) SetArray(v uint8) *FieldDescription {
+	m.Array = v
+	return m
+}
+
+// SetComponents sets FieldDescription value.
+func (m *FieldDescription) SetComponents(v string) *FieldDescription {
+	m.Components = v
+	return m
+}
+
+// SetScale sets FieldDescription value.
+func (m *FieldDescription) SetScale(v uint8) *FieldDescription {
+	m.Scale = v
+	return m
+}
+
+// SetOffset sets FieldDescription value.
+func (m *FieldDescription) SetOffset(v int8) *FieldDescription {
+	m.Offset = v
+	return m
+}
+
+// SetUnits sets FieldDescription value.
+//
+// Array: [N];
+func (m *FieldDescription) SetUnits(v []string) *FieldDescription {
+	m.Units = v
+	return m
+}
+
+// SetBits sets FieldDescription value.
+func (m *FieldDescription) SetBits(v string) *FieldDescription {
+	m.Bits = v
+	return m
+}
+
+// SetAccumulate sets FieldDescription value.
+func (m *FieldDescription) SetAccumulate(v string) *FieldDescription {
+	m.Accumulate = v
+	return m
+}
+
+// SetFitBaseUnitId sets FieldDescription value.
+func (m *FieldDescription) SetFitBaseUnitId(v typedef.FitBaseUnit) *FieldDescription {
+	m.FitBaseUnitId = v
+	return m
+}
+
+// SetNativeMesgNum sets FieldDescription value.
+func (m *FieldDescription) SetNativeMesgNum(v typedef.MesgNum) *FieldDescription {
+	m.NativeMesgNum = v
+	return m
+}
+
+// SetNativeFieldNum sets FieldDescription value.
+func (m *FieldDescription) SetNativeFieldNum(v uint8) *FieldDescription {
+	m.NativeFieldNum = v
+	return m
 }

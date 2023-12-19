@@ -122,6 +122,13 @@ func {{ .Type }}Register(v {{ .Type }}, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", {{ .Type}}Invalid)
 	}
 
+    switch v {
+    {{ range .Constants -}}
+    case {{ .Name }}:
+		return fmt.Errorf("duplicate: %d is already exist for {{ .Name }}", v)
+    {{ end -}}
+    }
+
 	{{ .Type | ToLower }}ToString[v] = s
 	stringTo{{ .Type }}[s] = v
 

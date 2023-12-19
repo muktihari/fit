@@ -25,19 +25,20 @@ type Software struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSoftware creates new Software struct based on given mesg. If mesg is nil or mesg.Num is not equal to Software mesg number, it will return nil.
-func NewSoftware(mesg proto.Message) *Software {
-	if mesg.Num != typedef.MesgNumSoftware {
-		return nil
-	}
-
+// NewSoftware creates new Software struct based on given mesg.
+// If mesg is nil, it will return Software with all fields being set to its corresponding invalid value.
+func NewSoftware(mesg *proto.Message) *Software {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Software{
@@ -45,7 +46,7 @@ func NewSoftware(mesg proto.Message) *Software {
 		Version:      typeconv.ToUint16[uint16](vals[3]),
 		PartNumber:   typeconv.ToString[string](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *Software) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Software value.
+func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
+	m.MessageIndex = v
+	return m
+}
+
+// SetVersion sets Software value.
+//
+// Scale: 100;
+func (m *Software) SetVersion(v uint16) *Software {
+	m.Version = v
+	return m
+}
+
+// SetPartNumber sets Software value.
+func (m *Software) SetPartNumber(v string) *Software {
+	m.PartNumber = v
+	return m
+}
+
+// SetDeveloperFields Software's DeveloperFields.
+func (m *Software) SetDeveloperFields(developerFields ...proto.DeveloperField) *Software {
+	m.DeveloperFields = developerFields
+	return m
 }

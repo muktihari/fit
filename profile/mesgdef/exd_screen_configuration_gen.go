@@ -26,19 +26,20 @@ type ExdScreenConfiguration struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewExdScreenConfiguration creates new ExdScreenConfiguration struct based on given mesg. If mesg is nil or mesg.Num is not equal to ExdScreenConfiguration mesg number, it will return nil.
-func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
-	if mesg.Num != typedef.MesgNumExdScreenConfiguration {
-		return nil
-	}
-
+// NewExdScreenConfiguration creates new ExdScreenConfiguration struct based on given mesg.
+// If mesg is nil, it will return ExdScreenConfiguration with all fields being set to its corresponding invalid value.
+func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 	vals := [4]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ExdScreenConfiguration{
@@ -47,7 +48,7 @@ func NewExdScreenConfiguration(mesg proto.Message) *ExdScreenConfiguration {
 		Layout:        typeconv.ToEnum[typedef.ExdLayout](vals[2]),
 		ScreenEnabled: typeconv.ToBool[bool](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,4 +99,36 @@ func (m *ExdScreenConfiguration) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetScreenIndex sets ExdScreenConfiguration value.
+func (m *ExdScreenConfiguration) SetScreenIndex(v uint8) *ExdScreenConfiguration {
+	m.ScreenIndex = v
+	return m
+}
+
+// SetFieldCount sets ExdScreenConfiguration value.
+//
+// number of fields in screen
+func (m *ExdScreenConfiguration) SetFieldCount(v uint8) *ExdScreenConfiguration {
+	m.FieldCount = v
+	return m
+}
+
+// SetLayout sets ExdScreenConfiguration value.
+func (m *ExdScreenConfiguration) SetLayout(v typedef.ExdLayout) *ExdScreenConfiguration {
+	m.Layout = v
+	return m
+}
+
+// SetScreenEnabled sets ExdScreenConfiguration value.
+func (m *ExdScreenConfiguration) SetScreenEnabled(v bool) *ExdScreenConfiguration {
+	m.ScreenEnabled = v
+	return m
+}
+
+// SetDeveloperFields ExdScreenConfiguration's DeveloperFields.
+func (m *ExdScreenConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdScreenConfiguration {
+	m.DeveloperFields = developerFields
+	return m
 }

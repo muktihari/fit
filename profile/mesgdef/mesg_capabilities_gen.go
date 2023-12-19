@@ -27,19 +27,20 @@ type MesgCapabilities struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMesgCapabilities creates new MesgCapabilities struct based on given mesg. If mesg is nil or mesg.Num is not equal to MesgCapabilities mesg number, it will return nil.
-func NewMesgCapabilities(mesg proto.Message) *MesgCapabilities {
-	if mesg.Num != typedef.MesgNumMesgCapabilities {
-		return nil
-	}
-
+// NewMesgCapabilities creates new MesgCapabilities struct based on given mesg.
+// If mesg is nil, it will return MesgCapabilities with all fields being set to its corresponding invalid value.
+func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MesgCapabilities{
@@ -49,7 +50,7 @@ func NewMesgCapabilities(mesg proto.Message) *MesgCapabilities {
 		CountType:    typeconv.ToEnum[typedef.MesgCount](vals[2]),
 		Count:        typeconv.ToUint16[uint16](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,40 @@ func (m *MesgCapabilities) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets MesgCapabilities value.
+func (m *MesgCapabilities) SetMessageIndex(v typedef.MessageIndex) *MesgCapabilities {
+	m.MessageIndex = v
+	return m
+}
+
+// SetFile sets MesgCapabilities value.
+func (m *MesgCapabilities) SetFile(v typedef.File) *MesgCapabilities {
+	m.File = v
+	return m
+}
+
+// SetMesgNum sets MesgCapabilities value.
+func (m *MesgCapabilities) SetMesgNum(v typedef.MesgNum) *MesgCapabilities {
+	m.MesgNum = v
+	return m
+}
+
+// SetCountType sets MesgCapabilities value.
+func (m *MesgCapabilities) SetCountType(v typedef.MesgCount) *MesgCapabilities {
+	m.CountType = v
+	return m
+}
+
+// SetCount sets MesgCapabilities value.
+func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
+	m.Count = v
+	return m
+}
+
+// SetDeveloperFields MesgCapabilities's DeveloperFields.
+func (m *MesgCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *MesgCapabilities {
+	m.DeveloperFields = developerFields
+	return m
 }

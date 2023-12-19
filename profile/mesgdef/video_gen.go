@@ -25,19 +25,20 @@ type Video struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewVideo creates new Video struct based on given mesg. If mesg is nil or mesg.Num is not equal to Video mesg number, it will return nil.
-func NewVideo(mesg proto.Message) *Video {
-	if mesg.Num != typedef.MesgNumVideo {
-		return nil
-	}
-
+// NewVideo creates new Video struct based on given mesg.
+// If mesg is nil, it will return Video with all fields being set to its corresponding invalid value.
+func NewVideo(mesg *proto.Message) *Video {
 	vals := [3]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Video{
@@ -45,7 +46,7 @@ func NewVideo(mesg proto.Message) *Video {
 		HostingProvider: typeconv.ToString[string](vals[1]),
 		Duration:        typeconv.ToUint32[uint32](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *Video) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetUrl sets Video value.
+func (m *Video) SetUrl(v string) *Video {
+	m.Url = v
+	return m
+}
+
+// SetHostingProvider sets Video value.
+func (m *Video) SetHostingProvider(v string) *Video {
+	m.HostingProvider = v
+	return m
+}
+
+// SetDuration sets Video value.
+//
+// Units: ms; Playback time of video
+func (m *Video) SetDuration(v uint32) *Video {
+	m.Duration = v
+	return m
+}
+
+// SetDeveloperFields Video's DeveloperFields.
+func (m *Video) SetDeveloperFields(developerFields ...proto.DeveloperField) *Video {
+	m.DeveloperFields = developerFields
+	return m
 }

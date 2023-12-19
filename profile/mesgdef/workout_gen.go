@@ -30,19 +30,20 @@ type Workout struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWorkout creates new Workout struct based on given mesg. If mesg is nil or mesg.Num is not equal to Workout mesg number, it will return nil.
-func NewWorkout(mesg proto.Message) *Workout {
-	if mesg.Num != typedef.MesgNumWorkout {
-		return nil
-	}
-
+// NewWorkout creates new Workout struct based on given mesg.
+// If mesg is nil, it will return Workout with all fields being set to its corresponding invalid value.
+func NewWorkout(mesg *proto.Message) *Workout {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Workout{
@@ -55,7 +56,7 @@ func NewWorkout(mesg proto.Message) *Workout {
 		PoolLength:     typeconv.ToUint16[uint16](vals[14]),
 		PoolLengthUnit: typeconv.ToEnum[typedef.DisplayMeasure](vals[15]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -138,4 +139,62 @@ func (m *Workout) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Workout value.
+func (m *Workout) SetMessageIndex(v typedef.MessageIndex) *Workout {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSport sets Workout value.
+func (m *Workout) SetSport(v typedef.Sport) *Workout {
+	m.Sport = v
+	return m
+}
+
+// SetCapabilities sets Workout value.
+func (m *Workout) SetCapabilities(v typedef.WorkoutCapabilities) *Workout {
+	m.Capabilities = v
+	return m
+}
+
+// SetNumValidSteps sets Workout value.
+//
+// number of valid steps
+func (m *Workout) SetNumValidSteps(v uint16) *Workout {
+	m.NumValidSteps = v
+	return m
+}
+
+// SetWktName sets Workout value.
+func (m *Workout) SetWktName(v string) *Workout {
+	m.WktName = v
+	return m
+}
+
+// SetSubSport sets Workout value.
+func (m *Workout) SetSubSport(v typedef.SubSport) *Workout {
+	m.SubSport = v
+	return m
+}
+
+// SetPoolLength sets Workout value.
+//
+// Scale: 100; Units: m;
+func (m *Workout) SetPoolLength(v uint16) *Workout {
+	m.PoolLength = v
+	return m
+}
+
+// SetPoolLengthUnit sets Workout value.
+func (m *Workout) SetPoolLengthUnit(v typedef.DisplayMeasure) *Workout {
+	m.PoolLengthUnit = v
+	return m
+}
+
+// SetDeveloperFields Workout's DeveloperFields.
+func (m *Workout) SetDeveloperFields(developerFields ...proto.DeveloperField) *Workout {
+	m.DeveloperFields = developerFields
+	return m
 }

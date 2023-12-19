@@ -27,19 +27,20 @@ type ZonesTarget struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewZonesTarget creates new ZonesTarget struct based on given mesg. If mesg is nil or mesg.Num is not equal to ZonesTarget mesg number, it will return nil.
-func NewZonesTarget(mesg proto.Message) *ZonesTarget {
-	if mesg.Num != typedef.MesgNumZonesTarget {
-		return nil
-	}
-
+// NewZonesTarget creates new ZonesTarget struct based on given mesg.
+// If mesg is nil, it will return ZonesTarget with all fields being set to its corresponding invalid value.
+func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 	vals := [8]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ZonesTarget{
@@ -49,7 +50,7 @@ func NewZonesTarget(mesg proto.Message) *ZonesTarget {
 		HrCalcType:               typeconv.ToEnum[typedef.HrZoneCalc](vals[5]),
 		PwrCalcType:              typeconv.ToEnum[typedef.PwrZoneCalc](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,40 @@ func (m *ZonesTarget) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMaxHeartRate sets ZonesTarget value.
+func (m *ZonesTarget) SetMaxHeartRate(v uint8) *ZonesTarget {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetThresholdHeartRate sets ZonesTarget value.
+func (m *ZonesTarget) SetThresholdHeartRate(v uint8) *ZonesTarget {
+	m.ThresholdHeartRate = v
+	return m
+}
+
+// SetFunctionalThresholdPower sets ZonesTarget value.
+func (m *ZonesTarget) SetFunctionalThresholdPower(v uint16) *ZonesTarget {
+	m.FunctionalThresholdPower = v
+	return m
+}
+
+// SetHrCalcType sets ZonesTarget value.
+func (m *ZonesTarget) SetHrCalcType(v typedef.HrZoneCalc) *ZonesTarget {
+	m.HrCalcType = v
+	return m
+}
+
+// SetPwrCalcType sets ZonesTarget value.
+func (m *ZonesTarget) SetPwrCalcType(v typedef.PwrZoneCalc) *ZonesTarget {
+	m.PwrCalcType = v
+	return m
+}
+
+// SetDeveloperFields ZonesTarget's DeveloperFields.
+func (m *ZonesTarget) SetDeveloperFields(developerFields ...proto.DeveloperField) *ZonesTarget {
+	m.DeveloperFields = developerFields
+	return m
 }

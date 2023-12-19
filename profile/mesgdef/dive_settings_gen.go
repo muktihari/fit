@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // DiveSettings is a DiveSettings message.
 type DiveSettings struct {
-	Timestamp                 typedef.DateTime
+	Timestamp                 time.Time
 	MessageIndex              typedef.MessageIndex
 	Name                      string
 	Model                     typedef.TissueModelType
@@ -57,23 +59,24 @@ type DiveSettings struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDiveSettings creates new DiveSettings struct based on given mesg. If mesg is nil or mesg.Num is not equal to DiveSettings mesg number, it will return nil.
-func NewDiveSettings(mesg proto.Message) *DiveSettings {
-	if mesg.Num != typedef.MesgNumDiveSettings {
-		return nil
-	}
-
+// NewDiveSettings creates new DiveSettings struct based on given mesg.
+// If mesg is nil, it will return DiveSettings with all fields being set to its corresponding invalid value.
+func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DiveSettings{
-		Timestamp:                 typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                 datetime.ToTime(vals[253]),
 		MessageIndex:              typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Name:                      typeconv.ToString[string](vals[0]),
 		Model:                     typeconv.ToEnum[typedef.TissueModelType](vals[1]),
@@ -109,7 +112,7 @@ func NewDiveSettings(mesg proto.Message) *DiveSettings {
 		LastStopMultiple:          typeconv.ToUint8[uint8](vals[36]),
 		NoFlyTimeMode:             typeconv.ToEnum[typedef.NoFlyTimeMode](vals[37]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -118,9 +121,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveSettings)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
@@ -302,7 +305,7 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 // size returns size of DiveSettings's valid fields.
 func (m *DiveSettings) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
@@ -408,4 +411,260 @@ func (m *DiveSettings) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets DiveSettings value.
+func (m *DiveSettings) SetTimestamp(v time.Time) *DiveSettings {
+	m.Timestamp = v
+	return m
+}
+
+// SetMessageIndex sets DiveSettings value.
+func (m *DiveSettings) SetMessageIndex(v typedef.MessageIndex) *DiveSettings {
+	m.MessageIndex = v
+	return m
+}
+
+// SetName sets DiveSettings value.
+func (m *DiveSettings) SetName(v string) *DiveSettings {
+	m.Name = v
+	return m
+}
+
+// SetModel sets DiveSettings value.
+func (m *DiveSettings) SetModel(v typedef.TissueModelType) *DiveSettings {
+	m.Model = v
+	return m
+}
+
+// SetGfLow sets DiveSettings value.
+//
+// Units: percent;
+func (m *DiveSettings) SetGfLow(v uint8) *DiveSettings {
+	m.GfLow = v
+	return m
+}
+
+// SetGfHigh sets DiveSettings value.
+//
+// Units: percent;
+func (m *DiveSettings) SetGfHigh(v uint8) *DiveSettings {
+	m.GfHigh = v
+	return m
+}
+
+// SetWaterType sets DiveSettings value.
+func (m *DiveSettings) SetWaterType(v typedef.WaterType) *DiveSettings {
+	m.WaterType = v
+	return m
+}
+
+// SetWaterDensity sets DiveSettings value.
+//
+// Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
+func (m *DiveSettings) SetWaterDensity(v float32) *DiveSettings {
+	m.WaterDensity = v
+	return m
+}
+
+// SetPo2Warn sets DiveSettings value.
+//
+// Scale: 100; Units: percent; Typically 1.40
+func (m *DiveSettings) SetPo2Warn(v uint8) *DiveSettings {
+	m.Po2Warn = v
+	return m
+}
+
+// SetPo2Critical sets DiveSettings value.
+//
+// Scale: 100; Units: percent; Typically 1.60
+func (m *DiveSettings) SetPo2Critical(v uint8) *DiveSettings {
+	m.Po2Critical = v
+	return m
+}
+
+// SetPo2Deco sets DiveSettings value.
+//
+// Scale: 100; Units: percent;
+func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
+	m.Po2Deco = v
+	return m
+}
+
+// SetSafetyStopEnabled sets DiveSettings value.
+func (m *DiveSettings) SetSafetyStopEnabled(v bool) *DiveSettings {
+	m.SafetyStopEnabled = v
+	return m
+}
+
+// SetBottomDepth sets DiveSettings value.
+func (m *DiveSettings) SetBottomDepth(v float32) *DiveSettings {
+	m.BottomDepth = v
+	return m
+}
+
+// SetBottomTime sets DiveSettings value.
+func (m *DiveSettings) SetBottomTime(v uint32) *DiveSettings {
+	m.BottomTime = v
+	return m
+}
+
+// SetApneaCountdownEnabled sets DiveSettings value.
+func (m *DiveSettings) SetApneaCountdownEnabled(v bool) *DiveSettings {
+	m.ApneaCountdownEnabled = v
+	return m
+}
+
+// SetApneaCountdownTime sets DiveSettings value.
+func (m *DiveSettings) SetApneaCountdownTime(v uint32) *DiveSettings {
+	m.ApneaCountdownTime = v
+	return m
+}
+
+// SetBacklightMode sets DiveSettings value.
+func (m *DiveSettings) SetBacklightMode(v typedef.DiveBacklightMode) *DiveSettings {
+	m.BacklightMode = v
+	return m
+}
+
+// SetBacklightBrightness sets DiveSettings value.
+func (m *DiveSettings) SetBacklightBrightness(v uint8) *DiveSettings {
+	m.BacklightBrightness = v
+	return m
+}
+
+// SetBacklightTimeout sets DiveSettings value.
+func (m *DiveSettings) SetBacklightTimeout(v typedef.BacklightTimeout) *DiveSettings {
+	m.BacklightTimeout = v
+	return m
+}
+
+// SetRepeatDiveInterval sets DiveSettings value.
+//
+// Units: s; Time between surfacing and ending the activity
+func (m *DiveSettings) SetRepeatDiveInterval(v uint16) *DiveSettings {
+	m.RepeatDiveInterval = v
+	return m
+}
+
+// SetSafetyStopTime sets DiveSettings value.
+//
+// Units: s; Time at safety stop (if enabled)
+func (m *DiveSettings) SetSafetyStopTime(v uint16) *DiveSettings {
+	m.SafetyStopTime = v
+	return m
+}
+
+// SetHeartRateSourceType sets DiveSettings value.
+func (m *DiveSettings) SetHeartRateSourceType(v typedef.SourceType) *DiveSettings {
+	m.HeartRateSourceType = v
+	return m
+}
+
+// SetHeartRateSource sets DiveSettings value.
+func (m *DiveSettings) SetHeartRateSource(v uint8) *DiveSettings {
+	m.HeartRateSource = v
+	return m
+}
+
+// SetTravelGas sets DiveSettings value.
+//
+// Index of travel dive_gas message
+func (m *DiveSettings) SetTravelGas(v typedef.MessageIndex) *DiveSettings {
+	m.TravelGas = v
+	return m
+}
+
+// SetCcrLowSetpointSwitchMode sets DiveSettings value.
+//
+// If low PO2 should be switched to automatically
+func (m *DiveSettings) SetCcrLowSetpointSwitchMode(v typedef.CcrSetpointSwitchMode) *DiveSettings {
+	m.CcrLowSetpointSwitchMode = v
+	return m
+}
+
+// SetCcrLowSetpoint sets DiveSettings value.
+//
+// Scale: 100; Units: percent; Target PO2 when using low setpoint
+func (m *DiveSettings) SetCcrLowSetpoint(v uint8) *DiveSettings {
+	m.CcrLowSetpoint = v
+	return m
+}
+
+// SetCcrLowSetpointDepth sets DiveSettings value.
+//
+// Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
+func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
+	m.CcrLowSetpointDepth = v
+	return m
+}
+
+// SetCcrHighSetpointSwitchMode sets DiveSettings value.
+//
+// If high PO2 should be switched to automatically
+func (m *DiveSettings) SetCcrHighSetpointSwitchMode(v typedef.CcrSetpointSwitchMode) *DiveSettings {
+	m.CcrHighSetpointSwitchMode = v
+	return m
+}
+
+// SetCcrHighSetpoint sets DiveSettings value.
+//
+// Scale: 100; Units: percent; Target PO2 when using high setpoint
+func (m *DiveSettings) SetCcrHighSetpoint(v uint8) *DiveSettings {
+	m.CcrHighSetpoint = v
+	return m
+}
+
+// SetCcrHighSetpointDepth sets DiveSettings value.
+//
+// Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
+func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
+	m.CcrHighSetpointDepth = v
+	return m
+}
+
+// SetGasConsumptionDisplay sets DiveSettings value.
+//
+// Type of gas consumption rate to display. Some values are only valid if tank volume is known.
+func (m *DiveSettings) SetGasConsumptionDisplay(v typedef.GasConsumptionRateType) *DiveSettings {
+	m.GasConsumptionDisplay = v
+	return m
+}
+
+// SetUpKeyEnabled sets DiveSettings value.
+//
+// Indicates whether the up key is enabled during dives
+func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
+	m.UpKeyEnabled = v
+	return m
+}
+
+// SetDiveSounds sets DiveSettings value.
+//
+// Sounds and vibration enabled or disabled in-dive
+func (m *DiveSettings) SetDiveSounds(v typedef.Tone) *DiveSettings {
+	m.DiveSounds = v
+	return m
+}
+
+// SetLastStopMultiple sets DiveSettings value.
+//
+// Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
+func (m *DiveSettings) SetLastStopMultiple(v uint8) *DiveSettings {
+	m.LastStopMultiple = v
+	return m
+}
+
+// SetNoFlyTimeMode sets DiveSettings value.
+//
+// Indicates which guidelines to use for no-fly surface interval.
+func (m *DiveSettings) SetNoFlyTimeMode(v typedef.NoFlyTimeMode) *DiveSettings {
+	m.NoFlyTimeMode = v
+	return m
+}
+
+// SetDeveloperFields DiveSettings's DeveloperFields.
+func (m *DiveSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveSettings {
+	m.DeveloperFields = developerFields
+	return m
 }

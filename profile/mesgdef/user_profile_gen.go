@@ -51,19 +51,20 @@ type UserProfile struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewUserProfile creates new UserProfile struct based on given mesg. If mesg is nil or mesg.Num is not equal to UserProfile mesg number, it will return nil.
-func NewUserProfile(mesg proto.Message) *UserProfile {
-	if mesg.Num != typedef.MesgNumUserProfile {
-		return nil
-	}
-
+// NewUserProfile creates new UserProfile struct based on given mesg.
+// If mesg is nil, it will return UserProfile with all fields being set to its corresponding invalid value.
+func NewUserProfile(mesg *proto.Message) *UserProfile {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &UserProfile{
@@ -97,7 +98,7 @@ func NewUserProfile(mesg proto.Message) *UserProfile {
 		DepthSetting:               typeconv.ToEnum[typedef.DisplayMeasure](vals[47]),
 		DiveCount:                  typeconv.ToUint32[uint32](vals[49]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -348,4 +349,210 @@ func (m *UserProfile) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets UserProfile value.
+func (m *UserProfile) SetMessageIndex(v typedef.MessageIndex) *UserProfile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetFriendlyName sets UserProfile value.
+//
+// Used for Morning Report greeting
+func (m *UserProfile) SetFriendlyName(v string) *UserProfile {
+	m.FriendlyName = v
+	return m
+}
+
+// SetGender sets UserProfile value.
+func (m *UserProfile) SetGender(v typedef.Gender) *UserProfile {
+	m.Gender = v
+	return m
+}
+
+// SetAge sets UserProfile value.
+//
+// Units: years;
+func (m *UserProfile) SetAge(v uint8) *UserProfile {
+	m.Age = v
+	return m
+}
+
+// SetHeight sets UserProfile value.
+//
+// Scale: 100; Units: m;
+func (m *UserProfile) SetHeight(v uint8) *UserProfile {
+	m.Height = v
+	return m
+}
+
+// SetWeight sets UserProfile value.
+//
+// Scale: 10; Units: kg;
+func (m *UserProfile) SetWeight(v uint16) *UserProfile {
+	m.Weight = v
+	return m
+}
+
+// SetLanguage sets UserProfile value.
+func (m *UserProfile) SetLanguage(v typedef.Language) *UserProfile {
+	m.Language = v
+	return m
+}
+
+// SetElevSetting sets UserProfile value.
+func (m *UserProfile) SetElevSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.ElevSetting = v
+	return m
+}
+
+// SetWeightSetting sets UserProfile value.
+func (m *UserProfile) SetWeightSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.WeightSetting = v
+	return m
+}
+
+// SetRestingHeartRate sets UserProfile value.
+//
+// Units: bpm;
+func (m *UserProfile) SetRestingHeartRate(v uint8) *UserProfile {
+	m.RestingHeartRate = v
+	return m
+}
+
+// SetDefaultMaxRunningHeartRate sets UserProfile value.
+//
+// Units: bpm;
+func (m *UserProfile) SetDefaultMaxRunningHeartRate(v uint8) *UserProfile {
+	m.DefaultMaxRunningHeartRate = v
+	return m
+}
+
+// SetDefaultMaxBikingHeartRate sets UserProfile value.
+//
+// Units: bpm;
+func (m *UserProfile) SetDefaultMaxBikingHeartRate(v uint8) *UserProfile {
+	m.DefaultMaxBikingHeartRate = v
+	return m
+}
+
+// SetDefaultMaxHeartRate sets UserProfile value.
+//
+// Units: bpm;
+func (m *UserProfile) SetDefaultMaxHeartRate(v uint8) *UserProfile {
+	m.DefaultMaxHeartRate = v
+	return m
+}
+
+// SetHrSetting sets UserProfile value.
+func (m *UserProfile) SetHrSetting(v typedef.DisplayHeart) *UserProfile {
+	m.HrSetting = v
+	return m
+}
+
+// SetSpeedSetting sets UserProfile value.
+func (m *UserProfile) SetSpeedSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.SpeedSetting = v
+	return m
+}
+
+// SetDistSetting sets UserProfile value.
+func (m *UserProfile) SetDistSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.DistSetting = v
+	return m
+}
+
+// SetPowerSetting sets UserProfile value.
+func (m *UserProfile) SetPowerSetting(v typedef.DisplayPower) *UserProfile {
+	m.PowerSetting = v
+	return m
+}
+
+// SetActivityClass sets UserProfile value.
+func (m *UserProfile) SetActivityClass(v typedef.ActivityClass) *UserProfile {
+	m.ActivityClass = v
+	return m
+}
+
+// SetPositionSetting sets UserProfile value.
+func (m *UserProfile) SetPositionSetting(v typedef.DisplayPosition) *UserProfile {
+	m.PositionSetting = v
+	return m
+}
+
+// SetTemperatureSetting sets UserProfile value.
+func (m *UserProfile) SetTemperatureSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.TemperatureSetting = v
+	return m
+}
+
+// SetLocalId sets UserProfile value.
+func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
+	m.LocalId = v
+	return m
+}
+
+// SetGlobalId sets UserProfile value.
+//
+// Array: [6];
+func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
+	m.GlobalId = v
+	return m
+}
+
+// SetWakeTime sets UserProfile value.
+//
+// Typical wake time
+func (m *UserProfile) SetWakeTime(v typedef.LocaltimeIntoDay) *UserProfile {
+	m.WakeTime = v
+	return m
+}
+
+// SetSleepTime sets UserProfile value.
+//
+// Typical bed time
+func (m *UserProfile) SetSleepTime(v typedef.LocaltimeIntoDay) *UserProfile {
+	m.SleepTime = v
+	return m
+}
+
+// SetHeightSetting sets UserProfile value.
+func (m *UserProfile) SetHeightSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.HeightSetting = v
+	return m
+}
+
+// SetUserRunningStepLength sets UserProfile value.
+//
+// Scale: 1000; Units: m; User defined running step length set to 0 for auto length
+func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
+	m.UserRunningStepLength = v
+	return m
+}
+
+// SetUserWalkingStepLength sets UserProfile value.
+//
+// Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
+	m.UserWalkingStepLength = v
+	return m
+}
+
+// SetDepthSetting sets UserProfile value.
+func (m *UserProfile) SetDepthSetting(v typedef.DisplayMeasure) *UserProfile {
+	m.DepthSetting = v
+	return m
+}
+
+// SetDiveCount sets UserProfile value.
+func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
+	m.DiveCount = v
+	return m
+}
+
+// SetDeveloperFields UserProfile's DeveloperFields.
+func (m *UserProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *UserProfile {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -8,19 +8,21 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Length is a Length message.
 type Length struct {
 	MessageIndex               typedef.MessageIndex
-	Timestamp                  typedef.DateTime
+	Timestamp                  time.Time
 	Event                      typedef.Event
 	EventType                  typedef.EventType
-	StartTime                  typedef.DateTime
+	StartTime                  time.Time
 	TotalElapsedTime           uint32             // Scale: 1000; Units: s;
 	TotalTimerTime             uint32             // Scale: 1000; Units: s;
 	TotalStrokes               uint16             // Units: strokes;
@@ -44,27 +46,28 @@ type Length struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewLength creates new Length struct based on given mesg. If mesg is nil or mesg.Num is not equal to Length mesg number, it will return nil.
-func NewLength(mesg proto.Message) *Length {
-	if mesg.Num != typedef.MesgNumLength {
-		return nil
-	}
-
+// NewLength creates new Length struct based on given mesg.
+// If mesg is nil, it will return Length with all fields being set to its corresponding invalid value.
+func NewLength(mesg *proto.Message) *Length {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Length{
 		MessageIndex:               typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Timestamp:                  typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                  datetime.ToTime(vals[253]),
 		Event:                      typeconv.ToEnum[typedef.Event](vals[0]),
 		EventType:                  typeconv.ToEnum[typedef.EventType](vals[1]),
-		StartTime:                  typeconv.ToUint32[typedef.DateTime](vals[2]),
+		StartTime:                  datetime.ToTime(vals[2]),
 		TotalElapsedTime:           typeconv.ToUint32[uint32](vals[3]),
 		TotalTimerTime:             typeconv.ToUint32[uint32](vals[4]),
 		TotalStrokes:               typeconv.ToUint16[uint16](vals[5]),
@@ -83,7 +86,7 @@ func NewLength(mesg proto.Message) *Length {
 		AvgRespirationRate:         typeconv.ToUint8[uint8](vals[24]),
 		MaxRespirationRate:         typeconv.ToUint8[uint8](vals[25]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -97,9 +100,9 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -112,9 +115,9 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.EventType)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32[uint32](m.StartTime)
+		field.Value = datetime.ToUint32(m.StartTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
@@ -214,7 +217,7 @@ func (m *Length) size() byte {
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -223,7 +226,7 @@ func (m *Length) size() byte {
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
@@ -278,4 +281,164 @@ func (m *Length) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Length value.
+func (m *Length) SetMessageIndex(v typedef.MessageIndex) *Length {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets Length value.
+func (m *Length) SetTimestamp(v time.Time) *Length {
+	m.Timestamp = v
+	return m
+}
+
+// SetEvent sets Length value.
+func (m *Length) SetEvent(v typedef.Event) *Length {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Length value.
+func (m *Length) SetEventType(v typedef.EventType) *Length {
+	m.EventType = v
+	return m
+}
+
+// SetStartTime sets Length value.
+func (m *Length) SetStartTime(v time.Time) *Length {
+	m.StartTime = v
+	return m
+}
+
+// SetTotalElapsedTime sets Length value.
+//
+// Scale: 1000; Units: s;
+func (m *Length) SetTotalElapsedTime(v uint32) *Length {
+	m.TotalElapsedTime = v
+	return m
+}
+
+// SetTotalTimerTime sets Length value.
+//
+// Scale: 1000; Units: s;
+func (m *Length) SetTotalTimerTime(v uint32) *Length {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetTotalStrokes sets Length value.
+//
+// Units: strokes;
+func (m *Length) SetTotalStrokes(v uint16) *Length {
+	m.TotalStrokes = v
+	return m
+}
+
+// SetAvgSpeed sets Length value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Length) SetAvgSpeed(v uint16) *Length {
+	m.AvgSpeed = v
+	return m
+}
+
+// SetSwimStroke sets Length value.
+//
+// Units: swim_stroke;
+func (m *Length) SetSwimStroke(v typedef.SwimStroke) *Length {
+	m.SwimStroke = v
+	return m
+}
+
+// SetAvgSwimmingCadence sets Length value.
+//
+// Units: strokes/min;
+func (m *Length) SetAvgSwimmingCadence(v uint8) *Length {
+	m.AvgSwimmingCadence = v
+	return m
+}
+
+// SetEventGroup sets Length value.
+func (m *Length) SetEventGroup(v uint8) *Length {
+	m.EventGroup = v
+	return m
+}
+
+// SetTotalCalories sets Length value.
+//
+// Units: kcal;
+func (m *Length) SetTotalCalories(v uint16) *Length {
+	m.TotalCalories = v
+	return m
+}
+
+// SetLengthType sets Length value.
+func (m *Length) SetLengthType(v typedef.LengthType) *Length {
+	m.LengthType = v
+	return m
+}
+
+// SetPlayerScore sets Length value.
+func (m *Length) SetPlayerScore(v uint16) *Length {
+	m.PlayerScore = v
+	return m
+}
+
+// SetOpponentScore sets Length value.
+func (m *Length) SetOpponentScore(v uint16) *Length {
+	m.OpponentScore = v
+	return m
+}
+
+// SetStrokeCount sets Length value.
+//
+// Array: [N]; Units: counts; stroke_type enum used as the index
+func (m *Length) SetStrokeCount(v []uint16) *Length {
+	m.StrokeCount = v
+	return m
+}
+
+// SetZoneCount sets Length value.
+//
+// Array: [N]; Units: counts; zone number used as the index
+func (m *Length) SetZoneCount(v []uint16) *Length {
+	m.ZoneCount = v
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets Length value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
+	m.EnhancedAvgRespirationRate = v
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets Length value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
+	m.EnhancedMaxRespirationRate = v
+	return m
+}
+
+// SetAvgRespirationRate sets Length value.
+func (m *Length) SetAvgRespirationRate(v uint8) *Length {
+	m.AvgRespirationRate = v
+	return m
+}
+
+// SetMaxRespirationRate sets Length value.
+func (m *Length) SetMaxRespirationRate(v uint8) *Length {
+	m.MaxRespirationRate = v
+	return m
+}
+
+// SetDeveloperFields Length's DeveloperFields.
+func (m *Length) SetDeveloperFields(developerFields ...proto.DeveloperField) *Length {
+	m.DeveloperFields = developerFields
+	return m
 }

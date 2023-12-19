@@ -8,19 +8,21 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // MonitoringInfo is a MonitoringInfo message.
 type MonitoringInfo struct {
-	Timestamp            typedef.DateTime       // Units: s;
-	LocalTimestamp       typedef.LocalDateTime  // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
+	Timestamp            time.Time              // Units: s;
+	LocalTimestamp       time.Time              // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
 	ActivityType         []typedef.ActivityType // Array: [N];
-	CyclesToDistance     []uint16               // Scale: 5000; Array: [N]; Units: m/cycle; Indexed by activity_type
-	CyclesToCalories     []uint16               // Scale: 5000; Array: [N]; Units: kcal/cycle; Indexed by activity_type
+	CyclesToDistance     []uint16               // Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
+	CyclesToCalories     []uint16               // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
 	RestingMetabolicRate uint16                 // Units: kcal / day;
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -28,30 +30,31 @@ type MonitoringInfo struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMonitoringInfo creates new MonitoringInfo struct based on given mesg. If mesg is nil or mesg.Num is not equal to MonitoringInfo mesg number, it will return nil.
-func NewMonitoringInfo(mesg proto.Message) *MonitoringInfo {
-	if mesg.Num != typedef.MesgNumMonitoringInfo {
-		return nil
-	}
-
+// NewMonitoringInfo creates new MonitoringInfo struct based on given mesg.
+// If mesg is nil, it will return MonitoringInfo with all fields being set to its corresponding invalid value.
+func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MonitoringInfo{
-		Timestamp:            typeconv.ToUint32[typedef.DateTime](vals[253]),
-		LocalTimestamp:       typeconv.ToUint32[typedef.LocalDateTime](vals[0]),
+		Timestamp:            datetime.ToTime(vals[253]),
+		LocalTimestamp:       datetime.ToTime(vals[0]),
 		ActivityType:         typeconv.ToSliceEnum[typedef.ActivityType](vals[1]),
 		CyclesToDistance:     typeconv.ToSliceUint16[uint16](vals[3]),
 		CyclesToCalories:     typeconv.ToSliceUint16[uint16](vals[4]),
 		RestingMetabolicRate: typeconv.ToUint16[uint16](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -60,14 +63,14 @@ func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringInfo)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint32[uint32](m.LocalTimestamp)
+		field.Value = datetime.ToUint32(m.LocalTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
@@ -99,10 +102,10 @@ func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
 // size returns size of MonitoringInfo's valid fields.
 func (m *MonitoringInfo) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
@@ -118,4 +121,58 @@ func (m *MonitoringInfo) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets MonitoringInfo value.
+//
+// Units: s;
+func (m *MonitoringInfo) SetTimestamp(v time.Time) *MonitoringInfo {
+	m.Timestamp = v
+	return m
+}
+
+// SetLocalTimestamp sets MonitoringInfo value.
+//
+// Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
+func (m *MonitoringInfo) SetLocalTimestamp(v time.Time) *MonitoringInfo {
+	m.LocalTimestamp = v
+	return m
+}
+
+// SetActivityType sets MonitoringInfo value.
+//
+// Array: [N];
+func (m *MonitoringInfo) SetActivityType(v []typedef.ActivityType) *MonitoringInfo {
+	m.ActivityType = v
+	return m
+}
+
+// SetCyclesToDistance sets MonitoringInfo value.
+//
+// Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
+func (m *MonitoringInfo) SetCyclesToDistance(v []uint16) *MonitoringInfo {
+	m.CyclesToDistance = v
+	return m
+}
+
+// SetCyclesToCalories sets MonitoringInfo value.
+//
+// Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
+func (m *MonitoringInfo) SetCyclesToCalories(v []uint16) *MonitoringInfo {
+	m.CyclesToCalories = v
+	return m
+}
+
+// SetRestingMetabolicRate sets MonitoringInfo value.
+//
+// Units: kcal / day;
+func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {
+	m.RestingMetabolicRate = v
+	return m
+}
+
+// SetDeveloperFields MonitoringInfo's DeveloperFields.
+func (m *MonitoringInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *MonitoringInfo {
+	m.DeveloperFields = developerFields
+	return m
 }

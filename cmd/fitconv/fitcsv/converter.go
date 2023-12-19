@@ -271,7 +271,19 @@ func (c *FitToCsvConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition)
 			if fieldName == nil {
 				break
 			}
-			return typeconv.ToString[string](fieldName.Value)
+
+			strbuf := new(strings.Builder)
+			if vals, ok := sliceAny(fieldName.Value); ok {
+				for i := range vals {
+					strbuf.WriteString(format(vals[i]))
+					if i < len(vals)-1 {
+						strbuf.WriteByte('|')
+					}
+				}
+				return strbuf.String()
+			} else {
+				return format(fieldName.Value)
+			}
 		}
 	}
 
@@ -354,7 +366,18 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 
 		c.buf.WriteString(devField.Name)
 		c.buf.WriteByte(',')
-		c.buf.WriteString(format(devField.Value))
+
+		if vals, ok := sliceAny(devField.Value); ok { // array
+			for i := range vals {
+				c.buf.WriteString(format(vals[i]))
+				if i < len(vals)-1 {
+					c.buf.WriteByte('|')
+				}
+			}
+		} else {
+			c.buf.WriteString(format(devField.Value))
+		}
+
 		c.buf.WriteByte(',')
 		c.buf.WriteString(devField.Units)
 		c.buf.WriteByte(',')
@@ -424,6 +447,11 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 		}
 		return
 	case []float64:
+		for i := range vs {
+			vals = append(vals, vs[i])
+		}
+		return
+	case []string:
 		for i := range vs {
 			vals = append(vals, vs[i])
 		}

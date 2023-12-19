@@ -8,19 +8,21 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Totals is a Totals message.
 type Totals struct {
 	MessageIndex typedef.MessageIndex
-	Timestamp    typedef.DateTime // Units: s;
-	TimerTime    uint32           // Units: s; Excludes pauses
-	Distance     uint32           // Units: m;
-	Calories     uint32           // Units: kcal;
+	Timestamp    time.Time // Units: s;
+	TimerTime    uint32    // Units: s; Excludes pauses
+	Distance     uint32    // Units: m;
+	Calories     uint32    // Units: kcal;
 	Sport        typedef.Sport
 	ElapsedTime  uint32 // Units: s; Includes pauses
 	Sessions     uint16
@@ -32,24 +34,25 @@ type Totals struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewTotals creates new Totals struct based on given mesg. If mesg is nil or mesg.Num is not equal to Totals mesg number, it will return nil.
-func NewTotals(mesg proto.Message) *Totals {
-	if mesg.Num != typedef.MesgNumTotals {
-		return nil
-	}
-
+// NewTotals creates new Totals struct based on given mesg.
+// If mesg is nil, it will return Totals with all fields being set to its corresponding invalid value.
+func NewTotals(mesg *proto.Message) *Totals {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Totals{
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Timestamp:    typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:    datetime.ToTime(vals[253]),
 		TimerTime:    typeconv.ToUint32[uint32](vals[0]),
 		Distance:     typeconv.ToUint32[uint32](vals[1]),
 		Calories:     typeconv.ToUint32[uint32](vals[2]),
@@ -59,7 +62,7 @@ func NewTotals(mesg proto.Message) *Totals {
 		ActiveTime:   typeconv.ToUint32[uint32](vals[6]),
 		SportIndex:   typeconv.ToUint8[uint8](vals[9]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -73,9 +76,9 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimerTime != basetype.Uint32Invalid {
@@ -130,7 +133,7 @@ func (m *Totals) size() byte {
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimerTime != basetype.Uint32Invalid {
@@ -158,4 +161,82 @@ func (m *Totals) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Totals value.
+func (m *Totals) SetMessageIndex(v typedef.MessageIndex) *Totals {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets Totals value.
+//
+// Units: s;
+func (m *Totals) SetTimestamp(v time.Time) *Totals {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimerTime sets Totals value.
+//
+// Units: s; Excludes pauses
+func (m *Totals) SetTimerTime(v uint32) *Totals {
+	m.TimerTime = v
+	return m
+}
+
+// SetDistance sets Totals value.
+//
+// Units: m;
+func (m *Totals) SetDistance(v uint32) *Totals {
+	m.Distance = v
+	return m
+}
+
+// SetCalories sets Totals value.
+//
+// Units: kcal;
+func (m *Totals) SetCalories(v uint32) *Totals {
+	m.Calories = v
+	return m
+}
+
+// SetSport sets Totals value.
+func (m *Totals) SetSport(v typedef.Sport) *Totals {
+	m.Sport = v
+	return m
+}
+
+// SetElapsedTime sets Totals value.
+//
+// Units: s; Includes pauses
+func (m *Totals) SetElapsedTime(v uint32) *Totals {
+	m.ElapsedTime = v
+	return m
+}
+
+// SetSessions sets Totals value.
+func (m *Totals) SetSessions(v uint16) *Totals {
+	m.Sessions = v
+	return m
+}
+
+// SetActiveTime sets Totals value.
+//
+// Units: s;
+func (m *Totals) SetActiveTime(v uint32) *Totals {
+	m.ActiveTime = v
+	return m
+}
+
+// SetSportIndex sets Totals value.
+func (m *Totals) SetSportIndex(v uint8) *Totals {
+	m.SportIndex = v
+	return m
+}
+
+// SetDeveloperFields Totals's DeveloperFields.
+func (m *Totals) SetDeveloperFields(developerFields ...proto.DeveloperField) *Totals {
+	m.DeveloperFields = developerFields
+	return m
 }

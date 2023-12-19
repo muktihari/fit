@@ -697,6 +697,221 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", MesgNumInvalid)
 	}
 
+	switch v {
+	case MesgNumFileId:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumFileId", v)
+	case MesgNumCapabilities:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumCapabilities", v)
+	case MesgNumDeviceSettings:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDeviceSettings", v)
+	case MesgNumUserProfile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumUserProfile", v)
+	case MesgNumHrmProfile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrmProfile", v)
+	case MesgNumSdmProfile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSdmProfile", v)
+	case MesgNumBikeProfile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumBikeProfile", v)
+	case MesgNumZonesTarget:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumZonesTarget", v)
+	case MesgNumHrZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrZone", v)
+	case MesgNumPowerZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumPowerZone", v)
+	case MesgNumMetZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMetZone", v)
+	case MesgNumSport:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSport", v)
+	case MesgNumGoal:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumGoal", v)
+	case MesgNumSession:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSession", v)
+	case MesgNumLap:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumLap", v)
+	case MesgNumRecord:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumRecord", v)
+	case MesgNumEvent:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumEvent", v)
+	case MesgNumDeviceInfo:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDeviceInfo", v)
+	case MesgNumWorkout:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWorkout", v)
+	case MesgNumWorkoutStep:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWorkoutStep", v)
+	case MesgNumSchedule:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSchedule", v)
+	case MesgNumWeightScale:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWeightScale", v)
+	case MesgNumCourse:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumCourse", v)
+	case MesgNumCoursePoint:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumCoursePoint", v)
+	case MesgNumTotals:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTotals", v)
+	case MesgNumActivity:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumActivity", v)
+	case MesgNumSoftware:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSoftware", v)
+	case MesgNumFileCapabilities:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumFileCapabilities", v)
+	case MesgNumMesgCapabilities:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMesgCapabilities", v)
+	case MesgNumFieldCapabilities:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumFieldCapabilities", v)
+	case MesgNumFileCreator:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumFileCreator", v)
+	case MesgNumBloodPressure:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumBloodPressure", v)
+	case MesgNumSpeedZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSpeedZone", v)
+	case MesgNumMonitoring:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMonitoring", v)
+	case MesgNumTrainingFile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTrainingFile", v)
+	case MesgNumHrv:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrv", v)
+	case MesgNumAntRx:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumAntRx", v)
+	case MesgNumAntTx:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumAntTx", v)
+	case MesgNumAntChannelId:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumAntChannelId", v)
+	case MesgNumLength:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumLength", v)
+	case MesgNumMonitoringInfo:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMonitoringInfo", v)
+	case MesgNumPad:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumPad", v)
+	case MesgNumSlaveDevice:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSlaveDevice", v)
+	case MesgNumConnectivity:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumConnectivity", v)
+	case MesgNumWeatherConditions:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWeatherConditions", v)
+	case MesgNumWeatherAlert:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWeatherAlert", v)
+	case MesgNumCadenceZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumCadenceZone", v)
+	case MesgNumHr:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHr", v)
+	case MesgNumSegmentLap:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSegmentLap", v)
+	case MesgNumMemoGlob:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMemoGlob", v)
+	case MesgNumSegmentId:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSegmentId", v)
+	case MesgNumSegmentLeaderboardEntry:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSegmentLeaderboardEntry", v)
+	case MesgNumSegmentPoint:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSegmentPoint", v)
+	case MesgNumSegmentFile:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSegmentFile", v)
+	case MesgNumWorkoutSession:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWorkoutSession", v)
+	case MesgNumWatchfaceSettings:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumWatchfaceSettings", v)
+	case MesgNumGpsMetadata:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumGpsMetadata", v)
+	case MesgNumCameraEvent:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumCameraEvent", v)
+	case MesgNumTimestampCorrelation:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTimestampCorrelation", v)
+	case MesgNumGyroscopeData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumGyroscopeData", v)
+	case MesgNumAccelerometerData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumAccelerometerData", v)
+	case MesgNumThreeDSensorCalibration:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumThreeDSensorCalibration", v)
+	case MesgNumVideoFrame:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumVideoFrame", v)
+	case MesgNumObdiiData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumObdiiData", v)
+	case MesgNumNmeaSentence:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumNmeaSentence", v)
+	case MesgNumAviationAttitude:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumAviationAttitude", v)
+	case MesgNumVideo:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumVideo", v)
+	case MesgNumVideoTitle:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumVideoTitle", v)
+	case MesgNumVideoDescription:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumVideoDescription", v)
+	case MesgNumVideoClip:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumVideoClip", v)
+	case MesgNumOhrSettings:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumOhrSettings", v)
+	case MesgNumExdScreenConfiguration:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumExdScreenConfiguration", v)
+	case MesgNumExdDataFieldConfiguration:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumExdDataFieldConfiguration", v)
+	case MesgNumExdDataConceptConfiguration:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumExdDataConceptConfiguration", v)
+	case MesgNumFieldDescription:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumFieldDescription", v)
+	case MesgNumDeveloperDataId:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDeveloperDataId", v)
+	case MesgNumMagnetometerData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMagnetometerData", v)
+	case MesgNumBarometerData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumBarometerData", v)
+	case MesgNumOneDSensorCalibration:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumOneDSensorCalibration", v)
+	case MesgNumMonitoringHrData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMonitoringHrData", v)
+	case MesgNumTimeInZone:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTimeInZone", v)
+	case MesgNumSet:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSet", v)
+	case MesgNumStressLevel:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumStressLevel", v)
+	case MesgNumMaxMetData:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMaxMetData", v)
+	case MesgNumDiveSettings:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveSettings", v)
+	case MesgNumDiveGas:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveGas", v)
+	case MesgNumDiveAlarm:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveAlarm", v)
+	case MesgNumExerciseTitle:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumExerciseTitle", v)
+	case MesgNumDiveSummary:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveSummary", v)
+	case MesgNumSpo2Data:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSpo2Data", v)
+	case MesgNumSleepLevel:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSleepLevel", v)
+	case MesgNumJump:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumJump", v)
+	case MesgNumBeatIntervals:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumBeatIntervals", v)
+	case MesgNumRespirationRate:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumRespirationRate", v)
+	case MesgNumSplit:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSplit", v)
+	case MesgNumSplitSummary:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSplitSummary", v)
+	case MesgNumClimbPro:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumClimbPro", v)
+	case MesgNumTankUpdate:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTankUpdate", v)
+	case MesgNumTankSummary:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTankSummary", v)
+	case MesgNumSleepAssessment:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSleepAssessment", v)
+	case MesgNumHrvStatusSummary:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrvStatusSummary", v)
+	case MesgNumHrvValue:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrvValue", v)
+	case MesgNumDeviceAuxBatteryInfo:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDeviceAuxBatteryInfo", v)
+	case MesgNumDiveApneaAlarm:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveApneaAlarm", v)
+	case MesgNumMfgRangeMin:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMfgRangeMin", v)
+	case MesgNumMfgRangeMax:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumMfgRangeMax", v)
+	}
+
 	mesgnumToString[v] = s
 	stringToMesgNum[s] = v
 

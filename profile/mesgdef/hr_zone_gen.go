@@ -25,19 +25,20 @@ type HrZone struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewHrZone creates new HrZone struct based on given mesg. If mesg is nil or mesg.Num is not equal to HrZone mesg number, it will return nil.
-func NewHrZone(mesg proto.Message) *HrZone {
-	if mesg.Num != typedef.MesgNumHrZone {
-		return nil
-	}
-
+// NewHrZone creates new HrZone struct based on given mesg.
+// If mesg is nil, it will return HrZone with all fields being set to its corresponding invalid value.
+func NewHrZone(mesg *proto.Message) *HrZone {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &HrZone{
@@ -45,7 +46,7 @@ func NewHrZone(mesg proto.Message) *HrZone {
 		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
 		Name:         typeconv.ToString[string](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *HrZone) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets HrZone value.
+func (m *HrZone) SetMessageIndex(v typedef.MessageIndex) *HrZone {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHighBpm sets HrZone value.
+//
+// Units: bpm;
+func (m *HrZone) SetHighBpm(v uint8) *HrZone {
+	m.HighBpm = v
+	return m
+}
+
+// SetName sets HrZone value.
+func (m *HrZone) SetName(v string) *HrZone {
+	m.Name = v
+	return m
+}
+
+// SetDeveloperFields HrZone's DeveloperFields.
+func (m *HrZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrZone {
+	m.DeveloperFields = developerFields
+	return m
 }

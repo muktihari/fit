@@ -31,19 +31,20 @@ type SegmentId struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSegmentId creates new SegmentId struct based on given mesg. If mesg is nil or mesg.Num is not equal to SegmentId mesg number, it will return nil.
-func NewSegmentId(mesg proto.Message) *SegmentId {
-	if mesg.Num != typedef.MesgNumSegmentId {
-		return nil
-	}
-
+// NewSegmentId creates new SegmentId struct based on given mesg.
+// If mesg is nil, it will return SegmentId with all fields being set to its corresponding invalid value.
+func NewSegmentId(mesg *proto.Message) *SegmentId {
 	vals := [9]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SegmentId{
@@ -57,7 +58,7 @@ func NewSegmentId(mesg proto.Message) *SegmentId {
 		DeleteStatus:          typeconv.ToEnum[typedef.SegmentDeleteStatus](vals[7]),
 		SelectionType:         typeconv.ToEnum[typedef.SegmentSelectionType](vals[8]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -148,4 +149,82 @@ func (m *SegmentId) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetName sets SegmentId value.
+//
+// Friendly name assigned to segment
+func (m *SegmentId) SetName(v string) *SegmentId {
+	m.Name = v
+	return m
+}
+
+// SetUuid sets SegmentId value.
+//
+// UUID of the segment
+func (m *SegmentId) SetUuid(v string) *SegmentId {
+	m.Uuid = v
+	return m
+}
+
+// SetSport sets SegmentId value.
+//
+// Sport associated with the segment
+func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
+	m.Sport = v
+	return m
+}
+
+// SetEnabled sets SegmentId value.
+//
+// Segment enabled for evaluation
+func (m *SegmentId) SetEnabled(v bool) *SegmentId {
+	m.Enabled = v
+	return m
+}
+
+// SetUserProfilePrimaryKey sets SegmentId value.
+//
+// Primary key of the user that created the segment
+func (m *SegmentId) SetUserProfilePrimaryKey(v uint32) *SegmentId {
+	m.UserProfilePrimaryKey = v
+	return m
+}
+
+// SetDeviceId sets SegmentId value.
+//
+// ID of the device that created the segment
+func (m *SegmentId) SetDeviceId(v uint32) *SegmentId {
+	m.DeviceId = v
+	return m
+}
+
+// SetDefaultRaceLeader sets SegmentId value.
+//
+// Index for the Leader Board entry selected as the default race participant
+func (m *SegmentId) SetDefaultRaceLeader(v uint8) *SegmentId {
+	m.DefaultRaceLeader = v
+	return m
+}
+
+// SetDeleteStatus sets SegmentId value.
+//
+// Indicates if any segments should be deleted
+func (m *SegmentId) SetDeleteStatus(v typedef.SegmentDeleteStatus) *SegmentId {
+	m.DeleteStatus = v
+	return m
+}
+
+// SetSelectionType sets SegmentId value.
+//
+// Indicates how the segment was selected to be sent to the device
+func (m *SegmentId) SetSelectionType(v typedef.SegmentSelectionType) *SegmentId {
+	m.SelectionType = v
+	return m
+}
+
+// SetDeveloperFields SegmentId's DeveloperFields.
+func (m *SegmentId) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentId {
+	m.DeveloperFields = developerFields
+	return m
 }

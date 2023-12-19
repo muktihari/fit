@@ -8,16 +8,18 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Spo2Data is a Spo2Data message.
 type Spo2Data struct {
-	Timestamp         typedef.DateTime // Units: s;
-	ReadingSpo2       uint8            // Units: percent;
+	Timestamp         time.Time // Units: s;
+	ReadingSpo2       uint8     // Units: percent;
 	ReadingConfidence uint8
 	Mode              typedef.Spo2MeasurementType // Mode when data was captured
 
@@ -26,28 +28,29 @@ type Spo2Data struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSpo2Data creates new Spo2Data struct based on given mesg. If mesg is nil or mesg.Num is not equal to Spo2Data mesg number, it will return nil.
-func NewSpo2Data(mesg proto.Message) *Spo2Data {
-	if mesg.Num != typedef.MesgNumSpo2Data {
-		return nil
-	}
-
+// NewSpo2Data creates new Spo2Data struct based on given mesg.
+// If mesg is nil, it will return Spo2Data with all fields being set to its corresponding invalid value.
+func NewSpo2Data(mesg *proto.Message) *Spo2Data {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Spo2Data{
-		Timestamp:         typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:         datetime.ToTime(vals[253]),
 		ReadingSpo2:       typeconv.ToUint8[uint8](vals[0]),
 		ReadingConfidence: typeconv.ToUint8[uint8](vals[1]),
 		Mode:              typeconv.ToEnum[typedef.Spo2MeasurementType](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -56,9 +59,9 @@ func (m *Spo2Data) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSpo2Data)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.ReadingSpo2 != basetype.Uint8Invalid {
@@ -85,7 +88,7 @@ func (m *Spo2Data) ToMesg(fac Factory) proto.Message {
 // size returns size of Spo2Data's valid fields.
 func (m *Spo2Data) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.ReadingSpo2 != basetype.Uint8Invalid {
@@ -98,4 +101,40 @@ func (m *Spo2Data) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets Spo2Data value.
+//
+// Units: s;
+func (m *Spo2Data) SetTimestamp(v time.Time) *Spo2Data {
+	m.Timestamp = v
+	return m
+}
+
+// SetReadingSpo2 sets Spo2Data value.
+//
+// Units: percent;
+func (m *Spo2Data) SetReadingSpo2(v uint8) *Spo2Data {
+	m.ReadingSpo2 = v
+	return m
+}
+
+// SetReadingConfidence sets Spo2Data value.
+func (m *Spo2Data) SetReadingConfidence(v uint8) *Spo2Data {
+	m.ReadingConfidence = v
+	return m
+}
+
+// SetMode sets Spo2Data value.
+//
+// Mode when data was captured
+func (m *Spo2Data) SetMode(v typedef.Spo2MeasurementType) *Spo2Data {
+	m.Mode = v
+	return m
+}
+
+// SetDeveloperFields Spo2Data's DeveloperFields.
+func (m *Spo2Data) SetDeveloperFields(developerFields ...proto.DeveloperField) *Spo2Data {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -23,19 +23,18 @@ type DeveloperDataId struct {
 	ApplicationVersion uint32
 }
 
-// NewDeveloperDataId creates new DeveloperDataId struct based on given mesg. If mesg is nil or mesg.Num is not equal to DeveloperDataId mesg number, it will return nil.
-func NewDeveloperDataId(mesg proto.Message) *DeveloperDataId {
-	if mesg.Num != typedef.MesgNumDeveloperDataId {
-		return nil
-	}
-
+// NewDeveloperDataId creates new DeveloperDataId struct based on given mesg.
+// If mesg is nil, it will return DeveloperDataId with all fields being set to its corresponding invalid value.
+func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 	vals := [5]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
 	}
 
 	return &DeveloperDataId{
@@ -100,4 +99,38 @@ func (m *DeveloperDataId) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetDeveloperId sets DeveloperDataId value.
+//
+// Array: [N];
+func (m *DeveloperDataId) SetDeveloperId(v []byte) *DeveloperDataId {
+	m.DeveloperId = v
+	return m
+}
+
+// SetApplicationId sets DeveloperDataId value.
+//
+// Array: [N];
+func (m *DeveloperDataId) SetApplicationId(v []byte) *DeveloperDataId {
+	m.ApplicationId = v
+	return m
+}
+
+// SetManufacturerId sets DeveloperDataId value.
+func (m *DeveloperDataId) SetManufacturerId(v typedef.Manufacturer) *DeveloperDataId {
+	m.ManufacturerId = v
+	return m
+}
+
+// SetDeveloperDataIndex sets DeveloperDataId value.
+func (m *DeveloperDataId) SetDeveloperDataIndex(v uint8) *DeveloperDataId {
+	m.DeveloperDataIndex = v
+	return m
+}
+
+// SetApplicationVersion sets DeveloperDataId value.
+func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
+	m.ApplicationVersion = v
+	return m
 }

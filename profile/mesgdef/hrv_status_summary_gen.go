@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // HrvStatusSummary is a HrvStatusSummary message.
 type HrvStatusSummary struct {
-	Timestamp             typedef.DateTime
+	Timestamp             time.Time
 	WeeklyAverage         uint16 // Scale: 128; Units: ms; 7 day RMSSD average over sleep
 	LastNightAverage      uint16 // Scale: 128; Units: ms; Last night RMSSD average over sleep
 	LastNight5MinHigh     uint16 // Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
@@ -30,23 +32,24 @@ type HrvStatusSummary struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewHrvStatusSummary creates new HrvStatusSummary struct based on given mesg. If mesg is nil or mesg.Num is not equal to HrvStatusSummary mesg number, it will return nil.
-func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
-	if mesg.Num != typedef.MesgNumHrvStatusSummary {
-		return nil
-	}
-
+// NewHrvStatusSummary creates new HrvStatusSummary struct based on given mesg.
+// If mesg is nil, it will return HrvStatusSummary with all fields being set to its corresponding invalid value.
+func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &HrvStatusSummary{
-		Timestamp:             typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:             datetime.ToTime(vals[253]),
 		WeeklyAverage:         typeconv.ToUint16[uint16](vals[0]),
 		LastNightAverage:      typeconv.ToUint16[uint16](vals[1]),
 		LastNight5MinHigh:     typeconv.ToUint16[uint16](vals[2]),
@@ -55,7 +58,7 @@ func NewHrvStatusSummary(mesg proto.Message) *HrvStatusSummary {
 		BaselineBalancedUpper: typeconv.ToUint16[uint16](vals[5]),
 		Status:                typeconv.ToEnum[typedef.HrvStatus](vals[6]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -64,9 +67,9 @@ func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrvStatusSummary)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.WeeklyAverage != basetype.Uint16Invalid {
@@ -113,7 +116,7 @@ func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
 // size returns size of HrvStatusSummary's valid fields.
 func (m *HrvStatusSummary) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.WeeklyAverage != basetype.Uint16Invalid {
@@ -138,4 +141,70 @@ func (m *HrvStatusSummary) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets HrvStatusSummary value.
+func (m *HrvStatusSummary) SetTimestamp(v time.Time) *HrvStatusSummary {
+	m.Timestamp = v
+	return m
+}
+
+// SetWeeklyAverage sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; 7 day RMSSD average over sleep
+func (m *HrvStatusSummary) SetWeeklyAverage(v uint16) *HrvStatusSummary {
+	m.WeeklyAverage = v
+	return m
+}
+
+// SetLastNightAverage sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; Last night RMSSD average over sleep
+func (m *HrvStatusSummary) SetLastNightAverage(v uint16) *HrvStatusSummary {
+	m.LastNightAverage = v
+	return m
+}
+
+// SetLastNight5MinHigh sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
+func (m *HrvStatusSummary) SetLastNight5MinHigh(v uint16) *HrvStatusSummary {
+	m.LastNight5MinHigh = v
+	return m
+}
+
+// SetBaselineLowUpper sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status
+func (m *HrvStatusSummary) SetBaselineLowUpper(v uint16) *HrvStatusSummary {
+	m.BaselineLowUpper = v
+	return m
+}
+
+// SetBaselineBalancedLower sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
+func (m *HrvStatusSummary) SetBaselineBalancedLower(v uint16) *HrvStatusSummary {
+	m.BaselineBalancedLower = v
+	return m
+}
+
+// SetBaselineBalancedUpper sets HrvStatusSummary value.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
+func (m *HrvStatusSummary) SetBaselineBalancedUpper(v uint16) *HrvStatusSummary {
+	m.BaselineBalancedUpper = v
+	return m
+}
+
+// SetStatus sets HrvStatusSummary value.
+func (m *HrvStatusSummary) SetStatus(v typedef.HrvStatus) *HrvStatusSummary {
+	m.Status = v
+	return m
+}
+
+// SetDeveloperFields HrvStatusSummary's DeveloperFields.
+func (m *HrvStatusSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrvStatusSummary {
+	m.DeveloperFields = developerFields
+	return m
 }

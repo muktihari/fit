@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // BeatIntervals is a BeatIntervals message.
 type BeatIntervals struct {
-	Timestamp   typedef.DateTime
+	Timestamp   time.Time
 	TimestampMs uint16   // Units: ms; Milliseconds past date_time
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
 
@@ -25,27 +27,28 @@ type BeatIntervals struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewBeatIntervals creates new BeatIntervals struct based on given mesg. If mesg is nil or mesg.Num is not equal to BeatIntervals mesg number, it will return nil.
-func NewBeatIntervals(mesg proto.Message) *BeatIntervals {
-	if mesg.Num != typedef.MesgNumBeatIntervals {
-		return nil
-	}
-
+// NewBeatIntervals creates new BeatIntervals struct based on given mesg.
+// If mesg is nil, it will return BeatIntervals with all fields being set to its corresponding invalid value.
+func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &BeatIntervals{
-		Timestamp:   typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:   datetime.ToTime(vals[253]),
 		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		Time:        typeconv.ToSliceUint16[uint16](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -54,9 +57,9 @@ func (m *BeatIntervals) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBeatIntervals)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -78,7 +81,7 @@ func (m *BeatIntervals) ToMesg(fac Factory) proto.Message {
 // size returns size of BeatIntervals's valid fields.
 func (m *BeatIntervals) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -88,4 +91,32 @@ func (m *BeatIntervals) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets BeatIntervals value.
+func (m *BeatIntervals) SetTimestamp(v time.Time) *BeatIntervals {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets BeatIntervals value.
+//
+// Units: ms; Milliseconds past date_time
+func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
+	m.TimestampMs = v
+	return m
+}
+
+// SetTime sets BeatIntervals value.
+//
+// Array: [N]; Units: ms; Array of millisecond times between beats
+func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
+	m.Time = v
+	return m
+}
+
+// SetDeveloperFields BeatIntervals's DeveloperFields.
+func (m *BeatIntervals) SetDeveloperFields(developerFields ...proto.DeveloperField) *BeatIntervals {
+	m.DeveloperFields = developerFields
+	return m
 }

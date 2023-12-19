@@ -25,19 +25,20 @@ type PowerZone struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewPowerZone creates new PowerZone struct based on given mesg. If mesg is nil or mesg.Num is not equal to PowerZone mesg number, it will return nil.
-func NewPowerZone(mesg proto.Message) *PowerZone {
-	if mesg.Num != typedef.MesgNumPowerZone {
-		return nil
-	}
-
+// NewPowerZone creates new PowerZone struct based on given mesg.
+// If mesg is nil, it will return PowerZone with all fields being set to its corresponding invalid value.
+func NewPowerZone(mesg *proto.Message) *PowerZone {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &PowerZone{
@@ -45,7 +46,7 @@ func NewPowerZone(mesg proto.Message) *PowerZone {
 		HighValue:    typeconv.ToUint16[uint16](vals[1]),
 		Name:         typeconv.ToString[string](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *PowerZone) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets PowerZone value.
+func (m *PowerZone) SetMessageIndex(v typedef.MessageIndex) *PowerZone {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHighValue sets PowerZone value.
+//
+// Units: watts;
+func (m *PowerZone) SetHighValue(v uint16) *PowerZone {
+	m.HighValue = v
+	return m
+}
+
+// SetName sets PowerZone value.
+func (m *PowerZone) SetName(v string) *PowerZone {
+	m.Name = v
+	return m
+}
+
+// SetDeveloperFields PowerZone's DeveloperFields.
+func (m *PowerZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *PowerZone {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -8,16 +8,18 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // MaxMetData is a MaxMetData message.
 type MaxMetData struct {
-	UpdateTime     typedef.DateTime // Time maxMET and vo2 were calculated
-	Vo2Max         uint16           // Scale: 10; Units: mL/kg/min;
+	UpdateTime     time.Time // Time maxMET and vo2 were calculated
+	Vo2Max         uint16    // Scale: 10; Units: mL/kg/min;
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	MaxMetCategory typedef.MaxMetCategory
@@ -30,23 +32,24 @@ type MaxMetData struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMaxMetData creates new MaxMetData struct based on given mesg. If mesg is nil or mesg.Num is not equal to MaxMetData mesg number, it will return nil.
-func NewMaxMetData(mesg proto.Message) *MaxMetData {
-	if mesg.Num != typedef.MesgNumMaxMetData {
-		return nil
-	}
-
+// NewMaxMetData creates new MaxMetData struct based on given mesg.
+// If mesg is nil, it will return MaxMetData with all fields being set to its corresponding invalid value.
+func NewMaxMetData(mesg *proto.Message) *MaxMetData {
 	vals := [14]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MaxMetData{
-		UpdateTime:     typeconv.ToUint32[typedef.DateTime](vals[0]),
+		UpdateTime:     datetime.ToTime(vals[0]),
 		Vo2Max:         typeconv.ToUint16[uint16](vals[2]),
 		Sport:          typeconv.ToEnum[typedef.Sport](vals[5]),
 		SubSport:       typeconv.ToEnum[typedef.SubSport](vals[6]),
@@ -55,7 +58,7 @@ func NewMaxMetData(mesg proto.Message) *MaxMetData {
 		HrSource:       typeconv.ToEnum[typedef.MaxMetHeartRateSource](vals[12]),
 		SpeedSource:    typeconv.ToEnum[typedef.MaxMetSpeedSource](vals[13]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -64,9 +67,9 @@ func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMaxMetData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.UpdateTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint32[uint32](m.UpdateTime)
+		field.Value = datetime.ToUint32(m.UpdateTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Vo2Max != basetype.Uint16Invalid {
@@ -113,7 +116,7 @@ func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
 // size returns size of MaxMetData's valid fields.
 func (m *MaxMetData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.UpdateTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Vo2Max != basetype.Uint16Invalid {
@@ -138,4 +141,68 @@ func (m *MaxMetData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetUpdateTime sets MaxMetData value.
+//
+// Time maxMET and vo2 were calculated
+func (m *MaxMetData) SetUpdateTime(v time.Time) *MaxMetData {
+	m.UpdateTime = v
+	return m
+}
+
+// SetVo2Max sets MaxMetData value.
+//
+// Scale: 10; Units: mL/kg/min;
+func (m *MaxMetData) SetVo2Max(v uint16) *MaxMetData {
+	m.Vo2Max = v
+	return m
+}
+
+// SetSport sets MaxMetData value.
+func (m *MaxMetData) SetSport(v typedef.Sport) *MaxMetData {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets MaxMetData value.
+func (m *MaxMetData) SetSubSport(v typedef.SubSport) *MaxMetData {
+	m.SubSport = v
+	return m
+}
+
+// SetMaxMetCategory sets MaxMetData value.
+func (m *MaxMetData) SetMaxMetCategory(v typedef.MaxMetCategory) *MaxMetData {
+	m.MaxMetCategory = v
+	return m
+}
+
+// SetCalibratedData sets MaxMetData value.
+//
+// Indicates if calibrated data was used in the calculation
+func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
+	m.CalibratedData = v
+	return m
+}
+
+// SetHrSource sets MaxMetData value.
+//
+// Indicates if the estimate was obtained using a chest strap or wrist heart rate
+func (m *MaxMetData) SetHrSource(v typedef.MaxMetHeartRateSource) *MaxMetData {
+	m.HrSource = v
+	return m
+}
+
+// SetSpeedSource sets MaxMetData value.
+//
+// Indidcates if the estimate was obtained using onboard GPS or connected GPS
+func (m *MaxMetData) SetSpeedSource(v typedef.MaxMetSpeedSource) *MaxMetData {
+	m.SpeedSource = v
+	return m
+}
+
+// SetDeveloperFields MaxMetData's DeveloperFields.
+func (m *MaxMetData) SetDeveloperFields(developerFields ...proto.DeveloperField) *MaxMetData {
+	m.DeveloperFields = developerFields
+	return m
 }

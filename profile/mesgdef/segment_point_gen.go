@@ -21,7 +21,7 @@ type SegmentPoint struct {
 	PositionLong     int32    // Units: semicircles;
 	Distance         uint32   // Scale: 100; Units: m; Accumulated distance along the segment at the described point
 	Altitude         uint16   // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
-	LeaderTime       []uint32 // Scale: 1000; Array: [N]; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
+	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 	EnhancedAltitude uint32   // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -29,19 +29,20 @@ type SegmentPoint struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSegmentPoint creates new SegmentPoint struct based on given mesg. If mesg is nil or mesg.Num is not equal to SegmentPoint mesg number, it will return nil.
-func NewSegmentPoint(mesg proto.Message) *SegmentPoint {
-	if mesg.Num != typedef.MesgNumSegmentPoint {
-		return nil
-	}
-
+// NewSegmentPoint creates new SegmentPoint struct based on given mesg.
+// If mesg is nil, it will return SegmentPoint with all fields being set to its corresponding invalid value.
+func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SegmentPoint{
@@ -53,7 +54,7 @@ func NewSegmentPoint(mesg proto.Message) *SegmentPoint {
 		LeaderTime:       typeconv.ToSliceUint32[uint32](vals[5]),
 		EnhancedAltitude: typeconv.ToUint32[uint32](vals[6]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -128,4 +129,64 @@ func (m *SegmentPoint) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SegmentPoint value.
+func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
+	m.MessageIndex = v
+	return m
+}
+
+// SetPositionLat sets SegmentPoint value.
+//
+// Units: semicircles;
+func (m *SegmentPoint) SetPositionLat(v int32) *SegmentPoint {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets SegmentPoint value.
+//
+// Units: semicircles;
+func (m *SegmentPoint) SetPositionLong(v int32) *SegmentPoint {
+	m.PositionLong = v
+	return m
+}
+
+// SetDistance sets SegmentPoint value.
+//
+// Scale: 100; Units: m; Accumulated distance along the segment at the described point
+func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
+	m.Distance = v
+	return m
+}
+
+// SetAltitude sets SegmentPoint value.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
+	m.Altitude = v
+	return m
+}
+
+// SetLeaderTime sets SegmentPoint value.
+//
+// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
+func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
+	m.LeaderTime = v
+	return m
+}
+
+// SetEnhancedAltitude sets SegmentPoint value.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
+	m.EnhancedAltitude = v
+	return m
+}
+
+// SetDeveloperFields SegmentPoint's DeveloperFields.
+func (m *SegmentPoint) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentPoint {
+	m.DeveloperFields = developerFields
+	return m
 }

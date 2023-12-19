@@ -147,6 +147,11 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 
 	strbuf.WriteString("}")
 
+	mesgnums := make([]string, 0, len(b.messages))
+	for i := range b.messages {
+		mesgnums = append(mesgnums, b.transformMesgnum(b.messages[i].Name))
+	}
+
 	return []builder.Data{
 		{
 			Template:     b.template,
@@ -157,6 +162,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 				Package:    "factory",
 				SDKVersion: b.sdkVersion,
 				Messages:   strbuf.String(),
+				Mesgnums:   mesgnums,
 			},
 		},
 		{

@@ -33,19 +33,20 @@ type ExdDataConceptConfiguration struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewExdDataConceptConfiguration creates new ExdDataConceptConfiguration struct based on given mesg. If mesg is nil or mesg.Num is not equal to ExdDataConceptConfiguration mesg number, it will return nil.
-func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfiguration {
-	if mesg.Num != typedef.MesgNumExdDataConceptConfiguration {
-		return nil
-	}
-
+// NewExdDataConceptConfiguration creates new ExdDataConceptConfiguration struct based on given mesg.
+// If mesg is nil, it will return ExdDataConceptConfiguration with all fields being set to its corresponding invalid value.
+func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfiguration {
 	vals := [12]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ExdDataConceptConfiguration{
@@ -61,7 +62,7 @@ func NewExdDataConceptConfiguration(mesg proto.Message) *ExdDataConceptConfigura
 		Descriptor:   typeconv.ToEnum[typedef.ExdDescriptors](vals[10]),
 		IsSigned:     typeconv.ToBool[bool](vals[11]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -168,4 +169,76 @@ func (m *ExdDataConceptConfiguration) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetScreenIndex sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetScreenIndex(v uint8) *ExdDataConceptConfiguration {
+	m.ScreenIndex = v
+	return m
+}
+
+// SetConceptField sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetConceptField(v byte) *ExdDataConceptConfiguration {
+	m.ConceptField = v
+	return m
+}
+
+// SetFieldId sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetFieldId(v uint8) *ExdDataConceptConfiguration {
+	m.FieldId = v
+	return m
+}
+
+// SetConceptIndex sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetConceptIndex(v uint8) *ExdDataConceptConfiguration {
+	m.ConceptIndex = v
+	return m
+}
+
+// SetDataPage sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetDataPage(v uint8) *ExdDataConceptConfiguration {
+	m.DataPage = v
+	return m
+}
+
+// SetConceptKey sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetConceptKey(v uint8) *ExdDataConceptConfiguration {
+	m.ConceptKey = v
+	return m
+}
+
+// SetScaling sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetScaling(v uint8) *ExdDataConceptConfiguration {
+	m.Scaling = v
+	return m
+}
+
+// SetDataUnits sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetDataUnits(v typedef.ExdDataUnits) *ExdDataConceptConfiguration {
+	m.DataUnits = v
+	return m
+}
+
+// SetQualifier sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetQualifier(v typedef.ExdQualifiers) *ExdDataConceptConfiguration {
+	m.Qualifier = v
+	return m
+}
+
+// SetDescriptor sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetDescriptor(v typedef.ExdDescriptors) *ExdDataConceptConfiguration {
+	m.Descriptor = v
+	return m
+}
+
+// SetIsSigned sets ExdDataConceptConfiguration value.
+func (m *ExdDataConceptConfiguration) SetIsSigned(v bool) *ExdDataConceptConfiguration {
+	m.IsSigned = v
+	return m
+}
+
+// SetDeveloperFields ExdDataConceptConfiguration's DeveloperFields.
+func (m *ExdDataConceptConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataConceptConfiguration {
+	m.DeveloperFields = developerFields
+	return m
 }

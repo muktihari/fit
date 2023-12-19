@@ -8,44 +8,47 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // MonitoringHrData is a MonitoringHrData message.
 type MonitoringHrData struct {
-	Timestamp                  typedef.DateTime // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
-	RestingHeartRate           uint8            // Units: bpm; 7-day rolling average
-	CurrentDayRestingHeartRate uint8            // Units: bpm; RHR for today only. (Feeds into 7-day average)
+	Timestamp                  time.Time // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
+	RestingHeartRate           uint8     // Units: bpm; 7-day rolling average
+	CurrentDayRestingHeartRate uint8     // Units: bpm; RHR for today only. (Feeds into 7-day average)
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMonitoringHrData creates new MonitoringHrData struct based on given mesg. If mesg is nil or mesg.Num is not equal to MonitoringHrData mesg number, it will return nil.
-func NewMonitoringHrData(mesg proto.Message) *MonitoringHrData {
-	if mesg.Num != typedef.MesgNumMonitoringHrData {
-		return nil
-	}
-
+// NewMonitoringHrData creates new MonitoringHrData struct based on given mesg.
+// If mesg is nil, it will return MonitoringHrData with all fields being set to its corresponding invalid value.
+func NewMonitoringHrData(mesg *proto.Message) *MonitoringHrData {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MonitoringHrData{
-		Timestamp:                  typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                  datetime.ToTime(vals[253]),
 		RestingHeartRate:           typeconv.ToUint8[uint8](vals[0]),
 		CurrentDayRestingHeartRate: typeconv.ToUint8[uint8](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -54,9 +57,9 @@ func (m *MonitoringHrData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringHrData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
@@ -78,7 +81,7 @@ func (m *MonitoringHrData) ToMesg(fac Factory) proto.Message {
 // size returns size of MonitoringHrData's valid fields.
 func (m *MonitoringHrData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
@@ -88,4 +91,34 @@ func (m *MonitoringHrData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets MonitoringHrData value.
+//
+// Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
+func (m *MonitoringHrData) SetTimestamp(v time.Time) *MonitoringHrData {
+	m.Timestamp = v
+	return m
+}
+
+// SetRestingHeartRate sets MonitoringHrData value.
+//
+// Units: bpm; 7-day rolling average
+func (m *MonitoringHrData) SetRestingHeartRate(v uint8) *MonitoringHrData {
+	m.RestingHeartRate = v
+	return m
+}
+
+// SetCurrentDayRestingHeartRate sets MonitoringHrData value.
+//
+// Units: bpm; RHR for today only. (Feeds into 7-day average)
+func (m *MonitoringHrData) SetCurrentDayRestingHeartRate(v uint8) *MonitoringHrData {
+	m.CurrentDayRestingHeartRate = v
+	return m
+}
+
+// SetDeveloperFields MonitoringHrData's DeveloperFields.
+func (m *MonitoringHrData) SetDeveloperFields(developerFields ...proto.DeveloperField) *MonitoringHrData {
+	m.DeveloperFields = developerFields
+	return m
 }

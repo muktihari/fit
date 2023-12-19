@@ -36,19 +36,20 @@ type SleepAssessment struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSleepAssessment creates new SleepAssessment struct based on given mesg. If mesg is nil or mesg.Num is not equal to SleepAssessment mesg number, it will return nil.
-func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
-	if mesg.Num != typedef.MesgNumSleepAssessment {
-		return nil
-	}
-
+// NewSleepAssessment creates new SleepAssessment struct based on given mesg.
+// If mesg is nil, it will return SleepAssessment with all fields being set to its corresponding invalid value.
+func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 	vals := [16]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SleepAssessment{
@@ -67,7 +68,7 @@ func NewSleepAssessment(mesg proto.Message) *SleepAssessment {
 		InterruptionsScore:       typeconv.ToUint8[uint8](vals[14]),
 		AverageStressDuringSleep: typeconv.ToUint16[uint16](vals[15]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -198,4 +199,122 @@ func (m *SleepAssessment) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetCombinedAwakeScore sets SleepAssessment value.
+//
+// Average of awake_time_score and awakenings_count_score. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetCombinedAwakeScore(v uint8) *SleepAssessment {
+	m.CombinedAwakeScore = v
+	return m
+}
+
+// SetAwakeTimeScore sets SleepAssessment value.
+//
+// Score that evaluates the total time spent awake between sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetAwakeTimeScore(v uint8) *SleepAssessment {
+	m.AwakeTimeScore = v
+	return m
+}
+
+// SetAwakeningsCountScore sets SleepAssessment value.
+//
+// Score that evaluates the number of awakenings that interrupt sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetAwakeningsCountScore(v uint8) *SleepAssessment {
+	m.AwakeningsCountScore = v
+	return m
+}
+
+// SetDeepSleepScore sets SleepAssessment value.
+//
+// Score that evaluates the amount of deep sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetDeepSleepScore(v uint8) *SleepAssessment {
+	m.DeepSleepScore = v
+	return m
+}
+
+// SetSleepDurationScore sets SleepAssessment value.
+//
+// Score that evaluates the quality of sleep based on sleep stages, heart-rate variability and possible awakenings during the night. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetSleepDurationScore(v uint8) *SleepAssessment {
+	m.SleepDurationScore = v
+	return m
+}
+
+// SetLightSleepScore sets SleepAssessment value.
+//
+// Score that evaluates the amount of light sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetLightSleepScore(v uint8) *SleepAssessment {
+	m.LightSleepScore = v
+	return m
+}
+
+// SetOverallSleepScore sets SleepAssessment value.
+//
+// Total score that summarizes the overall quality of sleep, combining sleep duration and quality. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetOverallSleepScore(v uint8) *SleepAssessment {
+	m.OverallSleepScore = v
+	return m
+}
+
+// SetSleepQualityScore sets SleepAssessment value.
+//
+// Score that evaluates the quality of sleep based on sleep stages, heart-rate variability and possible awakenings during the night. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetSleepQualityScore(v uint8) *SleepAssessment {
+	m.SleepQualityScore = v
+	return m
+}
+
+// SetSleepRecoveryScore sets SleepAssessment value.
+//
+// Score that evaluates stress and recovery during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetSleepRecoveryScore(v uint8) *SleepAssessment {
+	m.SleepRecoveryScore = v
+	return m
+}
+
+// SetRemSleepScore sets SleepAssessment value.
+//
+// Score that evaluates the amount of REM sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetRemSleepScore(v uint8) *SleepAssessment {
+	m.RemSleepScore = v
+	return m
+}
+
+// SetSleepRestlessnessScore sets SleepAssessment value.
+//
+// Score that evaluates the amount of restlessness during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetSleepRestlessnessScore(v uint8) *SleepAssessment {
+	m.SleepRestlessnessScore = v
+	return m
+}
+
+// SetAwakeningsCount sets SleepAssessment value.
+//
+// The number of awakenings during sleep.
+func (m *SleepAssessment) SetAwakeningsCount(v uint8) *SleepAssessment {
+	m.AwakeningsCount = v
+	return m
+}
+
+// SetInterruptionsScore sets SleepAssessment value.
+//
+// Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
+func (m *SleepAssessment) SetInterruptionsScore(v uint8) *SleepAssessment {
+	m.InterruptionsScore = v
+	return m
+}
+
+// SetAverageStressDuringSleep sets SleepAssessment value.
+//
+// Scale: 100; Excludes stress during awake periods in the sleep window
+func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
+	m.AverageStressDuringSleep = v
+	return m
+}
+
+// SetDeveloperFields SleepAssessment's DeveloperFields.
+func (m *SleepAssessment) SetDeveloperFields(developerFields ...proto.DeveloperField) *SleepAssessment {
+	m.DeveloperFields = developerFields
+	return m
 }

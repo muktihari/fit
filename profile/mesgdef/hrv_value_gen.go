@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // HrvValue is a HrvValue message.
 type HrvValue struct {
-	Timestamp typedef.DateTime
+	Timestamp time.Time
 	Value     uint16 // Scale: 128; Units: ms; 5 minute RMSSD
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -24,26 +26,27 @@ type HrvValue struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewHrvValue creates new HrvValue struct based on given mesg. If mesg is nil or mesg.Num is not equal to HrvValue mesg number, it will return nil.
-func NewHrvValue(mesg proto.Message) *HrvValue {
-	if mesg.Num != typedef.MesgNumHrvValue {
-		return nil
-	}
-
+// NewHrvValue creates new HrvValue struct based on given mesg.
+// If mesg is nil, it will return HrvValue with all fields being set to its corresponding invalid value.
+func NewHrvValue(mesg *proto.Message) *HrvValue {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &HrvValue{
-		Timestamp: typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp: datetime.ToTime(vals[253]),
 		Value:     typeconv.ToUint16[uint16](vals[0]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -52,9 +55,9 @@ func (m *HrvValue) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrvValue)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Value != basetype.Uint16Invalid {
@@ -71,11 +74,31 @@ func (m *HrvValue) ToMesg(fac Factory) proto.Message {
 // size returns size of HrvValue's valid fields.
 func (m *HrvValue) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Value != basetype.Uint16Invalid {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets HrvValue value.
+func (m *HrvValue) SetTimestamp(v time.Time) *HrvValue {
+	m.Timestamp = v
+	return m
+}
+
+// SetValue sets HrvValue value.
+//
+// Scale: 128; Units: ms; 5 minute RMSSD
+func (m *HrvValue) SetValue(v uint16) *HrvValue {
+	m.Value = v
+	return m
+}
+
+// SetDeveloperFields HrvValue's DeveloperFields.
+func (m *HrvValue) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrvValue {
+	m.DeveloperFields = developerFields
+	return m
 }

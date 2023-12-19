@@ -27,19 +27,20 @@ type FieldCapabilities struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewFieldCapabilities creates new FieldCapabilities struct based on given mesg. If mesg is nil or mesg.Num is not equal to FieldCapabilities mesg number, it will return nil.
-func NewFieldCapabilities(mesg proto.Message) *FieldCapabilities {
-	if mesg.Num != typedef.MesgNumFieldCapabilities {
-		return nil
-	}
-
+// NewFieldCapabilities creates new FieldCapabilities struct based on given mesg.
+// If mesg is nil, it will return FieldCapabilities with all fields being set to its corresponding invalid value.
+func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &FieldCapabilities{
@@ -49,7 +50,7 @@ func NewFieldCapabilities(mesg proto.Message) *FieldCapabilities {
 		FieldNum:     typeconv.ToUint8[uint8](vals[2]),
 		Count:        typeconv.ToUint16[uint16](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,40 @@ func (m *FieldCapabilities) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets FieldCapabilities value.
+func (m *FieldCapabilities) SetMessageIndex(v typedef.MessageIndex) *FieldCapabilities {
+	m.MessageIndex = v
+	return m
+}
+
+// SetFile sets FieldCapabilities value.
+func (m *FieldCapabilities) SetFile(v typedef.File) *FieldCapabilities {
+	m.File = v
+	return m
+}
+
+// SetMesgNum sets FieldCapabilities value.
+func (m *FieldCapabilities) SetMesgNum(v typedef.MesgNum) *FieldCapabilities {
+	m.MesgNum = v
+	return m
+}
+
+// SetFieldNum sets FieldCapabilities value.
+func (m *FieldCapabilities) SetFieldNum(v uint8) *FieldCapabilities {
+	m.FieldNum = v
+	return m
+}
+
+// SetCount sets FieldCapabilities value.
+func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
+	m.Count = v
+	return m
+}
+
+// SetDeveloperFields FieldCapabilities's DeveloperFields.
+func (m *FieldCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *FieldCapabilities {
+	m.DeveloperFields = developerFields
+	return m
 }

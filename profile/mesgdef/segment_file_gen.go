@@ -31,19 +31,20 @@ type SegmentFile struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSegmentFile creates new SegmentFile struct based on given mesg. If mesg is nil or mesg.Num is not equal to SegmentFile mesg number, it will return nil.
-func NewSegmentFile(mesg proto.Message) *SegmentFile {
-	if mesg.Num != typedef.MesgNumSegmentFile {
-		return nil
-	}
-
+// NewSegmentFile creates new SegmentFile struct based on given mesg.
+// If mesg is nil, it will return SegmentFile with all fields being set to its corresponding invalid value.
+func NewSegmentFile(mesg *proto.Message) *SegmentFile {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SegmentFile{
@@ -57,7 +58,7 @@ func NewSegmentFile(mesg proto.Message) *SegmentFile {
 		LeaderActivityIdString: typeconv.ToSliceString[string](vals[10]),
 		DefaultRaceLeader:      typeconv.ToUint8[uint8](vals[11]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -148,4 +149,80 @@ func (m *SegmentFile) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SegmentFile value.
+func (m *SegmentFile) SetMessageIndex(v typedef.MessageIndex) *SegmentFile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetFileUuid sets SegmentFile value.
+//
+// UUID of the segment file
+func (m *SegmentFile) SetFileUuid(v string) *SegmentFile {
+	m.FileUuid = v
+	return m
+}
+
+// SetEnabled sets SegmentFile value.
+//
+// Enabled state of the segment file
+func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
+	m.Enabled = v
+	return m
+}
+
+// SetUserProfilePrimaryKey sets SegmentFile value.
+//
+// Primary key of the user that created the segment file
+func (m *SegmentFile) SetUserProfilePrimaryKey(v uint32) *SegmentFile {
+	m.UserProfilePrimaryKey = v
+	return m
+}
+
+// SetLeaderType sets SegmentFile value.
+//
+// Array: [N]; Leader type of each leader in the segment file
+func (m *SegmentFile) SetLeaderType(v []typedef.SegmentLeaderboardType) *SegmentFile {
+	m.LeaderType = v
+	return m
+}
+
+// SetLeaderGroupPrimaryKey sets SegmentFile value.
+//
+// Array: [N]; Group primary key of each leader in the segment file
+func (m *SegmentFile) SetLeaderGroupPrimaryKey(v []uint32) *SegmentFile {
+	m.LeaderGroupPrimaryKey = v
+	return m
+}
+
+// SetLeaderActivityId sets SegmentFile value.
+//
+// Array: [N]; Activity ID of each leader in the segment file
+func (m *SegmentFile) SetLeaderActivityId(v []uint32) *SegmentFile {
+	m.LeaderActivityId = v
+	return m
+}
+
+// SetLeaderActivityIdString sets SegmentFile value.
+//
+// Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
+func (m *SegmentFile) SetLeaderActivityIdString(v []string) *SegmentFile {
+	m.LeaderActivityIdString = v
+	return m
+}
+
+// SetDefaultRaceLeader sets SegmentFile value.
+//
+// Index for the Leader Board entry selected as the default race participant
+func (m *SegmentFile) SetDefaultRaceLeader(v uint8) *SegmentFile {
+	m.DefaultRaceLeader = v
+	return m
+}
+
+// SetDeveloperFields SegmentFile's DeveloperFields.
+func (m *SegmentFile) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentFile {
+	m.DeveloperFields = developerFields
+	return m
 }

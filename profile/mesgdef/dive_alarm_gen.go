@@ -35,19 +35,20 @@ type DiveAlarm struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDiveAlarm creates new DiveAlarm struct based on given mesg. If mesg is nil or mesg.Num is not equal to DiveAlarm mesg number, it will return nil.
-func NewDiveAlarm(mesg proto.Message) *DiveAlarm {
-	if mesg.Num != typedef.MesgNumDiveAlarm {
-		return nil
-	}
-
+// NewDiveAlarm creates new DiveAlarm struct based on given mesg.
+// If mesg is nil, it will return DiveAlarm with all fields being set to its corresponding invalid value.
+func NewDiveAlarm(mesg *proto.Message) *DiveAlarm {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DiveAlarm{
@@ -65,7 +66,7 @@ func NewDiveAlarm(mesg proto.Message) *DiveAlarm {
 		Repeating:        typeconv.ToBool[bool](vals[10]),
 		Speed:            typeconv.ToSint32[int32](vals[11]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -188,4 +189,114 @@ func (m *DiveAlarm) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets DiveAlarm value.
+//
+// Index of the alarm
+func (m *DiveAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveAlarm {
+	m.MessageIndex = v
+	return m
+}
+
+// SetDepth sets DiveAlarm value.
+//
+// Scale: 1000; Units: m; Depth setting (m) for depth type alarms
+func (m *DiveAlarm) SetDepth(v uint32) *DiveAlarm {
+	m.Depth = v
+	return m
+}
+
+// SetTime sets DiveAlarm value.
+//
+// Units: s; Time setting (s) for time type alarms
+func (m *DiveAlarm) SetTime(v int32) *DiveAlarm {
+	m.Time = v
+	return m
+}
+
+// SetEnabled sets DiveAlarm value.
+//
+// Enablement flag
+func (m *DiveAlarm) SetEnabled(v bool) *DiveAlarm {
+	m.Enabled = v
+	return m
+}
+
+// SetAlarmType sets DiveAlarm value.
+//
+// Alarm type setting
+func (m *DiveAlarm) SetAlarmType(v typedef.DiveAlarmType) *DiveAlarm {
+	m.AlarmType = v
+	return m
+}
+
+// SetSound sets DiveAlarm value.
+//
+// Tone and Vibe setting for the alarm
+func (m *DiveAlarm) SetSound(v typedef.Tone) *DiveAlarm {
+	m.Sound = v
+	return m
+}
+
+// SetDiveTypes sets DiveAlarm value.
+//
+// Array: [N]; Dive types the alarm will trigger on
+func (m *DiveAlarm) SetDiveTypes(v []typedef.SubSport) *DiveAlarm {
+	m.DiveTypes = v
+	return m
+}
+
+// SetId sets DiveAlarm value.
+//
+// Alarm ID
+func (m *DiveAlarm) SetId(v uint32) *DiveAlarm {
+	m.Id = v
+	return m
+}
+
+// SetPopupEnabled sets DiveAlarm value.
+//
+// Show a visible pop-up for this alarm
+func (m *DiveAlarm) SetPopupEnabled(v bool) *DiveAlarm {
+	m.PopupEnabled = v
+	return m
+}
+
+// SetTriggerOnDescent sets DiveAlarm value.
+//
+// Trigger the alarm on descent
+func (m *DiveAlarm) SetTriggerOnDescent(v bool) *DiveAlarm {
+	m.TriggerOnDescent = v
+	return m
+}
+
+// SetTriggerOnAscent sets DiveAlarm value.
+//
+// Trigger the alarm on ascent
+func (m *DiveAlarm) SetTriggerOnAscent(v bool) *DiveAlarm {
+	m.TriggerOnAscent = v
+	return m
+}
+
+// SetRepeating sets DiveAlarm value.
+//
+// Repeat alarm each time threshold is crossed?
+func (m *DiveAlarm) SetRepeating(v bool) *DiveAlarm {
+	m.Repeating = v
+	return m
+}
+
+// SetSpeed sets DiveAlarm value.
+//
+// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
+func (m *DiveAlarm) SetSpeed(v int32) *DiveAlarm {
+	m.Speed = v
+	return m
+}
+
+// SetDeveloperFields DiveAlarm's DeveloperFields.
+func (m *DiveAlarm) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveAlarm {
+	m.DeveloperFields = developerFields
+	return m
 }

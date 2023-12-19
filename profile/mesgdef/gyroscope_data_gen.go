@@ -8,46 +8,49 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // GyroscopeData is a GyroscopeData message.
 type GyroscopeData struct {
-	Timestamp        typedef.DateTime // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16           // Units: ms; Millisecond part of the timestamp.
-	SampleTimeOffset []uint16         // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
-	GyroX            []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	GyroY            []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	GyroZ            []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	CalibratedGyroX  []float32        // Array: [N]; Units: deg/s; Calibrated gyro reading
-	CalibratedGyroY  []float32        // Array: [N]; Units: deg/s; Calibrated gyro reading
-	CalibratedGyroZ  []float32        // Array: [N]; Units: deg/s; Calibrated gyro reading
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
+	GyroX            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	GyroY            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	GyroZ            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	CalibratedGyroX  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
+	CalibratedGyroY  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
+	CalibratedGyroZ  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewGyroscopeData creates new GyroscopeData struct based on given mesg. If mesg is nil or mesg.Num is not equal to GyroscopeData mesg number, it will return nil.
-func NewGyroscopeData(mesg proto.Message) *GyroscopeData {
-	if mesg.Num != typedef.MesgNumGyroscopeData {
-		return nil
-	}
-
+// NewGyroscopeData creates new GyroscopeData struct based on given mesg.
+// If mesg is nil, it will return GyroscopeData with all fields being set to its corresponding invalid value.
+func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &GyroscopeData{
-		Timestamp:        typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:        datetime.ToTime(vals[253]),
 		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		GyroX:            typeconv.ToSliceUint16[uint16](vals[2]),
@@ -57,7 +60,7 @@ func NewGyroscopeData(mesg proto.Message) *GyroscopeData {
 		CalibratedGyroY:  typeconv.ToSliceFloat32[float32](vals[6]),
 		CalibratedGyroZ:  typeconv.ToSliceFloat32[float32](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -66,9 +69,9 @@ func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGyroscopeData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -120,7 +123,7 @@ func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
 // size returns size of GyroscopeData's valid fields.
 func (m *GyroscopeData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -148,4 +151,82 @@ func (m *GyroscopeData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets GyroscopeData value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *GyroscopeData) SetTimestamp(v time.Time) *GyroscopeData {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets GyroscopeData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSampleTimeOffset sets GyroscopeData value.
+//
+// Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
+func (m *GyroscopeData) SetSampleTimeOffset(v []uint16) *GyroscopeData {
+	m.SampleTimeOffset = v
+	return m
+}
+
+// SetGyroX sets GyroscopeData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *GyroscopeData) SetGyroX(v []uint16) *GyroscopeData {
+	m.GyroX = v
+	return m
+}
+
+// SetGyroY sets GyroscopeData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *GyroscopeData) SetGyroY(v []uint16) *GyroscopeData {
+	m.GyroY = v
+	return m
+}
+
+// SetGyroZ sets GyroscopeData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *GyroscopeData) SetGyroZ(v []uint16) *GyroscopeData {
+	m.GyroZ = v
+	return m
+}
+
+// SetCalibratedGyroX sets GyroscopeData value.
+//
+// Array: [N]; Units: deg/s; Calibrated gyro reading
+func (m *GyroscopeData) SetCalibratedGyroX(v []float32) *GyroscopeData {
+	m.CalibratedGyroX = v
+	return m
+}
+
+// SetCalibratedGyroY sets GyroscopeData value.
+//
+// Array: [N]; Units: deg/s; Calibrated gyro reading
+func (m *GyroscopeData) SetCalibratedGyroY(v []float32) *GyroscopeData {
+	m.CalibratedGyroY = v
+	return m
+}
+
+// SetCalibratedGyroZ sets GyroscopeData value.
+//
+// Array: [N]; Units: deg/s; Calibrated gyro reading
+func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {
+	m.CalibratedGyroZ = v
+	return m
+}
+
+// SetDeveloperFields GyroscopeData's DeveloperFields.
+func (m *GyroscopeData) SetDeveloperFields(developerFields ...proto.DeveloperField) *GyroscopeData {
+	m.DeveloperFields = developerFields
+	return m
 }

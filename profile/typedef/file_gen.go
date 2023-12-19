@@ -181,6 +181,49 @@ func FileRegister(v File, s string) error {
 		return fmt.Errorf("could not register outside max range: %d", FileInvalid)
 	}
 
+	switch v {
+	case FileDevice:
+		return fmt.Errorf("duplicate: %d is already exist for FileDevice", v)
+	case FileSettings:
+		return fmt.Errorf("duplicate: %d is already exist for FileSettings", v)
+	case FileSport:
+		return fmt.Errorf("duplicate: %d is already exist for FileSport", v)
+	case FileActivity:
+		return fmt.Errorf("duplicate: %d is already exist for FileActivity", v)
+	case FileWorkout:
+		return fmt.Errorf("duplicate: %d is already exist for FileWorkout", v)
+	case FileCourse:
+		return fmt.Errorf("duplicate: %d is already exist for FileCourse", v)
+	case FileSchedules:
+		return fmt.Errorf("duplicate: %d is already exist for FileSchedules", v)
+	case FileWeight:
+		return fmt.Errorf("duplicate: %d is already exist for FileWeight", v)
+	case FileTotals:
+		return fmt.Errorf("duplicate: %d is already exist for FileTotals", v)
+	case FileGoals:
+		return fmt.Errorf("duplicate: %d is already exist for FileGoals", v)
+	case FileBloodPressure:
+		return fmt.Errorf("duplicate: %d is already exist for FileBloodPressure", v)
+	case FileMonitoringA:
+		return fmt.Errorf("duplicate: %d is already exist for FileMonitoringA", v)
+	case FileActivitySummary:
+		return fmt.Errorf("duplicate: %d is already exist for FileActivitySummary", v)
+	case FileMonitoringDaily:
+		return fmt.Errorf("duplicate: %d is already exist for FileMonitoringDaily", v)
+	case FileMonitoringB:
+		return fmt.Errorf("duplicate: %d is already exist for FileMonitoringB", v)
+	case FileSegment:
+		return fmt.Errorf("duplicate: %d is already exist for FileSegment", v)
+	case FileSegmentList:
+		return fmt.Errorf("duplicate: %d is already exist for FileSegmentList", v)
+	case FileExdConfiguration:
+		return fmt.Errorf("duplicate: %d is already exist for FileExdConfiguration", v)
+	case FileMfgRangeMin:
+		return fmt.Errorf("duplicate: %d is already exist for FileMfgRangeMin", v)
+	case FileMfgRangeMax:
+		return fmt.Errorf("duplicate: %d is already exist for FileMfgRangeMax", v)
+	}
+
 	fileToString[v] = s
 	stringToFile[s] = v
 

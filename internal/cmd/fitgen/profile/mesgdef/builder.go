@@ -114,10 +114,6 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				f.Comment = fmt.Sprintf("Units: %s; %s", field.Units, field.Comment)
 			}
 
-			if strings.HasPrefix(f.Type, "[]") {
-				f.Comment = fmt.Sprintf("Array: %s; %s", field.Array, f.Comment)
-			}
-
 			offset := offsetOrDefault(field.Offsets, 0)
 			if offset != 0 {
 				f.Comment = fmt.Sprintf("Offset: %g; %s", offset, f.Comment)
@@ -126,12 +122,19 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			scale := scaleOrDefault(field.Scales, 0)
 			if scale != 1 {
 				f.Comment = fmt.Sprintf("Scale: %g; %s", scale, f.Comment)
+			}
 
+			if strings.HasPrefix(f.Type, "[]") {
+				f.Comment = fmt.Sprintf("Array: %s; %s", field.Array, f.Comment)
 			}
 
 			fields = append(fields, f)
 			if strings.HasPrefix(f.Type, "basetype") || strings.HasPrefix(f.InvalidValue, "basetype") {
 				imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
+			}
+			if isTypeTime(field.Type) {
+				imports["time"] = struct{}{}
+				imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
 			}
 		}
 
@@ -155,22 +158,39 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 	return dataBuilders, nil
 }
 
-func (b *mesgdefBuilder) transformType(name, array string) string {
-	var _type string
-	if v, ok := b.goTypesByBaseTypes[name]; ok {
-		_type = v
-	} else {
-		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(name))
+func (b *mesgdefBuilder) transformType(fieldType, fieldArray string) string {
+	if isTypeTime(fieldType) {
+		return "time.Time"
 	}
 
-	if array == "" {
+	var _type string
+	if v, ok := b.goTypesByBaseTypes[fieldType]; ok {
+		_type = v
+	} else {
+		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
+	}
+
+	if fieldArray == "" {
 		return _type
 	}
 
 	return fmt.Sprintf("[]%s", _type)
 }
 
+func isTypeTime(fieldType string) bool {
+	typeName := strutil.ToTitle(fieldType)
+	switch typeName {
+	case "DateTime", "LocalDateTime":
+		return true
+	}
+	return false
+}
+
 func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array string) string {
+	if isTypeTime(fieldType) {
+		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
+	}
+
 	if !strings.HasSuffix(fieldType, "z") && b.baseTypeMapByProfileType[fieldType] == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
@@ -186,8 +206,11 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 
 func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) string {
 	if fieldType == "fit_base_type" {
-		// return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](mesg.FieldValueByNum(%d))", num)
 		return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](vals[%d])", num)
+	}
+
+	if isTypeTime(fieldType) {
+		return fmt.Sprintf("datetime.ToTime(vals[%d])", num)
 	}
 
 	var _type string
@@ -202,7 +225,6 @@ func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) 
 		slicePrefix = "Slice"
 	}
 
-	// return fmt.Sprintf("typeconv.To%s%s[%s](mesg.FieldValueByNum(%d))",
 	return fmt.Sprintf("typeconv.To%s%s[%s](vals[%d])",
 		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), _type, num)
 }

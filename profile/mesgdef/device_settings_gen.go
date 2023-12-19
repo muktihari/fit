@@ -8,10 +8,12 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // DeviceSettings is a DeviceSettings message.
@@ -20,10 +22,10 @@ type DeviceSettings struct {
 	UtcOffset                           uint32                // Offset from system time. Required to convert timestamp from system time to UTC.
 	TimeOffset                          []uint32              // Array: [N]; Units: s; Offset from system time.
 	TimeMode                            []typedef.TimeMode    // Array: [N]; Display mode for the time
-	TimeZoneOffset                      []int8                // Scale: 4; Array: [N]; Units: hr; timezone offset in 1/4 hour increments
+	TimeZoneOffset                      []int8                // Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
 	BacklightMode                       typedef.BacklightMode // Mode for backlight
 	ActivityTrackerEnabled              bool                  // Enabled state of the activity tracker functionality
-	ClockTime                           typedef.DateTime      // UTC timestamp used to set the devices clock and date
+	ClockTime                           time.Time             // UTC timestamp used to set the devices clock and date
 	PagesEnabled                        []uint16              // Array: [N]; Bitfield to configure enabled screens for each supported loop
 	MoveAlertEnabled                    bool                  // Enabled state of the move alert
 	DateMode                            typedef.DateMode      // Display mode for the date
@@ -46,19 +48,20 @@ type DeviceSettings struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDeviceSettings creates new DeviceSettings struct based on given mesg. If mesg is nil or mesg.Num is not equal to DeviceSettings mesg number, it will return nil.
-func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
-	if mesg.Num != typedef.MesgNumDeviceSettings {
-		return nil
-	}
-
+// NewDeviceSettings creates new DeviceSettings struct based on given mesg.
+// If mesg is nil, it will return DeviceSettings with all fields being set to its corresponding invalid value.
+func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
 	vals := [175]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DeviceSettings{
@@ -69,7 +72,7 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 		TimeZoneOffset:                      typeconv.ToSliceSint8[int8](vals[5]),
 		BacklightMode:                       typeconv.ToEnum[typedef.BacklightMode](vals[12]),
 		ActivityTrackerEnabled:              typeconv.ToBool[bool](vals[36]),
-		ClockTime:                           typeconv.ToUint32[typedef.DateTime](vals[39]),
+		ClockTime:                           datetime.ToTime(vals[39]),
 		PagesEnabled:                        typeconv.ToSliceUint16[uint16](vals[40]),
 		MoveAlertEnabled:                    typeconv.ToBool[bool](vals[46]),
 		DateMode:                            typeconv.ToEnum[typedef.DateMode](vals[47]),
@@ -87,7 +90,7 @@ func NewDeviceSettings(mesg proto.Message) *DeviceSettings {
 		TapInterface:                        typeconv.ToEnum[typedef.Switch](vals[134]),
 		TapSensitivity:                      typeconv.ToEnum[typedef.TapSensitivity](vals[174]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -131,9 +134,9 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ActivityTrackerEnabled
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.ClockTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ClockTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 39)
-		field.Value = typeconv.ToUint32[uint32](m.ClockTime)
+		field.Value = datetime.ToUint32(m.ClockTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.PagesEnabled != nil {
@@ -246,7 +249,7 @@ func (m *DeviceSettings) size() byte {
 	if m.ActivityTrackerEnabled != false {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.ClockTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ClockTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.PagesEnabled != nil {
@@ -298,4 +301,196 @@ func (m *DeviceSettings) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetActiveTimeZone sets DeviceSettings value.
+//
+// Index into time zone arrays.
+func (m *DeviceSettings) SetActiveTimeZone(v uint8) *DeviceSettings {
+	m.ActiveTimeZone = v
+	return m
+}
+
+// SetUtcOffset sets DeviceSettings value.
+//
+// Offset from system time. Required to convert timestamp from system time to UTC.
+func (m *DeviceSettings) SetUtcOffset(v uint32) *DeviceSettings {
+	m.UtcOffset = v
+	return m
+}
+
+// SetTimeOffset sets DeviceSettings value.
+//
+// Array: [N]; Units: s; Offset from system time.
+func (m *DeviceSettings) SetTimeOffset(v []uint32) *DeviceSettings {
+	m.TimeOffset = v
+	return m
+}
+
+// SetTimeMode sets DeviceSettings value.
+//
+// Array: [N]; Display mode for the time
+func (m *DeviceSettings) SetTimeMode(v []typedef.TimeMode) *DeviceSettings {
+	m.TimeMode = v
+	return m
+}
+
+// SetTimeZoneOffset sets DeviceSettings value.
+//
+// Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
+func (m *DeviceSettings) SetTimeZoneOffset(v []int8) *DeviceSettings {
+	m.TimeZoneOffset = v
+	return m
+}
+
+// SetBacklightMode sets DeviceSettings value.
+//
+// Mode for backlight
+func (m *DeviceSettings) SetBacklightMode(v typedef.BacklightMode) *DeviceSettings {
+	m.BacklightMode = v
+	return m
+}
+
+// SetActivityTrackerEnabled sets DeviceSettings value.
+//
+// Enabled state of the activity tracker functionality
+func (m *DeviceSettings) SetActivityTrackerEnabled(v bool) *DeviceSettings {
+	m.ActivityTrackerEnabled = v
+	return m
+}
+
+// SetClockTime sets DeviceSettings value.
+//
+// UTC timestamp used to set the devices clock and date
+func (m *DeviceSettings) SetClockTime(v time.Time) *DeviceSettings {
+	m.ClockTime = v
+	return m
+}
+
+// SetPagesEnabled sets DeviceSettings value.
+//
+// Array: [N]; Bitfield to configure enabled screens for each supported loop
+func (m *DeviceSettings) SetPagesEnabled(v []uint16) *DeviceSettings {
+	m.PagesEnabled = v
+	return m
+}
+
+// SetMoveAlertEnabled sets DeviceSettings value.
+//
+// Enabled state of the move alert
+func (m *DeviceSettings) SetMoveAlertEnabled(v bool) *DeviceSettings {
+	m.MoveAlertEnabled = v
+	return m
+}
+
+// SetDateMode sets DeviceSettings value.
+//
+// Display mode for the date
+func (m *DeviceSettings) SetDateMode(v typedef.DateMode) *DeviceSettings {
+	m.DateMode = v
+	return m
+}
+
+// SetDisplayOrientation sets DeviceSettings value.
+func (m *DeviceSettings) SetDisplayOrientation(v typedef.DisplayOrientation) *DeviceSettings {
+	m.DisplayOrientation = v
+	return m
+}
+
+// SetMountingSide sets DeviceSettings value.
+func (m *DeviceSettings) SetMountingSide(v typedef.Side) *DeviceSettings {
+	m.MountingSide = v
+	return m
+}
+
+// SetDefaultPage sets DeviceSettings value.
+//
+// Array: [N]; Bitfield to indicate one page as default for each supported loop
+func (m *DeviceSettings) SetDefaultPage(v []uint16) *DeviceSettings {
+	m.DefaultPage = v
+	return m
+}
+
+// SetAutosyncMinSteps sets DeviceSettings value.
+//
+// Units: steps; Minimum steps before an autosync can occur
+func (m *DeviceSettings) SetAutosyncMinSteps(v uint16) *DeviceSettings {
+	m.AutosyncMinSteps = v
+	return m
+}
+
+// SetAutosyncMinTime sets DeviceSettings value.
+//
+// Units: minutes; Minimum minutes before an autosync can occur
+func (m *DeviceSettings) SetAutosyncMinTime(v uint16) *DeviceSettings {
+	m.AutosyncMinTime = v
+	return m
+}
+
+// SetLactateThresholdAutodetectEnabled sets DeviceSettings value.
+//
+// Enable auto-detect setting for the lactate threshold feature.
+func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v bool) *DeviceSettings {
+	m.LactateThresholdAutodetectEnabled = v
+	return m
+}
+
+// SetBleAutoUploadEnabled sets DeviceSettings value.
+//
+// Automatically upload using BLE
+func (m *DeviceSettings) SetBleAutoUploadEnabled(v bool) *DeviceSettings {
+	m.BleAutoUploadEnabled = v
+	return m
+}
+
+// SetAutoSyncFrequency sets DeviceSettings value.
+//
+// Helps to conserve battery by changing modes
+func (m *DeviceSettings) SetAutoSyncFrequency(v typedef.AutoSyncFrequency) *DeviceSettings {
+	m.AutoSyncFrequency = v
+	return m
+}
+
+// SetAutoActivityDetect sets DeviceSettings value.
+//
+// Allows setting specific activities auto-activity detect enabled/disabled settings
+func (m *DeviceSettings) SetAutoActivityDetect(v typedef.AutoActivityDetect) *DeviceSettings {
+	m.AutoActivityDetect = v
+	return m
+}
+
+// SetNumberOfScreens sets DeviceSettings value.
+//
+// Number of screens configured to display
+func (m *DeviceSettings) SetNumberOfScreens(v uint8) *DeviceSettings {
+	m.NumberOfScreens = v
+	return m
+}
+
+// SetSmartNotificationDisplayOrientation sets DeviceSettings value.
+//
+// Smart Notification display orientation
+func (m *DeviceSettings) SetSmartNotificationDisplayOrientation(v typedef.DisplayOrientation) *DeviceSettings {
+	m.SmartNotificationDisplayOrientation = v
+	return m
+}
+
+// SetTapInterface sets DeviceSettings value.
+func (m *DeviceSettings) SetTapInterface(v typedef.Switch) *DeviceSettings {
+	m.TapInterface = v
+	return m
+}
+
+// SetTapSensitivity sets DeviceSettings value.
+//
+// Used to hold the tap threshold setting
+func (m *DeviceSettings) SetTapSensitivity(v typedef.TapSensitivity) *DeviceSettings {
+	m.TapSensitivity = v
+	return m
+}
+
+// SetDeveloperFields DeviceSettings's DeveloperFields.
+func (m *DeviceSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *DeviceSettings {
+	m.DeveloperFields = developerFields
+	return m
 }

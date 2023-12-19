@@ -29,19 +29,20 @@ type SegmentLeaderboardEntry struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSegmentLeaderboardEntry creates new SegmentLeaderboardEntry struct based on given mesg. If mesg is nil or mesg.Num is not equal to SegmentLeaderboardEntry mesg number, it will return nil.
-func NewSegmentLeaderboardEntry(mesg proto.Message) *SegmentLeaderboardEntry {
-	if mesg.Num != typedef.MesgNumSegmentLeaderboardEntry {
-		return nil
-	}
-
+// NewSegmentLeaderboardEntry creates new SegmentLeaderboardEntry struct based on given mesg.
+// If mesg is nil, it will return SegmentLeaderboardEntry with all fields being set to its corresponding invalid value.
+func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SegmentLeaderboardEntry{
@@ -53,7 +54,7 @@ func NewSegmentLeaderboardEntry(mesg proto.Message) *SegmentLeaderboardEntry {
 		SegmentTime:      typeconv.ToUint32[uint32](vals[4]),
 		ActivityIdString: typeconv.ToString[string](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -128,4 +129,64 @@ func (m *SegmentLeaderboardEntry) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SegmentLeaderboardEntry value.
+func (m *SegmentLeaderboardEntry) SetMessageIndex(v typedef.MessageIndex) *SegmentLeaderboardEntry {
+	m.MessageIndex = v
+	return m
+}
+
+// SetName sets SegmentLeaderboardEntry value.
+//
+// Friendly name assigned to leader
+func (m *SegmentLeaderboardEntry) SetName(v string) *SegmentLeaderboardEntry {
+	m.Name = v
+	return m
+}
+
+// SetType sets SegmentLeaderboardEntry value.
+//
+// Leader classification
+func (m *SegmentLeaderboardEntry) SetType(v typedef.SegmentLeaderboardType) *SegmentLeaderboardEntry {
+	m.Type = v
+	return m
+}
+
+// SetGroupPrimaryKey sets SegmentLeaderboardEntry value.
+//
+// Primary user ID of this leader
+func (m *SegmentLeaderboardEntry) SetGroupPrimaryKey(v uint32) *SegmentLeaderboardEntry {
+	m.GroupPrimaryKey = v
+	return m
+}
+
+// SetActivityId sets SegmentLeaderboardEntry value.
+//
+// ID of the activity associated with this leader time
+func (m *SegmentLeaderboardEntry) SetActivityId(v uint32) *SegmentLeaderboardEntry {
+	m.ActivityId = v
+	return m
+}
+
+// SetSegmentTime sets SegmentLeaderboardEntry value.
+//
+// Scale: 1000; Units: s; Segment Time (includes pauses)
+func (m *SegmentLeaderboardEntry) SetSegmentTime(v uint32) *SegmentLeaderboardEntry {
+	m.SegmentTime = v
+	return m
+}
+
+// SetActivityIdString sets SegmentLeaderboardEntry value.
+//
+// String version of the activity_id. 21 characters long, express in decimal
+func (m *SegmentLeaderboardEntry) SetActivityIdString(v string) *SegmentLeaderboardEntry {
+	m.ActivityIdString = v
+	return m
+}
+
+// SetDeveloperFields SegmentLeaderboardEntry's DeveloperFields.
+func (m *SegmentLeaderboardEntry) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentLeaderboardEntry {
+	m.DeveloperFields = developerFields
+	return m
 }

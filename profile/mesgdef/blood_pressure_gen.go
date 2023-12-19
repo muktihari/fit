@@ -8,22 +8,24 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // BloodPressure is a BloodPressure message.
 type BloodPressure struct {
-	Timestamp            typedef.DateTime // Units: s;
-	SystolicPressure     uint16           // Units: mmHg;
-	DiastolicPressure    uint16           // Units: mmHg;
-	MeanArterialPressure uint16           // Units: mmHg;
-	Map3SampleMean       uint16           // Units: mmHg;
-	MapMorningValues     uint16           // Units: mmHg;
-	MapEveningValues     uint16           // Units: mmHg;
-	HeartRate            uint8            // Units: bpm;
+	Timestamp            time.Time // Units: s;
+	SystolicPressure     uint16    // Units: mmHg;
+	DiastolicPressure    uint16    // Units: mmHg;
+	MeanArterialPressure uint16    // Units: mmHg;
+	Map3SampleMean       uint16    // Units: mmHg;
+	MapMorningValues     uint16    // Units: mmHg;
+	MapEveningValues     uint16    // Units: mmHg;
+	HeartRate            uint8     // Units: bpm;
 	HeartRateType        typedef.HrType
 	Status               typedef.BpStatus
 	UserProfileIndex     typedef.MessageIndex // Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
@@ -33,23 +35,24 @@ type BloodPressure struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewBloodPressure creates new BloodPressure struct based on given mesg. If mesg is nil or mesg.Num is not equal to BloodPressure mesg number, it will return nil.
-func NewBloodPressure(mesg proto.Message) *BloodPressure {
-	if mesg.Num != typedef.MesgNumBloodPressure {
-		return nil
-	}
-
+// NewBloodPressure creates new BloodPressure struct based on given mesg.
+// If mesg is nil, it will return BloodPressure with all fields being set to its corresponding invalid value.
+func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &BloodPressure{
-		Timestamp:            typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:            datetime.ToTime(vals[253]),
 		SystolicPressure:     typeconv.ToUint16[uint16](vals[0]),
 		DiastolicPressure:    typeconv.ToUint16[uint16](vals[1]),
 		MeanArterialPressure: typeconv.ToUint16[uint16](vals[2]),
@@ -61,7 +64,7 @@ func NewBloodPressure(mesg proto.Message) *BloodPressure {
 		Status:               typeconv.ToEnum[typedef.BpStatus](vals[8]),
 		UserProfileIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[9]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -70,9 +73,9 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBloodPressure)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.SystolicPressure != basetype.Uint16Invalid {
@@ -134,7 +137,7 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 // size returns size of BloodPressure's valid fields.
 func (m *BloodPressure) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.SystolicPressure != basetype.Uint16Invalid {
@@ -168,4 +171,94 @@ func (m *BloodPressure) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets BloodPressure value.
+//
+// Units: s;
+func (m *BloodPressure) SetTimestamp(v time.Time) *BloodPressure {
+	m.Timestamp = v
+	return m
+}
+
+// SetSystolicPressure sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetSystolicPressure(v uint16) *BloodPressure {
+	m.SystolicPressure = v
+	return m
+}
+
+// SetDiastolicPressure sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetDiastolicPressure(v uint16) *BloodPressure {
+	m.DiastolicPressure = v
+	return m
+}
+
+// SetMeanArterialPressure sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetMeanArterialPressure(v uint16) *BloodPressure {
+	m.MeanArterialPressure = v
+	return m
+}
+
+// SetMap3SampleMean sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetMap3SampleMean(v uint16) *BloodPressure {
+	m.Map3SampleMean = v
+	return m
+}
+
+// SetMapMorningValues sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetMapMorningValues(v uint16) *BloodPressure {
+	m.MapMorningValues = v
+	return m
+}
+
+// SetMapEveningValues sets BloodPressure value.
+//
+// Units: mmHg;
+func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
+	m.MapEveningValues = v
+	return m
+}
+
+// SetHeartRate sets BloodPressure value.
+//
+// Units: bpm;
+func (m *BloodPressure) SetHeartRate(v uint8) *BloodPressure {
+	m.HeartRate = v
+	return m
+}
+
+// SetHeartRateType sets BloodPressure value.
+func (m *BloodPressure) SetHeartRateType(v typedef.HrType) *BloodPressure {
+	m.HeartRateType = v
+	return m
+}
+
+// SetStatus sets BloodPressure value.
+func (m *BloodPressure) SetStatus(v typedef.BpStatus) *BloodPressure {
+	m.Status = v
+	return m
+}
+
+// SetUserProfileIndex sets BloodPressure value.
+//
+// Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
+func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {
+	m.UserProfileIndex = v
+	return m
+}
+
+// SetDeveloperFields BloodPressure's DeveloperFields.
+func (m *BloodPressure) SetDeveloperFields(developerFields ...proto.DeveloperField) *BloodPressure {
+	m.DeveloperFields = developerFields
+	return m
 }

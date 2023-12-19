@@ -25,19 +25,20 @@ type WatchfaceSettings struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWatchfaceSettings creates new WatchfaceSettings struct based on given mesg. If mesg is nil or mesg.Num is not equal to WatchfaceSettings mesg number, it will return nil.
-func NewWatchfaceSettings(mesg proto.Message) *WatchfaceSettings {
-	if mesg.Num != typedef.MesgNumWatchfaceSettings {
-		return nil
-	}
-
+// NewWatchfaceSettings creates new WatchfaceSettings struct based on given mesg.
+// If mesg is nil, it will return WatchfaceSettings with all fields being set to its corresponding invalid value.
+func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &WatchfaceSettings{
@@ -45,7 +46,7 @@ func NewWatchfaceSettings(mesg proto.Message) *WatchfaceSettings {
 		Mode:         typeconv.ToEnum[typedef.WatchfaceMode](vals[0]),
 		Layout:       typeconv.ToByte[byte](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,28 @@ func (m *WatchfaceSettings) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets WatchfaceSettings value.
+func (m *WatchfaceSettings) SetMessageIndex(v typedef.MessageIndex) *WatchfaceSettings {
+	m.MessageIndex = v
+	return m
+}
+
+// SetMode sets WatchfaceSettings value.
+func (m *WatchfaceSettings) SetMode(v typedef.WatchfaceMode) *WatchfaceSettings {
+	m.Mode = v
+	return m
+}
+
+// SetLayout sets WatchfaceSettings value.
+func (m *WatchfaceSettings) SetLayout(v byte) *WatchfaceSettings {
+	m.Layout = v
+	return m
+}
+
+// SetDeveloperFields WatchfaceSettings's DeveloperFields.
+func (m *WatchfaceSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *WatchfaceSettings {
+	m.DeveloperFields = developerFields
+	return m
 }

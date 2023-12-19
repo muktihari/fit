@@ -36,19 +36,20 @@ type SplitSummary struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSplitSummary creates new SplitSummary struct based on given mesg. If mesg is nil or mesg.Num is not equal to SplitSummary mesg number, it will return nil.
-func NewSplitSummary(mesg proto.Message) *SplitSummary {
-	if mesg.Num != typedef.MesgNumSplitSummary {
-		return nil
-	}
-
+// NewSplitSummary creates new SplitSummary struct based on given mesg.
+// If mesg is nil, it will return SplitSummary with all fields being set to its corresponding invalid value.
+func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SplitSummary{
@@ -67,7 +68,7 @@ func NewSplitSummary(mesg proto.Message) *SplitSummary {
 		TotalCalories:   typeconv.ToUint32[uint32](vals[13]),
 		TotalMovingTime: typeconv.ToUint32[uint32](vals[77]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -198,4 +199,116 @@ func (m *SplitSummary) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SplitSummary value.
+func (m *SplitSummary) SetMessageIndex(v typedef.MessageIndex) *SplitSummary {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSplitType sets SplitSummary value.
+func (m *SplitSummary) SetSplitType(v typedef.SplitType) *SplitSummary {
+	m.SplitType = v
+	return m
+}
+
+// SetNumSplits sets SplitSummary value.
+func (m *SplitSummary) SetNumSplits(v uint16) *SplitSummary {
+	m.NumSplits = v
+	return m
+}
+
+// SetTotalTimerTime sets SplitSummary value.
+//
+// Scale: 1000; Units: s;
+func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetTotalDistance sets SplitSummary value.
+//
+// Scale: 100; Units: m;
+func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
+	m.TotalDistance = v
+	return m
+}
+
+// SetAvgSpeed sets SplitSummary value.
+//
+// Scale: 1000; Units: m/s;
+func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
+	m.AvgSpeed = v
+	return m
+}
+
+// SetMaxSpeed sets SplitSummary value.
+//
+// Scale: 1000; Units: m/s;
+func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
+	m.MaxSpeed = v
+	return m
+}
+
+// SetTotalAscent sets SplitSummary value.
+//
+// Units: m;
+func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets SplitSummary value.
+//
+// Units: m;
+func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
+	m.TotalDescent = v
+	return m
+}
+
+// SetAvgHeartRate sets SplitSummary value.
+//
+// Units: bpm;
+func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets SplitSummary value.
+//
+// Units: bpm;
+func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetAvgVertSpeed sets SplitSummary value.
+//
+// Scale: 1000; Units: m/s;
+func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
+	m.AvgVertSpeed = v
+	return m
+}
+
+// SetTotalCalories sets SplitSummary value.
+//
+// Units: kcal;
+func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
+	m.TotalCalories = v
+	return m
+}
+
+// SetTotalMovingTime sets SplitSummary value.
+//
+// Scale: 1000; Units: s;
+func (m *SplitSummary) SetTotalMovingTime(v uint32) *SplitSummary {
+	m.TotalMovingTime = v
+	return m
+}
+
+// SetDeveloperFields SplitSummary's DeveloperFields.
+func (m *SplitSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *SplitSummary {
+	m.DeveloperFields = developerFields
+	return m
 }

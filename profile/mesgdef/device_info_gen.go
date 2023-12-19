@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // DeviceInfo is a DeviceInfo message.
 type DeviceInfo struct {
-	Timestamp           typedef.DateTime // Units: s;
+	Timestamp           time.Time // Units: s;
 	DeviceIndex         typedef.DeviceIndex
 	DeviceType          uint8
 	Manufacturer        typedef.Manufacturer
@@ -41,23 +43,24 @@ type DeviceInfo struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDeviceInfo creates new DeviceInfo struct based on given mesg. If mesg is nil or mesg.Num is not equal to DeviceInfo mesg number, it will return nil.
-func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
-	if mesg.Num != typedef.MesgNumDeviceInfo {
-		return nil
-	}
-
+// NewDeviceInfo creates new DeviceInfo struct based on given mesg.
+// If mesg is nil, it will return DeviceInfo with all fields being set to its corresponding invalid value.
+func NewDeviceInfo(mesg *proto.Message) *DeviceInfo {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DeviceInfo{
-		Timestamp:           typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:           datetime.ToTime(vals[253]),
 		DeviceIndex:         typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
 		DeviceType:          typeconv.ToUint8[uint8](vals[1]),
 		Manufacturer:        typeconv.ToUint16[typedef.Manufacturer](vals[2]),
@@ -77,7 +80,7 @@ func NewDeviceInfo(mesg proto.Message) *DeviceInfo {
 		ProductName:         typeconv.ToString[string](vals[27]),
 		BatteryLevel:        typeconv.ToUint8[uint8](vals[32]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -86,9 +89,9 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceInfo)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -190,7 +193,7 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 // size returns size of DeviceInfo's valid fields.
 func (m *DeviceInfo) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -248,4 +251,140 @@ func (m *DeviceInfo) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets DeviceInfo value.
+//
+// Units: s;
+func (m *DeviceInfo) SetTimestamp(v time.Time) *DeviceInfo {
+	m.Timestamp = v
+	return m
+}
+
+// SetDeviceIndex sets DeviceInfo value.
+func (m *DeviceInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceInfo {
+	m.DeviceIndex = v
+	return m
+}
+
+// SetDeviceType sets DeviceInfo value.
+func (m *DeviceInfo) SetDeviceType(v uint8) *DeviceInfo {
+	m.DeviceType = v
+	return m
+}
+
+// SetManufacturer sets DeviceInfo value.
+func (m *DeviceInfo) SetManufacturer(v typedef.Manufacturer) *DeviceInfo {
+	m.Manufacturer = v
+	return m
+}
+
+// SetSerialNumber sets DeviceInfo value.
+func (m *DeviceInfo) SetSerialNumber(v uint32) *DeviceInfo {
+	m.SerialNumber = v
+	return m
+}
+
+// SetProduct sets DeviceInfo value.
+func (m *DeviceInfo) SetProduct(v uint16) *DeviceInfo {
+	m.Product = v
+	return m
+}
+
+// SetSoftwareVersion sets DeviceInfo value.
+//
+// Scale: 100;
+func (m *DeviceInfo) SetSoftwareVersion(v uint16) *DeviceInfo {
+	m.SoftwareVersion = v
+	return m
+}
+
+// SetHardwareVersion sets DeviceInfo value.
+func (m *DeviceInfo) SetHardwareVersion(v uint8) *DeviceInfo {
+	m.HardwareVersion = v
+	return m
+}
+
+// SetCumOperatingTime sets DeviceInfo value.
+//
+// Units: s; Reset by new battery or charge.
+func (m *DeviceInfo) SetCumOperatingTime(v uint32) *DeviceInfo {
+	m.CumOperatingTime = v
+	return m
+}
+
+// SetBatteryVoltage sets DeviceInfo value.
+//
+// Scale: 256; Units: V;
+func (m *DeviceInfo) SetBatteryVoltage(v uint16) *DeviceInfo {
+	m.BatteryVoltage = v
+	return m
+}
+
+// SetBatteryStatus sets DeviceInfo value.
+func (m *DeviceInfo) SetBatteryStatus(v typedef.BatteryStatus) *DeviceInfo {
+	m.BatteryStatus = v
+	return m
+}
+
+// SetSensorPosition sets DeviceInfo value.
+//
+// Indicates the location of the sensor
+func (m *DeviceInfo) SetSensorPosition(v typedef.BodyLocation) *DeviceInfo {
+	m.SensorPosition = v
+	return m
+}
+
+// SetDescriptor sets DeviceInfo value.
+//
+// Used to describe the sensor or location
+func (m *DeviceInfo) SetDescriptor(v string) *DeviceInfo {
+	m.Descriptor = v
+	return m
+}
+
+// SetAntTransmissionType sets DeviceInfo value.
+func (m *DeviceInfo) SetAntTransmissionType(v uint8) *DeviceInfo {
+	m.AntTransmissionType = v
+	return m
+}
+
+// SetAntDeviceNumber sets DeviceInfo value.
+func (m *DeviceInfo) SetAntDeviceNumber(v uint16) *DeviceInfo {
+	m.AntDeviceNumber = v
+	return m
+}
+
+// SetAntNetwork sets DeviceInfo value.
+func (m *DeviceInfo) SetAntNetwork(v typedef.AntNetwork) *DeviceInfo {
+	m.AntNetwork = v
+	return m
+}
+
+// SetSourceType sets DeviceInfo value.
+func (m *DeviceInfo) SetSourceType(v typedef.SourceType) *DeviceInfo {
+	m.SourceType = v
+	return m
+}
+
+// SetProductName sets DeviceInfo value.
+//
+// Optional free form string to indicate the devices name or model
+func (m *DeviceInfo) SetProductName(v string) *DeviceInfo {
+	m.ProductName = v
+	return m
+}
+
+// SetBatteryLevel sets DeviceInfo value.
+//
+// Units: %;
+func (m *DeviceInfo) SetBatteryLevel(v uint8) *DeviceInfo {
+	m.BatteryLevel = v
+	return m
+}
+
+// SetDeveloperFields DeviceInfo's DeveloperFields.
+func (m *DeviceInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *DeviceInfo {
+	m.DeveloperFields = developerFields
+	return m
 }
