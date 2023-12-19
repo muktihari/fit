@@ -41,8 +41,9 @@ func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 }
 
 // RegisterMesg registers a new message that is not defined in the profile.xlsx.
-// You can not edit or replace existing message in the factory, including the messages you have registered.
-// If you intend to edit your own messages, create a new factory instance using New() and define the new message definitions on it.
+// You can not edit or replace existing predefined messages in the factory, you can only edit the messages you have registered.
+// However, we don't create a lock for efficiency, since this is intended to be used on instantiation. If you want to
+// change something without triggering data race, you can create a new instance of Factory using New().
 //
 // By registering, any Fit file containing these messages can be recognized instead of returning "unknown" message.
 func RegisterMesg(mesg proto.Message) error {
