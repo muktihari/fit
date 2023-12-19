@@ -60,39 +60,39 @@ func NewActivity(mesgs ...proto.Message) *Activity {
 func (f *Activity) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = *mesgdef.NewFileId(mesg)
+		f.FileId = *mesgdef.NewFileId(&mesg)
 	case mesgnum.DeveloperDataId:
-		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
+		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(&mesg))
 	case mesgnum.FieldDescription:
-		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
+		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(&mesg))
 	case mesgnum.Activity:
-		f.Activity = mesgdef.NewActivity(mesg)
+		f.Activity = mesgdef.NewActivity(&mesg)
 	case mesgnum.Session:
-		f.Sessions = append(f.Sessions, mesgdef.NewSession(mesg))
+		f.Sessions = append(f.Sessions, mesgdef.NewSession(&mesg))
 	case mesgnum.Lap:
-		f.Laps = append(f.Laps, mesgdef.NewLap(mesg))
+		f.Laps = append(f.Laps, mesgdef.NewLap(&mesg))
 	case mesgnum.Record:
-		f.Records = append(f.Records, mesgdef.NewRecord(mesg))
+		f.Records = append(f.Records, mesgdef.NewRecord(&mesg))
 	case mesgnum.DeviceInfo:
-		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(mesg))
+		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(&mesg))
 	case mesgnum.UserProfile:
-		f.UserProfile = mesgdef.NewUserProfile(mesg)
+		f.UserProfile = mesgdef.NewUserProfile(&mesg)
 	case mesgnum.Event:
-		f.Events = append(f.Events, mesgdef.NewEvent(mesg))
+		f.Events = append(f.Events, mesgdef.NewEvent(&mesg))
 	case mesgnum.Length:
-		f.Lengths = append(f.Lengths, mesgdef.NewLength(mesg))
+		f.Lengths = append(f.Lengths, mesgdef.NewLength(&mesg))
 	case mesgnum.SegmentLap:
-		f.SegmentLap = append(f.SegmentLap, mesgdef.NewSegmentLap(mesg))
+		f.SegmentLap = append(f.SegmentLap, mesgdef.NewSegmentLap(&mesg))
 	case mesgnum.ZonesTarget:
-		f.ZonesTargets = append(f.ZonesTargets, mesgdef.NewZonesTarget(mesg))
+		f.ZonesTargets = append(f.ZonesTargets, mesgdef.NewZonesTarget(&mesg))
 	case mesgnum.Workout:
-		f.Workouts = append(f.Workouts, mesgdef.NewWorkout(mesg))
+		f.Workouts = append(f.Workouts, mesgdef.NewWorkout(&mesg))
 	case mesgnum.WorkoutStep:
-		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(mesg))
+		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(&mesg))
 	case mesgnum.Hr:
-		f.HRs = append(f.HRs, mesgdef.NewHr(mesg))
+		f.HRs = append(f.HRs, mesgdef.NewHr(&mesg))
 	case mesgnum.Hrv:
-		f.HRVs = append(f.HRVs, mesgdef.NewHrv(mesg))
+		f.HRVs = append(f.HRVs, mesgdef.NewHrv(&mesg))
 	default:
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}

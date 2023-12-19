@@ -7,6 +7,7 @@ package combiner
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/muktihari/fit/cmd/fitactivity/finder"
 	"github.com/muktihari/fit/factory"
@@ -53,7 +54,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 			return nil, fmt.Errorf("could not find last session index, fit index: %d: %w", i-1, ErrNoSessionFound)
 		}
 		sessionMesg := fits[i-1].Messages[sessionInfo.SessionIndex]
-		session := mesgdef.NewSession(sessionMesg)
+		session := mesgdef.NewSession(&sessionMesg)
 
 		if i-1 == 0 {
 			// remove target session from result, session will be added later depend on sequence order.
@@ -64,7 +65,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		if nextSessionInfo.SessionIndex == -1 {
 			return nil, fmt.Errorf("could not find next first session index, fit index: %d: %w", i, ErrNoSessionFound)
 		}
-		nextSession := mesgdef.NewSession(fits[i].Messages[nextSessionInfo.SessionIndex])
+		nextSession := mesgdef.NewSession(&fits[i].Messages[nextSessionInfo.SessionIndex])
 
 		if session.Sport != nextSession.Sport {
 			return nil, fmt.Errorf("last session's sport: %s, next first session's sport %s, fit index: %d: %w",
@@ -134,10 +135,10 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 
 // combineSession combines s2 into s1.
 func combineSession(s1, s2 *mesgdef.Session) {
-	s1EndTime := uint32(s1.StartTime) + (s1.TotalElapsedTime / 1000)
-	elapsedTimeGap := uint32(s2.StartTime) - s1EndTime
-	if elapsedTimeGap <= uint32(s2.StartTime) { // only if not overflow
-		s1.TotalElapsedTime += elapsedTimeGap
+	s1EndTime := s1.StartTime.Add(time.Duration(s1.TotalElapsedTime/1000) * time.Second)
+	elapsedTimeGap := s2.StartTime.Sub(s1EndTime)
+	if elapsedTimeGap >= 0 {
+		s1.TotalElapsedTime += uint32(elapsedTimeGap.Seconds())
 	}
 
 	s1.TotalElapsedTime += s2.TotalElapsedTime

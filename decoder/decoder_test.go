@@ -22,6 +22,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/listener"
@@ -239,7 +240,7 @@ func TestPeekFileId(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
-			fileId: mesgdef.NewFileId(fit.Messages[0]),
+			fileId: mesgdef.NewFileId(&fit.Messages[0]),
 		},
 		{
 			name: "peek file id decode header return error",
@@ -248,7 +249,7 @@ func TestPeekFileId(t *testing.T) {
 					return 0, io.EOF
 				})
 			}(),
-			fileId: mesgdef.NewFileId(fit.Messages[0]),
+			fileId: mesgdef.NewFileId(&fit.Messages[0]),
 			err:    io.EOF,
 		},
 		{
@@ -263,7 +264,7 @@ func TestPeekFileId(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
-			fileId: mesgdef.NewFileId(fit.Messages[0]),
+			fileId: mesgdef.NewFileId(&fit.Messages[0]),
 			err:    io.EOF,
 		},
 	}
@@ -1215,14 +1216,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields happy flow",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				),
+				)),
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -1241,14 +1242,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields missing developer data index 1",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				),
+				)),
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -1267,14 +1268,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields missing field description number",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				),
+				)),
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -1290,17 +1291,44 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			mesg: &proto.Message{},
 		},
 		{
-			name: "decode developer fields got io.EOF",
+			name: "decode developer fields missing field description number but unable to read acquired bytes",
 			r:    fnReaderErr,
 			fieldDescription: mesgdef.NewFieldDescription(
-				factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				),
+				)),
+			),
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.Record,
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num:                1,
+						DeveloperDataIndex: 0,
+						Size:               1,
+					},
+				},
+			},
+			mesg: &proto.Message{},
+			err:  io.EOF,
+		},
+		{
+			name: "decode developer fields got io.EOF",
+			r:    fnReaderErr,
+			fieldDescription: mesgdef.NewFieldDescription(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
+				)),
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,

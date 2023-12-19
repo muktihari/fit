@@ -52,21 +52,21 @@ func NewCourse(mesgs ...proto.Message) *Course {
 func (f *Course) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = *mesgdef.NewFileId(mesg)
+		f.FileId = *mesgdef.NewFileId(&mesg)
 	case mesgnum.DeveloperDataId:
-		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(mesg))
+		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(&mesg))
 	case mesgnum.FieldDescription:
-		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(mesg))
+		f.FieldDescriptions = append(f.FieldDescriptions, mesgdef.NewFieldDescription(&mesg))
 	case mesgnum.Course:
-		f.Course = mesgdef.NewCourse(mesg)
+		f.Course = mesgdef.NewCourse(&mesg)
 	case mesgnum.Lap:
-		f.Lap = mesgdef.NewLap(mesg)
+		f.Lap = mesgdef.NewLap(&mesg)
 	case mesgnum.Record:
-		f.Records = append(f.Records, mesgdef.NewRecord(mesg))
+		f.Records = append(f.Records, mesgdef.NewRecord(&mesg))
 	case mesgnum.Event:
-		f.Events = append(f.Events, mesgdef.NewEvent(mesg))
+		f.Events = append(f.Events, mesgdef.NewEvent(&mesg))
 	case mesgnum.CoursePoint:
-		f.CoursePoints = append(f.CoursePoints, mesgdef.NewCoursePoint(mesg))
+		f.CoursePoints = append(f.CoursePoints, mesgdef.NewCoursePoint(&mesg))
 	default:
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}

@@ -22,14 +22,14 @@ type File interface {
 }
 
 // ToMesgs bulks convert mesgdef into proto.Message and append it to messages
-func ToMesgs[S []E, E PutMessage](messages *[]proto.Message, fac mesgdef.Factory, mesgNum typedef.MesgNum, s S) {
+func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, fac mesgdef.Factory, mesgNum typedef.MesgNum, s S) {
 	for i := range s {
 		*messages = append(*messages, s[i].ToMesg(fac))
 	}
 }
 
-// PutMessage is a type constraint to retrieve all mesgdef structures which implement PutMessage method.
-type PutMessage interface {
+// ToMesg is a type constraint to retrieve all mesgdef structures which implement ToMesg method.
+type ToMesg interface {
 	ToMesg(fac mesgdef.Factory) proto.Message
 }
 

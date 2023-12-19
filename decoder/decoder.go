@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 
 	"github.com/muktihari/fit/factory"
@@ -346,13 +347,12 @@ func (d *Decoder) decodeHeader() error {
 		d.fileHeader.CRC = binary.LittleEndian.Uint16(b[11:13])
 	}
 
-	if d.fileHeader.CRC == 0x0000 { // do not need to check header's crc integrity.
+	if d.fileHeader.CRC == 0x0000 || !d.options.shouldChecksum { // do not need to check header's crc integrity.
 		return nil
 	}
 
 	_, _ = d.crc16.Write(append([]byte{size}, b[:11]...))
-
-	if d.options.shouldChecksum && d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
+	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
 		return ErrCRCChecksumMismatch
 	}
 
@@ -481,17 +481,17 @@ func (d *Decoder) decodeMessageData(header byte) error {
 
 	// FileId Message
 	if d.fileId == nil && mesg.Num == mesgnum.FileId {
-		d.fileId = mesgdef.NewFileId(mesg)
+		d.fileId = mesgdef.NewFileId(&mesg)
 	}
 
 	// Prerequisites for decoding developer fields
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
 		// These messages must occur before any related field description messages are written to the proto.
-		d.developerDataIds = append(d.developerDataIds, mesgdef.NewDeveloperDataId(mesg))
+		d.developerDataIds = append(d.developerDataIds, mesgdef.NewDeveloperDataId(&mesg))
 	case mesgnum.FieldDescription:
 		// These messages must occur in the file before any related developer data is written to the proto.
-		d.fieldDescriptions = append(d.fieldDescriptions, mesgdef.NewFieldDescription(mesg))
+		d.fieldDescriptions = append(d.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
 	}
 
 	if len(mesgDef.DeveloperFieldDefinitions) != 0 {
@@ -627,7 +627,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if fieldDescription == nil {
-			continue // Can't interpret this DeveloperField, no FieldDescription found.
+			// Can't interpret this DeveloperField, no FieldDescription found. Just read acquired bytes and move forward.
+			if err := d.read(make([]byte, devFieldDef.Size)); err != nil {
+				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
+			}
+			continue
 		}
 
 		developerField := proto.DeveloperField{
@@ -639,14 +643,19 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 			Type:               fieldDescription.FitBaseTypeId,
 		}
 
-		if len(fieldDescription.FieldName) > 0 {
-			developerField.Name = fieldDescription.FieldName[0]
-		}
+		developerField.Name = strings.Join(fieldDescription.FieldName, "|")
+		developerField.Units = strings.Join(fieldDescription.Units, "|")
 
-		if len(fieldDescription.Units) > 0 {
-			developerField.Units = fieldDescription.Units[0]
-		}
-
+		// TODO: We still don't know how []string should be handled in the developer field.
+		// For the Field, we have "Array" (bool) for determining if the value is an array.
+		// However, we could not find any reference on how to use the DeveloperField's Array (uint8).
+		//
+		// For example:
+		// - "suuntoplus_plugin_owner_id" is []string, 1 - 10 strings, 1 - 64 characters each. (ref: https://apizone.suunto.com/fit-description).
+		//   but still it does not specify DeveloperField's Array.
+		//
+		// Until we discover a better implementation, let's determine it by using multiplication of the size.
+		// Consequently, all strings will be treated as arrays since its size is 1.
 		var isArray bool
 		if devFieldDef.Size > developerField.Type.Size() && devFieldDef.Size%developerField.Type.Size() == 0 {
 			isArray = true
@@ -682,8 +691,10 @@ func (d *Decoder) read(b []byte) error {
 	if err != nil {
 		return err
 	}
-	_, _ = d.crc16.Write(b)
-	return err
+	if d.options.shouldChecksum {
+		_, _ = d.crc16.Write(b)
+	}
+	return nil
 }
 
 // readByte is shorthand for read([1]byte).

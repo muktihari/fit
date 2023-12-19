@@ -124,9 +124,9 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
-		v.developerDataIds = append(v.developerDataIds, mesgdef.NewDeveloperDataId(*mesg))
+		v.developerDataIds = append(v.developerDataIds, mesgdef.NewDeveloperDataId(mesg))
 	case mesgnum.FieldDescription:
-		v.fieldDescriptions = append(v.fieldDescriptions, mesgdef.NewFieldDescription(*mesg))
+		v.fieldDescriptions = append(v.fieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	}
 
 	if len(mesg.DeveloperFields) == 0 {
