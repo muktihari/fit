@@ -23,20 +23,266 @@ Please see [Usage](/docs/usage.md).
 
 Version 2.0 introduced [**Developer Fields**](https://developer.garmin.com/fit/cookbook/developer-data) as a way to add custom data fields to existing messages. We strives to support **Developer Fields** and carefully thought about how to implement it since the inception of the SDK. While this may still need to be battle-tested to ensure correctness, this is generally work and usable.
 
-Here is the sample of what **Developer Fields** would look like in a **.fit** that have been converted to **.csv** by `fitconv`. The **device_info** message has some **Developer Fields** defined in **field_description**:
+Here is the sample of what **Developer Fields** would look like in a **.fit** that have been converted to **.csv** by `fitconv`. The **device_info** message has some **Developer Fields** defined in **field_description** (the ones that are being bold):
 
-| Type       | Local Number | Message           | Field 1              | Value 1 | Units 1 | Field 2              | Value 2                                                                                                                             | Units 2 | Field 3                 | Value 3    | Units 3 | Field 4             | Value 4             | Units 4 | Field 5           | Value 5 | Units 5 | Field 6            | Value 6 | Units 6 |
-| ---------- | ------------ | ----------------- | -------------------- | ------- | ------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------- | ----------------------- | ---------- | ------- | ------------------- | ------------------- | ------- | ----------------- | ------- | ------- | ------------------ | ------- | ------- |
-| Definition | 0            | developer_data_id | developer_data_index | 1       |         | application_id       | 16                                                                                                                                  |         | application_version     | 1          |         |                     |                     |         |                   |         |         |                    |         |         |
-| Data       | 0            | developer_data_id | developer_data_index | 1       |         | application_id       | 32&#124;99&#124;111&#124;109&#124;46&#124;115&#124;116&#124;114&#124;97&#124;118&#124;97&#124;46&#124;105&#124;111&#124;115&#124;32 |         | application_version     | 40113      |         |                     |                     |         |                   |         |         |                    |         |         |
-| Definition | 0            | field_description | fit_base_type_id     | 1       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 1          |         | field_name          | 13                  |         |                   |         |         |                    |         |         |
-| Data       | 0            | field_description | fit_base_type_id     | 7       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 5          |         | field_name          | device_model        |         |                   |         |         |                    |         |         |
-| Definition | 0            | field_description | fit_base_type_id     | 1       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 1          |         | field_name          | 20                  |         |                   |         |         |                    |         |         |
-| Data       | 0            | field_description | fit_base_type_id     | 7       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 4          |         | field_name          | device_manufacturer |         |                   |         |         |                    |         |         |
-| Data       | 0            | field_description | fit_base_type_id     | 7       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 6          |         | field_name          | device_os_version   |         |                   |         |         |                    |         |         |
-| Data       | 0            | field_description | fit_base_type_id     | 7       |         | developer_data_index | 1                                                                                                                                   |         | field_definition_number | 7          |         | field_name          | mobile_app_version  |         |                   |         |         |                    |         |         |
-| Definition | 0            | device_info       | manufacturer         | 1       |         | product              | 1                                                                                                                                   |         | device_model            | 11         |         | device_manufacturer | 6                   |         | device_os_version | 5       |         | mobile_app_version | 8       |         |
-| Data       | 0            | device_info       | manufacturer         | 265     |         | product              | 101                                                                                                                                 |         | device_model            | iPhone14,4 |         | device_manufacturer | apple               |         | device_os_version | 16.6    |         | mobile_app_version | 332.0.0 |
+<table class="table table-bordered table-hover table-condensed">
+<thead>
+<tr>
+    <th>Type</th>
+    <th>Local Number</th>
+    <th>Message</th>
+    <th>Field 1</th>
+    <th>Value 1</th>
+    <th>Units 1</th>
+    <th>Field 2</th>
+    <th>Value 2</th>
+    <th>Units 2</th>
+    <th>Field 3</th>
+    <th>Value 3</th>
+    <th>Units 3</th>
+    <th>Field 4</th>
+    <th>Value 4</th>
+    <th>Units 4</th>
+    <th>Field 5</th>
+    <th>Value 5</th>
+    <th>Units 5</th>
+    <th>Field 6</th>
+    <th>Value 6</th>
+    <th>Units 6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>Definition</td>
+    <td>0</td>
+    <td>developer_data_id</td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>application_id</td>
+    <td>16</td>
+    <td> </td>
+    <td>application_version</td>
+    <td>1</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>developer_data_id</td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>application_id</td>
+    <td>&lt;omitted&gt;</td>
+    <td> </td>
+    <td>application_version</td>
+    <td>40113</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Definition</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>1</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>1</td>
+    <td></td>
+    <td>field_name</td>
+    <td>13</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>7</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>5</td>
+    <td></td>
+    <td>field_name</td>
+    <td><strong>device_model</strong></td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Definition</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>1</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>1</td>
+    <td></td>
+    <td>field_name</td>
+    <td>20</td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>7</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>4</td>
+    <td></td>
+    <td>field_name</td>
+    <td><strong>device_manufacturer</strong></td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>7</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>6</td>
+    <td></td>
+    <td>field_name</td>
+    <td><strong>device_os_version</strong></td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>field_description</td>
+    <td>fit_base_type_id</td>
+    <td>7</td>
+    <td> </td>
+    <td>developer_data_index</td>
+    <td>1</td>
+    <td> </td>
+    <td>field_definition_number</td>
+    <td>7</td>
+    <td></td>
+    <td>field_name</td>
+    <td><strong>mobile_app_version</strong></td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Definition</td>
+    <td>0</td>
+    <td>device_info</td>
+    <td>manufacturer</td>
+    <td>1</td>
+    <td> </td>
+    <td>product</td>
+    <td>1</td>
+    <td> </td>
+    <td>device_model</td>
+    <td>11</td>
+    <td></td>
+    <td>device_manufacturer</td>
+    <td>6</td>
+    <td> </td>
+    <td>device_os_version</td>
+    <td>5</td>
+    <td></td>
+    <td>mobile_app_version</td>
+    <td>8</td>
+    <td> </td>
+</tr>
+<tr>
+    <td>Data</td>
+    <td>0</td>
+    <td>device_info</td>
+    <td>manufacturer</td>
+    <td>265</td>
+    <td> </td>
+    <td>product</td>
+    <td>101</td>
+    <td> </td>
+    <td><strong>device_model</strong></td>
+    <td><strong>iPhone14,4</strong></td>
+    <td> </td>
+    <td><strong>device_manufacturer</strong></td>
+    <td><strong>apple</strong></td>
+    <td> </td>
+    <td><strong>device_os_version</strong></td>
+    <td><strong>16</strong>.6</td>
+    <td> </td>
+    <td><strong>mobile_app_version</strong></td>
+    <td><strong>332.0.0</strong></td>
+</tr>
+</tbody>
+</table>
 
 ## CLIs
 
