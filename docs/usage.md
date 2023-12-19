@@ -250,7 +250,7 @@ func main() {
    Example:
 
    ```go
-   al := filedef.NewListener(filedef.NewActivity())
+   al := filedef.NewListener()
    dec := decoder.New(f,
        decoder.WithMesgListener(al),
    )
@@ -275,7 +275,7 @@ func main() {
    Example:
 
    ```go
-   al := filedef.NewListener(filedef.NewActivity())
+   al := filedef.NewListener()
    dec := decoder.New(f,
        decoder.WithMesgListener(al),
        decoder.WithBroadcastOnly(),
@@ -518,7 +518,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
    ```go
    enc := encoder.New(f, encoder.WithMessageValidator(
-           encoder.ValidatorWithPreserveInvalidValues()),
+       encoder.NewMessageValidator(encoder.ValidatorWithPreserveInvalidValues())),
    )
    ```
 
