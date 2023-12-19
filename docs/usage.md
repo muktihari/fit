@@ -261,12 +261,12 @@ func main() {
    Example:
 
    ```go
-   csvconv := csv.NewConverter(bw)
-   defer csvconv.Wait()
+   conv := fitcsv.NewConverter(bw)
+   defer conv.Wait()
 
    dec := decoder.New(f,
-       decoder.WithMesgDefListener(csvconv),
-       decoder.WithMesgListener(csvconv),
+       decoder.WithMesgDefListener(conv),
+       decoder.WithMesgListener(conv),
    )
    ```
 
@@ -335,7 +335,7 @@ func main() {
                 fieldnum.FileIdProductName:  "Bryton Active App",
             }),
             factory.CreateMesg(mesgnum.Activity).WithFieldValues(map[byte]any{
-                fieldnum.ActivityType:        typedef.ActivityTypeCycling,
+                fieldnum.ActivityType:        typedef.ActivityManual,
                 fieldnum.ActivityTimestamp:   datetime.ToUint32(now),
                 fieldnum.ActivityNumSessions: uint16(1),
 			}),
@@ -344,8 +344,10 @@ func main() {
                 fieldnum.SessionAvgCadence:   uint8(78),
                 fieldnum.SessionAvgHeartRate: uint8(100),
             }),
-            // We can use WithFields as well. See factory for details.
-            factory.CreateMesg(mesgnum.Record).WithFields(
+            // We can use WithFields as well, see `proto` for details.
+            // When using WithFields, it's recommended to use CreateMesgOnly to create a mesg with empty fields
+            // to reduce unecessary alloc since the fields will be replaced anyway, see `factory` for details.
+            factory.CreateMesgOnly(mesgnum.Record).WithFields(
                 factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
                 factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
                 factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
@@ -364,6 +366,91 @@ func main() {
 ```
 
 ### Encode Common File Types
+
+Example of encoding fit by self declaring the protocol messages but using common File Types building block.
+
+```go
+package main
+
+import (
+	"os"
+	"time"
+
+	"github.com/muktihari/fit/encoder"
+	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit/bufferedwriter"
+	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/typedef"
+)
+
+func main() {
+    f, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+    if err != nil {
+        panic(err)
+    }
+
+    now := time.Now()
+
+    activity := filedef.NewActivity()
+
+    activity.FileId = *mesgdef.NewFileId(nil).
+        SetType(typedef.FileActivity).
+        SetTimeCreated(now).
+        SetManufacturer(typedef.ManufacturerSuunto).
+        SetProduct(56). // Suunto 5 Peak
+        SetProductName("Suunto 5 Peak")
+
+    activity.Records = append(activity.Records,
+        mesgdef.NewRecord(nil).
+            SetTimestamp(now.Add(1*time.Second)).
+            SetSpeed(1000).
+            SetCadence(90).
+            SetHeartRate(100),
+        mesgdef.NewRecord(nil).
+            SetTimestamp(now.Add(2*time.Second)).
+            SetSpeed(1010).
+            SetCadence(100).
+            SetHeartRate(110),
+    )
+
+    activity.Laps = append(activity.Laps,
+        mesgdef.NewLap(nil).
+            SetTimestamp(now.Add(3*time.Second)).
+            SetStartTime(now.Add(1*time.Second)).
+            SetAvgSpeed(1000).
+            SetAvgCadence(95).
+            SetAvgHeartRate(105),
+    )
+
+    activity.Sessions = append(activity.Sessions,
+        mesgdef.NewSession(nil).
+            SetTimestamp(now.Add(3*time.Second)).
+            SetStartTime(now.Add(1*time.Second)).
+            SetAvgSpeed(1000).
+            SetAvgCadence(95).
+            SetAvgHeartRate(105),
+    )
+
+    activity.Activity = mesgdef.NewActivity(nil).
+        SetType(typedef.ActivityManual).
+        SetTimestamp(now.Add(4 * time.Second)).
+        SetNumSessions(1)
+
+    // Convert back to FIT protocol messages
+    fit := activity.ToFit(factory.StandardFactory())
+
+    bw := bufferedwriter.New(f)
+    defer bw.Flush()
+
+    enc := encoder.New(bw)
+    if err := enc.Encode(&fit); err != nil {
+        panic(err)
+    }
+}
+
+
+```
 
 Example decoding FIT file into common file `Activity File`, edit the manufacturer and product, and then encode it again.
 
