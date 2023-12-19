@@ -8,44 +8,47 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // NmeaSentence is a NmeaSentence message.
 type NmeaSentence struct {
-	Timestamp   typedef.DateTime // Units: s; Timestamp message was output
-	TimestampMs uint16           // Units: ms; Fractional part of timestamp, added to timestamp
-	Sentence    string           // NMEA sentence
+	Timestamp   time.Time // Units: s; Timestamp message was output
+	TimestampMs uint16    // Units: ms; Fractional part of timestamp, added to timestamp
+	Sentence    string    // NMEA sentence
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewNmeaSentence creates new NmeaSentence struct based on given mesg. If mesg is nil or mesg.Num is not equal to NmeaSentence mesg number, it will return nil.
-func NewNmeaSentence(mesg proto.Message) *NmeaSentence {
-	if mesg.Num != typedef.MesgNumNmeaSentence {
-		return nil
-	}
-
+// NewNmeaSentence creates new NmeaSentence struct based on given mesg.
+// If mesg is nil, it will return NmeaSentence with all fields being set to its corresponding invalid value.
+func NewNmeaSentence(mesg *proto.Message) *NmeaSentence {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &NmeaSentence{
-		Timestamp:   typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:   datetime.ToTime(vals[253]),
 		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		Sentence:    typeconv.ToString[string](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -54,9 +57,9 @@ func (m *NmeaSentence) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumNmeaSentence)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -78,7 +81,7 @@ func (m *NmeaSentence) ToMesg(fac Factory) proto.Message {
 // size returns size of NmeaSentence's valid fields.
 func (m *NmeaSentence) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -88,4 +91,34 @@ func (m *NmeaSentence) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets NmeaSentence value.
+//
+// Units: s; Timestamp message was output
+func (m *NmeaSentence) SetTimestamp(v time.Time) *NmeaSentence {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets NmeaSentence value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSentence sets NmeaSentence value.
+//
+// NMEA sentence
+func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {
+	m.Sentence = v
+	return m
+}
+
+// SetDeveloperFields NmeaSentence's DeveloperFields.
+func (m *NmeaSentence) SetDeveloperFields(developerFields ...proto.DeveloperField) *NmeaSentence {
+	m.DeveloperFields = developerFields
+	return m
 }

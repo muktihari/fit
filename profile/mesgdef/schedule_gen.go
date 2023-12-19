@@ -8,10 +8,12 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Schedule is a Schedule message.
@@ -19,41 +21,42 @@ type Schedule struct {
 	Manufacturer  typedef.Manufacturer // Corresponds to file_id of scheduled workout / course.
 	Product       uint16               // Corresponds to file_id of scheduled workout / course.
 	SerialNumber  uint32               // Corresponds to file_id of scheduled workout / course.
-	TimeCreated   typedef.DateTime     // Corresponds to file_id of scheduled workout / course.
+	TimeCreated   time.Time            // Corresponds to file_id of scheduled workout / course.
 	Completed     bool                 // TRUE if this activity has been started
 	Type          typedef.Schedule
-	ScheduledTime typedef.LocalDateTime
+	ScheduledTime time.Time
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSchedule creates new Schedule struct based on given mesg. If mesg is nil or mesg.Num is not equal to Schedule mesg number, it will return nil.
-func NewSchedule(mesg proto.Message) *Schedule {
-	if mesg.Num != typedef.MesgNumSchedule {
-		return nil
-	}
-
+// NewSchedule creates new Schedule struct based on given mesg.
+// If mesg is nil, it will return Schedule with all fields being set to its corresponding invalid value.
+func NewSchedule(mesg *proto.Message) *Schedule {
 	vals := [7]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Schedule{
 		Manufacturer:  typeconv.ToUint16[typedef.Manufacturer](vals[0]),
 		Product:       typeconv.ToUint16[uint16](vals[1]),
 		SerialNumber:  typeconv.ToUint32z[uint32](vals[2]),
-		TimeCreated:   typeconv.ToUint32[typedef.DateTime](vals[3]),
+		TimeCreated:   datetime.ToTime(vals[3]),
 		Completed:     typeconv.ToBool[bool](vals[4]),
 		Type:          typeconv.ToEnum[typedef.Schedule](vals[5]),
-		ScheduledTime: typeconv.ToUint32[typedef.LocalDateTime](vals[6]),
+		ScheduledTime: datetime.ToTime(vals[6]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -77,9 +80,9 @@ func (m *Schedule) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint32[uint32](m.TimeCreated)
+		field.Value = datetime.ToUint32(m.TimeCreated)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Completed != false {
@@ -92,9 +95,9 @@ func (m *Schedule) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.Type)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.ScheduledTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToUint32[uint32](m.ScheduledTime)
+		field.Value = datetime.ToUint32(m.ScheduledTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 
@@ -115,7 +118,7 @@ func (m *Schedule) size() byte {
 	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.TimeCreated) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Completed != false {
@@ -124,8 +127,66 @@ func (m *Schedule) size() byte {
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.ScheduledTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
 		size++
 	}
 	return size
+}
+
+// SetManufacturer sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetManufacturer(v typedef.Manufacturer) *Schedule {
+	m.Manufacturer = v
+	return m
+}
+
+// SetProduct sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetProduct(v uint16) *Schedule {
+	m.Product = v
+	return m
+}
+
+// SetSerialNumber sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
+	m.SerialNumber = v
+	return m
+}
+
+// SetTimeCreated sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
+	m.TimeCreated = v
+	return m
+}
+
+// SetCompleted sets Schedule value.
+//
+// TRUE if this activity has been started
+func (m *Schedule) SetCompleted(v bool) *Schedule {
+	m.Completed = v
+	return m
+}
+
+// SetType sets Schedule value.
+func (m *Schedule) SetType(v typedef.Schedule) *Schedule {
+	m.Type = v
+	return m
+}
+
+// SetScheduledTime sets Schedule value.
+func (m *Schedule) SetScheduledTime(v time.Time) *Schedule {
+	m.ScheduledTime = v
+	return m
+}
+
+// SetDeveloperFields Schedule's DeveloperFields.
+func (m *Schedule) SetDeveloperFields(developerFields ...proto.DeveloperField) *Schedule {
+	m.DeveloperFields = developerFields
+	return m
 }

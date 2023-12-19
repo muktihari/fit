@@ -8,49 +8,52 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // AccelerometerData is a AccelerometerData message.
 type AccelerometerData struct {
-	Timestamp                  typedef.DateTime // Units: s; Whole second part of the timestamp
-	TimestampMs                uint16           // Units: ms; Millisecond part of the timestamp.
-	SampleTimeOffset           []uint16         // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
-	AccelX                     []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	AccelY                     []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	AccelZ                     []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	CalibratedAccelX           []float32        // Array: [N]; Units: g; Calibrated accel reading
-	CalibratedAccelY           []float32        // Array: [N]; Units: g; Calibrated accel reading
-	CalibratedAccelZ           []float32        // Array: [N]; Units: g; Calibrated accel reading
-	CompressedCalibratedAccelX []int16          // Array: [N]; Units: mG; Calibrated accel reading
-	CompressedCalibratedAccelY []int16          // Array: [N]; Units: mG; Calibrated accel reading
-	CompressedCalibratedAccelZ []int16          // Array: [N]; Units: mG; Calibrated accel reading
+	Timestamp                  time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs                uint16    // Units: ms; Millisecond part of the timestamp.
+	SampleTimeOffset           []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
+	AccelX                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	AccelY                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	AccelZ                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	CalibratedAccelX           []float32 // Array: [N]; Units: g; Calibrated accel reading
+	CalibratedAccelY           []float32 // Array: [N]; Units: g; Calibrated accel reading
+	CalibratedAccelZ           []float32 // Array: [N]; Units: g; Calibrated accel reading
+	CompressedCalibratedAccelX []int16   // Array: [N]; Units: mG; Calibrated accel reading
+	CompressedCalibratedAccelY []int16   // Array: [N]; Units: mG; Calibrated accel reading
+	CompressedCalibratedAccelZ []int16   // Array: [N]; Units: mG; Calibrated accel reading
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewAccelerometerData creates new AccelerometerData struct based on given mesg. If mesg is nil or mesg.Num is not equal to AccelerometerData mesg number, it will return nil.
-func NewAccelerometerData(mesg proto.Message) *AccelerometerData {
-	if mesg.Num != typedef.MesgNumAccelerometerData {
-		return nil
-	}
-
+// NewAccelerometerData creates new AccelerometerData struct based on given mesg.
+// If mesg is nil, it will return AccelerometerData with all fields being set to its corresponding invalid value.
+func NewAccelerometerData(mesg *proto.Message) *AccelerometerData {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &AccelerometerData{
-		Timestamp:                  typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                  datetime.ToTime(vals[253]),
 		TimestampMs:                typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset:           typeconv.ToSliceUint16[uint16](vals[1]),
 		AccelX:                     typeconv.ToSliceUint16[uint16](vals[2]),
@@ -63,7 +66,7 @@ func NewAccelerometerData(mesg proto.Message) *AccelerometerData {
 		CompressedCalibratedAccelY: typeconv.ToSliceSint16[int16](vals[9]),
 		CompressedCalibratedAccelZ: typeconv.ToSliceSint16[int16](vals[10]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -72,9 +75,9 @@ func (m *AccelerometerData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAccelerometerData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -141,7 +144,7 @@ func (m *AccelerometerData) ToMesg(fac Factory) proto.Message {
 // size returns size of AccelerometerData's valid fields.
 func (m *AccelerometerData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -178,4 +181,106 @@ func (m *AccelerometerData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets AccelerometerData value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *AccelerometerData) SetTimestamp(v time.Time) *AccelerometerData {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets AccelerometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSampleTimeOffset sets AccelerometerData value.
+//
+// Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
+func (m *AccelerometerData) SetSampleTimeOffset(v []uint16) *AccelerometerData {
+	m.SampleTimeOffset = v
+	return m
+}
+
+// SetAccelX sets AccelerometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *AccelerometerData) SetAccelX(v []uint16) *AccelerometerData {
+	m.AccelX = v
+	return m
+}
+
+// SetAccelY sets AccelerometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *AccelerometerData) SetAccelY(v []uint16) *AccelerometerData {
+	m.AccelY = v
+	return m
+}
+
+// SetAccelZ sets AccelerometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *AccelerometerData) SetAccelZ(v []uint16) *AccelerometerData {
+	m.AccelZ = v
+	return m
+}
+
+// SetCalibratedAccelX sets AccelerometerData value.
+//
+// Array: [N]; Units: g; Calibrated accel reading
+func (m *AccelerometerData) SetCalibratedAccelX(v []float32) *AccelerometerData {
+	m.CalibratedAccelX = v
+	return m
+}
+
+// SetCalibratedAccelY sets AccelerometerData value.
+//
+// Array: [N]; Units: g; Calibrated accel reading
+func (m *AccelerometerData) SetCalibratedAccelY(v []float32) *AccelerometerData {
+	m.CalibratedAccelY = v
+	return m
+}
+
+// SetCalibratedAccelZ sets AccelerometerData value.
+//
+// Array: [N]; Units: g; Calibrated accel reading
+func (m *AccelerometerData) SetCalibratedAccelZ(v []float32) *AccelerometerData {
+	m.CalibratedAccelZ = v
+	return m
+}
+
+// SetCompressedCalibratedAccelX sets AccelerometerData value.
+//
+// Array: [N]; Units: mG; Calibrated accel reading
+func (m *AccelerometerData) SetCompressedCalibratedAccelX(v []int16) *AccelerometerData {
+	m.CompressedCalibratedAccelX = v
+	return m
+}
+
+// SetCompressedCalibratedAccelY sets AccelerometerData value.
+//
+// Array: [N]; Units: mG; Calibrated accel reading
+func (m *AccelerometerData) SetCompressedCalibratedAccelY(v []int16) *AccelerometerData {
+	m.CompressedCalibratedAccelY = v
+	return m
+}
+
+// SetCompressedCalibratedAccelZ sets AccelerometerData value.
+//
+// Array: [N]; Units: mG; Calibrated accel reading
+func (m *AccelerometerData) SetCompressedCalibratedAccelZ(v []int16) *AccelerometerData {
+	m.CompressedCalibratedAccelZ = v
+	return m
+}
+
+// SetDeveloperFields AccelerometerData's DeveloperFields.
+func (m *AccelerometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *AccelerometerData {
+	m.DeveloperFields = developerFields
+	return m
 }

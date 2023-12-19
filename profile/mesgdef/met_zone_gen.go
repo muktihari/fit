@@ -26,19 +26,20 @@ type MetZone struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMetZone creates new MetZone struct based on given mesg. If mesg is nil or mesg.Num is not equal to MetZone mesg number, it will return nil.
-func NewMetZone(mesg proto.Message) *MetZone {
-	if mesg.Num != typedef.MesgNumMetZone {
-		return nil
-	}
-
+// NewMetZone creates new MetZone struct based on given mesg.
+// If mesg is nil, it will return MetZone with all fields being set to its corresponding invalid value.
+func NewMetZone(mesg *proto.Message) *MetZone {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MetZone{
@@ -47,7 +48,7 @@ func NewMetZone(mesg proto.Message) *MetZone {
 		Calories:     typeconv.ToUint16[uint16](vals[2]),
 		FatCalories:  typeconv.ToUint8[uint8](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,4 +99,38 @@ func (m *MetZone) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets MetZone value.
+func (m *MetZone) SetMessageIndex(v typedef.MessageIndex) *MetZone {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHighBpm sets MetZone value.
+func (m *MetZone) SetHighBpm(v uint8) *MetZone {
+	m.HighBpm = v
+	return m
+}
+
+// SetCalories sets MetZone value.
+//
+// Scale: 10; Units: kcal / min;
+func (m *MetZone) SetCalories(v uint16) *MetZone {
+	m.Calories = v
+	return m
+}
+
+// SetFatCalories sets MetZone value.
+//
+// Scale: 10; Units: kcal / min;
+func (m *MetZone) SetFatCalories(v uint8) *MetZone {
+	m.FatCalories = v
+	return m
+}
+
+// SetDeveloperFields MetZone's DeveloperFields.
+func (m *MetZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *MetZone {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -35,19 +35,20 @@ type Connectivity struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewConnectivity creates new Connectivity struct based on given mesg. If mesg is nil or mesg.Num is not equal to Connectivity mesg number, it will return nil.
-func NewConnectivity(mesg proto.Message) *Connectivity {
-	if mesg.Num != typedef.MesgNumConnectivity {
-		return nil
-	}
-
+// NewConnectivity creates new Connectivity struct based on given mesg.
+// If mesg is nil, it will return Connectivity with all fields being set to its corresponding invalid value.
+func NewConnectivity(mesg *proto.Message) *Connectivity {
 	vals := [13]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Connectivity{
@@ -65,7 +66,7 @@ func NewConnectivity(mesg proto.Message) *Connectivity {
 		IncidentDetectionEnabled:    typeconv.ToBool[bool](vals[11]),
 		GrouptrackEnabled:           typeconv.ToBool[bool](vals[12]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -188,4 +189,94 @@ func (m *Connectivity) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetBluetoothEnabled sets Connectivity value.
+//
+// Use Bluetooth for connectivity features
+func (m *Connectivity) SetBluetoothEnabled(v bool) *Connectivity {
+	m.BluetoothEnabled = v
+	return m
+}
+
+// SetBluetoothLeEnabled sets Connectivity value.
+//
+// Use Bluetooth Low Energy for connectivity features
+func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
+	m.BluetoothLeEnabled = v
+	return m
+}
+
+// SetAntEnabled sets Connectivity value.
+//
+// Use ANT for connectivity features
+func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
+	m.AntEnabled = v
+	return m
+}
+
+// SetName sets Connectivity value.
+func (m *Connectivity) SetName(v string) *Connectivity {
+	m.Name = v
+	return m
+}
+
+// SetLiveTrackingEnabled sets Connectivity value.
+func (m *Connectivity) SetLiveTrackingEnabled(v bool) *Connectivity {
+	m.LiveTrackingEnabled = v
+	return m
+}
+
+// SetWeatherConditionsEnabled sets Connectivity value.
+func (m *Connectivity) SetWeatherConditionsEnabled(v bool) *Connectivity {
+	m.WeatherConditionsEnabled = v
+	return m
+}
+
+// SetWeatherAlertsEnabled sets Connectivity value.
+func (m *Connectivity) SetWeatherAlertsEnabled(v bool) *Connectivity {
+	m.WeatherAlertsEnabled = v
+	return m
+}
+
+// SetAutoActivityUploadEnabled sets Connectivity value.
+func (m *Connectivity) SetAutoActivityUploadEnabled(v bool) *Connectivity {
+	m.AutoActivityUploadEnabled = v
+	return m
+}
+
+// SetCourseDownloadEnabled sets Connectivity value.
+func (m *Connectivity) SetCourseDownloadEnabled(v bool) *Connectivity {
+	m.CourseDownloadEnabled = v
+	return m
+}
+
+// SetWorkoutDownloadEnabled sets Connectivity value.
+func (m *Connectivity) SetWorkoutDownloadEnabled(v bool) *Connectivity {
+	m.WorkoutDownloadEnabled = v
+	return m
+}
+
+// SetGpsEphemerisDownloadEnabled sets Connectivity value.
+func (m *Connectivity) SetGpsEphemerisDownloadEnabled(v bool) *Connectivity {
+	m.GpsEphemerisDownloadEnabled = v
+	return m
+}
+
+// SetIncidentDetectionEnabled sets Connectivity value.
+func (m *Connectivity) SetIncidentDetectionEnabled(v bool) *Connectivity {
+	m.IncidentDetectionEnabled = v
+	return m
+}
+
+// SetGrouptrackEnabled sets Connectivity value.
+func (m *Connectivity) SetGrouptrackEnabled(v bool) *Connectivity {
+	m.GrouptrackEnabled = v
+	return m
+}
+
+// SetDeveloperFields Connectivity's DeveloperFields.
+func (m *Connectivity) SetDeveloperFields(developerFields ...proto.DeveloperField) *Connectivity {
+	m.DeveloperFields = developerFields
+	return m
 }

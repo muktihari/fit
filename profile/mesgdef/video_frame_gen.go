@@ -8,44 +8,47 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // VideoFrame is a VideoFrame message.
 type VideoFrame struct {
-	Timestamp   typedef.DateTime // Units: s; Whole second part of the timestamp
-	TimestampMs uint16           // Units: ms; Millisecond part of the timestamp.
-	FrameNumber uint32           // Number of the frame that the timestamp and timestamp_ms correlate to
+	Timestamp   time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs uint16    // Units: ms; Millisecond part of the timestamp.
+	FrameNumber uint32    // Number of the frame that the timestamp and timestamp_ms correlate to
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewVideoFrame creates new VideoFrame struct based on given mesg. If mesg is nil or mesg.Num is not equal to VideoFrame mesg number, it will return nil.
-func NewVideoFrame(mesg proto.Message) *VideoFrame {
-	if mesg.Num != typedef.MesgNumVideoFrame {
-		return nil
-	}
-
+// NewVideoFrame creates new VideoFrame struct based on given mesg.
+// If mesg is nil, it will return VideoFrame with all fields being set to its corresponding invalid value.
+func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &VideoFrame{
-		Timestamp:   typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:   datetime.ToTime(vals[253]),
 		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		FrameNumber: typeconv.ToUint32[uint32](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -54,9 +57,9 @@ func (m *VideoFrame) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoFrame)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -78,7 +81,7 @@ func (m *VideoFrame) ToMesg(fac Factory) proto.Message {
 // size returns size of VideoFrame's valid fields.
 func (m *VideoFrame) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -88,4 +91,34 @@ func (m *VideoFrame) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets VideoFrame value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *VideoFrame) SetTimestamp(v time.Time) *VideoFrame {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets VideoFrame value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
+	m.TimestampMs = v
+	return m
+}
+
+// SetFrameNumber sets VideoFrame value.
+//
+// Number of the frame that the timestamp and timestamp_ms correlate to
+func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
+	m.FrameNumber = v
+	return m
+}
+
+// SetDeveloperFields VideoFrame's DeveloperFields.
+func (m *VideoFrame) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoFrame {
+	m.DeveloperFields = developerFields
+	return m
 }

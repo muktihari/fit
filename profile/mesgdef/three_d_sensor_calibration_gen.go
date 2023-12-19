@@ -8,44 +8,47 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // ThreeDSensorCalibration is a ThreeDSensorCalibration message.
 type ThreeDSensorCalibration struct {
-	Timestamp          typedef.DateTime   // Units: s; Whole second part of the timestamp
+	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
 	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
 	OffsetCal          []int32            // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-	OrientationMatrix  []int32            // Scale: 65535; Array: [9]; 3 x 3 rotation matrix (row major)
+	OrientationMatrix  []int32            // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewThreeDSensorCalibration creates new ThreeDSensorCalibration struct based on given mesg. If mesg is nil or mesg.Num is not equal to ThreeDSensorCalibration mesg number, it will return nil.
-func NewThreeDSensorCalibration(mesg proto.Message) *ThreeDSensorCalibration {
-	if mesg.Num != typedef.MesgNumThreeDSensorCalibration {
-		return nil
-	}
-
+// NewThreeDSensorCalibration creates new ThreeDSensorCalibration struct based on given mesg.
+// If mesg is nil, it will return ThreeDSensorCalibration with all fields being set to its corresponding invalid value.
+func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ThreeDSensorCalibration{
-		Timestamp:          typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:          datetime.ToTime(vals[253]),
 		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
 		CalibrationFactor:  typeconv.ToUint32[uint32](vals[1]),
 		CalibrationDivisor: typeconv.ToUint32[uint32](vals[2]),
@@ -53,7 +56,7 @@ func NewThreeDSensorCalibration(mesg proto.Message) *ThreeDSensorCalibration {
 		OffsetCal:          typeconv.ToSliceSint32[int32](vals[4]),
 		OrientationMatrix:  typeconv.ToSliceSint32[int32](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -62,9 +65,9 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumThreeDSensorCalibration)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
@@ -106,7 +109,7 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 // size returns size of ThreeDSensorCalibration's valid fields.
 func (m *ThreeDSensorCalibration) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
@@ -128,4 +131,66 @@ func (m *ThreeDSensorCalibration) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets ThreeDSensorCalibration value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *ThreeDSensorCalibration) SetTimestamp(v time.Time) *ThreeDSensorCalibration {
+	m.Timestamp = v
+	return m
+}
+
+// SetSensorType sets ThreeDSensorCalibration value.
+//
+// Indicates which sensor the calibration is for
+func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
+	m.SensorType = v
+	return m
+}
+
+// SetCalibrationFactor sets ThreeDSensorCalibration value.
+//
+// Calibration factor used to convert from raw ADC value to degrees, g, etc.
+func (m *ThreeDSensorCalibration) SetCalibrationFactor(v uint32) *ThreeDSensorCalibration {
+	m.CalibrationFactor = v
+	return m
+}
+
+// SetCalibrationDivisor sets ThreeDSensorCalibration value.
+//
+// Units: counts; Calibration factor divisor
+func (m *ThreeDSensorCalibration) SetCalibrationDivisor(v uint32) *ThreeDSensorCalibration {
+	m.CalibrationDivisor = v
+	return m
+}
+
+// SetLevelShift sets ThreeDSensorCalibration value.
+//
+// Level shift value used to shift the ADC value back into range
+func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibration {
+	m.LevelShift = v
+	return m
+}
+
+// SetOffsetCal sets ThreeDSensorCalibration value.
+//
+// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
+func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
+	m.OffsetCal = v
+	return m
+}
+
+// SetOrientationMatrix sets ThreeDSensorCalibration value.
+//
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
+	m.OrientationMatrix = v
+	return m
+}
+
+// SetDeveloperFields ThreeDSensorCalibration's DeveloperFields.
+func (m *ThreeDSensorCalibration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ThreeDSensorCalibration {
+	m.DeveloperFields = developerFields
+	return m
 }

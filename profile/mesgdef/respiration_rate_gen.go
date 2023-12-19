@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // RespirationRate is a RespirationRate message.
 type RespirationRate struct {
-	Timestamp       typedef.DateTime
+	Timestamp       time.Time
 	RespirationRate int16 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -24,26 +26,27 @@ type RespirationRate struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewRespirationRate creates new RespirationRate struct based on given mesg. If mesg is nil or mesg.Num is not equal to RespirationRate mesg number, it will return nil.
-func NewRespirationRate(mesg proto.Message) *RespirationRate {
-	if mesg.Num != typedef.MesgNumRespirationRate {
-		return nil
-	}
-
+// NewRespirationRate creates new RespirationRate struct based on given mesg.
+// If mesg is nil, it will return RespirationRate with all fields being set to its corresponding invalid value.
+func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &RespirationRate{
-		Timestamp:       typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:       datetime.ToTime(vals[253]),
 		RespirationRate: typeconv.ToSint16[int16](vals[0]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -52,9 +55,9 @@ func (m *RespirationRate) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumRespirationRate)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.RespirationRate != basetype.Sint16Invalid {
@@ -71,11 +74,31 @@ func (m *RespirationRate) ToMesg(fac Factory) proto.Message {
 // size returns size of RespirationRate's valid fields.
 func (m *RespirationRate) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.RespirationRate != basetype.Sint16Invalid {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets RespirationRate value.
+func (m *RespirationRate) SetTimestamp(v time.Time) *RespirationRate {
+	m.Timestamp = v
+	return m
+}
+
+// SetRespirationRate sets RespirationRate value.
+//
+// Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
+func (m *RespirationRate) SetRespirationRate(v int16) *RespirationRate {
+	m.RespirationRate = v
+	return m
+}
+
+// SetDeveloperFields RespirationRate's DeveloperFields.
+func (m *RespirationRate) SetDeveloperFields(developerFields ...proto.DeveloperField) *RespirationRate {
+	m.DeveloperFields = developerFields
+	return m
 }

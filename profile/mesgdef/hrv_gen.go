@@ -15,32 +15,33 @@ import (
 
 // Hrv is a Hrv message.
 type Hrv struct {
-	Time []uint16 // Scale: 1000; Array: [N]; Units: s; Time between beats
+	Time []uint16 // Array: [N]; Scale: 1000; Units: s; Time between beats
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewHrv creates new Hrv struct based on given mesg. If mesg is nil or mesg.Num is not equal to Hrv mesg number, it will return nil.
-func NewHrv(mesg proto.Message) *Hrv {
-	if mesg.Num != typedef.MesgNumHrv {
-		return nil
-	}
-
+// NewHrv creates new Hrv struct based on given mesg.
+// If mesg is nil, it will return Hrv with all fields being set to its corresponding invalid value.
+func NewHrv(mesg *proto.Message) *Hrv {
 	vals := [1]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Hrv{
 		Time: typeconv.ToSliceUint16[uint16](vals[0]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -67,4 +68,18 @@ func (m *Hrv) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTime sets Hrv value.
+//
+// Array: [N]; Scale: 1000; Units: s; Time between beats
+func (m *Hrv) SetTime(v []uint16) *Hrv {
+	m.Time = v
+	return m
+}
+
+// SetDeveloperFields Hrv's DeveloperFields.
+func (m *Hrv) SetDeveloperFields(developerFields ...proto.DeveloperField) *Hrv {
+	m.DeveloperFields = developerFields
+	return m
 }

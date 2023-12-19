@@ -30,19 +30,20 @@ type SdmProfile struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSdmProfile creates new SdmProfile struct based on given mesg. If mesg is nil or mesg.Num is not equal to SdmProfile mesg number, it will return nil.
-func NewSdmProfile(mesg proto.Message) *SdmProfile {
-	if mesg.Num != typedef.MesgNumSdmProfile {
-		return nil
-	}
-
+// NewSdmProfile creates new SdmProfile struct based on given mesg.
+// If mesg is nil, it will return SdmProfile with all fields being set to its corresponding invalid value.
+func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SdmProfile{
@@ -55,7 +56,7 @@ func NewSdmProfile(mesg proto.Message) *SdmProfile {
 		SdmAntIdTransType: typeconv.ToUint8z[uint8](vals[5]),
 		OdometerRollover:  typeconv.ToUint8[uint8](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -138,4 +139,66 @@ func (m *SdmProfile) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SdmProfile value.
+func (m *SdmProfile) SetMessageIndex(v typedef.MessageIndex) *SdmProfile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetEnabled sets SdmProfile value.
+func (m *SdmProfile) SetEnabled(v bool) *SdmProfile {
+	m.Enabled = v
+	return m
+}
+
+// SetSdmAntId sets SdmProfile value.
+func (m *SdmProfile) SetSdmAntId(v uint16) *SdmProfile {
+	m.SdmAntId = v
+	return m
+}
+
+// SetSdmCalFactor sets SdmProfile value.
+//
+// Scale: 10; Units: %;
+func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
+	m.SdmCalFactor = v
+	return m
+}
+
+// SetOdometer sets SdmProfile value.
+//
+// Scale: 100; Units: m;
+func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
+	m.Odometer = v
+	return m
+}
+
+// SetSpeedSource sets SdmProfile value.
+//
+// Use footpod for speed source instead of GPS
+func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
+	m.SpeedSource = v
+	return m
+}
+
+// SetSdmAntIdTransType sets SdmProfile value.
+func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
+	m.SdmAntIdTransType = v
+	return m
+}
+
+// SetOdometerRollover sets SdmProfile value.
+//
+// Rollover counter that can be used to extend the odometer
+func (m *SdmProfile) SetOdometerRollover(v uint8) *SdmProfile {
+	m.OdometerRollover = v
+	return m
+}
+
+// SetDeveloperFields SdmProfile's DeveloperFields.
+func (m *SdmProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *SdmProfile {
+	m.DeveloperFields = developerFields
+	return m
 }

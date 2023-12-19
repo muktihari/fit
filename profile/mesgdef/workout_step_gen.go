@@ -41,19 +41,20 @@ type WorkoutStep struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWorkoutStep creates new WorkoutStep struct based on given mesg. If mesg is nil or mesg.Num is not equal to WorkoutStep mesg number, it will return nil.
-func NewWorkoutStep(mesg proto.Message) *WorkoutStep {
-	if mesg.Num != typedef.MesgNumWorkoutStep {
-		return nil
-	}
-
+// NewWorkoutStep creates new WorkoutStep struct based on given mesg.
+// If mesg is nil, it will return WorkoutStep with all fields being set to its corresponding invalid value.
+func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &WorkoutStep{
@@ -77,7 +78,7 @@ func NewWorkoutStep(mesg proto.Message) *WorkoutStep {
 		SecondaryCustomTargetValueLow:  typeconv.ToUint32[uint32](vals[21]),
 		SecondaryCustomTargetValueHigh: typeconv.ToUint32[uint32](vals[22]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -248,4 +249,126 @@ func (m *WorkoutStep) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets WorkoutStep value.
+func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
+	m.MessageIndex = v
+	return m
+}
+
+// SetWktStepName sets WorkoutStep value.
+func (m *WorkoutStep) SetWktStepName(v string) *WorkoutStep {
+	m.WktStepName = v
+	return m
+}
+
+// SetDurationType sets WorkoutStep value.
+func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
+	m.DurationType = v
+	return m
+}
+
+// SetDurationValue sets WorkoutStep value.
+func (m *WorkoutStep) SetDurationValue(v uint32) *WorkoutStep {
+	m.DurationValue = v
+	return m
+}
+
+// SetTargetType sets WorkoutStep value.
+func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
+	m.TargetType = v
+	return m
+}
+
+// SetTargetValue sets WorkoutStep value.
+func (m *WorkoutStep) SetTargetValue(v uint32) *WorkoutStep {
+	m.TargetValue = v
+	return m
+}
+
+// SetCustomTargetValueLow sets WorkoutStep value.
+func (m *WorkoutStep) SetCustomTargetValueLow(v uint32) *WorkoutStep {
+	m.CustomTargetValueLow = v
+	return m
+}
+
+// SetCustomTargetValueHigh sets WorkoutStep value.
+func (m *WorkoutStep) SetCustomTargetValueHigh(v uint32) *WorkoutStep {
+	m.CustomTargetValueHigh = v
+	return m
+}
+
+// SetIntensity sets WorkoutStep value.
+func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
+	m.Intensity = v
+	return m
+}
+
+// SetNotes sets WorkoutStep value.
+func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
+	m.Notes = v
+	return m
+}
+
+// SetEquipment sets WorkoutStep value.
+func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
+	m.Equipment = v
+	return m
+}
+
+// SetExerciseCategory sets WorkoutStep value.
+func (m *WorkoutStep) SetExerciseCategory(v typedef.ExerciseCategory) *WorkoutStep {
+	m.ExerciseCategory = v
+	return m
+}
+
+// SetExerciseName sets WorkoutStep value.
+func (m *WorkoutStep) SetExerciseName(v uint16) *WorkoutStep {
+	m.ExerciseName = v
+	return m
+}
+
+// SetExerciseWeight sets WorkoutStep value.
+//
+// Scale: 100; Units: kg;
+func (m *WorkoutStep) SetExerciseWeight(v uint16) *WorkoutStep {
+	m.ExerciseWeight = v
+	return m
+}
+
+// SetWeightDisplayUnit sets WorkoutStep value.
+func (m *WorkoutStep) SetWeightDisplayUnit(v typedef.FitBaseUnit) *WorkoutStep {
+	m.WeightDisplayUnit = v
+	return m
+}
+
+// SetSecondaryTargetType sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryTargetType(v typedef.WktStepTarget) *WorkoutStep {
+	m.SecondaryTargetType = v
+	return m
+}
+
+// SetSecondaryTargetValue sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
+	m.SecondaryTargetValue = v
+	return m
+}
+
+// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueLow = v
+	return m
+}
+
+// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueHigh = v
+	return m
+}
+
+// SetDeveloperFields WorkoutStep's DeveloperFields.
+func (m *WorkoutStep) SetDeveloperFields(developerFields ...proto.DeveloperField) *WorkoutStep {
+	m.DeveloperFields = developerFields
+	return m
 }

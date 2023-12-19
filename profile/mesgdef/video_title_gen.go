@@ -25,19 +25,20 @@ type VideoTitle struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewVideoTitle creates new VideoTitle struct based on given mesg. If mesg is nil or mesg.Num is not equal to VideoTitle mesg number, it will return nil.
-func NewVideoTitle(mesg proto.Message) *VideoTitle {
-	if mesg.Num != typedef.MesgNumVideoTitle {
-		return nil
-	}
-
+// NewVideoTitle creates new VideoTitle struct based on given mesg.
+// If mesg is nil, it will return VideoTitle with all fields being set to its corresponding invalid value.
+func NewVideoTitle(mesg *proto.Message) *VideoTitle {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &VideoTitle{
@@ -45,7 +46,7 @@ func NewVideoTitle(mesg proto.Message) *VideoTitle {
 		MessageCount: typeconv.ToUint16[uint16](vals[0]),
 		Text:         typeconv.ToString[string](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,32 @@ func (m *VideoTitle) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets VideoTitle value.
+//
+// Long titles will be split into multiple parts
+func (m *VideoTitle) SetMessageIndex(v typedef.MessageIndex) *VideoTitle {
+	m.MessageIndex = v
+	return m
+}
+
+// SetMessageCount sets VideoTitle value.
+//
+// Total number of title parts
+func (m *VideoTitle) SetMessageCount(v uint16) *VideoTitle {
+	m.MessageCount = v
+	return m
+}
+
+// SetText sets VideoTitle value.
+func (m *VideoTitle) SetText(v string) *VideoTitle {
+	m.Text = v
+	return m
+}
+
+// SetDeveloperFields VideoTitle's DeveloperFields.
+func (m *VideoTitle) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoTitle {
+	m.DeveloperFields = developerFields
+	return m
 }

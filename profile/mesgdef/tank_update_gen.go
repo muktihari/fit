@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // TankUpdate is a TankUpdate message.
 type TankUpdate struct {
-	Timestamp typedef.DateTime // Units: s;
+	Timestamp time.Time // Units: s;
 	Sensor    typedef.AntChannelId
 	Pressure  uint16 // Scale: 100; Units: bar;
 
@@ -25,27 +27,28 @@ type TankUpdate struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewTankUpdate creates new TankUpdate struct based on given mesg. If mesg is nil or mesg.Num is not equal to TankUpdate mesg number, it will return nil.
-func NewTankUpdate(mesg proto.Message) *TankUpdate {
-	if mesg.Num != typedef.MesgNumTankUpdate {
-		return nil
-	}
-
+// NewTankUpdate creates new TankUpdate struct based on given mesg.
+// If mesg is nil, it will return TankUpdate with all fields being set to its corresponding invalid value.
+func NewTankUpdate(mesg *proto.Message) *TankUpdate {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &TankUpdate{
-		Timestamp: typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp: datetime.ToTime(vals[253]),
 		Sensor:    typeconv.ToUint32z[typedef.AntChannelId](vals[0]),
 		Pressure:  typeconv.ToUint16[uint16](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -54,9 +57,9 @@ func (m *TankUpdate) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTankUpdate)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint32z[uint32](m.Sensor) != basetype.Uint32zInvalid {
@@ -78,7 +81,7 @@ func (m *TankUpdate) ToMesg(fac Factory) proto.Message {
 // size returns size of TankUpdate's valid fields.
 func (m *TankUpdate) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint32z[uint32](m.Sensor) != basetype.Uint32zInvalid {
@@ -88,4 +91,32 @@ func (m *TankUpdate) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets TankUpdate value.
+//
+// Units: s;
+func (m *TankUpdate) SetTimestamp(v time.Time) *TankUpdate {
+	m.Timestamp = v
+	return m
+}
+
+// SetSensor sets TankUpdate value.
+func (m *TankUpdate) SetSensor(v typedef.AntChannelId) *TankUpdate {
+	m.Sensor = v
+	return m
+}
+
+// SetPressure sets TankUpdate value.
+//
+// Scale: 100; Units: bar;
+func (m *TankUpdate) SetPressure(v uint16) *TankUpdate {
+	m.Pressure = v
+	return m
+}
+
+// SetDeveloperFields TankUpdate's DeveloperFields.
+func (m *TankUpdate) SetDeveloperFields(developerFields ...proto.DeveloperField) *TankUpdate {
+	m.DeveloperFields = developerFields
+	return m
 }

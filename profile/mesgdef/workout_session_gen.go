@@ -29,19 +29,20 @@ type WorkoutSession struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWorkoutSession creates new WorkoutSession struct based on given mesg. If mesg is nil or mesg.Num is not equal to WorkoutSession mesg number, it will return nil.
-func NewWorkoutSession(mesg proto.Message) *WorkoutSession {
-	if mesg.Num != typedef.MesgNumWorkoutSession {
-		return nil
-	}
-
+// NewWorkoutSession creates new WorkoutSession struct based on given mesg.
+// If mesg is nil, it will return WorkoutSession with all fields being set to its corresponding invalid value.
+func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &WorkoutSession{
@@ -53,7 +54,7 @@ func NewWorkoutSession(mesg proto.Message) *WorkoutSession {
 		PoolLength:     typeconv.ToUint16[uint16](vals[4]),
 		PoolLengthUnit: typeconv.ToEnum[typedef.DisplayMeasure](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -128,4 +129,54 @@ func (m *WorkoutSession) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets WorkoutSession value.
+func (m *WorkoutSession) SetMessageIndex(v typedef.MessageIndex) *WorkoutSession {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSport sets WorkoutSession value.
+func (m *WorkoutSession) SetSport(v typedef.Sport) *WorkoutSession {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets WorkoutSession value.
+func (m *WorkoutSession) SetSubSport(v typedef.SubSport) *WorkoutSession {
+	m.SubSport = v
+	return m
+}
+
+// SetNumValidSteps sets WorkoutSession value.
+func (m *WorkoutSession) SetNumValidSteps(v uint16) *WorkoutSession {
+	m.NumValidSteps = v
+	return m
+}
+
+// SetFirstStepIndex sets WorkoutSession value.
+func (m *WorkoutSession) SetFirstStepIndex(v uint16) *WorkoutSession {
+	m.FirstStepIndex = v
+	return m
+}
+
+// SetPoolLength sets WorkoutSession value.
+//
+// Scale: 100; Units: m;
+func (m *WorkoutSession) SetPoolLength(v uint16) *WorkoutSession {
+	m.PoolLength = v
+	return m
+}
+
+// SetPoolLengthUnit sets WorkoutSession value.
+func (m *WorkoutSession) SetPoolLengthUnit(v typedef.DisplayMeasure) *WorkoutSession {
+	m.PoolLengthUnit = v
+	return m
+}
+
+// SetDeveloperFields WorkoutSession's DeveloperFields.
+func (m *WorkoutSession) SetDeveloperFields(developerFields ...proto.DeveloperField) *WorkoutSession {
+	m.DeveloperFields = developerFields
+	return m
 }

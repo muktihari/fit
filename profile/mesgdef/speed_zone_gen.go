@@ -25,19 +25,20 @@ type SpeedZone struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSpeedZone creates new SpeedZone struct based on given mesg. If mesg is nil or mesg.Num is not equal to SpeedZone mesg number, it will return nil.
-func NewSpeedZone(mesg proto.Message) *SpeedZone {
-	if mesg.Num != typedef.MesgNumSpeedZone {
-		return nil
-	}
-
+// NewSpeedZone creates new SpeedZone struct based on given mesg.
+// If mesg is nil, it will return SpeedZone with all fields being set to its corresponding invalid value.
+func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SpeedZone{
@@ -45,7 +46,7 @@ func NewSpeedZone(mesg proto.Message) *SpeedZone {
 		HighValue:    typeconv.ToUint16[uint16](vals[0]),
 		Name:         typeconv.ToString[string](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *SpeedZone) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets SpeedZone value.
+func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHighValue sets SpeedZone value.
+//
+// Scale: 1000; Units: m/s;
+func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
+	m.HighValue = v
+	return m
+}
+
+// SetName sets SpeedZone value.
+func (m *SpeedZone) SetName(v string) *SpeedZone {
+	m.Name = v
+	return m
+}
+
+// SetDeveloperFields SpeedZone's DeveloperFields.
+func (m *SpeedZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *SpeedZone {
+	m.DeveloperFields = developerFields
+	return m
 }

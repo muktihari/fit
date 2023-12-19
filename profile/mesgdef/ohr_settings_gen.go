@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // OhrSettings is a OhrSettings message.
 type OhrSettings struct {
-	Timestamp typedef.DateTime // Units: s;
+	Timestamp time.Time // Units: s;
 	Enabled   typedef.Switch
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -24,26 +26,27 @@ type OhrSettings struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewOhrSettings creates new OhrSettings struct based on given mesg. If mesg is nil or mesg.Num is not equal to OhrSettings mesg number, it will return nil.
-func NewOhrSettings(mesg proto.Message) *OhrSettings {
-	if mesg.Num != typedef.MesgNumOhrSettings {
-		return nil
-	}
-
+// NewOhrSettings creates new OhrSettings struct based on given mesg.
+// If mesg is nil, it will return OhrSettings with all fields being set to its corresponding invalid value.
+func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &OhrSettings{
-		Timestamp: typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp: datetime.ToTime(vals[253]),
 		Enabled:   typeconv.ToEnum[typedef.Switch](vals[0]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -52,9 +55,9 @@ func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumOhrSettings)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Enabled) != basetype.EnumInvalid {
@@ -71,11 +74,31 @@ func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
 // size returns size of OhrSettings's valid fields.
 func (m *OhrSettings) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Enabled) != basetype.EnumInvalid {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets OhrSettings value.
+//
+// Units: s;
+func (m *OhrSettings) SetTimestamp(v time.Time) *OhrSettings {
+	m.Timestamp = v
+	return m
+}
+
+// SetEnabled sets OhrSettings value.
+func (m *OhrSettings) SetEnabled(v typedef.Switch) *OhrSettings {
+	m.Enabled = v
+	return m
+}
+
+// SetDeveloperFields OhrSettings's DeveloperFields.
+func (m *OhrSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *OhrSettings {
+	m.DeveloperFields = developerFields
+	return m
 }

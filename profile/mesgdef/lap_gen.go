@@ -8,19 +8,21 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Lap is a Lap message.
 type Lap struct {
 	MessageIndex                  typedef.MessageIndex
-	Timestamp                     typedef.DateTime // Units: s; Lap end time.
+	Timestamp                     time.Time // Units: s; Lap end time.
 	Event                         typedef.Event
 	EventType                     typedef.EventType
-	StartTime                     typedef.DateTime
+	StartTime                     time.Time
 	StartPositionLat              int32  // Units: semicircles;
 	StartPositionLong             int32  // Units: semicircles;
 	EndPositionLat                int32  // Units: semicircles;
@@ -69,10 +71,10 @@ type Lap struct {
 	AvgNegVerticalSpeed           int16    // Scale: 1000; Units: m/s;
 	MaxPosVerticalSpeed           int16    // Scale: 1000; Units: m/s;
 	MaxNegVerticalSpeed           int16    // Scale: 1000; Units: m/s;
-	TimeInHrZone                  []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInSpeedZone               []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInCadenceZone             []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInPowerZone               []uint32 // Scale: 1000; Array: [N]; Units: s;
+	TimeInHrZone                  []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInSpeedZone               []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInCadenceZone             []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInPowerZone               []uint32 // Array: [N]; Scale: 1000; Units: s;
 	RepetitionNum                 uint16
 	MinAltitude                   uint16 // Scale: 5; Offset: 500; Units: m;
 	MinHeartRate                  uint8  // Units: bpm;
@@ -87,12 +89,12 @@ type Lap struct {
 	MaxFractionalCadence          uint8    // Scale: 128; Units: rpm; fractional part of the max_cadence
 	TotalFractionalCycles         uint8    // Scale: 128; Units: cycles; fractional part of the total_cycles
 	PlayerScore                   uint16
-	AvgTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Avg saturated and unsaturated hemoglobin
-	MinTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Min saturated and unsaturated hemoglobin
-	MaxTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Max saturated and unsaturated hemoglobin
-	AvgSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Avg percentage of hemoglobin saturated with oxygen
-	MinSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Min percentage of hemoglobin saturated with oxygen
-	MaxSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Max percentage of hemoglobin saturated with oxygen
+	AvgTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+	MinTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+	MaxTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+	AvgSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+	MinSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+	MaxSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 	AvgLeftTorqueEffectiveness    uint8    // Scale: 2; Units: percent;
 	AvgRightTorqueEffectiveness   uint8    // Scale: 2; Units: percent;
 	AvgLeftPedalSmoothness        uint8    // Scale: 2; Units: percent;
@@ -102,10 +104,10 @@ type Lap struct {
 	StandCount                    uint16   // Number of transitions to the standing state
 	AvgLeftPco                    int8     // Units: mm; Average left platform center offset
 	AvgRightPco                   int8     // Units: mm; Average right platform center offset
-	AvgLeftPowerPhase             []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
-	AvgLeftPowerPhasePeak         []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
-	AvgRightPowerPhase            []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
-	AvgRightPowerPhasePeak        []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+	AvgLeftPowerPhase             []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+	AvgLeftPowerPhasePeak         []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhase            []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhasePeak        []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
 	AvgPowerPosition              []uint16 // Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
 	MaxPowerPosition              []uint16 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 	AvgCadencePosition            []uint8  // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
@@ -145,27 +147,28 @@ type Lap struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewLap creates new Lap struct based on given mesg. If mesg is nil or mesg.Num is not equal to Lap mesg number, it will return nil.
-func NewLap(mesg proto.Message) *Lap {
-	if mesg.Num != typedef.MesgNumLap {
-		return nil
-	}
-
+// NewLap creates new Lap struct based on given mesg.
+// If mesg is nil, it will return Lap with all fields being set to its corresponding invalid value.
+func NewLap(mesg *proto.Message) *Lap {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Lap{
 		MessageIndex:                  typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Timestamp:                     typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                     datetime.ToTime(vals[253]),
 		Event:                         typeconv.ToEnum[typedef.Event](vals[0]),
 		EventType:                     typeconv.ToEnum[typedef.EventType](vals[1]),
-		StartTime:                     typeconv.ToUint32[typedef.DateTime](vals[2]),
+		StartTime:                     datetime.ToTime(vals[2]),
 		StartPositionLat:              typeconv.ToSint32[int32](vals[3]),
 		StartPositionLong:             typeconv.ToSint32[int32](vals[4]),
 		EndPositionLat:                typeconv.ToSint32[int32](vals[5]),
@@ -285,7 +288,7 @@ func NewLap(mesg proto.Message) *Lap {
 		MinCoreTemperature:            typeconv.ToUint16[uint16](vals[159]),
 		MaxCoreTemperature:            typeconv.ToUint16[uint16](vals[160]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -299,9 +302,9 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -314,9 +317,9 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.EventType)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32[uint32](m.StartTime)
+		field.Value = datetime.ToUint32(m.StartTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -921,7 +924,7 @@ func (m *Lap) size() byte {
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -930,7 +933,7 @@ func (m *Lap) size() byte {
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -1288,4 +1291,956 @@ func (m *Lap) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Lap value.
+func (m *Lap) SetMessageIndex(v typedef.MessageIndex) *Lap {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets Lap value.
+//
+// Units: s; Lap end time.
+func (m *Lap) SetTimestamp(v time.Time) *Lap {
+	m.Timestamp = v
+	return m
+}
+
+// SetEvent sets Lap value.
+func (m *Lap) SetEvent(v typedef.Event) *Lap {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Lap value.
+func (m *Lap) SetEventType(v typedef.EventType) *Lap {
+	m.EventType = v
+	return m
+}
+
+// SetStartTime sets Lap value.
+func (m *Lap) SetStartTime(v time.Time) *Lap {
+	m.StartTime = v
+	return m
+}
+
+// SetStartPositionLat sets Lap value.
+//
+// Units: semicircles;
+func (m *Lap) SetStartPositionLat(v int32) *Lap {
+	m.StartPositionLat = v
+	return m
+}
+
+// SetStartPositionLong sets Lap value.
+//
+// Units: semicircles;
+func (m *Lap) SetStartPositionLong(v int32) *Lap {
+	m.StartPositionLong = v
+	return m
+}
+
+// SetEndPositionLat sets Lap value.
+//
+// Units: semicircles;
+func (m *Lap) SetEndPositionLat(v int32) *Lap {
+	m.EndPositionLat = v
+	return m
+}
+
+// SetEndPositionLong sets Lap value.
+//
+// Units: semicircles;
+func (m *Lap) SetEndPositionLong(v int32) *Lap {
+	m.EndPositionLong = v
+	return m
+}
+
+// SetTotalElapsedTime sets Lap value.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
+func (m *Lap) SetTotalElapsedTime(v uint32) *Lap {
+	m.TotalElapsedTime = v
+	return m
+}
+
+// SetTotalTimerTime sets Lap value.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
+func (m *Lap) SetTotalTimerTime(v uint32) *Lap {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetTotalDistance sets Lap value.
+//
+// Scale: 100; Units: m;
+func (m *Lap) SetTotalDistance(v uint32) *Lap {
+	m.TotalDistance = v
+	return m
+}
+
+// SetTotalCycles sets Lap value.
+//
+// Units: cycles;
+func (m *Lap) SetTotalCycles(v uint32) *Lap {
+	m.TotalCycles = v
+	return m
+}
+
+// SetTotalCalories sets Lap value.
+//
+// Units: kcal;
+func (m *Lap) SetTotalCalories(v uint16) *Lap {
+	m.TotalCalories = v
+	return m
+}
+
+// SetTotalFatCalories sets Lap value.
+//
+// Units: kcal; If New Leaf
+func (m *Lap) SetTotalFatCalories(v uint16) *Lap {
+	m.TotalFatCalories = v
+	return m
+}
+
+// SetAvgSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetAvgSpeed(v uint16) *Lap {
+	m.AvgSpeed = v
+	return m
+}
+
+// SetMaxSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetMaxSpeed(v uint16) *Lap {
+	m.MaxSpeed = v
+	return m
+}
+
+// SetAvgHeartRate sets Lap value.
+//
+// Units: bpm;
+func (m *Lap) SetAvgHeartRate(v uint8) *Lap {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets Lap value.
+//
+// Units: bpm;
+func (m *Lap) SetMaxHeartRate(v uint8) *Lap {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetAvgCadence sets Lap value.
+//
+// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
+func (m *Lap) SetAvgCadence(v uint8) *Lap {
+	m.AvgCadence = v
+	return m
+}
+
+// SetMaxCadence sets Lap value.
+//
+// Units: rpm;
+func (m *Lap) SetMaxCadence(v uint8) *Lap {
+	m.MaxCadence = v
+	return m
+}
+
+// SetAvgPower sets Lap value.
+//
+// Units: watts; total_power / total_timer_time if non_zero_avg_power otherwise total_power / total_elapsed_time
+func (m *Lap) SetAvgPower(v uint16) *Lap {
+	m.AvgPower = v
+	return m
+}
+
+// SetMaxPower sets Lap value.
+//
+// Units: watts;
+func (m *Lap) SetMaxPower(v uint16) *Lap {
+	m.MaxPower = v
+	return m
+}
+
+// SetTotalAscent sets Lap value.
+//
+// Units: m;
+func (m *Lap) SetTotalAscent(v uint16) *Lap {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets Lap value.
+//
+// Units: m;
+func (m *Lap) SetTotalDescent(v uint16) *Lap {
+	m.TotalDescent = v
+	return m
+}
+
+// SetIntensity sets Lap value.
+func (m *Lap) SetIntensity(v typedef.Intensity) *Lap {
+	m.Intensity = v
+	return m
+}
+
+// SetLapTrigger sets Lap value.
+func (m *Lap) SetLapTrigger(v typedef.LapTrigger) *Lap {
+	m.LapTrigger = v
+	return m
+}
+
+// SetSport sets Lap value.
+func (m *Lap) SetSport(v typedef.Sport) *Lap {
+	m.Sport = v
+	return m
+}
+
+// SetEventGroup sets Lap value.
+func (m *Lap) SetEventGroup(v uint8) *Lap {
+	m.EventGroup = v
+	return m
+}
+
+// SetNumLengths sets Lap value.
+//
+// Units: lengths; # of lengths of swim pool
+func (m *Lap) SetNumLengths(v uint16) *Lap {
+	m.NumLengths = v
+	return m
+}
+
+// SetNormalizedPower sets Lap value.
+//
+// Units: watts;
+func (m *Lap) SetNormalizedPower(v uint16) *Lap {
+	m.NormalizedPower = v
+	return m
+}
+
+// SetLeftRightBalance sets Lap value.
+func (m *Lap) SetLeftRightBalance(v typedef.LeftRightBalance100) *Lap {
+	m.LeftRightBalance = v
+	return m
+}
+
+// SetFirstLengthIndex sets Lap value.
+func (m *Lap) SetFirstLengthIndex(v uint16) *Lap {
+	m.FirstLengthIndex = v
+	return m
+}
+
+// SetAvgStrokeDistance sets Lap value.
+//
+// Scale: 100; Units: m;
+func (m *Lap) SetAvgStrokeDistance(v uint16) *Lap {
+	m.AvgStrokeDistance = v
+	return m
+}
+
+// SetSwimStroke sets Lap value.
+func (m *Lap) SetSwimStroke(v typedef.SwimStroke) *Lap {
+	m.SwimStroke = v
+	return m
+}
+
+// SetSubSport sets Lap value.
+func (m *Lap) SetSubSport(v typedef.SubSport) *Lap {
+	m.SubSport = v
+	return m
+}
+
+// SetNumActiveLengths sets Lap value.
+//
+// Units: lengths; # of active lengths of swim pool
+func (m *Lap) SetNumActiveLengths(v uint16) *Lap {
+	m.NumActiveLengths = v
+	return m
+}
+
+// SetTotalWork sets Lap value.
+//
+// Units: J;
+func (m *Lap) SetTotalWork(v uint32) *Lap {
+	m.TotalWork = v
+	return m
+}
+
+// SetAvgAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetAvgAltitude(v uint16) *Lap {
+	m.AvgAltitude = v
+	return m
+}
+
+// SetMaxAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetMaxAltitude(v uint16) *Lap {
+	m.MaxAltitude = v
+	return m
+}
+
+// SetGpsAccuracy sets Lap value.
+//
+// Units: m;
+func (m *Lap) SetGpsAccuracy(v uint8) *Lap {
+	m.GpsAccuracy = v
+	return m
+}
+
+// SetAvgGrade sets Lap value.
+//
+// Scale: 100; Units: %;
+func (m *Lap) SetAvgGrade(v int16) *Lap {
+	m.AvgGrade = v
+	return m
+}
+
+// SetAvgPosGrade sets Lap value.
+//
+// Scale: 100; Units: %;
+func (m *Lap) SetAvgPosGrade(v int16) *Lap {
+	m.AvgPosGrade = v
+	return m
+}
+
+// SetAvgNegGrade sets Lap value.
+//
+// Scale: 100; Units: %;
+func (m *Lap) SetAvgNegGrade(v int16) *Lap {
+	m.AvgNegGrade = v
+	return m
+}
+
+// SetMaxPosGrade sets Lap value.
+//
+// Scale: 100; Units: %;
+func (m *Lap) SetMaxPosGrade(v int16) *Lap {
+	m.MaxPosGrade = v
+	return m
+}
+
+// SetMaxNegGrade sets Lap value.
+//
+// Scale: 100; Units: %;
+func (m *Lap) SetMaxNegGrade(v int16) *Lap {
+	m.MaxNegGrade = v
+	return m
+}
+
+// SetAvgTemperature sets Lap value.
+//
+// Units: C;
+func (m *Lap) SetAvgTemperature(v int8) *Lap {
+	m.AvgTemperature = v
+	return m
+}
+
+// SetMaxTemperature sets Lap value.
+//
+// Units: C;
+func (m *Lap) SetMaxTemperature(v int8) *Lap {
+	m.MaxTemperature = v
+	return m
+}
+
+// SetTotalMovingTime sets Lap value.
+//
+// Scale: 1000; Units: s;
+func (m *Lap) SetTotalMovingTime(v uint32) *Lap {
+	m.TotalMovingTime = v
+	return m
+}
+
+// SetAvgPosVerticalSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetAvgPosVerticalSpeed(v int16) *Lap {
+	m.AvgPosVerticalSpeed = v
+	return m
+}
+
+// SetAvgNegVerticalSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetAvgNegVerticalSpeed(v int16) *Lap {
+	m.AvgNegVerticalSpeed = v
+	return m
+}
+
+// SetMaxPosVerticalSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetMaxPosVerticalSpeed(v int16) *Lap {
+	m.MaxPosVerticalSpeed = v
+	return m
+}
+
+// SetMaxNegVerticalSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetMaxNegVerticalSpeed(v int16) *Lap {
+	m.MaxNegVerticalSpeed = v
+	return m
+}
+
+// SetTimeInHrZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Lap) SetTimeInHrZone(v []uint32) *Lap {
+	m.TimeInHrZone = v
+	return m
+}
+
+// SetTimeInSpeedZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Lap) SetTimeInSpeedZone(v []uint32) *Lap {
+	m.TimeInSpeedZone = v
+	return m
+}
+
+// SetTimeInCadenceZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Lap) SetTimeInCadenceZone(v []uint32) *Lap {
+	m.TimeInCadenceZone = v
+	return m
+}
+
+// SetTimeInPowerZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Lap) SetTimeInPowerZone(v []uint32) *Lap {
+	m.TimeInPowerZone = v
+	return m
+}
+
+// SetRepetitionNum sets Lap value.
+func (m *Lap) SetRepetitionNum(v uint16) *Lap {
+	m.RepetitionNum = v
+	return m
+}
+
+// SetMinAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetMinAltitude(v uint16) *Lap {
+	m.MinAltitude = v
+	return m
+}
+
+// SetMinHeartRate sets Lap value.
+//
+// Units: bpm;
+func (m *Lap) SetMinHeartRate(v uint8) *Lap {
+	m.MinHeartRate = v
+	return m
+}
+
+// SetWktStepIndex sets Lap value.
+func (m *Lap) SetWktStepIndex(v typedef.MessageIndex) *Lap {
+	m.WktStepIndex = v
+	return m
+}
+
+// SetOpponentScore sets Lap value.
+func (m *Lap) SetOpponentScore(v uint16) *Lap {
+	m.OpponentScore = v
+	return m
+}
+
+// SetStrokeCount sets Lap value.
+//
+// Array: [N]; Units: counts; stroke_type enum used as the index
+func (m *Lap) SetStrokeCount(v []uint16) *Lap {
+	m.StrokeCount = v
+	return m
+}
+
+// SetZoneCount sets Lap value.
+//
+// Array: [N]; Units: counts; zone number used as the index
+func (m *Lap) SetZoneCount(v []uint16) *Lap {
+	m.ZoneCount = v
+	return m
+}
+
+// SetAvgVerticalOscillation sets Lap value.
+//
+// Scale: 10; Units: mm;
+func (m *Lap) SetAvgVerticalOscillation(v uint16) *Lap {
+	m.AvgVerticalOscillation = v
+	return m
+}
+
+// SetAvgStanceTimePercent sets Lap value.
+//
+// Scale: 100; Units: percent;
+func (m *Lap) SetAvgStanceTimePercent(v uint16) *Lap {
+	m.AvgStanceTimePercent = v
+	return m
+}
+
+// SetAvgStanceTime sets Lap value.
+//
+// Scale: 10; Units: ms;
+func (m *Lap) SetAvgStanceTime(v uint16) *Lap {
+	m.AvgStanceTime = v
+	return m
+}
+
+// SetAvgFractionalCadence sets Lap value.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
+func (m *Lap) SetAvgFractionalCadence(v uint8) *Lap {
+	m.AvgFractionalCadence = v
+	return m
+}
+
+// SetMaxFractionalCadence sets Lap value.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
+func (m *Lap) SetMaxFractionalCadence(v uint8) *Lap {
+	m.MaxFractionalCadence = v
+	return m
+}
+
+// SetTotalFractionalCycles sets Lap value.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
+func (m *Lap) SetTotalFractionalCycles(v uint8) *Lap {
+	m.TotalFractionalCycles = v
+	return m
+}
+
+// SetPlayerScore sets Lap value.
+func (m *Lap) SetPlayerScore(v uint16) *Lap {
+	m.PlayerScore = v
+	return m
+}
+
+// SetAvgTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+func (m *Lap) SetAvgTotalHemoglobinConc(v []uint16) *Lap {
+	m.AvgTotalHemoglobinConc = v
+	return m
+}
+
+// SetMinTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Lap) SetMinTotalHemoglobinConc(v []uint16) *Lap {
+	m.MinTotalHemoglobinConc = v
+	return m
+}
+
+// SetMaxTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Lap) SetMaxTotalHemoglobinConc(v []uint16) *Lap {
+	m.MaxTotalHemoglobinConc = v
+	return m
+}
+
+// SetAvgSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetAvgSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.AvgSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMinSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetMinSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.MinSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMaxSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetMaxSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.MaxSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetAvgLeftTorqueEffectiveness sets Lap value.
+//
+// Scale: 2; Units: percent;
+func (m *Lap) SetAvgLeftTorqueEffectiveness(v uint8) *Lap {
+	m.AvgLeftTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgRightTorqueEffectiveness sets Lap value.
+//
+// Scale: 2; Units: percent;
+func (m *Lap) SetAvgRightTorqueEffectiveness(v uint8) *Lap {
+	m.AvgRightTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgLeftPedalSmoothness sets Lap value.
+//
+// Scale: 2; Units: percent;
+func (m *Lap) SetAvgLeftPedalSmoothness(v uint8) *Lap {
+	m.AvgLeftPedalSmoothness = v
+	return m
+}
+
+// SetAvgRightPedalSmoothness sets Lap value.
+//
+// Scale: 2; Units: percent;
+func (m *Lap) SetAvgRightPedalSmoothness(v uint8) *Lap {
+	m.AvgRightPedalSmoothness = v
+	return m
+}
+
+// SetAvgCombinedPedalSmoothness sets Lap value.
+//
+// Scale: 2; Units: percent;
+func (m *Lap) SetAvgCombinedPedalSmoothness(v uint8) *Lap {
+	m.AvgCombinedPedalSmoothness = v
+	return m
+}
+
+// SetTimeStanding sets Lap value.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *Lap) SetTimeStanding(v uint32) *Lap {
+	m.TimeStanding = v
+	return m
+}
+
+// SetStandCount sets Lap value.
+//
+// Number of transitions to the standing state
+func (m *Lap) SetStandCount(v uint16) *Lap {
+	m.StandCount = v
+	return m
+}
+
+// SetAvgLeftPco sets Lap value.
+//
+// Units: mm; Average left platform center offset
+func (m *Lap) SetAvgLeftPco(v int8) *Lap {
+	m.AvgLeftPco = v
+	return m
+}
+
+// SetAvgRightPco sets Lap value.
+//
+// Units: mm; Average right platform center offset
+func (m *Lap) SetAvgRightPco(v int8) *Lap {
+	m.AvgRightPco = v
+	return m
+}
+
+// SetAvgLeftPowerPhase sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgLeftPowerPhase(v []uint8) *Lap {
+	m.AvgLeftPowerPhase = v
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgLeftPowerPhasePeak(v []uint8) *Lap {
+	m.AvgLeftPowerPhasePeak = v
+	return m
+}
+
+// SetAvgRightPowerPhase sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgRightPowerPhase(v []uint8) *Lap {
+	m.AvgRightPowerPhase = v
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgRightPowerPhasePeak(v []uint8) *Lap {
+	m.AvgRightPowerPhasePeak = v
+	return m
+}
+
+// SetAvgPowerPosition sets Lap value.
+//
+// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetAvgPowerPosition(v []uint16) *Lap {
+	m.AvgPowerPosition = v
+	return m
+}
+
+// SetMaxPowerPosition sets Lap value.
+//
+// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetMaxPowerPosition(v []uint16) *Lap {
+	m.MaxPowerPosition = v
+	return m
+}
+
+// SetAvgCadencePosition sets Lap value.
+//
+// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetAvgCadencePosition(v []uint8) *Lap {
+	m.AvgCadencePosition = v
+	return m
+}
+
+// SetMaxCadencePosition sets Lap value.
+//
+// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetMaxCadencePosition(v []uint8) *Lap {
+	m.MaxCadencePosition = v
+	return m
+}
+
+// SetEnhancedAvgSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetEnhancedAvgSpeed(v uint32) *Lap {
+	m.EnhancedAvgSpeed = v
+	return m
+}
+
+// SetEnhancedMaxSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetEnhancedMaxSpeed(v uint32) *Lap {
+	m.EnhancedMaxSpeed = v
+	return m
+}
+
+// SetEnhancedAvgAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetEnhancedAvgAltitude(v uint32) *Lap {
+	m.EnhancedAvgAltitude = v
+	return m
+}
+
+// SetEnhancedMinAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetEnhancedMinAltitude(v uint32) *Lap {
+	m.EnhancedMinAltitude = v
+	return m
+}
+
+// SetEnhancedMaxAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Lap) SetEnhancedMaxAltitude(v uint32) *Lap {
+	m.EnhancedMaxAltitude = v
+	return m
+}
+
+// SetAvgLevMotorPower sets Lap value.
+//
+// Units: watts; lev average motor power during lap
+func (m *Lap) SetAvgLevMotorPower(v uint16) *Lap {
+	m.AvgLevMotorPower = v
+	return m
+}
+
+// SetMaxLevMotorPower sets Lap value.
+//
+// Units: watts; lev maximum motor power during lap
+func (m *Lap) SetMaxLevMotorPower(v uint16) *Lap {
+	m.MaxLevMotorPower = v
+	return m
+}
+
+// SetLevBatteryConsumption sets Lap value.
+//
+// Scale: 2; Units: percent; lev battery consumption during lap
+func (m *Lap) SetLevBatteryConsumption(v uint8) *Lap {
+	m.LevBatteryConsumption = v
+	return m
+}
+
+// SetAvgVerticalRatio sets Lap value.
+//
+// Scale: 100; Units: percent;
+func (m *Lap) SetAvgVerticalRatio(v uint16) *Lap {
+	m.AvgVerticalRatio = v
+	return m
+}
+
+// SetAvgStanceTimeBalance sets Lap value.
+//
+// Scale: 100; Units: percent;
+func (m *Lap) SetAvgStanceTimeBalance(v uint16) *Lap {
+	m.AvgStanceTimeBalance = v
+	return m
+}
+
+// SetAvgStepLength sets Lap value.
+//
+// Scale: 10; Units: mm;
+func (m *Lap) SetAvgStepLength(v uint16) *Lap {
+	m.AvgStepLength = v
+	return m
+}
+
+// SetAvgVam sets Lap value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Lap) SetAvgVam(v uint16) *Lap {
+	m.AvgVam = v
+	return m
+}
+
+// SetAvgDepth sets Lap value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Lap) SetAvgDepth(v uint32) *Lap {
+	m.AvgDepth = v
+	return m
+}
+
+// SetMaxDepth sets Lap value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Lap) SetMaxDepth(v uint32) *Lap {
+	m.MaxDepth = v
+	return m
+}
+
+// SetMinTemperature sets Lap value.
+//
+// Units: C;
+func (m *Lap) SetMinTemperature(v int8) *Lap {
+	m.MinTemperature = v
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets Lap value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Lap) SetEnhancedAvgRespirationRate(v uint16) *Lap {
+	m.EnhancedAvgRespirationRate = v
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets Lap value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Lap) SetEnhancedMaxRespirationRate(v uint16) *Lap {
+	m.EnhancedMaxRespirationRate = v
+	return m
+}
+
+// SetAvgRespirationRate sets Lap value.
+func (m *Lap) SetAvgRespirationRate(v uint8) *Lap {
+	m.AvgRespirationRate = v
+	return m
+}
+
+// SetMaxRespirationRate sets Lap value.
+func (m *Lap) SetMaxRespirationRate(v uint8) *Lap {
+	m.MaxRespirationRate = v
+	return m
+}
+
+// SetTotalGrit sets Lap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Lap) SetTotalGrit(v float32) *Lap {
+	m.TotalGrit = v
+	return m
+}
+
+// SetTotalFlow sets Lap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Lap) SetTotalFlow(v float32) *Lap {
+	m.TotalFlow = v
+	return m
+}
+
+// SetJumpCount sets Lap value.
+func (m *Lap) SetJumpCount(v uint16) *Lap {
+	m.JumpCount = v
+	return m
+}
+
+// SetAvgGrit sets Lap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Lap) SetAvgGrit(v float32) *Lap {
+	m.AvgGrit = v
+	return m
+}
+
+// SetAvgFlow sets Lap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Lap) SetAvgFlow(v float32) *Lap {
+	m.AvgFlow = v
+	return m
+}
+
+// SetTotalFractionalAscent sets Lap value.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Lap) SetTotalFractionalAscent(v uint8) *Lap {
+	m.TotalFractionalAscent = v
+	return m
+}
+
+// SetTotalFractionalDescent sets Lap value.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Lap) SetTotalFractionalDescent(v uint8) *Lap {
+	m.TotalFractionalDescent = v
+	return m
+}
+
+// SetAvgCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C;
+func (m *Lap) SetAvgCoreTemperature(v uint16) *Lap {
+	m.AvgCoreTemperature = v
+	return m
+}
+
+// SetMinCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C;
+func (m *Lap) SetMinCoreTemperature(v uint16) *Lap {
+	m.MinCoreTemperature = v
+	return m
+}
+
+// SetMaxCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C;
+func (m *Lap) SetMaxCoreTemperature(v uint16) *Lap {
+	m.MaxCoreTemperature = v
+	return m
+}
+
+// SetDeveloperFields Lap's DeveloperFields.
+func (m *Lap) SetDeveloperFields(developerFields ...proto.DeveloperField) *Lap {
+	m.DeveloperFields = developerFields
+	return m
 }

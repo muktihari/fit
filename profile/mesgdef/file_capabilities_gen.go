@@ -28,19 +28,20 @@ type FileCapabilities struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewFileCapabilities creates new FileCapabilities struct based on given mesg. If mesg is nil or mesg.Num is not equal to FileCapabilities mesg number, it will return nil.
-func NewFileCapabilities(mesg proto.Message) *FileCapabilities {
-	if mesg.Num != typedef.MesgNumFileCapabilities {
-		return nil
-	}
-
+// NewFileCapabilities creates new FileCapabilities struct based on given mesg.
+// If mesg is nil, it will return FileCapabilities with all fields being set to its corresponding invalid value.
+func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &FileCapabilities{
@@ -51,7 +52,7 @@ func NewFileCapabilities(mesg proto.Message) *FileCapabilities {
 		MaxCount:     typeconv.ToUint16[uint16](vals[3]),
 		MaxSize:      typeconv.ToUint32[uint32](vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -118,4 +119,48 @@ func (m *FileCapabilities) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets FileCapabilities value.
+func (m *FileCapabilities) SetMessageIndex(v typedef.MessageIndex) *FileCapabilities {
+	m.MessageIndex = v
+	return m
+}
+
+// SetType sets FileCapabilities value.
+func (m *FileCapabilities) SetType(v typedef.File) *FileCapabilities {
+	m.Type = v
+	return m
+}
+
+// SetFlags sets FileCapabilities value.
+func (m *FileCapabilities) SetFlags(v typedef.FileFlags) *FileCapabilities {
+	m.Flags = v
+	return m
+}
+
+// SetDirectory sets FileCapabilities value.
+func (m *FileCapabilities) SetDirectory(v string) *FileCapabilities {
+	m.Directory = v
+	return m
+}
+
+// SetMaxCount sets FileCapabilities value.
+func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
+	m.MaxCount = v
+	return m
+}
+
+// SetMaxSize sets FileCapabilities value.
+//
+// Units: bytes;
+func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
+	m.MaxSize = v
+	return m
+}
+
+// SetDeveloperFields FileCapabilities's DeveloperFields.
+func (m *FileCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *FileCapabilities {
+	m.DeveloperFields = developerFields
+	return m
 }

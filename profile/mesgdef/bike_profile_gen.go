@@ -54,19 +54,20 @@ type BikeProfile struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewBikeProfile creates new BikeProfile struct based on given mesg. If mesg is nil or mesg.Num is not equal to BikeProfile mesg number, it will return nil.
-func NewBikeProfile(mesg proto.Message) *BikeProfile {
-	if mesg.Num != typedef.MesgNumBikeProfile {
-		return nil
-	}
-
+// NewBikeProfile creates new BikeProfile struct based on given mesg.
+// If mesg is nil, it will return BikeProfile with all fields being set to its corresponding invalid value.
+func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &BikeProfile{
@@ -103,7 +104,7 @@ func NewBikeProfile(mesg proto.Message) *BikeProfile {
 		RearGear:                 typeconv.ToSliceUint8z[uint8](vals[41]),
 		ShimanoDi2Enabled:        typeconv.ToBool[bool](vals[44]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -378,4 +379,224 @@ func (m *BikeProfile) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets BikeProfile value.
+func (m *BikeProfile) SetMessageIndex(v typedef.MessageIndex) *BikeProfile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetName sets BikeProfile value.
+func (m *BikeProfile) SetName(v string) *BikeProfile {
+	m.Name = v
+	return m
+}
+
+// SetSport sets BikeProfile value.
+func (m *BikeProfile) SetSport(v typedef.Sport) *BikeProfile {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets BikeProfile value.
+func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
+	m.SubSport = v
+	return m
+}
+
+// SetOdometer sets BikeProfile value.
+//
+// Scale: 100; Units: m;
+func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
+	m.Odometer = v
+	return m
+}
+
+// SetBikeSpdAntId sets BikeProfile value.
+func (m *BikeProfile) SetBikeSpdAntId(v uint16) *BikeProfile {
+	m.BikeSpdAntId = v
+	return m
+}
+
+// SetBikeCadAntId sets BikeProfile value.
+func (m *BikeProfile) SetBikeCadAntId(v uint16) *BikeProfile {
+	m.BikeCadAntId = v
+	return m
+}
+
+// SetBikeSpdcadAntId sets BikeProfile value.
+func (m *BikeProfile) SetBikeSpdcadAntId(v uint16) *BikeProfile {
+	m.BikeSpdcadAntId = v
+	return m
+}
+
+// SetBikePowerAntId sets BikeProfile value.
+func (m *BikeProfile) SetBikePowerAntId(v uint16) *BikeProfile {
+	m.BikePowerAntId = v
+	return m
+}
+
+// SetCustomWheelsize sets BikeProfile value.
+//
+// Scale: 1000; Units: m;
+func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
+	m.CustomWheelsize = v
+	return m
+}
+
+// SetAutoWheelsize sets BikeProfile value.
+//
+// Scale: 1000; Units: m;
+func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
+	m.AutoWheelsize = v
+	return m
+}
+
+// SetBikeWeight sets BikeProfile value.
+//
+// Scale: 10; Units: kg;
+func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
+	m.BikeWeight = v
+	return m
+}
+
+// SetPowerCalFactor sets BikeProfile value.
+//
+// Scale: 10; Units: %;
+func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
+	m.PowerCalFactor = v
+	return m
+}
+
+// SetAutoWheelCal sets BikeProfile value.
+func (m *BikeProfile) SetAutoWheelCal(v bool) *BikeProfile {
+	m.AutoWheelCal = v
+	return m
+}
+
+// SetAutoPowerZero sets BikeProfile value.
+func (m *BikeProfile) SetAutoPowerZero(v bool) *BikeProfile {
+	m.AutoPowerZero = v
+	return m
+}
+
+// SetId sets BikeProfile value.
+func (m *BikeProfile) SetId(v uint8) *BikeProfile {
+	m.Id = v
+	return m
+}
+
+// SetSpdEnabled sets BikeProfile value.
+func (m *BikeProfile) SetSpdEnabled(v bool) *BikeProfile {
+	m.SpdEnabled = v
+	return m
+}
+
+// SetCadEnabled sets BikeProfile value.
+func (m *BikeProfile) SetCadEnabled(v bool) *BikeProfile {
+	m.CadEnabled = v
+	return m
+}
+
+// SetSpdcadEnabled sets BikeProfile value.
+func (m *BikeProfile) SetSpdcadEnabled(v bool) *BikeProfile {
+	m.SpdcadEnabled = v
+	return m
+}
+
+// SetPowerEnabled sets BikeProfile value.
+func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
+	m.PowerEnabled = v
+	return m
+}
+
+// SetCrankLength sets BikeProfile value.
+//
+// Scale: 2; Offset: -110; Units: mm;
+func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
+	m.CrankLength = v
+	return m
+}
+
+// SetEnabled sets BikeProfile value.
+func (m *BikeProfile) SetEnabled(v bool) *BikeProfile {
+	m.Enabled = v
+	return m
+}
+
+// SetBikeSpdAntIdTransType sets BikeProfile value.
+func (m *BikeProfile) SetBikeSpdAntIdTransType(v uint8) *BikeProfile {
+	m.BikeSpdAntIdTransType = v
+	return m
+}
+
+// SetBikeCadAntIdTransType sets BikeProfile value.
+func (m *BikeProfile) SetBikeCadAntIdTransType(v uint8) *BikeProfile {
+	m.BikeCadAntIdTransType = v
+	return m
+}
+
+// SetBikeSpdcadAntIdTransType sets BikeProfile value.
+func (m *BikeProfile) SetBikeSpdcadAntIdTransType(v uint8) *BikeProfile {
+	m.BikeSpdcadAntIdTransType = v
+	return m
+}
+
+// SetBikePowerAntIdTransType sets BikeProfile value.
+func (m *BikeProfile) SetBikePowerAntIdTransType(v uint8) *BikeProfile {
+	m.BikePowerAntIdTransType = v
+	return m
+}
+
+// SetOdometerRollover sets BikeProfile value.
+//
+// Rollover counter that can be used to extend the odometer
+func (m *BikeProfile) SetOdometerRollover(v uint8) *BikeProfile {
+	m.OdometerRollover = v
+	return m
+}
+
+// SetFrontGearNum sets BikeProfile value.
+//
+// Number of front gears
+func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
+	m.FrontGearNum = v
+	return m
+}
+
+// SetFrontGear sets BikeProfile value.
+//
+// Array: [N]; Number of teeth on each gear 0 is innermost
+func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
+	m.FrontGear = v
+	return m
+}
+
+// SetRearGearNum sets BikeProfile value.
+//
+// Number of rear gears
+func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
+	m.RearGearNum = v
+	return m
+}
+
+// SetRearGear sets BikeProfile value.
+//
+// Array: [N]; Number of teeth on each gear 0 is innermost
+func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
+	m.RearGear = v
+	return m
+}
+
+// SetShimanoDi2Enabled sets BikeProfile value.
+func (m *BikeProfile) SetShimanoDi2Enabled(v bool) *BikeProfile {
+	m.ShimanoDi2Enabled = v
+	return m
+}
+
+// SetDeveloperFields BikeProfile's DeveloperFields.
+func (m *BikeProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *BikeProfile {
+	m.DeveloperFields = developerFields
+	return m
 }

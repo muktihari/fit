@@ -8,56 +8,59 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // GpsMetadata is a GpsMetadata message.
 type GpsMetadata struct {
-	Timestamp        typedef.DateTime // Units: s; Whole second part of the timestamp.
-	TimestampMs      uint16           // Units: ms; Millisecond part of the timestamp.
-	PositionLat      int32            // Units: semicircles;
-	PositionLong     int32            // Units: semicircles;
-	EnhancedAltitude uint32           // Scale: 5; Offset: 500; Units: m;
-	EnhancedSpeed    uint32           // Scale: 1000; Units: m/s;
-	Heading          uint16           // Scale: 100; Units: degrees;
-	UtcTimestamp     typedef.DateTime // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
-	Velocity         []int16          // Scale: 100; Array: [3]; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp.
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
+	PositionLat      int32     // Units: semicircles;
+	PositionLong     int32     // Units: semicircles;
+	EnhancedAltitude uint32    // Scale: 5; Offset: 500; Units: m;
+	EnhancedSpeed    uint32    // Scale: 1000; Units: m/s;
+	Heading          uint16    // Scale: 100; Units: degrees;
+	UtcTimestamp     time.Time // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
+	Velocity         []int16   // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewGpsMetadata creates new GpsMetadata struct based on given mesg. If mesg is nil or mesg.Num is not equal to GpsMetadata mesg number, it will return nil.
-func NewGpsMetadata(mesg proto.Message) *GpsMetadata {
-	if mesg.Num != typedef.MesgNumGpsMetadata {
-		return nil
-	}
-
+// NewGpsMetadata creates new GpsMetadata struct based on given mesg.
+// If mesg is nil, it will return GpsMetadata with all fields being set to its corresponding invalid value.
+func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &GpsMetadata{
-		Timestamp:        typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:        datetime.ToTime(vals[253]),
 		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		PositionLat:      typeconv.ToSint32[int32](vals[1]),
 		PositionLong:     typeconv.ToSint32[int32](vals[2]),
 		EnhancedAltitude: typeconv.ToUint32[uint32](vals[3]),
 		EnhancedSpeed:    typeconv.ToUint32[uint32](vals[4]),
 		Heading:          typeconv.ToUint16[uint16](vals[5]),
-		UtcTimestamp:     typeconv.ToUint32[typedef.DateTime](vals[6]),
+		UtcTimestamp:     datetime.ToTime(vals[6]),
 		Velocity:         typeconv.ToSliceSint16[int16](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -66,9 +69,9 @@ func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGpsMetadata)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -101,9 +104,9 @@ func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Heading
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.UtcTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToUint32[uint32](m.UtcTimestamp)
+		field.Value = datetime.ToUint32(m.UtcTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Velocity != nil {
@@ -120,7 +123,7 @@ func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
 // size returns size of GpsMetadata's valid fields.
 func (m *GpsMetadata) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -141,11 +144,89 @@ func (m *GpsMetadata) size() byte {
 	if m.Heading != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.UtcTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Velocity != nil {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets GpsMetadata value.
+//
+// Units: s; Whole second part of the timestamp.
+func (m *GpsMetadata) SetTimestamp(v time.Time) *GpsMetadata {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets GpsMetadata value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
+	m.TimestampMs = v
+	return m
+}
+
+// SetPositionLat sets GpsMetadata value.
+//
+// Units: semicircles;
+func (m *GpsMetadata) SetPositionLat(v int32) *GpsMetadata {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets GpsMetadata value.
+//
+// Units: semicircles;
+func (m *GpsMetadata) SetPositionLong(v int32) *GpsMetadata {
+	m.PositionLong = v
+	return m
+}
+
+// SetEnhancedAltitude sets GpsMetadata value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
+	m.EnhancedAltitude = v
+	return m
+}
+
+// SetEnhancedSpeed sets GpsMetadata value.
+//
+// Scale: 1000; Units: m/s;
+func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
+	m.EnhancedSpeed = v
+	return m
+}
+
+// SetHeading sets GpsMetadata value.
+//
+// Scale: 100; Units: degrees;
+func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
+	m.Heading = v
+	return m
+}
+
+// SetUtcTimestamp sets GpsMetadata value.
+//
+// Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
+func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
+	m.UtcTimestamp = v
+	return m
+}
+
+// SetVelocity sets GpsMetadata value.
+//
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) SetVelocity(v []int16) *GpsMetadata {
+	m.Velocity = v
+	return m
+}
+
+// SetDeveloperFields GpsMetadata's DeveloperFields.
+func (m *GpsMetadata) SetDeveloperFields(developerFields ...proto.DeveloperField) *GpsMetadata {
+	m.DeveloperFields = developerFields
+	return m
 }

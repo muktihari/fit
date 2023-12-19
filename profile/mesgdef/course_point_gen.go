@@ -8,16 +8,18 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // CoursePoint is a CoursePoint message.
 type CoursePoint struct {
 	MessageIndex typedef.MessageIndex
-	Timestamp    typedef.DateTime
+	Timestamp    time.Time
 	PositionLat  int32  // Units: semicircles;
 	PositionLong int32  // Units: semicircles;
 	Distance     uint32 // Scale: 100; Units: m;
@@ -30,24 +32,25 @@ type CoursePoint struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewCoursePoint creates new CoursePoint struct based on given mesg. If mesg is nil or mesg.Num is not equal to CoursePoint mesg number, it will return nil.
-func NewCoursePoint(mesg proto.Message) *CoursePoint {
-	if mesg.Num != typedef.MesgNumCoursePoint {
-		return nil
-	}
-
+// NewCoursePoint creates new CoursePoint struct based on given mesg.
+// If mesg is nil, it will return CoursePoint with all fields being set to its corresponding invalid value.
+func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &CoursePoint{
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Timestamp:    typeconv.ToUint32[typedef.DateTime](vals[1]),
+		Timestamp:    datetime.ToTime(vals[1]),
 		PositionLat:  typeconv.ToSint32[int32](vals[2]),
 		PositionLong: typeconv.ToSint32[int32](vals[3]),
 		Distance:     typeconv.ToUint32[uint32](vals[4]),
@@ -55,7 +58,7 @@ func NewCoursePoint(mesg proto.Message) *CoursePoint {
 		Name:         typeconv.ToString[string](vals[6]),
 		Favorite:     typeconv.ToBool[bool](vals[8]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -69,9 +72,9 @@ func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -116,7 +119,7 @@ func (m *CoursePoint) size() byte {
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -138,4 +141,64 @@ func (m *CoursePoint) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets CoursePoint value.
+func (m *CoursePoint) SetMessageIndex(v typedef.MessageIndex) *CoursePoint {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets CoursePoint value.
+func (m *CoursePoint) SetTimestamp(v time.Time) *CoursePoint {
+	m.Timestamp = v
+	return m
+}
+
+// SetPositionLat sets CoursePoint value.
+//
+// Units: semicircles;
+func (m *CoursePoint) SetPositionLat(v int32) *CoursePoint {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets CoursePoint value.
+//
+// Units: semicircles;
+func (m *CoursePoint) SetPositionLong(v int32) *CoursePoint {
+	m.PositionLong = v
+	return m
+}
+
+// SetDistance sets CoursePoint value.
+//
+// Scale: 100; Units: m;
+func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
+	m.Distance = v
+	return m
+}
+
+// SetType sets CoursePoint value.
+func (m *CoursePoint) SetType(v typedef.CoursePoint) *CoursePoint {
+	m.Type = v
+	return m
+}
+
+// SetName sets CoursePoint value.
+func (m *CoursePoint) SetName(v string) *CoursePoint {
+	m.Name = v
+	return m
+}
+
+// SetFavorite sets CoursePoint value.
+func (m *CoursePoint) SetFavorite(v bool) *CoursePoint {
+	m.Favorite = v
+	return m
+}
+
+// SetDeveloperFields CoursePoint's DeveloperFields.
+func (m *CoursePoint) SetDeveloperFields(developerFields ...proto.DeveloperField) *CoursePoint {
+	m.DeveloperFields = developerFields
+	return m
 }

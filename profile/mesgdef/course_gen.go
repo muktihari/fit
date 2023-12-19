@@ -26,19 +26,20 @@ type Course struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewCourse creates new Course struct based on given mesg. If mesg is nil or mesg.Num is not equal to Course mesg number, it will return nil.
-func NewCourse(mesg proto.Message) *Course {
-	if mesg.Num != typedef.MesgNumCourse {
-		return nil
-	}
-
+// NewCourse creates new Course struct based on given mesg.
+// If mesg is nil, it will return Course with all fields being set to its corresponding invalid value.
+func NewCourse(mesg *proto.Message) *Course {
 	vals := [8]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Course{
@@ -47,7 +48,7 @@ func NewCourse(mesg proto.Message) *Course {
 		Capabilities: typeconv.ToUint32z[typedef.CourseCapabilities](vals[6]),
 		SubSport:     typeconv.ToEnum[typedef.SubSport](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,4 +99,34 @@ func (m *Course) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetSport sets Course value.
+func (m *Course) SetSport(v typedef.Sport) *Course {
+	m.Sport = v
+	return m
+}
+
+// SetName sets Course value.
+func (m *Course) SetName(v string) *Course {
+	m.Name = v
+	return m
+}
+
+// SetCapabilities sets Course value.
+func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
+	m.Capabilities = v
+	return m
+}
+
+// SetSubSport sets Course value.
+func (m *Course) SetSubSport(v typedef.SubSport) *Course {
+	m.SubSport = v
+	return m
+}
+
+// SetDeveloperFields Course's DeveloperFields.
+func (m *Course) SetDeveloperFields(developerFields ...proto.DeveloperField) *Course {
+	m.DeveloperFields = developerFields
+	return m
 }

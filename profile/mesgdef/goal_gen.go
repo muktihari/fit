@@ -8,10 +8,12 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Goal is a Goal message.
@@ -19,8 +21,8 @@ type Goal struct {
 	MessageIndex    typedef.MessageIndex
 	Sport           typedef.Sport
 	SubSport        typedef.SubSport
-	StartDate       typedef.DateTime
-	EndDate         typedef.DateTime
+	StartDate       time.Time
+	EndDate         time.Time
 	Type            typedef.Goal
 	Value           uint32
 	Repeat          bool
@@ -35,27 +37,28 @@ type Goal struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewGoal creates new Goal struct based on given mesg. If mesg is nil or mesg.Num is not equal to Goal mesg number, it will return nil.
-func NewGoal(mesg proto.Message) *Goal {
-	if mesg.Num != typedef.MesgNumGoal {
-		return nil
-	}
-
+// NewGoal creates new Goal struct based on given mesg.
+// If mesg is nil, it will return Goal with all fields being set to its corresponding invalid value.
+func NewGoal(mesg *proto.Message) *Goal {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Goal{
 		MessageIndex:    typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Sport:           typeconv.ToEnum[typedef.Sport](vals[0]),
 		SubSport:        typeconv.ToEnum[typedef.SubSport](vals[1]),
-		StartDate:       typeconv.ToUint32[typedef.DateTime](vals[2]),
-		EndDate:         typeconv.ToUint32[typedef.DateTime](vals[3]),
+		StartDate:       datetime.ToTime(vals[2]),
+		EndDate:         datetime.ToTime(vals[3]),
 		Type:            typeconv.ToEnum[typedef.Goal](vals[4]),
 		Value:           typeconv.ToUint32[uint32](vals[5]),
 		Repeat:          typeconv.ToBool[bool](vals[6]),
@@ -65,7 +68,7 @@ func NewGoal(mesg proto.Message) *Goal {
 		Enabled:         typeconv.ToBool[bool](vals[10]),
 		Source:          typeconv.ToEnum[typedef.GoalSource](vals[11]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -89,14 +92,14 @@ func (m *Goal) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.SubSport)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartDate) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32[uint32](m.StartDate)
+		field.Value = datetime.ToUint32(m.StartDate)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.EndDate) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndDate) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint32[uint32](m.EndDate)
+		field.Value = datetime.ToUint32(m.EndDate)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
@@ -157,10 +160,10 @@ func (m *Goal) size() byte {
 	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartDate) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.EndDate) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndDate) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
@@ -188,4 +191,88 @@ func (m *Goal) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Goal value.
+func (m *Goal) SetMessageIndex(v typedef.MessageIndex) *Goal {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSport sets Goal value.
+func (m *Goal) SetSport(v typedef.Sport) *Goal {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets Goal value.
+func (m *Goal) SetSubSport(v typedef.SubSport) *Goal {
+	m.SubSport = v
+	return m
+}
+
+// SetStartDate sets Goal value.
+func (m *Goal) SetStartDate(v time.Time) *Goal {
+	m.StartDate = v
+	return m
+}
+
+// SetEndDate sets Goal value.
+func (m *Goal) SetEndDate(v time.Time) *Goal {
+	m.EndDate = v
+	return m
+}
+
+// SetType sets Goal value.
+func (m *Goal) SetType(v typedef.Goal) *Goal {
+	m.Type = v
+	return m
+}
+
+// SetValue sets Goal value.
+func (m *Goal) SetValue(v uint32) *Goal {
+	m.Value = v
+	return m
+}
+
+// SetRepeat sets Goal value.
+func (m *Goal) SetRepeat(v bool) *Goal {
+	m.Repeat = v
+	return m
+}
+
+// SetTargetValue sets Goal value.
+func (m *Goal) SetTargetValue(v uint32) *Goal {
+	m.TargetValue = v
+	return m
+}
+
+// SetRecurrence sets Goal value.
+func (m *Goal) SetRecurrence(v typedef.GoalRecurrence) *Goal {
+	m.Recurrence = v
+	return m
+}
+
+// SetRecurrenceValue sets Goal value.
+func (m *Goal) SetRecurrenceValue(v uint16) *Goal {
+	m.RecurrenceValue = v
+	return m
+}
+
+// SetEnabled sets Goal value.
+func (m *Goal) SetEnabled(v bool) *Goal {
+	m.Enabled = v
+	return m
+}
+
+// SetSource sets Goal value.
+func (m *Goal) SetSource(v typedef.GoalSource) *Goal {
+	m.Source = v
+	return m
+}
+
+// SetDeveloperFields Goal's DeveloperFields.
+func (m *Goal) SetDeveloperFields(developerFields ...proto.DeveloperField) *Goal {
+	m.DeveloperFields = developerFields
+	return m
 }

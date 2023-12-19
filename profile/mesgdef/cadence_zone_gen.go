@@ -25,19 +25,20 @@ type CadenceZone struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewCadenceZone creates new CadenceZone struct based on given mesg. If mesg is nil or mesg.Num is not equal to CadenceZone mesg number, it will return nil.
-func NewCadenceZone(mesg proto.Message) *CadenceZone {
-	if mesg.Num != typedef.MesgNumCadenceZone {
-		return nil
-	}
-
+// NewCadenceZone creates new CadenceZone struct based on given mesg.
+// If mesg is nil, it will return CadenceZone with all fields being set to its corresponding invalid value.
+func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &CadenceZone{
@@ -45,7 +46,7 @@ func NewCadenceZone(mesg proto.Message) *CadenceZone {
 		HighValue:    typeconv.ToUint8[uint8](vals[0]),
 		Name:         typeconv.ToString[string](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,30 @@ func (m *CadenceZone) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets CadenceZone value.
+func (m *CadenceZone) SetMessageIndex(v typedef.MessageIndex) *CadenceZone {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHighValue sets CadenceZone value.
+//
+// Units: rpm;
+func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
+	m.HighValue = v
+	return m
+}
+
+// SetName sets CadenceZone value.
+func (m *CadenceZone) SetName(v string) *CadenceZone {
+	m.Name = v
+	return m
+}
+
+// SetDeveloperFields CadenceZone's DeveloperFields.
+func (m *CadenceZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *CadenceZone {
+	m.DeveloperFields = developerFields
+	return m
 }

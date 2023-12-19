@@ -24,26 +24,27 @@ type SlaveDevice struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSlaveDevice creates new SlaveDevice struct based on given mesg. If mesg is nil or mesg.Num is not equal to SlaveDevice mesg number, it will return nil.
-func NewSlaveDevice(mesg proto.Message) *SlaveDevice {
-	if mesg.Num != typedef.MesgNumSlaveDevice {
-		return nil
-	}
-
+// NewSlaveDevice creates new SlaveDevice struct based on given mesg.
+// If mesg is nil, it will return SlaveDevice with all fields being set to its corresponding invalid value.
+func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
 	vals := [2]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &SlaveDevice{
 		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[0]),
 		Product:      typeconv.ToUint16[uint16](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -78,4 +79,22 @@ func (m *SlaveDevice) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetManufacturer sets SlaveDevice value.
+func (m *SlaveDevice) SetManufacturer(v typedef.Manufacturer) *SlaveDevice {
+	m.Manufacturer = v
+	return m
+}
+
+// SetProduct sets SlaveDevice value.
+func (m *SlaveDevice) SetProduct(v uint16) *SlaveDevice {
+	m.Product = v
+	return m
+}
+
+// SetDeveloperFields SlaveDevice's DeveloperFields.
+func (m *SlaveDevice) SetDeveloperFields(developerFields ...proto.DeveloperField) *SlaveDevice {
+	m.DeveloperFields = developerFields
+	return m
 }

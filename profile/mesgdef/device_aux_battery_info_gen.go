@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // DeviceAuxBatteryInfo is a DeviceAuxBatteryInfo message.
 type DeviceAuxBatteryInfo struct {
-	Timestamp         typedef.DateTime
+	Timestamp         time.Time
 	DeviceIndex       typedef.DeviceIndex
 	BatteryVoltage    uint16 // Scale: 256; Units: V;
 	BatteryStatus     typedef.BatteryStatus
@@ -27,29 +29,30 @@ type DeviceAuxBatteryInfo struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDeviceAuxBatteryInfo creates new DeviceAuxBatteryInfo struct based on given mesg. If mesg is nil or mesg.Num is not equal to DeviceAuxBatteryInfo mesg number, it will return nil.
-func NewDeviceAuxBatteryInfo(mesg proto.Message) *DeviceAuxBatteryInfo {
-	if mesg.Num != typedef.MesgNumDeviceAuxBatteryInfo {
-		return nil
-	}
-
+// NewDeviceAuxBatteryInfo creates new DeviceAuxBatteryInfo struct based on given mesg.
+// If mesg is nil, it will return DeviceAuxBatteryInfo with all fields being set to its corresponding invalid value.
+func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DeviceAuxBatteryInfo{
-		Timestamp:         typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:         datetime.ToTime(vals[253]),
 		DeviceIndex:       typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
 		BatteryVoltage:    typeconv.ToUint16[uint16](vals[1]),
 		BatteryStatus:     typeconv.ToUint8[typedef.BatteryStatus](vals[2]),
 		BatteryIdentifier: typeconv.ToUint8[uint8](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -58,9 +61,9 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceAuxBatteryInfo)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -92,7 +95,7 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 // size returns size of DeviceAuxBatteryInfo's valid fields.
 func (m *DeviceAuxBatteryInfo) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -108,4 +111,42 @@ func (m *DeviceAuxBatteryInfo) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets DeviceAuxBatteryInfo value.
+func (m *DeviceAuxBatteryInfo) SetTimestamp(v time.Time) *DeviceAuxBatteryInfo {
+	m.Timestamp = v
+	return m
+}
+
+// SetDeviceIndex sets DeviceAuxBatteryInfo value.
+func (m *DeviceAuxBatteryInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceAuxBatteryInfo {
+	m.DeviceIndex = v
+	return m
+}
+
+// SetBatteryVoltage sets DeviceAuxBatteryInfo value.
+//
+// Scale: 256; Units: V;
+func (m *DeviceAuxBatteryInfo) SetBatteryVoltage(v uint16) *DeviceAuxBatteryInfo {
+	m.BatteryVoltage = v
+	return m
+}
+
+// SetBatteryStatus sets DeviceAuxBatteryInfo value.
+func (m *DeviceAuxBatteryInfo) SetBatteryStatus(v typedef.BatteryStatus) *DeviceAuxBatteryInfo {
+	m.BatteryStatus = v
+	return m
+}
+
+// SetBatteryIdentifier sets DeviceAuxBatteryInfo value.
+func (m *DeviceAuxBatteryInfo) SetBatteryIdentifier(v uint8) *DeviceAuxBatteryInfo {
+	m.BatteryIdentifier = v
+	return m
+}
+
+// SetDeveloperFields DeviceAuxBatteryInfo's DeveloperFields.
+func (m *DeviceAuxBatteryInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *DeviceAuxBatteryInfo {
+	m.DeveloperFields = developerFields
+	return m
 }

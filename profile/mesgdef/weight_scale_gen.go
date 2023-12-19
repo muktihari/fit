@@ -8,22 +8,24 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // WeightScale is a WeightScale message.
 type WeightScale struct {
-	Timestamp         typedef.DateTime // Units: s;
-	Weight            typedef.Weight   // Scale: 100; Units: kg;
-	PercentFat        uint16           // Scale: 100; Units: %;
-	PercentHydration  uint16           // Scale: 100; Units: %;
-	VisceralFatMass   uint16           // Scale: 100; Units: kg;
-	BoneMass          uint16           // Scale: 100; Units: kg;
-	MuscleMass        uint16           // Scale: 100; Units: kg;
-	BasalMet          uint16           // Scale: 4; Units: kcal/day;
+	Timestamp         time.Time      // Units: s;
+	Weight            typedef.Weight // Scale: 100; Units: kg;
+	PercentFat        uint16         // Scale: 100; Units: %;
+	PercentHydration  uint16         // Scale: 100; Units: %;
+	VisceralFatMass   uint16         // Scale: 100; Units: kg;
+	BoneMass          uint16         // Scale: 100; Units: kg;
+	MuscleMass        uint16         // Scale: 100; Units: kg;
+	BasalMet          uint16         // Scale: 4; Units: kcal/day;
 	PhysiqueRating    uint8
 	ActiveMet         uint16 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 	MetabolicAge      uint8  // Units: years;
@@ -36,23 +38,24 @@ type WeightScale struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWeightScale creates new WeightScale struct based on given mesg. If mesg is nil or mesg.Num is not equal to WeightScale mesg number, it will return nil.
-func NewWeightScale(mesg proto.Message) *WeightScale {
-	if mesg.Num != typedef.MesgNumWeightScale {
-		return nil
-	}
-
+// NewWeightScale creates new WeightScale struct based on given mesg.
+// If mesg is nil, it will return WeightScale with all fields being set to its corresponding invalid value.
+func NewWeightScale(mesg *proto.Message) *WeightScale {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &WeightScale{
-		Timestamp:         typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:         datetime.ToTime(vals[253]),
 		Weight:            typeconv.ToUint16[typedef.Weight](vals[0]),
 		PercentFat:        typeconv.ToUint16[uint16](vals[1]),
 		PercentHydration:  typeconv.ToUint16[uint16](vals[2]),
@@ -67,7 +70,7 @@ func NewWeightScale(mesg proto.Message) *WeightScale {
 		UserProfileIndex:  typeconv.ToUint16[typedef.MessageIndex](vals[12]),
 		Bmi:               typeconv.ToUint16[uint16](vals[13]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -76,9 +79,9 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeightScale)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.Weight) != basetype.Uint16Invalid {
@@ -155,7 +158,7 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 // size returns size of WeightScale's valid fields.
 func (m *WeightScale) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint16[uint16](m.Weight) != basetype.Uint16Invalid {
@@ -198,4 +201,118 @@ func (m *WeightScale) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets WeightScale value.
+//
+// Units: s;
+func (m *WeightScale) SetTimestamp(v time.Time) *WeightScale {
+	m.Timestamp = v
+	return m
+}
+
+// SetWeight sets WeightScale value.
+//
+// Scale: 100; Units: kg;
+func (m *WeightScale) SetWeight(v typedef.Weight) *WeightScale {
+	m.Weight = v
+	return m
+}
+
+// SetPercentFat sets WeightScale value.
+//
+// Scale: 100; Units: %;
+func (m *WeightScale) SetPercentFat(v uint16) *WeightScale {
+	m.PercentFat = v
+	return m
+}
+
+// SetPercentHydration sets WeightScale value.
+//
+// Scale: 100; Units: %;
+func (m *WeightScale) SetPercentHydration(v uint16) *WeightScale {
+	m.PercentHydration = v
+	return m
+}
+
+// SetVisceralFatMass sets WeightScale value.
+//
+// Scale: 100; Units: kg;
+func (m *WeightScale) SetVisceralFatMass(v uint16) *WeightScale {
+	m.VisceralFatMass = v
+	return m
+}
+
+// SetBoneMass sets WeightScale value.
+//
+// Scale: 100; Units: kg;
+func (m *WeightScale) SetBoneMass(v uint16) *WeightScale {
+	m.BoneMass = v
+	return m
+}
+
+// SetMuscleMass sets WeightScale value.
+//
+// Scale: 100; Units: kg;
+func (m *WeightScale) SetMuscleMass(v uint16) *WeightScale {
+	m.MuscleMass = v
+	return m
+}
+
+// SetBasalMet sets WeightScale value.
+//
+// Scale: 4; Units: kcal/day;
+func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
+	m.BasalMet = v
+	return m
+}
+
+// SetPhysiqueRating sets WeightScale value.
+func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
+	m.PhysiqueRating = v
+	return m
+}
+
+// SetActiveMet sets WeightScale value.
+//
+// Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
+func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
+	m.ActiveMet = v
+	return m
+}
+
+// SetMetabolicAge sets WeightScale value.
+//
+// Units: years;
+func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
+	m.MetabolicAge = v
+	return m
+}
+
+// SetVisceralFatRating sets WeightScale value.
+func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
+	m.VisceralFatRating = v
+	return m
+}
+
+// SetUserProfileIndex sets WeightScale value.
+//
+// Associates this weight scale message to a user. This corresponds to the index of the user profile message in the weight scale file.
+func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
+	m.UserProfileIndex = v
+	return m
+}
+
+// SetBmi sets WeightScale value.
+//
+// Scale: 10; Units: kg/m^2;
+func (m *WeightScale) SetBmi(v uint16) *WeightScale {
+	m.Bmi = v
+	return m
+}
+
+// SetDeveloperFields WeightScale's DeveloperFields.
+func (m *WeightScale) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeightScale {
+	m.DeveloperFields = developerFields
+	return m
 }

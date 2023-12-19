@@ -8,21 +8,23 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Activity is a Activity message.
 type Activity struct {
-	Timestamp      typedef.DateTime
+	Timestamp      time.Time
 	TotalTimerTime uint32 // Scale: 1000; Units: s; Exclude pauses
 	NumSessions    uint16
 	Type           typedef.Activity
 	Event          typedef.Event
 	EventType      typedef.EventType
-	LocalTimestamp typedef.LocalDateTime // timestamp epoch expressed in local time, used to convert activity timestamps to local time
+	LocalTimestamp time.Time // timestamp epoch expressed in local time, used to convert activity timestamps to local time
 	EventGroup     uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -30,32 +32,33 @@ type Activity struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewActivity creates new Activity struct based on given mesg. If mesg is nil or mesg.Num is not equal to Activity mesg number, it will return nil.
-func NewActivity(mesg proto.Message) *Activity {
-	if mesg.Num != typedef.MesgNumActivity {
-		return nil
-	}
-
+// NewActivity creates new Activity struct based on given mesg.
+// If mesg is nil, it will return Activity with all fields being set to its corresponding invalid value.
+func NewActivity(mesg *proto.Message) *Activity {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Activity{
-		Timestamp:      typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:      datetime.ToTime(vals[253]),
 		TotalTimerTime: typeconv.ToUint32[uint32](vals[0]),
 		NumSessions:    typeconv.ToUint16[uint16](vals[1]),
 		Type:           typeconv.ToEnum[typedef.Activity](vals[2]),
 		Event:          typeconv.ToEnum[typedef.Event](vals[3]),
 		EventType:      typeconv.ToEnum[typedef.EventType](vals[4]),
-		LocalTimestamp: typeconv.ToUint32[typedef.LocalDateTime](vals[5]),
+		LocalTimestamp: datetime.ToTime(vals[5]),
 		EventGroup:     typeconv.ToUint8[uint8](vals[6]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -64,9 +67,9 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumActivity)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
@@ -94,9 +97,9 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.EventType)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToUint32[uint32](m.LocalTimestamp)
+		field.Value = datetime.ToUint32(m.LocalTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
@@ -113,7 +116,7 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 // size returns size of Activity's valid fields.
 func (m *Activity) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
@@ -131,11 +134,69 @@ func (m *Activity) size() byte {
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets Activity value.
+func (m *Activity) SetTimestamp(v time.Time) *Activity {
+	m.Timestamp = v
+	return m
+}
+
+// SetTotalTimerTime sets Activity value.
+//
+// Scale: 1000; Units: s; Exclude pauses
+func (m *Activity) SetTotalTimerTime(v uint32) *Activity {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetNumSessions sets Activity value.
+func (m *Activity) SetNumSessions(v uint16) *Activity {
+	m.NumSessions = v
+	return m
+}
+
+// SetType sets Activity value.
+func (m *Activity) SetType(v typedef.Activity) *Activity {
+	m.Type = v
+	return m
+}
+
+// SetEvent sets Activity value.
+func (m *Activity) SetEvent(v typedef.Event) *Activity {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Activity value.
+func (m *Activity) SetEventType(v typedef.EventType) *Activity {
+	m.EventType = v
+	return m
+}
+
+// SetLocalTimestamp sets Activity value.
+//
+// timestamp epoch expressed in local time, used to convert activity timestamps to local time
+func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
+	m.LocalTimestamp = v
+	return m
+}
+
+// SetEventGroup sets Activity value.
+func (m *Activity) SetEventGroup(v uint8) *Activity {
+	m.EventGroup = v
+	return m
+}
+
+// SetDeveloperFields Activity's DeveloperFields.
+func (m *Activity) SetDeveloperFields(developerFields ...proto.DeveloperField) *Activity {
+	m.DeveloperFields = developerFields
+	return m
 }

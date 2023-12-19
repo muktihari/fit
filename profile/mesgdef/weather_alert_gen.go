@@ -8,18 +8,20 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // WeatherAlert is a WeatherAlert message.
 type WeatherAlert struct {
-	Timestamp  typedef.DateTime
+	Timestamp  time.Time
 	ReportId   string                    // Unique identifier from GCS report ID string, length is 12
-	IssueTime  typedef.DateTime          // Time alert was issued
-	ExpireTime typedef.DateTime          // Time alert expires
+	IssueTime  time.Time                 // Time alert was issued
+	ExpireTime time.Time                 // Time alert expires
 	Severity   typedef.WeatherSeverity   // Warning, Watch, Advisory, Statement
 	Type       typedef.WeatherSevereType // Tornado, Severe Thunderstorm, etc.
 
@@ -28,30 +30,31 @@ type WeatherAlert struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewWeatherAlert creates new WeatherAlert struct based on given mesg. If mesg is nil or mesg.Num is not equal to WeatherAlert mesg number, it will return nil.
-func NewWeatherAlert(mesg proto.Message) *WeatherAlert {
-	if mesg.Num != typedef.MesgNumWeatherAlert {
-		return nil
-	}
-
+// NewWeatherAlert creates new WeatherAlert struct based on given mesg.
+// If mesg is nil, it will return WeatherAlert with all fields being set to its corresponding invalid value.
+func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &WeatherAlert{
-		Timestamp:  typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:  datetime.ToTime(vals[253]),
 		ReportId:   typeconv.ToString[string](vals[0]),
-		IssueTime:  typeconv.ToUint32[typedef.DateTime](vals[1]),
-		ExpireTime: typeconv.ToUint32[typedef.DateTime](vals[2]),
+		IssueTime:  datetime.ToTime(vals[1]),
+		ExpireTime: datetime.ToTime(vals[2]),
 		Severity:   typeconv.ToEnum[typedef.WeatherSeverity](vals[3]),
 		Type:       typeconv.ToEnum[typedef.WeatherSevereType](vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -60,9 +63,9 @@ func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherAlert)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
@@ -70,14 +73,14 @@ func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ReportId
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.IssueTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint32[uint32](m.IssueTime)
+		field.Value = datetime.ToUint32(m.IssueTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.ExpireTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32[uint32](m.ExpireTime)
+		field.Value = datetime.ToUint32(m.ExpireTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
@@ -99,16 +102,16 @@ func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
 // size returns size of WeatherAlert's valid fields.
 func (m *WeatherAlert) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.IssueTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.ExpireTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
@@ -118,4 +121,56 @@ func (m *WeatherAlert) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets WeatherAlert value.
+func (m *WeatherAlert) SetTimestamp(v time.Time) *WeatherAlert {
+	m.Timestamp = v
+	return m
+}
+
+// SetReportId sets WeatherAlert value.
+//
+// Unique identifier from GCS report ID string, length is 12
+func (m *WeatherAlert) SetReportId(v string) *WeatherAlert {
+	m.ReportId = v
+	return m
+}
+
+// SetIssueTime sets WeatherAlert value.
+//
+// Time alert was issued
+func (m *WeatherAlert) SetIssueTime(v time.Time) *WeatherAlert {
+	m.IssueTime = v
+	return m
+}
+
+// SetExpireTime sets WeatherAlert value.
+//
+// Time alert expires
+func (m *WeatherAlert) SetExpireTime(v time.Time) *WeatherAlert {
+	m.ExpireTime = v
+	return m
+}
+
+// SetSeverity sets WeatherAlert value.
+//
+// Warning, Watch, Advisory, Statement
+func (m *WeatherAlert) SetSeverity(v typedef.WeatherSeverity) *WeatherAlert {
+	m.Severity = v
+	return m
+}
+
+// SetType sets WeatherAlert value.
+//
+// Tornado, Severe Thunderstorm, etc.
+func (m *WeatherAlert) SetType(v typedef.WeatherSevereType) *WeatherAlert {
+	m.Type = v
+	return m
+}
+
+// SetDeveloperFields WeatherAlert's DeveloperFields.
+func (m *WeatherAlert) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeatherAlert {
+	m.DeveloperFields = developerFields
+	return m
 }

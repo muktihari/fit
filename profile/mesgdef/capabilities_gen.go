@@ -26,19 +26,20 @@ type Capabilities struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewCapabilities creates new Capabilities struct based on given mesg. If mesg is nil or mesg.Num is not equal to Capabilities mesg number, it will return nil.
-func NewCapabilities(mesg proto.Message) *Capabilities {
-	if mesg.Num != typedef.MesgNumCapabilities {
-		return nil
-	}
-
+// NewCapabilities creates new Capabilities struct based on given mesg.
+// If mesg is nil, it will return Capabilities with all fields being set to its corresponding invalid value.
+func NewCapabilities(mesg *proto.Message) *Capabilities {
 	vals := [24]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Capabilities{
@@ -47,7 +48,7 @@ func NewCapabilities(mesg proto.Message) *Capabilities {
 		WorkoutsSupported:     typeconv.ToUint32z[typedef.WorkoutCapabilities](vals[21]),
 		ConnectivitySupported: typeconv.ToUint32z[typedef.ConnectivityCapabilities](vals[23]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,4 +99,38 @@ func (m *Capabilities) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetLanguages sets Capabilities value.
+//
+// Array: [N]; Use language_bits_x types where x is index of array.
+func (m *Capabilities) SetLanguages(v []uint8) *Capabilities {
+	m.Languages = v
+	return m
+}
+
+// SetSports sets Capabilities value.
+//
+// Array: [N]; Use sport_bits_x types where x is index of array.
+func (m *Capabilities) SetSports(v []typedef.SportBits0) *Capabilities {
+	m.Sports = v
+	return m
+}
+
+// SetWorkoutsSupported sets Capabilities value.
+func (m *Capabilities) SetWorkoutsSupported(v typedef.WorkoutCapabilities) *Capabilities {
+	m.WorkoutsSupported = v
+	return m
+}
+
+// SetConnectivitySupported sets Capabilities value.
+func (m *Capabilities) SetConnectivitySupported(v typedef.ConnectivityCapabilities) *Capabilities {
+	m.ConnectivitySupported = v
+	return m
+}
+
+// SetDeveloperFields Capabilities's DeveloperFields.
+func (m *Capabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *Capabilities {
+	m.DeveloperFields = developerFields
+	return m
 }

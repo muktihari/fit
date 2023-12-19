@@ -28,19 +28,20 @@ type MemoGlob struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMemoGlob creates new MemoGlob struct based on given mesg. If mesg is nil or mesg.Num is not equal to MemoGlob mesg number, it will return nil.
-func NewMemoGlob(mesg proto.Message) *MemoGlob {
-	if mesg.Num != typedef.MesgNumMemoGlob {
-		return nil
-	}
-
+// NewMemoGlob creates new MemoGlob struct based on given mesg.
+// If mesg is nil, it will return MemoGlob with all fields being set to its corresponding invalid value.
+func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 	vals := [251]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MemoGlob{
@@ -51,7 +52,7 @@ func NewMemoGlob(mesg proto.Message) *MemoGlob {
 		FieldNum:    typeconv.ToUint8[uint8](vals[3]),
 		Data:        typeconv.ToSliceUint8z[uint8](vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -118,4 +119,58 @@ func (m *MemoGlob) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetPartIndex sets MemoGlob value.
+//
+// Sequence number of memo blocks
+func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
+	m.PartIndex = v
+	return m
+}
+
+// SetMemo sets MemoGlob value.
+//
+// Array: [N]; Deprecated. Use data field.
+func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
+	m.Memo = v
+	return m
+}
+
+// SetMesgNum sets MemoGlob value.
+//
+// Message Number of the parent message
+func (m *MemoGlob) SetMesgNum(v typedef.MesgNum) *MemoGlob {
+	m.MesgNum = v
+	return m
+}
+
+// SetParentIndex sets MemoGlob value.
+//
+// Index of mesg that this glob is associated with.
+func (m *MemoGlob) SetParentIndex(v typedef.MessageIndex) *MemoGlob {
+	m.ParentIndex = v
+	return m
+}
+
+// SetFieldNum sets MemoGlob value.
+//
+// Field within the parent that this glob is associated with
+func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
+	m.FieldNum = v
+	return m
+}
+
+// SetData sets MemoGlob value.
+//
+// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
+	m.Data = v
+	return m
+}
+
+// SetDeveloperFields MemoGlob's DeveloperFields.
+func (m *MemoGlob) SetDeveloperFields(developerFields ...proto.DeveloperField) *MemoGlob {
+	m.DeveloperFields = developerFields
+	return m
 }

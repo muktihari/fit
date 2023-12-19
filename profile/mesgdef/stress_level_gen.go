@@ -8,42 +8,45 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // StressLevel is a StressLevel message.
 type StressLevel struct {
 	StressLevelValue int16
-	StressLevelTime  typedef.DateTime // Units: s; Time stress score was calculated
+	StressLevelTime  time.Time // Units: s; Time stress score was calculated
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewStressLevel creates new StressLevel struct based on given mesg. If mesg is nil or mesg.Num is not equal to StressLevel mesg number, it will return nil.
-func NewStressLevel(mesg proto.Message) *StressLevel {
-	if mesg.Num != typedef.MesgNumStressLevel {
-		return nil
-	}
-
+// NewStressLevel creates new StressLevel struct based on given mesg.
+// If mesg is nil, it will return StressLevel with all fields being set to its corresponding invalid value.
+func NewStressLevel(mesg *proto.Message) *StressLevel {
 	vals := [2]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &StressLevel{
 		StressLevelValue: typeconv.ToSint16[int16](vals[0]),
-		StressLevelTime:  typeconv.ToUint32[typedef.DateTime](vals[1]),
+		StressLevelTime:  datetime.ToTime(vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -57,9 +60,9 @@ func (m *StressLevel) ToMesg(fac Factory) proto.Message {
 		field.Value = m.StressLevelValue
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StressLevelTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint32[uint32](m.StressLevelTime)
+		field.Value = datetime.ToUint32(m.StressLevelTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 
@@ -74,8 +77,28 @@ func (m *StressLevel) size() byte {
 	if m.StressLevelValue != basetype.Sint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StressLevelTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
 		size++
 	}
 	return size
+}
+
+// SetStressLevelValue sets StressLevel value.
+func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
+	m.StressLevelValue = v
+	return m
+}
+
+// SetStressLevelTime sets StressLevel value.
+//
+// Units: s; Time stress score was calculated
+func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
+	m.StressLevelTime = v
+	return m
+}
+
+// SetDeveloperFields StressLevel's DeveloperFields.
+func (m *StressLevel) SetDeveloperFields(developerFields ...proto.DeveloperField) *StressLevel {
+	m.DeveloperFields = developerFields
+	return m
 }

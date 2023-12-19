@@ -8,10 +8,12 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Split is a Split message.
@@ -22,7 +24,7 @@ type Split struct {
 	TotalTimerTime    uint32 // Scale: 1000; Units: s;
 	TotalDistance     uint32 // Scale: 100; Units: m;
 	AvgSpeed          uint32 // Scale: 1000; Units: m/s;
-	StartTime         typedef.DateTime
+	StartTime         time.Time
 	TotalAscent       uint16 // Units: m;
 	TotalDescent      uint16 // Units: m;
 	StartPositionLat  int32  // Units: semicircles;
@@ -31,7 +33,7 @@ type Split struct {
 	EndPositionLong   int32  // Units: semicircles;
 	MaxSpeed          uint32 // Scale: 1000; Units: m/s;
 	AvgVertSpeed      int32  // Scale: 1000; Units: m/s;
-	EndTime           typedef.DateTime
+	EndTime           time.Time
 	TotalCalories     uint32 // Units: kcal;
 	StartElevation    uint32 // Scale: 5; Offset: 500; Units: m;
 	TotalMovingTime   uint32 // Scale: 1000; Units: s;
@@ -41,19 +43,20 @@ type Split struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSplit creates new Split struct based on given mesg. If mesg is nil or mesg.Num is not equal to Split mesg number, it will return nil.
-func NewSplit(mesg proto.Message) *Split {
-	if mesg.Num != typedef.MesgNumSplit {
-		return nil
-	}
-
+// NewSplit creates new Split struct based on given mesg.
+// If mesg is nil, it will return Split with all fields being set to its corresponding invalid value.
+func NewSplit(mesg *proto.Message) *Split {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Split{
@@ -63,7 +66,7 @@ func NewSplit(mesg proto.Message) *Split {
 		TotalTimerTime:    typeconv.ToUint32[uint32](vals[2]),
 		TotalDistance:     typeconv.ToUint32[uint32](vals[3]),
 		AvgSpeed:          typeconv.ToUint32[uint32](vals[4]),
-		StartTime:         typeconv.ToUint32[typedef.DateTime](vals[9]),
+		StartTime:         datetime.ToTime(vals[9]),
 		TotalAscent:       typeconv.ToUint16[uint16](vals[13]),
 		TotalDescent:      typeconv.ToUint16[uint16](vals[14]),
 		StartPositionLat:  typeconv.ToSint32[int32](vals[21]),
@@ -72,12 +75,12 @@ func NewSplit(mesg proto.Message) *Split {
 		EndPositionLong:   typeconv.ToSint32[int32](vals[24]),
 		MaxSpeed:          typeconv.ToUint32[uint32](vals[25]),
 		AvgVertSpeed:      typeconv.ToSint32[int32](vals[26]),
-		EndTime:           typeconv.ToUint32[typedef.DateTime](vals[27]),
+		EndTime:           datetime.ToTime(vals[27]),
 		TotalCalories:     typeconv.ToUint32[uint32](vals[28]),
 		StartElevation:    typeconv.ToUint32[uint32](vals[74]),
 		TotalMovingTime:   typeconv.ToUint32[uint32](vals[110]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -116,9 +119,9 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgSpeed
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = typeconv.ToUint32[uint32](m.StartTime)
+		field.Value = datetime.ToUint32(m.StartTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TotalAscent != basetype.Uint16Invalid {
@@ -161,9 +164,9 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgVertSpeed
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.EndTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 27)
-		field.Value = typeconv.ToUint32[uint32](m.EndTime)
+		field.Value = datetime.ToUint32(m.EndTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TotalCalories != basetype.Uint32Invalid {
@@ -208,7 +211,7 @@ func (m *Split) size() byte {
 	if m.AvgSpeed != basetype.Uint32Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TotalAscent != basetype.Uint16Invalid {
@@ -235,7 +238,7 @@ func (m *Split) size() byte {
 	if m.AvgVertSpeed != basetype.Sint32Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.EndTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TotalCalories != basetype.Uint32Invalid {
@@ -248,4 +251,154 @@ func (m *Split) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Split value.
+func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSplitType sets Split value.
+func (m *Split) SetSplitType(v typedef.SplitType) *Split {
+	m.SplitType = v
+	return m
+}
+
+// SetTotalElapsedTime sets Split value.
+//
+// Scale: 1000; Units: s;
+func (m *Split) SetTotalElapsedTime(v uint32) *Split {
+	m.TotalElapsedTime = v
+	return m
+}
+
+// SetTotalTimerTime sets Split value.
+//
+// Scale: 1000; Units: s;
+func (m *Split) SetTotalTimerTime(v uint32) *Split {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetTotalDistance sets Split value.
+//
+// Scale: 100; Units: m;
+func (m *Split) SetTotalDistance(v uint32) *Split {
+	m.TotalDistance = v
+	return m
+}
+
+// SetAvgSpeed sets Split value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Split) SetAvgSpeed(v uint32) *Split {
+	m.AvgSpeed = v
+	return m
+}
+
+// SetStartTime sets Split value.
+func (m *Split) SetStartTime(v time.Time) *Split {
+	m.StartTime = v
+	return m
+}
+
+// SetTotalAscent sets Split value.
+//
+// Units: m;
+func (m *Split) SetTotalAscent(v uint16) *Split {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets Split value.
+//
+// Units: m;
+func (m *Split) SetTotalDescent(v uint16) *Split {
+	m.TotalDescent = v
+	return m
+}
+
+// SetStartPositionLat sets Split value.
+//
+// Units: semicircles;
+func (m *Split) SetStartPositionLat(v int32) *Split {
+	m.StartPositionLat = v
+	return m
+}
+
+// SetStartPositionLong sets Split value.
+//
+// Units: semicircles;
+func (m *Split) SetStartPositionLong(v int32) *Split {
+	m.StartPositionLong = v
+	return m
+}
+
+// SetEndPositionLat sets Split value.
+//
+// Units: semicircles;
+func (m *Split) SetEndPositionLat(v int32) *Split {
+	m.EndPositionLat = v
+	return m
+}
+
+// SetEndPositionLong sets Split value.
+//
+// Units: semicircles;
+func (m *Split) SetEndPositionLong(v int32) *Split {
+	m.EndPositionLong = v
+	return m
+}
+
+// SetMaxSpeed sets Split value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Split) SetMaxSpeed(v uint32) *Split {
+	m.MaxSpeed = v
+	return m
+}
+
+// SetAvgVertSpeed sets Split value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Split) SetAvgVertSpeed(v int32) *Split {
+	m.AvgVertSpeed = v
+	return m
+}
+
+// SetEndTime sets Split value.
+func (m *Split) SetEndTime(v time.Time) *Split {
+	m.EndTime = v
+	return m
+}
+
+// SetTotalCalories sets Split value.
+//
+// Units: kcal;
+func (m *Split) SetTotalCalories(v uint32) *Split {
+	m.TotalCalories = v
+	return m
+}
+
+// SetStartElevation sets Split value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Split) SetStartElevation(v uint32) *Split {
+	m.StartElevation = v
+	return m
+}
+
+// SetTotalMovingTime sets Split value.
+//
+// Scale: 1000; Units: s;
+func (m *Split) SetTotalMovingTime(v uint32) *Split {
+	m.TotalMovingTime = v
+	return m
+}
+
+// SetDeveloperFields Split's DeveloperFields.
+func (m *Split) SetDeveloperFields(developerFields ...proto.DeveloperField) *Split {
+	m.DeveloperFields = developerFields
+	return m
 }

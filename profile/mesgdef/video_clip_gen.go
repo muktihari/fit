@@ -8,18 +8,20 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // VideoClip is a VideoClip message.
 type VideoClip struct {
 	ClipNumber       uint16
-	StartTimestamp   typedef.DateTime
+	StartTimestamp   time.Time
 	StartTimestampMs uint16
-	EndTimestamp     typedef.DateTime
+	EndTimestamp     time.Time
 	EndTimestampMs   uint16
 	ClipStart        uint32 // Units: ms; Start of clip in video time
 	ClipEnd          uint32 // Units: ms; End of clip in video time
@@ -29,31 +31,32 @@ type VideoClip struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewVideoClip creates new VideoClip struct based on given mesg. If mesg is nil or mesg.Num is not equal to VideoClip mesg number, it will return nil.
-func NewVideoClip(mesg proto.Message) *VideoClip {
-	if mesg.Num != typedef.MesgNumVideoClip {
-		return nil
-	}
-
+// NewVideoClip creates new VideoClip struct based on given mesg.
+// If mesg is nil, it will return VideoClip with all fields being set to its corresponding invalid value.
+func NewVideoClip(mesg *proto.Message) *VideoClip {
 	vals := [8]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &VideoClip{
 		ClipNumber:       typeconv.ToUint16[uint16](vals[0]),
-		StartTimestamp:   typeconv.ToUint32[typedef.DateTime](vals[1]),
+		StartTimestamp:   datetime.ToTime(vals[1]),
 		StartTimestampMs: typeconv.ToUint16[uint16](vals[2]),
-		EndTimestamp:     typeconv.ToUint32[typedef.DateTime](vals[3]),
+		EndTimestamp:     datetime.ToTime(vals[3]),
 		EndTimestampMs:   typeconv.ToUint16[uint16](vals[4]),
 		ClipStart:        typeconv.ToUint32[uint32](vals[6]),
 		ClipEnd:          typeconv.ToUint32[uint32](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -67,9 +70,9 @@ func (m *VideoClip) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ClipNumber
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint32[uint32](m.StartTimestamp)
+		field.Value = datetime.ToUint32(m.StartTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
@@ -77,9 +80,9 @@ func (m *VideoClip) ToMesg(fac Factory) proto.Message {
 		field.Value = m.StartTimestampMs
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.EndTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint32[uint32](m.EndTimestamp)
+		field.Value = datetime.ToUint32(m.EndTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
@@ -109,13 +112,13 @@ func (m *VideoClip) size() byte {
 	if m.ClipNumber != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.EndTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
@@ -128,4 +131,56 @@ func (m *VideoClip) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetClipNumber sets VideoClip value.
+func (m *VideoClip) SetClipNumber(v uint16) *VideoClip {
+	m.ClipNumber = v
+	return m
+}
+
+// SetStartTimestamp sets VideoClip value.
+func (m *VideoClip) SetStartTimestamp(v time.Time) *VideoClip {
+	m.StartTimestamp = v
+	return m
+}
+
+// SetStartTimestampMs sets VideoClip value.
+func (m *VideoClip) SetStartTimestampMs(v uint16) *VideoClip {
+	m.StartTimestampMs = v
+	return m
+}
+
+// SetEndTimestamp sets VideoClip value.
+func (m *VideoClip) SetEndTimestamp(v time.Time) *VideoClip {
+	m.EndTimestamp = v
+	return m
+}
+
+// SetEndTimestampMs sets VideoClip value.
+func (m *VideoClip) SetEndTimestampMs(v uint16) *VideoClip {
+	m.EndTimestampMs = v
+	return m
+}
+
+// SetClipStart sets VideoClip value.
+//
+// Units: ms; Start of clip in video time
+func (m *VideoClip) SetClipStart(v uint32) *VideoClip {
+	m.ClipStart = v
+	return m
+}
+
+// SetClipEnd sets VideoClip value.
+//
+// Units: ms; End of clip in video time
+func (m *VideoClip) SetClipEnd(v uint32) *VideoClip {
+	m.ClipEnd = v
+	return m
+}
+
+// SetDeveloperFields VideoClip's DeveloperFields.
+func (m *VideoClip) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoClip {
+	m.DeveloperFields = developerFields
+	return m
 }

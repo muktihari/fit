@@ -8,15 +8,17 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Monitoring is a Monitoring message.
 type Monitoring struct {
-	Timestamp                    typedef.DateTime    // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
+	Timestamp                    time.Time           // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	DeviceIndex                  typedef.DeviceIndex // Associates this data to device_info message. Not required for file with single device (sensor).
 	Calories                     uint16              // Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
 	Distance                     uint32              // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
@@ -25,49 +27,50 @@ type Monitoring struct {
 	ActivityType                 typedef.ActivityType
 	ActivitySubtype              typedef.ActivitySubtype
 	ActivityLevel                typedef.ActivityLevel
-	Distance16                   uint16                // Units: 100 * m;
-	Cycles16                     uint16                // Units: 2 * cycles (steps);
-	ActiveTime16                 uint16                // Units: s;
-	LocalTimestamp               typedef.LocalDateTime // Must align to logging interval, for example, time must be 00:00:00 for daily log.
-	Temperature                  int16                 // Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
-	TemperatureMin               int16                 // Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
-	TemperatureMax               int16                 // Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
-	ActivityTime                 []uint16              // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
-	ActiveCalories               uint16                // Units: kcal;
-	CurrentActivityTypeIntensity byte                  // Indicates single type / intensity for duration since last monitoring message.
-	TimestampMin8                uint8                 // Units: min;
-	Timestamp16                  uint16                // Units: s;
-	HeartRate                    uint8                 // Units: bpm;
-	Intensity                    uint8                 // Scale: 10;
-	DurationMin                  uint16                // Units: min;
-	Duration                     uint32                // Units: s;
-	Ascent                       uint32                // Scale: 1000; Units: m;
-	Descent                      uint32                // Scale: 1000; Units: m;
-	ModerateActivityMinutes      uint16                // Units: minutes;
-	VigorousActivityMinutes      uint16                // Units: minutes;
+	Distance16                   uint16    // Units: 100 * m;
+	Cycles16                     uint16    // Units: 2 * cycles (steps);
+	ActiveTime16                 uint16    // Units: s;
+	LocalTimestamp               time.Time // Must align to logging interval, for example, time must be 00:00:00 for daily log.
+	Temperature                  int16     // Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
+	TemperatureMin               int16     // Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
+	TemperatureMax               int16     // Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
+	ActivityTime                 []uint16  // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
+	ActiveCalories               uint16    // Units: kcal;
+	CurrentActivityTypeIntensity byte      // Indicates single type / intensity for duration since last monitoring message.
+	TimestampMin8                uint8     // Units: min;
+	Timestamp16                  uint16    // Units: s;
+	HeartRate                    uint8     // Units: bpm;
+	Intensity                    uint8     // Scale: 10;
+	DurationMin                  uint16    // Units: min;
+	Duration                     uint32    // Units: s;
+	Ascent                       uint32    // Scale: 1000; Units: m;
+	Descent                      uint32    // Scale: 1000; Units: m;
+	ModerateActivityMinutes      uint16    // Units: minutes;
+	VigorousActivityMinutes      uint16    // Units: minutes;
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMonitoring creates new Monitoring struct based on given mesg. If mesg is nil or mesg.Num is not equal to Monitoring mesg number, it will return nil.
-func NewMonitoring(mesg proto.Message) *Monitoring {
-	if mesg.Num != typedef.MesgNumMonitoring {
-		return nil
-	}
-
+// NewMonitoring creates new Monitoring struct based on given mesg.
+// If mesg is nil, it will return Monitoring with all fields being set to its corresponding invalid value.
+func NewMonitoring(mesg *proto.Message) *Monitoring {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Monitoring{
-		Timestamp:                    typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                    datetime.ToTime(vals[253]),
 		DeviceIndex:                  typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
 		Calories:                     typeconv.ToUint16[uint16](vals[1]),
 		Distance:                     typeconv.ToUint32[uint32](vals[2]),
@@ -79,7 +82,7 @@ func NewMonitoring(mesg proto.Message) *Monitoring {
 		Distance16:                   typeconv.ToUint16[uint16](vals[8]),
 		Cycles16:                     typeconv.ToUint16[uint16](vals[9]),
 		ActiveTime16:                 typeconv.ToUint16[uint16](vals[10]),
-		LocalTimestamp:               typeconv.ToUint32[typedef.LocalDateTime](vals[11]),
+		LocalTimestamp:               datetime.ToTime(vals[11]),
 		Temperature:                  typeconv.ToSint16[int16](vals[12]),
 		TemperatureMin:               typeconv.ToSint16[int16](vals[14]),
 		TemperatureMax:               typeconv.ToSint16[int16](vals[15]),
@@ -97,7 +100,7 @@ func NewMonitoring(mesg proto.Message) *Monitoring {
 		ModerateActivityMinutes:      typeconv.ToUint16[uint16](vals[33]),
 		VigorousActivityMinutes:      typeconv.ToUint16[uint16](vals[34]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -106,9 +109,9 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoring)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -166,9 +169,9 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ActiveTime16
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = typeconv.ToUint32[uint32](m.LocalTimestamp)
+		field.Value = datetime.ToUint32(m.LocalTimestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.Temperature != basetype.Sint16Invalid {
@@ -260,7 +263,7 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 // size returns size of Monitoring's valid fields.
 func (m *Monitoring) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -296,7 +299,7 @@ func (m *Monitoring) size() byte {
 	if m.ActiveTime16 != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.LocalTimestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.Temperature != basetype.Sint16Invalid {
@@ -348,4 +351,236 @@ func (m *Monitoring) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets Monitoring value.
+//
+// Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
+func (m *Monitoring) SetTimestamp(v time.Time) *Monitoring {
+	m.Timestamp = v
+	return m
+}
+
+// SetDeviceIndex sets Monitoring value.
+//
+// Associates this data to device_info message. Not required for file with single device (sensor).
+func (m *Monitoring) SetDeviceIndex(v typedef.DeviceIndex) *Monitoring {
+	m.DeviceIndex = v
+	return m
+}
+
+// SetCalories sets Monitoring value.
+//
+// Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
+func (m *Monitoring) SetCalories(v uint16) *Monitoring {
+	m.Calories = v
+	return m
+}
+
+// SetDistance sets Monitoring value.
+//
+// Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
+func (m *Monitoring) SetDistance(v uint32) *Monitoring {
+	m.Distance = v
+	return m
+}
+
+// SetCycles sets Monitoring value.
+//
+// Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
+func (m *Monitoring) SetCycles(v uint32) *Monitoring {
+	m.Cycles = v
+	return m
+}
+
+// SetActiveTime sets Monitoring value.
+//
+// Scale: 1000; Units: s;
+func (m *Monitoring) SetActiveTime(v uint32) *Monitoring {
+	m.ActiveTime = v
+	return m
+}
+
+// SetActivityType sets Monitoring value.
+func (m *Monitoring) SetActivityType(v typedef.ActivityType) *Monitoring {
+	m.ActivityType = v
+	return m
+}
+
+// SetActivitySubtype sets Monitoring value.
+func (m *Monitoring) SetActivitySubtype(v typedef.ActivitySubtype) *Monitoring {
+	m.ActivitySubtype = v
+	return m
+}
+
+// SetActivityLevel sets Monitoring value.
+func (m *Monitoring) SetActivityLevel(v typedef.ActivityLevel) *Monitoring {
+	m.ActivityLevel = v
+	return m
+}
+
+// SetDistance16 sets Monitoring value.
+//
+// Units: 100 * m;
+func (m *Monitoring) SetDistance16(v uint16) *Monitoring {
+	m.Distance16 = v
+	return m
+}
+
+// SetCycles16 sets Monitoring value.
+//
+// Units: 2 * cycles (steps);
+func (m *Monitoring) SetCycles16(v uint16) *Monitoring {
+	m.Cycles16 = v
+	return m
+}
+
+// SetActiveTime16 sets Monitoring value.
+//
+// Units: s;
+func (m *Monitoring) SetActiveTime16(v uint16) *Monitoring {
+	m.ActiveTime16 = v
+	return m
+}
+
+// SetLocalTimestamp sets Monitoring value.
+//
+// Must align to logging interval, for example, time must be 00:00:00 for daily log.
+func (m *Monitoring) SetLocalTimestamp(v time.Time) *Monitoring {
+	m.LocalTimestamp = v
+	return m
+}
+
+// SetTemperature sets Monitoring value.
+//
+// Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperature(v int16) *Monitoring {
+	m.Temperature = v
+	return m
+}
+
+// SetTemperatureMin sets Monitoring value.
+//
+// Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperatureMin(v int16) *Monitoring {
+	m.TemperatureMin = v
+	return m
+}
+
+// SetTemperatureMax sets Monitoring value.
+//
+// Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperatureMax(v int16) *Monitoring {
+	m.TemperatureMax = v
+	return m
+}
+
+// SetActivityTime sets Monitoring value.
+//
+// Array: [8]; Units: minutes; Indexed using minute_activity_level enum
+func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
+	m.ActivityTime = v
+	return m
+}
+
+// SetActiveCalories sets Monitoring value.
+//
+// Units: kcal;
+func (m *Monitoring) SetActiveCalories(v uint16) *Monitoring {
+	m.ActiveCalories = v
+	return m
+}
+
+// SetCurrentActivityTypeIntensity sets Monitoring value.
+//
+// Indicates single type / intensity for duration since last monitoring message.
+func (m *Monitoring) SetCurrentActivityTypeIntensity(v byte) *Monitoring {
+	m.CurrentActivityTypeIntensity = v
+	return m
+}
+
+// SetTimestampMin8 sets Monitoring value.
+//
+// Units: min;
+func (m *Monitoring) SetTimestampMin8(v uint8) *Monitoring {
+	m.TimestampMin8 = v
+	return m
+}
+
+// SetTimestamp16 sets Monitoring value.
+//
+// Units: s;
+func (m *Monitoring) SetTimestamp16(v uint16) *Monitoring {
+	m.Timestamp16 = v
+	return m
+}
+
+// SetHeartRate sets Monitoring value.
+//
+// Units: bpm;
+func (m *Monitoring) SetHeartRate(v uint8) *Monitoring {
+	m.HeartRate = v
+	return m
+}
+
+// SetIntensity sets Monitoring value.
+//
+// Scale: 10;
+func (m *Monitoring) SetIntensity(v uint8) *Monitoring {
+	m.Intensity = v
+	return m
+}
+
+// SetDurationMin sets Monitoring value.
+//
+// Units: min;
+func (m *Monitoring) SetDurationMin(v uint16) *Monitoring {
+	m.DurationMin = v
+	return m
+}
+
+// SetDuration sets Monitoring value.
+//
+// Units: s;
+func (m *Monitoring) SetDuration(v uint32) *Monitoring {
+	m.Duration = v
+	return m
+}
+
+// SetAscent sets Monitoring value.
+//
+// Scale: 1000; Units: m;
+func (m *Monitoring) SetAscent(v uint32) *Monitoring {
+	m.Ascent = v
+	return m
+}
+
+// SetDescent sets Monitoring value.
+//
+// Scale: 1000; Units: m;
+func (m *Monitoring) SetDescent(v uint32) *Monitoring {
+	m.Descent = v
+	return m
+}
+
+// SetModerateActivityMinutes sets Monitoring value.
+//
+// Units: minutes;
+func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
+	m.ModerateActivityMinutes = v
+	return m
+}
+
+// SetVigorousActivityMinutes sets Monitoring value.
+//
+// Units: minutes;
+func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
+	m.VigorousActivityMinutes = v
+	return m
+}
+
+// SetDeveloperFields Monitoring's DeveloperFields.
+func (m *Monitoring) SetDeveloperFields(developerFields ...proto.DeveloperField) *Monitoring {
+	m.DeveloperFields = developerFields
+	return m
 }

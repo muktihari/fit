@@ -8,17 +8,19 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Jump is a Jump message.
 type Jump struct {
-	Timestamp     typedef.DateTime // Units: s;
-	Distance      float32          // Units: m;
-	Height        float32          // Units: m;
+	Timestamp     time.Time // Units: s;
+	Distance      float32   // Units: m;
+	Height        float32   // Units: m;
 	Rotations     uint8
 	HangTime      float32 // Units: s;
 	Score         float32 // A score for a jump calculated based on hang time, rotations, and distance.
@@ -32,23 +34,24 @@ type Jump struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewJump creates new Jump struct based on given mesg. If mesg is nil or mesg.Num is not equal to Jump mesg number, it will return nil.
-func NewJump(mesg proto.Message) *Jump {
-	if mesg.Num != typedef.MesgNumJump {
-		return nil
-	}
-
+// NewJump creates new Jump struct based on given mesg.
+// If mesg is nil, it will return Jump with all fields being set to its corresponding invalid value.
+func NewJump(mesg *proto.Message) *Jump {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Jump{
-		Timestamp:     typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:     datetime.ToTime(vals[253]),
 		Distance:      typeconv.ToFloat32[float32](vals[0]),
 		Height:        typeconv.ToFloat32[float32](vals[1]),
 		Rotations:     typeconv.ToUint8[uint8](vals[2]),
@@ -59,7 +62,7 @@ func NewJump(mesg proto.Message) *Jump {
 		Speed:         typeconv.ToUint16[uint16](vals[7]),
 		EnhancedSpeed: typeconv.ToUint32[uint32](vals[8]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -68,9 +71,9 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumJump)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.Distance) != basetype.Uint32Invalid {
@@ -127,7 +130,7 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 // size returns size of Jump's valid fields.
 func (m *Jump) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToUint32[uint32](m.Distance) != basetype.Uint32Invalid {
@@ -158,4 +161,88 @@ func (m *Jump) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets Jump value.
+//
+// Units: s;
+func (m *Jump) SetTimestamp(v time.Time) *Jump {
+	m.Timestamp = v
+	return m
+}
+
+// SetDistance sets Jump value.
+//
+// Units: m;
+func (m *Jump) SetDistance(v float32) *Jump {
+	m.Distance = v
+	return m
+}
+
+// SetHeight sets Jump value.
+//
+// Units: m;
+func (m *Jump) SetHeight(v float32) *Jump {
+	m.Height = v
+	return m
+}
+
+// SetRotations sets Jump value.
+func (m *Jump) SetRotations(v uint8) *Jump {
+	m.Rotations = v
+	return m
+}
+
+// SetHangTime sets Jump value.
+//
+// Units: s;
+func (m *Jump) SetHangTime(v float32) *Jump {
+	m.HangTime = v
+	return m
+}
+
+// SetScore sets Jump value.
+//
+// A score for a jump calculated based on hang time, rotations, and distance.
+func (m *Jump) SetScore(v float32) *Jump {
+	m.Score = v
+	return m
+}
+
+// SetPositionLat sets Jump value.
+//
+// Units: semicircles;
+func (m *Jump) SetPositionLat(v int32) *Jump {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets Jump value.
+//
+// Units: semicircles;
+func (m *Jump) SetPositionLong(v int32) *Jump {
+	m.PositionLong = v
+	return m
+}
+
+// SetSpeed sets Jump value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Jump) SetSpeed(v uint16) *Jump {
+	m.Speed = v
+	return m
+}
+
+// SetEnhancedSpeed sets Jump value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
+	m.EnhancedSpeed = v
+	return m
+}
+
+// SetDeveloperFields Jump's DeveloperFields.
+func (m *Jump) SetDeveloperFields(developerFields ...proto.DeveloperField) *Jump {
+	m.DeveloperFields = developerFields
+	return m
 }

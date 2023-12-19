@@ -27,19 +27,20 @@ type AntChannelId struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewAntChannelId creates new AntChannelId struct based on given mesg. If mesg is nil or mesg.Num is not equal to AntChannelId mesg number, it will return nil.
-func NewAntChannelId(mesg proto.Message) *AntChannelId {
-	if mesg.Num != typedef.MesgNumAntChannelId {
-		return nil
-	}
-
+// NewAntChannelId creates new AntChannelId struct based on given mesg.
+// If mesg is nil, it will return AntChannelId with all fields being set to its corresponding invalid value.
+func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 	vals := [5]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &AntChannelId{
@@ -49,7 +50,7 @@ func NewAntChannelId(mesg proto.Message) *AntChannelId {
 		TransmissionType: typeconv.ToUint8z[uint8](vals[3]),
 		DeviceIndex:      typeconv.ToUint8[typedef.DeviceIndex](vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,40 @@ func (m *AntChannelId) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetChannelNumber sets AntChannelId value.
+func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
+	m.ChannelNumber = v
+	return m
+}
+
+// SetDeviceType sets AntChannelId value.
+func (m *AntChannelId) SetDeviceType(v uint8) *AntChannelId {
+	m.DeviceType = v
+	return m
+}
+
+// SetDeviceNumber sets AntChannelId value.
+func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
+	m.DeviceNumber = v
+	return m
+}
+
+// SetTransmissionType sets AntChannelId value.
+func (m *AntChannelId) SetTransmissionType(v uint8) *AntChannelId {
+	m.TransmissionType = v
+	return m
+}
+
+// SetDeviceIndex sets AntChannelId value.
+func (m *AntChannelId) SetDeviceIndex(v typedef.DeviceIndex) *AntChannelId {
+	m.DeviceIndex = v
+	return m
+}
+
+// SetDeveloperFields AntChannelId's DeveloperFields.
+func (m *AntChannelId) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntChannelId {
+	m.DeveloperFields = developerFields
+	return m
 }

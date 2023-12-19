@@ -8,46 +8,49 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // MagnetometerData is a MagnetometerData message.
 type MagnetometerData struct {
-	Timestamp        typedef.DateTime // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16           // Units: ms; Millisecond part of the timestamp.
-	SampleTimeOffset []uint16         // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
-	MagX             []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	MagY             []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	MagZ             []uint16         // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	CalibratedMagX   []float32        // Array: [N]; Units: G; Calibrated Magnetometer reading
-	CalibratedMagY   []float32        // Array: [N]; Units: G; Calibrated Magnetometer reading
-	CalibratedMagZ   []float32        // Array: [N]; Units: G; Calibrated Magnetometer reading
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
+	MagX             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	MagY             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	MagZ             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+	CalibratedMagX   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
+	CalibratedMagY   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
+	CalibratedMagZ   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewMagnetometerData creates new MagnetometerData struct based on given mesg. If mesg is nil or mesg.Num is not equal to MagnetometerData mesg number, it will return nil.
-func NewMagnetometerData(mesg proto.Message) *MagnetometerData {
-	if mesg.Num != typedef.MesgNumMagnetometerData {
-		return nil
-	}
-
+// NewMagnetometerData creates new MagnetometerData struct based on given mesg.
+// If mesg is nil, it will return MagnetometerData with all fields being set to its corresponding invalid value.
+func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &MagnetometerData{
-		Timestamp:        typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:        datetime.ToTime(vals[253]),
 		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		MagX:             typeconv.ToSliceUint16[uint16](vals[2]),
@@ -57,7 +60,7 @@ func NewMagnetometerData(mesg proto.Message) *MagnetometerData {
 		CalibratedMagY:   typeconv.ToSliceFloat32[float32](vals[6]),
 		CalibratedMagZ:   typeconv.ToSliceFloat32[float32](vals[7]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -66,9 +69,9 @@ func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMagnetometerData)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -120,7 +123,7 @@ func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
 // size returns size of MagnetometerData's valid fields.
 func (m *MagnetometerData) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -148,4 +151,82 @@ func (m *MagnetometerData) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets MagnetometerData value.
+//
+// Units: s; Whole second part of the timestamp
+func (m *MagnetometerData) SetTimestamp(v time.Time) *MagnetometerData {
+	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets MagnetometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSampleTimeOffset sets MagnetometerData value.
+//
+// Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
+func (m *MagnetometerData) SetSampleTimeOffset(v []uint16) *MagnetometerData {
+	m.SampleTimeOffset = v
+	return m
+}
+
+// SetMagX sets MagnetometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *MagnetometerData) SetMagX(v []uint16) *MagnetometerData {
+	m.MagX = v
+	return m
+}
+
+// SetMagY sets MagnetometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *MagnetometerData) SetMagY(v []uint16) *MagnetometerData {
+	m.MagY = v
+	return m
+}
+
+// SetMagZ sets MagnetometerData value.
+//
+// Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
+func (m *MagnetometerData) SetMagZ(v []uint16) *MagnetometerData {
+	m.MagZ = v
+	return m
+}
+
+// SetCalibratedMagX sets MagnetometerData value.
+//
+// Array: [N]; Units: G; Calibrated Magnetometer reading
+func (m *MagnetometerData) SetCalibratedMagX(v []float32) *MagnetometerData {
+	m.CalibratedMagX = v
+	return m
+}
+
+// SetCalibratedMagY sets MagnetometerData value.
+//
+// Array: [N]; Units: G; Calibrated Magnetometer reading
+func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
+	m.CalibratedMagY = v
+	return m
+}
+
+// SetCalibratedMagZ sets MagnetometerData value.
+//
+// Array: [N]; Units: G; Calibrated Magnetometer reading
+func (m *MagnetometerData) SetCalibratedMagZ(v []float32) *MagnetometerData {
+	m.CalibratedMagZ = v
+	return m
+}
+
+// SetDeveloperFields MagnetometerData's DeveloperFields.
+func (m *MagnetometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *MagnetometerData {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -25,19 +25,20 @@ type VideoDescription struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewVideoDescription creates new VideoDescription struct based on given mesg. If mesg is nil or mesg.Num is not equal to VideoDescription mesg number, it will return nil.
-func NewVideoDescription(mesg proto.Message) *VideoDescription {
-	if mesg.Num != typedef.MesgNumVideoDescription {
-		return nil
-	}
-
+// NewVideoDescription creates new VideoDescription struct based on given mesg.
+// If mesg is nil, it will return VideoDescription with all fields being set to its corresponding invalid value.
+func NewVideoDescription(mesg *proto.Message) *VideoDescription {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &VideoDescription{
@@ -45,7 +46,7 @@ func NewVideoDescription(mesg proto.Message) *VideoDescription {
 		MessageCount: typeconv.ToUint16[uint16](vals[0]),
 		Text:         typeconv.ToString[string](vals[1]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,32 @@ func (m *VideoDescription) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets VideoDescription value.
+//
+// Long descriptions will be split into multiple parts
+func (m *VideoDescription) SetMessageIndex(v typedef.MessageIndex) *VideoDescription {
+	m.MessageIndex = v
+	return m
+}
+
+// SetMessageCount sets VideoDescription value.
+//
+// Total number of description parts
+func (m *VideoDescription) SetMessageCount(v uint16) *VideoDescription {
+	m.MessageCount = v
+	return m
+}
+
+// SetText sets VideoDescription value.
+func (m *VideoDescription) SetText(v string) *VideoDescription {
+	m.Text = v
+	return m
+}
+
+// SetDeveloperFields VideoDescription's DeveloperFields.
+func (m *VideoDescription) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoDescription {
+	m.DeveloperFields = developerFields
+	return m
 }

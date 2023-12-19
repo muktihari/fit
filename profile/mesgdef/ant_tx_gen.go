@@ -8,16 +8,18 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // AntTx is a AntTx message.
 type AntTx struct {
-	Timestamp           typedef.DateTime // Units: s;
-	FractionalTimestamp uint16           // Scale: 32768; Units: s;
+	Timestamp           time.Time // Units: s;
+	FractionalTimestamp uint16    // Scale: 32768; Units: s;
 	MesgId              byte
 	MesgData            []byte // Array: [N];
 	ChannelNumber       uint8
@@ -28,30 +30,31 @@ type AntTx struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewAntTx creates new AntTx struct based on given mesg. If mesg is nil or mesg.Num is not equal to AntTx mesg number, it will return nil.
-func NewAntTx(mesg proto.Message) *AntTx {
-	if mesg.Num != typedef.MesgNumAntTx {
-		return nil
-	}
-
+// NewAntTx creates new AntTx struct based on given mesg.
+// If mesg is nil, it will return AntTx with all fields being set to its corresponding invalid value.
+func NewAntTx(mesg *proto.Message) *AntTx {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &AntTx{
-		Timestamp:           typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:           datetime.ToTime(vals[253]),
 		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
 		MesgId:              typeconv.ToByte[byte](vals[1]),
 		MesgData:            typeconv.ToSliceByte[byte](vals[2]),
 		ChannelNumber:       typeconv.ToUint8[uint8](vals[3]),
 		Data:                typeconv.ToSliceByte[byte](vals[4]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -60,9 +63,9 @@ func (m *AntTx) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAntTx)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
@@ -99,7 +102,7 @@ func (m *AntTx) ToMesg(fac Factory) proto.Message {
 // size returns size of AntTx's valid fields.
 func (m *AntTx) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
@@ -118,4 +121,54 @@ func (m *AntTx) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets AntTx value.
+//
+// Units: s;
+func (m *AntTx) SetTimestamp(v time.Time) *AntTx {
+	m.Timestamp = v
+	return m
+}
+
+// SetFractionalTimestamp sets AntTx value.
+//
+// Scale: 32768; Units: s;
+func (m *AntTx) SetFractionalTimestamp(v uint16) *AntTx {
+	m.FractionalTimestamp = v
+	return m
+}
+
+// SetMesgId sets AntTx value.
+func (m *AntTx) SetMesgId(v byte) *AntTx {
+	m.MesgId = v
+	return m
+}
+
+// SetMesgData sets AntTx value.
+//
+// Array: [N];
+func (m *AntTx) SetMesgData(v []byte) *AntTx {
+	m.MesgData = v
+	return m
+}
+
+// SetChannelNumber sets AntTx value.
+func (m *AntTx) SetChannelNumber(v uint8) *AntTx {
+	m.ChannelNumber = v
+	return m
+}
+
+// SetData sets AntTx value.
+//
+// Array: [N];
+func (m *AntTx) SetData(v []byte) *AntTx {
+	m.Data = v
+	return m
+}
+
+// SetDeveloperFields AntTx's DeveloperFields.
+func (m *AntTx) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntTx {
+	m.DeveloperFields = developerFields
+	return m
 }

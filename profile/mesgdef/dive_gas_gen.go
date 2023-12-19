@@ -27,19 +27,20 @@ type DiveGas struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewDiveGas creates new DiveGas struct based on given mesg. If mesg is nil or mesg.Num is not equal to DiveGas mesg number, it will return nil.
-func NewDiveGas(mesg proto.Message) *DiveGas {
-	if mesg.Num != typedef.MesgNumDiveGas {
-		return nil
-	}
-
+// NewDiveGas creates new DiveGas struct based on given mesg.
+// If mesg is nil, it will return DiveGas with all fields being set to its corresponding invalid value.
+func NewDiveGas(mesg *proto.Message) *DiveGas {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &DiveGas{
@@ -49,7 +50,7 @@ func NewDiveGas(mesg proto.Message) *DiveGas {
 		Status:        typeconv.ToEnum[typedef.DiveGasStatus](vals[2]),
 		Mode:          typeconv.ToEnum[typedef.DiveGasMode](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -108,4 +109,44 @@ func (m *DiveGas) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets DiveGas value.
+func (m *DiveGas) SetMessageIndex(v typedef.MessageIndex) *DiveGas {
+	m.MessageIndex = v
+	return m
+}
+
+// SetHeliumContent sets DiveGas value.
+//
+// Units: percent;
+func (m *DiveGas) SetHeliumContent(v uint8) *DiveGas {
+	m.HeliumContent = v
+	return m
+}
+
+// SetOxygenContent sets DiveGas value.
+//
+// Units: percent;
+func (m *DiveGas) SetOxygenContent(v uint8) *DiveGas {
+	m.OxygenContent = v
+	return m
+}
+
+// SetStatus sets DiveGas value.
+func (m *DiveGas) SetStatus(v typedef.DiveGasStatus) *DiveGas {
+	m.Status = v
+	return m
+}
+
+// SetMode sets DiveGas value.
+func (m *DiveGas) SetMode(v typedef.DiveGasMode) *DiveGas {
+	m.Mode = v
+	return m
+}
+
+// SetDeveloperFields DiveGas's DeveloperFields.
+func (m *DiveGas) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveGas {
+	m.DeveloperFields = developerFields
+	return m
 }

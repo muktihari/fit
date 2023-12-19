@@ -8,17 +8,19 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // ClimbPro is a ClimbPro message.
 type ClimbPro struct {
-	Timestamp     typedef.DateTime // Units: s;
-	PositionLat   int32            // Units: semicircles;
-	PositionLong  int32            // Units: semicircles;
+	Timestamp     time.Time // Units: s;
+	PositionLat   int32     // Units: semicircles;
+	PositionLong  int32     // Units: semicircles;
 	ClimbProEvent typedef.ClimbProEvent
 	ClimbNumber   uint16
 	ClimbCategory uint8
@@ -29,23 +31,24 @@ type ClimbPro struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewClimbPro creates new ClimbPro struct based on given mesg. If mesg is nil or mesg.Num is not equal to ClimbPro mesg number, it will return nil.
-func NewClimbPro(mesg proto.Message) *ClimbPro {
-	if mesg.Num != typedef.MesgNumClimbPro {
-		return nil
-	}
-
+// NewClimbPro creates new ClimbPro struct based on given mesg.
+// If mesg is nil, it will return ClimbPro with all fields being set to its corresponding invalid value.
+func NewClimbPro(mesg *proto.Message) *ClimbPro {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ClimbPro{
-		Timestamp:     typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:     datetime.ToTime(vals[253]),
 		PositionLat:   typeconv.ToSint32[int32](vals[0]),
 		PositionLong:  typeconv.ToSint32[int32](vals[1]),
 		ClimbProEvent: typeconv.ToEnum[typedef.ClimbProEvent](vals[2]),
@@ -53,7 +56,7 @@ func NewClimbPro(mesg proto.Message) *ClimbPro {
 		ClimbCategory: typeconv.ToUint8[uint8](vals[4]),
 		CurrentDist:   typeconv.ToFloat32[float32](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -62,9 +65,9 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumClimbPro)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -106,7 +109,7 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 // size returns size of ClimbPro's valid fields.
 func (m *ClimbPro) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -128,4 +131,60 @@ func (m *ClimbPro) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets ClimbPro value.
+//
+// Units: s;
+func (m *ClimbPro) SetTimestamp(v time.Time) *ClimbPro {
+	m.Timestamp = v
+	return m
+}
+
+// SetPositionLat sets ClimbPro value.
+//
+// Units: semicircles;
+func (m *ClimbPro) SetPositionLat(v int32) *ClimbPro {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets ClimbPro value.
+//
+// Units: semicircles;
+func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
+	m.PositionLong = v
+	return m
+}
+
+// SetClimbProEvent sets ClimbPro value.
+func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
+	m.ClimbProEvent = v
+	return m
+}
+
+// SetClimbNumber sets ClimbPro value.
+func (m *ClimbPro) SetClimbNumber(v uint16) *ClimbPro {
+	m.ClimbNumber = v
+	return m
+}
+
+// SetClimbCategory sets ClimbPro value.
+func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
+	m.ClimbCategory = v
+	return m
+}
+
+// SetCurrentDist sets ClimbPro value.
+//
+// Units: m;
+func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
+	m.CurrentDist = v
+	return m
+}
+
+// SetDeveloperFields ClimbPro's DeveloperFields.
+func (m *ClimbPro) SetDeveloperFields(developerFields ...proto.DeveloperField) *ClimbPro {
+	m.DeveloperFields = developerFields
+	return m
 }

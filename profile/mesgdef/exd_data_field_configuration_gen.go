@@ -28,19 +28,20 @@ type ExdDataFieldConfiguration struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg. If mesg is nil or mesg.Num is not equal to ExdDataFieldConfiguration mesg number, it will return nil.
-func NewExdDataFieldConfiguration(mesg proto.Message) *ExdDataFieldConfiguration {
-	if mesg.Num != typedef.MesgNumExdDataFieldConfiguration {
-		return nil
-	}
-
+// NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg.
+// If mesg is nil, it will return ExdDataFieldConfiguration with all fields being set to its corresponding invalid value.
+func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguration {
 	vals := [6]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ExdDataFieldConfiguration{
@@ -51,7 +52,7 @@ func NewExdDataFieldConfiguration(mesg proto.Message) *ExdDataFieldConfiguration
 		DisplayType:  typeconv.ToEnum[typedef.ExdDisplayType](vals[4]),
 		Title:        typeconv.ToSliceString[string](vals[5]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -118,4 +119,48 @@ func (m *ExdDataFieldConfiguration) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetScreenIndex sets ExdDataFieldConfiguration value.
+func (m *ExdDataFieldConfiguration) SetScreenIndex(v uint8) *ExdDataFieldConfiguration {
+	m.ScreenIndex = v
+	return m
+}
+
+// SetConceptField sets ExdDataFieldConfiguration value.
+func (m *ExdDataFieldConfiguration) SetConceptField(v byte) *ExdDataFieldConfiguration {
+	m.ConceptField = v
+	return m
+}
+
+// SetFieldId sets ExdDataFieldConfiguration value.
+func (m *ExdDataFieldConfiguration) SetFieldId(v uint8) *ExdDataFieldConfiguration {
+	m.FieldId = v
+	return m
+}
+
+// SetConceptCount sets ExdDataFieldConfiguration value.
+func (m *ExdDataFieldConfiguration) SetConceptCount(v uint8) *ExdDataFieldConfiguration {
+	m.ConceptCount = v
+	return m
+}
+
+// SetDisplayType sets ExdDataFieldConfiguration value.
+func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *ExdDataFieldConfiguration {
+	m.DisplayType = v
+	return m
+}
+
+// SetTitle sets ExdDataFieldConfiguration value.
+//
+// Array: [32];
+func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
+	m.Title = v
+	return m
+}
+
+// SetDeveloperFields ExdDataFieldConfiguration's DeveloperFields.
+func (m *ExdDataFieldConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataFieldConfiguration {
+	m.DeveloperFields = developerFields
+	return m
 }

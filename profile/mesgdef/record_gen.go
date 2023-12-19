@@ -8,34 +8,36 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Record is a Record message.
 type Record struct {
-	Timestamp                     typedef.DateTime // Units: s;
-	PositionLat                   int32            // Units: semicircles;
-	PositionLong                  int32            // Units: semicircles;
-	Altitude                      uint16           // Scale: 5; Offset: 500; Units: m;
-	HeartRate                     uint8            // Units: bpm;
-	Cadence                       uint8            // Units: rpm;
-	Distance                      uint32           // Scale: 100; Units: m;
-	Speed                         uint16           // Scale: 1000; Units: m/s;
-	Power                         uint16           // Units: watts;
-	CompressedSpeedDistance       []byte           // Scale: 100; Array: [3]; Units: m/s,m;
-	Grade                         int16            // Scale: 100; Units: %;
-	Resistance                    uint8            // Relative. 0 is none 254 is Max.
-	TimeFromCourse                int32            // Scale: 1000; Units: s;
-	CycleLength                   uint8            // Scale: 100; Units: m;
-	Temperature                   int8             // Units: C;
-	Speed1S                       []uint8          // Scale: 16; Array: [N]; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
-	Cycles                        uint8            // Units: cycles;
-	TotalCycles                   uint32           // Units: cycles;
-	CompressedAccumulatedPower    uint16           // Units: watts;
-	AccumulatedPower              uint32           // Units: watts;
+	Timestamp                     time.Time // Units: s;
+	PositionLat                   int32     // Units: semicircles;
+	PositionLong                  int32     // Units: semicircles;
+	Altitude                      uint16    // Scale: 5; Offset: 500; Units: m;
+	HeartRate                     uint8     // Units: bpm;
+	Cadence                       uint8     // Units: rpm;
+	Distance                      uint32    // Scale: 100; Units: m;
+	Speed                         uint16    // Scale: 1000; Units: m/s;
+	Power                         uint16    // Units: watts;
+	CompressedSpeedDistance       []byte    // Array: [3]; Scale: 100; Units: m/s,m;
+	Grade                         int16     // Scale: 100; Units: %;
+	Resistance                    uint8     // Relative. 0 is none 254 is Max.
+	TimeFromCourse                int32     // Scale: 1000; Units: s;
+	CycleLength                   uint8     // Scale: 100; Units: m;
+	Temperature                   int8      // Units: C;
+	Speed1S                       []uint8   // Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
+	Cycles                        uint8     // Units: cycles;
+	TotalCycles                   uint32    // Units: cycles;
+	CompressedAccumulatedPower    uint16    // Units: watts;
+	AccumulatedPower              uint32    // Units: watts;
 	LeftRightBalance              typedef.LeftRightBalance
 	GpsAccuracy                   uint8  // Units: m;
 	VerticalSpeed                 int16  // Scale: 1000; Units: m/s;
@@ -64,10 +66,10 @@ type Record struct {
 	DeviceIndex                   typedef.DeviceIndex
 	LeftPco                       int8    // Units: mm; Left platform center offset
 	RightPco                      int8    // Units: mm; Right platform center offset
-	LeftPowerPhase                []uint8 // Scale: 0.7111111; Array: [N]; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
-	LeftPowerPhasePeak            []uint8 // Scale: 0.7111111; Array: [N]; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
-	RightPowerPhase               []uint8 // Scale: 0.7111111; Array: [N]; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
-	RightPowerPhasePeak           []uint8 // Scale: 0.7111111; Array: [N]; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
+	LeftPowerPhase                []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
+	LeftPowerPhasePeak            []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
+	RightPowerPhase               []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
+	RightPowerPhasePeak           []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
 	EnhancedSpeed                 uint32  // Scale: 1000; Units: m/s;
 	EnhancedAltitude              uint32  // Scale: 5; Offset: 500; Units: m;
 	BatterySoc                    uint8   // Scale: 2; Units: percent; lev battery state of charge
@@ -106,23 +108,24 @@ type Record struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewRecord creates new Record struct based on given mesg. If mesg is nil or mesg.Num is not equal to Record mesg number, it will return nil.
-func NewRecord(mesg proto.Message) *Record {
-	if mesg.Num != typedef.MesgNumRecord {
-		return nil
-	}
-
+// NewRecord creates new Record struct based on given mesg.
+// If mesg is nil, it will return Record with all fields being set to its corresponding invalid value.
+func NewRecord(mesg *proto.Message) *Record {
 	vals := [254]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Record{
-		Timestamp:                     typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                     datetime.ToTime(vals[253]),
 		PositionLat:                   typeconv.ToSint32[int32](vals[0]),
 		PositionLong:                  typeconv.ToSint32[int32](vals[1]),
 		Altitude:                      typeconv.ToUint16[uint16](vals[2]),
@@ -207,7 +210,7 @@ func NewRecord(mesg proto.Message) *Record {
 		Po2:                           typeconv.ToUint8[uint8](vals[129]),
 		CoreTemperature:               typeconv.ToUint16[uint16](vals[139]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -216,9 +219,9 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	mesg := fac.CreateMesgOnly(typedef.MesgNumRecord)
 	mesg.Fields = make([]proto.Field, 0, m.size())
 
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -645,7 +648,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 // size returns size of Record's valid fields.
 func (m *Record) size() byte {
 	var size byte
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -898,4 +901,672 @@ func (m *Record) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetTimestamp sets Record value.
+//
+// Units: s;
+func (m *Record) SetTimestamp(v time.Time) *Record {
+	m.Timestamp = v
+	return m
+}
+
+// SetPositionLat sets Record value.
+//
+// Units: semicircles;
+func (m *Record) SetPositionLat(v int32) *Record {
+	m.PositionLat = v
+	return m
+}
+
+// SetPositionLong sets Record value.
+//
+// Units: semicircles;
+func (m *Record) SetPositionLong(v int32) *Record {
+	m.PositionLong = v
+	return m
+}
+
+// SetAltitude sets Record value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Record) SetAltitude(v uint16) *Record {
+	m.Altitude = v
+	return m
+}
+
+// SetHeartRate sets Record value.
+//
+// Units: bpm;
+func (m *Record) SetHeartRate(v uint8) *Record {
+	m.HeartRate = v
+	return m
+}
+
+// SetCadence sets Record value.
+//
+// Units: rpm;
+func (m *Record) SetCadence(v uint8) *Record {
+	m.Cadence = v
+	return m
+}
+
+// SetDistance sets Record value.
+//
+// Scale: 100; Units: m;
+func (m *Record) SetDistance(v uint32) *Record {
+	m.Distance = v
+	return m
+}
+
+// SetSpeed sets Record value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Record) SetSpeed(v uint16) *Record {
+	m.Speed = v
+	return m
+}
+
+// SetPower sets Record value.
+//
+// Units: watts;
+func (m *Record) SetPower(v uint16) *Record {
+	m.Power = v
+	return m
+}
+
+// SetCompressedSpeedDistance sets Record value.
+//
+// Array: [3]; Scale: 100; Units: m/s,m;
+func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
+	m.CompressedSpeedDistance = v
+	return m
+}
+
+// SetGrade sets Record value.
+//
+// Scale: 100; Units: %;
+func (m *Record) SetGrade(v int16) *Record {
+	m.Grade = v
+	return m
+}
+
+// SetResistance sets Record value.
+//
+// Relative. 0 is none 254 is Max.
+func (m *Record) SetResistance(v uint8) *Record {
+	m.Resistance = v
+	return m
+}
+
+// SetTimeFromCourse sets Record value.
+//
+// Scale: 1000; Units: s;
+func (m *Record) SetTimeFromCourse(v int32) *Record {
+	m.TimeFromCourse = v
+	return m
+}
+
+// SetCycleLength sets Record value.
+//
+// Scale: 100; Units: m;
+func (m *Record) SetCycleLength(v uint8) *Record {
+	m.CycleLength = v
+	return m
+}
+
+// SetTemperature sets Record value.
+//
+// Units: C;
+func (m *Record) SetTemperature(v int8) *Record {
+	m.Temperature = v
+	return m
+}
+
+// SetSpeed1S sets Record value.
+//
+// Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
+func (m *Record) SetSpeed1S(v []uint8) *Record {
+	m.Speed1S = v
+	return m
+}
+
+// SetCycles sets Record value.
+//
+// Units: cycles;
+func (m *Record) SetCycles(v uint8) *Record {
+	m.Cycles = v
+	return m
+}
+
+// SetTotalCycles sets Record value.
+//
+// Units: cycles;
+func (m *Record) SetTotalCycles(v uint32) *Record {
+	m.TotalCycles = v
+	return m
+}
+
+// SetCompressedAccumulatedPower sets Record value.
+//
+// Units: watts;
+func (m *Record) SetCompressedAccumulatedPower(v uint16) *Record {
+	m.CompressedAccumulatedPower = v
+	return m
+}
+
+// SetAccumulatedPower sets Record value.
+//
+// Units: watts;
+func (m *Record) SetAccumulatedPower(v uint32) *Record {
+	m.AccumulatedPower = v
+	return m
+}
+
+// SetLeftRightBalance sets Record value.
+func (m *Record) SetLeftRightBalance(v typedef.LeftRightBalance) *Record {
+	m.LeftRightBalance = v
+	return m
+}
+
+// SetGpsAccuracy sets Record value.
+//
+// Units: m;
+func (m *Record) SetGpsAccuracy(v uint8) *Record {
+	m.GpsAccuracy = v
+	return m
+}
+
+// SetVerticalSpeed sets Record value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Record) SetVerticalSpeed(v int16) *Record {
+	m.VerticalSpeed = v
+	return m
+}
+
+// SetCalories sets Record value.
+//
+// Units: kcal;
+func (m *Record) SetCalories(v uint16) *Record {
+	m.Calories = v
+	return m
+}
+
+// SetVerticalOscillation sets Record value.
+//
+// Scale: 10; Units: mm;
+func (m *Record) SetVerticalOscillation(v uint16) *Record {
+	m.VerticalOscillation = v
+	return m
+}
+
+// SetStanceTimePercent sets Record value.
+//
+// Scale: 100; Units: percent;
+func (m *Record) SetStanceTimePercent(v uint16) *Record {
+	m.StanceTimePercent = v
+	return m
+}
+
+// SetStanceTime sets Record value.
+//
+// Scale: 10; Units: ms;
+func (m *Record) SetStanceTime(v uint16) *Record {
+	m.StanceTime = v
+	return m
+}
+
+// SetActivityType sets Record value.
+func (m *Record) SetActivityType(v typedef.ActivityType) *Record {
+	m.ActivityType = v
+	return m
+}
+
+// SetLeftTorqueEffectiveness sets Record value.
+//
+// Scale: 2; Units: percent;
+func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
+	m.LeftTorqueEffectiveness = v
+	return m
+}
+
+// SetRightTorqueEffectiveness sets Record value.
+//
+// Scale: 2; Units: percent;
+func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
+	m.RightTorqueEffectiveness = v
+	return m
+}
+
+// SetLeftPedalSmoothness sets Record value.
+//
+// Scale: 2; Units: percent;
+func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
+	m.LeftPedalSmoothness = v
+	return m
+}
+
+// SetRightPedalSmoothness sets Record value.
+//
+// Scale: 2; Units: percent;
+func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
+	m.RightPedalSmoothness = v
+	return m
+}
+
+// SetCombinedPedalSmoothness sets Record value.
+//
+// Scale: 2; Units: percent;
+func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
+	m.CombinedPedalSmoothness = v
+	return m
+}
+
+// SetTime128 sets Record value.
+//
+// Scale: 128; Units: s;
+func (m *Record) SetTime128(v uint8) *Record {
+	m.Time128 = v
+	return m
+}
+
+// SetStrokeType sets Record value.
+func (m *Record) SetStrokeType(v typedef.StrokeType) *Record {
+	m.StrokeType = v
+	return m
+}
+
+// SetZone sets Record value.
+func (m *Record) SetZone(v uint8) *Record {
+	m.Zone = v
+	return m
+}
+
+// SetBallSpeed sets Record value.
+//
+// Scale: 100; Units: m/s;
+func (m *Record) SetBallSpeed(v uint16) *Record {
+	m.BallSpeed = v
+	return m
+}
+
+// SetCadence256 sets Record value.
+//
+// Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability
+func (m *Record) SetCadence256(v uint16) *Record {
+	m.Cadence256 = v
+	return m
+}
+
+// SetFractionalCadence sets Record value.
+//
+// Scale: 128; Units: rpm;
+func (m *Record) SetFractionalCadence(v uint8) *Record {
+	m.FractionalCadence = v
+	return m
+}
+
+// SetTotalHemoglobinConc sets Record value.
+//
+// Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConc(v uint16) *Record {
+	m.TotalHemoglobinConc = v
+	return m
+}
+
+// SetTotalHemoglobinConcMin sets Record value.
+//
+// Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConcMin(v uint16) *Record {
+	m.TotalHemoglobinConcMin = v
+	return m
+}
+
+// SetTotalHemoglobinConcMax sets Record value.
+//
+// Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConcMax(v uint16) *Record {
+	m.TotalHemoglobinConcMax = v
+	return m
+}
+
+// SetSaturatedHemoglobinPercent sets Record value.
+//
+// Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercent(v uint16) *Record {
+	m.SaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetSaturatedHemoglobinPercentMin sets Record value.
+//
+// Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercentMin(v uint16) *Record {
+	m.SaturatedHemoglobinPercentMin = v
+	return m
+}
+
+// SetSaturatedHemoglobinPercentMax sets Record value.
+//
+// Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercentMax(v uint16) *Record {
+	m.SaturatedHemoglobinPercentMax = v
+	return m
+}
+
+// SetDeviceIndex sets Record value.
+func (m *Record) SetDeviceIndex(v typedef.DeviceIndex) *Record {
+	m.DeviceIndex = v
+	return m
+}
+
+// SetLeftPco sets Record value.
+//
+// Units: mm; Left platform center offset
+func (m *Record) SetLeftPco(v int8) *Record {
+	m.LeftPco = v
+	return m
+}
+
+// SetRightPco sets Record value.
+//
+// Units: mm; Right platform center offset
+func (m *Record) SetRightPco(v int8) *Record {
+	m.RightPco = v
+	return m
+}
+
+// SetLeftPowerPhase sets Record value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetLeftPowerPhase(v []uint8) *Record {
+	m.LeftPowerPhase = v
+	return m
+}
+
+// SetLeftPowerPhasePeak sets Record value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetLeftPowerPhasePeak(v []uint8) *Record {
+	m.LeftPowerPhasePeak = v
+	return m
+}
+
+// SetRightPowerPhase sets Record value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetRightPowerPhase(v []uint8) *Record {
+	m.RightPowerPhase = v
+	return m
+}
+
+// SetRightPowerPhasePeak sets Record value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetRightPowerPhasePeak(v []uint8) *Record {
+	m.RightPowerPhasePeak = v
+	return m
+}
+
+// SetEnhancedSpeed sets Record value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Record) SetEnhancedSpeed(v uint32) *Record {
+	m.EnhancedSpeed = v
+	return m
+}
+
+// SetEnhancedAltitude sets Record value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Record) SetEnhancedAltitude(v uint32) *Record {
+	m.EnhancedAltitude = v
+	return m
+}
+
+// SetBatterySoc sets Record value.
+//
+// Scale: 2; Units: percent; lev battery state of charge
+func (m *Record) SetBatterySoc(v uint8) *Record {
+	m.BatterySoc = v
+	return m
+}
+
+// SetMotorPower sets Record value.
+//
+// Units: watts; lev motor power
+func (m *Record) SetMotorPower(v uint16) *Record {
+	m.MotorPower = v
+	return m
+}
+
+// SetVerticalRatio sets Record value.
+//
+// Scale: 100; Units: percent;
+func (m *Record) SetVerticalRatio(v uint16) *Record {
+	m.VerticalRatio = v
+	return m
+}
+
+// SetStanceTimeBalance sets Record value.
+//
+// Scale: 100; Units: percent;
+func (m *Record) SetStanceTimeBalance(v uint16) *Record {
+	m.StanceTimeBalance = v
+	return m
+}
+
+// SetStepLength sets Record value.
+//
+// Scale: 10; Units: mm;
+func (m *Record) SetStepLength(v uint16) *Record {
+	m.StepLength = v
+	return m
+}
+
+// SetCycleLength16 sets Record value.
+//
+// Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
+func (m *Record) SetCycleLength16(v uint16) *Record {
+	m.CycleLength16 = v
+	return m
+}
+
+// SetAbsolutePressure sets Record value.
+//
+// Units: Pa; Includes atmospheric pressure
+func (m *Record) SetAbsolutePressure(v uint32) *Record {
+	m.AbsolutePressure = v
+	return m
+}
+
+// SetDepth sets Record value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Record) SetDepth(v uint32) *Record {
+	m.Depth = v
+	return m
+}
+
+// SetNextStopDepth sets Record value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Record) SetNextStopDepth(v uint32) *Record {
+	m.NextStopDepth = v
+	return m
+}
+
+// SetNextStopTime sets Record value.
+//
+// Units: s;
+func (m *Record) SetNextStopTime(v uint32) *Record {
+	m.NextStopTime = v
+	return m
+}
+
+// SetTimeToSurface sets Record value.
+//
+// Units: s;
+func (m *Record) SetTimeToSurface(v uint32) *Record {
+	m.TimeToSurface = v
+	return m
+}
+
+// SetNdlTime sets Record value.
+//
+// Units: s;
+func (m *Record) SetNdlTime(v uint32) *Record {
+	m.NdlTime = v
+	return m
+}
+
+// SetCnsLoad sets Record value.
+//
+// Units: percent;
+func (m *Record) SetCnsLoad(v uint8) *Record {
+	m.CnsLoad = v
+	return m
+}
+
+// SetN2Load sets Record value.
+//
+// Units: percent;
+func (m *Record) SetN2Load(v uint16) *Record {
+	m.N2Load = v
+	return m
+}
+
+// SetRespirationRate sets Record value.
+//
+// Units: s;
+func (m *Record) SetRespirationRate(v uint8) *Record {
+	m.RespirationRate = v
+	return m
+}
+
+// SetEnhancedRespirationRate sets Record value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Record) SetEnhancedRespirationRate(v uint16) *Record {
+	m.EnhancedRespirationRate = v
+	return m
+}
+
+// SetGrit sets Record value.
+//
+// The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Record) SetGrit(v float32) *Record {
+	m.Grit = v
+	return m
+}
+
+// SetFlow sets Record value.
+//
+// The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Record) SetFlow(v float32) *Record {
+	m.Flow = v
+	return m
+}
+
+// SetCurrentStress sets Record value.
+//
+// Scale: 100; Current Stress value
+func (m *Record) SetCurrentStress(v uint16) *Record {
+	m.CurrentStress = v
+	return m
+}
+
+// SetEbikeTravelRange sets Record value.
+//
+// Units: km;
+func (m *Record) SetEbikeTravelRange(v uint16) *Record {
+	m.EbikeTravelRange = v
+	return m
+}
+
+// SetEbikeBatteryLevel sets Record value.
+//
+// Units: percent;
+func (m *Record) SetEbikeBatteryLevel(v uint8) *Record {
+	m.EbikeBatteryLevel = v
+	return m
+}
+
+// SetEbikeAssistMode sets Record value.
+//
+// Units: depends on sensor;
+func (m *Record) SetEbikeAssistMode(v uint8) *Record {
+	m.EbikeAssistMode = v
+	return m
+}
+
+// SetEbikeAssistLevelPercent sets Record value.
+//
+// Units: percent;
+func (m *Record) SetEbikeAssistLevelPercent(v uint8) *Record {
+	m.EbikeAssistLevelPercent = v
+	return m
+}
+
+// SetAirTimeRemaining sets Record value.
+//
+// Units: s;
+func (m *Record) SetAirTimeRemaining(v uint32) *Record {
+	m.AirTimeRemaining = v
+	return m
+}
+
+// SetPressureSac sets Record value.
+//
+// Scale: 100; Units: bar/min; Pressure-based surface air consumption
+func (m *Record) SetPressureSac(v uint16) *Record {
+	m.PressureSac = v
+	return m
+}
+
+// SetVolumeSac sets Record value.
+//
+// Scale: 100; Units: L/min; Volumetric surface air consumption
+func (m *Record) SetVolumeSac(v uint16) *Record {
+	m.VolumeSac = v
+	return m
+}
+
+// SetRmv sets Record value.
+//
+// Scale: 100; Units: L/min; Respiratory minute volume
+func (m *Record) SetRmv(v uint16) *Record {
+	m.Rmv = v
+	return m
+}
+
+// SetAscentRate sets Record value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Record) SetAscentRate(v int32) *Record {
+	m.AscentRate = v
+	return m
+}
+
+// SetPo2 sets Record value.
+//
+// Scale: 100; Units: percent; Current partial pressure of oxygen
+func (m *Record) SetPo2(v uint8) *Record {
+	m.Po2 = v
+	return m
+}
+
+// SetCoreTemperature sets Record value.
+//
+// Scale: 100; Units: C;
+func (m *Record) SetCoreTemperature(v uint16) *Record {
+	m.CoreTemperature = v
+	return m
+}
+
+// SetDeveloperFields Record's DeveloperFields.
+func (m *Record) SetDeveloperFields(developerFields ...proto.DeveloperField) *Record {
+	m.DeveloperFields = developerFields
+	return m
 }

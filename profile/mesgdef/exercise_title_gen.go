@@ -26,19 +26,20 @@ type ExerciseTitle struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewExerciseTitle creates new ExerciseTitle struct based on given mesg. If mesg is nil or mesg.Num is not equal to ExerciseTitle mesg number, it will return nil.
-func NewExerciseTitle(mesg proto.Message) *ExerciseTitle {
-	if mesg.Num != typedef.MesgNumExerciseTitle {
-		return nil
-	}
-
+// NewExerciseTitle creates new ExerciseTitle struct based on given mesg.
+// If mesg is nil, it will return ExerciseTitle with all fields being set to its corresponding invalid value.
+func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &ExerciseTitle{
@@ -47,7 +48,7 @@ func NewExerciseTitle(mesg proto.Message) *ExerciseTitle {
 		ExerciseName:     typeconv.ToUint16[uint16](vals[1]),
 		WktStepName:      typeconv.ToSliceString[string](vals[2]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,4 +99,36 @@ func (m *ExerciseTitle) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets ExerciseTitle value.
+func (m *ExerciseTitle) SetMessageIndex(v typedef.MessageIndex) *ExerciseTitle {
+	m.MessageIndex = v
+	return m
+}
+
+// SetExerciseCategory sets ExerciseTitle value.
+func (m *ExerciseTitle) SetExerciseCategory(v typedef.ExerciseCategory) *ExerciseTitle {
+	m.ExerciseCategory = v
+	return m
+}
+
+// SetExerciseName sets ExerciseTitle value.
+func (m *ExerciseTitle) SetExerciseName(v uint16) *ExerciseTitle {
+	m.ExerciseName = v
+	return m
+}
+
+// SetWktStepName sets ExerciseTitle value.
+//
+// Array: [N];
+func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
+	m.WktStepName = v
+	return m
+}
+
+// SetDeveloperFields ExerciseTitle's DeveloperFields.
+func (m *ExerciseTitle) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExerciseTitle {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -8,19 +8,21 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"time"
 )
 
 // Session is a Session message.
 type Session struct {
 	MessageIndex                  typedef.MessageIndex // Selected bit is set for the current session.
-	Timestamp                     typedef.DateTime     // Units: s; Sesson end time.
+	Timestamp                     time.Time            // Units: s; Sesson end time.
 	Event                         typedef.Event        // session
 	EventType                     typedef.EventType    // stop
-	StartTime                     typedef.DateTime
+	StartTime                     time.Time
 	StartPositionLat              int32 // Units: semicircles;
 	StartPositionLong             int32 // Units: semicircles;
 	Sport                         typedef.Sport
@@ -81,10 +83,10 @@ type Session struct {
 	MaxPosVerticalSpeed           int16    // Scale: 1000; Units: m/s;
 	MaxNegVerticalSpeed           int16    // Scale: 1000; Units: m/s;
 	MinHeartRate                  uint8    // Units: bpm;
-	TimeInHrZone                  []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInSpeedZone               []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInCadenceZone             []uint32 // Scale: 1000; Array: [N]; Units: s;
-	TimeInPowerZone               []uint32 // Scale: 1000; Array: [N]; Units: s;
+	TimeInHrZone                  []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInSpeedZone               []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInCadenceZone             []uint32 // Array: [N]; Scale: 1000; Units: s;
+	TimeInPowerZone               []uint32 // Array: [N]; Scale: 1000; Units: s;
 	AvgLapTime                    uint32   // Scale: 1000; Units: s;
 	BestLapIndex                  uint16
 	MinAltitude                   uint16 // Scale: 5; Offset: 500; Units: m;
@@ -101,12 +103,12 @@ type Session struct {
 	AvgFractionalCadence          uint8    // Scale: 128; Units: rpm; fractional part of the avg_cadence
 	MaxFractionalCadence          uint8    // Scale: 128; Units: rpm; fractional part of the max_cadence
 	TotalFractionalCycles         uint8    // Scale: 128; Units: cycles; fractional part of the total_cycles
-	AvgTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Avg saturated and unsaturated hemoglobin
-	MinTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Min saturated and unsaturated hemoglobin
-	MaxTotalHemoglobinConc        []uint16 // Scale: 100; Array: [N]; Units: g/dL; Max saturated and unsaturated hemoglobin
-	AvgSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Avg percentage of hemoglobin saturated with oxygen
-	MinSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Min percentage of hemoglobin saturated with oxygen
-	MaxSaturatedHemoglobinPercent []uint16 // Scale: 10; Array: [N]; Units: %; Max percentage of hemoglobin saturated with oxygen
+	AvgTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+	MinTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+	MaxTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+	AvgSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+	MinSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+	MaxSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 	AvgLeftTorqueEffectiveness    uint8    // Scale: 2; Units: percent;
 	AvgRightTorqueEffectiveness   uint8    // Scale: 2; Units: percent;
 	AvgLeftPedalSmoothness        uint8    // Scale: 2; Units: percent;
@@ -118,10 +120,10 @@ type Session struct {
 	StandCount                    uint16   // Number of transitions to the standing state
 	AvgLeftPco                    int8     // Units: mm; Average platform center offset Left
 	AvgRightPco                   int8     // Units: mm; Average platform center offset Right
-	AvgLeftPowerPhase             []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
-	AvgLeftPowerPhasePeak         []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
-	AvgRightPowerPhase            []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
-	AvgRightPowerPhasePeak        []uint8  // Scale: 0.7111111; Array: [N]; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
+	AvgLeftPowerPhase             []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
+	AvgLeftPowerPhasePeak         []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhase            []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhasePeak        []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
 	AvgPowerPosition              []uint16 // Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
 	MaxPowerPosition              []uint16 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 	AvgCadencePosition            []uint8  // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
@@ -176,27 +178,28 @@ type Session struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSession creates new Session struct based on given mesg. If mesg is nil or mesg.Num is not equal to Session mesg number, it will return nil.
-func NewSession(mesg proto.Message) *Session {
-	if mesg.Num != typedef.MesgNumSession {
-		return nil
-	}
-
+// NewSession creates new Session struct based on given mesg.
+// If mesg is nil, it will return Session with all fields being set to its corresponding invalid value.
+func NewSession(mesg *proto.Message) *Session {
 	vals := [255]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Session{
 		MessageIndex:                  typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Timestamp:                     typeconv.ToUint32[typedef.DateTime](vals[253]),
+		Timestamp:                     datetime.ToTime(vals[253]),
 		Event:                         typeconv.ToEnum[typedef.Event](vals[0]),
 		EventType:                     typeconv.ToEnum[typedef.EventType](vals[1]),
-		StartTime:                     typeconv.ToUint32[typedef.DateTime](vals[2]),
+		StartTime:                     datetime.ToTime(vals[2]),
 		StartPositionLat:              typeconv.ToSint32[int32](vals[3]),
 		StartPositionLong:             typeconv.ToSint32[int32](vals[4]),
 		Sport:                         typeconv.ToEnum[typedef.Sport](vals[5]),
@@ -347,7 +350,7 @@ func NewSession(mesg proto.Message) *Session {
 		MinCoreTemperature:            typeconv.ToUint16[uint16](vals[209]),
 		MaxCoreTemperature:            typeconv.ToUint16[uint16](vals[210]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -361,9 +364,9 @@ func (m *Session) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = typeconv.ToUint32[uint32](m.Timestamp)
+		field.Value = datetime.ToUint32(m.Timestamp)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -376,9 +379,9 @@ func (m *Session) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToEnum[byte](m.EventType)
 		mesg.Fields = append(mesg.Fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32[uint32](m.StartTime)
+		field.Value = datetime.ToUint32(m.StartTime)
 		mesg.Fields = append(mesg.Fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -1138,7 +1141,7 @@ func (m *Session) size() byte {
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.Timestamp) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		size++
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
@@ -1147,7 +1150,7 @@ func (m *Session) size() byte {
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		size++
 	}
-	if typeconv.ToUint32[uint32](m.StartTime) != basetype.Uint32Invalid {
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		size++
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -1598,4 +1601,1204 @@ func (m *Session) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetMessageIndex sets Session value.
+//
+// Selected bit is set for the current session.
+func (m *Session) SetMessageIndex(v typedef.MessageIndex) *Session {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets Session value.
+//
+// Units: s; Sesson end time.
+func (m *Session) SetTimestamp(v time.Time) *Session {
+	m.Timestamp = v
+	return m
+}
+
+// SetEvent sets Session value.
+//
+// session
+func (m *Session) SetEvent(v typedef.Event) *Session {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Session value.
+//
+// stop
+func (m *Session) SetEventType(v typedef.EventType) *Session {
+	m.EventType = v
+	return m
+}
+
+// SetStartTime sets Session value.
+func (m *Session) SetStartTime(v time.Time) *Session {
+	m.StartTime = v
+	return m
+}
+
+// SetStartPositionLat sets Session value.
+//
+// Units: semicircles;
+func (m *Session) SetStartPositionLat(v int32) *Session {
+	m.StartPositionLat = v
+	return m
+}
+
+// SetStartPositionLong sets Session value.
+//
+// Units: semicircles;
+func (m *Session) SetStartPositionLong(v int32) *Session {
+	m.StartPositionLong = v
+	return m
+}
+
+// SetSport sets Session value.
+func (m *Session) SetSport(v typedef.Sport) *Session {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets Session value.
+func (m *Session) SetSubSport(v typedef.SubSport) *Session {
+	m.SubSport = v
+	return m
+}
+
+// SetTotalElapsedTime sets Session value.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
+func (m *Session) SetTotalElapsedTime(v uint32) *Session {
+	m.TotalElapsedTime = v
+	return m
+}
+
+// SetTotalTimerTime sets Session value.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
+func (m *Session) SetTotalTimerTime(v uint32) *Session {
+	m.TotalTimerTime = v
+	return m
+}
+
+// SetTotalDistance sets Session value.
+//
+// Scale: 100; Units: m;
+func (m *Session) SetTotalDistance(v uint32) *Session {
+	m.TotalDistance = v
+	return m
+}
+
+// SetTotalCycles sets Session value.
+//
+// Units: cycles;
+func (m *Session) SetTotalCycles(v uint32) *Session {
+	m.TotalCycles = v
+	return m
+}
+
+// SetTotalCalories sets Session value.
+//
+// Units: kcal;
+func (m *Session) SetTotalCalories(v uint16) *Session {
+	m.TotalCalories = v
+	return m
+}
+
+// SetTotalFatCalories sets Session value.
+//
+// Units: kcal;
+func (m *Session) SetTotalFatCalories(v uint16) *Session {
+	m.TotalFatCalories = v
+	return m
+}
+
+// SetAvgSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
+func (m *Session) SetAvgSpeed(v uint16) *Session {
+	m.AvgSpeed = v
+	return m
+}
+
+// SetMaxSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetMaxSpeed(v uint16) *Session {
+	m.MaxSpeed = v
+	return m
+}
+
+// SetAvgHeartRate sets Session value.
+//
+// Units: bpm; average heart rate (excludes pause time)
+func (m *Session) SetAvgHeartRate(v uint8) *Session {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets Session value.
+//
+// Units: bpm;
+func (m *Session) SetMaxHeartRate(v uint8) *Session {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetAvgCadence sets Session value.
+//
+// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
+func (m *Session) SetAvgCadence(v uint8) *Session {
+	m.AvgCadence = v
+	return m
+}
+
+// SetMaxCadence sets Session value.
+//
+// Units: rpm;
+func (m *Session) SetMaxCadence(v uint8) *Session {
+	m.MaxCadence = v
+	return m
+}
+
+// SetAvgPower sets Session value.
+//
+// Units: watts; total_power / total_timer_time if non_zero_avg_power otherwise total_power / total_elapsed_time
+func (m *Session) SetAvgPower(v uint16) *Session {
+	m.AvgPower = v
+	return m
+}
+
+// SetMaxPower sets Session value.
+//
+// Units: watts;
+func (m *Session) SetMaxPower(v uint16) *Session {
+	m.MaxPower = v
+	return m
+}
+
+// SetTotalAscent sets Session value.
+//
+// Units: m;
+func (m *Session) SetTotalAscent(v uint16) *Session {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets Session value.
+//
+// Units: m;
+func (m *Session) SetTotalDescent(v uint16) *Session {
+	m.TotalDescent = v
+	return m
+}
+
+// SetTotalTrainingEffect sets Session value.
+//
+// Scale: 10;
+func (m *Session) SetTotalTrainingEffect(v uint8) *Session {
+	m.TotalTrainingEffect = v
+	return m
+}
+
+// SetFirstLapIndex sets Session value.
+func (m *Session) SetFirstLapIndex(v uint16) *Session {
+	m.FirstLapIndex = v
+	return m
+}
+
+// SetNumLaps sets Session value.
+func (m *Session) SetNumLaps(v uint16) *Session {
+	m.NumLaps = v
+	return m
+}
+
+// SetEventGroup sets Session value.
+func (m *Session) SetEventGroup(v uint8) *Session {
+	m.EventGroup = v
+	return m
+}
+
+// SetTrigger sets Session value.
+func (m *Session) SetTrigger(v typedef.SessionTrigger) *Session {
+	m.Trigger = v
+	return m
+}
+
+// SetNecLat sets Session value.
+//
+// Units: semicircles; North east corner latitude
+func (m *Session) SetNecLat(v int32) *Session {
+	m.NecLat = v
+	return m
+}
+
+// SetNecLong sets Session value.
+//
+// Units: semicircles; North east corner longitude
+func (m *Session) SetNecLong(v int32) *Session {
+	m.NecLong = v
+	return m
+}
+
+// SetSwcLat sets Session value.
+//
+// Units: semicircles; South west corner latitude
+func (m *Session) SetSwcLat(v int32) *Session {
+	m.SwcLat = v
+	return m
+}
+
+// SetSwcLong sets Session value.
+//
+// Units: semicircles; South west corner longitude
+func (m *Session) SetSwcLong(v int32) *Session {
+	m.SwcLong = v
+	return m
+}
+
+// SetNumLengths sets Session value.
+//
+// Units: lengths; # of lengths of swim pool
+func (m *Session) SetNumLengths(v uint16) *Session {
+	m.NumLengths = v
+	return m
+}
+
+// SetNormalizedPower sets Session value.
+//
+// Units: watts;
+func (m *Session) SetNormalizedPower(v uint16) *Session {
+	m.NormalizedPower = v
+	return m
+}
+
+// SetTrainingStressScore sets Session value.
+//
+// Scale: 10; Units: tss;
+func (m *Session) SetTrainingStressScore(v uint16) *Session {
+	m.TrainingStressScore = v
+	return m
+}
+
+// SetIntensityFactor sets Session value.
+//
+// Scale: 1000; Units: if;
+func (m *Session) SetIntensityFactor(v uint16) *Session {
+	m.IntensityFactor = v
+	return m
+}
+
+// SetLeftRightBalance sets Session value.
+func (m *Session) SetLeftRightBalance(v typedef.LeftRightBalance100) *Session {
+	m.LeftRightBalance = v
+	return m
+}
+
+// SetEndPositionLat sets Session value.
+//
+// Units: semicircles;
+func (m *Session) SetEndPositionLat(v int32) *Session {
+	m.EndPositionLat = v
+	return m
+}
+
+// SetEndPositionLong sets Session value.
+//
+// Units: semicircles;
+func (m *Session) SetEndPositionLong(v int32) *Session {
+	m.EndPositionLong = v
+	return m
+}
+
+// SetAvgStrokeCount sets Session value.
+//
+// Scale: 10; Units: strokes/lap;
+func (m *Session) SetAvgStrokeCount(v uint32) *Session {
+	m.AvgStrokeCount = v
+	return m
+}
+
+// SetAvgStrokeDistance sets Session value.
+//
+// Scale: 100; Units: m;
+func (m *Session) SetAvgStrokeDistance(v uint16) *Session {
+	m.AvgStrokeDistance = v
+	return m
+}
+
+// SetSwimStroke sets Session value.
+//
+// Units: swim_stroke;
+func (m *Session) SetSwimStroke(v typedef.SwimStroke) *Session {
+	m.SwimStroke = v
+	return m
+}
+
+// SetPoolLength sets Session value.
+//
+// Scale: 100; Units: m;
+func (m *Session) SetPoolLength(v uint16) *Session {
+	m.PoolLength = v
+	return m
+}
+
+// SetThresholdPower sets Session value.
+//
+// Units: watts;
+func (m *Session) SetThresholdPower(v uint16) *Session {
+	m.ThresholdPower = v
+	return m
+}
+
+// SetPoolLengthUnit sets Session value.
+func (m *Session) SetPoolLengthUnit(v typedef.DisplayMeasure) *Session {
+	m.PoolLengthUnit = v
+	return m
+}
+
+// SetNumActiveLengths sets Session value.
+//
+// Units: lengths; # of active lengths of swim pool
+func (m *Session) SetNumActiveLengths(v uint16) *Session {
+	m.NumActiveLengths = v
+	return m
+}
+
+// SetTotalWork sets Session value.
+//
+// Units: J;
+func (m *Session) SetTotalWork(v uint32) *Session {
+	m.TotalWork = v
+	return m
+}
+
+// SetAvgAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetAvgAltitude(v uint16) *Session {
+	m.AvgAltitude = v
+	return m
+}
+
+// SetMaxAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetMaxAltitude(v uint16) *Session {
+	m.MaxAltitude = v
+	return m
+}
+
+// SetGpsAccuracy sets Session value.
+//
+// Units: m;
+func (m *Session) SetGpsAccuracy(v uint8) *Session {
+	m.GpsAccuracy = v
+	return m
+}
+
+// SetAvgGrade sets Session value.
+//
+// Scale: 100; Units: %;
+func (m *Session) SetAvgGrade(v int16) *Session {
+	m.AvgGrade = v
+	return m
+}
+
+// SetAvgPosGrade sets Session value.
+//
+// Scale: 100; Units: %;
+func (m *Session) SetAvgPosGrade(v int16) *Session {
+	m.AvgPosGrade = v
+	return m
+}
+
+// SetAvgNegGrade sets Session value.
+//
+// Scale: 100; Units: %;
+func (m *Session) SetAvgNegGrade(v int16) *Session {
+	m.AvgNegGrade = v
+	return m
+}
+
+// SetMaxPosGrade sets Session value.
+//
+// Scale: 100; Units: %;
+func (m *Session) SetMaxPosGrade(v int16) *Session {
+	m.MaxPosGrade = v
+	return m
+}
+
+// SetMaxNegGrade sets Session value.
+//
+// Scale: 100; Units: %;
+func (m *Session) SetMaxNegGrade(v int16) *Session {
+	m.MaxNegGrade = v
+	return m
+}
+
+// SetAvgTemperature sets Session value.
+//
+// Units: C;
+func (m *Session) SetAvgTemperature(v int8) *Session {
+	m.AvgTemperature = v
+	return m
+}
+
+// SetMaxTemperature sets Session value.
+//
+// Units: C;
+func (m *Session) SetMaxTemperature(v int8) *Session {
+	m.MaxTemperature = v
+	return m
+}
+
+// SetTotalMovingTime sets Session value.
+//
+// Scale: 1000; Units: s;
+func (m *Session) SetTotalMovingTime(v uint32) *Session {
+	m.TotalMovingTime = v
+	return m
+}
+
+// SetAvgPosVerticalSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetAvgPosVerticalSpeed(v int16) *Session {
+	m.AvgPosVerticalSpeed = v
+	return m
+}
+
+// SetAvgNegVerticalSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetAvgNegVerticalSpeed(v int16) *Session {
+	m.AvgNegVerticalSpeed = v
+	return m
+}
+
+// SetMaxPosVerticalSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetMaxPosVerticalSpeed(v int16) *Session {
+	m.MaxPosVerticalSpeed = v
+	return m
+}
+
+// SetMaxNegVerticalSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetMaxNegVerticalSpeed(v int16) *Session {
+	m.MaxNegVerticalSpeed = v
+	return m
+}
+
+// SetMinHeartRate sets Session value.
+//
+// Units: bpm;
+func (m *Session) SetMinHeartRate(v uint8) *Session {
+	m.MinHeartRate = v
+	return m
+}
+
+// SetTimeInHrZone sets Session value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Session) SetTimeInHrZone(v []uint32) *Session {
+	m.TimeInHrZone = v
+	return m
+}
+
+// SetTimeInSpeedZone sets Session value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Session) SetTimeInSpeedZone(v []uint32) *Session {
+	m.TimeInSpeedZone = v
+	return m
+}
+
+// SetTimeInCadenceZone sets Session value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Session) SetTimeInCadenceZone(v []uint32) *Session {
+	m.TimeInCadenceZone = v
+	return m
+}
+
+// SetTimeInPowerZone sets Session value.
+//
+// Array: [N]; Scale: 1000; Units: s;
+func (m *Session) SetTimeInPowerZone(v []uint32) *Session {
+	m.TimeInPowerZone = v
+	return m
+}
+
+// SetAvgLapTime sets Session value.
+//
+// Scale: 1000; Units: s;
+func (m *Session) SetAvgLapTime(v uint32) *Session {
+	m.AvgLapTime = v
+	return m
+}
+
+// SetBestLapIndex sets Session value.
+func (m *Session) SetBestLapIndex(v uint16) *Session {
+	m.BestLapIndex = v
+	return m
+}
+
+// SetMinAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetMinAltitude(v uint16) *Session {
+	m.MinAltitude = v
+	return m
+}
+
+// SetPlayerScore sets Session value.
+func (m *Session) SetPlayerScore(v uint16) *Session {
+	m.PlayerScore = v
+	return m
+}
+
+// SetOpponentScore sets Session value.
+func (m *Session) SetOpponentScore(v uint16) *Session {
+	m.OpponentScore = v
+	return m
+}
+
+// SetOpponentName sets Session value.
+func (m *Session) SetOpponentName(v string) *Session {
+	m.OpponentName = v
+	return m
+}
+
+// SetStrokeCount sets Session value.
+//
+// Array: [N]; Units: counts; stroke_type enum used as the index
+func (m *Session) SetStrokeCount(v []uint16) *Session {
+	m.StrokeCount = v
+	return m
+}
+
+// SetZoneCount sets Session value.
+//
+// Array: [N]; Units: counts; zone number used as the index
+func (m *Session) SetZoneCount(v []uint16) *Session {
+	m.ZoneCount = v
+	return m
+}
+
+// SetMaxBallSpeed sets Session value.
+//
+// Scale: 100; Units: m/s;
+func (m *Session) SetMaxBallSpeed(v uint16) *Session {
+	m.MaxBallSpeed = v
+	return m
+}
+
+// SetAvgBallSpeed sets Session value.
+//
+// Scale: 100; Units: m/s;
+func (m *Session) SetAvgBallSpeed(v uint16) *Session {
+	m.AvgBallSpeed = v
+	return m
+}
+
+// SetAvgVerticalOscillation sets Session value.
+//
+// Scale: 10; Units: mm;
+func (m *Session) SetAvgVerticalOscillation(v uint16) *Session {
+	m.AvgVerticalOscillation = v
+	return m
+}
+
+// SetAvgStanceTimePercent sets Session value.
+//
+// Scale: 100; Units: percent;
+func (m *Session) SetAvgStanceTimePercent(v uint16) *Session {
+	m.AvgStanceTimePercent = v
+	return m
+}
+
+// SetAvgStanceTime sets Session value.
+//
+// Scale: 10; Units: ms;
+func (m *Session) SetAvgStanceTime(v uint16) *Session {
+	m.AvgStanceTime = v
+	return m
+}
+
+// SetAvgFractionalCadence sets Session value.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
+func (m *Session) SetAvgFractionalCadence(v uint8) *Session {
+	m.AvgFractionalCadence = v
+	return m
+}
+
+// SetMaxFractionalCadence sets Session value.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
+func (m *Session) SetMaxFractionalCadence(v uint8) *Session {
+	m.MaxFractionalCadence = v
+	return m
+}
+
+// SetTotalFractionalCycles sets Session value.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
+func (m *Session) SetTotalFractionalCycles(v uint8) *Session {
+	m.TotalFractionalCycles = v
+	return m
+}
+
+// SetAvgTotalHemoglobinConc sets Session value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+func (m *Session) SetAvgTotalHemoglobinConc(v []uint16) *Session {
+	m.AvgTotalHemoglobinConc = v
+	return m
+}
+
+// SetMinTotalHemoglobinConc sets Session value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Session) SetMinTotalHemoglobinConc(v []uint16) *Session {
+	m.MinTotalHemoglobinConc = v
+	return m
+}
+
+// SetMaxTotalHemoglobinConc sets Session value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Session) SetMaxTotalHemoglobinConc(v []uint16) *Session {
+	m.MaxTotalHemoglobinConc = v
+	return m
+}
+
+// SetAvgSaturatedHemoglobinPercent sets Session value.
+//
+// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+func (m *Session) SetAvgSaturatedHemoglobinPercent(v []uint16) *Session {
+	m.AvgSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMinSaturatedHemoglobinPercent sets Session value.
+//
+// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Session) SetMinSaturatedHemoglobinPercent(v []uint16) *Session {
+	m.MinSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMaxSaturatedHemoglobinPercent sets Session value.
+//
+// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Session) SetMaxSaturatedHemoglobinPercent(v []uint16) *Session {
+	m.MaxSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetAvgLeftTorqueEffectiveness sets Session value.
+//
+// Scale: 2; Units: percent;
+func (m *Session) SetAvgLeftTorqueEffectiveness(v uint8) *Session {
+	m.AvgLeftTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgRightTorqueEffectiveness sets Session value.
+//
+// Scale: 2; Units: percent;
+func (m *Session) SetAvgRightTorqueEffectiveness(v uint8) *Session {
+	m.AvgRightTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgLeftPedalSmoothness sets Session value.
+//
+// Scale: 2; Units: percent;
+func (m *Session) SetAvgLeftPedalSmoothness(v uint8) *Session {
+	m.AvgLeftPedalSmoothness = v
+	return m
+}
+
+// SetAvgRightPedalSmoothness sets Session value.
+//
+// Scale: 2; Units: percent;
+func (m *Session) SetAvgRightPedalSmoothness(v uint8) *Session {
+	m.AvgRightPedalSmoothness = v
+	return m
+}
+
+// SetAvgCombinedPedalSmoothness sets Session value.
+//
+// Scale: 2; Units: percent;
+func (m *Session) SetAvgCombinedPedalSmoothness(v uint8) *Session {
+	m.AvgCombinedPedalSmoothness = v
+	return m
+}
+
+// SetSportProfileName sets Session value.
+//
+// Sport name from associated sport mesg
+func (m *Session) SetSportProfileName(v string) *Session {
+	m.SportProfileName = v
+	return m
+}
+
+// SetSportIndex sets Session value.
+func (m *Session) SetSportIndex(v uint8) *Session {
+	m.SportIndex = v
+	return m
+}
+
+// SetTimeStanding sets Session value.
+//
+// Scale: 1000; Units: s; Total time spend in the standing position
+func (m *Session) SetTimeStanding(v uint32) *Session {
+	m.TimeStanding = v
+	return m
+}
+
+// SetStandCount sets Session value.
+//
+// Number of transitions to the standing state
+func (m *Session) SetStandCount(v uint16) *Session {
+	m.StandCount = v
+	return m
+}
+
+// SetAvgLeftPco sets Session value.
+//
+// Units: mm; Average platform center offset Left
+func (m *Session) SetAvgLeftPco(v int8) *Session {
+	m.AvgLeftPco = v
+	return m
+}
+
+// SetAvgRightPco sets Session value.
+//
+// Units: mm; Average platform center offset Right
+func (m *Session) SetAvgRightPco(v int8) *Session {
+	m.AvgRightPco = v
+	return m
+}
+
+// SetAvgLeftPowerPhase sets Session value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
+func (m *Session) SetAvgLeftPowerPhase(v []uint8) *Session {
+	m.AvgLeftPowerPhase = v
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets Session value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Session) SetAvgLeftPowerPhasePeak(v []uint8) *Session {
+	m.AvgLeftPowerPhasePeak = v
+	return m
+}
+
+// SetAvgRightPowerPhase sets Session value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Session) SetAvgRightPowerPhase(v []uint8) *Session {
+	m.AvgRightPowerPhase = v
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets Session value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
+func (m *Session) SetAvgRightPowerPhasePeak(v []uint8) *Session {
+	m.AvgRightPowerPhasePeak = v
+	return m
+}
+
+// SetAvgPowerPosition sets Session value.
+//
+// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+func (m *Session) SetAvgPowerPosition(v []uint16) *Session {
+	m.AvgPowerPosition = v
+	return m
+}
+
+// SetMaxPowerPosition sets Session value.
+//
+// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+func (m *Session) SetMaxPowerPosition(v []uint16) *Session {
+	m.MaxPowerPosition = v
+	return m
+}
+
+// SetAvgCadencePosition sets Session value.
+//
+// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
+func (m *Session) SetAvgCadencePosition(v []uint8) *Session {
+	m.AvgCadencePosition = v
+	return m
+}
+
+// SetMaxCadencePosition sets Session value.
+//
+// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
+func (m *Session) SetMaxCadencePosition(v []uint8) *Session {
+	m.MaxCadencePosition = v
+	return m
+}
+
+// SetEnhancedAvgSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
+func (m *Session) SetEnhancedAvgSpeed(v uint32) *Session {
+	m.EnhancedAvgSpeed = v
+	return m
+}
+
+// SetEnhancedMaxSpeed sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetEnhancedMaxSpeed(v uint32) *Session {
+	m.EnhancedMaxSpeed = v
+	return m
+}
+
+// SetEnhancedAvgAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetEnhancedAvgAltitude(v uint32) *Session {
+	m.EnhancedAvgAltitude = v
+	return m
+}
+
+// SetEnhancedMinAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetEnhancedMinAltitude(v uint32) *Session {
+	m.EnhancedMinAltitude = v
+	return m
+}
+
+// SetEnhancedMaxAltitude sets Session value.
+//
+// Scale: 5; Offset: 500; Units: m;
+func (m *Session) SetEnhancedMaxAltitude(v uint32) *Session {
+	m.EnhancedMaxAltitude = v
+	return m
+}
+
+// SetAvgLevMotorPower sets Session value.
+//
+// Units: watts; lev average motor power during session
+func (m *Session) SetAvgLevMotorPower(v uint16) *Session {
+	m.AvgLevMotorPower = v
+	return m
+}
+
+// SetMaxLevMotorPower sets Session value.
+//
+// Units: watts; lev maximum motor power during session
+func (m *Session) SetMaxLevMotorPower(v uint16) *Session {
+	m.MaxLevMotorPower = v
+	return m
+}
+
+// SetLevBatteryConsumption sets Session value.
+//
+// Scale: 2; Units: percent; lev battery consumption during session
+func (m *Session) SetLevBatteryConsumption(v uint8) *Session {
+	m.LevBatteryConsumption = v
+	return m
+}
+
+// SetAvgVerticalRatio sets Session value.
+//
+// Scale: 100; Units: percent;
+func (m *Session) SetAvgVerticalRatio(v uint16) *Session {
+	m.AvgVerticalRatio = v
+	return m
+}
+
+// SetAvgStanceTimeBalance sets Session value.
+//
+// Scale: 100; Units: percent;
+func (m *Session) SetAvgStanceTimeBalance(v uint16) *Session {
+	m.AvgStanceTimeBalance = v
+	return m
+}
+
+// SetAvgStepLength sets Session value.
+//
+// Scale: 10; Units: mm;
+func (m *Session) SetAvgStepLength(v uint16) *Session {
+	m.AvgStepLength = v
+	return m
+}
+
+// SetTotalAnaerobicTrainingEffect sets Session value.
+//
+// Scale: 10;
+func (m *Session) SetTotalAnaerobicTrainingEffect(v uint8) *Session {
+	m.TotalAnaerobicTrainingEffect = v
+	return m
+}
+
+// SetAvgVam sets Session value.
+//
+// Scale: 1000; Units: m/s;
+func (m *Session) SetAvgVam(v uint16) *Session {
+	m.AvgVam = v
+	return m
+}
+
+// SetAvgDepth sets Session value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Session) SetAvgDepth(v uint32) *Session {
+	m.AvgDepth = v
+	return m
+}
+
+// SetMaxDepth sets Session value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Session) SetMaxDepth(v uint32) *Session {
+	m.MaxDepth = v
+	return m
+}
+
+// SetSurfaceInterval sets Session value.
+//
+// Units: s; Time since end of last dive
+func (m *Session) SetSurfaceInterval(v uint32) *Session {
+	m.SurfaceInterval = v
+	return m
+}
+
+// SetStartCns sets Session value.
+//
+// Units: percent;
+func (m *Session) SetStartCns(v uint8) *Session {
+	m.StartCns = v
+	return m
+}
+
+// SetEndCns sets Session value.
+//
+// Units: percent;
+func (m *Session) SetEndCns(v uint8) *Session {
+	m.EndCns = v
+	return m
+}
+
+// SetStartN2 sets Session value.
+//
+// Units: percent;
+func (m *Session) SetStartN2(v uint16) *Session {
+	m.StartN2 = v
+	return m
+}
+
+// SetEndN2 sets Session value.
+//
+// Units: percent;
+func (m *Session) SetEndN2(v uint16) *Session {
+	m.EndN2 = v
+	return m
+}
+
+// SetAvgRespirationRate sets Session value.
+func (m *Session) SetAvgRespirationRate(v uint8) *Session {
+	m.AvgRespirationRate = v
+	return m
+}
+
+// SetMaxRespirationRate sets Session value.
+func (m *Session) SetMaxRespirationRate(v uint8) *Session {
+	m.MaxRespirationRate = v
+	return m
+}
+
+// SetMinRespirationRate sets Session value.
+func (m *Session) SetMinRespirationRate(v uint8) *Session {
+	m.MinRespirationRate = v
+	return m
+}
+
+// SetMinTemperature sets Session value.
+//
+// Units: C;
+func (m *Session) SetMinTemperature(v int8) *Session {
+	m.MinTemperature = v
+	return m
+}
+
+// SetO2Toxicity sets Session value.
+//
+// Units: OTUs;
+func (m *Session) SetO2Toxicity(v uint16) *Session {
+	m.O2Toxicity = v
+	return m
+}
+
+// SetDiveNumber sets Session value.
+func (m *Session) SetDiveNumber(v uint32) *Session {
+	m.DiveNumber = v
+	return m
+}
+
+// SetTrainingLoadPeak sets Session value.
+//
+// Scale: 65536;
+func (m *Session) SetTrainingLoadPeak(v int32) *Session {
+	m.TrainingLoadPeak = v
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets Session value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Session) SetEnhancedAvgRespirationRate(v uint16) *Session {
+	m.EnhancedAvgRespirationRate = v
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets Session value.
+//
+// Scale: 100; Units: Breaths/min;
+func (m *Session) SetEnhancedMaxRespirationRate(v uint16) *Session {
+	m.EnhancedMaxRespirationRate = v
+	return m
+}
+
+// SetEnhancedMinRespirationRate sets Session value.
+//
+// Scale: 100;
+func (m *Session) SetEnhancedMinRespirationRate(v uint16) *Session {
+	m.EnhancedMinRespirationRate = v
+	return m
+}
+
+// SetTotalGrit sets Session value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Session) SetTotalGrit(v float32) *Session {
+	m.TotalGrit = v
+	return m
+}
+
+// SetTotalFlow sets Session value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Session) SetTotalFlow(v float32) *Session {
+	m.TotalFlow = v
+	return m
+}
+
+// SetJumpCount sets Session value.
+func (m *Session) SetJumpCount(v uint16) *Session {
+	m.JumpCount = v
+	return m
+}
+
+// SetAvgGrit sets Session value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Session) SetAvgGrit(v float32) *Session {
+	m.AvgGrit = v
+	return m
+}
+
+// SetAvgFlow sets Session value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Session) SetAvgFlow(v float32) *Session {
+	m.AvgFlow = v
+	return m
+}
+
+// SetAvgSpo2 sets Session value.
+//
+// Units: percent; Average SPO2 for the monitoring session
+func (m *Session) SetAvgSpo2(v uint8) *Session {
+	m.AvgSpo2 = v
+	return m
+}
+
+// SetAvgStress sets Session value.
+//
+// Units: percent; Average stress for the monitoring session
+func (m *Session) SetAvgStress(v uint8) *Session {
+	m.AvgStress = v
+	return m
+}
+
+// SetSdrrHrv sets Session value.
+//
+// Units: mS; Standard deviation of R-R interval (SDRR) - Heart rate variability measure most useful for wellness users.
+func (m *Session) SetSdrrHrv(v uint8) *Session {
+	m.SdrrHrv = v
+	return m
+}
+
+// SetRmssdHrv sets Session value.
+//
+// Units: mS; Root mean square successive difference (RMSSD) - Heart rate variability measure most useful for athletes
+func (m *Session) SetRmssdHrv(v uint8) *Session {
+	m.RmssdHrv = v
+	return m
+}
+
+// SetTotalFractionalAscent sets Session value.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Session) SetTotalFractionalAscent(v uint8) *Session {
+	m.TotalFractionalAscent = v
+	return m
+}
+
+// SetTotalFractionalDescent sets Session value.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Session) SetTotalFractionalDescent(v uint8) *Session {
+	m.TotalFractionalDescent = v
+	return m
+}
+
+// SetAvgCoreTemperature sets Session value.
+//
+// Scale: 100; Units: C;
+func (m *Session) SetAvgCoreTemperature(v uint16) *Session {
+	m.AvgCoreTemperature = v
+	return m
+}
+
+// SetMinCoreTemperature sets Session value.
+//
+// Scale: 100; Units: C;
+func (m *Session) SetMinCoreTemperature(v uint16) *Session {
+	m.MinCoreTemperature = v
+	return m
+}
+
+// SetMaxCoreTemperature sets Session value.
+//
+// Scale: 100; Units: C;
+func (m *Session) SetMaxCoreTemperature(v uint16) *Session {
+	m.MaxCoreTemperature = v
+	return m
+}
+
+// SetDeveloperFields Session's DeveloperFields.
+func (m *Session) SetDeveloperFields(developerFields ...proto.DeveloperField) *Session {
+	m.DeveloperFields = developerFields
+	return m
 }

@@ -25,19 +25,20 @@ type Sport struct {
 	DeveloperFields []proto.DeveloperField
 }
 
-// NewSport creates new Sport struct based on given mesg. If mesg is nil or mesg.Num is not equal to Sport mesg number, it will return nil.
-func NewSport(mesg proto.Message) *Sport {
-	if mesg.Num != typedef.MesgNumSport {
-		return nil
-	}
-
+// NewSport creates new Sport struct based on given mesg.
+// If mesg is nil, it will return Sport with all fields being set to its corresponding invalid value.
+func NewSport(mesg *proto.Message) *Sport {
 	vals := [4]any{}
-	for i := range mesg.Fields {
-		field := &mesg.Fields[i]
-		if field.Num >= byte(len(vals)) {
-			continue
+
+	var developerFields []proto.DeveloperField
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num >= byte(len(vals)) {
+				continue
+			}
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		vals[field.Num] = field.Value
+		developerFields = mesg.DeveloperFields
 	}
 
 	return &Sport{
@@ -45,7 +46,7 @@ func NewSport(mesg proto.Message) *Sport {
 		SubSport: typeconv.ToEnum[typedef.SubSport](vals[1]),
 		Name:     typeconv.ToString[string](vals[3]),
 
-		DeveloperFields: mesg.DeveloperFields,
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -88,4 +89,28 @@ func (m *Sport) size() byte {
 		size++
 	}
 	return size
+}
+
+// SetSport sets Sport value.
+func (m *Sport) SetSport(v typedef.Sport) *Sport {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets Sport value.
+func (m *Sport) SetSubSport(v typedef.SubSport) *Sport {
+	m.SubSport = v
+	return m
+}
+
+// SetName sets Sport value.
+func (m *Sport) SetName(v string) *Sport {
+	m.Name = v
+	return m
+}
+
+// SetDeveloperFields Sport's DeveloperFields.
+func (m *Sport) SetDeveloperFields(developerFields ...proto.DeveloperField) *Sport {
+	m.DeveloperFields = developerFields
+	return m
 }
