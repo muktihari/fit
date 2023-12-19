@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 )
 
@@ -32,6 +33,11 @@ func TestToTime(t *testing.T) {
 			name: "Thu, 30 Dec 2021 21:52:08 GMT",
 			u32:  typedef.LocalDateTime(1009835528),
 			time: time.Date(2021, time.December, 30, 21, 52, 8, 00, time.UTC),
+		},
+		{
+			name: "nil",
+			u32:  nil,
+			time: time.Time{},
 		},
 	}
 
@@ -87,21 +93,58 @@ func TestToLocalTime(t *testing.T) {
 func TestTzOffsetHours(t *testing.T) {
 	tt := []struct {
 		name          string
-		localDateTime typedef.LocalDateTime
-		t             typedef.DateTime
+		localDateTime time.Time
+		t             time.Time
 		tzOffsetHours int
 	}{
 		{
 			name:          "",
-			localDateTime: 1029647779, // Wed, 17 Aug 2022 05:16:19 GMT
-			t:             1029622579,
-			tzOffsetHours: 7,
+			localDateTime: datetime.ToTime(uint32(1029647779)), // Wed, 17 Aug 2022 05:16:19 GMT
+			t:             datetime.ToTime(uint32(1029622579)), // Tue, 16 Aug 2022 22:16:19 GMT
+			tzOffsetHours: 7,                                   // actual gap 7 hours
+		},
+		{
+			name:          "",
+			localDateTime: datetime.ToTime(uint32(1029648779)), // Wed, 17 Aug 2022 05:32:59 GMT
+			t:             datetime.ToTime(uint32(1029622579)), // Tue, 16 Aug 2022 22:16:19 GMT
+			tzOffsetHours: 7,                                   // actual gap 7.278 hours
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			tz := datetime.TzOffsetHours(tc.localDateTime, tc.t)
+			if tz != tc.tzOffsetHours {
+				t.Fatalf("expected: %d, got: %d", tc.tzOffsetHours, tz)
+			}
+		})
+	}
+}
+
+func TestTzOffsetHoursFromUint32(t *testing.T) {
+	tt := []struct {
+		name          string
+		localDateTime uint32
+		t             uint32
+		tzOffsetHours int
+	}{
+		{
+			name:          "",
+			localDateTime: 1029647779, // Wed, 17 Aug 2022 05:16:19 GMT
+			t:             1029622579, // Tue, 16 Aug 2022 22:16:19 GMT
+			tzOffsetHours: 7,          // actual gap 7 hours
+		},
+		{
+			name:          "",
+			localDateTime: 1029648779, // Wed, 17 Aug 2022 05:32:59 GMT
+			t:             1029622579, // Tue, 16 Aug 2022 22:16:19 GMT
+			tzOffsetHours: 7,          // actual gap 7.278 hours
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			tz := datetime.TzOffsetHoursFromUint32(tc.localDateTime, tc.t)
 			if tz != tc.tzOffsetHours {
 				t.Fatalf("expected: %d, got: %d", tc.tzOffsetHours, tz)
 			}
@@ -119,6 +162,11 @@ func TestToUint32(t *testing.T) {
 			name: "Thu, 30 Dec 2021 21:52:08 GMT",
 			time: time.Date(2021, time.December, 30, 21, 52, 8, 00, time.UTC),
 			u32:  1009835528,
+		},
+		{
+			name: time.Time{}.Format(time.RFC3339),
+			time: time.Time{},
+			u32:  basetype.Uint32Invalid,
 		},
 	}
 	for _, tc := range tt {

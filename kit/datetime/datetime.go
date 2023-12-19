@@ -20,6 +20,10 @@ func Epoch() time.Time { return epoch }
 
 // ToTime return new time based on given v.
 func ToTime(value any) time.Time {
+	if value == nil {
+		return time.Time{}
+	}
+
 	var val uint32 = basetype.Uint32Invalid
 
 	switch v := value.(type) {
@@ -51,25 +55,32 @@ func ToLocalTime(value any, tzOffsetHours int) time.Time {
 
 	zone := new(strings.Builder)
 	zone.WriteString("UTC")
-	tzSec := tzOffsetHours * 60 * 60
-	if tzSec > 0 {
+	if tzOffsetHours > 0 {
 		zone.WriteRune('+')
 	}
 
-	zone.WriteString(strconv.Itoa(tzSec)) // e.g. zone name -> UTC+7, UTC-7, etc...
-	loc := time.FixedZone(zone.String(), tzSec)
+	zone.WriteString(strconv.Itoa(tzOffsetHours)) // e.g. zone name -> UTC+7, UTC-7, etc...
+	loc := time.FixedZone(zone.String(), tzOffsetHours*60*60)
 
 	return t.In(loc)
 }
 
-// TzOffsetHours calculates time zone offset using LocalDateTime and DateTime.
+// TzOffsetHours calculates time zone offset.
 //
 // formula ilustration: (activity.LocalTimestamp - activity.Timestamp) / 3600
-func TzOffsetHours(localTime typedef.LocalDateTime, t typedef.DateTime) int {
-	return (int(localTime) - int(t)) / 3600
+func TzOffsetHours(localDateTime, dateTime time.Time) int {
+	return int(localDateTime.Sub(dateTime).Seconds()) / 3600
+}
+
+// TzOffsetHoursFromUint32 is similiar to TzOffsetHours but it took uint32 as parameters.
+func TzOffsetHoursFromUint32(localDateTime, dateTime uint32) int {
+	return int(localDateTime-dateTime) / 3600
 }
 
 // Convert t into uint32 fit representative time value.
 func ToUint32(t time.Time) uint32 {
+	if t.IsZero() {
+		return basetype.Uint32Invalid
+	}
 	return uint32(t.Sub(epoch).Seconds())
 }
