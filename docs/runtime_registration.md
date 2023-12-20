@@ -20,8 +20,8 @@ import "github.com/muktihari/fit/profile/typedef"
 
 func main() {
     // Register specific MesgNum
-	typedef.MesgNumRegister(68, "Internal Message")
-	typedef.MesgNumRegister(65282, "Product Information")
+    typedef.MesgNumRegister(68, "Internal Message")
+    typedef.MesgNumRegister(65282, "Product Information")
 
     // If your company have specific File Type, you can register it as well.
     typedef.FileRegister(247, "Internal File")
@@ -40,86 +40,86 @@ The available range is between `0xFF00 - 0xFFFE (65280 - 65534)`, but we found s
 package main
 
 import (
-	"app/bryton"
-	"app/garmin"
-	"os"
+    "app/bryton"
+    "app/garmin"
+    "os"
 
-	"github.com/muktihari/fit/decoder"
-	"github.com/muktihari/fit/encoder"
-	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/profile"
-	"github.com/muktihari/fit/profile/filedef"
-	"github.com/muktihari/fit/proto"
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/factory"
+    "github.com/muktihari/fit/profile"
+    "github.com/muktihari/fit/profile/filedef"
+    "github.com/muktihari/fit/proto"
 )
 
 func main() {
-	brytonFactory := factory.New()
-
-	brytonFactory.RegisterMesg(proto.Message{
-		Num: 68, // I found this mesg num used by Bryton & Garmin in their FIT file.
-		Fields: []proto.Field{
-			{
-				FieldBase: &proto.FieldBase{
-					Num:    0,
-					Name:   "Software Version",
-					Type:   profile.Uint16,
-					Scale:  1,
-					Offset: 0,
-				},
-			},
-		},
-	})
+    brytonFactory := factory.New()
 
     brytonFactory.RegisterMesg(proto.Message{
-		Num: 65290,
-		Fields: []proto.Field{
-			{
-				FieldBase: &proto.FieldBase{
-					Num:    0,
-					Name:   "Max Heart Rate",
-					Type:   profile.Uint8,
-					Scale:  1,
-					Offset: 0,
-				},
-			},
-		},
-	})
+        Num: 68, // I found this mesg num used by Bryton & Garmin in their FIT file.
+        Fields: []proto.Field{
+            {
+                FieldBase: &proto.FieldBase{
+                    Num:    0,
+                    Name:   "Software Version",
+                    Type:   profile.Uint16,
+                    Scale:  1,
+                    Offset: 0,
+                },
+            },
+        },
+    })
 
-	garminFactory := factory.New()
+    brytonFactory.RegisterMesg(proto.Message{
+        Num: 65290,
+        Fields: []proto.Field{
+            {
+                FieldBase: &proto.FieldBase{
+                    Num:    0,
+                    Name:   "Max Heart Rate",
+                    Type:   profile.Uint8,
+                    Scale:  1,
+                    Offset: 0,
+                },
+            },
+        },
+    })
 
-	garminFactory.RegisterMesg(proto.Message{
-		Num: 65282, // I found this mesg num used by Garmin in their FIT file.
-		Fields: []proto.Field{
-			{
-				FieldBase: &proto.FieldBase{
-					Num:    0,
-					Name:   "Region",
-					Type:   profile.String,
-					Scale:  1,
-					Offset: 0,
-				},
-			},
-			{
-				FieldBase: &proto.FieldBase{
-					Num:    1,
-					Name:   "Product Year",
-					Type:   profile.Uint8,
-					Scale:  1,
-					Offset: 0,
-				},
-			},
-		},
-	})
+    garminFactory := factory.New()
 
-	// Add the factory to your service
-	brytonService := bryton.NewService(brytonFactory)
-	garminService := garmin.NewService(garminFactory)
+    garminFactory.RegisterMesg(proto.Message{
+        Num: 65282, // I found this mesg num used by Garmin in their FIT file.
+        Fields: []proto.Field{
+            {
+                FieldBase: &proto.FieldBase{
+                    Num:    0,
+                    Name:   "Region",
+                    Type:   profile.String,
+                    Scale:  1,
+                    Offset: 0,
+                },
+            },
+            {
+                FieldBase: &proto.FieldBase{
+                    Num:    1,
+                    Name:   "Product Year",
+                    Type:   profile.Uint8,
+                    Scale:  1,
+                    Offset: 0,
+                },
+            },
+        },
+    })
 
-	...
+    // Add the factory to your service
+    brytonService := bryton.NewService(brytonFactory)
+    garminService := garmin.NewService(garminFactory)
 
-	// Or if you just want to decode FIT files right away, add it to decoder
-	brytonDec := decoder.New(f, decoder.WithFactory(brytonFactory))
-	garminDec := decoder.New(f, decoder.WithFactory(garminFactory))
+    ...
+
+    // Or if you just want to decode FIT files right away, add it to decoder
+    brytonDec := decoder.New(f, decoder.WithFactory(brytonFactory))
+    garminDec := decoder.New(f, decoder.WithFactory(garminFactory))
 
     ...
 }
