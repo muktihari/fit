@@ -250,8 +250,7 @@ type Field struct {
 
 	// The decoded value, composed by decoder, will always in a form of a primitive-type (or a slice of primitive types):
 	// - int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64 and string.
-	// - []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []float32 and []float64.
-	//   (there is no []string)
+	// - []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []float32, []float64 and []string.
 	//
 	// When the field is manually composed, you may use type-defined value as long as it refer to any of primitive-types
 	// (e.g. typedef.FileActivity). However, please note that marshaling type-defined value requires reflection.

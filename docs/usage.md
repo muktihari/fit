@@ -48,8 +48,7 @@ func main() {
 
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
-    field, _ := fit.Messages[0].FieldByNum(fieldnum.FileIdType) // FileId is always the first message.
-    fmt.Printf("File Type: %v\n", field.Value) // 4 = activity
+    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType)) // FileId is always the first message; 4 = activity
 
     // Output:
     // FileHeader DataSize: 94080
@@ -389,6 +388,7 @@ func main() {
     if err != nil {
         panic(err)
     }
+    defer f.Close()
 
     now := time.Now()
 
@@ -462,6 +462,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     if err != nil {
         panic(err)
     }
+    defer fin.Close()
 
     al := filedef.NewListener()
     defer al.Close()
