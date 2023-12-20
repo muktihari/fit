@@ -280,6 +280,7 @@ Here is the sample of what **Developer Fields** would look like in a **.fit** th
     <td> </td>
     <td><strong>mobile_app_version</strong></td>
     <td><strong>332.0.0</strong></td>
+    <td> </td>
 </tr>
 </tbody>
 </table>
@@ -301,7 +302,7 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
 1. Register manufacturer specific messages at runtime
 
-   For those who prefer using this SDK as it is without need to generate their own custom SDK, we provide `factory` package as an abstraction to hold the profile messages. For example, please see [usage.md/#Available-Decode-Options (WithFactory)](/docs/usage.md#Available-Decode-Options).
+   For those who prefer using this SDK as it is without need to generate their own custom SDK, we provide `factory` package as an abstraction to hold the profile messages. For example, please see [Register Manufacturer Specific Types & Messages at Runtime](/docs/runtime_registration.md).
 
 2. Generate custom FIT SDK
 
