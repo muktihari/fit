@@ -431,11 +431,11 @@ func hasValidValue(val any) bool {
 					invalidcounter++
 				}
 			default: // not supported
-				return false
+				return true // unknown type, let it be swept by isValueTypeAligned
 			}
 		}
 		return invalidcounter != rv.Len()
 	default: // not supported
-		return false
+		return true // unknown type, let it be swept by isValueTypeAligned
 	}
 }
