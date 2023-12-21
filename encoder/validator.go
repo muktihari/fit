@@ -79,11 +79,12 @@ type messageValidator struct {
 func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
-	fields := make([]proto.Field, 0, v.size(mesg.Fields))
-	for i := range mesg.Fields {
+	for i := 0; i < len(mesg.Fields); i++ {
 		field := &mesg.Fields[i]
 
 		if field.FieldBase == nil || field.IsExpandedField {
+			mesg.Fields = append(mesg.Fields[:i], mesg.Fields[i+1:]...)
+			i--
 			continue
 		}
 
@@ -93,6 +94,8 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		if v.options.omitInvalidValues && !hasValidValue(field.Value) {
+			mesg.Fields = append(mesg.Fields[:i], mesg.Fields[i+1:]...)
+			i--
 			continue
 		}
 
@@ -112,15 +115,11 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 				"type '%T' is not align with the expected type '%s' for fieldIndex: %d, fieldNum: %d, fieldName: %q, fieldValue: '%v': %w",
 				field.Value, field.Type, i, field.Num, field.Name, field.Value, ErrValueTypeMismatch)
 		}
-
-		fields = append(fields, *field)
 	}
 
-	if len(fields) == 0 && len(mesg.DeveloperFields) == 0 {
+	if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
 		return ErrNoFields
 	}
-
-	mesg.Fields = fields
 
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
@@ -163,23 +162,6 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	}
 
 	return nil
-}
-
-// size return the size of valid fields.
-// This is method ensure we just do 1 alloc on creating new slice of fields.
-func (v *messageValidator) size(fields []proto.Field) byte {
-	var size byte
-	for i := range fields {
-		field := &fields[i]
-		if field.FieldBase == nil || field.IsExpandedField {
-			continue
-		}
-		if v.options.omitInvalidValues && !hasValidValue(field.Value) {
-			continue
-		}
-		size++
-	}
-	return size
 }
 
 // isValueTypeAligned checks whether the value is aligned with type. The value should be a concrete type not pointer to a value.
