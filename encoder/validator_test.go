@@ -58,6 +58,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		name          string
 		mesgs         []proto.Message
 		mesgValidator MessageValidator
+		sizes         []int
 		errs          []error
 	}{
 		{
@@ -69,6 +70,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
+			sizes: []int{1},
 		},
 		{
 			name: "valid message with developer fields happy flow",
@@ -81,9 +83,9 @@ func TestMessageValidatorValidate(t *testing.T) {
 					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
 					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
 					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
-					fieldnum.FieldDescriptionNativeMesgNum:         mesgnum.Record,
-					fieldnum.FieldDescriptionNativeFieldNum:        fieldnum.RecordHeartRate,
-					fieldnum.FieldDescriptionFitBaseTypeId:         basetype.Uint8,
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
 				}),
 				{
 					Fields: []proto.Field{
@@ -102,6 +104,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
+			sizes: []int{2, 6, 1},
 		},
 		{
 			name: "mesg contain expanded field",
@@ -116,6 +119,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					}(),
 				),
 			},
+			sizes: []int{1},
 		},
 		{
 			name: "mesg contain field with invalid size",
@@ -137,6 +141,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue((float64(37304) / 5) - 500), // 6960.8m
 				),
 			},
+			sizes: []int{1},
 		},
 		{
 			name: "mesg contain field value type not align",
@@ -163,7 +168,8 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs: []error{nil, ErrMissingDeveloperDataId},
+			sizes: []int{2, 0},
+			errs:  []error{nil, ErrMissingDeveloperDataId},
 		},
 		{
 			name: "valid message with field description not found in previous message sequence",
@@ -181,7 +187,8 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs: []error{nil, ErrMissingFieldDescription},
+			errs:  []error{nil, ErrMissingFieldDescription},
+			sizes: []int{2, 0},
 		},
 	}
 
@@ -200,6 +207,12 @@ func TestMessageValidatorValidate(t *testing.T) {
 				err := mesgValidator.Validate(&mesg)
 				if !errors.Is(err, tc.errs[i]) {
 					t.Fatalf("expected err: %v, got: %v", tc.errs[i], err)
+				}
+				if err != nil {
+					continue
+				}
+				if len(mesg.Fields) != tc.sizes[i] {
+					t.Fatalf("expected size after validate: %d, got: %d", tc.sizes[i], len(mesg.Fields))
 				}
 			}
 		})
@@ -272,6 +285,8 @@ func TestHasValidValue(t *testing.T) {
 		expected bool
 	}{
 		{value: nil, expected: false},
+		{value: int(0), expected: true},  // mark as valid since its invalid value is unknown
+		{value: uint(0), expected: true}, // mark as valid since its invalid value is unknown
 		{value: int8(0), expected: true},
 		{value: uint8(0), expected: true},
 		{value: int16(0), expected: true},
@@ -289,7 +304,7 @@ func TestHasValidValue(t *testing.T) {
 		{value: float64(math.Float64frombits(basetype.Float64Invalid - 1)), expected: true},
 		{value: int64(0), expected: true},
 		{value: uint64(0), expected: true},
-		{value: struct{}{}, expected: false},
+		{value: struct{}{}, expected: true}, // mark as valid since its invalid value is unknown
 		{value: []int8{0, basetype.Sint8Invalid}, expected: true},
 		{value: []uint8{0, basetype.Uint8Invalid}, expected: true},
 		{value: []int16{0, basetype.Sint16Invalid}, expected: true},
@@ -327,7 +342,7 @@ func TestHasValidValue(t *testing.T) {
 		{value: []Float64{0.5, Float64(math.Float64frombits(basetype.Float64Invalid))}, expected: true},
 		{value: []Int64{0, Int64(basetype.Sint64Invalid)}, expected: true},
 		{value: []Uint64{0, Uint64(basetype.Uint64Invalid)}, expected: true},
-		{value: []struct{}{{}}, expected: false},
+		{value: []struct{}{{}}, expected: true}, // mark as valid since its invalid value is unknown
 	}
 	for _, tc := range tt {
 		t.Run(fmt.Sprintf("%v (%T)", tc.value, tc.value), func(t *testing.T) {
