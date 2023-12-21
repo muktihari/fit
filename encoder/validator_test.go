@@ -415,3 +415,35 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkValidate(b *testing.B) {
+	b.StopTimer()
+	mesgValidator := NewMessageValidator()
+	mesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(10000)),
+		func() proto.Field {
+			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
+			field.IsExpandedField = true
+			field.Value = uint32(1000)
+			return field
+		}(),
+		func() proto.Field {
+			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
+			field.IsExpandedField = true
+			field.Value = uint32(1000)
+			return field
+		}(),
+		func() proto.Field {
+			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
+			field.IsExpandedField = true
+			field.Value = uint32(1000)
+			return field
+		}(),
+	)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_ = mesgValidator.Validate(&mesg)
+	}
+}
