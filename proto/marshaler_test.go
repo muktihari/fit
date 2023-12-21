@@ -9,8 +9,11 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -135,15 +138,6 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 	}
 }
 
-func TestDeveloperFieldDefinitionMarshaler(t *testing.T) {
-	f := proto.DeveloperFieldDefinition{Num: 0, Size: 1, DeveloperDataIndex: 0}
-	b, _ := f.MarshalBinary()
-	expected := []byte{0, 1, 0}
-	if diff := cmp.Diff(b, expected); diff != "" {
-		t.Fatal(diff)
-	}
-}
-
 func TestMessageMarshaler(t *testing.T) {
 	tt := []struct {
 		name string
@@ -239,5 +233,30 @@ func TestMessageMarshaler(t *testing.T) {
 				t.Fatal(diff)
 			}
 		})
+	}
+}
+
+func BenchmarkMarshalMessageDefinition(b *testing.B) {
+	b.StopTimer()
+	mesg := factory.CreateMesg(mesgnum.Record)
+	mesgDef := proto.CreateMessageDefinition(&mesg)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = mesgDef.MarshalBinary()
+	}
+}
+
+func BenchmarkMarshalMessage(b *testing.B) {
+	b.StopTimer()
+	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+		fieldnum.RecordPositionLat:  int32(1000),
+		fieldnum.RecordPositionLong: int32(1000),
+		fieldnum.RecordSpeed:        uint16(1000),
+	})
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = mesg.MarshalBinary()
 	}
 }

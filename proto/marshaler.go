@@ -9,6 +9,7 @@ import (
 	"encoding"
 	"encoding/binary"
 	"fmt"
+	"sync"
 
 	"github.com/muktihari/fit/kit/byteorder"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,8 +20,6 @@ import (
 var (
 	_ encoding.BinaryMarshaler = &FileHeader{}
 	_ encoding.BinaryMarshaler = &MessageDefinition{}
-	_ encoding.BinaryMarshaler = &FieldDefinition{}
-	_ encoding.BinaryMarshaler = &DeveloperFieldDefinition{}
 	_ encoding.BinaryMarshaler = &Message{}
 )
 
@@ -65,8 +64,11 @@ func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
 	b = append(b, byte(len(m.FieldDefinitions)))
 
 	for i := range m.FieldDefinitions {
-		bs, _ := m.FieldDefinitions[i].MarshalBinary()
-		b = append(b, bs...)
+		b = append(b,
+			m.FieldDefinitions[i].Num,
+			m.FieldDefinitions[i].Size,
+			byte(m.FieldDefinitions[i].BaseType),
+		)
 	}
 
 	if (m.Header & DevDataMask) != DevDataMask {
@@ -75,29 +77,33 @@ func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
 
 	b = append(b, byte(len(m.DeveloperFieldDefinitions)))
 	for i := range m.DeveloperFieldDefinitions {
-		bs, _ := m.DeveloperFieldDefinitions[i].MarshalBinary()
-		b = append(b, bs...)
+		b = append(b,
+			m.DeveloperFieldDefinitions[i].Num,
+			m.DeveloperFieldDefinitions[i].Size,
+			m.DeveloperFieldDefinitions[i].DeveloperDataIndex,
+		)
 	}
 
 	return b, nil
 }
 
-func (f *FieldDefinition) MarshalBinary() ([]byte, error) {
-	return []byte{f.Num, f.Size, byte(f.BaseType)}, nil
-}
-
-func (f *DeveloperFieldDefinition) MarshalBinary() ([]byte, error) {
-	return []byte{f.Num, f.Size, f.DeveloperDataIndex}, nil
+var bufPool = sync.Pool{
+	New: func() any {
+		return new(bytes.Buffer)
+	},
 }
 
 func (m *Message) MarshalBinary() ([]byte, error) {
-	buf := new(bytes.Buffer)
+	buf := bufPool.Get().(*bytes.Buffer)
+	buf.Reset()
+
 	buf.WriteByte(m.Header)
 
 	for i := range m.Fields {
 		field := &m.Fields[i]
 		b, err := typedef.Marshal(field.Value, byteorder.Select(m.Architecture))
 		if err != nil {
+			bufPool.Put(buf)
 			return nil, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value, err)
 		}
 		buf.Write(b)
@@ -107,10 +113,13 @@ func (m *Message) MarshalBinary() ([]byte, error) {
 		developerField := &m.DeveloperFields[i]
 		b, err := typedef.Marshal(developerField.Value, byteorder.Select(m.Architecture))
 		if err != nil {
+			bufPool.Put(buf)
 			return nil, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value, err)
 		}
 		buf.Write(b)
 	}
 
-	return buf.Bytes(), nil
+	b := buf.Bytes()
+	bufPool.Put(buf)
+	return b, nil
 }
