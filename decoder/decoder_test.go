@@ -416,7 +416,6 @@ func TestNext(t *testing.T) {
 
 	// Test Begin
 	dec := New(r)
-	prevAccumulator := dec.accumulator
 
 	if !dec.Next() {
 		t.Fatalf("should have next, return false")
@@ -427,14 +426,17 @@ func TestNext(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Manually add accumulated value
+	dec.accumulator.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
+
 	// Check whether after decode, fields are reset and next sequence is retrieved.
 
 	if !dec.Next() {
 		t.Fatalf("should have next, return false")
 	}
 
-	if prevAccumulator == dec.accumulator {
-		t.Fatalf("expected new accumulator got same")
+	if len(dec.accumulator.AccumulatedValues) != 0 {
+		t.Fatalf("expected accumulator's AccumulatedValues is 0, got: %d", len(dec.accumulator.AccumulatedValues))
 	}
 
 	if dec.crc16.Sum16() != 0 { // not necessary since reset every decode header anyway, but let's just add it

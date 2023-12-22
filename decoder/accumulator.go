@@ -13,7 +13,7 @@ type Accumulator struct {
 }
 
 func NewAccumulator() *Accumulator {
-	return &Accumulator{AccumulatedValues: make([]AccumulatedValue, 0)}
+	return &Accumulator{} // No need to make AccumulatedValues as it will be created on append anyway.
 }
 
 func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value int64) {
@@ -42,6 +42,8 @@ func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val
 	}
 	return value
 }
+
+func (a *Accumulator) Reset() { a.AccumulatedValues = a.AccumulatedValues[:0] }
 
 type AccumulatedValue struct {
 	MesgNum      typedef.MesgNum

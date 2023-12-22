@@ -190,14 +190,12 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
 		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))
-		strbuf.WriteString(fmt.Sprintf("Type: %s, /* %s */\n",
+		strbuf.WriteString(fmt.Sprintf("Type: %s, /* %s (size: %d) */\n",
 			b.transformProfileType(field.Type),
 			b.transformBaseType(field.Type),
-		))
-		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
-		strbuf.WriteString(fmt.Sprintf("Size: %d,\n",
 			basetype.FromString(b.baseTypeMapByProfileType[field.Type]).Size(),
 		))
+		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
 		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(field, message.Name)))
 		strbuf.WriteString(fmt.Sprintf("Scale: %g,\n", scaleOrDefault(field.Scales, 0)))    // first index or default
 		strbuf.WriteString(fmt.Sprintf("Offset: %g,\n", offsetOrDefault(field.Offsets, 0))) // first index or default

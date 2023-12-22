@@ -55,38 +55,34 @@ func (b *profilebuilder) Build() ([]builder.Data, error) {
 }
 
 func (b *profilebuilder) buildProfile() builder.Data {
-	mappingToBaseTypes := make([]MappingBaseType, 0, len(b.types))
 	constants := make([]shared.Constant, 0, len(b.types))
+	mappingToBaseTypes := make([]MappingBaseType, 0, len(b.types))
 
 	for _, t := range b.types {
-		if t.Name == FitBaseType { // special types to be included
-			ms := make([]MappingBaseType, len(mappingToBaseTypes)+len(t.Values)+1, len(t.Values)+cap(mappingToBaseTypes)+1)
-			cs := make([]shared.Constant, len(constants)+len(t.Values)+1, len(t.Values)+cap(constants)+1)
-			for i, v := range t.Values {
-				ms[i] = MappingBaseType{
-					ConstantName: strutil.ToTitle(v.Name),
-					BaseType:     transformBaseType(strutil.ToTitle(v.Name)), // mapping to itself
-				}
-				cs[i] = shared.Constant{
-					Name:   strutil.ToTitle(v.Name),
+		if t.Name == FitBaseType { // special types to be included, mapping to itself (profile.Uint8 == basetype.Uint8)
+			for _, v := range t.Values {
+				constantName := strutil.ToTitle(v.Name)
+				baseType := transformBaseType(strutil.ToTitle(v.Name))
+				constants = append(constants, shared.Constant{
+					Name:   constantName,
 					String: v.Name,
-				}
+				})
+				mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{
+					ConstantName: constantName,
+					BaseType:     baseType,
+				})
 			}
 
-			cs[len(t.Values)] = shared.Constant{Name: "Bool", String: "bool"} // +1
-			copy(cs[len(t.Values)+1:], constants)
-			constants = cs
-
-			ms[len(t.Values)] = MappingBaseType{ConstantName: "Bool", BaseType: transformBaseType("Enum")} // +1
-			copy(ms[len(t.Values)+1:], mappingToBaseTypes)
-			mappingToBaseTypes = ms
+			constants = append(constants, shared.Constant{Name: "Bool", String: "bool"})
+			mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{ConstantName: "Bool", BaseType: transformBaseType("Enum")})
 		}
+	}
 
+	for _, t := range b.types {
 		constants = append(constants, shared.Constant{
 			Name:   strutil.ToTitle(t.Name),
 			String: t.Name,
 		})
-
 		mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{
 			ConstantName: strutil.ToTitle(t.Name),
 			BaseType:     transformBaseType(strutil.ToTitle(t.BaseType)),

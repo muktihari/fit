@@ -122,19 +122,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 			sizes: []int{1},
 		},
 		{
-			name: "mesg contain field with invalid size",
-			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
-					proto.Field{
-						FieldBase: &proto.FieldBase{
-							Size: 0,
-						},
-					},
-				),
-			},
-			errs: []error{ErrSizeZero},
-		},
-		{
 			name: "mesg contain field with scaled value",
 			mesgs: []proto.Message{
 				factory.CreateMesgOnly(mesgnum.Record).WithFields(
