@@ -544,7 +544,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
    specified multiple local message typedef. By default, the Encoder uses local message type 0.
    This option allows users to specify values between 0-15 (while entering zero is equivalent to using
    the default option, nothing is changed). Using multiple local message types optimizes file size by
-   avoiding the need to interleave different message typedef.
+   avoiding the need to interleave different message definition.
 
    Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of
    local message types in a file. For instance, embedded devices may only support decoding data
