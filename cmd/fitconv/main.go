@@ -17,6 +17,8 @@ import (
 
 var version = "dev"
 
+const blockSize = 8 << 10
+
 func main() {
 	var flagVersion bool
 	flag.BoolVar(&flagVersion, "v", false, "Show version")
@@ -54,7 +56,7 @@ func main() {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUnknownNumber())
 	}
 	if flagFitToCsvUseDisk {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUseDisk())
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUseDisk(blockSize))
 	}
 
 	paths := flag.Args()
@@ -101,11 +103,10 @@ func fitToCsv(path string, opts ...fitcsv.Option) error {
 	}
 	defer cf.Close()
 
-	const bsize = 1000 << 10 // 1 MB
-	bw := bufio.NewWriterSize(cf, bsize)
+	bw := bufio.NewWriterSize(cf, blockSize)
 	conv := fitcsv.NewConverter(bw, opts...)
 
-	dec := decoder.New(bufio.NewReaderSize(ff, bsize),
+	dec := decoder.New(bufio.NewReaderSize(ff, blockSize),
 		decoder.WithMesgDefListener(conv),
 		decoder.WithMesgListener(conv),
 		decoder.WithBroadcastOnly(),
