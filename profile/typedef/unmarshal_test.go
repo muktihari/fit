@@ -100,6 +100,21 @@ func TestUnmarshal(t *testing.T) {
 			if diff := cmp.Diff(v, tc.expected); diff != "" {
 				t.Fatal(diff)
 			}
+
+			// Extra check for bytes, the value should be copied
+			if in, ok := tc.value.([]byte); ok {
+				out, ok := v.([]byte)
+				if !ok {
+					return
+				}
+
+				in[0] = 255
+				out[0] = 100
+
+				if in[0] == out[0] {
+					t.Fatalf("slice of bytes should not be referenced")
+				}
+			}
 		})
 	}
 }

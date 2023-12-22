@@ -51,6 +51,10 @@ type Decoder struct {
 	accumulator *Accumulator
 	crc16       hash.Hash16
 
+	// The maximum n field definition in a mesg is 255 and we need 3 byte per field. 255 * 3 = 765 (+1 cap).
+	// So we will never exceed 766.
+	backingArray [(255 * 3) + 1]byte
+
 	options *options
 
 	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
@@ -184,7 +188,6 @@ func New(r io.Reader, opts ...Option) *Decoder {
 		accumulator:             NewAccumulator(),
 		crc16:                   crc16.New(crc16.MakeFitTable()),
 		localMessageDefinitions: [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{},
-		messages:                make([]proto.Message, 0),
 		mesgListeners:           options.mesgListeners,
 		mesgDefListeners:        options.mesgDefListeners,
 		developerDataIds:        make([]*mesgdef.DeveloperDataId, 0),
@@ -234,15 +237,26 @@ func (d *Decoder) Next() bool {
 		return true
 	}
 
-	// reset values for the next chained Fit file
-	d.accumulator = NewAccumulator()
+	d.reset() // reset values for the next chained Fit file
+
+	// err is saved in the func, any exported will call this func anyway.
+	return d.decodeHeaderOnce() == nil
+}
+
+func (d *Decoder) reset() {
+	for i := range d.localMessageDefinitions {
+		d.localMessageDefinitions[i] = nil
+	}
+
+	d.accumulator.Reset()
 	d.crc16.Reset()
 	d.fileHeader = proto.FileHeader{}
-	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
-	d.messages = make([]proto.Message, 0)
+	if !d.options.broadcastOnly {
+		d.messages = make([]proto.Message, 0) // Must create new.
+	}
 	d.fileId = nil
-	d.developerDataIds = make([]*mesgdef.DeveloperDataId, 0)
-	d.fieldDescriptions = make([]*mesgdef.FieldDescription, 0)
+	d.developerDataIds = d.developerDataIds[:0]
+	d.fieldDescriptions = d.fieldDescriptions[:0]
 	d.crc = 0
 	d.cur = 0
 	d.timestamp = 0
@@ -250,9 +264,6 @@ func (d *Decoder) Next() bool {
 	d.sequenceCompleted = false
 
 	d.initDecodeHeaderOnce() // reset to enable invocation.
-
-	// err is saved in the func, any exported will call this func anyway.
-	return d.decodeHeaderOnce() == nil
 }
 
 // DecodeWithContext wraps Decode to respect context propagation.
@@ -308,7 +319,7 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 }
 
 func (d *Decoder) decodeHeader() error {
-	b := make([]byte, 1)
+	b := d.backingArray[:1]
 	n, err := io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -320,7 +331,7 @@ func (d *Decoder) decodeHeader() error {
 	}
 
 	size := b[0]
-	b = make([]byte, size-1)
+	b = d.backingArray[1:size]
 	n, err = io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -351,7 +362,7 @@ func (d *Decoder) decodeHeader() error {
 		return nil
 	}
 
-	_, _ = d.crc16.Write(append([]byte{size}, b[:11]...))
+	_, _ = d.crc16.Write(d.backingArray[:12])
 	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
 		return ErrCRCChecksumMismatch
 	}
@@ -384,7 +395,7 @@ func (d *Decoder) decodeMessage() error {
 }
 
 func (d *Decoder) decodeMessageDefinition(header byte) error {
-	b := make([]byte, 5)
+	b := d.backingArray[:5]
 	if err := d.read(b); err != nil {
 		return err
 	}
@@ -397,7 +408,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	}
 
 	n := b[4]
-	b = make([]byte, n*3) // 3 byte per field
+	b = d.backingArray[:n*3] // 3 byte per field
 	if err := d.read(b); err != nil {
 		return err
 	}
@@ -417,7 +428,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			return err
 		}
 
-		b = make([]byte, n*3) // 3 byte per field
+		b := d.backingArray[:n*3] // 3 byte per field
 		if err := d.read(b); err != nil {
 			return err
 		}
@@ -517,8 +528,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 
 		field := d.factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 		if field.Name == factory.NameUnknown {
-			// Assign fieldDef's size and type for unknown field so later we can encode it as per its original value.
-			field.Size = fieldDef.Size
+			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
 			field.Type = profile.ProfileTypeFromString(fieldDef.BaseType.String())
 		}
 
@@ -628,7 +638,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 
 		if fieldDescription == nil {
 			// Can't interpret this DeveloperField, no FieldDescription found. Just read acquired bytes and move forward.
-			if err := d.read(make([]byte, devFieldDef.Size)); err != nil {
+			if err := d.read(d.backingArray[:devFieldDef.Size]); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
 			continue
@@ -674,7 +684,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 }
 
 func (d *Decoder) decodeCRC() error {
-	b := make([]byte, 2)
+	b := d.backingArray[:2]
 	n, err := io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -699,7 +709,7 @@ func (d *Decoder) read(b []byte) error {
 
 // readByte is shorthand for read([1]byte).
 func (d *Decoder) readByte() (byte, error) {
-	b := make([]byte, 1)
+	b := d.backingArray[:1]
 	if err := d.read(b); err != nil {
 		return 0, err
 	}
@@ -708,7 +718,7 @@ func (d *Decoder) readByte() (byte, error) {
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
 func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (any, error) {
-	b := make([]byte, size)
+	b := d.backingArray[:size]
 	if err := d.read(b); err != nil {
 		return nil, err
 	}

@@ -23,7 +23,6 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -608,7 +607,6 @@ func TestEncodeMessage(t *testing.T) {
 				{
 					FieldBase: &proto.FieldBase{
 						Name: factory.NameUnknown,
-						Size: basetype.Sint64.Size(),
 						Type: profile.Sint64, // int64 type is ilegal for protocol v1.0
 					},
 					Value: int64(1234),
@@ -627,7 +625,6 @@ func TestEncodeMessage(t *testing.T) {
 				{
 					FieldBase: &proto.FieldBase{
 						Name: factory.NameUnknown,
-						Size: basetype.Sint64.Size(),
 						Type: profile.Sint64, // int64 type is ilegal for protocol v1.0
 					},
 					Value: int64(1234),

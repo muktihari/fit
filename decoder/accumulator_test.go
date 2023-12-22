@@ -85,3 +85,18 @@ func TestCollect(t *testing.T) {
 		})
 	}
 }
+
+func TestReset(t *testing.T) {
+	accumu := NewAccumulator()
+	accumu.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
+
+	if len(accumu.AccumulatedValues) != 1 {
+		t.Fatalf("expected AccumulatedValues is 1, got: %d", len(accumu.AccumulatedValues))
+	}
+
+	accumu.Reset()
+
+	if len(accumu.AccumulatedValues) != 0 {
+		t.Fatalf("expected AccumulatedValues is 0 after reset, got: %d", len(accumu.AccumulatedValues))
+	}
+}

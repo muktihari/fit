@@ -416,7 +416,6 @@ func TestNext(t *testing.T) {
 
 	// Test Begin
 	dec := New(r)
-	prevAccumulator := dec.accumulator
 
 	if !dec.Next() {
 		t.Fatalf("should have next, return false")
@@ -427,14 +426,17 @@ func TestNext(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Manually add accumulated value
+	dec.accumulator.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
+
 	// Check whether after decode, fields are reset and next sequence is retrieved.
 
 	if !dec.Next() {
 		t.Fatalf("should have next, return false")
 	}
 
-	if prevAccumulator == dec.accumulator {
-		t.Fatalf("expected new accumulator got same")
+	if len(dec.accumulator.AccumulatedValues) != 0 {
+		t.Fatalf("expected accumulator's AccumulatedValues is 0, got: %d", len(dec.accumulator.AccumulatedValues))
 	}
 
 	if dec.crc16.Sum16() != 0 { // not necessary since reset every decode header anyway, but let's just add it
@@ -1400,5 +1402,49 @@ func TestReadValue(t *testing.T) {
 				t.Fatal(diff)
 			}
 		})
+	}
+}
+
+func BenchmarkDecodeMessageData(b *testing.B) {
+	b.StopTimer()
+	mesg := factory.CreateMesg(typedef.MesgNumRecord)
+	mesgDef := proto.CreateMessageDefinition(&mesg)
+	dec := New(nil, WithIgnoreChecksum(), WithNoComponentExpansion())
+	dec.localMessageDefinitions[0] = &mesgDef
+	mesgb, _ := mesg.MarshalBinary()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		dec.r = bytes.NewBuffer(mesgb)
+		err := dec.decodeMessageData(0)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkDecode(b *testing.B) {
+	b.StopTimer()
+	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// But since it's big, it's should be good to benchmark.
+	f, err := os.Open("../testdata/big_activity.fit")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	all, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	b.StartTimer()
+
+	dec := New(nil)
+	for i := 0; i < b.N; i++ {
+		dec.r = bytes.NewBuffer(all)
+		for dec.Next() {
+			_, _ = dec.Decode()
+		}
+		dec.reset()
 	}
 }

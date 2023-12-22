@@ -18,7 +18,6 @@ import (
 )
 
 var (
-	ErrSizeZero                = errors.New("size is zero")
 	ErrValueTypeMismatch       = errors.New("value type mismatch")
 	ErrNoFields                = errors.New("no fields")
 	ErrMissingDeveloperDataId  = errors.New("missing developer data id")
@@ -86,11 +85,6 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			mesg.Fields = append(mesg.Fields[:i], mesg.Fields[i+1:]...)
 			i--
 			continue
-		}
-
-		if field.Size == 0 {
-			return fmt.Errorf("size could not be zero for fieldIndex: %d fieldNum: %d, fieldName: %s: %w",
-				i, field.Num, field.Name, ErrSizeZero)
 		}
 
 		if v.options.omitInvalidValues && !hasValidValue(field.Value) {

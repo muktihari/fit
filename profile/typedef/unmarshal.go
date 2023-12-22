@@ -18,7 +18,9 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 	switch ref {
 	case basetype.Enum, basetype.Byte:
 		if isArray {
-			return b, nil
+			vals := make([]byte, len(b))
+			copy(vals, b)
+			return vals, nil
 		}
 		return b[0], nil
 	case basetype.Sint8:
@@ -32,7 +34,9 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 		return int8(b[0]), nil
 	case basetype.Uint8, basetype.Uint8z:
 		if isArray {
-			return b, nil
+			vals := make([]byte, len(b))
+			copy(vals, b)
+			return vals, nil
 		}
 		return b[0], nil
 	case basetype.Sint16:
