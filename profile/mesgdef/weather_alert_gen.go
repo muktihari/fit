@@ -60,67 +60,49 @@ func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 
 // ToMesg converts WeatherAlert into proto.Message.
 func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherAlert)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ReportId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.IssueTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = datetime.ToUint32(m.ExpireTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToEnum[byte](m.Severity)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = typeconv.ToEnum[byte](m.Type)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of WeatherAlert's valid fields.
-func (m *WeatherAlert) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
-		size++
-	}
-	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets WeatherAlert value.

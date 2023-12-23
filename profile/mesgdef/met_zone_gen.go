@@ -54,51 +54,39 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 
 // ToMesg converts MetZone into proto.Message.
 func (m *MetZone) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMetZone)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HighBpm != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.HighBpm
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Calories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Calories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FatCalories != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.FatCalories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of MetZone's valid fields.
-func (m *MetZone) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.HighBpm != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Calories != basetype.Uint16Invalid {
-		size++
-	}
-	if m.FatCalories != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets MetZone value.

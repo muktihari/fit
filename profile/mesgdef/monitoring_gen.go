@@ -106,251 +106,164 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 
 // ToMesg converts Monitoring into proto.Message.
 func (m *Monitoring) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoring)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Calories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Calories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Distance
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Cycles != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Cycles
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActiveTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.ActiveTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.ActivityType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivitySubtype) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = typeconv.ToEnum[byte](m.ActivitySubtype)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivityLevel) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.ActivityLevel)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Distance16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.Distance16
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Cycles16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.Cycles16
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActiveTime16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.ActiveTime16
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = datetime.ToUint32(m.LocalTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Temperature != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.Temperature
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TemperatureMin != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = m.TemperatureMin
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TemperatureMax != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.TemperatureMax
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActivityTime != nil {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = m.ActivityTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActiveCalories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.ActiveCalories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CurrentActivityTypeIntensity != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = m.CurrentActivityTypeIntensity
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMin8 != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = m.TimestampMin8
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Timestamp16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 26)
 		field.Value = m.Timestamp16
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 27)
 		field.Value = m.HeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Intensity != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = m.Intensity
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DurationMin != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = m.DurationMin
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Duration != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = m.Duration
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Ascent != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 31)
 		field.Value = m.Ascent
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Descent != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 32)
 		field.Value = m.Descent
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ModerateActivityMinutes != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 33)
 		field.Value = m.ModerateActivityMinutes
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 34)
 		field.Value = m.VigorousActivityMinutes
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Monitoring's valid fields.
-func (m *Monitoring) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Calories != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Distance != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Cycles != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ActiveTime != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ActivitySubtype) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ActivityLevel) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Distance16 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Cycles16 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ActiveTime16 != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Temperature != basetype.Sint16Invalid {
-		size++
-	}
-	if m.TemperatureMin != basetype.Sint16Invalid {
-		size++
-	}
-	if m.TemperatureMax != basetype.Sint16Invalid {
-		size++
-	}
-	if m.ActivityTime != nil {
-		size++
-	}
-	if m.ActiveCalories != basetype.Uint16Invalid {
-		size++
-	}
-	if m.CurrentActivityTypeIntensity != basetype.ByteInvalid {
-		size++
-	}
-	if m.TimestampMin8 != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Timestamp16 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.HeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Intensity != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DurationMin != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Duration != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Ascent != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Descent != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ModerateActivityMinutes != basetype.Uint16Invalid {
-		size++
-	}
-	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets Monitoring value.

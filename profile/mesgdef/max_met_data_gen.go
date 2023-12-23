@@ -64,83 +64,59 @@ func NewMaxMetData(mesg *proto.Message) *MaxMetData {
 
 // ToMesg converts MaxMetData into proto.Message.
 func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMaxMetData)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = datetime.ToUint32(m.UpdateTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Vo2Max != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Vo2Max
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.Sport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = typeconv.ToEnum[byte](m.SubSport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.MaxMetCategory) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = typeconv.ToEnum[byte](m.MaxMetCategory)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedData != false {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.CalibratedData
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HrSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToEnum[byte](m.HrSource)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SpeedSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = typeconv.ToEnum[byte](m.SpeedSource)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of MaxMetData's valid fields.
-func (m *MaxMetData) size() byte {
-	var size byte
-	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Vo2Max != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.MaxMetCategory) != basetype.EnumInvalid {
-		size++
-	}
-	if m.CalibratedData != false {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HrSource) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SpeedSource) != basetype.EnumInvalid {
-		size++
-	}
-	return size
 }
 
 // SetUpdateTime sets MaxMetData value.

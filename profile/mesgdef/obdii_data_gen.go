@@ -66,91 +66,64 @@ func NewObdiiData(mesg *proto.Message) *ObdiiData {
 
 // ToMesg converts ObdiiData into proto.Message.
 func (m *ObdiiData) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumObdiiData)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.TimeOffset
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Pid != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Pid
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RawData != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.RawData
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PidDataSize != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.PidDataSize
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.SystemTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = datetime.ToUint32(m.StartTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.StartTimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ObdiiData's valid fields.
-func (m *ObdiiData) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.TimeOffset != nil {
-		size++
-	}
-	if m.Pid != basetype.ByteInvalid {
-		size++
-	}
-	if m.RawData != nil {
-		size++
-	}
-	if m.PidDataSize != nil {
-		size++
-	}
-	if m.SystemTime != nil {
-		size++
-	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.StartTimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets ObdiiData value.

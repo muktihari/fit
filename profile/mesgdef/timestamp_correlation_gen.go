@@ -62,75 +62,54 @@ func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 
 // ToMesg converts TimestampCorrelation into proto.Message.
 func (m *TimestampCorrelation) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTimestampCorrelation)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FractionalTimestamp
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.SystemTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.SystemTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.FractionalSystemTimestamp
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = datetime.ToUint32(m.LocalTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SystemTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.SystemTimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of TimestampCorrelation's valid fields.
-func (m *TimestampCorrelation) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.SystemTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.SystemTimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets TimestampCorrelation value.

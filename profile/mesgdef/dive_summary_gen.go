@@ -94,203 +94,134 @@ func NewDiveSummary(mesg *proto.Message) *DiveSummary {
 
 // ToMesg converts DiveSummary into proto.Message.
 func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveSummary)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToUint16[uint16](m.ReferenceMesg)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16[uint16](m.ReferenceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgDepth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.AvgDepth
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxDepth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.MaxDepth
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SurfaceInterval != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.SurfaceInterval
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.StartCns != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.StartCns
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EndCns != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EndCns
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.StartN2 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.StartN2
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EndN2 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.EndN2
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.O2Toxicity != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.O2Toxicity
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DiveNumber != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.DiveNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.BottomTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.BottomTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgPressureSac != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.AvgPressureSac
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgVolumeSac != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = m.AvgVolumeSac
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgRmv != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = m.AvgRmv
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DescentTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.DescentTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AscentTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = m.AscentTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgAscentRate != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 17)
 		field.Value = m.AvgAscentRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgDescentRate != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.AvgDescentRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxAscentRate != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.MaxAscentRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxDescentRate != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = m.MaxDescentRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HangTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = m.HangTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of DiveSummary's valid fields.
-func (m *DiveSummary) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.AvgDepth != basetype.Uint32Invalid {
-		size++
-	}
-	if m.MaxDepth != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SurfaceInterval != basetype.Uint32Invalid {
-		size++
-	}
-	if m.StartCns != basetype.Uint8Invalid {
-		size++
-	}
-	if m.EndCns != basetype.Uint8Invalid {
-		size++
-	}
-	if m.StartN2 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.EndN2 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.O2Toxicity != basetype.Uint16Invalid {
-		size++
-	}
-	if m.DiveNumber != basetype.Uint32Invalid {
-		size++
-	}
-	if m.BottomTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.AvgPressureSac != basetype.Uint16Invalid {
-		size++
-	}
-	if m.AvgVolumeSac != basetype.Uint16Invalid {
-		size++
-	}
-	if m.AvgRmv != basetype.Uint16Invalid {
-		size++
-	}
-	if m.DescentTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.AscentTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.AvgAscentRate != basetype.Sint32Invalid {
-		size++
-	}
-	if m.AvgDescentRate != basetype.Uint32Invalid {
-		size++
-	}
-	if m.MaxAscentRate != basetype.Uint32Invalid {
-		size++
-	}
-	if m.MaxDescentRate != basetype.Uint32Invalid {
-		size++
-	}
-	if m.HangTime != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets DiveSummary value.

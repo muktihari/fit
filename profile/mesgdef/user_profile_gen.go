@@ -104,251 +104,164 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 
 // ToMesg converts UserProfile into proto.Message.
 func (m *UserProfile) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumUserProfile)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FriendlyName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Gender) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.Gender)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Age != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Age
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Height != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Height
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Weight != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Weight
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Language) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.Language)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ElevSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = typeconv.ToEnum[byte](m.ElevSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.WeightSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.WeightSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.RestingHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DefaultMaxRunningHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.DefaultMaxRunningHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DefaultMaxBikingHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.DefaultMaxBikingHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DefaultMaxHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.DefaultMaxHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HrSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToEnum[byte](m.HrSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SpeedSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = typeconv.ToEnum[byte](m.SpeedSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.DistSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = typeconv.ToEnum[byte](m.DistSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.PowerSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = typeconv.ToEnum[byte](m.PowerSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivityClass) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 17)
 		field.Value = typeconv.ToEnum[byte](m.ActivityClass)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.PositionSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = typeconv.ToEnum[byte](m.PositionSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.TemperatureSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = typeconv.ToEnum[byte](m.TemperatureSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.LocalId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = typeconv.ToUint16[uint16](m.LocalId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GlobalId != nil {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.GlobalId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.WakeTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = typeconv.ToUint32[uint32](m.WakeTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.SleepTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = typeconv.ToUint32[uint32](m.SleepTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HeightSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = typeconv.ToEnum[byte](m.HeightSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.UserRunningStepLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 31)
 		field.Value = m.UserRunningStepLength
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.UserWalkingStepLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 32)
 		field.Value = m.UserWalkingStepLength
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.DepthSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 47)
 		field.Value = typeconv.ToEnum[byte](m.DepthSetting)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DiveCount != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 49)
 		field.Value = m.DiveCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of UserProfile's valid fields.
-func (m *UserProfile) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Gender) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Age != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Height != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Weight != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Language) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ElevSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.WeightSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if m.RestingHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DefaultMaxRunningHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DefaultMaxBikingHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DefaultMaxHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HrSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SpeedSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.DistSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.PowerSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ActivityClass) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.PositionSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.TemperatureSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.LocalId) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.GlobalId != nil {
-		size++
-	}
-	if typeconv.ToUint32[uint32](m.WakeTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToUint32[uint32](m.SleepTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HeightSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if m.UserRunningStepLength != basetype.Uint16Invalid {
-		size++
-	}
-	if m.UserWalkingStepLength != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.DepthSetting) != basetype.EnumInvalid {
-		size++
-	}
-	if m.DiveCount != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets UserProfile value.

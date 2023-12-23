@@ -72,123 +72,84 @@ func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
 
 // ToMesg converts DiveApneaAlarm into proto.Message.
 func (m *DiveApneaAlarm) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveApneaAlarm)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Depth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Depth
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Time != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Time
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Enabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.AlarmType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToEnum[byte](m.AlarmType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Sound) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = typeconv.ToEnum[byte](m.Sound)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.DiveTypes) != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToSliceEnum[byte](m.DiveTypes)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Id != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.Id
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PopupEnabled != false {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.PopupEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TriggerOnDescent != false {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.TriggerOnDescent
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TriggerOnAscent != false {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.TriggerOnAscent
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Repeating != false {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.Repeating
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Speed != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.Speed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of DiveApneaAlarm's valid fields.
-func (m *DiveApneaAlarm) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Depth != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Time != basetype.Sint32Invalid {
-		size++
-	}
-	if m.Enabled != false {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.AlarmType) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Sound) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToSliceEnum[byte](m.DiveTypes) != nil {
-		size++
-	}
-	if m.Id != basetype.Uint32Invalid {
-		size++
-	}
-	if m.PopupEnabled != false {
-		size++
-	}
-	if m.TriggerOnDescent != false {
-		size++
-	}
-	if m.TriggerOnAscent != false {
-		size++
-	}
-	if m.Repeating != false {
-		size++
-	}
-	if m.Speed != basetype.Sint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets DiveApneaAlarm value.

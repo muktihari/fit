@@ -92,195 +92,129 @@ func NewLength(mesg *proto.Message) *Length {
 
 // ToMesg converts Length into proto.Message.
 func (m *Length) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumLength)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Event)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.EventType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = datetime.ToUint32(m.StartTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.TotalElapsedTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.TotalTimerTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TotalStrokes != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.TotalStrokes
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.AvgSpeed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SwimStroke) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.SwimStroke)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgSwimmingCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.AvgSwimmingCadence
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.EventGroup
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TotalCalories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.TotalCalories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.LengthType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToEnum[byte](m.LengthType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PlayerScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = m.PlayerScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OpponentScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.OpponentScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.StrokeCount != nil {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = m.StrokeCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ZoneCount != nil {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = m.ZoneCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.EnhancedAvgRespirationRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.EnhancedMaxRespirationRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = m.AvgRespirationRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxRespirationRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = m.MaxRespirationRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Length's valid fields.
-func (m *Length) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
-		size++
-	}
-	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TotalElapsedTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TotalTimerTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TotalStrokes != basetype.Uint16Invalid {
-		size++
-	}
-	if m.AvgSpeed != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SwimStroke) != basetype.EnumInvalid {
-		size++
-	}
-	if m.AvgSwimmingCadence != basetype.Uint8Invalid {
-		size++
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		size++
-	}
-	if m.TotalCalories != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.LengthType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.PlayerScore != basetype.Uint16Invalid {
-		size++
-	}
-	if m.OpponentScore != basetype.Uint16Invalid {
-		size++
-	}
-	if m.StrokeCount != nil {
-		size++
-	}
-	if m.ZoneCount != nil {
-		size++
-	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
-		size++
-	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
-		size++
-	}
-	if m.AvgRespirationRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.MaxRespirationRate != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets Length value.

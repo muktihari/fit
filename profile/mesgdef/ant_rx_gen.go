@@ -60,67 +60,49 @@ func NewAntRx(mesg *proto.Message) *AntRx {
 
 // ToMesg converts AntRx into proto.Message.
 func (m *AntRx) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAntRx)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FractionalTimestamp
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MesgId != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.MesgId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MesgData != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.MesgData
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ChannelNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Data != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Data
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of AntRx's valid fields.
-func (m *AntRx) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid {
-		size++
-	}
-	if m.MesgId != basetype.ByteInvalid {
-		size++
-	}
-	if m.MesgData != nil {
-		size++
-	}
-	if m.ChannelNumber != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Data != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets AntRx value.

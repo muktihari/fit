@@ -70,107 +70,74 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 
 // ToMesg converts BloodPressure into proto.Message.
 func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBloodPressure)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SystolicPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.SystolicPressure
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DiastolicPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.DiastolicPressure
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MeanArterialPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.MeanArterialPressure
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Map3SampleMean != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Map3SampleMean
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MapMorningValues != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.MapMorningValues
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MapEveningValues != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.MapEveningValues
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.HeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HeartRateType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.HeartRateType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = typeconv.ToEnum[byte](m.Status)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = typeconv.ToUint16[uint16](m.UserProfileIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of BloodPressure's valid fields.
-func (m *BloodPressure) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SystolicPressure != basetype.Uint16Invalid {
-		size++
-	}
-	if m.DiastolicPressure != basetype.Uint16Invalid {
-		size++
-	}
-	if m.MeanArterialPressure != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Map3SampleMean != basetype.Uint16Invalid {
-		size++
-	}
-	if m.MapMorningValues != basetype.Uint16Invalid {
-		size++
-	}
-	if m.MapEveningValues != basetype.Uint16Invalid {
-		size++
-	}
-	if m.HeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HeartRateType) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets BloodPressure value.

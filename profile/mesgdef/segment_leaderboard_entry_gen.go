@@ -60,75 +60,54 @@ func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
 
 // ToMesg converts SegmentLeaderboardEntry into proto.Message.
 func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentLeaderboardEntry)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Name
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.Type)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GroupPrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.GroupPrimaryKey
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActivityId != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ActivityId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SegmentTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.SegmentTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.ActivityIdString
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SegmentLeaderboardEntry's valid fields.
-func (m *SegmentLeaderboardEntry) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
-		size++
-	}
-	if m.GroupPrimaryKey != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ActivityId != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SegmentTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets SegmentLeaderboardEntry value.

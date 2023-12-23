@@ -74,131 +74,89 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 
 // ToMesg converts SleepAssessment into proto.Message.
 func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepAssessment)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.CombinedAwakeScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.CombinedAwakeScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AwakeTimeScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.AwakeTimeScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AwakeningsCountScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.AwakeningsCountScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DeepSleepScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.DeepSleepScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SleepDurationScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.SleepDurationScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LightSleepScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.LightSleepScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OverallSleepScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.OverallSleepScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SleepQualityScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.SleepQualityScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SleepRecoveryScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.SleepRecoveryScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RemSleepScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.RemSleepScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SleepRestlessnessScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.SleepRestlessnessScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AwakeningsCount != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.AwakeningsCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.InterruptionsScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = m.InterruptionsScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.AverageStressDuringSleep
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SleepAssessment's valid fields.
-func (m *SleepAssessment) size() byte {
-	var size byte
-	if m.CombinedAwakeScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.AwakeTimeScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.AwakeningsCountScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DeepSleepScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.SleepDurationScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.LightSleepScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.OverallSleepScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.SleepQualityScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.SleepRecoveryScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.RemSleepScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.SleepRestlessnessScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.AwakeningsCount != basetype.Uint8Invalid {
-		size++
-	}
-	if m.InterruptionsScore != basetype.Uint8Invalid {
-		size++
-	}
-	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetCombinedAwakeScore sets SleepAssessment value.

@@ -52,35 +52,29 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 
 // ToMesg converts StressLevel into proto.Message.
 func (m *StressLevel) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumStressLevel)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.StressLevelValue != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.StressLevelValue
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.StressLevelTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of StressLevel's valid fields.
-func (m *StressLevel) size() byte {
-	var size byte
-	if m.StressLevelValue != basetype.Sint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetStressLevelValue sets StressLevel value.

@@ -60,75 +60,54 @@ func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 
 // ToMesg converts WorkoutSession into proto.Message.
 func (m *WorkoutSession) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkoutSession)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Sport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.SubSport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.NumValidSteps
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FirstStepIndex != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.FirstStepIndex
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PoolLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.PoolLength
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.PoolLengthUnit) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.PoolLengthUnit)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of WorkoutSession's valid fields.
-func (m *WorkoutSession) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
-		size++
-	}
-	if m.NumValidSteps != basetype.Uint16Invalid {
-		size++
-	}
-	if m.FirstStepIndex != basetype.Uint16Invalid {
-		size++
-	}
-	if m.PoolLength != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.PoolLengthUnit) != basetype.EnumInvalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets WorkoutSession value.

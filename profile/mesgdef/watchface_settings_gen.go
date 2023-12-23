@@ -52,43 +52,34 @@ func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 
 // ToMesg converts WatchfaceSettings into proto.Message.
 func (m *WatchfaceSettings) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWatchfaceSettings)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Mode)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Layout != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Layout
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of WatchfaceSettings's valid fields.
-func (m *WatchfaceSettings) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Layout != basetype.ByteInvalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets WatchfaceSettings value.

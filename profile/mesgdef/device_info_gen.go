@@ -86,171 +86,114 @@ func NewDeviceInfo(mesg *proto.Message) *DeviceInfo {
 
 // ToMesg converts DeviceInfo into proto.Message.
 func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceInfo)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DeviceType != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.DeviceType
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Product
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SoftwareVersion != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.SoftwareVersion
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HardwareVersion != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.HardwareVersion
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CumOperatingTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.CumOperatingTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.BatteryVoltage != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.BatteryVoltage
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = typeconv.ToUint8[uint8](m.BatteryStatus)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SensorPosition) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = typeconv.ToEnum[byte](m.SensorPosition)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.Descriptor
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.AntTransmissionType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = typeconv.ToUint8z[uint8](m.AntTransmissionType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16z[uint16](m.AntDeviceNumber) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = typeconv.ToUint16z[uint16](m.AntDeviceNumber)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.AntNetwork) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = typeconv.ToEnum[byte](m.AntNetwork)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SourceType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = typeconv.ToEnum[byte](m.SourceType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
 		field := fac.CreateField(mesg.Num, 27)
 		field.Value = m.ProductName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.BatteryLevel != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 32)
 		field.Value = m.BatteryLevel
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of DeviceInfo's valid fields.
-func (m *DeviceInfo) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
-		size++
-	}
-	if m.DeviceType != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
-		size++
-	}
-	if m.Product != basetype.Uint16Invalid {
-		size++
-	}
-	if m.SoftwareVersion != basetype.Uint16Invalid {
-		size++
-	}
-	if m.HardwareVersion != basetype.Uint8Invalid {
-		size++
-	}
-	if m.CumOperatingTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.BatteryVoltage != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SensorPosition) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.AntTransmissionType) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint16z[uint16](m.AntDeviceNumber) != basetype.Uint16zInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.AntNetwork) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SourceType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
-		size++
-	}
-	if m.BatteryLevel != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets DeviceInfo value.

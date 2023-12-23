@@ -72,115 +72,79 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 
 // ToMesg converts AviationAttitude into proto.Message.
 func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAviationAttitude)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.SystemTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Pitch != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Pitch
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Roll != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Roll
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AccelLateral != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.AccelLateral
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AccelNormal != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.AccelNormal
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TurnRate != nil {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.TurnRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.Stage) != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToSliceEnum[byte](m.Stage)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AttitudeStageComplete != nil {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.AttitudeStageComplete
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Track != nil {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.Track
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceUint16[uint16](m.Validity) != nil {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToSliceUint16[uint16](m.Validity)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of AviationAttitude's valid fields.
-func (m *AviationAttitude) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.SystemTime != nil {
-		size++
-	}
-	if m.Pitch != nil {
-		size++
-	}
-	if m.Roll != nil {
-		size++
-	}
-	if m.AccelLateral != nil {
-		size++
-	}
-	if m.AccelNormal != nil {
-		size++
-	}
-	if m.TurnRate != nil {
-		size++
-	}
-	if typeconv.ToSliceEnum[byte](m.Stage) != nil {
-		size++
-	}
-	if m.AttitudeStageComplete != nil {
-		size++
-	}
-	if m.Track != nil {
-		size++
-	}
-	if typeconv.ToSliceUint16[uint16](m.Validity) != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets AviationAttitude value.

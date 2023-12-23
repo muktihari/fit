@@ -82,155 +82,104 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 
 // ToMesg converts TimeInZone into proto.Message.
 func (m *TimeInZone) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTimeInZone)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToUint16[uint16](m.ReferenceMesg)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16[uint16](m.ReferenceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimeInHrZone != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.TimeInHrZone
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimeInSpeedZone != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.TimeInSpeedZone
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimeInCadenceZone != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.TimeInCadenceZone
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimeInPowerZone != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.TimeInPowerZone
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HrZoneHighBoundary != nil {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.HrZoneHighBoundary
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SpeedZoneHighBoundary != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.SpeedZoneHighBoundary
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CadenceZoneHighBondary != nil {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.CadenceZoneHighBondary
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PowerZoneHighBoundary != nil {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.PowerZoneHighBoundary
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToEnum[byte](m.HrCalcType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.MaxHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.RestingHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ThresholdHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = m.ThresholdHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = typeconv.ToEnum[byte](m.PwrCalcType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.FunctionalThresholdPower
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of TimeInZone's valid fields.
-func (m *TimeInZone) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ReferenceMesg) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ReferenceIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.TimeInHrZone != nil {
-		size++
-	}
-	if m.TimeInSpeedZone != nil {
-		size++
-	}
-	if m.TimeInCadenceZone != nil {
-		size++
-	}
-	if m.TimeInPowerZone != nil {
-		size++
-	}
-	if m.HrZoneHighBoundary != nil {
-		size++
-	}
-	if m.SpeedZoneHighBoundary != nil {
-		size++
-	}
-	if m.CadenceZoneHighBondary != nil {
-		size++
-	}
-	if m.PowerZoneHighBoundary != nil {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.MaxHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.RestingHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.ThresholdHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets TimeInZone value.

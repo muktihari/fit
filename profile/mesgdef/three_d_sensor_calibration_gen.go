@@ -62,75 +62,54 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 
 // ToMesg converts ThreeDSensorCalibration into proto.Message.
 func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumThreeDSensorCalibration)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.SensorType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.CalibrationFactor
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibrationDivisor != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.CalibrationDivisor
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LevelShift != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.LevelShift
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OffsetCal != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.OffsetCal
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OrientationMatrix != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.OrientationMatrix
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ThreeDSensorCalibration's valid fields.
-func (m *ThreeDSensorCalibration) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.CalibrationFactor != basetype.Uint32Invalid {
-		size++
-	}
-	if m.CalibrationDivisor != basetype.Uint32Invalid {
-		size++
-	}
-	if m.LevelShift != basetype.Uint32Invalid {
-		size++
-	}
-	if m.OffsetCal != nil {
-		size++
-	}
-	if m.OrientationMatrix != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets ThreeDSensorCalibration value.

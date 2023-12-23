@@ -66,91 +66,64 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 
 // ToMesg converts GyroscopeData into proto.Message.
 func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGyroscopeData)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.SampleTimeOffset
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GyroX != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.GyroX
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GyroY != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.GyroY
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GyroZ != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.GyroZ
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedGyroX != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.CalibratedGyroX
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedGyroY != nil {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.CalibratedGyroY
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedGyroZ != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.CalibratedGyroZ
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of GyroscopeData's valid fields.
-func (m *GyroscopeData) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.SampleTimeOffset != nil {
-		size++
-	}
-	if m.GyroX != nil {
-		size++
-	}
-	if m.GyroY != nil {
-		size++
-	}
-	if m.GyroZ != nil {
-		size++
-	}
-	if m.CalibratedGyroX != nil {
-		size++
-	}
-	if m.CalibratedGyroY != nil {
-		size++
-	}
-	if m.CalibratedGyroZ != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets GyroscopeData value.

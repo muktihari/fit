@@ -72,123 +72,84 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 
 // ToMesg converts Connectivity into proto.Message.
 func (m *Connectivity) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumConnectivity)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.BluetoothEnabled != false {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.BluetoothEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.BluetoothLeEnabled != false {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.BluetoothLeEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AntEnabled != false {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.AntEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Name
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LiveTrackingEnabled != false {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.LiveTrackingEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WeatherConditionsEnabled != false {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.WeatherConditionsEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WeatherAlertsEnabled != false {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.WeatherAlertsEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.AutoActivityUploadEnabled != false {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.AutoActivityUploadEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CourseDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.CourseDownloadEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WorkoutDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.WorkoutDownloadEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GpsEphemerisDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.GpsEphemerisDownloadEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.IncidentDetectionEnabled != false {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.IncidentDetectionEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.GrouptrackEnabled != false {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.GrouptrackEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Connectivity's valid fields.
-func (m *Connectivity) size() byte {
-	var size byte
-	if m.BluetoothEnabled != false {
-		size++
-	}
-	if m.BluetoothLeEnabled != false {
-		size++
-	}
-	if m.AntEnabled != false {
-		size++
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		size++
-	}
-	if m.LiveTrackingEnabled != false {
-		size++
-	}
-	if m.WeatherConditionsEnabled != false {
-		size++
-	}
-	if m.WeatherAlertsEnabled != false {
-		size++
-	}
-	if m.AutoActivityUploadEnabled != false {
-		size++
-	}
-	if m.CourseDownloadEnabled != false {
-		size++
-	}
-	if m.WorkoutDownloadEnabled != false {
-		size++
-	}
-	if m.GpsEphemerisDownloadEnabled != false {
-		size++
-	}
-	if m.IncidentDetectionEnabled != false {
-		size++
-	}
-	if m.GrouptrackEnabled != false {
-		size++
-	}
-	return size
 }
 
 // SetBluetoothEnabled sets Connectivity value.

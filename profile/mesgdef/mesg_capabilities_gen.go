@@ -56,59 +56,44 @@ func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 
 // ToMesg converts MesgCapabilities into proto.Message.
 func (m *MesgCapabilities) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMesgCapabilities)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.File) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.File)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16[uint16](m.MesgNum)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.CountType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.CountType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Count != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Count
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of MesgCapabilities's valid fields.
-func (m *MesgCapabilities) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.File) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.CountType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Count != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets MesgCapabilities value.
