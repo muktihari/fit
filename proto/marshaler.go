@@ -9,6 +9,7 @@ import (
 	"encoding"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"sync"
 
 	"github.com/muktihari/fit/kit/byteorder"
@@ -17,49 +18,79 @@ import (
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
+// m.Header + ((max cap of m.Fields) * (n value)) + ((max cap of m.DeveloperFields) * (n value)) + cap
+const MaxBytesPerMessage = 1 + (255 * 255) + (255 * 255) + 1
+
+var arrayPool = sync.Pool{
+	New: func() any {
+		b := [MaxBytesPerMessage]byte{}
+		return &b
+	},
+}
+
+var bufPool = sync.Pool{
+	New: func() any {
+		return bytes.NewBuffer(make([]byte, MaxBytesPerMessage))
+	},
+}
+
 var (
+	// Zero alloc marshaler for efficient marshaling.
+	// We don't need to implement io.WriterTo for FileHeader, as writing FileHeader is much less frequently
+	// compared to writing MessageDefinition or Message.
+	_ io.WriterTo = &Message{}
+	_ io.WriterTo = &MessageDefinition{}
+
 	_ encoding.BinaryMarshaler = &FileHeader{}
 	_ encoding.BinaryMarshaler = &MessageDefinition{}
 	_ encoding.BinaryMarshaler = &Message{}
 )
 
 func (h *FileHeader) MarshalBinary() ([]byte, error) {
-	b := make([]byte, 0, h.Size)
+	b := make([]byte, h.Size)
 
-	var profileVersion = make([]byte, 2)
-	binary.LittleEndian.PutUint16(profileVersion, h.ProfileVersion)
-	var dataSize = make([]byte, 4)
-	binary.LittleEndian.PutUint32(dataSize, h.DataSize)
+	b[0] = h.Size
+	b[1] = h.ProtocolVersion
 
-	// Ensure the size of the DataType is fixed even if h.DataType is empty or even exceeding 4 bytes.
-	var dataType = make([]byte, 4)
-	copy(dataType[:4], []byte(h.DataType))
+	binary.LittleEndian.PutUint16(b[2:4], h.ProfileVersion)
+	binary.LittleEndian.PutUint32(b[4:8], h.DataSize)
 
-	b = append(b, h.Size)
-	b = append(b, h.ProtocolVersion)
-	b = append(b, profileVersion...)
-	b = append(b, dataSize...)
-	b = append(b, dataType...)
+	copy(b[8:12], []byte(h.DataType))
 
-	var crc = make([]byte, 2)
-	binary.LittleEndian.PutUint16(crc, h.CRC)
-	b = append(b, crc...)
+	if h.Size < 14 {
+		return b, nil
+	}
+
+	binary.LittleEndian.PutUint16(b[12:14], h.CRC)
 
 	return b, nil
 }
 
 func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
-	// 6 is the size of non-slice m's fields, and 3 is the amount of byte per field.
-	size := 6 + (len(m.FieldDefinitions) * 3) + (len(m.DeveloperFieldDefinitions) * 3)
-	b := make([]byte, 0, size)
+	buf := bufPool.Get().(*bytes.Buffer)
+	defer bufPool.Put(buf)
+	buf.Reset()
+
+	_, _ = m.WriteTo(buf)
+
+	b := make([]byte, buf.Len())
+	copy(b, buf.Bytes())
+
+	return b, nil
+}
+
+// WriteTo zero alloc marshal then copy it to w.
+func (m *MessageDefinition) WriteTo(w io.Writer) (n int64, err error) {
+	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
+	defer arrayPool.Put(arr)
+	b := (*arr)[:0]
 
 	b = append(b, m.Header)
 	b = append(b, m.Reserved)
 	b = append(b, m.Architecture)
 
-	globalMesgNum := make([]byte, 2)
-	byteorder.Select(m.Architecture).PutUint16(globalMesgNum, uint16(m.MesgNum))
-	b = append(b, globalMesgNum...)
+	b = append(b, 0, 0)
+	byteorder.Select(m.Architecture).PutUint16(b[len(b)-2:], uint16(m.MesgNum))
 
 	b = append(b, byte(len(m.FieldDefinitions)))
 
@@ -71,55 +102,61 @@ func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
 		)
 	}
 
-	if (m.Header & DevDataMask) != DevDataMask {
-		return b, nil
+	if (m.Header & DevDataMask) == DevDataMask {
+		b = append(b, byte(len(m.DeveloperFieldDefinitions)))
+		for i := range m.DeveloperFieldDefinitions {
+			b = append(b,
+				m.DeveloperFieldDefinitions[i].Num,
+				m.DeveloperFieldDefinitions[i].Size,
+				m.DeveloperFieldDefinitions[i].DeveloperDataIndex,
+			)
+		}
 	}
 
-	b = append(b, byte(len(m.DeveloperFieldDefinitions)))
-	for i := range m.DeveloperFieldDefinitions {
-		b = append(b,
-			m.DeveloperFieldDefinitions[i].Num,
-			m.DeveloperFieldDefinitions[i].Size,
-			m.DeveloperFieldDefinitions[i].DeveloperDataIndex,
-		)
-	}
-
-	return b, nil
-}
-
-var bufPool = sync.Pool{
-	New: func() any {
-		return new(bytes.Buffer)
-	},
+	nn, err := w.Write(b)
+	return int64(nn), err
 }
 
 func (m *Message) MarshalBinary() ([]byte, error) {
 	buf := bufPool.Get().(*bytes.Buffer)
+	defer bufPool.Put(buf)
 	buf.Reset()
 
-	buf.WriteByte(m.Header)
+	_, err := m.WriteTo(buf)
+	if err != nil {
+		return nil, err
+	}
+
+	b := make([]byte, buf.Len())
+	copy(b, buf.Bytes())
+
+	return b, nil
+}
+
+// WriteTo zero alloc marshal then copy it to w.
+func (m *Message) WriteTo(w io.Writer) (n int64, err error) {
+	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
+	defer arrayPool.Put(arr)
+	b := (*arr)[:0]
+
+	b = append(b, m.Header)
 
 	for i := range m.Fields {
 		field := &m.Fields[i]
-		b, err := typedef.Marshal(field.Value, byteorder.Select(m.Architecture))
+		err = typedef.MarshalTo(&b, field.Value, byteorder.Select(m.Architecture))
 		if err != nil {
-			bufPool.Put(buf)
-			return nil, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value, err)
+			return 0, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value, err)
 		}
-		buf.Write(b)
 	}
 
 	for i := range m.DeveloperFields {
 		developerField := &m.DeveloperFields[i]
-		b, err := typedef.Marshal(developerField.Value, byteorder.Select(m.Architecture))
+		err = typedef.MarshalTo(&b, developerField.Value, byteorder.Select(m.Architecture))
 		if err != nil {
-			bufPool.Put(buf)
-			return nil, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value, err)
+			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value, err)
 		}
-		buf.Write(b)
 	}
 
-	b := buf.Bytes()
-	bufPool.Put(buf)
-	return b, nil
+	nn, err := w.Write(b)
+	return int64(nn), err
 }

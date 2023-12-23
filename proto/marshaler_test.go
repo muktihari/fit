@@ -6,6 +6,7 @@ package proto_test
 
 import (
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -41,6 +42,23 @@ func TestHeaderMarshaler(t *testing.T) {
 				214, 204, 9, 0,
 				46, 70, 73, 84,
 				56, 50,
+			},
+		},
+		{
+			name: "correct header size 12",
+			fileHeader: &proto.FileHeader{
+				Size:            12,
+				ProtocolVersion: 32,
+				ProfileVersion:  2132,
+				DataSize:        642262,
+				DataType:        ".FIT",
+			},
+			b: []byte{
+				12,
+				32,
+				84, 8,
+				214, 204, 9, 0,
+				46, 70, 73, 84,
 			},
 		},
 	}
@@ -236,7 +254,24 @@ func TestMessageMarshaler(t *testing.T) {
 	}
 }
 
-func BenchmarkMarshalMessageDefinition(b *testing.B) {
+func BenchmarkHeaderMarshalBinary(b *testing.B) {
+	b.StopTimer()
+	header := proto.FileHeader{
+		Size:            14,
+		ProtocolVersion: 32,
+		ProfileVersion:  2132,
+		DataSize:        642262,
+		DataType:        ".FIT",
+		CRC:             12856,
+	}
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = header.MarshalBinary()
+	}
+}
+
+func BenchmarkMessageDefinitionMarshalBinary(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record)
 	mesgDef := proto.CreateMessageDefinition(&mesg)
@@ -247,7 +282,18 @@ func BenchmarkMarshalMessageDefinition(b *testing.B) {
 	}
 }
 
-func BenchmarkMarshalMessage(b *testing.B) {
+func BenchmarkMessageDefinitionWriteTo(b *testing.B) {
+	b.StopTimer()
+	mesg := factory.CreateMesg(mesgnum.Record)
+	mesgDef := proto.CreateMessageDefinition(&mesg)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = mesgDef.WriteTo(io.Discard)
+	}
+}
+
+func BenchmarkMessageMarshalBinary(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
 		fieldnum.RecordPositionLat:  int32(1000),
@@ -258,5 +304,19 @@ func BenchmarkMarshalMessage(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		_, _ = mesg.MarshalBinary()
+	}
+}
+
+func BenchmarkMessageWriterTo(b *testing.B) {
+	b.StopTimer()
+	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+		fieldnum.RecordPositionLat:  int32(1000),
+		fieldnum.RecordPositionLong: int32(1000),
+		fieldnum.RecordSpeed:        uint16(1000),
+	})
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = mesg.WriteTo(io.Discard)
 	}
 }

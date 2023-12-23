@@ -5,6 +5,7 @@
 package encoder
 
 import (
+	"bytes"
 	"container/list"
 	"context"
 	"encoding/binary"
@@ -19,6 +20,7 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -82,6 +84,10 @@ type Encoder struct {
 	// It is initialized only if the 'compressedTimestamp' option is applied and reset when decoding is completed.
 	// This reference only serves as a flag and might be helpful for debugging purposes.
 	timestampReference uint32
+
+	// Temporary buffer to hold message binary form to reduce alloc.
+	// Reminder: Any bytes manipulation on buf.Bytes() should perform a copy, e.g. copy bytes before put it on LRU.
+	buf *bytes.Buffer
 }
 
 type options struct {
@@ -195,6 +201,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 			DataType:        proto.DataTypeFIT,
 			CRC:             0, // calculated during encoding
 		},
+		buf: bytes.NewBuffer(make([]byte, proto.MaxBytesPerMessage)),
 	}
 }
 
@@ -401,6 +408,7 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	var b []byte
 	var localMesgNum byte
 	var writeable bool
+	e.buf.Reset()
 
 	// Writing strategy based on the selected header option:
 	switch e.options.headerOption {
@@ -410,7 +418,8 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 			return err
 		}
 
-		b, _ = mesgDef.MarshalBinary()
+		_, _ = mesgDef.WriteTo(e.buf)
+		b = e.buf.Bytes() // Should be copied before put on LRU.
 		if e.options.multipleLocalMessageType == 0 {
 			writeable = e.isMesgDefinitionWriteable(b) // Local Message Type Zero
 		} else {
@@ -427,7 +436,8 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 		if err := e.protocolValidator.ValidateMessageDefinition(&mesgDef); err != nil {
 			return err
 		}
-		b, _ = mesgDef.MarshalBinary()
+		_, _ = mesgDef.WriteTo(e.buf)
+		b = e.buf.Bytes() // Should be copied before putting it to LRU.
 
 		writeable = e.isMesgDefinitionWriteable(b)
 	}
@@ -438,10 +448,12 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 		}
 	}
 
-	b, err := mesg.MarshalBinary()
+	e.buf.Reset()
+	_, err := mesg.WriteTo(e.buf)
 	if err != nil {
 		return fmt.Errorf("marshal failed: %w", err)
 	}
+	b = e.buf.Bytes()
 	if err := e.writeMessage(w, b); err != nil {
 		return fmt.Errorf("write message failed: %w", err)
 	}
@@ -450,7 +462,7 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 
 func (e *Encoder) isMesgDefinitionWriteable(b []byte) bool {
 	if e.localMesgDefinitions.Len() == 0 {
-		e.localMesgDefinitions.PushFront(b)
+		e.localMesgDefinitions.PushFront(slices.Clone(b))
 		return true
 	}
 
@@ -459,7 +471,7 @@ func (e *Encoder) isMesgDefinitionWriteable(b []byte) bool {
 	}
 
 	e.localMesgDefinitions.Remove(e.localMesgDefinitions.Front())
-	e.localMesgDefinitions.PushFront(b)
+	e.localMesgDefinitions.PushFront(slices.Clone(b))
 
 	return true
 }
@@ -475,6 +487,8 @@ func (e *Encoder) redefineLocalMesgNum(b []byte) (newLocalMesgNum byte, writeabl
 		}
 		index++
 	}
+
+	b = slices.Clone(b)
 
 	index = byte(e.localMesgDefinitions.Len())
 	if byte(e.localMesgDefinitions.Len()) <= max {
