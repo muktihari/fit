@@ -64,83 +64,59 @@ func NewActivity(mesg *proto.Message) *Activity {
 
 // ToMesg converts Activity into proto.Message.
 func (m *Activity) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumActivity)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TotalTimerTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.NumSessions != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.NumSessions
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.Type)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToEnum[byte](m.Event)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = typeconv.ToEnum[byte](m.EventType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = datetime.ToUint32(m.LocalTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EventGroup
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Activity's valid fields.
-func (m *Activity) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TotalTimerTime != basetype.Uint32Invalid {
-		size++
-	}
-	if m.NumSessions != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
-		size++
-	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets Activity value.

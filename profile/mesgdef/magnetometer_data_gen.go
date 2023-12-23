@@ -66,91 +66,64 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 
 // ToMesg converts MagnetometerData into proto.Message.
 func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMagnetometerData)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.SampleTimeOffset
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MagX != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.MagX
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MagY != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.MagY
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MagZ != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.MagZ
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedMagX != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.CalibratedMagX
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedMagY != nil {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.CalibratedMagY
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CalibratedMagZ != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.CalibratedMagZ
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of MagnetometerData's valid fields.
-func (m *MagnetometerData) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.SampleTimeOffset != nil {
-		size++
-	}
-	if m.MagX != nil {
-		size++
-	}
-	if m.MagY != nil {
-		size++
-	}
-	if m.MagZ != nil {
-		size++
-	}
-	if m.CalibratedMagX != nil {
-		size++
-	}
-	if m.CalibratedMagY != nil {
-		size++
-	}
-	if m.CalibratedMagZ != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets MagnetometerData value.

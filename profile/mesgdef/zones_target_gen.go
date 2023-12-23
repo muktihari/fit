@@ -56,59 +56,44 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 
 // ToMesg converts ZonesTarget into proto.Message.
 func (m *ZonesTarget) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumZonesTarget)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.MaxHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.MaxHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ThresholdHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.ThresholdHeartRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.FunctionalThresholdPower
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.HrCalcType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.PwrCalcType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ZonesTarget's valid fields.
-func (m *ZonesTarget) size() byte {
-	var size byte
-	if m.MaxHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.ThresholdHeartRate != basetype.Uint8Invalid {
-		size++
-	}
-	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
-		size++
-	}
-	return size
 }
 
 // SetMaxHeartRate sets ZonesTarget value.

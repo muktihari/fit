@@ -54,73 +54,52 @@ func NewFileId(mesg *proto.Message) *FileId {
 
 // ToMesg converts FileId into proto.Message.
 func (m *FileId) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFileId)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Type)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Product
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = datetime.ToUint32(m.TimeCreated)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Number != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Number
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.ProductName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	return mesg
-}
-
-// size returns size of FileId's valid fields.
-func (m *FileId) size() byte {
-	var size byte
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Product != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
-		size++
-	}
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Number != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
-		size++
-	}
-	return size
 }
 
 // SetType sets FileId value.

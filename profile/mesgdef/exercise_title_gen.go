@@ -54,51 +54,39 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 
 // ToMesg converts ExerciseTitle into proto.Message.
 func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExerciseTitle)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToUint16[uint16](m.ExerciseCategory)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ExerciseName != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.ExerciseName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WktStepName != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.WktStepName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ExerciseTitle's valid fields.
-func (m *ExerciseTitle) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ExerciseName != basetype.Uint16Invalid {
-		size++
-	}
-	if m.WktStepName != nil {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets ExerciseTitle value.

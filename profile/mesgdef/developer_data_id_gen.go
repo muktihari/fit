@@ -48,57 +48,42 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 
 // ToMesg converts DeveloperDataId into proto.Message.
 func (m *DeveloperDataId) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeveloperDataId)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.DeveloperId != nil {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.DeveloperId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ApplicationId != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.ApplicationId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ManufacturerId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToUint16[uint16](m.ManufacturerId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.DeveloperDataIndex
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ApplicationVersion != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.ApplicationVersion
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	return mesg
-}
-
-// size returns size of DeveloperDataId's valid fields.
-func (m *DeveloperDataId) size() byte {
-	var size byte
-	if m.DeveloperId != nil {
-		size++
-	}
-	if m.ApplicationId != nil {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ManufacturerId) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.DeveloperDataIndex != basetype.Uint8Invalid {
-		size++
-	}
-	if m.ApplicationVersion != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetDeveloperId sets DeveloperDataId value.

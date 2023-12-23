@@ -54,51 +54,39 @@ func NewCapabilities(mesg *proto.Message) *Capabilities {
 
 // ToMesg converts Capabilities into proto.Message.
 func (m *Capabilities) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCapabilities)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToSliceUint8z[uint8](m.Languages) != nil {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToSliceUint8z[uint8](m.Languages)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceUint8z[uint8](m.Sports) != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToSliceUint8z[uint8](m.Sports)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32z[uint32](m.WorkoutsSupported) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = typeconv.ToUint32z[uint32](m.WorkoutsSupported)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32z[uint32](m.ConnectivitySupported) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = typeconv.ToUint32z[uint32](m.ConnectivitySupported)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Capabilities's valid fields.
-func (m *Capabilities) size() byte {
-	var size byte
-	if typeconv.ToSliceUint8z[uint8](m.Languages) != nil {
-		size++
-	}
-	if typeconv.ToSliceUint8z[uint8](m.Sports) != nil {
-		size++
-	}
-	if typeconv.ToUint32z[uint32](m.WorkoutsSupported) != basetype.Uint32zInvalid {
-		size++
-	}
-	if typeconv.ToUint32z[uint32](m.ConnectivitySupported) != basetype.Uint32zInvalid {
-		size++
-	}
-	return size
 }
 
 // SetLanguages sets Capabilities value.

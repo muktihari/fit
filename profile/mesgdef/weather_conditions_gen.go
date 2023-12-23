@@ -80,147 +80,99 @@ func NewWeatherConditions(mesg *proto.Message) *WeatherConditions {
 
 // ToMesg converts WeatherConditions into proto.Message.
 func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherConditions)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.WeatherReport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.WeatherReport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Temperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Temperature
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Condition) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.Condition)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WindDirection != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.WindDirection
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WindSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.WindSpeed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PrecipitationProbability != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.PrecipitationProbability
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.TemperatureFeelsLike
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RelativeHumidity != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.RelativeHumidity
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Location != basetype.StringInvalid && m.Location != "" {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.Location
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.ObservedAtTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = datetime.ToUint32(m.ObservedAtTime)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ObservedLocationLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.ObservedLocationLat
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ObservedLocationLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.ObservedLocationLong
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.DayOfWeek) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToEnum[byte](m.DayOfWeek)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.HighTemperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = m.HighTemperature
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LowTemperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = m.LowTemperature
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of WeatherConditions's valid fields.
-func (m *WeatherConditions) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.WeatherReport) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Temperature != basetype.Sint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Condition) != basetype.EnumInvalid {
-		size++
-	}
-	if m.WindDirection != basetype.Uint16Invalid {
-		size++
-	}
-	if m.WindSpeed != basetype.Uint16Invalid {
-		size++
-	}
-	if m.PrecipitationProbability != basetype.Uint8Invalid {
-		size++
-	}
-	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
-		size++
-	}
-	if m.RelativeHumidity != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Location != basetype.StringInvalid && m.Location != "" {
-		size++
-	}
-	if datetime.ToUint32(m.ObservedAtTime) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ObservedLocationLat != basetype.Sint32Invalid {
-		size++
-	}
-	if m.ObservedLocationLong != basetype.Sint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.DayOfWeek) != basetype.EnumInvalid {
-		size++
-	}
-	if m.HighTemperature != basetype.Sint8Invalid {
-		size++
-	}
-	if m.LowTemperature != basetype.Sint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets WeatherConditions value.

@@ -64,91 +64,64 @@ func NewSegmentFile(mesg *proto.Message) *SegmentFile {
 
 // ToMesg converts SegmentFile into proto.Message.
 func (m *SegmentFile) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentFile)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FileUuid != basetype.StringInvalid && m.FileUuid != "" {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.FileUuid
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Enabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.UserProfilePrimaryKey
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.LeaderType) != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToSliceEnum[byte](m.LeaderType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LeaderGroupPrimaryKey != nil {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.LeaderGroupPrimaryKey
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LeaderActivityId != nil {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.LeaderActivityId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LeaderActivityIdString != nil {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.LeaderActivityIdString
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.DefaultRaceLeader
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SegmentFile's valid fields.
-func (m *SegmentFile) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.FileUuid != basetype.StringInvalid && m.FileUuid != "" {
-		size++
-	}
-	if m.Enabled != false {
-		size++
-	}
-	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToSliceEnum[byte](m.LeaderType) != nil {
-		size++
-	}
-	if m.LeaderGroupPrimaryKey != nil {
-		size++
-	}
-	if m.LeaderActivityId != nil {
-		size++
-	}
-	if m.LeaderActivityIdString != nil {
-		size++
-	}
-	if m.DefaultRaceLeader != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets SegmentFile value.

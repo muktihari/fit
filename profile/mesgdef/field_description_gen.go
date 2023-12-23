@@ -66,129 +66,87 @@ func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 
 // ToMesg converts FieldDescription into proto.Message.
 func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFieldDescription)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.DeveloperDataIndex
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FieldDefinitionNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.FieldDefinitionNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.FitBaseTypeId) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToUint8[uint8](m.FitBaseTypeId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FieldName != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.FieldName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Array != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Array
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Components != basetype.StringInvalid && m.Components != "" {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Components
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Scale != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.Scale
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Offset != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.Offset
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Units != nil {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.Units
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Bits != basetype.StringInvalid && m.Bits != "" {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.Bits
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Accumulate != basetype.StringInvalid && m.Accumulate != "" {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.Accumulate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.FitBaseUnitId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = typeconv.ToUint16[uint16](m.FitBaseUnitId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.NativeMesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = typeconv.ToUint16[uint16](m.NativeMesgNum)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.NativeFieldNum != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.NativeFieldNum
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	return mesg
-}
-
-// size returns size of FieldDescription's valid fields.
-func (m *FieldDescription) size() byte {
-	var size byte
-	if m.DeveloperDataIndex != basetype.Uint8Invalid {
-		size++
-	}
-	if m.FieldDefinitionNumber != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.FitBaseTypeId) != basetype.Uint8Invalid {
-		size++
-	}
-	if m.FieldName != nil {
-		size++
-	}
-	if m.Array != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Components != basetype.StringInvalid && m.Components != "" {
-		size++
-	}
-	if m.Scale != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Offset != basetype.Sint8Invalid {
-		size++
-	}
-	if m.Units != nil {
-		size++
-	}
-	if m.Bits != basetype.StringInvalid && m.Bits != "" {
-		size++
-	}
-	if m.Accumulate != basetype.StringInvalid && m.Accumulate != "" {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.FitBaseUnitId) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.NativeMesgNum) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.NativeFieldNum != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetDeveloperDataIndex sets FieldDescription value.

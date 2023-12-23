@@ -56,59 +56,44 @@ func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 
 // ToMesg converts HrmProfile into proto.Message.
 func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrmProfile)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Enabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16z[uint16](m.HrmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16z[uint16](m.HrmAntId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LogHrv != false {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.LogHrv
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.HrmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToUint8z[uint8](m.HrmAntIdTransType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of HrmProfile's valid fields.
-func (m *HrmProfile) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Enabled != false {
-		size++
-	}
-	if typeconv.ToUint16z[uint16](m.HrmAntId) != basetype.Uint16zInvalid {
-		size++
-	}
-	if m.LogHrv != false {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.HrmAntIdTransType) != basetype.Uint8zInvalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets HrmProfile value.

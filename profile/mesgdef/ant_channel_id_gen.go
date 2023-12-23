@@ -56,59 +56,44 @@ func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 
 // ToMesg converts AntChannelId into proto.Message.
 func (m *AntChannelId) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAntChannelId)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ChannelNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.DeviceType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint8z[uint8](m.DeviceType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16z[uint16](m.DeviceNumber) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToUint16z[uint16](m.DeviceNumber)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.TransmissionType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToUint8z[uint8](m.TransmissionType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of AntChannelId's valid fields.
-func (m *AntChannelId) size() byte {
-	var size byte
-	if m.ChannelNumber != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.DeviceType) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint16z[uint16](m.DeviceNumber) != basetype.Uint16zInvalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.TransmissionType) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetChannelNumber sets AntChannelId value.

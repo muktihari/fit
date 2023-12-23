@@ -52,43 +52,34 @@ func NewSport(mesg *proto.Message) *Sport {
 
 // ToMesg converts Sport into proto.Message.
 func (m *Sport) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSport)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Sport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.SubSport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Name
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Sport's valid fields.
-func (m *Sport) size() byte {
-	var size byte
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		size++
-	}
-	return size
 }
 
 // SetSport sets Sport value.

@@ -84,171 +84,114 @@ func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 
 // ToMesg converts WorkoutStep into proto.Message.
 func (m *WorkoutStep) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkoutStep)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.WktStepName != basetype.StringInvalid && m.WktStepName != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.WktStepName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.DurationType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.DurationType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DurationValue != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.DurationValue
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.TargetType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = typeconv.ToEnum[byte](m.TargetType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TargetValue != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.TargetValue
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CustomTargetValueLow != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.CustomTargetValueLow
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CustomTargetValueHigh != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.CustomTargetValueHigh
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Intensity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.Intensity)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Notes != basetype.StringInvalid && m.Notes != "" {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.Notes
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Equipment) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = typeconv.ToEnum[byte](m.Equipment)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToUint16[uint16](m.ExerciseCategory)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ExerciseName != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.ExerciseName
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ExerciseWeight != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.ExerciseWeight
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16[uint16](m.WeightDisplayUnit) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = typeconv.ToUint16[uint16](m.WeightDisplayUnit)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SecondaryTargetType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = typeconv.ToEnum[byte](m.SecondaryTargetType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SecondaryTargetValue != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = m.SecondaryTargetValue
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = m.SecondaryCustomTargetValueLow
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.SecondaryCustomTargetValueHigh
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of WorkoutStep's valid fields.
-func (m *WorkoutStep) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.WktStepName != basetype.StringInvalid && m.WktStepName != "" {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.DurationType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.DurationValue != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.TargetType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.TargetValue != basetype.Uint32Invalid {
-		size++
-	}
-	if m.CustomTargetValueLow != basetype.Uint32Invalid {
-		size++
-	}
-	if m.CustomTargetValueHigh != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Intensity) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Notes != basetype.StringInvalid && m.Notes != "" {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Equipment) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ExerciseName != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ExerciseWeight != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint16[uint16](m.WeightDisplayUnit) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SecondaryTargetType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.SecondaryTargetValue != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets WorkoutStep value.

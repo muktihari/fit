@@ -62,75 +62,54 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 
 // ToMesg converts ClimbPro into proto.Message.
 func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumClimbPro)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.PositionLat
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.PositionLong
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ClimbProEvent) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.ClimbProEvent)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ClimbNumber != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ClimbNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ClimbCategory != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.ClimbCategory
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.CurrentDist
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ClimbPro's valid fields.
-func (m *ClimbPro) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.PositionLat != basetype.Sint32Invalid {
-		size++
-	}
-	if m.PositionLong != basetype.Sint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ClimbProEvent) != basetype.EnumInvalid {
-		size++
-	}
-	if m.ClimbNumber != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ClimbCategory != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets ClimbPro value.

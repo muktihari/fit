@@ -64,91 +64,64 @@ func NewSegmentId(mesg *proto.Message) *SegmentId {
 
 // ToMesg converts SegmentId into proto.Message.
 func (m *SegmentId) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentId)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Name
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Uuid
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.Sport)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Enabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.UserProfilePrimaryKey
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DeviceId != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.DeviceId
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.DefaultRaceLeader
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.DeleteStatus) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = typeconv.ToEnum[byte](m.DeleteStatus)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.SelectionType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = typeconv.ToEnum[byte](m.SelectionType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SegmentId's valid fields.
-func (m *SegmentId) size() byte {
-	var size byte
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		size++
-	}
-	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Enabled != false {
-		size++
-	}
-	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
-		size++
-	}
-	if m.DeviceId != basetype.Uint32Invalid {
-		size++
-	}
-	if m.DefaultRaceLeader != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.DeleteStatus) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.SelectionType) != basetype.EnumInvalid {
-		size++
-	}
-	return size
 }
 
 // SetName sets SegmentId value.

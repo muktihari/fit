@@ -60,75 +60,54 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 
 // ToMesg converts SegmentPoint into proto.Message.
 func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentPoint)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.PositionLat
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.PositionLong
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Distance
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Altitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Altitude
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.LeaderTime != nil {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.LeaderTime
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EnhancedAltitude
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SegmentPoint's valid fields.
-func (m *SegmentPoint) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.PositionLat != basetype.Sint32Invalid {
-		size++
-	}
-	if m.PositionLong != basetype.Sint32Invalid {
-		size++
-	}
-	if m.Distance != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Altitude != basetype.Uint16Invalid {
-		size++
-	}
-	if m.LeaderTime != nil {
-		size++
-	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets SegmentPoint value.

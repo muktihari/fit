@@ -62,83 +62,59 @@ func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 
 // ToMesg converts SdmProfile into proto.Message.
 func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSdmProfile)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Enabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint16z[uint16](m.SdmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint16z[uint16](m.SdmAntId)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SdmCalFactor != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.SdmCalFactor
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Odometer != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Odometer
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.SpeedSource != false {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.SpeedSource
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.SdmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToUint8z[uint8](m.SdmAntIdTransType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OdometerRollover != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.OdometerRollover
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of SdmProfile's valid fields.
-func (m *SdmProfile) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Enabled != false {
-		size++
-	}
-	if typeconv.ToUint16z[uint16](m.SdmAntId) != basetype.Uint16zInvalid {
-		size++
-	}
-	if m.SdmCalFactor != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Odometer != basetype.Uint32Invalid {
-		size++
-	}
-	if m.SpeedSource != false {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.SdmAntIdTransType) != basetype.Uint8zInvalid {
-		size++
-	}
-	if m.OdometerRollover != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets SdmProfile value.

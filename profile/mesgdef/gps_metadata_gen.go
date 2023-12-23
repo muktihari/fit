@@ -66,91 +66,64 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 
 // ToMesg converts GpsMetadata into proto.Message.
 func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGpsMetadata)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.PositionLat
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.PositionLong
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.EnhancedAltitude
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EnhancedSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.EnhancedSpeed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Heading != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Heading
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = datetime.ToUint32(m.UtcTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Velocity != nil {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.Velocity
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of GpsMetadata's valid fields.
-func (m *GpsMetadata) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.PositionLat != basetype.Sint32Invalid {
-		size++
-	}
-	if m.PositionLong != basetype.Sint32Invalid {
-		size++
-	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid {
-		size++
-	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Heading != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.Velocity != nil {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets GpsMetadata value.

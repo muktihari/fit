@@ -86,171 +86,114 @@ func NewEvent(mesg *proto.Message) *Event {
 
 // ToMesg converts Event into proto.Message.
 func (m *Event) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumEvent)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Event)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToEnum[byte](m.EventType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Data16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Data16
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Data != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Data
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.EventGroup
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Score != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.Score
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.OpponentScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.OpponentScore
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = typeconv.ToUint8z[uint8](m.FrontGearNum)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.FrontGear) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToUint8z[uint8](m.FrontGear)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = typeconv.ToUint8z[uint8](m.RearGearNum)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.RearGear) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToUint8z[uint8](m.RearGear)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = typeconv.ToEnum[byte](m.ActivityType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = datetime.ToUint32(m.StartTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.RadarThreatLevelMax) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = typeconv.ToEnum[byte](m.RadarThreatLevelMax)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RadarThreatCount != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.RadarThreatCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.RadarThreatAvgApproachSpeed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = m.RadarThreatMaxApproachSpeed
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of Event's valid fields.
-func (m *Event) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
-		size++
-	}
-	if m.Data16 != basetype.Uint16Invalid {
-		size++
-	}
-	if m.Data != basetype.Uint32Invalid {
-		size++
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		size++
-	}
-	if m.Score != basetype.Uint16Invalid {
-		size++
-	}
-	if m.OpponentScore != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.FrontGear) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.RearGear) != basetype.Uint8zInvalid {
-		size++
-	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
-		size++
-	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.RadarThreatLevelMax) != basetype.EnumInvalid {
-		size++
-	}
-	if m.RadarThreatCount != basetype.Uint8Invalid {
-		size++
-	}
-	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid {
-		size++
-	}
-	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets Event value.

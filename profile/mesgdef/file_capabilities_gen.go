@@ -58,67 +58,49 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 
 // ToMesg converts FileCapabilities into proto.Message.
 func (m *FileCapabilities) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFileCapabilities)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = typeconv.ToEnum[byte](m.Type)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.Flags) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToUint8z[uint8](m.Flags)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.Directory != basetype.StringInvalid && m.Directory != "" {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Directory
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.MaxCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.MaxSize != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.MaxSize
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of FileCapabilities's valid fields.
-func (m *FileCapabilities) size() byte {
-	var size byte
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
-		size++
-	}
-	if typeconv.ToUint8z[uint8](m.Flags) != basetype.Uint8zInvalid {
-		size++
-	}
-	if m.Directory != basetype.StringInvalid && m.Directory != "" {
-		size++
-	}
-	if m.MaxCount != basetype.Uint16Invalid {
-		size++
-	}
-	if m.MaxSize != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetMessageIndex sets FileCapabilities value.

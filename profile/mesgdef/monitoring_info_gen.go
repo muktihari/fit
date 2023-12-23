@@ -60,67 +60,49 @@ func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 
 // ToMesg converts MonitoringInfo into proto.Message.
 func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringInfo)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = datetime.ToUint32(m.LocalTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = typeconv.ToSliceEnum[byte](m.ActivityType)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CyclesToDistance != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.CyclesToDistance
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.CyclesToCalories != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.CyclesToCalories
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.RestingMetabolicRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.RestingMetabolicRate
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of MonitoringInfo's valid fields.
-func (m *MonitoringInfo) size() byte {
-	var size byte
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if typeconv.ToSliceEnum[byte](m.ActivityType) != nil {
-		size++
-	}
-	if m.CyclesToDistance != nil {
-		size++
-	}
-	if m.CyclesToCalories != nil {
-		size++
-	}
-	if m.RestingMetabolicRate != basetype.Uint16Invalid {
-		size++
-	}
-	return size
 }
 
 // SetTimestamp sets MonitoringInfo value.

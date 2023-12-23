@@ -62,75 +62,54 @@ func NewVideoClip(mesg *proto.Message) *VideoClip {
 
 // ToMesg converts VideoClip into proto.Message.
 func (m *VideoClip) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoClip)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.ClipNumber != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ClipNumber
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.StartTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.StartTimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = datetime.ToUint32(m.EndTimestamp)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.EndTimestampMs
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ClipStart != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.ClipStart
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ClipEnd != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.ClipEnd
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of VideoClip's valid fields.
-func (m *VideoClip) size() byte {
-	var size byte
-	if m.ClipNumber != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.StartTimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
-		size++
-	}
-	if m.EndTimestampMs != basetype.Uint16Invalid {
-		size++
-	}
-	if m.ClipStart != basetype.Uint32Invalid {
-		size++
-	}
-	if m.ClipEnd != basetype.Uint32Invalid {
-		size++
-	}
-	return size
 }
 
 // SetClipNumber sets VideoClip value.

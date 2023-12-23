@@ -54,51 +54,39 @@ func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 
 // ToMesg converts ExdScreenConfiguration into proto.Message.
 func (m *ExdScreenConfiguration) ToMesg(fac Factory) proto.Message {
+	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsPtr)
+
+	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExdScreenConfiguration)
-	mesg.Fields = make([]proto.Field, 0, m.size())
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ScreenIndex
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.FieldCount != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.FieldCount
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.Layout) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = typeconv.ToEnum[byte](m.Layout)
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
 	if m.ScreenEnabled != false {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ScreenEnabled
-		mesg.Fields = append(mesg.Fields, field)
+		fields = append(fields, field)
 	}
+
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// size returns size of ExdScreenConfiguration's valid fields.
-func (m *ExdScreenConfiguration) size() byte {
-	var size byte
-	if m.ScreenIndex != basetype.Uint8Invalid {
-		size++
-	}
-	if m.FieldCount != basetype.Uint8Invalid {
-		size++
-	}
-	if typeconv.ToEnum[byte](m.Layout) != basetype.EnumInvalid {
-		size++
-	}
-	if m.ScreenEnabled != false {
-		size++
-	}
-	return size
 }
 
 // SetScreenIndex sets ExdScreenConfiguration value.
