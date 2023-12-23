@@ -44,6 +44,23 @@ func TestHeaderMarshaler(t *testing.T) {
 				56, 50,
 			},
 		},
+		{
+			name: "correct header size 12",
+			fileHeader: &proto.FileHeader{
+				Size:            12,
+				ProtocolVersion: 32,
+				ProfileVersion:  2132,
+				DataSize:        642262,
+				DataType:        ".FIT",
+			},
+			b: []byte{
+				12,
+				32,
+				84, 8,
+				214, 204, 9, 0,
+				46, 70, 73, 84,
+			},
+		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {

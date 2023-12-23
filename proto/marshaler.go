@@ -71,10 +71,7 @@ func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
 	defer bufPool.Put(buf)
 	buf.Reset()
 
-	_, err := m.WriteTo(buf)
-	if err != nil {
-		return nil, err
-	}
+	_, _ = m.WriteTo(buf)
 
 	b := make([]byte, buf.Len())
 	copy(b, buf.Bytes())
