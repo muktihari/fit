@@ -6,7 +6,6 @@ package encoder
 
 import (
 	"bytes"
-	"container/list"
 	"context"
 	"encoding/binary"
 	"errors"
@@ -712,7 +711,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 			mesgs[i] = mesgs[i].Clone()
 		}
 
-		enc := New(nil, WithNormalHeader(3))
+		enc := New(nil, WithNormalHeader(2))
 		for i, mesg := range mesgs {
 			w := new(bytes.Buffer)
 			err := enc.encodeMessage(w, &mesg)
@@ -723,8 +722,22 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 			mesgDefHeader := w.Bytes()
 			expectedHeader := (mesgDefHeader[0] &^ proto.LocalMesgNumMask) | byte(i)
 			if mesgDefHeader[0] != expectedHeader {
-				t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, mesgDefHeader[0])
+				t.Fatalf("[%d] expected 0b%08b, got: 0b%08b", i, expectedHeader, mesgDefHeader[0])
 			}
+		}
+
+		// add 4th mesg, header should be 0, reset.
+		mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+			fieldnum.RecordTimestamp: datetime.ToUint32(now),
+		})
+		w := new(bytes.Buffer)
+		if err := enc.encodeMessage(w, &mesg); err != nil {
+			t.Fatal(err)
+		}
+		mesgDefHeader := w.Bytes()
+		expectedHeader := byte(0)
+		if mesgDefHeader[0] != expectedHeader {
+			t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, mesgDefHeader[0])
 		}
 	})
 }
@@ -774,153 +787,153 @@ func TestEncodeMessages(t *testing.T) {
 	}
 }
 
-func TestRedefineLocalMesgNum(t *testing.T) {
-	type _struct struct {
-		name         string
-		b            []byte
-		listCapacity byte
-		list         *list.List
-		lru          *list.List
-		num          byte
-		writtable    bool
-	}
+// func TestRedefineLocalMesgNum(t *testing.T) {
+// 	type _struct struct {
+// 		name         string
+// 		b            []byte
+// 		listCapacity byte
+// 		list         *list.List
+// 		lru          *list.List
+// 		num          byte
+// 		writtable    bool
+// 	}
 
-	tt := []_struct{
-		{
-			name:      "init value",
-			b:         []byte{0, 1},
-			list:      list.New(),
-			lru:       list.New(),
-			num:       0,
-			writtable: true,
-		},
-		{
-			name: "eq with 1st index",
-			b:    []byte{0, 1},
-			list: func() *list.List {
-				l := list.New()
-				l.PushFront([]byte{0, 1})
-				return l
-			}(),
-			lru:       list.New(),
-			num:       0,
-			writtable: false,
-		},
-		{
-			name: "eq with 2st index",
-			b:    []byte{0, 2},
-			list: func() *list.List {
-				l := list.New()
-				l.PushBack([]byte{0, 1})
-				l.PushBack([]byte{0, 2})
-				return l
-			}(),
-			lru:       list.New(),
-			num:       1,
-			writtable: false,
-		},
-		func() _struct {
-			ls := list.New()
-			lru := list.New()
-			lru.PushBack(ls.PushBack([]byte{0, 1}))
-			lru.PushBack(ls.PushBack([]byte{0, 2}))
+// 	tt := []_struct{
+// 		{
+// 			name:      "init value",
+// 			b:         []byte{0, 1},
+// 			list:      list.New(),
+// 			lru:       list.New(),
+// 			num:       0,
+// 			writtable: true,
+// 		},
+// 		{
+// 			name: "eq with 1st index",
+// 			b:    []byte{0, 1},
+// 			list: func() *list.List {
+// 				l := list.New()
+// 				l.PushFront([]byte{0, 1})
+// 				return l
+// 			}(),
+// 			lru:       list.New(),
+// 			num:       0,
+// 			writtable: false,
+// 		},
+// 		{
+// 			name: "eq with 2st index",
+// 			b:    []byte{0, 2},
+// 			list: func() *list.List {
+// 				l := list.New()
+// 				l.PushBack([]byte{0, 1})
+// 				l.PushBack([]byte{0, 2})
+// 				return l
+// 			}(),
+// 			lru:       list.New(),
+// 			num:       1,
+// 			writtable: false,
+// 		},
+// 		func() _struct {
+// 			ls := list.New()
+// 			lru := list.New()
+// 			lru.PushBack(ls.PushBack([]byte{0, 1}))
+// 			lru.PushBack(ls.PushBack([]byte{0, 2}))
 
-			return _struct{
-				name:         "full, replace LRU item on the first index",
-				b:            []byte{0, 3},
-				listCapacity: 1,
-				list:         ls,
-				lru:          lru,
-				num:          0,
-				writtable:    true,
-			}
-		}(),
-		func() _struct {
-			ls, lru := list.New(), list.New()
+// 			return _struct{
+// 				name:         "full, replace LRU item on the first index",
+// 				b:            []byte{0, 3},
+// 				listCapacity: 1,
+// 				list:         ls,
+// 				lru:          lru,
+// 				num:          0,
+// 				writtable:    true,
+// 			}
+// 		}(),
+// 		func() _struct {
+// 			ls, lru := list.New(), list.New()
 
-			lru.PushBack(ls.PushBack([]byte{0, 1}))
-			lru.PushBack(ls.PushBack([]byte{0, 2}))
-			lru.PushBack(ls.PushBack([]byte{0, 3}))
+// 			lru.PushBack(ls.PushBack([]byte{0, 1}))
+// 			lru.PushBack(ls.PushBack([]byte{0, 2}))
+// 			lru.PushBack(ls.PushBack([]byte{0, 3}))
 
-			lru.MoveToBack(lru.Front())
+// 			lru.MoveToBack(lru.Front())
 
-			return _struct{
-				name:         "full, replace LRU item on 2nd index",
-				b:            []byte{0, 4},
-				listCapacity: 2,
-				list:         ls,
-				lru:          lru,
-				num:          1,
-				writtable:    true,
-			}
-		}(),
-	}
+// 			return _struct{
+// 				name:         "full, replace LRU item on 2nd index",
+// 				b:            []byte{0, 4},
+// 				listCapacity: 2,
+// 				list:         ls,
+// 				lru:          lru,
+// 				num:          1,
+// 				writtable:    true,
+// 			}
+// 		}(),
+// 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			enc := New(nil)
-			enc.options.multipleLocalMessageType = tc.listCapacity
-			enc.localMesgDefinitions = tc.list
-			enc.localMesgDefinitionsLRU = tc.lru
+// 	for _, tc := range tt {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			enc := New(nil)
+// 			enc.options.multipleLocalMessageType = tc.listCapacity
+// 			enc.localMesgDefinitions = tc.list
+// 			enc.localMesgDefinitionsLRU = tc.lru
 
-			num, writtable := enc.redefineLocalMesgNum(tc.b)
-			if num != tc.num {
-				t.Fatalf("expected: %d, got: %d", tc.num, num)
-			}
-			if writtable != tc.writtable {
-				t.Fatalf("expected: %t, got: %t", tc.writtable, writtable)
-			}
+// 			num, writtable := enc.redefineLocalMesgNum(tc.b)
+// 			if num != tc.num {
+// 				t.Fatalf("expected: %d, got: %d", tc.num, num)
+// 			}
+// 			if writtable != tc.writtable {
+// 				t.Fatalf("expected: %t, got: %t", tc.writtable, writtable)
+// 			}
 
-		})
-	}
-}
+// 		})
+// 	}
+// }
 
-func TestIsMesgDefinitionWriteable(t *testing.T) {
-	tt := []struct {
-		name      string
-		b         []byte
-		list      *list.List
-		writeable bool
-	}{
-		{
-			name:      "init element value",
-			b:         []byte{1, 1},
-			list:      list.New(),
-			writeable: true,
-		},
-		{
-			name: "eq with 1st element value",
-			b:    []byte{1, 1},
-			list: func() *list.List {
-				ls := list.New()
-				ls.PushFront([]byte{1, 1})
-				return ls
-			}(),
-			writeable: false,
-		},
-		{
-			name: "not eq, replace existing",
-			b:    []byte{1, 1},
-			list: func() *list.List {
-				ls := list.New()
-				ls.PushFront([]byte{0, 1})
-				return ls
-			}(),
-			writeable: true,
-		},
-	}
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			enc := New(nil)
-			enc.localMesgDefinitions = tc.list
+// func TestIsMesgDefinitionWriteable(t *testing.T) {
+// 	tt := []struct {
+// 		name      string
+// 		b         []byte
+// 		list      *list.List
+// 		writeable bool
+// 	}{
+// 		{
+// 			name:      "init element value",
+// 			b:         []byte{1, 1},
+// 			list:      list.New(),
+// 			writeable: true,
+// 		},
+// 		{
+// 			name: "eq with 1st element value",
+// 			b:    []byte{1, 1},
+// 			list: func() *list.List {
+// 				ls := list.New()
+// 				ls.PushFront([]byte{1, 1})
+// 				return ls
+// 			}(),
+// 			writeable: false,
+// 		},
+// 		{
+// 			name: "not eq, replace existing",
+// 			b:    []byte{1, 1},
+// 			list: func() *list.List {
+// 				ls := list.New()
+// 				ls.PushFront([]byte{0, 1})
+// 				return ls
+// 			}(),
+// 			writeable: true,
+// 		},
+// 	}
+// 	for _, tc := range tt {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			enc := New(nil)
+// 			enc.localMesgDefinitions = tc.list
 
-			writeable := enc.isMesgDefinitionWriteable(tc.b)
-			if writeable != tc.writeable {
-				t.Fatalf("expected: %t, got: %t", tc.writeable, writeable)
-			}
-		})
-	}
-}
+// 			writeable := enc.isMesgDefinitionWriteable(tc.b)
+// 			if writeable != tc.writeable {
+// 				t.Fatalf("expected: %t, got: %t", tc.writeable, writeable)
+// 			}
+// 		})
+// 	}
+// }
 
 func TestCompressTimestampInHeader(t *testing.T) {
 	now := time.Now()
@@ -1024,36 +1037,10 @@ func TestCompressTimestampInHeader(t *testing.T) {
 	}
 }
 
-func TestIsEqual(t *testing.T) {
-	tt := []struct {
-		name   string
-		prev   []byte
-		target []byte
-		eq     bool
-	}{
-		{name: "same as prev", prev: []byte{1, 2}, target: []byte{1, 2}, eq: true},
-		{name: "diff len", prev: []byte{1, 2}, target: []byte{1}, eq: false},
-		{name: "diff byte", prev: []byte{1, 2}, target: []byte{2, 1}, eq: false},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			eq := isEqual(tc.prev, tc.target)
-			if eq != tc.eq {
-				t.Fatalf("expected: %t, got: %t", tc.eq, eq)
-			}
-		})
-	}
-}
-
-func BenchmarkEncode(b *testing.B) {
-	b.StopTimer()
-
-	const RecordSize = 100_000
-
+func createFitForBenchmark(recodSize int) *proto.Fit {
 	now := time.Now()
 	fit := new(proto.Fit)
-	fit.Messages = make([]proto.Message, 0, RecordSize)
+	fit.Messages = make([]proto.Message, 0, recodSize)
 	fit.Messages = append(fit.Messages,
 		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 			fieldnum.FileIdType:         typedef.FileActivity,
@@ -1095,9 +1082,24 @@ func BenchmarkEncode(b *testing.B) {
 		}),
 	)
 
-	for i := 0; i < RecordSize-len(fit.Messages); i++ {
+	for i := 0; i < recodSize-len(fit.Messages); i++ {
 		now = now.Add(time.Second) // only time is moving forward
-		fit.Messages = append(fit.Messages, factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+		if i%100 == 0 {            // add event every 100 message
+			fit.Messages = append(fit.Messages, factory.CreateMesgOnly(mesgnum.Event).WithFields(
+				factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStop)),
+			))
+			now = now.Add(10 * time.Second) // gap
+			fit.Messages = append(fit.Messages, factory.CreateMesgOnly(mesgnum.Event).WithFields(
+				factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
+			))
+			now = now.Add(time.Second) // gap
+		}
+
+		record := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
 			fieldnum.RecordTimestamp:    datetime.ToUint32(now),
 			fieldnum.RecordPositionLat:  int32(-90481372),
 			fieldnum.RecordPositionLong: int32(1323227263),
@@ -1107,14 +1109,48 @@ func BenchmarkEncode(b *testing.B) {
 			fieldnum.RecordCadence:      uint8(85),
 			fieldnum.RecordAltitude:     uint16((166.0 + 500.0) * 5.0),
 			fieldnum.RecordTemperature:  int8(32),
-		}))
+		})
+
+		if i%200 == 0 { // assume every 200 record hr sensor is not sending any data
+			record.RemoveFieldByNum(fieldnum.RecordHeartRate)
+		}
+
+		fit.Messages = append(fit.Messages, record)
 	}
 
-	enc := New(io.Discard)
+	return fit
+}
+
+func BenchmarkEncode(b *testing.B) {
+	b.StopTimer()
+	fit := createFitForBenchmark(100_000)
 	b.StartTimer()
 
-	for i := 0; i < b.N; i++ {
-		_ = enc.Encode(fit)
-		enc.reset()
-	}
+	b.Run("normal header zero", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(io.Discard)
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
+	b.Run("normal header 15", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(io.Discard, WithNormalHeader(15))
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
+	b.Run("compressed timestamp header", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(io.Discard, WithCompressedTimestampHeader())
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
 }
