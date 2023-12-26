@@ -82,6 +82,68 @@ Decode to Common File Types enables us to interact with FIT files through common
 
 _Note: Currently only 3 common file types are defined: Activity, Course & Workout, but you can create your own file types using our building block and register it in the listener as an option using WithFileSets()_
 
+1. To get started, the simpliest way to create an common file type is to decode the FIT file in its raw protocol messages then pass the messages to create the desired common file type.
+
+```go
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/filedef"
+)
+
+func main() {
+    f, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    dec := decoder.New(bufio.NewReader(f))
+
+    for dec.Next() {
+        fit, err := dec.Decode()
+        if err != nil {
+            panic(err)
+        }
+
+        activity := filedef.NewActivity(fit.Messages...)
+
+        fmt.Printf("File Type: %s\n", activity.FileId.Type)
+        fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
+        fmt.Printf("Laps count: %d\n", len(activity.Laps))
+        fmt.Printf("Records count: %d\n", len(activity.Records))
+
+        i := 100
+        fmt.Printf("\nSample value of record[%d]:\n", i)
+        fmt.Printf("  Lat: %v semicircles\n", activity.Records[i].PositionLat)
+        fmt.Printf("  Long: %v semicircles\n", activity.Records[i].PositionLong)
+        fmt.Printf("  Speed: %g m/s\n", float64(activity.Records[i].Speed)/1000)
+        fmt.Printf("  HeartRate: %v bpm\n", activity.Records[i].HeartRate)
+        fmt.Printf("  Cadence: %v rpm\n", activity.Records[i].Cadence)
+
+        // Output:
+        // File Type: activity
+        // Sessions count: 1
+        // Laps count: 1
+        // Records count: 3601
+        //
+        // Sample value of record[100]:
+        //   Lat: 0 semicircles
+        //   Long: 10717 semicircles
+        //   Speed: 1 m/s
+        //   HeartRate: 126 bpm
+        //   Cadence: 100 rpm
+    }
+}
+```
+
+2. While the previous example is work for most use cases and probably can be your goto choice to use for small scale, it's slighly inefficient as we only utilize one goroutine (the main goroutine) and also we need to allocate the `fit.Messages` before creating the `activity` file itself. For bigger scale, or in scale that require a streaming process, we can define `filedef's Listener` to create the `activity` file. This not only reduce the need to allocate `fit.Messages` but also we can receive the message as it is decode in other goroutine. As the decoder decode the message, we can create the message in another process concurrently.
+
 ```go
 package main
 
@@ -153,6 +215,8 @@ func main() {
     }
 }
 ```
+
+**The ability to broadcast every message as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/listener/listener.go) interface.**
 
 ### Peek FileId
 
