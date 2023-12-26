@@ -29,13 +29,21 @@ type {{ .Name }} struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields. 
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-	{{- end -}}
+	{{ end -}}
+
+	{{ if gt .MaxFieldExpandNum 1 }}
+
+	IsExpandedFields [{{ .MaxFieldExpandNum }}]bool // Used for tracking expanded fields, field.Num as index.
+	{{ end -}}
 }
 
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
     vals := [{{ .MaxFieldNum }}]any{}
+	{{ if gt .MaxFieldExpandNum 1 -}}
+	isExpandedFields := [{{ .MaxFieldExpandNum }}]bool{}
+	{{ end }}
 
     {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
         var developerFields []proto.DeveloperField
@@ -45,6 +53,11 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
             if mesg.Fields[i].Num >= byte(len(vals)) {
                 continue
             }
+			{{ if gt $.MaxFieldExpandNum 1 -}}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			}
+			{{ end -}}
             vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
         }
         {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
@@ -60,6 +73,9 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 		DeveloperFields: developerFields,
+		{{ end }}
+		{{ if gt .MaxFieldExpandNum 1 -}}
+		IsExpandedFields: isExpandedFields,
 		{{ end -}}
 	}
 }
@@ -74,9 +90,12 @@ func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
 	
     {{ range .Fields -}}
         if {{ .ComparableValue }} != {{ .InvalidValue }} {
-            field := fac.CreateField(mesg.Num, {{ .Num }})
-            field.Value = {{ .PrimitiveValue }}
-            fields = append(fields, field)
+			field := fac.CreateField(mesg.Num, {{ .Num }})
+			field.Value = {{ .PrimitiveValue }}
+			{{ if eq .CanExpand true -}}
+				field.IsExpandedField = m.IsExpandedFields[{{ .Num }}]
+			{{ end -}}
+			fields = append(fields, field)
         }
 	{{ end }}
 

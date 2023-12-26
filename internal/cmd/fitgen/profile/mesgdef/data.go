@@ -4,13 +4,17 @@
 
 package mesgdef
 
+import "github.com/muktihari/fit/internal/cmd/fitgen/parser"
+
 type Data struct {
-	SDKVersion  string
-	Package     string
-	Imports     []string
-	Name        string
-	Fields      []Field
-	MaxFieldNum byte
+	SDKVersion           string
+	Package              string
+	Imports              []string
+	Name                 string
+	Fields               []Field
+	MaxFieldNum          byte
+	MaxFieldExpandNum    byte
+	SubFieldSubtitutions []parser.SubField
 }
 
 type Field struct {
@@ -23,4 +27,5 @@ type Field struct {
 	ComparableValue string
 	InvalidValue    string
 	Comment         string
+	CanExpand       bool
 }
