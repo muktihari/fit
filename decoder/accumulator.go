@@ -16,7 +16,7 @@ func NewAccumulator() *Accumulator {
 	return &Accumulator{} // No need to make AccumulatedValues as it will be created on append anyway.
 }
 
-func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value int64) {
+func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value uint32) {
 	for i := range a.AccumulatedValues {
 		field := &a.AccumulatedValues[i]
 		if field.MesgNum == mesgNum && field.DestFieldNum == destFieldNum {
@@ -33,7 +33,7 @@ func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value 
 	})
 }
 
-func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, value int64, bits byte) int64 {
+func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, value uint32, bits byte) uint32 {
 	for i := range a.AccumulatedValues {
 		av := &a.AccumulatedValues[i]
 		if av.MesgNum == mesgNum && av.DestFieldNum == destFieldNum {
@@ -48,12 +48,12 @@ func (a *Accumulator) Reset() { a.AccumulatedValues = a.AccumulatedValues[:0] }
 type AccumulatedValue struct {
 	MesgNum      typedef.MesgNum
 	DestFieldNum byte
-	Last         int64
-	Value        int64
+	Last         uint32
+	Value        uint32
 }
 
-func (a *AccumulatedValue) Accumulate(value int64, bits byte) int64 {
-	var mask int64 = (1 << bits) - 1
+func (a *AccumulatedValue) Accumulate(value uint32, bits byte) uint32 {
+	var mask uint32 = (1 << bits) - 1
 	a.Value += (value - a.Last) & mask
 	a.Last = value
 	return a.Value

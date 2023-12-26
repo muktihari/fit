@@ -265,21 +265,21 @@ func (f Field) WithValue(v any) Field {
 }
 
 // SubFieldSubstitution returns any sub-field that can substitute the properties interpretation of the parent Field (Dynamic Field).
-func (f *Field) SubFieldSubtitution(mesgRef *Message) (*SubField, bool) {
+func (f *Field) SubFieldSubtitution(mesgRef *Message) *SubField {
 	for i := range f.SubFields {
 		subField := &f.SubFields[i]
 		for j := range subField.Maps {
 			smap := &subField.Maps[j]
 			fieldRef := mesgRef.FieldByNum(smap.RefFieldNum)
 			if fieldRef == nil {
-				return nil, false
+				continue
 			}
 			if fieldRef.isValueEqualTo(smap.RefFieldValue) {
-				return subField, true
+				return subField
 			}
 		}
 	}
-	return nil, false
+	return nil
 }
 
 // isValueEqualTo compare if Value == SubField's Map RefFieldValue.
