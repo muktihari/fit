@@ -16,8 +16,8 @@ func TestCollect(t *testing.T) {
 	type value struct {
 		mesgNum      typedef.MesgNum
 		destFieldNum byte
-		value        int64
-		expected     int64
+		value        uint32
+		expected     uint32
 	}
 
 	tt := []struct {

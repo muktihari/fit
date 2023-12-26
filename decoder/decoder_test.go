@@ -26,6 +26,7 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/listener"
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
@@ -1202,6 +1203,130 @@ func TestExpandComponents(t *testing.T) {
 				t.Fatalf("expected n fields: %d, got: %d", tc.nFieldAfterExpansion, len(tc.mesg.Fields))
 			}
 		})
+	}
+}
+
+func TestExpandMutipleComponents(t *testing.T) {
+	// Expand componentField.Components that require expansion
+	compressedSepeedDistanceField := factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).
+		WithValue([]byte{0, 4, 1})
+
+	mesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(compressedSepeedDistanceField)
+	dec := New(nil)
+	dec.expandComponents(&mesg, &compressedSepeedDistanceField, compressedSepeedDistanceField.Components)
+
+	if len(mesg.Fields) != 4 {
+		t.Errorf("expected n fields after expansion: %d, got: %d", 4, len(mesg.Fields))
+	}
+
+	if diff := cmp.Diff(
+		mesg.FieldValueByNum(fieldnum.RecordCompressedSpeedDistance),
+		[]byte{0, 4, 1},
+	); diff != "" {
+		t.Errorf("compressed_speed_distance: %s", diff)
+	}
+
+	// Formula: value = (value / component_speed_scale) * destination_field_scale
+
+	if diff := cmp.Diff(
+		mesg.FieldValueByNum(fieldnum.RecordSpeed),
+		uint16(10240), // (1024 / 100) * 1000
+	); diff != "" {
+		t.Errorf("speed: %s", diff)
+	}
+
+	if diff := cmp.Diff(
+		mesg.FieldValueByNum(fieldnum.RecordDistance),
+		uint32(100), // (1600 / 16) * 1
+	); diff != "" {
+		t.Errorf("distance: %s", diff)
+	}
+
+	if diff := cmp.Diff(
+		mesg.FieldValueByNum(fieldnum.RecordEnhancedSpeed),
+		uint32(10240), // (1024 / 1000) * 1000
+	); diff != "" {
+		t.Errorf("enhanced_speed: %s", diff)
+	}
+}
+
+func TestExpandMutipleComponentsDynamicField(t *testing.T) {
+	// Test expand component's components that have dynamic field
+	// Since we don't have real world example, message from Profile.xlsx doesn't not have this but it is possible,
+	// Let's create our own custom message.
+
+	const customMesgNum = 65280
+	fac := factory.New()
+	fac.RegisterMesg(
+		proto.Message{
+			Num: customMesgNum,
+			Fields: []proto.Field{
+				{
+					FieldBase: &proto.FieldBase{
+						Num:        0,
+						Name:       "event",
+						Type:       profile.Event, /* basetype.Enum (size: 1) */
+						Components: nil,
+						Scale:      1, Offset: 0,
+					},
+					Value: basetype.EnumInvalid,
+				},
+				{
+					FieldBase: &proto.FieldBase{
+						Num:   1,
+						Name:  "data",
+						Type:  profile.Uint32,
+						Scale: 1, Offset: 0,
+						SubFields: []proto.SubField{
+							{Name: "timer_trigger", Type: profile.TimerTrigger /* basetype.Enum */, Scale: 1, Offset: 0,
+								Components: nil,
+								Maps: []proto.SubFieldMap{
+									{RefFieldNum: 0 /* event */, RefFieldValue: 0 /* timer */},
+								},
+							},
+							{Name: "course_point_index", Type: profile.MessageIndex /* basetype.Uint16 */, Scale: 1, Offset: 0,
+								Components: nil,
+								Maps: []proto.SubFieldMap{
+									{RefFieldNum: 0 /* event */, RefFieldValue: 10 /* course_point */},
+								},
+							},
+						},
+					},
+				},
+				{
+					FieldBase: &proto.FieldBase{
+						Num:  2,
+						Name: "compressed_data",
+						Type: profile.Uint32,
+						Components: []proto.Component{
+							{FieldNum: 1 /* data */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
+						},
+						Scale: 1, Offset: 0,
+					},
+					Value: basetype.Uint32Invalid,
+				},
+			},
+		},
+	)
+
+	mesg := fac.CreateMesgOnly(customMesgNum).WithFields(
+		fac.CreateField(customMesgNum, 0).WithValue(uint8(10)),  // event
+		fac.CreateField(customMesgNum, 2).WithValue(uint32(10)), // compressed_data
+	)
+
+	dec := New(nil, WithFactory(fac))
+	fieldToExpand := mesg.FieldByNum(2)
+	dec.expandComponents(&mesg, fieldToExpand, fieldToExpand.Components)
+
+	if len(mesg.Fields) != 3 {
+		t.Errorf("expected n fields: %d, got %d", 3, len(mesg.Fields))
+	}
+
+	if diff := cmp.Diff(
+		mesg.FieldValueByNum(1),
+		uint32(10),
+	); diff != "" {
+		t.Errorf("data: %s", diff)
 	}
 }
 

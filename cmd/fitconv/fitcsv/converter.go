@@ -337,7 +337,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 		if c.options.unknownNumber && field.Name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
 		}
-		if subField, ok := field.SubFieldSubtitution(&mesg); ok {
+		if subField := field.SubFieldSubtitution(&mesg); subField != nil {
 			name, units = subField.Name, subField.Units
 		}
 

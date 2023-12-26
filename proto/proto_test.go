@@ -298,11 +298,11 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			subfield, ok := tc.field.SubFieldSubtitution(&tc.mesg)
-			if ok != tc.ok {
-				t.Fatalf("expected: %t, got: %t", tc.ok, ok)
+			subfield := tc.field.SubFieldSubtitution(&tc.mesg)
+			if subfield != nil != tc.ok {
+				t.Fatalf("expected: %t, got: %t", tc.ok, subfield != nil)
 			}
-			if !ok {
+			if subfield == nil {
 				return
 			}
 			if subfield.Name != tc.subfieldName {

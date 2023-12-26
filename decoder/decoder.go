@@ -17,7 +17,7 @@ import (
 	"github.com/muktihari/fit/kit/byteorder"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
-	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
@@ -25,6 +25,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -38,12 +39,6 @@ var (
 	ErrByteSizeMismatch       = errors.New("byte size mismath")
 )
 
-const (
-	// Buffer for component expansion to avoid runtime grow slice which more expensive than having buffered size at front.
-	// The value 10 is from the current max components in factory (MesgNumHr -> event_timestamp_12).
-	bufferSizeFields = 10
-)
-
 // Decoder is Fit file decoder. See New() for details.
 type Decoder struct {
 	r           io.Reader
@@ -53,7 +48,11 @@ type Decoder struct {
 
 	// The maximum n field definition in a mesg is 255 and we need 3 byte per field. 255 * 3 = 765 (+1 cap).
 	// So we will never exceed 766.
-	backingArray [(255 * 3) + 1]byte
+	bytesArray [(255 * 3) + 1]byte
+
+	// The maximum n field in a mesg is 255, with this backing array, we don't have to worry about component expansions
+	// that require allocating additional fields triggering runtime.mallocgc.
+	fieldsArray [256]proto.Field
 
 	options *options
 
@@ -319,7 +318,7 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 }
 
 func (d *Decoder) decodeHeader() error {
-	b := d.backingArray[:1]
+	b := d.bytesArray[:1]
 	n, err := io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -331,7 +330,7 @@ func (d *Decoder) decodeHeader() error {
 	}
 
 	size := b[0]
-	b = d.backingArray[1:size]
+	b = d.bytesArray[1:size]
 	n, err = io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -362,7 +361,7 @@ func (d *Decoder) decodeHeader() error {
 		return nil
 	}
 
-	_, _ = d.crc16.Write(d.backingArray[:12])
+	_, _ = d.crc16.Write(d.bytesArray[:12])
 	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
 		return ErrCRCChecksumMismatch
 	}
@@ -395,7 +394,7 @@ func (d *Decoder) decodeMessage() error {
 }
 
 func (d *Decoder) decodeMessageDefinition(header byte) error {
-	b := d.backingArray[:5]
+	b := d.bytesArray[:5]
 	if err := d.read(b); err != nil {
 		return err
 	}
@@ -408,7 +407,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	}
 
 	n := b[4]
-	b = d.backingArray[:n*3] // 3 byte per field
+	b = d.bytesArray[:n*3] // 3 byte per field
 	if err := d.read(b); err != nil {
 		return err
 	}
@@ -428,7 +427,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			return err
 		}
 
-		b := d.backingArray[:n*3] // 3 byte per field
+		b := d.bytesArray[:n*3] // 3 byte per field
 		if err := d.read(b); err != nil {
 			return err
 		}
@@ -461,16 +460,10 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	}
 
 	mesg := d.factory.CreateMesgOnly(mesgDef.MesgNum)
+	mesg.Header = header
 	mesg.Reserved = mesgDef.Reserved
-
-	size := len(mesgDef.FieldDefinitions)
-	if d.options.shouldExpandComponent {
-		size += bufferSizeFields
-	}
-	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
-		size += 1 // +1 for timestamp field
-	}
-	mesg.Fields = make([]proto.Field, 0, size)
+	mesg.Architecture = mesgDef.Architecture
+	mesg.Fields = d.fieldsArray[:0]
 
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
 		timeOffset := header & proto.CompressedTimeMask
@@ -483,12 +476,11 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
 	}
 
-	mesg.Header = header
-	mesg.Architecture = mesgDef.Architecture
-
 	if err := d.decodeFields(mesgDef, &mesg); err != nil {
 		return err
 	}
+
+	mesg.Fields = slices.Clone(mesg.Fields)
 
 	// FileId Message
 	if d.fileId == nil && mesg.Num == mesgnum.FileId {
@@ -551,8 +543,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 
 		field.Value = val
 
-		if isEligibleToAccumulate(field.Accumulate, field.Type.BaseType()) {
-			if val, ok := typeconv.NumericToInt64(field.Value); ok {
+		if d.options.shouldExpandComponent && field.Accumulate {
+			if val, ok := bitsFromValue(field.Value); ok {
 				d.accumulator.Collect(mesg.Num, field.Num, val) // Collect the field values to be used in component expansion.
 			}
 		}
@@ -568,7 +560,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 
-		if subField, ok := field.SubFieldSubtitution(mesg); ok {
+		if subField := field.SubFieldSubtitution(mesg); subField != nil {
 			// Expand sub-field components as the main field components
 			d.expandComponents(mesg, field, subField.Components)
 			continue
@@ -580,12 +572,12 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	return nil
 }
 
-func isEligibleToAccumulate(accumulate bool, baseType basetype.BaseType) bool {
-	return accumulate && baseType != basetype.Enum && baseType != basetype.String
-}
-
 func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
-	bitVal, ok := typeconv.NumericToInt64(containingField.Value)
+	if len(components) == 0 {
+		return
+	}
+
+	bitVal, ok := bitsFromValue(containingField.Value)
 	if !ok {
 		return
 	}
@@ -596,7 +588,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		componentField := d.factory.CreateField(mesg.Num, component.FieldNum)
 		componentField.IsExpandedField = true
 
-		if isEligibleToAccumulate(component.Accumulate, componentField.Type.BaseType()) {
+		if component.Accumulate {
 			bitVal = d.accumulator.Accumulate(mesg.Num, component.FieldNum, bitVal, component.Bits)
 		}
 
@@ -605,14 +597,25 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 			if bitVal == 0 {
 				break // no more bits to shift
 			}
-			var mask int64 = (1 << component.Bits) - 1 // e.g. (1 << 8) - 1     = 255
-			val = val & mask                           // e.g. 0x27010E08 & 255 = 0x08
-			bitVal = bitVal >> component.Bits          // e.g. 0x27010E08 >> 8  = 0x27010E
+			var mask uint32 = (1 << component.Bits) - 1 // e.g. (1 << 8) - 1     = 255
+			val = val & mask                            // e.g. 0x27010E08 & 255 = 0x08
+			bitVal = bitVal >> component.Bits           // e.g. 0x27010E08 >> 8  = 0x27010E
 		}
 
-		// QUESTION: Should we expand componentField.Components too (?)
-		componentField.Value = typeconv.Int64ToNumber(val, componentField.Type.BaseType()) // cast back to original value
+		componentScaled := scaleoffset.Apply(val, component.Scale, component.Offset)
+		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
+		value := valueFromBits(val, componentField.Type.BaseType())
+
+		componentField.Value = value
 		mesg.Fields = append(mesg.Fields, componentField)
+
+		// The destination field (componentField) can itself contain components requiring expansion.
+		// e.g. compressed_speed_distance -> (speed, distance), speed -> enhanced_speed.
+		if subField := componentField.SubFieldSubtitution(mesg); subField != nil {
+			d.expandComponents(mesg, &componentField, subField.Components)
+		} else {
+			d.expandComponents(mesg, &componentField, componentField.Components)
+		}
 	}
 }
 
@@ -638,7 +641,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 
 		if fieldDescription == nil {
 			// Can't interpret this DeveloperField, no FieldDescription found. Just read acquired bytes and move forward.
-			if err := d.read(d.backingArray[:devFieldDef.Size]); err != nil {
+			if err := d.read(d.bytesArray[:devFieldDef.Size]); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
 			continue
@@ -684,7 +687,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 }
 
 func (d *Decoder) decodeCRC() error {
-	b := d.backingArray[:2]
+	b := d.bytesArray[:2]
 	n, err := io.ReadFull(d.r, b)
 	d.n += int64(n)
 	if err != nil {
@@ -709,7 +712,7 @@ func (d *Decoder) read(b []byte) error {
 
 // readByte is shorthand for read([1]byte).
 func (d *Decoder) readByte() (byte, error) {
-	b := d.backingArray[:1]
+	b := d.bytesArray[:1]
 	if err := d.read(b); err != nil {
 		return 0, err
 	}
@@ -718,7 +721,7 @@ func (d *Decoder) readByte() (byte, error) {
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
 func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (any, error) {
-	b := d.backingArray[:size]
+	b := d.bytesArray[:size]
 	if err := d.read(b); err != nil {
 		return nil, err
 	}
