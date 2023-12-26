@@ -289,14 +289,12 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 
 	b, _ := header.MarshalBinary()
 
-	_, _ = e.crc16.Write(b[:header.Size-2]) // recalculate CRC Checksum since header is changed.
-	header.CRC = e.crc16.Sum16()            // update crc in header
-
-	crc := make([]byte, 2)
-	binary.LittleEndian.PutUint16(crc, e.crc16.Sum16())
-	e.crc16.Reset()
-
-	copy(b[12:], crc) // update CRC directly without re-marshal
+	if header.Size >= 14 {
+		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since header is changed.
+		header.CRC = e.crc16.Sum16() // update crc in header
+		binary.LittleEndian.PutUint16(b[12:14], e.crc16.Sum16())
+		e.crc16.Reset()
+	}
 
 	switch w := e.w.(type) {
 	case io.WriterAt:
@@ -344,20 +342,21 @@ func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
 func (e *Encoder) encodeHeader(header *proto.FileHeader) error {
 	e.lastHeaderPos = e.n
 
-	if header.Size == 0 {
+	if header.Size < 12 {
 		*header = e.defaultFileHeader
 	}
 	header.ProtocolVersion = byte(e.options.protocolVersion)
 
 	b, _ := header.MarshalBinary()
+
 	if header.Size < 14 {
 		n, err := e.w.Write(b[:header.Size])
 		e.n += int64(n)
 		return err
 	}
 
-	_, _ = e.crc16.Write(b[:header.Size-2])
-	binary.LittleEndian.PutUint16(b[header.Size-2:], e.crc16.Sum16())
+	_, _ = e.crc16.Write(b[:12])
+	binary.LittleEndian.PutUint16(b[12:14], e.crc16.Sum16())
 	header.CRC = e.crc16.Sum16()
 
 	e.crc16.Reset() // this hash will be re-used for calculating data integrity.
