@@ -28,7 +28,7 @@ func (l *lru) Reset() {
 	l.bucket = l.bucket[:0]
 }
 
-// Putwill compare the equality of item with lru' items using cmp and store the item accordingly.
+// Put will compare the equality of item with lru' items and store the item accordingly.
 func (l *lru) Put(item []byte) (itemIndex byte, isNewItem bool) {
 	if bucketIndex := l.bucketIndex(item); bucketIndex != -1 {
 		return l.markAsRecentlyUsed(bucketIndex), false
