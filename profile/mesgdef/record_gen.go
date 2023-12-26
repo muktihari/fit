@@ -106,18 +106,24 @@ type Record struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [109]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewRecord creates new Record struct based on given mesg.
 // If mesg is nil, it will return Record with all fields being set to its corresponding invalid value.
 func NewRecord(mesg *proto.Message) *Record {
 	vals := [254]any{}
+	isExpandedFields := [109]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -211,6 +217,8 @@ func NewRecord(mesg *proto.Message) *Record {
 		CoreTemperature:               typeconv.ToUint16[uint16](vals[139]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -255,11 +263,13 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	if m.Distance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Distance
+		field.IsExpandedField = m.IsExpandedFields[5]
 		fields = append(fields, field)
 	}
 	if m.Speed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.Speed
+		field.IsExpandedField = m.IsExpandedFields[6]
 		fields = append(fields, field)
 	}
 	if m.Power != basetype.Uint16Invalid {
@@ -310,6 +320,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	if m.TotalCycles != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.TotalCycles
+		field.IsExpandedField = m.IsExpandedFields[19]
 		fields = append(fields, field)
 	}
 	if m.CompressedAccumulatedPower != basetype.Uint16Invalid {
@@ -320,6 +331,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	if m.AccumulatedPower != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = m.AccumulatedPower
+		field.IsExpandedField = m.IsExpandedFields[29]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.LeftRightBalance) != basetype.Uint8Invalid {
@@ -485,11 +497,13 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 73)
 		field.Value = m.EnhancedSpeed
+		field.IsExpandedField = m.IsExpandedFields[73]
 		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 78)
 		field.Value = m.EnhancedAltitude
+		field.IsExpandedField = m.IsExpandedFields[78]
 		fields = append(fields, field)
 	}
 	if m.BatterySoc != basetype.Uint8Invalid {
@@ -570,6 +584,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 108)
 		field.Value = m.EnhancedRespirationRate
+		field.IsExpandedField = m.IsExpandedFields[108]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.Grit) != basetype.Uint32Invalid {

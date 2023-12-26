@@ -117,18 +117,24 @@ type SegmentLap struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [94]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewSegmentLap creates new SegmentLap struct based on given mesg.
 // If mesg is nil, it will return SegmentLap with all fields being set to its corresponding invalid value.
 func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 	vals := [255]any{}
+	isExpandedFields := [94]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -233,6 +239,8 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 		EnhancedMinAltitude:         typeconv.ToUint32[uint32](vals[93]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -707,16 +715,19 @@ func (m *SegmentLap) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedAvgAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 91)
 		field.Value = m.EnhancedAvgAltitude
+		field.IsExpandedField = m.IsExpandedFields[91]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 92)
 		field.Value = m.EnhancedMaxAltitude
+		field.IsExpandedField = m.IsExpandedFields[92]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMinAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 93)
 		field.Value = m.EnhancedMinAltitude
+		field.IsExpandedField = m.IsExpandedFields[93]
 		fields = append(fields, field)
 	}
 

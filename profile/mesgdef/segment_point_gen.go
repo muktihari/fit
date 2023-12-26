@@ -27,18 +27,24 @@ type SegmentPoint struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [7]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.
 // If mesg is nil, it will return SegmentPoint with all fields being set to its corresponding invalid value.
 func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	vals := [255]any{}
+	isExpandedFields := [7]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -55,6 +61,8 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 		EnhancedAltitude: typeconv.ToUint32[uint32](vals[6]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -99,6 +107,7 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EnhancedAltitude
+		field.IsExpandedField = m.IsExpandedFields[6]
 		fields = append(fields, field)
 	}
 

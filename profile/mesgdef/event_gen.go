@@ -41,18 +41,24 @@ type Event struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [25]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewEvent creates new Event struct based on given mesg.
 // If mesg is nil, it will return Event with all fields being set to its corresponding invalid value.
 func NewEvent(mesg *proto.Message) *Event {
 	vals := [254]any{}
+	isExpandedFields := [25]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -81,6 +87,8 @@ func NewEvent(mesg *proto.Message) *Event {
 		RadarThreatMaxApproachSpeed: typeconv.ToUint8[uint8](vals[24]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -115,6 +123,7 @@ func (m *Event) ToMesg(fac Factory) proto.Message {
 	if m.Data != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Data
+		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
@@ -125,31 +134,37 @@ func (m *Event) ToMesg(fac Factory) proto.Message {
 	if m.Score != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.Score
+		field.IsExpandedField = m.IsExpandedFields[7]
 		fields = append(fields, field)
 	}
 	if m.OpponentScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.OpponentScore
+		field.IsExpandedField = m.IsExpandedFields[8]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = typeconv.ToUint8z[uint8](m.FrontGearNum)
+		field.IsExpandedField = m.IsExpandedFields[9]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.FrontGear) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToUint8z[uint8](m.FrontGear)
+		field.IsExpandedField = m.IsExpandedFields[10]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = typeconv.ToUint8z[uint8](m.RearGearNum)
+		field.IsExpandedField = m.IsExpandedFields[11]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8z[uint8](m.RearGear) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = typeconv.ToUint8z[uint8](m.RearGear)
+		field.IsExpandedField = m.IsExpandedFields[12]
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
@@ -170,21 +185,25 @@ func (m *Event) ToMesg(fac Factory) proto.Message {
 	if typeconv.ToEnum[byte](m.RadarThreatLevelMax) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = typeconv.ToEnum[byte](m.RadarThreatLevelMax)
+		field.IsExpandedField = m.IsExpandedFields[21]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatCount != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.RadarThreatCount
+		field.IsExpandedField = m.IsExpandedFields[22]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.RadarThreatAvgApproachSpeed
+		field.IsExpandedField = m.IsExpandedFields[23]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = m.RadarThreatMaxApproachSpeed
+		field.IsExpandedField = m.IsExpandedFields[24]
 		fields = append(fields, field)
 	}
 
