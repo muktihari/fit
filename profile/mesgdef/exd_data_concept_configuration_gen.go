@@ -31,18 +31,24 @@ type ExdDataConceptConfiguration struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewExdDataConceptConfiguration creates new ExdDataConceptConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdDataConceptConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfiguration {
 	vals := [12]any{}
+	isExpandedFields := [4]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -63,6 +69,8 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 		IsSigned:     typeconv.ToBool[bool](vals[11]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -87,11 +95,13 @@ func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
 	if m.FieldId != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.FieldId
+		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
 	if m.ConceptIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ConceptIndex
+		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.DataPage != basetype.Uint8Invalid {

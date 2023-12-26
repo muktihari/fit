@@ -145,18 +145,24 @@ type Lap struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [138]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewLap creates new Lap struct based on given mesg.
 // If mesg is nil, it will return Lap with all fields being set to its corresponding invalid value.
 func NewLap(mesg *proto.Message) *Lap {
 	vals := [255]any{}
+	isExpandedFields := [138]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -289,6 +295,8 @@ func NewLap(mesg *proto.Message) *Lap {
 		MaxCoreTemperature:            typeconv.ToUint16[uint16](vals[160]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -773,26 +781,31 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedAvgSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 110)
 		field.Value = m.EnhancedAvgSpeed
+		field.IsExpandedField = m.IsExpandedFields[110]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 111)
 		field.Value = m.EnhancedMaxSpeed
+		field.IsExpandedField = m.IsExpandedFields[111]
 		fields = append(fields, field)
 	}
 	if m.EnhancedAvgAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 112)
 		field.Value = m.EnhancedAvgAltitude
+		field.IsExpandedField = m.IsExpandedFields[112]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMinAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 113)
 		field.Value = m.EnhancedMinAltitude
+		field.IsExpandedField = m.IsExpandedFields[113]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 114)
 		field.Value = m.EnhancedMaxAltitude
+		field.IsExpandedField = m.IsExpandedFields[114]
 		fields = append(fields, field)
 	}
 	if m.AvgLevMotorPower != basetype.Uint16Invalid {
@@ -848,11 +861,13 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 136)
 		field.Value = m.EnhancedAvgRespirationRate
+		field.IsExpandedField = m.IsExpandedFields[136]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 137)
 		field.Value = m.EnhancedMaxRespirationRate
+		field.IsExpandedField = m.IsExpandedFields[137]
 		fields = append(fields, field)
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {

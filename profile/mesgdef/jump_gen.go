@@ -32,18 +32,24 @@ type Jump struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [9]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewJump creates new Jump struct based on given mesg.
 // If mesg is nil, it will return Jump with all fields being set to its corresponding invalid value.
 func NewJump(mesg *proto.Message) *Jump {
 	vals := [254]any{}
+	isExpandedFields := [9]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -63,6 +69,8 @@ func NewJump(mesg *proto.Message) *Jump {
 		EnhancedSpeed: typeconv.ToUint32[uint32](vals[8]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -122,6 +130,7 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.EnhancedSpeed
+		field.IsExpandedField = m.IsExpandedFields[8]
 		fields = append(fields, field)
 	}
 

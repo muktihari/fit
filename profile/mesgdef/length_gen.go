@@ -44,18 +44,24 @@ type Length struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [24]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewLength creates new Length struct based on given mesg.
 // If mesg is nil, it will return Length with all fields being set to its corresponding invalid value.
 func NewLength(mesg *proto.Message) *Length {
 	vals := [255]any{}
+	isExpandedFields := [24]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -87,6 +93,8 @@ func NewLength(mesg *proto.Message) *Length {
 		MaxRespirationRate:         typeconv.ToUint8[uint8](vals[25]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -191,11 +199,13 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.EnhancedAvgRespirationRate
+		field.IsExpandedField = m.IsExpandedFields[22]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.EnhancedMaxRespirationRate
+		field.IsExpandedField = m.IsExpandedFields[23]
 		fields = append(fields, field)
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {

@@ -28,18 +28,24 @@ type AntTx struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [5]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewAntTx creates new AntTx struct based on given mesg.
 // If mesg is nil, it will return AntTx with all fields being set to its corresponding invalid value.
 func NewAntTx(mesg *proto.Message) *AntTx {
 	vals := [254]any{}
+	isExpandedFields := [5]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -55,6 +61,8 @@ func NewAntTx(mesg *proto.Message) *AntTx {
 		Data:                typeconv.ToSliceByte[byte](vals[4]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -89,11 +97,13 @@ func (m *AntTx) ToMesg(fac Factory) proto.Message {
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ChannelNumber
+		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.Data != nil {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Data
+		field.IsExpandedField = m.IsExpandedFields[4]
 		fields = append(fields, field)
 	}
 

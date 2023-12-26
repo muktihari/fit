@@ -33,6 +33,8 @@ type mesgdefBuilder struct {
 	goTypesByBaseTypes       map[string]string // (k -> v) enum -> byte
 	goTypesByProfileTypes    map[string]string // (k -> v) typedef.DateTime -> uint32
 	baseTypeMapByProfileType map[string]string // (k -> v) enum -> enum, typedef.DateTime -> uint32
+
+	fieldByMesgNameByFieldName map[string]map[string]parser.Field
 }
 
 func NewBuilder(path, version string, message []parser.Message, types []parser.Type) builder.Builder {
@@ -41,14 +43,15 @@ func NewBuilder(path, version string, message []parser.Message, types []parser.T
 	return &mesgdefBuilder{
 		template: template.Must(template.New("main").
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
-		templateExec:             "mesgdef",
-		path:                     filepath.Join(path, "profile", "mesgdef"),
-		sdkVersion:               version,
-		messages:                 message,
-		types:                    types,
-		goTypesByBaseTypes:       make(map[string]string),
-		goTypesByProfileTypes:    make(map[string]string),
-		baseTypeMapByProfileType: make(map[string]string),
+		templateExec:               "mesgdef",
+		path:                       filepath.Join(path, "profile", "mesgdef"),
+		sdkVersion:                 version,
+		messages:                   message,
+		types:                      types,
+		goTypesByBaseTypes:         make(map[string]string),
+		goTypesByProfileTypes:      make(map[string]string),
+		baseTypeMapByProfileType:   make(map[string]string),
+		fieldByMesgNameByFieldName: make(map[string]map[string]parser.Field),
 	}
 }
 
@@ -68,6 +71,13 @@ func (b *mesgdefBuilder) populateLookupData() {
 		b.goTypesByProfileTypes[_type.Name] = b.goTypesByBaseTypes[_type.BaseType]
 		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
 	}
+
+	for _, mesg := range b.messages {
+		b.fieldByMesgNameByFieldName[mesg.Name] = make(map[string]parser.Field)
+		for _, field := range mesg.Fields {
+			b.fieldByMesgNameByFieldName[mesg.Name][field.Name] = field
+		}
+	}
 }
 
 func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
@@ -75,6 +85,27 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 
 	dataBuilders := make([]builder.Data, 0, len(b.messages))
 	for _, mesg := range b.messages {
+		canExpandMap := map[string]byte{}
+		var maxFieldExpandNum byte
+		for _, field := range mesg.Fields {
+			for _, component := range field.Components {
+				ref := b.fieldByMesgNameByFieldName[mesg.Name][component]
+				canExpandMap[ref.Name] = ref.Num
+				if ref.Num > maxFieldExpandNum {
+					maxFieldExpandNum = ref.Num
+				}
+			}
+			for _, subfield := range field.SubFields {
+				for _, component := range subfield.Components {
+					ref := b.fieldByMesgNameByFieldName[mesg.Name][component]
+					canExpandMap[ref.Name] = ref.Num
+					if ref.Num > maxFieldExpandNum {
+						maxFieldExpandNum = ref.Num
+					}
+				}
+			}
+		}
+
 		dataBuilder := builder.Data{
 			Template:     b.template,
 			TemplateExec: b.templateExec,
@@ -102,6 +133,10 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
 				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
 				Comment:        field.Comment,
+			}
+
+			if _, ok := canExpandMap[field.Name]; ok {
+				f.CanExpand = true
 			}
 
 			f.ComparableValue = b.transformComparableValue(field.Type, field.Array, f.PrimitiveValue)
@@ -139,12 +174,13 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		}
 
 		data := Data{
-			SDKVersion:  b.sdkVersion,
-			Package:     "mesgdef",
-			Imports:     []string{},
-			Name:        strutil.ToTitle(mesg.Name),
-			Fields:      fields,
-			MaxFieldNum: maxFieldNum + 1,
+			SDKVersion:        b.sdkVersion,
+			Package:           "mesgdef",
+			Imports:           []string{},
+			Name:              strutil.ToTitle(mesg.Name),
+			Fields:            fields,
+			MaxFieldNum:       maxFieldNum + 1,
+			MaxFieldExpandNum: maxFieldExpandNum + 1,
 		}
 
 		for k := range imports {

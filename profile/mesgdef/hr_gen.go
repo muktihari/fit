@@ -28,18 +28,24 @@ type Hr struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [10]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewHr creates new Hr struct based on given mesg.
 // If mesg is nil, it will return Hr with all fields being set to its corresponding invalid value.
 func NewHr(mesg *proto.Message) *Hr {
 	vals := [254]any{}
+	isExpandedFields := [10]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -55,6 +61,8 @@ func NewHr(mesg *proto.Message) *Hr {
 		EventTimestamp12:    typeconv.ToSliceByte[byte](vals[10]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -74,6 +82,7 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FractionalTimestamp
+		field.IsExpandedField = m.IsExpandedFields[0]
 		fields = append(fields, field)
 	}
 	if m.Time256 != basetype.Uint8Invalid {
@@ -89,6 +98,7 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 	if m.EventTimestamp != nil {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.EventTimestamp
+		field.IsExpandedField = m.IsExpandedFields[9]
 		fields = append(fields, field)
 	}
 	if m.EventTimestamp12 != nil {

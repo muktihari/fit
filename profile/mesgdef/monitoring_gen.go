@@ -51,18 +51,24 @@ type Monitoring struct {
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
+
+	IsExpandedFields [29]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewMonitoring creates new Monitoring struct based on given mesg.
 // If mesg is nil, it will return Monitoring with all fields being set to its corresponding invalid value.
 func NewMonitoring(mesg *proto.Message) *Monitoring {
 	vals := [254]any{}
+	isExpandedFields := [29]bool{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
+			}
+			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
+				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -101,6 +107,8 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 		VigorousActivityMinutes:      typeconv.ToUint16[uint16](vals[34]),
 
 		DeveloperFields: developerFields,
+
+		IsExpandedFields: isExpandedFields,
 	}
 }
 
@@ -145,6 +153,7 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = typeconv.ToEnum[byte](m.ActivityType)
+		field.IsExpandedField = m.IsExpandedFields[5]
 		fields = append(fields, field)
 	}
 	if typeconv.ToEnum[byte](m.ActivitySubtype) != basetype.EnumInvalid {
@@ -225,6 +234,7 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 	if m.Intensity != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = m.Intensity
+		field.IsExpandedField = m.IsExpandedFields[28]
 		fields = append(fields, field)
 	}
 	if m.DurationMin != basetype.Uint16Invalid {

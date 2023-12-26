@@ -5,12 +5,13 @@
 package mesgdef
 
 type Data struct {
-	SDKVersion  string
-	Package     string
-	Imports     []string
-	Name        string
-	Fields      []Field
-	MaxFieldNum byte
+	SDKVersion        string
+	Package           string
+	Imports           []string
+	Name              string
+	Fields            []Field
+	MaxFieldNum       byte
+	MaxFieldExpandNum byte
 }
 
 type Field struct {
@@ -23,4 +24,5 @@ type Field struct {
 	ComparableValue string
 	InvalidValue    string
 	Comment         string
+	CanExpand       bool
 }
