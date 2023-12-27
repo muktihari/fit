@@ -164,7 +164,7 @@ func isValueTypeAligned(value any, baseType basetype.BaseType) bool {
 		return false
 	}
 
-	switch val := value.(type) { // Fast path
+	switch value.(type) { // Fast path
 	case bool, []bool:
 		return baseType == basetype.Enum
 	case int8, []int8:
@@ -190,15 +190,10 @@ func isValueTypeAligned(value any, baseType basetype.BaseType) bool {
 		return baseType == basetype.Sint64
 	case uint64, []uint64:
 		return baseType == basetype.Uint64 || baseType == basetype.Uint64z
-	case string: // we have no []string values
+	case string, []string:
 		return baseType == basetype.String
-	case []any:
-		for i := range val {
-			if !isValueTypeAligned(val[i], baseType) {
-				return false
-			}
-		}
-		return true
+	case []any: // type is not supported. ref: profile/typedef/marshal.go
+		return false
 	}
 
 	// Fallback to reflection, reflect.TypeOf is fast enough and manageable. In this case, it's preferrable than asserting every possible types.
