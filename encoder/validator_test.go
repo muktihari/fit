@@ -21,6 +21,20 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+type ( // custom type for test
+	test_int8    int8
+	test_uint8   uint8
+	test_int16   int16
+	test_uint16  uint16
+	test_int32   int32
+	test_uint32  uint32
+	test_string  string
+	test_float32 float32
+	test_float64 float64
+	test_int64   int64
+	test_uint64  uint64
+)
+
 func TestMessageValidatorOption(t *testing.T) {
 	tt := []struct {
 		name    string
@@ -207,7 +221,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 }
 
 func TestIsValueTypeAligned(t *testing.T) {
-	type DefinedByte byte
 	var i8 int8 = 10
 
 	tt := []struct {
@@ -234,15 +247,28 @@ func TestIsValueTypeAligned(t *testing.T) {
 		{value: uint64(1), baseType: basetype.Uint64, expected: true},
 		{value: uint64(1), baseType: basetype.Uint64z, expected: true},
 		{value: string("Fit SDK"), baseType: basetype.String, expected: true},
+		{value: test_uint8(1), baseType: basetype.Byte, expected: true},
+		{value: test_uint8(1), baseType: basetype.Sint16, expected: false},
+		{value: []int8{1}, baseType: basetype.Sint8, expected: true},
+		{value: []uint8{1}, baseType: basetype.Uint8, expected: true},
+		{value: []uint8{1}, baseType: basetype.Uint8z, expected: true},
+		{value: []int16{1}, baseType: basetype.Sint16, expected: true},
+		{value: []uint16{1}, baseType: basetype.Uint16, expected: true},
+		{value: []uint16{1}, baseType: basetype.Uint16z, expected: true},
+		{value: []int32{1}, baseType: basetype.Sint32, expected: true},
+		{value: []uint32{1}, baseType: basetype.Uint32, expected: true},
+		{value: []uint32{1}, baseType: basetype.Uint32z, expected: true},
+		{value: []float32{1.0}, baseType: basetype.Float32, expected: true},
+		{value: []float64{1.0}, baseType: basetype.Float64, expected: true},
+		{value: []int64{1}, baseType: basetype.Sint64, expected: true},
+		{value: []uint64{1}, baseType: basetype.Uint64, expected: true},
+		{value: []uint64{1}, baseType: basetype.Uint64z, expected: true},
+		{value: []string{"Fit SDK"}, baseType: basetype.String, expected: true},
 		{value: []byte("Fit SDK"), baseType: basetype.Byte, expected: true},
-		{value: []any{byte(1), byte(2)}, baseType: basetype.Byte, expected: true},
-		{value: []any{byte(1), DefinedByte(2)}, baseType: basetype.Byte, expected: true},
-		{value: []any{DefinedByte(1), DefinedByte(2)}, baseType: basetype.Byte, expected: true},
-		{value: []any{DefinedByte(1), int8(2)}, baseType: basetype.Byte, expected: false},
+		{value: []any{byte(1), byte(2)}, baseType: basetype.Byte, expected: false}, // []any is not supported
 		{value: []*int8{&i8}, baseType: basetype.Sint8, expected: false},
 		{value: []int8{1, 2, 3}, baseType: basetype.Sint8, expected: true},
-		{value: DefinedByte(1), baseType: basetype.Byte, expected: true},
-		{value: DefinedByte(1), baseType: basetype.Sint16, expected: false},
+		{value: []test_string{"Fit SDK"}, baseType: basetype.String, expected: true},
 	}
 
 	for _, tc := range tt {
@@ -255,18 +281,6 @@ func TestIsValueTypeAligned(t *testing.T) {
 }
 
 func TestHasValidValue(t *testing.T) {
-	type Int8 int8
-	type Uint8 uint8
-	type Int16 int16
-	type Uint16 uint16
-	type Int32 int32
-	type Uint32 uint32
-	type String string
-	type Float32 float32
-	type Float64 float64
-	type Int64 int64
-	type Uint64 uint64
-
 	tt := []struct {
 		value    any
 		expected bool
@@ -305,30 +319,30 @@ func TestHasValidValue(t *testing.T) {
 		{value: []float64{0.5, math.Float64frombits(basetype.Float64Invalid)}, expected: true},
 		{value: []int64{0, basetype.Sint64Invalid}, expected: true},
 		{value: []uint64{0, basetype.Uint64Invalid}, expected: true},
-		{value: Int8(0), expected: true},
-		{value: Uint8(0), expected: true},
-		{value: Int16(0), expected: true},
-		{value: Uint16(0), expected: true},
-		{value: Int32(0), expected: true},
-		{value: Uint32(0), expected: true},
-		{value: String("Fit SDK Go"), expected: true},
-		{value: Float32(0.2), expected: true},
-		{value: Float64(0.5), expected: true},
-		{value: Int64(0), expected: true},
-		{value: Uint64(0), expected: true},
-		{value: []Int8{0, Int8(basetype.Sint8Invalid)}, expected: true},
-		{value: []Uint8{0, Uint8(basetype.Uint8Invalid)}, expected: true},
-		{value: []Int16{0, Int16(basetype.Sint16Invalid)}, expected: true},
-		{value: []Uint16{0, Uint16(basetype.Uint16Invalid)}, expected: true},
-		{value: []Int32{0, Int32(basetype.Sint32Invalid)}, expected: true},
-		{value: []Uint32{0, Uint32(basetype.Uint32Invalid)}, expected: true},
-		{value: []String{"Fit SDK Go"}, expected: true},
-		{value: []String{""}, expected: false},
-		{value: []String{"\x00"}, expected: false},
-		{value: []Float32{0.2, Float32(math.Float32frombits(basetype.Float32Invalid))}, expected: true},
-		{value: []Float64{0.5, Float64(math.Float64frombits(basetype.Float64Invalid))}, expected: true},
-		{value: []Int64{0, Int64(basetype.Sint64Invalid)}, expected: true},
-		{value: []Uint64{0, Uint64(basetype.Uint64Invalid)}, expected: true},
+		{value: test_int8(0), expected: true},
+		{value: test_uint8(0), expected: true},
+		{value: test_int16(0), expected: true},
+		{value: test_uint16(0), expected: true},
+		{value: test_int32(0), expected: true},
+		{value: test_uint32(0), expected: true},
+		{value: test_string("Fit SDK Go"), expected: true},
+		{value: test_float32(0.2), expected: true},
+		{value: test_float64(0.5), expected: true},
+		{value: test_int64(0), expected: true},
+		{value: test_uint64(0), expected: true},
+		{value: []test_int8{0, test_int8(basetype.Sint8Invalid)}, expected: true},
+		{value: []test_uint8{0, test_uint8(basetype.Uint8Invalid)}, expected: true},
+		{value: []test_int16{0, test_int16(basetype.Sint16Invalid)}, expected: true},
+		{value: []test_uint16{0, test_uint16(basetype.Uint16Invalid)}, expected: true},
+		{value: []test_int32{0, test_int32(basetype.Sint32Invalid)}, expected: true},
+		{value: []test_uint32{0, test_uint32(basetype.Uint32Invalid)}, expected: true},
+		{value: []test_string{"Fit SDK Go"}, expected: true},
+		{value: []test_string{""}, expected: false},
+		{value: []test_string{"\x00"}, expected: false},
+		{value: []test_float32{0.2, test_float32(math.Float32frombits(basetype.Float32Invalid))}, expected: true},
+		{value: []test_float64{0.5, test_float64(math.Float64frombits(basetype.Float64Invalid))}, expected: true},
+		{value: []test_int64{0, test_int64(basetype.Sint64Invalid)}, expected: true},
+		{value: []test_uint64{0, test_uint64(basetype.Uint64Invalid)}, expected: true},
 		{value: []struct{}{{}}, expected: true}, // mark as valid since its invalid value is unknown
 	}
 	for _, tc := range tt {
