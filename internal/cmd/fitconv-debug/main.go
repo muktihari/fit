@@ -27,19 +27,23 @@ func main() {
 	var flagVersion bool
 	flag.BoolVar(&flagVersion, "v", false, "Show version")
 
-	// Commands
 	var flagFitToCsv bool
-	flag.BoolVar(&flagFitToCsv, "f2c", false, "Convert FIT to CSV (default if not specified)")
+	flag.BoolVar(&flagFitToCsv, "csv", false, "Convert FIT to CSV (default if not specified)")
 
-	// FitToCsv Options
-	var flagFitToCsvRawValue bool
-	flag.BoolVar(&flagFitToCsvRawValue, "f2c-raw-value", false, "Use raw value instead of scaled value")
+	var flagUseDisk bool
+	flag.BoolVar(&flagUseDisk, "disk", false, "Use disk instead of load everything in memory")
 
-	var flagFitToCsvUseDisk bool
-	flag.BoolVar(&flagFitToCsvUseDisk, "f2c-use-disk", false, "Use disk instead of load everything in memory")
+	var flagPrintRawValue bool
+	flag.BoolVar(&flagPrintRawValue, "raw", false, "Use raw value instead of scaled value")
 
-	var flagFitToCsvUnknownNumber bool
-	flag.BoolVar(&flagFitToCsvUnknownNumber, "f2c-unknown-number", false, "Print 'unknown(68)' instead of 'unknown'")
+	var flagPrintDegrees bool
+	flag.BoolVar(&flagPrintDegrees, "deg", false, "Print GPS position in degrees instead of semicircles")
+
+	var flagPrintUnknownMesgNum bool
+	flag.BoolVar(&flagPrintUnknownMesgNum, "unknown", false, "Print unknown mesg num e.g. 'unknown(68)' instead of 'unknown'")
+
+	var flagPrintOnlyValidValue bool
+	flag.BoolVar(&flagPrintOnlyValidValue, "valid", false, "Print only valid value")
 
 	flag.Parse()
 
@@ -52,15 +56,21 @@ func main() {
 		flagFitToCsv = true // default
 	}
 
-	var fitToCsvOptions = []fitcsv.Option{fitcsv.WithChannelBufferSize(2000)}
-	if flagFitToCsvRawValue {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithRawValue())
+	var fitToCsvOptions []fitcsv.Option
+	if flagUseDisk {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUseDisk(blockSize))
 	}
-	if flagFitToCsvUnknownNumber {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUnknownNumber())
+	if flagPrintRawValue {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintRawValue())
 	}
-	if flagFitToCsvUseDisk {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUseDisk(1*blockSize))
+	if flagPrintUnknownMesgNum {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintUnknownMesgNum())
+	}
+	if flagPrintDegrees {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintSemicirclesInDegrees())
+	}
+	if flagPrintOnlyValidValue {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintOnlyValidValue())
 	}
 
 	paths := flag.Args()

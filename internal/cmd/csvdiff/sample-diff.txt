@@ -1,0 +1,15 @@
+[1] Line Number: 5
+input1: Data,0,session,timestamp,"1047788683",s,start_time,"1047787360",,total_elapsed_time,"1323.0",s,total_timer_time,"1190.0",s,total_distance,"7058.08",m,total_strokes,"0",strokes,total_calories,"248",kcal,avg_speed,"5.933",m/s,max_speed,"11.38",m/s,total_ascent,"34",m,total_descent,"22",m,num_laps,"0",,event,"9",,event_type,"1",,sport,"2",,sub_sport,"0",,avg_heart_rate,"148",bpm,max_heart_rate,"172",bpm,avg_cadence,"73",rpm,max_cadence,"109",rpm,total_moving_time,"1190.0",s,avg_altitude,"176.20000000000005",m,max_altitude,"188.39999999999998",m,avg_temperature,"32",C,max_temperature,"33",C,enhanced_avg_speed,"5.933",m/s,enhanced_max_speed,"11.38",m/s,enhanced_avg_altitude,"176.20000000000005",m,enhanced_max_altitude,"188.39999999999998",m
+input2: Data,0,session,timestamp,"1047788683",s,start_time,"1047787360",,total_elapsed_time,"1323.0",s,total_timer_time,"1190.0",s,total_distance,"7058.08",m,total_strokes,"0",cycles,total_calories,"248",kcal,avg_speed,"5.933",m/s,max_speed,"11.38",m/s,total_ascent,"34",m,total_descent,"22",m,num_laps,"0",,event,"9",,event_type,"1",,sport,"2",,sub_sport,"0",,avg_heart_rate,"148",bpm,max_heart_rate,"172",bpm,avg_cadence,"73",rpm,max_cadence,"109",rpm,total_moving_time,"1190.0",s,avg_altitude,"176.20000000000005",m,max_altitude,"188.39999999999998",m,avg_temperature,"32",C,max_temperature,"33",C,enhanced_avg_speed,"5.933",m/s,enhanced_max_speed,"11.38",m/s,enhanced_avg_altitude,"176.20000000000005",m,enhanced_max_altitude,"188.39999999999998",m
+[diff]:  
+  	... // 4 identical elements
+  	"total_timer_time,1190.0,s,",
+  	"total_distance,7058.08,m,",
+- 	"total_strokes,0,strokes,",
++ 	"total_strokes,0,cycles,",
+  	"total_calories,248,kcal,",
+  	"avg_speed,5.933,m/s,",
+  	... // 21 identical elements
+  
+
+[Total diff: 1]
