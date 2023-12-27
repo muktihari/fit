@@ -8,13 +8,17 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"math"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/kit/semicircles"
+	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/listener"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -52,20 +56,24 @@ type FitToCsvConv struct {
 type Option interface{ apply(o *options) }
 
 type options struct {
-	channelBufferSize int
-	rawValue          bool // Print scaled value as is in the binary form (sint, uint, etc.) than in its representation.
-	unknownNumber     bool // Print 'unknown(68)' instead of 'unknown'.
-	useDisk           bool // Write temporary data in disk instead of in memory.
-	ondiskWriteBuffer int  // Buffer on read/write in disk when useDisk is specified.
+	channelBufferSize         int
+	useDisk                   bool // Write temporary data in disk instead of in memory.
+	ondiskWriteBuffer         int  // Buffer on read/write in disk when useDisk is specified.
+	printRawValue             bool // Print scaled value as is in the binary form (sint, uint, etc.) than in its representation.
+	printUnknownMesgNum       bool // Print 'unknown(68)' instead of 'unknown'.
+	printOnlyValidValue       bool // Print invalid value e.g. 65535 for uint16.
+	printSemicirclesInDegrees bool // Print latitude and longitude in degrees instead of semicircles.
 }
 
 func defaultOptions() *options {
 	return &options{
-		channelBufferSize: 1000, // Ensures the broadcaster isn't blocked even if 1000 events are generated; we should have caught up by then.
-		rawValue:          false,
-		unknownNumber:     false,
-		useDisk:           false,
-		ondiskWriteBuffer: 4 << 10,
+		channelBufferSize:         1000, // Ensures the broadcaster isn't blocked even if 1000 events are generated; we should have caught up by then.
+		useDisk:                   false,
+		ondiskWriteBuffer:         4 << 10,
+		printRawValue:             false,
+		printUnknownMesgNum:       false,
+		printOnlyValidValue:       false,
+		printSemicirclesInDegrees: false,
 	}
 }
 
@@ -81,12 +89,12 @@ func WithChannelBufferSize(size int) Option {
 	})
 }
 
-func WithRawValue() Option {
-	return fnApply(func(o *options) { o.rawValue = true })
+func WithPrintRawValue() Option {
+	return fnApply(func(o *options) { o.printRawValue = true })
 }
 
-func WithUnknownNumber() Option {
-	return fnApply(func(o *options) { o.unknownNumber = true })
+func WithPrintUnknownMesgNum() Option {
+	return fnApply(func(o *options) { o.printUnknownMesgNum = true })
 }
 
 func WithUseDisk(writeBuffer int) Option {
@@ -95,6 +103,18 @@ func WithUseDisk(writeBuffer int) Option {
 		if writeBuffer > 0 {
 			o.ondiskWriteBuffer = writeBuffer
 		}
+	})
+}
+
+func WithPrintOnlyValidValue() Option {
+	return fnApply(func(o *options) {
+		o.printOnlyValidValue = true
+	})
+}
+
+func WithPrintSemicirclesInDegrees() Option {
+	return fnApply(func(o *options) {
+		o.printSemicirclesInDegrees = true
 	})
 }
 
@@ -236,7 +256,7 @@ func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	mesgName := mesgDef.MesgNum.String()
 	if strings.HasPrefix(mesgName, "MesgNumInvalid") {
 		mesgName = factory.NameUnknown
-		if c.options.unknownNumber {
+		if c.options.printUnknownMesgNum {
 			mesgName = formatUnknown(int(mesgDef.MesgNum))
 		}
 	}
@@ -248,7 +268,7 @@ func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 		field := factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 
 		name := field.Name
-		if c.options.unknownNumber && name == factory.NameUnknown {
+		if c.options.printUnknownMesgNum && name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
 		}
 
@@ -306,7 +326,7 @@ func (c *FitToCsvConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition)
 	if fieldDescription != nil {
 		return strings.Join(fieldDescription.FieldName, "|")
 	}
-	if c.options.unknownNumber {
+	if c.options.printUnknownMesgNum {
 		return formatUnknown(int(devFieldDef.Num))
 	}
 	return factory.NameUnknown
@@ -323,7 +343,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 	mesgName := mesg.Num.String()
 	if strings.HasPrefix(mesgName, "MesgNumInvalid") {
 		mesgName = factory.NameUnknown
-		if c.options.unknownNumber {
+		if c.options.printUnknownMesgNum {
 			mesgName = formatUnknown(int(mesg.Num))
 		}
 	}
@@ -334,7 +354,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 		name, units := field.Name, field.Units
-		if c.options.unknownNumber && field.Name == factory.NameUnknown {
+		if c.options.printUnknownMesgNum && field.Name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
 		}
 		if subField := field.SubFieldSubtitution(&mesg); subField != nil {
@@ -348,7 +368,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 			c.buf.WriteByte('"')
 			for i := range vals {
 				value := vals[i]
-				if !c.options.rawValue {
+				if !c.options.printRawValue {
 					value = scaleoffset.ApplyAny(vals[i], field.Scale, field.Offset)
 				}
 				c.buf.WriteString(format(value))
@@ -364,13 +384,23 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 			continue
 		}
 
+		if c.options.printOnlyValidValue && !isValueValid(field) {
+			continue
+		}
+
 		c.buf.WriteString(name)
 		c.buf.WriteByte(',')
 
 		value := field.Value
-		if !c.options.rawValue {
+		if !c.options.printRawValue {
 			value = scaleoffset.ApplyAny(field.Value, field.Scale, field.Offset)
 		}
+
+		if c.options.printSemicirclesInDegrees && field.Units == "semicircles" {
+			value = semicircles.ToDegrees(typeconv.ToSint32[int32](value))
+			units = "degrees"
+		}
+
 		c.buf.WriteByte('"')
 		c.buf.WriteString(format(value))
 		c.buf.WriteString("\",")
@@ -478,4 +508,24 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 	}
 
 	return nil, false
+}
+
+func isValueValid(field *proto.Field) bool {
+	switch field.Type.BaseType() {
+	case basetype.Float32:
+		f32 := typeconv.ToFloat32[float32](field.Value)
+		if math.Float32bits(f32) == basetype.Float32Invalid {
+			return false
+		}
+	case basetype.Float64:
+		f64 := typeconv.ToFloat64[float64](field.Value)
+		if math.Float64bits(f64) == basetype.Float64Invalid {
+			return false
+		}
+	default:
+		if field.Value == field.Type.BaseType().Invalid() {
+			return false
+		}
+	}
+	return true
 }
