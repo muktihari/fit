@@ -11,6 +11,7 @@ Table of Contents:
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
    - [Encode Common File Types](#Encode-Common-File-Types)
    - [Available Encode Options](#Available-Encode-Options)
+   - [Stream Encoder](#Stream-Encoder)
 
 ## Decoding
 
@@ -348,10 +349,17 @@ func main() {
 1. **WithIgnoreChecksum**: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
 
    Example:
-   Example:
 
    ```go
    dec := decoder.New(f, decoder.WithIgnoreChecksum())
+   ```
+
+1. **WithNoComponentExpansion**: directs the Decoder to not expand the components.
+
+   Example:
+
+   ```go
+   dec := decoder.New(f, decoder.WithNoComponentExpansion())
    ```
 
 ## Encoding
@@ -622,3 +630,56 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
    ```
 
    Note: we can only use either WithCompressedTimestampHeader or WithNormalHeader, can't use both at the same time.
+
+### Stream Encoder
+
+This is a new feature to enable encode per message basis or in streaming fashion rather than bulk per `proto.Fit`. To enable this, the Encoder's Writer should either implement io.WriterAt or io.WriteSeeker, since we need to be able to update FileHeader (the first 14 bytes) for every sequence completed. This is another building block that we can use.
+
+```go
+package main
+
+import (
+    "os"
+    "time"
+
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/factory"
+    "github.com/muktihari/fit/kit/datetime"
+    "github.com/muktihari/fit/profile/untyped/fieldnum"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+)
+
+func main() {
+    f, err := os.OpenFile("Activity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o777)
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    // f (*os.File) is even implementing both io.WriterAt and io.WriteSeeker
+    streamEnc, err := encoder.New(f).StreamEncoder()
+    if err != nil {
+        panic(err)
+    }
+
+    // Simplified example, writing only this mesg.
+    mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+        factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
+    )
+
+    // Write per message, we can use this to write message as it arrives.
+    // For example, message retrieved from decoder's Listener can be write right away
+    // without waiting all messages to be received.
+    if err := streamEnc.WriteMessage(&mesg); err != nil {
+        panic(err)
+    }
+
+    /* Write more messages */
+
+    // This should be invoked for every sequence of FIT File (not every message) to finalize.
+    if err := streamEnc.SequenceCompleted(); err != nil {
+        panic(err)
+    }
+}
+
+```
