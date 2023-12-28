@@ -315,6 +315,7 @@ func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
 	e.dataSize = 0
 	e.n = n
 	e.crc16.Reset()
+	e.localMesgNumLRU.Reset()
 
 	return nil
 }
