@@ -199,26 +199,6 @@ func New(w io.Writer, opts ...Option) *Encoder {
 	}
 }
 
-// EncodeWithContext wraps Encode to respect context propagation.
-func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	done := make(chan struct{})
-	go func() {
-		err = e.Encode(fit)
-		close(done)
-	}()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-done:
-		return
-	}
-}
-
 // Encode encodes fit into the dest writer. Encoder will do the following validations:
 //  1. Calculating Header's CRC & DataSize and Fit's CRC: any mismatch calculation will be corrected and updated to the given fit structure.
 //  2. Checking if fit.Messages are having all of its mesg definitions, return error if it's missing any mesg definition.
@@ -516,4 +496,76 @@ func (e *Encoder) reset() {
 	e.crc16.Reset()
 	e.localMesgNumLRU.Reset()
 	e.timestampReference = 0
+}
+
+// EncodeWithContext is similiar to Encode but with respect to context propagation.
+func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
+	defer e.reset()
+
+	// Encode Strategy
+	switch e.w.(type) {
+	case io.WriterAt, io.WriteSeeker:
+		return e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)
+	case io.Writer:
+		return e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
+	}
+
+	return ErrNilWriter
+}
+
+func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+		return err
+	}
+	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
+		return err
+	}
+	if err := e.encodeCRC(&fit.CRC); err != nil {
+		return err
+	}
+	if err := e.updateHeader(&fit.FileHeader); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+	if err := e.calculateDataSize(fit); err != nil {
+		return err
+	}
+	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+		return err
+	}
+	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
+		return err
+	}
+	if err := e.encodeCRC(&fit.CRC); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Encoder) encodeMessagesWithContext(ctx context.Context, w io.Writer, messages []proto.Message) error {
+	if len(messages) == 0 {
+		return ErrEmptyMessages
+	}
+
+	if messages[0].Num != mesgnum.FileId {
+		return ErrMissingFileId
+	}
+
+	for i := range messages {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+		mesg := &messages[i]
+		if err := e.encodeMessage(w, mesg); err != nil {
+			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
+				e.n, i, mesg.Num, mesg.Num.String(), err)
+		}
+	}
+
+	return nil
 }

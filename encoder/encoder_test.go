@@ -150,38 +150,6 @@ func TestOptions(t *testing.T) {
 	}
 }
 
-func TestEncodeExported(t *testing.T) {
-	tt := []struct {
-		name string
-		ctx  context.Context
-		fit  *proto.Fit
-		err  error
-	}{
-		{
-			name: "context nil", ctx: nil, err: ErrNilWriter,
-		},
-		{
-			name: "context canceled",
-			ctx: func() context.Context {
-				ctx, cancel := context.WithCancel(context.Background())
-				cancel()
-				return ctx
-			}(),
-			err: context.Canceled,
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			enc := New(nil)
-			err := enc.EncodeWithContext(tc.ctx, tc.fit)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err: %v, got: %v", tc.err, err)
-			}
-		})
-	}
-}
-
 type fnWriter func(b []byte) (n int, err error)
 
 func (f fnWriter) Write(b []byte) (n int, err error) { return f(b) }
@@ -213,7 +181,7 @@ var (
 	fnSeekErr    = fnSeeker(func(offset int64, whence int) (n int64, err error) { return 0, io.EOF })
 )
 
-func TestEncodeUnexported(t *testing.T) {
+func TestEncode(t *testing.T) {
 	tt := []struct {
 		name string
 		w    io.Writer
@@ -230,15 +198,24 @@ func TestEncodeUnexported(t *testing.T) {
 			_ = enc.Encode(&proto.Fit{})
 		})
 	}
+
+	// Test same logic for EncodeWithContext
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(tc.w)
+			_ = enc.EncodeWithContext(context.Background(), &proto.Fit{})
+		})
+	}
 }
 
-func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
-	tt := []struct {
-		name string
-		opts []Option
-		fit  *proto.Fit
-		w    io.Writer
-	}{
+type encodeWithDirectUpdateTestCase struct {
+	name string
+	fit  *proto.Fit
+	w    io.Writer
+}
+
+func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestCase {
+	return []encodeWithDirectUpdateTestCase{
 		{
 			name: "happy flow coverage",
 			fit: &proto.Fit{Messages: []proto.Message{
@@ -289,6 +266,10 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 			w: mockWriterAt{fnWriteOK, fnWriteAtErr},
 		},
 	}
+}
+
+func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
+	tt := makeEncodeWithDirectUpdateStrategyTableTest()
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
@@ -296,15 +277,27 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 			_ = enc.Encode(tc.fit)
 		})
 	}
+
+	// Test same logic for EncodeWithContext
+	tt2 := makeEncodeWithDirectUpdateStrategyTableTest()
+
+	for _, tc := range tt2 {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(tc.w)
+			_ = enc.EncodeWithContext(context.Background(), tc.fit)
+		})
+	}
 }
 
-func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
-	tt := []struct {
-		name string
-		fit  *proto.Fit
-		w    io.Writer
-		err  error
-	}{
+type encodeWithEarlyCheckStrategyTestCase struct {
+	name string
+	fit  *proto.Fit
+	w    io.Writer
+	err  error
+}
+
+func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
+	return []encodeWithEarlyCheckStrategyTestCase{
 		{
 			name: "happy flow coverage",
 			fit:  &proto.Fit{Messages: []proto.Message{{}}},
@@ -370,11 +363,28 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 			err: io.EOF, // since fnWriteErr produce io.EOF
 		},
 	}
+}
+
+func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
+	tt := makeEncodeWithEarlyCheckStrategy()
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w, WithMessageValidator(fnValidateOK))
 			err := enc.Encode(tc.fit)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+		})
+	}
+
+	// Test same logic for EncodeWithContext
+	tt2 := makeEncodeWithEarlyCheckStrategy()
+
+	for _, tc := range tt2 {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(tc.w, WithMessageValidator(fnValidateOK))
+			err := enc.EncodeWithContext(context.Background(), tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -742,13 +752,15 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 	})
 }
 
-func TestEncodeMessages(t *testing.T) {
-	tt := []struct {
-		name          string
-		mesgValidator MessageValidator
-		mesgs         []proto.Message
-		err           error
-	}{
+type encodeMessagesTestCase struct {
+	name          string
+	mesgValidator MessageValidator
+	mesgs         []proto.Message
+	err           error
+}
+
+func makeEncodeMessagesTableTest() []encodeMessagesTestCase {
+	return []encodeMessagesTestCase{
 		{
 			name:          "encode messages happy flow",
 			mesgValidator: fnValidateOK,
@@ -776,6 +788,11 @@ func TestEncodeMessages(t *testing.T) {
 			err:   ErrMissingFileId,
 		},
 	}
+}
+
+func TestEncodeMessages(t *testing.T) {
+	tt := makeEncodeMessagesTableTest()
+
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(nil)
@@ -785,155 +802,20 @@ func TestEncodeMessages(t *testing.T) {
 			}
 		})
 	}
+
+	// Test same logic for encodeMessagesWithContext
+	tt2 := makeEncodeMessagesTableTest()
+
+	for _, tc := range tt2 {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(nil)
+			err := enc.encodeMessagesWithContext(context.Background(), io.Discard, tc.mesgs)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+		})
+	}
 }
-
-// func TestRedefineLocalMesgNum(t *testing.T) {
-// 	type _struct struct {
-// 		name         string
-// 		b            []byte
-// 		listCapacity byte
-// 		list         *list.List
-// 		lru          *list.List
-// 		num          byte
-// 		writtable    bool
-// 	}
-
-// 	tt := []_struct{
-// 		{
-// 			name:      "init value",
-// 			b:         []byte{0, 1},
-// 			list:      list.New(),
-// 			lru:       list.New(),
-// 			num:       0,
-// 			writtable: true,
-// 		},
-// 		{
-// 			name: "eq with 1st index",
-// 			b:    []byte{0, 1},
-// 			list: func() *list.List {
-// 				l := list.New()
-// 				l.PushFront([]byte{0, 1})
-// 				return l
-// 			}(),
-// 			lru:       list.New(),
-// 			num:       0,
-// 			writtable: false,
-// 		},
-// 		{
-// 			name: "eq with 2st index",
-// 			b:    []byte{0, 2},
-// 			list: func() *list.List {
-// 				l := list.New()
-// 				l.PushBack([]byte{0, 1})
-// 				l.PushBack([]byte{0, 2})
-// 				return l
-// 			}(),
-// 			lru:       list.New(),
-// 			num:       1,
-// 			writtable: false,
-// 		},
-// 		func() _struct {
-// 			ls := list.New()
-// 			lru := list.New()
-// 			lru.PushBack(ls.PushBack([]byte{0, 1}))
-// 			lru.PushBack(ls.PushBack([]byte{0, 2}))
-
-// 			return _struct{
-// 				name:         "full, replace LRU item on the first index",
-// 				b:            []byte{0, 3},
-// 				listCapacity: 1,
-// 				list:         ls,
-// 				lru:          lru,
-// 				num:          0,
-// 				writtable:    true,
-// 			}
-// 		}(),
-// 		func() _struct {
-// 			ls, lru := list.New(), list.New()
-
-// 			lru.PushBack(ls.PushBack([]byte{0, 1}))
-// 			lru.PushBack(ls.PushBack([]byte{0, 2}))
-// 			lru.PushBack(ls.PushBack([]byte{0, 3}))
-
-// 			lru.MoveToBack(lru.Front())
-
-// 			return _struct{
-// 				name:         "full, replace LRU item on 2nd index",
-// 				b:            []byte{0, 4},
-// 				listCapacity: 2,
-// 				list:         ls,
-// 				lru:          lru,
-// 				num:          1,
-// 				writtable:    true,
-// 			}
-// 		}(),
-// 	}
-
-// 	for _, tc := range tt {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			enc := New(nil)
-// 			enc.options.multipleLocalMessageType = tc.listCapacity
-// 			enc.localMesgDefinitions = tc.list
-// 			enc.localMesgDefinitionsLRU = tc.lru
-
-// 			num, writtable := enc.redefineLocalMesgNum(tc.b)
-// 			if num != tc.num {
-// 				t.Fatalf("expected: %d, got: %d", tc.num, num)
-// 			}
-// 			if writtable != tc.writtable {
-// 				t.Fatalf("expected: %t, got: %t", tc.writtable, writtable)
-// 			}
-
-// 		})
-// 	}
-// }
-
-// func TestIsMesgDefinitionWriteable(t *testing.T) {
-// 	tt := []struct {
-// 		name      string
-// 		b         []byte
-// 		list      *list.List
-// 		writeable bool
-// 	}{
-// 		{
-// 			name:      "init element value",
-// 			b:         []byte{1, 1},
-// 			list:      list.New(),
-// 			writeable: true,
-// 		},
-// 		{
-// 			name: "eq with 1st element value",
-// 			b:    []byte{1, 1},
-// 			list: func() *list.List {
-// 				ls := list.New()
-// 				ls.PushFront([]byte{1, 1})
-// 				return ls
-// 			}(),
-// 			writeable: false,
-// 		},
-// 		{
-// 			name: "not eq, replace existing",
-// 			b:    []byte{1, 1},
-// 			list: func() *list.List {
-// 				ls := list.New()
-// 				ls.PushFront([]byte{0, 1})
-// 				return ls
-// 			}(),
-// 			writeable: true,
-// 		},
-// 	}
-// 	for _, tc := range tt {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			enc := New(nil)
-// 			enc.localMesgDefinitions = tc.list
-
-// 			writeable := enc.isMesgDefinitionWriteable(tc.b)
-// 			if writeable != tc.writeable {
-// 				t.Fatalf("expected: %t, got: %t", tc.writeable, writeable)
-// 			}
-// 		})
-// 	}
-// }
 
 func TestCompressTimestampInHeader(t *testing.T) {
 	now := time.Now()
@@ -1034,6 +916,22 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestEncodeMessagesWithContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	mesgs := []proto.Message{
+		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
+		),
+	}
+	enc := New(nil)
+	err := enc.encodeMessagesWithContext(ctx, nil, mesgs)
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected: %v, got: %v", context.Canceled, err)
 	}
 }
 
