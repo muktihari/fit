@@ -11,6 +11,7 @@ Table of Contents:
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
    - [Encode Common File Types](#Encode-Common-File-Types)
    - [Available Encode Options](#Available-Encode-Options)
+   - [Stream Encoder](#Stream-Encoder)
 
 ## Decoding
 
