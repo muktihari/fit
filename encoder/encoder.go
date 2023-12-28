@@ -16,7 +16,6 @@ import (
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -25,6 +24,8 @@ var (
 	ErrNilWriter     = errors.New("nil writer")
 	ErrEmptyMessages = errors.New("empty messages")
 	ErrMissingFileId = errors.New("missing file_id mesg")
+
+	ErrWriterAtOrWriteSeekerIsExpected = errors.New("io.WriterAt or io.WriteSeeker is expected")
 )
 
 const (
@@ -232,7 +233,8 @@ func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
 	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
 		return err
 	}
-	if err := e.encodeCRC(&fit.CRC); err != nil {
+	fit.CRC = e.crc16.Sum16()
+	if err := e.encodeCRC(); err != nil {
 		return err
 	}
 	if err := e.updateHeader(&fit.FileHeader); err != nil {
@@ -252,9 +254,11 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.Fit) error {
 	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
 		return err
 	}
-	if err := e.encodeCRC(&fit.CRC); err != nil {
+	fit.CRC = e.crc16.Sum16()
+	if err := e.encodeCRC(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -425,7 +429,7 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 }
 
 func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
-	field := mesg.FieldByNum(fieldnum.TimestampCorrelationTimestamp)
+	field := mesg.FieldByNum(proto.FieldNumTimestamp)
 	if field == nil {
 		return
 	}
@@ -456,7 +460,7 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
 	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
-	mesg.RemoveFieldByNum(fieldnum.TimestampCorrelationTimestamp)
+	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 }
 
 // writeMessage writes buf (marshaled message) to given w, and counts the total data size of all messages.
@@ -473,9 +477,7 @@ func (e *Encoder) writeMessage(w io.Writer, buf []byte) error {
 	return nil
 }
 
-func (e *Encoder) encodeCRC(crc *uint16) error {
-	*crc = e.crc16.Sum16() // update calculated crc to fit's CRC
-
+func (e *Encoder) encodeCRC() error {
 	b := make([]byte, 2)
 	binary.LittleEndian.PutUint16(b, e.crc16.Sum16())
 
@@ -521,7 +523,8 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
 		return err
 	}
-	if err := e.encodeCRC(&fit.CRC); err != nil {
+	fit.CRC = e.crc16.Sum16()
+	if err := e.encodeCRC(); err != nil {
 		return err
 	}
 	if err := e.updateHeader(&fit.FileHeader); err != nil {
@@ -540,7 +543,8 @@ func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, f
 	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
 		return err
 	}
-	if err := e.encodeCRC(&fit.CRC); err != nil {
+	fit.CRC = e.crc16.Sum16()
+	if err := e.encodeCRC(); err != nil {
 		return err
 	}
 	return nil
@@ -569,4 +573,17 @@ func (e *Encoder) encodeMessagesWithContext(ctx context.Context, w io.Writer, me
 	}
 
 	return nil
+}
+
+// StreamEncoder turns this Encoder into StreamEncoder to encode per message basis or in streaming fashion.
+// It returns an error if the Encoder's Writer does not implement io.WriterAt or io.WriteSeeker.
+// After invoking this method, it is recommended not to use the Encoder to avoid undefined behavior.
+func (e *Encoder) StreamEncoder() (*StreamEncoder, error) {
+	switch e.w.(type) {
+	case io.WriterAt, io.WriteSeeker:
+		return &StreamEncoder{enc: e}, nil
+	default:
+		return nil, fmt.Errorf("could not convert encoder into stream encoder: %w",
+			ErrWriterAtOrWriteSeekerIsExpected)
+	}
 }

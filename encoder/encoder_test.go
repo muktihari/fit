@@ -173,9 +173,9 @@ type mockWriteSeeker struct {
 }
 
 var (
-	fnWriteOK    = fnWriter(func(b []byte) (n int, err error) { return 0, nil })
-	fnWriteErr   = fnWriter(func(b []byte) (n int, err error) { return 0, io.EOF })
-	fnWriteAtOK  = fnWriterAt(func(p []byte, offset int64) (n int, err error) { return 0, nil })
+	fnWriteOK    = fnWriter(func(p []byte) (n int, err error) { return len(p), nil })
+	fnWriteErr   = fnWriter(func(p []byte) (n int, err error) { return 0, io.EOF })
+	fnWriteAtOK  = fnWriterAt(func(p []byte, offset int64) (n int, err error) { return len(p), nil })
 	fnWriteAtErr = fnWriterAt(func(p []byte, offset int64) (n int, err error) { return 0, io.EOF })
 	fnSeekOK     = fnSeeker(func(offset int64, whence int) (n int64, err error) { return 0, nil })
 	fnSeekErr    = fnSeeker(func(offset int64, whence int) (n int64, err error) { return 0, io.EOF })
@@ -351,7 +351,7 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 			name: "encode crc error",
 			fit:  &proto.Fit{Messages: []proto.Message{{}}},
 			w: func() io.Writer {
-				fnInstances := []io.Writer{fnWriteOK, fnWriteOK, fnWriteErr}
+				fnInstances := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
 				index := 0
 
 				return fnWriter(func(b []byte) (n int, err error) {
@@ -932,6 +932,41 @@ func TestEncodeMessagesWithContext(t *testing.T) {
 	err := enc.encodeMessagesWithContext(ctx, nil, mesgs)
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected: %v, got: %v", context.Canceled, err)
+	}
+}
+
+func TestStreamEncoder(t *testing.T) {
+	tt := []struct {
+		name string
+		w    io.Writer
+		err  error
+	}{
+		{
+			name: "writer is io.WriterAt",
+			w:    mockWriterAt{},
+		},
+		{
+			name: "writer is io.WriteSeeker",
+			w:    mockWriteSeeker{},
+		},
+		{
+			name: "writer is pure io.Writer",
+			w:    fnWriteOK,
+			err:  ErrWriterAtOrWriteSeekerIsExpected,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := New(tc.w).StreamEncoder()
+			if !errors.Is(err, tc.err) {
+				t.Errorf("expected err: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+
+		})
 	}
 }
 
