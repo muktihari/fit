@@ -265,26 +265,6 @@ func (d *Decoder) reset() {
 	d.initDecodeHeaderOnce() // reset to enable invocation.
 }
 
-// DecodeWithContext wraps Decode to respect context propagation.
-func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	done := make(chan struct{})
-	go func() {
-		fit, err = d.Decode()
-		close(done)
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case <-done:
-		return
-	}
-}
-
 // Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.
 // To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
 // multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
@@ -732,4 +712,59 @@ func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool,
 	}
 
 	return val, nil
+}
+
+// DecodeWithContext is similar to Decode but with respect to context propagation.
+func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	defer func() { d.err = err }()
+	if err = checkContext(ctx); err != nil {
+		return nil, err
+	}
+	if err = d.decodeHeaderOnce(); err != nil {
+		return nil, err
+	}
+	if err = d.decodeMessagesWithContext(ctx); err != nil {
+		return nil, err
+	}
+	if err = checkContext(ctx); err != nil {
+		return nil, err
+	}
+	if err = d.decodeCRC(); err != nil {
+		return nil, err
+	}
+	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
+		return nil, ErrCRCChecksumMismatch
+	}
+	d.sequenceCompleted = true
+	return &proto.Fit{
+		FileHeader: d.fileHeader,
+		Messages:   d.messages,
+		CRC:        d.crc,
+	}, nil
+}
+
+func checkContext(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+		return nil
+	}
+}
+
+func (d *Decoder) decodeMessagesWithContext(ctx context.Context) error {
+	for d.cur < d.fileHeader.DataSize {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			if err := d.decodeMessage(); err != nil {
+				return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
+			}
+		}
+	}
+	return nil
 }

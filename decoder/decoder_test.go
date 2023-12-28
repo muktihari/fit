@@ -483,53 +483,16 @@ func TestNext(t *testing.T) {
 	}
 }
 
-func TestDecodeWithContext(t *testing.T) {
-	tt := []struct {
-		name string
-		r    io.Reader
-		ctx  context.Context
-		err  error
-	}{
-		{
-			name: "context nil",
-			r:    fnReaderErr,
-			ctx:  nil,
-			err:  io.EOF,
-		},
-		{
-			name: "context DeadlineExceeded",
-			r: fnReader(func(b []byte) (n int, err error) {
-				time.Sleep(1 * time.Second) // Let's make our process take longer, 1s per reader Read call.
-				return len(b), nil
-			}),
-			ctx: func() context.Context {
-				ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
-				_ = cancel // it's okay to discard this since only for testing.
-				return ctx
-			}(),
-			err: context.DeadlineExceeded,
-		},
-	}
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			dec := New(tc.r)
-			_, err := dec.DecodeWithContext(tc.ctx)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err: %v, got: %v", tc.err, err)
-			}
-		})
-	}
+type decodeTestCase struct {
+	name string
+	r    io.Reader
+	fit  proto.Fit
+	err  error
 }
 
-func TestDecode(t *testing.T) {
+func makeDecodeTableTest() []decodeTestCase {
 	fit, buf := createFitForTest()
-
-	tt := []struct {
-		name string
-		r    io.Reader
-		fit  proto.Fit
-		err  error
-	}{
+	return []decodeTestCase{
 		{
 			name: "decode happy flow",
 			r: func() io.Reader {
@@ -543,6 +506,21 @@ func TestDecode(t *testing.T) {
 				})
 			}(),
 			fit: fit,
+		},
+		{
+			name: "decode header return error",
+			r: func() io.Reader {
+				var buf, cur = slices.Clone(buf), 0
+				buf[0] = 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(buf) {
+						return 0, io.EOF
+					}
+					cur += copy(b, buf[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: ErrNotAFitFile,
 		},
 		{
 			name: "decode messages return error",
@@ -592,11 +570,15 @@ func TestDecode(t *testing.T) {
 			err: ErrCRCChecksumMismatch,
 		},
 	}
+}
+
+func TestDecode(t *testing.T) {
+	tt := makeDecodeTableTest()
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			fit, err := dec.DecodeWithContext(context.Background())
+			fit, err := dec.Decode()
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -1525,6 +1507,110 @@ func TestReadValue(t *testing.T) {
 			}
 			if diff := cmp.Diff(res, tc.result); diff != "" {
 				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestDecodeWithContext(t *testing.T) {
+	tt := makeDecodeTableTest()
+	var ctx context.Context
+
+	// Testing logic same as Decode()
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := New(tc.r)
+			fit, err := dec.DecodeWithContext(ctx)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+			if diff := cmp.Diff(*fit, tc.fit); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+
+	type strct struct {
+		name string
+		ctx  context.Context
+		r    io.Reader
+		err  error
+	}
+
+	// Test context related logic
+	tt2 := []strct{
+		{
+			name: "context canceled before decode header",
+			ctx: func() context.Context {
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+				return ctx
+			}(),
+			err: context.Canceled,
+		},
+		func() strct {
+			ctx, cancel := context.WithCancel(context.Background())
+			_, buffer := createFitForTest()
+			buf, cur := slices.Clone(buffer), 0
+			r := fnReader(func(b []byte) (n int, err error) {
+				cur += copy(b, buf[cur:cur+len(b)])
+				if cur == len(buf)-2 {
+					cancel() // cancel right after completing decode messages
+				}
+				return len(b), nil
+			})
+
+			return strct{
+				name: "context canceled before decode crc",
+				r:    r,
+				ctx:  ctx,
+				err:  context.Canceled,
+			}
+		}(),
+	}
+
+	for _, tc := range tt2 {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := New(tc.r)
+			_, err := dec.DecodeWithContext(tc.ctx)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+		})
+	}
+}
+
+func TestDecodeMessagesWithContext(t *testing.T) {
+	tt := []struct {
+		name string
+		r    io.Reader
+		ctx  context.Context
+		err  error
+	}{
+		{
+			name: "context DeadlineExceeded",
+			r: fnReader(func(b []byte) (n int, err error) {
+				time.Sleep(1 * time.Second) // Let's make our process take longer, 1s per reader Read call.
+				return len(b), nil
+			}),
+			ctx: func() context.Context {
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+				return ctx
+			}(),
+			err: context.Canceled,
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := New(tc.r)
+			dec.fileHeader.DataSize = 1024
+			err := dec.decodeMessagesWithContext(tc.ctx)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
 		})
 	}
