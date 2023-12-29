@@ -31,7 +31,7 @@ func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 		e.fileHeaderWritten = true
 	}
 	if err := e.enc.encodeMessage(e.enc.w, mesg); err != nil {
-		return fmt.Errorf("coould not encode mesg: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
+		return fmt.Errorf("could not encode mesg: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
 	}
 	return nil
 }
