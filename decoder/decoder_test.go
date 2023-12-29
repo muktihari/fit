@@ -41,6 +41,7 @@ var (
 	cd                = filepath.Dir(filename)
 	testdata          = filepath.Join(cd, "..", "testdata")
 	fromOfficialSDK   = filepath.Join(testdata, "from_official_sdk")
+	fromGarminForums  = filepath.Join(testdata, "from_garmin_forums")
 )
 
 func TestDecodeRealFiles(t *testing.T) {
@@ -75,6 +76,36 @@ func TestDecodeRealFiles(t *testing.T) {
 
 				t.Errorf("filename: %s: %v", info.Name(), err)
 
+				return nil
+			}
+
+			return nil
+		})
+	})
+
+	t.Run("testdata/from_garmin_forums", func(t *testing.T) {
+		_ = filepath.Walk(fromGarminForums, func(path string, info fs.FileInfo, _ error) error {
+			if info.IsDir() {
+				return nil
+			}
+
+			ext := filepath.Ext(info.Name())
+			if strings.ToLower(ext) != ".fit" {
+				return nil
+			}
+
+			f, err := os.Open(path)
+			if err != nil {
+				t.Errorf("filename: %s: %v", info.Name(), err)
+				return nil
+			}
+			defer f.Close()
+
+			dec := New(bufio.NewReader(f))
+
+			_, err = dec.DecodeWithContext(context.Background())
+			if err != nil {
+				t.Errorf("filename: %s: %v", info.Name(), err)
 				return nil
 			}
 
