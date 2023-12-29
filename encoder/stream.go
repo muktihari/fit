@@ -26,11 +26,14 @@ func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 	if !e.fileHeaderWritten {
 		e.fileHeader = e.enc.defaultFileHeader
 		if err := e.enc.encodeHeader(&e.fileHeader); err != nil {
-			return err
+			return fmt.Errorf("could not encode file header: %w", err)
 		}
 		e.fileHeaderWritten = true
 	}
-	return e.enc.encodeMessage(e.enc.w, mesg)
+	if err := e.enc.encodeMessage(e.enc.w, mesg); err != nil {
+		return fmt.Errorf("coould not encode mesg: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
+	}
+	return nil
 }
 
 // SequenceCompleted finalises the FIT File by updating its FileHeader's DataSize & CRC, as well as the File's CRC.

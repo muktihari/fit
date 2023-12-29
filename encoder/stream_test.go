@@ -145,4 +145,19 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	if !errors.Is(err, io.ErrUnexpectedEOF) {
 		t.Fatalf("expected err: %v, got: %v", io.ErrShortWrite, err)
 	}
+
+	// Encode message return error
+	ws := []io.Writer{fnWriteOK, fnWriteErr}
+	cur := 0
+	w = fnWriter(func(b []byte) (n int, err error) {
+		cur++
+		return ws[cur-1].Write(b)
+	})
+	enc = New(mockWriterAt{Writer: w, WriterAt: wa})
+	streamEnc, _ = enc.StreamEncoder()
+
+	err = streamEnc.WriteMessage(&mesg)
+	if !errors.Is(err, io.EOF) {
+		t.Fatalf("expected err: %v, got: %v", io.EOF, err)
+	}
 }
