@@ -387,7 +387,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	}
 
 	n := b[4]
-	b = d.bytesArray[:n*3] // 3 byte per field
+	b = d.bytesArray[:uint16(n)*3] // 3 byte per field
 	if err := d.read(b); err != nil {
 		return err
 	}
@@ -407,7 +407,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			return err
 		}
 
-		b := d.bytesArray[:n*3] // 3 byte per field
+		b := d.bytesArray[:uint16(n)*3] // 3 byte per field
 		if err := d.read(b); err != nil {
 			return err
 		}
