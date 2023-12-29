@@ -143,10 +143,7 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 			}
 			return vs, nil
 		}
-
-		if len(b) != 0 && b[len(b)-1] == '\x00' {
-			b = b[:len(b)-1] // trim utf-8 null-terminated string
-		}
+		b = trimUTF8NullTerminatedString(b)
 		return string(b), nil
 	}
 
@@ -156,4 +153,18 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 // Note: The size may be a multiple of the underlying FIT Base Type size indicating the field contains multiple elements represented as an array.
 func size(lenbytes int, typesize byte) byte {
 	return byte(lenbytes % int(typesize))
+}
+
+func trimUTF8NullTerminatedString(b []byte) []byte {
+	pos := -1
+	for i := len(b); i > 0; i-- {
+		if b[i-1] != '\x00' {
+			break
+		}
+		pos = i - 1
+	}
+	if pos < 0 {
+		return b
+	}
+	return b[:pos]
 }
