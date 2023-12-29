@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/muktihari/fit/cmd/fitconv/fitcsv"
 	"github.com/muktihari/fit/decoder"
@@ -95,7 +96,7 @@ func fitToCsv(path string, opts ...fitcsv.Option) error {
 	dir := filepath.Dir(path)
 	ext := filepath.Ext(path)
 
-	if ext != ".fit" {
+	if strings.ToLower(ext) != ".fit" {
 		return fmt.Errorf("expected *.fit, got %s", ext)
 	}
 
