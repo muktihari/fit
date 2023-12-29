@@ -6,11 +6,12 @@ package profile
 
 import (
 	"fmt"
+	"math"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"text/template"
-	"unicode"
 
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
@@ -144,11 +145,26 @@ func transformBaseType(s string) string {
 }
 
 func toProfileVersion(s string) string {
-	s = strings.Map(func(r rune) rune {
-		if !unicode.IsDigit(r) {
-			return -1
-		}
-		return r
-	}, s)
-	return s
+	// On error, use panic so we can get stack trace, should not generate when version is invalid.
+	parts := strings.Split(s, ".")
+	if len(parts) < 2 {
+		panic(fmt.Errorf("malformed sdkversion, should in the form of <major>.<minor>, got: %s", s))
+	}
+
+	major, err := strconv.ParseUint(parts[0], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("invalid major version: %w", err))
+	}
+	minor, err := strconv.ParseUint(parts[1], 10, 64)
+	if err != nil {
+		panic(fmt.Errorf("invalid minor version: %w", err))
+	}
+
+	version := (major * 1000) + minor
+
+	if version >= math.MaxUint16 {
+		panic(fmt.Errorf("version should not exceed max uint16, expected < %d, got: %d", math.MaxUint16, version))
+	}
+
+	return fmt.Sprintf("%s // (Major * 1000) + Minor", strconv.FormatUint(version, 10))
 }
