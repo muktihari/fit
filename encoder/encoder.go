@@ -375,6 +375,7 @@ func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask
+	mesg.Architecture = e.options.endianess
 
 	if err := e.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)

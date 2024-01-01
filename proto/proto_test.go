@@ -354,6 +354,28 @@ func TestCreateMessageDefinition(t *testing.T) {
 			},
 		},
 		{
+			name: "fields only with mesg architecture big-endian",
+			mesg: func() proto.Message {
+				mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+				)
+				mesg.Architecture = 1 // big-endian
+				return mesg
+			}(),
+			mesgDef: proto.MessageDefinition{
+				Header:       proto.MesgDefinitionMask,
+				Architecture: 1, // big-endian
+				MesgNum:      mesgnum.FileId,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.FileIdType,
+						Size:     1,
+						BaseType: basetype.Enum,
+					},
+				},
+			},
+		},
+		{
 			name: "fields only with string value",
 			mesg: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("Fit SDK Go"),

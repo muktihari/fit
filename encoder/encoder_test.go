@@ -562,11 +562,12 @@ func TestEncodeHeader(t *testing.T) {
 
 func TestEncodeMessage(t *testing.T) {
 	tt := []struct {
-		name string
-		mesg proto.Message
-		opts []Option
-		w    io.Writer
-		err  error
+		name      string
+		mesg      proto.Message
+		opts      []Option
+		w         io.Writer
+		endianess byte
+		err       error
 	}{
 		{
 			name: "encode message with default header option happy flow",
@@ -576,6 +577,17 @@ func TestEncodeMessage(t *testing.T) {
 			w: fnWriter(func(b []byte) (n int, err error) {
 				return 0, nil
 			}),
+		},
+		{
+			name: "encode message with big-endian",
+			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
+				fieldnum.FileIdType: typedef.FileActivity,
+			}),
+			w: fnWriter(func(b []byte) (n int, err error) {
+				return 0, nil
+			}),
+			opts:      []Option{WithBigEndian()},
+			endianess: bigEndian,
 		},
 		{
 			name: "encode message with header normal multiple local message type happy flow",
@@ -691,6 +703,10 @@ func TestEncodeMessage(t *testing.T) {
 			}
 			if (tc.mesg.Header & proto.DevDataMask) == proto.DevDataMask {
 				t.Fatalf("message header should not contain Developer Data Flag")
+			}
+
+			if tc.mesg.Architecture != tc.endianess {
+				t.Fatalf("expected endianess: %d, got: %d", tc.endianess, tc.mesg.Architecture)
 			}
 		})
 	}
