@@ -298,7 +298,7 @@ func (t BaseType) Kind() reflect.Kind {
 	return basetypes[t&BaseTypeNumMask].kind
 }
 
-// EndianAbility return whether t have endianess.
+// EndianAbility return whether t have endianness.
 func (t BaseType) EndianAbility() byte {
 	if !valid(t) {
 		return 0

@@ -111,7 +111,7 @@ func TestOptions(t *testing.T) {
 			opts: nil,
 			expected: &options{
 				multipleLocalMessageType: 0,
-				endianess:                0,
+				endianness:               0,
 				protocolVersion:          proto.V1,
 				messageValidator:         NewMessageValidator(),
 			},
@@ -127,7 +127,7 @@ func TestOptions(t *testing.T) {
 			},
 			expected: &options{
 				multipleLocalMessageType: 15,
-				endianess:                1,
+				endianness:               1,
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionCompressedTimestamp,
@@ -562,12 +562,12 @@ func TestEncodeHeader(t *testing.T) {
 
 func TestEncodeMessage(t *testing.T) {
 	tt := []struct {
-		name      string
-		mesg      proto.Message
-		opts      []Option
-		w         io.Writer
-		endianess byte
-		err       error
+		name       string
+		mesg       proto.Message
+		opts       []Option
+		w          io.Writer
+		endianness byte
+		err        error
 	}{
 		{
 			name: "encode message with default header option happy flow",
@@ -586,8 +586,8 @@ func TestEncodeMessage(t *testing.T) {
 			w: fnWriter(func(b []byte) (n int, err error) {
 				return 0, nil
 			}),
-			opts:      []Option{WithBigEndian()},
-			endianess: bigEndian,
+			opts:       []Option{WithBigEndian()},
+			endianness: bigEndian,
 		},
 		{
 			name: "encode message with header normal multiple local message type happy flow",
@@ -705,8 +705,8 @@ func TestEncodeMessage(t *testing.T) {
 				t.Fatalf("message header should not contain Developer Data Flag")
 			}
 
-			if tc.mesg.Architecture != tc.endianess {
-				t.Fatalf("expected endianess: %d, got: %d", tc.endianess, tc.mesg.Architecture)
+			if tc.mesg.Architecture != tc.endianness {
+				t.Fatalf("expected endianness: %d, got: %d", tc.endianness, tc.mesg.Architecture)
 			}
 		})
 	}
