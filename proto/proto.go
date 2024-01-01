@@ -137,7 +137,7 @@ type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
 	Num             typedef.MesgNum  // Global Message Number defined in Global Fit Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
 	Reserved        byte             // Currently undetermined; the default value is 0.
-	Architecture    byte             // Architecture type / Endianess. Must be the same
+	Architecture    byte             // Architecture type / Endianness. Must be the same
 	Fields          []Field          // List of Field
 	DeveloperFields []DeveloperField // List of DeveloperField
 }

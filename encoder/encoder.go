@@ -36,9 +36,9 @@ const (
 type headerOption byte
 
 const (
-	littleEndian     = 0
-	bigEndian        = 1
-	defaultEndianess = littleEndian
+	littleEndian      = 0
+	bigEndian         = 1
+	defaultEndianness = littleEndian
 
 	// headerOptionNormal is the default header option.
 	// This option has two sub-option to select from:
@@ -84,14 +84,14 @@ type Encoder struct {
 type options struct {
 	protocolVersion          proto.Version
 	messageValidator         MessageValidator
-	endianess                byte
+	endianness               byte
 	headerOption             headerOption
 	multipleLocalMessageType byte
 }
 
 func defaultOptions() *options {
 	return &options{
-		endianess:        defaultEndianess,
+		endianness:       defaultEndianness,
 		protocolVersion:  proto.V1,
 		messageValidator: NewMessageValidator(),
 		headerOption:     headerOptionNormal,
@@ -122,7 +122,7 @@ func WithMessageValidator(validator MessageValidator) Option {
 
 // WithBigEndian directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 func WithBigEndian() Option {
-	return fnApply(func(o *options) { o.endianess = bigEndian })
+	return fnApply(func(o *options) { o.endianness = bigEndian })
 }
 
 // WithCompressedTimestampHeader directs the Encoder to compress timestamp in header to reduce file size.
@@ -375,6 +375,7 @@ func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask
+	mesg.Architecture = e.options.endianness
 
 	if err := e.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
