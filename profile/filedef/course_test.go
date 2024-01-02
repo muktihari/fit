@@ -73,7 +73,7 @@ func TestCourseCorrectness(t *testing.T) {
 
 	course := filedef.NewCourse(mesgs...)
 	if course.FileId.Type != typedef.FileCourse {
-		t.Fatalf("expected: %#v, got: %#v", typedef.FileActivity, course.FileId.Type)
+		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, course.FileId.Type)
 	}
 
 	fit := course.ToFit(nil)

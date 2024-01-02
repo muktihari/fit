@@ -95,7 +95,7 @@ func newActivityMessageForTest(now time.Time) []proto.Message {
 		factory.CreateMesgOnly(mesgnum.Activity).WithFields(
 			factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
-		// Unordered pptional Messages
+		// Unordered optional Messages
 		factory.CreateMesgOnly(mesgnum.Length).WithFields(
 			factory.CreateField(mesgnum.Length, fieldnum.LengthAvgSpeed).WithValue(uint16(1000)),
 		),
@@ -132,7 +132,7 @@ func TestActivityCorrectness(t *testing.T) {
 
 	activity := filedef.NewActivity(mesgs...)
 	if activity.FileId.Type != typedef.FileActivity {
-		t.Fatalf("expected: %#v, got: %#v", typedef.FileActivity, activity.FileId.Type)
+		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, activity.FileId.Type)
 	}
 
 	fit := activity.ToFit(nil) // use standard factory
