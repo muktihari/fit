@@ -318,17 +318,17 @@ func main() {
     // After invoking CheckIntegrity and users want to reuse `dec` to Decode the FIT file,
     // `f` should be reset since `f` has been fully read. The following method with do:
     _, err = f.Seek(0, io.SeekStart)
-	if err != nil {
-		panic(err)
-	}
+    if err != nil {
+        panic(err)
+    }
 
-	for dec.Next() {
-		fit, err := dec.Decode()
-		if err != nil {
-			panic(err)
-		}
+    for dec.Next() {
+        fit, err := dec.Decode()
+        if err != nil {
+            panic(err)
+        }
         _ = fit // Do something with fit
-	}
+    }
 }
 ```
 
