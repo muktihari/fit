@@ -318,6 +318,122 @@ func TestPeekFileId(t *testing.T) {
 	}
 }
 
+func TestCheckIntegrity(t *testing.T) {
+	_, b := createFitForTest()
+
+	tt := []struct {
+		name string
+		r    io.Reader
+		err  error
+	}{
+		{
+			name: "happy flow",
+			r: func() io.Reader {
+				// Chained FIT File
+				b := slices.Clone(b)
+				nextb := slices.Clone(b)
+				b = append(b, nextb...)
+				return bytes.NewReader(b)
+			}(),
+			err: nil,
+		},
+		{
+			name: "decode header return io.EOF on first sequence",
+			r:    fnReaderErr,
+			err:  io.EOF,
+		},
+		{
+			name: "file header's DataSize == 0",
+			r: func() io.Reader {
+				h := proto.FileHeader{
+					Size:            14,
+					ProtocolVersion: byte(proto.V2),
+					ProfileVersion:  profile.Version(),
+					DataSize:        0,
+					DataType:        proto.DataTypeFIT,
+				}
+				b, _ := h.MarshalBinary()
+				crc := crc16.New(crc16.MakeFitTable())
+				crc.Write(b[:12])
+				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
+				return bytes.NewReader(b)
+			}(),
+			err: ErrDataSizeZero,
+		},
+		{
+			name: "read message return error",
+			r: func() io.Reader {
+				bb := slices.Clone(b)
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur > 14 {
+						return 0, io.EOF
+					}
+					cur += copy(b, bb[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: io.EOF,
+		},
+		{
+			name: "decode crc return error",
+			r: func() io.Reader {
+				bb := slices.Clone(b)
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(bb)-2 {
+						return 0, io.EOF
+					}
+					cur += copy(b, bb[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: io.EOF,
+		},
+		{
+			name: "crc checksum mismatch",
+			r: func() io.Reader {
+				bb := slices.Clone(b)
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(bb)-2 {
+						cur += copy(b, []byte{255, 255}) // crc intentionally altered
+						return len(b), nil
+					}
+					cur += copy(b, bb[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: ErrCRCChecksumMismatch,
+		},
+		{
+			name: "second sequence of FIT File return error",
+			r: func() io.Reader {
+				// Chained FIT File but with next sequence header is
+				b := slices.Clone(b)
+				h := headerForTest()
+				nextb, _ := h.MarshalBinary()
+				nextb[0] = 100 // alter FileHeader's Size
+				b = append(b, nextb...)
+				return bytes.NewReader(b)
+			}(),
+			err: ErrNotAFitFile,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := New(tc.r)
+			err := dec.CheckIntegrity()
+			// fmt.Println(err)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+			// t.Fail()
+		})
+	}
+}
+
 func headerForTest() proto.FileHeader {
 	return proto.FileHeader{
 		Size:            14,
@@ -368,6 +484,14 @@ func createFitForTest() (proto.Fit, []byte) {
 					},
 				),
 		},
+	}
+
+	for i := 0; i < 100; i++ {
+		fit.Messages = append(fit.Messages,
+			factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+			),
+		)
 	}
 
 	bytesbuffer := new(bytes.Buffer)

@@ -6,6 +6,7 @@ Table of Contents:
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
    - [Decode to Common File Types](#Decode-to-Common-File-Types)
    - [Peek FileId](#Peek-FileId)
+   - [Check Integrity](#Check-Integrity)
    - [Available Decode Options](#Available-Decode-Options)
 2. [Encoding](#Encoding)
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
@@ -277,6 +278,57 @@ func main() {
     fmt.Printf("Laps count: %d\n", len(activity.Laps))
     fmt.Printf("Records count: %d\n", len(activity.Records))
     // ...
+}
+```
+
+### Check Integrity
+
+Check integrity checks whether FIT File is not corrupted or contains missing data that can invalidates the entire file. Example of when we need to check the integrity is when dealing with **Course File** that contains turn-by-turn navigation, we don't want to guide a person halfway to their destination or guide them to unintended route, do we? The same applies for other file types where it is critical that the contents of the file should be valid, such as Workout, User Profile, Device Settings, etc. For Activity File, most cases, we don't need to check the integrity.
+
+More about this: [https://developer.garmin.com/fit/cookbook/isfit-checkintegrity-read/](https://developer.garmin.com/fit/cookbook/isfit-checkintegrity-read/)
+
+```go
+package main
+
+import (
+	"bufio"
+    "io"
+	"os"
+
+	"github.com/muktihari/fit/decoder"
+)
+
+func main() {
+    f, err := os.Open("Course.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    dec := decoder.New(bufio.NewReader(f))
+
+    // Fyi, we can invoke PeekFileId() first to check the type of the file before checking the integrity.
+    // For most cases, we wouldn't want to check integrity of Activity File.
+    // But it's up to the users to decide.
+
+    if err := dec.CheckIntegrity(); err != nil {
+        panic(err)
+    }
+
+    // After invoking CheckIntegrity and users want to reuse `dec` to Decode the FIT file,
+    // `f` should be reset since `f` has been fully read. The following method with do:
+    _, err = f.Seek(0, io.SeekStart)
+	if err != nil {
+		panic(err)
+	}
+
+	for dec.Next() {
+		fit, err := dec.Decode()
+		if err != nil {
+			panic(err)
+		}
+        _ = fit // Do something with fit
+	}
 }
 ```
 
