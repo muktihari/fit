@@ -23,7 +23,7 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 	CompressedTimeMask         = 0b00011111 // Mask for measuring time offset value from header. Compressed timestamp is using 5 least significant bits (lsb) of header
 	DevDataMask                = 0b00100000 // Mask for determining if a message contains developer fields.
 
-	CompressedBitShift = 5 // Used for right shifting the 5 least significant bits (lsb) of compressed ti
+	CompressedBitShift = 5 // Used for right-shifting the 5 least significant bits (lsb) of compressed time.
 
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
