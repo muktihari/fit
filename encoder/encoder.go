@@ -207,7 +207,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 // Multiple Fit files can be chained together into a single Fit file by calling Encode for each fit data.
 //
 //	for _, fit := range fits {
-//	   err := enc.Encode(context.Background(), fit)
+//	   err := enc.Encode(fit)
 //	}
 //
 // Encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
