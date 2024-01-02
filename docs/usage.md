@@ -80,9 +80,7 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
 
 ### Decode to Common File Types
 
-Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and more, which group protocol messages based on specific purposes.
-
-_Note: Currently only 3 common file types are defined: Activity, Course & Workout, but you can create your own file types using our building block and register it in the listener as an option using WithFileSets()_
+Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and [more](../profile/filedef/doc.go), which group protocol messages based on specific purposes.
 
 1. To get started, the simpliest way to create an common file type is to decode the FIT file in its raw protocol messages then pass the messages to create the desired common file type.
 
@@ -316,7 +314,7 @@ func main() {
     }
 
     // After invoking CheckIntegrity and users want to reuse `dec` to Decode the FIT file,
-    // `f` should be reset since `f` has been fully read. The following method with do:
+    // `f` should be reset since `f` has been fully read. The following method will do:
     _, err = f.Seek(0, io.SeekStart)
     if err != nil {
         panic(err)
