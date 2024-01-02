@@ -168,7 +168,7 @@ func WithNoComponentExpansion() Option {
 // To decode chained FIT files, use Next() to check if r hasn't reach EOF and next bytes are still a valid FIT sequences.
 //
 //	for dec.Next() {
-//	   fit, err := dec.Decode(context.Background())
+//	   fit, err := dec.Decode()
 //	}
 //
 // Note: We encourage wrapping r into a buffered reader such as bufio.NewReader(r),
