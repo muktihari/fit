@@ -292,7 +292,7 @@ package main
 
 import (
 	"bufio"
-    "io"
+        "io"
 	"os"
 
 	"github.com/muktihari/fit/decoder"
