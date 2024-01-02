@@ -91,7 +91,5 @@ func (f *Segment) ToFit(fac mesgdef.Factory) proto.Fit {
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
-	SortMessagesByTimestamp(fit.Messages)
-
 	return fit
 }
