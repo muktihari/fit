@@ -31,6 +31,7 @@ import (
 var (
 	// Integrity errors
 	ErrNotAFitFile         = errors.New("not a fit file")
+	ErrDataSizeZero        = errors.New("data size zero")
 	ErrCRCChecksumMismatch = errors.New("crc checksum mismatch")
 
 	// Message-field related errors
@@ -46,9 +47,9 @@ type Decoder struct {
 	accumulator *Accumulator
 	crc16       hash.Hash16
 
-	// The maximum n field definition in a mesg is 255 and we need 3 byte per field. 255 * 3 = 765 (+1 cap).
-	// So we will never exceed 766.
-	bytesArray [(255 * 3) + 1]byte
+	// The maximum n field definition in a mesg is 255 and we need 3 byte per field. 255 * 3 = 765.
+	// So we will never exceed 765.
+	bytesArray [255 * 3]byte
 
 	// The maximum n field in a mesg is 255, with this backing array, we don't have to worry about component expansions
 	// that require allocating additional fields triggering runtime.mallocgc.
@@ -224,6 +225,71 @@ func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 		}
 	}
 	return d.fileId, nil
+}
+
+// CheckIntegrity checks whether given reader is a valid FIT File determined by these following checks:
+//  1. Has valid FileHeader's size and bytes 8–11 of the FileHeader is “.FIT”
+//  2. FileHeader's DataSize > 0
+//  3. CRC checksum of messages should match with File's CRC value.
+//
+// After invoking this method, the Decoder can be reused again only if reader has been reset (since reader has been fully read).
+// If the reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
+func (d *Decoder) CheckIntegrity() (err error) {
+	shouldChecksum := d.options.shouldChecksum
+	d.options.shouldChecksum = true
+	sequenceCompletedCount := 0
+	nCount := int64(0)
+
+	defer func() {
+		if err != nil { // When there is an error, wrap it with informative message before return.
+			err = fmt.Errorf("sequence index: %d, byte pos: %d: %w", sequenceCompletedCount, d.n, err)
+		}
+		// Reset everything so that the decoder can be reused by the same reader.
+		d.reset()
+		d.n = 0
+		d.options.shouldChecksum = shouldChecksum
+	}()
+
+	for d.Next() {
+		// Check Header Integrity
+		if err = d.decodeHeaderOnce(); err != nil {
+			return
+		}
+		if d.fileHeader.DataSize == 0 {
+			err = ErrDataSizeZero
+			return
+		}
+		// Read bytes acquired by messages to calculate crc checksum of its contents
+		for d.cur < d.fileHeader.DataSize {
+			size := d.fileHeader.DataSize - d.cur
+			if arraySize := uint32(len(d.bytesArray)); size > arraySize {
+				size = arraySize
+			}
+			if err = d.read(d.bytesArray[:size]); err != nil { // Discard bytes
+				return
+			}
+		}
+		if err = d.decodeCRC(); err != nil {
+			return
+		}
+		// Check crc checksum of messages should match with file's crc.
+		if d.crc16.Sum16() != d.crc {
+			err = ErrCRCChecksumMismatch
+			return
+		}
+		d.sequenceCompleted = true
+		sequenceCompletedCount++
+		nCount += int64(d.fileHeader.Size) + int64(d.fileHeader.DataSize) + 2
+	}
+
+	// When nCount == d.n, it means EOF occurs exactly after sequence completed, error is not counted.
+	// Otherwise, error occurs in the middle of decoding process, mark it as error.
+	if nCount != d.n {
+		err = d.decodeHeaderOnce() // Retrieve error that occurs in decode header
+		return
+	}
+
+	return err
 }
 
 // Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
