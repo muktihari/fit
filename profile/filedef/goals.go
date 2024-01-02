@@ -15,7 +15,8 @@ type Goals struct {
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
 
-	Goals             []*mesgdef.Goal
+	Goals []*mesgdef.Goal
+
 	UnrelatedMessages []proto.Message
 }
 
@@ -68,8 +69,6 @@ func (f *Goals) ToFit(fac mesgdef.Factory) proto.Fit {
 	ToMesgs(&fit.Messages, fac, mesgnum.Goal, f.Goals)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
-
-	SortMessagesByTimestamp(fit.Messages)
 
 	return fit
 }

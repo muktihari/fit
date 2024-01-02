@@ -19,7 +19,6 @@ type ActivitySummary struct {
 	Sessions []*mesgdef.Session
 	Laps     []*mesgdef.Lap
 
-	// Messages not related to Activity
 	UnrelatedMessages []proto.Message
 }
 
