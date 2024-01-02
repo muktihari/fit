@@ -7,8 +7,8 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// Schedule files are used to schedule a user’s workouts and may contain multiple schedule messages each representing the start time of a workout.
-type Schedule struct {
+// Schedules files are used to schedule a user’s workouts and may contain multiple schedule messages each representing the start time of a workout.
+type Schedules struct {
 	FileId mesgdef.FileId
 
 	// Developer Data Lookup
@@ -20,10 +20,10 @@ type Schedule struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Schedule{}
+var _ File = &Schedules{}
 
-func NewSchedules(mesgs ...proto.Message) *Schedule {
-	f := &Schedule{}
+func NewSchedules(mesgs ...proto.Message) *Schedules {
+	f := &Schedules{}
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
@@ -31,7 +31,7 @@ func NewSchedules(mesgs ...proto.Message) *Schedule {
 	return f
 }
 
-func (f *Schedule) Add(mesg proto.Message) {
+func (f *Schedules) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
 		f.FileId = *mesgdef.NewFileId(&mesg)
@@ -46,7 +46,7 @@ func (f *Schedule) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Schedule) ToFit(fac mesgdef.Factory) proto.Fit {
+func (f *Schedules) ToFit(fac mesgdef.Factory) proto.Fit {
 	if fac == nil {
 		fac = factory.StandardFactory()
 	}
