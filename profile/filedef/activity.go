@@ -18,29 +18,29 @@ import (
 //
 // ref: https://developer.garmin.com/fit/file-types/activity/
 type Activity struct {
-	FileId mesgdef.FileId // must have mesg
+	FileId mesgdef.FileId // required fields: type, manufacturer, product, serial_number, time_created
 
 	// Developer Data Lookup
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
 
 	// Required Messages
-	Activity *mesgdef.Activity
-	Sessions []*mesgdef.Session
-	Laps     []*mesgdef.Lap
-	Records  []*mesgdef.Record
+	Activity *mesgdef.Activity  // required fields: timestamp, num_sessions, type, event, event_type
+	Sessions []*mesgdef.Session // required fields: timestamp, start_time, total_elapsed_time, sport, event, event_type
+	Laps     []*mesgdef.Lap     // required fields: timestamp, event, event_type
+	Records  []*mesgdef.Record  // required fields: timestamp
 
 	// Optional Messages
 	UserProfile  *mesgdef.UserProfile
-	DeviceInfos  []*mesgdef.DeviceInfo
+	DeviceInfos  []*mesgdef.DeviceInfo // required fields: timestamp
 	Events       []*mesgdef.Event
-	Lengths      []*mesgdef.Length
+	Lengths      []*mesgdef.Length // required fields: timestamp, event, event_type
 	SegmentLap   []*mesgdef.SegmentLap
 	ZonesTargets []*mesgdef.ZonesTarget
 	Workouts     []*mesgdef.Workout
 	WorkoutSteps []*mesgdef.WorkoutStep
 	HRs          []*mesgdef.Hr
-	HRVs         []*mesgdef.Hrv
+	HRVs         []*mesgdef.Hrv // required fields: time
 
 	// Messages not related to Activity
 	UnrelatedMessages []proto.Message

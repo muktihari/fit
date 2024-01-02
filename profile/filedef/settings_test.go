@@ -19,10 +19,10 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-func newWorkoutMessageForTest(now time.Time) []proto.Message {
+func newSettingsMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
 		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
-			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileWorkout)),
+			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileSettings)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
 		),
 		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
@@ -31,34 +31,40 @@ func newWorkoutMessageForTest(now time.Time) []proto.Message {
 		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 		),
-		factory.CreateMesgOnly(mesgnum.Workout).WithFields(
-			factory.CreateField(mesgnum.Workout, fieldnum.WorkoutSport).WithValue(uint8(typedef.SportSwimming)),
+		factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileAge).WithValue(uint8(29)),
 		),
-		factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
-			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepEquipment).WithValue(uint8(typedef.WorkoutEquipmentSwimFins)),
+		factory.CreateMesgOnly(mesgnum.HrmProfile).WithFields(
+			factory.CreateField(mesgnum.HrmProfile, fieldnum.HrmProfileEnabled).WithValue(true),
 		),
-		factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
-			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepEquipment).WithValue(uint8(typedef.WorkoutEquipmentSwimSnorkel)),
+		factory.CreateMesgOnly(mesgnum.SdmProfile).WithFields(
+			factory.CreateField(mesgnum.SdmProfile, fieldnum.SdmProfileEnabled).WithValue(true),
+		),
+		factory.CreateMesgOnly(mesgnum.BikeProfile).WithFields(
+			factory.CreateField(mesgnum.BikeProfile, fieldnum.BikeProfileEnabled).WithValue(true),
+		),
+		factory.CreateMesgOnly(mesgnum.DeviceSettings).WithFields(
+			factory.CreateField(mesgnum.DeviceSettings, fieldnum.DeviceSettingsBacklightMode).WithValue(uint8(typedef.BacklightModeAutoBrightness)),
 		),
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
-			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
 		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
 	}
 }
 
-func TestWorkoutCorrectness(t *testing.T) {
-	mesgs := newWorkoutMessageForTest(time.Now())
+func TestSettingsCorrectness(t *testing.T) {
+	mesgs := newSettingsMessageForTest(time.Now())
 
-	workout := filedef.NewWorkout(mesgs...)
-	if workout.FileId.Type != typedef.FileWorkout {
-		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, workout.FileId.Type)
+	settings := filedef.NewSettings(mesgs...)
+	if settings.FileId.Type != typedef.FileSettings {
+		t.Fatalf("expected: %v, got: %v", typedef.FileSettings, settings.FileId.Type)
 	}
 
-	fit := workout.ToFit(nil)
+	fit := settings.ToFit(nil) // use standard factory
 
 	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
 		fmt.Println("messages order:")
