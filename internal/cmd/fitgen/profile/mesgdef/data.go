@@ -24,5 +24,8 @@ type Field struct {
 	ComparableValue string
 	InvalidValue    string
 	Comment         string
+	Scale           float64
+	Offset          float64
+	Array           bool
 	CanExpand       bool
 }
