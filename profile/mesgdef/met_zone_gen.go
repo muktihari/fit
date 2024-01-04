@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,8 +19,8 @@ import (
 type MetZone struct {
 	MessageIndex typedef.MessageIndex
 	HighBpm      uint8
-	Calories     uint16 // Scale: 10; Units: kcal / min;
-	FatCalories  uint8  // Scale: 10; Units: kcal / min;
+	Calories     uint16 // Scale: 10; Units: kcal / min
+	FatCalories  uint8  // Scale: 10; Units: kcal / min
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -54,15 +55,15 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 
 // ToMesg converts MetZone into proto.Message.
 func (m *MetZone) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMetZone)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.HighBpm != basetype.Uint8Invalid {
@@ -89,6 +90,26 @@ func (m *MetZone) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// CaloriesScaled return Calories in its scaled value [Scale: 10; Units: kcal / min].
+//
+// If Calories value is invalid, float64 invalid value will be returned.
+func (m *MetZone) CaloriesScaled() float64 {
+	if m.Calories == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Calories, 10, 0)
+}
+
+// FatCaloriesScaled return FatCalories in its scaled value [Scale: 10; Units: kcal / min].
+//
+// If FatCalories value is invalid, float64 invalid value will be returned.
+func (m *MetZone) FatCaloriesScaled() float64 {
+	if m.FatCalories == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FatCalories, 10, 0)
+}
+
 // SetMessageIndex sets MetZone value.
 func (m *MetZone) SetMessageIndex(v typedef.MessageIndex) *MetZone {
 	m.MessageIndex = v
@@ -103,7 +124,7 @@ func (m *MetZone) SetHighBpm(v uint8) *MetZone {
 
 // SetCalories sets MetZone value.
 //
-// Scale: 10; Units: kcal / min;
+// Scale: 10; Units: kcal / min
 func (m *MetZone) SetCalories(v uint16) *MetZone {
 	m.Calories = v
 	return m
@@ -111,7 +132,7 @@ func (m *MetZone) SetCalories(v uint16) *MetZone {
 
 // SetFatCalories sets MetZone value.
 //
-// Scale: 10; Units: kcal / min;
+// Scale: 10; Units: kcal / min
 func (m *MetZone) SetFatCalories(v uint8) *MetZone {
 	m.FatCalories = v
 	return m

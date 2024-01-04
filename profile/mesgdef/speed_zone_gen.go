@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -17,7 +18,7 @@ import (
 // SpeedZone is a SpeedZone message.
 type SpeedZone struct {
 	MessageIndex typedef.MessageIndex
-	HighValue    uint16 // Scale: 1000; Units: m/s;
+	HighValue    uint16 // Scale: 1000; Units: m/s
 	Name         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,15 +53,15 @@ func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 
 // ToMesg converts SpeedZone into proto.Message.
 func (m *SpeedZone) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSpeedZone)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.HighValue != basetype.Uint16Invalid {
@@ -82,6 +83,16 @@ func (m *SpeedZone) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// HighValueScaled return HighValue in its scaled value [Scale: 1000; Units: m/s].
+//
+// If HighValue value is invalid, float64 invalid value will be returned.
+func (m *SpeedZone) HighValueScaled() float64 {
+	if m.HighValue == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.HighValue, 1000, 0)
+}
+
 // SetMessageIndex sets SpeedZone value.
 func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
 	m.MessageIndex = v
@@ -90,7 +101,7 @@ func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
 
 // SetHighValue sets SpeedZone value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
 	m.HighValue = v
 	return m

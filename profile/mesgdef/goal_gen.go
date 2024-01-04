@@ -74,25 +74,25 @@ func NewGoal(mesg *proto.Message) *Goal {
 
 // ToMesg converts Goal into proto.Message.
 func (m *Goal) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGoal)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
@@ -105,9 +105,9 @@ func (m *Goal) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.EndDate)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 	if m.Value != basetype.Uint32Invalid {
@@ -125,9 +125,9 @@ func (m *Goal) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TargetValue
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Recurrence) != basetype.EnumInvalid {
+	if byte(m.Recurrence) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = typeconv.ToEnum[byte](m.Recurrence)
+		field.Value = byte(m.Recurrence)
 		fields = append(fields, field)
 	}
 	if m.RecurrenceValue != basetype.Uint16Invalid {
@@ -140,9 +140,9 @@ func (m *Goal) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Source) != basetype.EnumInvalid {
+	if byte(m.Source) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = typeconv.ToEnum[byte](m.Source)
+		field.Value = byte(m.Source)
 		fields = append(fields, field)
 	}
 

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -52,10 +53,10 @@ func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 
 // ToMesg converts RespirationRate into proto.Message.
 func (m *RespirationRate) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumRespirationRate)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -75,6 +76,16 @@ func (m *RespirationRate) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// RespirationRateScaled return RespirationRate in its scaled value [Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist].
+//
+// If RespirationRate value is invalid, float64 invalid value will be returned.
+func (m *RespirationRate) RespirationRateScaled() float64 {
+	if m.RespirationRate == basetype.Sint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.RespirationRate, 100, 0)
 }
 
 // SetTimestamp sets RespirationRate value.

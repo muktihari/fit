@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -64,10 +65,10 @@ func NewActivity(mesg *proto.Message) *Activity {
 
 // ToMesg converts Activity into proto.Message.
 func (m *Activity) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumActivity)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -85,19 +86,19 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 		field.Value = m.NumSessions
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
+	if byte(m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.Event)
+		field.Value = byte(m.Event)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
+	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.EventType)
+		field.Value = byte(m.EventType)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
@@ -117,6 +118,16 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s; Exclude pauses].
+//
+// If TotalTimerTime value is invalid, float64 invalid value will be returned.
+func (m *Activity) TotalTimerTimeScaled() float64 {
+	if m.TotalTimerTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
 // SetTimestamp sets Activity value.

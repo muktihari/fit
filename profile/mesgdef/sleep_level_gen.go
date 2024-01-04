@@ -18,7 +18,7 @@ import (
 
 // SleepLevel is a SleepLevel message.
 type SleepLevel struct {
-	Timestamp  time.Time // Units: s;
+	Timestamp  time.Time // Units: s
 	SleepLevel typedef.SleepLevel
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,10 +52,10 @@ func NewSleepLevel(mesg *proto.Message) *SleepLevel {
 
 // ToMesg converts SleepLevel into proto.Message.
 func (m *SleepLevel) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepLevel)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -63,9 +63,9 @@ func (m *SleepLevel) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SleepLevel) != basetype.EnumInvalid {
+	if byte(m.SleepLevel) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.SleepLevel)
+		field.Value = byte(m.SleepLevel)
 		fields = append(fields, field)
 	}
 
@@ -79,7 +79,7 @@ func (m *SleepLevel) ToMesg(fac Factory) proto.Message {
 
 // SetTimestamp sets SleepLevel value.
 //
-// Units: s;
+// Units: s
 func (m *SleepLevel) SetTimestamp(v time.Time) *SleepLevel {
 	m.Timestamp = v
 	return m

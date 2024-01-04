@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,20 +19,20 @@ import (
 
 // WeightScale is a WeightScale message.
 type WeightScale struct {
-	Timestamp         time.Time      // Units: s;
-	Weight            typedef.Weight // Scale: 100; Units: kg;
-	PercentFat        uint16         // Scale: 100; Units: %;
-	PercentHydration  uint16         // Scale: 100; Units: %;
-	VisceralFatMass   uint16         // Scale: 100; Units: kg;
-	BoneMass          uint16         // Scale: 100; Units: kg;
-	MuscleMass        uint16         // Scale: 100; Units: kg;
-	BasalMet          uint16         // Scale: 4; Units: kcal/day;
+	Timestamp         time.Time      // Units: s
+	Weight            typedef.Weight // Scale: 100; Units: kg
+	PercentFat        uint16         // Scale: 100; Units: %
+	PercentHydration  uint16         // Scale: 100; Units: %
+	VisceralFatMass   uint16         // Scale: 100; Units: kg
+	BoneMass          uint16         // Scale: 100; Units: kg
+	MuscleMass        uint16         // Scale: 100; Units: kg
+	BasalMet          uint16         // Scale: 4; Units: kcal/day
 	PhysiqueRating    uint8
 	ActiveMet         uint16 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
-	MetabolicAge      uint8  // Units: years;
+	MetabolicAge      uint8  // Units: years
 	VisceralFatRating uint8
 	UserProfileIndex  typedef.MessageIndex // Associates this weight scale message to a user. This corresponds to the index of the user profile message in the weight scale file.
-	Bmi               uint16               // Scale: 10; Units: kg/m^2;
+	Bmi               uint16               // Scale: 10; Units: kg/m^2
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -76,10 +77,10 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 
 // ToMesg converts WeightScale into proto.Message.
 func (m *WeightScale) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeightScale)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -87,9 +88,9 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.Weight) != basetype.Uint16Invalid {
+	if uint16(m.Weight) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint16[uint16](m.Weight)
+		field.Value = uint16(m.Weight)
 		fields = append(fields, field)
 	}
 	if m.PercentFat != basetype.Uint16Invalid {
@@ -142,9 +143,9 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 		field.Value = m.VisceralFatRating
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
+	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToUint16[uint16](m.UserProfileIndex)
+		field.Value = uint16(m.UserProfileIndex)
 		fields = append(fields, field)
 	}
 	if m.Bmi != basetype.Uint16Invalid {
@@ -161,9 +162,99 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// WeightScaled return Weight in its scaled value [Scale: 100; Units: kg].
+//
+// If Weight value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) WeightScaled() float64 {
+	if uint16(m.Weight) == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Weight, 100, 0)
+}
+
+// PercentFatScaled return PercentFat in its scaled value [Scale: 100; Units: %].
+//
+// If PercentFat value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) PercentFatScaled() float64 {
+	if m.PercentFat == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.PercentFat, 100, 0)
+}
+
+// PercentHydrationScaled return PercentHydration in its scaled value [Scale: 100; Units: %].
+//
+// If PercentHydration value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) PercentHydrationScaled() float64 {
+	if m.PercentHydration == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.PercentHydration, 100, 0)
+}
+
+// VisceralFatMassScaled return VisceralFatMass in its scaled value [Scale: 100; Units: kg].
+//
+// If VisceralFatMass value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) VisceralFatMassScaled() float64 {
+	if m.VisceralFatMass == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VisceralFatMass, 100, 0)
+}
+
+// BoneMassScaled return BoneMass in its scaled value [Scale: 100; Units: kg].
+//
+// If BoneMass value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) BoneMassScaled() float64 {
+	if m.BoneMass == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BoneMass, 100, 0)
+}
+
+// MuscleMassScaled return MuscleMass in its scaled value [Scale: 100; Units: kg].
+//
+// If MuscleMass value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) MuscleMassScaled() float64 {
+	if m.MuscleMass == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.MuscleMass, 100, 0)
+}
+
+// BasalMetScaled return BasalMet in its scaled value [Scale: 4; Units: kcal/day].
+//
+// If BasalMet value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) BasalMetScaled() float64 {
+	if m.BasalMet == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BasalMet, 4, 0)
+}
+
+// ActiveMetScaled return ActiveMet in its scaled value [Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal].
+//
+// If ActiveMet value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) ActiveMetScaled() float64 {
+	if m.ActiveMet == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.ActiveMet, 4, 0)
+}
+
+// BmiScaled return Bmi in its scaled value [Scale: 10; Units: kg/m^2].
+//
+// If Bmi value is invalid, float64 invalid value will be returned.
+func (m *WeightScale) BmiScaled() float64 {
+	if m.Bmi == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Bmi, 10, 0)
+}
+
 // SetTimestamp sets WeightScale value.
 //
-// Units: s;
+// Units: s
 func (m *WeightScale) SetTimestamp(v time.Time) *WeightScale {
 	m.Timestamp = v
 	return m
@@ -171,7 +262,7 @@ func (m *WeightScale) SetTimestamp(v time.Time) *WeightScale {
 
 // SetWeight sets WeightScale value.
 //
-// Scale: 100; Units: kg;
+// Scale: 100; Units: kg
 func (m *WeightScale) SetWeight(v typedef.Weight) *WeightScale {
 	m.Weight = v
 	return m
@@ -179,7 +270,7 @@ func (m *WeightScale) SetWeight(v typedef.Weight) *WeightScale {
 
 // SetPercentFat sets WeightScale value.
 //
-// Scale: 100; Units: %;
+// Scale: 100; Units: %
 func (m *WeightScale) SetPercentFat(v uint16) *WeightScale {
 	m.PercentFat = v
 	return m
@@ -187,7 +278,7 @@ func (m *WeightScale) SetPercentFat(v uint16) *WeightScale {
 
 // SetPercentHydration sets WeightScale value.
 //
-// Scale: 100; Units: %;
+// Scale: 100; Units: %
 func (m *WeightScale) SetPercentHydration(v uint16) *WeightScale {
 	m.PercentHydration = v
 	return m
@@ -195,7 +286,7 @@ func (m *WeightScale) SetPercentHydration(v uint16) *WeightScale {
 
 // SetVisceralFatMass sets WeightScale value.
 //
-// Scale: 100; Units: kg;
+// Scale: 100; Units: kg
 func (m *WeightScale) SetVisceralFatMass(v uint16) *WeightScale {
 	m.VisceralFatMass = v
 	return m
@@ -203,7 +294,7 @@ func (m *WeightScale) SetVisceralFatMass(v uint16) *WeightScale {
 
 // SetBoneMass sets WeightScale value.
 //
-// Scale: 100; Units: kg;
+// Scale: 100; Units: kg
 func (m *WeightScale) SetBoneMass(v uint16) *WeightScale {
 	m.BoneMass = v
 	return m
@@ -211,7 +302,7 @@ func (m *WeightScale) SetBoneMass(v uint16) *WeightScale {
 
 // SetMuscleMass sets WeightScale value.
 //
-// Scale: 100; Units: kg;
+// Scale: 100; Units: kg
 func (m *WeightScale) SetMuscleMass(v uint16) *WeightScale {
 	m.MuscleMass = v
 	return m
@@ -219,7 +310,7 @@ func (m *WeightScale) SetMuscleMass(v uint16) *WeightScale {
 
 // SetBasalMet sets WeightScale value.
 //
-// Scale: 4; Units: kcal/day;
+// Scale: 4; Units: kcal/day
 func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
 	m.BasalMet = v
 	return m
@@ -241,7 +332,7 @@ func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
 
 // SetMetabolicAge sets WeightScale value.
 //
-// Units: years;
+// Units: years
 func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
 	m.MetabolicAge = v
 	return m
@@ -263,7 +354,7 @@ func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
 
 // SetBmi sets WeightScale value.
 //
-// Scale: 10; Units: kg/m^2;
+// Scale: 10; Units: kg/m^2
 func (m *WeightScale) SetBmi(v uint16) *WeightScale {
 	m.Bmi = v
 	return m

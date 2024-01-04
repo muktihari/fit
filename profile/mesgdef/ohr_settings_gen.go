@@ -18,7 +18,7 @@ import (
 
 // OhrSettings is a OhrSettings message.
 type OhrSettings struct {
-	Timestamp time.Time // Units: s;
+	Timestamp time.Time // Units: s
 	Enabled   typedef.Switch
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,10 +52,10 @@ func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 
 // ToMesg converts OhrSettings into proto.Message.
 func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumOhrSettings)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -63,9 +63,9 @@ func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Enabled) != basetype.EnumInvalid {
+	if byte(m.Enabled) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Enabled)
+		field.Value = byte(m.Enabled)
 		fields = append(fields, field)
 	}
 
@@ -79,7 +79,7 @@ func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
 
 // SetTimestamp sets OhrSettings value.
 //
-// Units: s;
+// Units: s
 func (m *OhrSettings) SetTimestamp(v time.Time) *OhrSettings {
 	m.Timestamp = v
 	return m

@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,15 +21,15 @@ type BikeProfile struct {
 	Name                     string
 	Sport                    typedef.Sport
 	SubSport                 typedef.SubSport
-	Odometer                 uint32 // Scale: 100; Units: m;
+	Odometer                 uint32 // Scale: 100; Units: m
 	BikeSpdAntId             uint16
 	BikeCadAntId             uint16
 	BikeSpdcadAntId          uint16
 	BikePowerAntId           uint16
-	CustomWheelsize          uint16 // Scale: 1000; Units: m;
-	AutoWheelsize            uint16 // Scale: 1000; Units: m;
-	BikeWeight               uint16 // Scale: 10; Units: kg;
-	PowerCalFactor           uint16 // Scale: 10; Units: %;
+	CustomWheelsize          uint16 // Scale: 1000; Units: m
+	AutoWheelsize            uint16 // Scale: 1000; Units: m
+	BikeWeight               uint16 // Scale: 10; Units: kg
+	PowerCalFactor           uint16 // Scale: 10; Units: %
 	AutoWheelCal             bool
 	AutoPowerZero            bool
 	Id                       uint8
@@ -36,7 +37,7 @@ type BikeProfile struct {
 	CadEnabled               bool
 	SpdcadEnabled            bool
 	PowerEnabled             bool
-	CrankLength              uint8 // Scale: 2; Offset: -110; Units: mm;
+	CrankLength              uint8 // Scale: 2; Offset: -110; Units: mm
 	Enabled                  bool
 	BikeSpdAntIdTransType    uint8
 	BikeCadAntIdTransType    uint8
@@ -110,15 +111,15 @@ func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 
 // ToMesg converts BikeProfile into proto.Message.
 func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBikeProfile)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
@@ -126,14 +127,14 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Name
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
 	if m.Odometer != basetype.Uint32Invalid {
@@ -141,24 +142,24 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Odometer
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.BikeSpdAntId) != basetype.Uint16zInvalid {
+	if uint16(m.BikeSpdAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToUint16z[uint16](m.BikeSpdAntId)
+		field.Value = uint16(m.BikeSpdAntId)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.BikeCadAntId) != basetype.Uint16zInvalid {
+	if uint16(m.BikeCadAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToUint16z[uint16](m.BikeCadAntId)
+		field.Value = uint16(m.BikeCadAntId)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.BikeSpdcadAntId) != basetype.Uint16zInvalid {
+	if uint16(m.BikeSpdcadAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToUint16z[uint16](m.BikeSpdcadAntId)
+		field.Value = uint16(m.BikeSpdcadAntId)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.BikePowerAntId) != basetype.Uint16zInvalid {
+	if uint16(m.BikePowerAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToUint16z[uint16](m.BikePowerAntId)
+		field.Value = uint16(m.BikePowerAntId)
 		fields = append(fields, field)
 	}
 	if m.CustomWheelsize != basetype.Uint16Invalid {
@@ -226,24 +227,24 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.BikeSpdAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.BikeSpdAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = typeconv.ToUint8z[uint8](m.BikeSpdAntIdTransType)
+		field.Value = uint8(m.BikeSpdAntIdTransType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.BikeCadAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.BikeCadAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = typeconv.ToUint8z[uint8](m.BikeCadAntIdTransType)
+		field.Value = uint8(m.BikeCadAntIdTransType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.BikeSpdcadAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.BikeSpdcadAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = typeconv.ToUint8z[uint8](m.BikeSpdcadAntIdTransType)
+		field.Value = uint8(m.BikeSpdcadAntIdTransType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.BikePowerAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.BikePowerAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 24)
-		field.Value = typeconv.ToUint8z[uint8](m.BikePowerAntIdTransType)
+		field.Value = uint8(m.BikePowerAntIdTransType)
 		fields = append(fields, field)
 	}
 	if m.OdometerRollover != basetype.Uint8Invalid {
@@ -251,9 +252,9 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.OdometerRollover
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.FrontGearNum) != basetype.Uint8zInvalid {
+	if uint8(m.FrontGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 38)
-		field.Value = typeconv.ToUint8z[uint8](m.FrontGearNum)
+		field.Value = uint8(m.FrontGearNum)
 		fields = append(fields, field)
 	}
 	if typeconv.ToSliceUint8z[uint8](m.FrontGear) != nil {
@@ -261,9 +262,9 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = typeconv.ToSliceUint8z[uint8](m.FrontGear)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.RearGearNum) != basetype.Uint8zInvalid {
+	if uint8(m.RearGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 40)
-		field.Value = typeconv.ToUint8z[uint8](m.RearGearNum)
+		field.Value = uint8(m.RearGearNum)
 		fields = append(fields, field)
 	}
 	if typeconv.ToSliceUint8z[uint8](m.RearGear) != nil {
@@ -283,6 +284,66 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// OdometerScaled return Odometer in its scaled value [Scale: 100; Units: m].
+//
+// If Odometer value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) OdometerScaled() float64 {
+	if m.Odometer == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Odometer, 100, 0)
+}
+
+// CustomWheelsizeScaled return CustomWheelsize in its scaled value [Scale: 1000; Units: m].
+//
+// If CustomWheelsize value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) CustomWheelsizeScaled() float64 {
+	if m.CustomWheelsize == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CustomWheelsize, 1000, 0)
+}
+
+// AutoWheelsizeScaled return AutoWheelsize in its scaled value [Scale: 1000; Units: m].
+//
+// If AutoWheelsize value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) AutoWheelsizeScaled() float64 {
+	if m.AutoWheelsize == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AutoWheelsize, 1000, 0)
+}
+
+// BikeWeightScaled return BikeWeight in its scaled value [Scale: 10; Units: kg].
+//
+// If BikeWeight value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) BikeWeightScaled() float64 {
+	if m.BikeWeight == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BikeWeight, 10, 0)
+}
+
+// PowerCalFactorScaled return PowerCalFactor in its scaled value [Scale: 10; Units: %].
+//
+// If PowerCalFactor value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) PowerCalFactorScaled() float64 {
+	if m.PowerCalFactor == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.PowerCalFactor, 10, 0)
+}
+
+// CrankLengthScaled return CrankLength in its scaled value [Scale: 2; Offset: -110; Units: mm].
+//
+// If CrankLength value is invalid, float64 invalid value will be returned.
+func (m *BikeProfile) CrankLengthScaled() float64 {
+	if m.CrankLength == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CrankLength, 2, -110)
 }
 
 // SetMessageIndex sets BikeProfile value.
@@ -311,7 +372,7 @@ func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
 
 // SetOdometer sets BikeProfile value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
 	m.Odometer = v
 	return m
@@ -343,7 +404,7 @@ func (m *BikeProfile) SetBikePowerAntId(v uint16) *BikeProfile {
 
 // SetCustomWheelsize sets BikeProfile value.
 //
-// Scale: 1000; Units: m;
+// Scale: 1000; Units: m
 func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
 	m.CustomWheelsize = v
 	return m
@@ -351,7 +412,7 @@ func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
 
 // SetAutoWheelsize sets BikeProfile value.
 //
-// Scale: 1000; Units: m;
+// Scale: 1000; Units: m
 func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
 	m.AutoWheelsize = v
 	return m
@@ -359,7 +420,7 @@ func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
 
 // SetBikeWeight sets BikeProfile value.
 //
-// Scale: 10; Units: kg;
+// Scale: 10; Units: kg
 func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
 	m.BikeWeight = v
 	return m
@@ -367,7 +428,7 @@ func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
 
 // SetPowerCalFactor sets BikeProfile value.
 //
-// Scale: 10; Units: %;
+// Scale: 10; Units: %
 func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
 	m.PowerCalFactor = v
 	return m
@@ -417,7 +478,7 @@ func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
 
 // SetCrankLength sets BikeProfile value.
 //
-// Scale: 2; Offset: -110; Units: mm;
+// Scale: 2; Offset: -110; Units: mm
 func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
 	m.CrankLength = v
 	return m

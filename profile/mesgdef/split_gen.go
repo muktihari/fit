@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,23 +21,23 @@ import (
 type Split struct {
 	MessageIndex      typedef.MessageIndex
 	SplitType         typedef.SplitType
-	TotalElapsedTime  uint32 // Scale: 1000; Units: s;
-	TotalTimerTime    uint32 // Scale: 1000; Units: s;
-	TotalDistance     uint32 // Scale: 100; Units: m;
-	AvgSpeed          uint32 // Scale: 1000; Units: m/s;
+	TotalElapsedTime  uint32 // Scale: 1000; Units: s
+	TotalTimerTime    uint32 // Scale: 1000; Units: s
+	TotalDistance     uint32 // Scale: 100; Units: m
+	AvgSpeed          uint32 // Scale: 1000; Units: m/s
 	StartTime         time.Time
-	TotalAscent       uint16 // Units: m;
-	TotalDescent      uint16 // Units: m;
-	StartPositionLat  int32  // Units: semicircles;
-	StartPositionLong int32  // Units: semicircles;
-	EndPositionLat    int32  // Units: semicircles;
-	EndPositionLong   int32  // Units: semicircles;
-	MaxSpeed          uint32 // Scale: 1000; Units: m/s;
-	AvgVertSpeed      int32  // Scale: 1000; Units: m/s;
+	TotalAscent       uint16 // Units: m
+	TotalDescent      uint16 // Units: m
+	StartPositionLat  int32  // Units: semicircles
+	StartPositionLong int32  // Units: semicircles
+	EndPositionLat    int32  // Units: semicircles
+	EndPositionLong   int32  // Units: semicircles
+	MaxSpeed          uint32 // Scale: 1000; Units: m/s
+	AvgVertSpeed      int32  // Scale: 1000; Units: m/s
 	EndTime           time.Time
-	TotalCalories     uint32 // Units: kcal;
-	StartElevation    uint32 // Scale: 5; Offset: 500; Units: m;
-	TotalMovingTime   uint32 // Scale: 1000; Units: s;
+	TotalCalories     uint32 // Units: kcal
+	StartElevation    uint32 // Scale: 5; Offset: 500; Units: m
+	TotalMovingTime   uint32 // Scale: 1000; Units: s
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -86,20 +87,20 @@ func NewSplit(mesg *proto.Message) *Split {
 
 // ToMesg converts Split into proto.Message.
 func (m *Split) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSplit)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SplitType) != basetype.EnumInvalid {
+	if byte(m.SplitType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.SplitType)
+		field.Value = byte(m.SplitType)
 		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
@@ -196,6 +197,86 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+func (m *Split) TotalElapsedTimeScaled() float64 {
+	if m.TotalElapsedTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
+}
+
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalTimerTime value is invalid, float64 invalid value will be returned.
+func (m *Split) TotalTimerTimeScaled() float64 {
+	if m.TotalTimerTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+}
+
+// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
+//
+// If TotalDistance value is invalid, float64 invalid value will be returned.
+func (m *Split) TotalDistanceScaled() float64 {
+	if m.TotalDistance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalDistance, 100, 0)
+}
+
+// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgSpeed value is invalid, float64 invalid value will be returned.
+func (m *Split) AvgSpeedScaled() float64 {
+	if m.AvgSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+}
+
+// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If MaxSpeed value is invalid, float64 invalid value will be returned.
+func (m *Split) MaxSpeedScaled() float64 {
+	if m.MaxSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
+}
+
+// AvgVertSpeedScaled return AvgVertSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgVertSpeed value is invalid, float64 invalid value will be returned.
+func (m *Split) AvgVertSpeedScaled() float64 {
+	if m.AvgVertSpeed == basetype.Sint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
+}
+
+// StartElevationScaled return StartElevation in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If StartElevation value is invalid, float64 invalid value will be returned.
+func (m *Split) StartElevationScaled() float64 {
+	if m.StartElevation == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StartElevation, 5, 500)
+}
+
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalMovingTime value is invalid, float64 invalid value will be returned.
+func (m *Split) TotalMovingTimeScaled() float64 {
+	if m.TotalMovingTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+}
+
 // SetMessageIndex sets Split value.
 func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
 	m.MessageIndex = v
@@ -210,7 +291,7 @@ func (m *Split) SetSplitType(v typedef.SplitType) *Split {
 
 // SetTotalElapsedTime sets Split value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Split) SetTotalElapsedTime(v uint32) *Split {
 	m.TotalElapsedTime = v
 	return m
@@ -218,7 +299,7 @@ func (m *Split) SetTotalElapsedTime(v uint32) *Split {
 
 // SetTotalTimerTime sets Split value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Split) SetTotalTimerTime(v uint32) *Split {
 	m.TotalTimerTime = v
 	return m
@@ -226,7 +307,7 @@ func (m *Split) SetTotalTimerTime(v uint32) *Split {
 
 // SetTotalDistance sets Split value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *Split) SetTotalDistance(v uint32) *Split {
 	m.TotalDistance = v
 	return m
@@ -234,7 +315,7 @@ func (m *Split) SetTotalDistance(v uint32) *Split {
 
 // SetAvgSpeed sets Split value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Split) SetAvgSpeed(v uint32) *Split {
 	m.AvgSpeed = v
 	return m
@@ -248,7 +329,7 @@ func (m *Split) SetStartTime(v time.Time) *Split {
 
 // SetTotalAscent sets Split value.
 //
-// Units: m;
+// Units: m
 func (m *Split) SetTotalAscent(v uint16) *Split {
 	m.TotalAscent = v
 	return m
@@ -256,7 +337,7 @@ func (m *Split) SetTotalAscent(v uint16) *Split {
 
 // SetTotalDescent sets Split value.
 //
-// Units: m;
+// Units: m
 func (m *Split) SetTotalDescent(v uint16) *Split {
 	m.TotalDescent = v
 	return m
@@ -264,7 +345,7 @@ func (m *Split) SetTotalDescent(v uint16) *Split {
 
 // SetStartPositionLat sets Split value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Split) SetStartPositionLat(v int32) *Split {
 	m.StartPositionLat = v
 	return m
@@ -272,7 +353,7 @@ func (m *Split) SetStartPositionLat(v int32) *Split {
 
 // SetStartPositionLong sets Split value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Split) SetStartPositionLong(v int32) *Split {
 	m.StartPositionLong = v
 	return m
@@ -280,7 +361,7 @@ func (m *Split) SetStartPositionLong(v int32) *Split {
 
 // SetEndPositionLat sets Split value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Split) SetEndPositionLat(v int32) *Split {
 	m.EndPositionLat = v
 	return m
@@ -288,7 +369,7 @@ func (m *Split) SetEndPositionLat(v int32) *Split {
 
 // SetEndPositionLong sets Split value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Split) SetEndPositionLong(v int32) *Split {
 	m.EndPositionLong = v
 	return m
@@ -296,7 +377,7 @@ func (m *Split) SetEndPositionLong(v int32) *Split {
 
 // SetMaxSpeed sets Split value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Split) SetMaxSpeed(v uint32) *Split {
 	m.MaxSpeed = v
 	return m
@@ -304,7 +385,7 @@ func (m *Split) SetMaxSpeed(v uint32) *Split {
 
 // SetAvgVertSpeed sets Split value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Split) SetAvgVertSpeed(v int32) *Split {
 	m.AvgVertSpeed = v
 	return m
@@ -318,7 +399,7 @@ func (m *Split) SetEndTime(v time.Time) *Split {
 
 // SetTotalCalories sets Split value.
 //
-// Units: kcal;
+// Units: kcal
 func (m *Split) SetTotalCalories(v uint32) *Split {
 	m.TotalCalories = v
 	return m
@@ -326,7 +407,7 @@ func (m *Split) SetTotalCalories(v uint32) *Split {
 
 // SetStartElevation sets Split value.
 //
-// Scale: 5; Offset: 500; Units: m;
+// Scale: 5; Offset: 500; Units: m
 func (m *Split) SetStartElevation(v uint32) *Split {
 	m.StartElevation = v
 	return m
@@ -334,7 +415,7 @@ func (m *Split) SetStartElevation(v uint32) *Split {
 
 // SetTotalMovingTime sets Split value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Split) SetTotalMovingTime(v uint32) *Split {
 	m.TotalMovingTime = v
 	return m

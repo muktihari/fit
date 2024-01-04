@@ -56,6 +56,17 @@ const (
 	Uint64zInvalid uint64 = 0              // 0x0000000000000000
 )
 
+var (
+	float32InvalidInFloatForm = math.Float32frombits(Float32Invalid)
+	float64InvalidInFloatForm = math.Float64frombits(Float64Invalid)
+)
+
+// Float32InvalidInFloatForm is math.Float32frombits(Float32Invalid)
+func Float32InvalidInFloatForm() float32 { return float32InvalidInFloatForm }
+
+// Float64InvalidInFloatForm is math.Float64frombits(Float64Invalid)
+func Float64InvalidInFloatForm() float64 { return float64InvalidInFloatForm }
+
 type typestruct struct {
 	base          BaseType
 	stringer      string
@@ -153,7 +164,7 @@ var basetypes = [...]typestruct{
 		stringer:      "float32",
 		size:          4,
 		endianAbility: 1,
-		invalid:       math.Float32frombits(Float32Invalid),
+		invalid:       float32InvalidInFloatForm,
 		goType:        "float32",
 		isInteger:     false,
 		kind:          reflect.Float32,
@@ -163,7 +174,7 @@ var basetypes = [...]typestruct{
 		stringer:      "float64",
 		size:          8,
 		endianAbility: 1,
-		invalid:       math.Float64frombits(Float64Invalid),
+		invalid:       float64InvalidInFloatForm,
 		goType:        "float64",
 		isInteger:     false,
 		kind:          reflect.Float64,

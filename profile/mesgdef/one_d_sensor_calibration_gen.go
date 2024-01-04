@@ -60,10 +60,10 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 
 // ToMesg converts OneDSensorCalibration into proto.Message.
 func (m *OneDSensorCalibration) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumOneDSensorCalibration)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -71,9 +71,9 @@ func (m *OneDSensorCalibration) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
+	if byte(m.SensorType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.SensorType)
+		field.Value = byte(m.SensorType)
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {

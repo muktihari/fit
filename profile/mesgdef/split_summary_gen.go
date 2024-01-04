@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,17 +20,17 @@ type SplitSummary struct {
 	MessageIndex    typedef.MessageIndex
 	SplitType       typedef.SplitType
 	NumSplits       uint16
-	TotalTimerTime  uint32 // Scale: 1000; Units: s;
-	TotalDistance   uint32 // Scale: 100; Units: m;
-	AvgSpeed        uint32 // Scale: 1000; Units: m/s;
-	MaxSpeed        uint32 // Scale: 1000; Units: m/s;
-	TotalAscent     uint16 // Units: m;
-	TotalDescent    uint16 // Units: m;
-	AvgHeartRate    uint8  // Units: bpm;
-	MaxHeartRate    uint8  // Units: bpm;
-	AvgVertSpeed    int32  // Scale: 1000; Units: m/s;
-	TotalCalories   uint32 // Units: kcal;
-	TotalMovingTime uint32 // Scale: 1000; Units: s;
+	TotalTimerTime  uint32 // Scale: 1000; Units: s
+	TotalDistance   uint32 // Scale: 100; Units: m
+	AvgSpeed        uint32 // Scale: 1000; Units: m/s
+	MaxSpeed        uint32 // Scale: 1000; Units: m/s
+	TotalAscent     uint16 // Units: m
+	TotalDescent    uint16 // Units: m
+	AvgHeartRate    uint8  // Units: bpm
+	MaxHeartRate    uint8  // Units: bpm
+	AvgVertSpeed    int32  // Scale: 1000; Units: m/s
+	TotalCalories   uint32 // Units: kcal
+	TotalMovingTime uint32 // Scale: 1000; Units: s
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -74,20 +75,20 @@ func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 
 // ToMesg converts SplitSummary into proto.Message.
 func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSplitSummary)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SplitType) != basetype.EnumInvalid {
+	if byte(m.SplitType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.SplitType)
+		field.Value = byte(m.SplitType)
 		fields = append(fields, field)
 	}
 	if m.NumSplits != basetype.Uint16Invalid {
@@ -159,6 +160,66 @@ func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalTimerTime value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) TotalTimerTimeScaled() float64 {
+	if m.TotalTimerTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+}
+
+// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
+//
+// If TotalDistance value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) TotalDistanceScaled() float64 {
+	if m.TotalDistance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalDistance, 100, 0)
+}
+
+// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgSpeed value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) AvgSpeedScaled() float64 {
+	if m.AvgSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+}
+
+// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If MaxSpeed value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) MaxSpeedScaled() float64 {
+	if m.MaxSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
+}
+
+// AvgVertSpeedScaled return AvgVertSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgVertSpeed value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) AvgVertSpeedScaled() float64 {
+	if m.AvgVertSpeed == basetype.Sint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
+}
+
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalMovingTime value is invalid, float64 invalid value will be returned.
+func (m *SplitSummary) TotalMovingTimeScaled() float64 {
+	if m.TotalMovingTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+}
+
 // SetMessageIndex sets SplitSummary value.
 func (m *SplitSummary) SetMessageIndex(v typedef.MessageIndex) *SplitSummary {
 	m.MessageIndex = v
@@ -179,7 +240,7 @@ func (m *SplitSummary) SetNumSplits(v uint16) *SplitSummary {
 
 // SetTotalTimerTime sets SplitSummary value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
 	m.TotalTimerTime = v
 	return m
@@ -187,7 +248,7 @@ func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
 
 // SetTotalDistance sets SplitSummary value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
 	m.TotalDistance = v
 	return m
@@ -195,7 +256,7 @@ func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
 
 // SetAvgSpeed sets SplitSummary value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
 	m.AvgSpeed = v
 	return m
@@ -203,7 +264,7 @@ func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
 
 // SetMaxSpeed sets SplitSummary value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
 	m.MaxSpeed = v
 	return m
@@ -211,7 +272,7 @@ func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
 
 // SetTotalAscent sets SplitSummary value.
 //
-// Units: m;
+// Units: m
 func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
 	m.TotalAscent = v
 	return m
@@ -219,7 +280,7 @@ func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
 
 // SetTotalDescent sets SplitSummary value.
 //
-// Units: m;
+// Units: m
 func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
 	m.TotalDescent = v
 	return m
@@ -227,7 +288,7 @@ func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
 
 // SetAvgHeartRate sets SplitSummary value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
 	m.AvgHeartRate = v
 	return m
@@ -235,7 +296,7 @@ func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
 
 // SetMaxHeartRate sets SplitSummary value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
 	m.MaxHeartRate = v
 	return m
@@ -243,7 +304,7 @@ func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
 
 // SetAvgVertSpeed sets SplitSummary value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
 	m.AvgVertSpeed = v
 	return m
@@ -251,7 +312,7 @@ func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
 
 // SetTotalCalories sets SplitSummary value.
 //
-// Units: kcal;
+// Units: kcal
 func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
 	m.TotalCalories = v
 	return m
@@ -259,7 +320,7 @@ func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
 
 // SetTotalMovingTime sets SplitSummary value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalMovingTime(v uint32) *SplitSummary {
 	m.TotalMovingTime = v
 	return m

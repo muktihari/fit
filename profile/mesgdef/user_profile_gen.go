@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,16 +20,16 @@ type UserProfile struct {
 	MessageIndex               typedef.MessageIndex
 	FriendlyName               string // Used for Morning Report greeting
 	Gender                     typedef.Gender
-	Age                        uint8  // Units: years;
-	Height                     uint8  // Scale: 100; Units: m;
-	Weight                     uint16 // Scale: 10; Units: kg;
+	Age                        uint8  // Units: years
+	Height                     uint8  // Scale: 100; Units: m
+	Weight                     uint16 // Scale: 10; Units: kg
 	Language                   typedef.Language
 	ElevSetting                typedef.DisplayMeasure
 	WeightSetting              typedef.DisplayMeasure
-	RestingHeartRate           uint8 // Units: bpm;
-	DefaultMaxRunningHeartRate uint8 // Units: bpm;
-	DefaultMaxBikingHeartRate  uint8 // Units: bpm;
-	DefaultMaxHeartRate        uint8 // Units: bpm;
+	RestingHeartRate           uint8 // Units: bpm
+	DefaultMaxRunningHeartRate uint8 // Units: bpm
+	DefaultMaxBikingHeartRate  uint8 // Units: bpm
+	DefaultMaxHeartRate        uint8 // Units: bpm
 	HrSetting                  typedef.DisplayHeart
 	SpeedSetting               typedef.DisplayMeasure
 	DistSetting                typedef.DisplayMeasure
@@ -37,7 +38,7 @@ type UserProfile struct {
 	PositionSetting            typedef.DisplayPosition
 	TemperatureSetting         typedef.DisplayMeasure
 	LocalId                    typedef.UserLocalId
-	GlobalId                   []byte                   // Array: [6];
+	GlobalId                   []byte                   // Array: [6]
 	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
 	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
 	HeightSetting              typedef.DisplayMeasure
@@ -104,15 +105,15 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 
 // ToMesg converts UserProfile into proto.Message.
 func (m *UserProfile) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumUserProfile)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
@@ -120,9 +121,9 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FriendlyName
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Gender) != basetype.EnumInvalid {
+	if byte(m.Gender) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.Gender)
+		field.Value = byte(m.Gender)
 		fields = append(fields, field)
 	}
 	if m.Age != basetype.Uint8Invalid {
@@ -140,19 +141,19 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Weight
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Language) != basetype.EnumInvalid {
+	if byte(m.Language) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToEnum[byte](m.Language)
+		field.Value = byte(m.Language)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.ElevSetting) != basetype.EnumInvalid {
+	if byte(m.ElevSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToEnum[byte](m.ElevSetting)
+		field.Value = byte(m.ElevSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.WeightSetting) != basetype.EnumInvalid {
+	if byte(m.WeightSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToEnum[byte](m.WeightSetting)
+		field.Value = byte(m.WeightSetting)
 		fields = append(fields, field)
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
@@ -175,44 +176,44 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.DefaultMaxHeartRate
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HrSetting) != basetype.EnumInvalid {
+	if byte(m.HrSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToEnum[byte](m.HrSetting)
+		field.Value = byte(m.HrSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SpeedSetting) != basetype.EnumInvalid {
+	if byte(m.SpeedSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = typeconv.ToEnum[byte](m.SpeedSetting)
+		field.Value = byte(m.SpeedSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DistSetting) != basetype.EnumInvalid {
+	if byte(m.DistSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = typeconv.ToEnum[byte](m.DistSetting)
+		field.Value = byte(m.DistSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.PowerSetting) != basetype.EnumInvalid {
+	if byte(m.PowerSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 16)
-		field.Value = typeconv.ToEnum[byte](m.PowerSetting)
+		field.Value = byte(m.PowerSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.ActivityClass) != basetype.EnumInvalid {
+	if byte(m.ActivityClass) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 17)
-		field.Value = typeconv.ToEnum[byte](m.ActivityClass)
+		field.Value = byte(m.ActivityClass)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.PositionSetting) != basetype.EnumInvalid {
+	if byte(m.PositionSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 18)
-		field.Value = typeconv.ToEnum[byte](m.PositionSetting)
+		field.Value = byte(m.PositionSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.TemperatureSetting) != basetype.EnumInvalid {
+	if byte(m.TemperatureSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = typeconv.ToEnum[byte](m.TemperatureSetting)
+		field.Value = byte(m.TemperatureSetting)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.LocalId) != basetype.Uint16Invalid {
+	if uint16(m.LocalId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = typeconv.ToUint16[uint16](m.LocalId)
+		field.Value = uint16(m.LocalId)
 		fields = append(fields, field)
 	}
 	if m.GlobalId != nil {
@@ -220,19 +221,19 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.GlobalId
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.WakeTime) != basetype.Uint32Invalid {
+	if uint32(m.WakeTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 28)
-		field.Value = typeconv.ToUint32[uint32](m.WakeTime)
+		field.Value = uint32(m.WakeTime)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.SleepTime) != basetype.Uint32Invalid {
+	if uint32(m.SleepTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 29)
-		field.Value = typeconv.ToUint32[uint32](m.SleepTime)
+		field.Value = uint32(m.SleepTime)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HeightSetting) != basetype.EnumInvalid {
+	if byte(m.HeightSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 30)
-		field.Value = typeconv.ToEnum[byte](m.HeightSetting)
+		field.Value = byte(m.HeightSetting)
 		fields = append(fields, field)
 	}
 	if m.UserRunningStepLength != basetype.Uint16Invalid {
@@ -245,9 +246,9 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.UserWalkingStepLength
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DepthSetting) != basetype.EnumInvalid {
+	if byte(m.DepthSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 47)
-		field.Value = typeconv.ToEnum[byte](m.DepthSetting)
+		field.Value = byte(m.DepthSetting)
 		fields = append(fields, field)
 	}
 	if m.DiveCount != basetype.Uint32Invalid {
@@ -262,6 +263,46 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// HeightScaled return Height in its scaled value [Scale: 100; Units: m].
+//
+// If Height value is invalid, float64 invalid value will be returned.
+func (m *UserProfile) HeightScaled() float64 {
+	if m.Height == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Height, 100, 0)
+}
+
+// WeightScaled return Weight in its scaled value [Scale: 10; Units: kg].
+//
+// If Weight value is invalid, float64 invalid value will be returned.
+func (m *UserProfile) WeightScaled() float64 {
+	if m.Weight == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Weight, 10, 0)
+}
+
+// UserRunningStepLengthScaled return UserRunningStepLength in its scaled value [Scale: 1000; Units: m; User defined running step length set to 0 for auto length].
+//
+// If UserRunningStepLength value is invalid, float64 invalid value will be returned.
+func (m *UserProfile) UserRunningStepLengthScaled() float64 {
+	if m.UserRunningStepLength == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.UserRunningStepLength, 1000, 0)
+}
+
+// UserWalkingStepLengthScaled return UserWalkingStepLength in its scaled value [Scale: 1000; Units: m; User defined walking step length set to 0 for auto length].
+//
+// If UserWalkingStepLength value is invalid, float64 invalid value will be returned.
+func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
+	if m.UserWalkingStepLength == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.UserWalkingStepLength, 1000, 0)
 }
 
 // SetMessageIndex sets UserProfile value.
@@ -286,7 +327,7 @@ func (m *UserProfile) SetGender(v typedef.Gender) *UserProfile {
 
 // SetAge sets UserProfile value.
 //
-// Units: years;
+// Units: years
 func (m *UserProfile) SetAge(v uint8) *UserProfile {
 	m.Age = v
 	return m
@@ -294,7 +335,7 @@ func (m *UserProfile) SetAge(v uint8) *UserProfile {
 
 // SetHeight sets UserProfile value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *UserProfile) SetHeight(v uint8) *UserProfile {
 	m.Height = v
 	return m
@@ -302,7 +343,7 @@ func (m *UserProfile) SetHeight(v uint8) *UserProfile {
 
 // SetWeight sets UserProfile value.
 //
-// Scale: 10; Units: kg;
+// Scale: 10; Units: kg
 func (m *UserProfile) SetWeight(v uint16) *UserProfile {
 	m.Weight = v
 	return m
@@ -328,7 +369,7 @@ func (m *UserProfile) SetWeightSetting(v typedef.DisplayMeasure) *UserProfile {
 
 // SetRestingHeartRate sets UserProfile value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *UserProfile) SetRestingHeartRate(v uint8) *UserProfile {
 	m.RestingHeartRate = v
 	return m
@@ -336,7 +377,7 @@ func (m *UserProfile) SetRestingHeartRate(v uint8) *UserProfile {
 
 // SetDefaultMaxRunningHeartRate sets UserProfile value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *UserProfile) SetDefaultMaxRunningHeartRate(v uint8) *UserProfile {
 	m.DefaultMaxRunningHeartRate = v
 	return m
@@ -344,7 +385,7 @@ func (m *UserProfile) SetDefaultMaxRunningHeartRate(v uint8) *UserProfile {
 
 // SetDefaultMaxBikingHeartRate sets UserProfile value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *UserProfile) SetDefaultMaxBikingHeartRate(v uint8) *UserProfile {
 	m.DefaultMaxBikingHeartRate = v
 	return m
@@ -352,7 +393,7 @@ func (m *UserProfile) SetDefaultMaxBikingHeartRate(v uint8) *UserProfile {
 
 // SetDefaultMaxHeartRate sets UserProfile value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *UserProfile) SetDefaultMaxHeartRate(v uint8) *UserProfile {
 	m.DefaultMaxHeartRate = v
 	return m
@@ -408,7 +449,7 @@ func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
 
 // SetGlobalId sets UserProfile value.
 //
-// Array: [6];
+// Array: [6]
 func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
 	m.GlobalId = v
 	return m

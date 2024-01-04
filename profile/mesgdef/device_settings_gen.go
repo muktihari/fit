@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -96,10 +97,10 @@ func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
 
 // ToMesg converts DeviceSettings into proto.Message.
 func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceSettings)
 
 	if m.ActiveTimeZone != basetype.Uint8Invalid {
@@ -127,9 +128,9 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TimeZoneOffset
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+	if byte(m.BacklightMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToEnum[byte](m.BacklightMode)
+		field.Value = byte(m.BacklightMode)
 		fields = append(fields, field)
 	}
 	if m.ActivityTrackerEnabled != false {
@@ -152,19 +153,19 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MoveAlertEnabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DateMode) != basetype.EnumInvalid {
+	if byte(m.DateMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 47)
-		field.Value = typeconv.ToEnum[byte](m.DateMode)
+		field.Value = byte(m.DateMode)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DisplayOrientation) != basetype.EnumInvalid {
+	if byte(m.DisplayOrientation) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 55)
-		field.Value = typeconv.ToEnum[byte](m.DisplayOrientation)
+		field.Value = byte(m.DisplayOrientation)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.MountingSide) != basetype.EnumInvalid {
+	if byte(m.MountingSide) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 56)
-		field.Value = typeconv.ToEnum[byte](m.MountingSide)
+		field.Value = byte(m.MountingSide)
 		fields = append(fields, field)
 	}
 	if m.DefaultPage != nil {
@@ -192,14 +193,14 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BleAutoUploadEnabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.AutoSyncFrequency) != basetype.EnumInvalid {
+	if byte(m.AutoSyncFrequency) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 89)
-		field.Value = typeconv.ToEnum[byte](m.AutoSyncFrequency)
+		field.Value = byte(m.AutoSyncFrequency)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.AutoActivityDetect) != basetype.Uint32Invalid {
+	if uint32(m.AutoActivityDetect) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 90)
-		field.Value = typeconv.ToUint32[uint32](m.AutoActivityDetect)
+		field.Value = uint32(m.AutoActivityDetect)
 		fields = append(fields, field)
 	}
 	if m.NumberOfScreens != basetype.Uint8Invalid {
@@ -207,19 +208,19 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.NumberOfScreens
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation) != basetype.EnumInvalid {
+	if byte(m.SmartNotificationDisplayOrientation) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 95)
-		field.Value = typeconv.ToEnum[byte](m.SmartNotificationDisplayOrientation)
+		field.Value = byte(m.SmartNotificationDisplayOrientation)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.TapInterface) != basetype.EnumInvalid {
+	if byte(m.TapInterface) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 134)
-		field.Value = typeconv.ToEnum[byte](m.TapInterface)
+		field.Value = byte(m.TapInterface)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.TapSensitivity) != basetype.EnumInvalid {
+	if byte(m.TapSensitivity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 174)
-		field.Value = typeconv.ToEnum[byte](m.TapSensitivity)
+		field.Value = byte(m.TapSensitivity)
 		fields = append(fields, field)
 	}
 
@@ -229,6 +230,16 @@ func (m *DeviceSettings) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// TimeZoneOffsetScaled return TimeZoneOffset in its scaled value [Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments].
+//
+// If TimeZoneOffset value is invalid, nil will be returned.
+func (m *DeviceSettings) TimeZoneOffsetScaled() []float64 {
+	if m.TimeZoneOffset == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeZoneOffset, 4, 0)
 }
 
 // SetActiveTimeZone sets DeviceSettings value.

@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -22,7 +23,7 @@ type Workout struct {
 	NumValidSteps  uint16 // number of valid steps
 	WktName        string
 	SubSport       typedef.SubSport
-	PoolLength     uint16 // Scale: 100; Units: m;
+	PoolLength     uint16 // Scale: 100; Units: m
 	PoolLengthUnit typedef.DisplayMeasure
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -62,25 +63,25 @@ func NewWorkout(mesg *proto.Message) *Workout {
 
 // ToMesg converts Workout into proto.Message.
 func (m *Workout) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkout)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.Capabilities) != basetype.Uint32zInvalid {
+	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToUint32z[uint32](m.Capabilities)
+		field.Value = uint32(m.Capabilities)
 		fields = append(fields, field)
 	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
@@ -93,9 +94,9 @@ func (m *Workout) ToMesg(fac Factory) proto.Message {
 		field.Value = m.WktName
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
 	if m.PoolLength != basetype.Uint16Invalid {
@@ -103,9 +104,9 @@ func (m *Workout) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PoolLength
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.PoolLengthUnit) != basetype.EnumInvalid {
+	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 15)
-		field.Value = typeconv.ToEnum[byte](m.PoolLengthUnit)
+		field.Value = byte(m.PoolLengthUnit)
 		fields = append(fields, field)
 	}
 
@@ -115,6 +116,16 @@ func (m *Workout) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// PoolLengthScaled return PoolLength in its scaled value [Scale: 100; Units: m].
+//
+// If PoolLength value is invalid, float64 invalid value will be returned.
+func (m *Workout) PoolLengthScaled() float64 {
+	if m.PoolLength == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.PoolLength, 100, 0)
 }
 
 // SetMessageIndex sets Workout value.
@@ -157,7 +168,7 @@ func (m *Workout) SetSubSport(v typedef.SubSport) *Workout {
 
 // SetPoolLength sets Workout value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *Workout) SetPoolLength(v uint16) *Workout {
 	m.PoolLength = v
 	return m

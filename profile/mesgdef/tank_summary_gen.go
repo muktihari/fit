@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,11 +19,11 @@ import (
 
 // TankSummary is a TankSummary message.
 type TankSummary struct {
-	Timestamp     time.Time // Units: s;
+	Timestamp     time.Time // Units: s
 	Sensor        typedef.AntChannelId
-	StartPressure uint16 // Scale: 100; Units: bar;
-	EndPressure   uint16 // Scale: 100; Units: bar;
-	VolumeUsed    uint32 // Scale: 100; Units: L;
+	StartPressure uint16 // Scale: 100; Units: bar
+	EndPressure   uint16 // Scale: 100; Units: bar
+	VolumeUsed    uint32 // Scale: 100; Units: L
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -58,10 +59,10 @@ func NewTankSummary(mesg *proto.Message) *TankSummary {
 
 // ToMesg converts TankSummary into proto.Message.
 func (m *TankSummary) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTankSummary)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -69,9 +70,9 @@ func (m *TankSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.Sensor) != basetype.Uint32zInvalid {
+	if uint32(m.Sensor) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint32z[uint32](m.Sensor)
+		field.Value = uint32(m.Sensor)
 		fields = append(fields, field)
 	}
 	if m.StartPressure != basetype.Uint16Invalid {
@@ -98,9 +99,39 @@ func (m *TankSummary) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// StartPressureScaled return StartPressure in its scaled value [Scale: 100; Units: bar].
+//
+// If StartPressure value is invalid, float64 invalid value will be returned.
+func (m *TankSummary) StartPressureScaled() float64 {
+	if m.StartPressure == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StartPressure, 100, 0)
+}
+
+// EndPressureScaled return EndPressure in its scaled value [Scale: 100; Units: bar].
+//
+// If EndPressure value is invalid, float64 invalid value will be returned.
+func (m *TankSummary) EndPressureScaled() float64 {
+	if m.EndPressure == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EndPressure, 100, 0)
+}
+
+// VolumeUsedScaled return VolumeUsed in its scaled value [Scale: 100; Units: L].
+//
+// If VolumeUsed value is invalid, float64 invalid value will be returned.
+func (m *TankSummary) VolumeUsedScaled() float64 {
+	if m.VolumeUsed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
+}
+
 // SetTimestamp sets TankSummary value.
 //
-// Units: s;
+// Units: s
 func (m *TankSummary) SetTimestamp(v time.Time) *TankSummary {
 	m.Timestamp = v
 	return m
@@ -114,7 +145,7 @@ func (m *TankSummary) SetSensor(v typedef.AntChannelId) *TankSummary {
 
 // SetStartPressure sets TankSummary value.
 //
-// Scale: 100; Units: bar;
+// Scale: 100; Units: bar
 func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
 	m.StartPressure = v
 	return m
@@ -122,7 +153,7 @@ func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
 
 // SetEndPressure sets TankSummary value.
 //
-// Scale: 100; Units: bar;
+// Scale: 100; Units: bar
 func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
 	m.EndPressure = v
 	return m
@@ -130,7 +161,7 @@ func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
 
 // SetVolumeUsed sets TankSummary value.
 //
-// Scale: 100; Units: L;
+// Scale: 100; Units: L
 func (m *TankSummary) SetVolumeUsed(v uint32) *TankSummary {
 	m.VolumeUsed = v
 	return m

@@ -60,10 +60,10 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 
 // ToMesg converts TrainingFile into proto.Message.
 func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTrainingFile)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -71,14 +71,14 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		field.Value = uint16(m.Manufacturer)
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
@@ -86,9 +86,9 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Product
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
+		field.Value = uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {

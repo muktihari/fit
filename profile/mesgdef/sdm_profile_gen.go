@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,8 +20,8 @@ type SdmProfile struct {
 	MessageIndex      typedef.MessageIndex
 	Enabled           bool
 	SdmAntId          uint16
-	SdmCalFactor      uint16 // Scale: 10; Units: %;
-	Odometer          uint32 // Scale: 100; Units: m;
+	SdmCalFactor      uint16 // Scale: 10; Units: %
+	Odometer          uint32 // Scale: 100; Units: m
 	SpeedSource       bool   // Use footpod for speed source instead of GPS
 	SdmAntIdTransType uint8
 	OdometerRollover  uint8 // Rollover counter that can be used to extend the odometer
@@ -62,15 +63,15 @@ func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 
 // ToMesg converts SdmProfile into proto.Message.
 func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSdmProfile)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
@@ -78,9 +79,9 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.SdmAntId) != basetype.Uint16zInvalid {
+	if uint16(m.SdmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint16z[uint16](m.SdmAntId)
+		field.Value = uint16(m.SdmAntId)
 		fields = append(fields, field)
 	}
 	if m.SdmCalFactor != basetype.Uint16Invalid {
@@ -98,9 +99,9 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SpeedSource
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.SdmAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.SdmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToUint8z[uint8](m.SdmAntIdTransType)
+		field.Value = uint8(m.SdmAntIdTransType)
 		fields = append(fields, field)
 	}
 	if m.OdometerRollover != basetype.Uint8Invalid {
@@ -115,6 +116,26 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SdmCalFactorScaled return SdmCalFactor in its scaled value [Scale: 10; Units: %].
+//
+// If SdmCalFactor value is invalid, float64 invalid value will be returned.
+func (m *SdmProfile) SdmCalFactorScaled() float64 {
+	if m.SdmCalFactor == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
+}
+
+// OdometerScaled return Odometer in its scaled value [Scale: 100; Units: m].
+//
+// If Odometer value is invalid, float64 invalid value will be returned.
+func (m *SdmProfile) OdometerScaled() float64 {
+	if m.Odometer == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
 
 // SetMessageIndex sets SdmProfile value.
@@ -137,7 +158,7 @@ func (m *SdmProfile) SetSdmAntId(v uint16) *SdmProfile {
 
 // SetSdmCalFactor sets SdmProfile value.
 //
-// Scale: 10; Units: %;
+// Scale: 10; Units: %
 func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
 	m.SdmCalFactor = v
 	return m
@@ -145,7 +166,7 @@ func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
 
 // SetOdometer sets SdmProfile value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
 	m.Odometer = v
 	return m

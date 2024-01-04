@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,45 +19,45 @@ import (
 
 // Record is a Record message.
 type Record struct {
-	Timestamp                     time.Time // Units: s;
-	PositionLat                   int32     // Units: semicircles;
-	PositionLong                  int32     // Units: semicircles;
-	Altitude                      uint16    // Scale: 5; Offset: 500; Units: m;
-	HeartRate                     uint8     // Units: bpm;
-	Cadence                       uint8     // Units: rpm;
-	Distance                      uint32    // Scale: 100; Units: m;
-	Speed                         uint16    // Scale: 1000; Units: m/s;
-	Power                         uint16    // Units: watts;
-	CompressedSpeedDistance       []byte    // Array: [3]; Scale: 100; Units: m/s,m;
-	Grade                         int16     // Scale: 100; Units: %;
+	Timestamp                     time.Time // Units: s
+	PositionLat                   int32     // Units: semicircles
+	PositionLong                  int32     // Units: semicircles
+	Altitude                      uint16    // Scale: 5; Offset: 500; Units: m
+	HeartRate                     uint8     // Units: bpm
+	Cadence                       uint8     // Units: rpm
+	Distance                      uint32    // Scale: 100; Units: m
+	Speed                         uint16    // Scale: 1000; Units: m/s
+	Power                         uint16    // Units: watts
+	CompressedSpeedDistance       []byte    // Array: [3]; Scale: 100; Units: m/s,m
+	Grade                         int16     // Scale: 100; Units: %
 	Resistance                    uint8     // Relative. 0 is none 254 is Max.
-	TimeFromCourse                int32     // Scale: 1000; Units: s;
-	CycleLength                   uint8     // Scale: 100; Units: m;
-	Temperature                   int8      // Units: C;
+	TimeFromCourse                int32     // Scale: 1000; Units: s
+	CycleLength                   uint8     // Scale: 100; Units: m
+	Temperature                   int8      // Units: C
 	Speed1S                       []uint8   // Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
-	Cycles                        uint8     // Units: cycles;
-	TotalCycles                   uint32    // Units: cycles;
-	CompressedAccumulatedPower    uint16    // Units: watts;
-	AccumulatedPower              uint32    // Units: watts;
+	Cycles                        uint8     // Units: cycles
+	TotalCycles                   uint32    // Units: cycles
+	CompressedAccumulatedPower    uint16    // Units: watts
+	AccumulatedPower              uint32    // Units: watts
 	LeftRightBalance              typedef.LeftRightBalance
-	GpsAccuracy                   uint8  // Units: m;
-	VerticalSpeed                 int16  // Scale: 1000; Units: m/s;
-	Calories                      uint16 // Units: kcal;
-	VerticalOscillation           uint16 // Scale: 10; Units: mm;
-	StanceTimePercent             uint16 // Scale: 100; Units: percent;
-	StanceTime                    uint16 // Scale: 10; Units: ms;
+	GpsAccuracy                   uint8  // Units: m
+	VerticalSpeed                 int16  // Scale: 1000; Units: m/s
+	Calories                      uint16 // Units: kcal
+	VerticalOscillation           uint16 // Scale: 10; Units: mm
+	StanceTimePercent             uint16 // Scale: 100; Units: percent
+	StanceTime                    uint16 // Scale: 10; Units: ms
 	ActivityType                  typedef.ActivityType
-	LeftTorqueEffectiveness       uint8 // Scale: 2; Units: percent;
-	RightTorqueEffectiveness      uint8 // Scale: 2; Units: percent;
-	LeftPedalSmoothness           uint8 // Scale: 2; Units: percent;
-	RightPedalSmoothness          uint8 // Scale: 2; Units: percent;
-	CombinedPedalSmoothness       uint8 // Scale: 2; Units: percent;
-	Time128                       uint8 // Scale: 128; Units: s;
+	LeftTorqueEffectiveness       uint8 // Scale: 2; Units: percent
+	RightTorqueEffectiveness      uint8 // Scale: 2; Units: percent
+	LeftPedalSmoothness           uint8 // Scale: 2; Units: percent
+	RightPedalSmoothness          uint8 // Scale: 2; Units: percent
+	CombinedPedalSmoothness       uint8 // Scale: 2; Units: percent
+	Time128                       uint8 // Scale: 128; Units: s
 	StrokeType                    typedef.StrokeType
 	Zone                          uint8
-	BallSpeed                     uint16 // Scale: 100; Units: m/s;
+	BallSpeed                     uint16 // Scale: 100; Units: m/s
 	Cadence256                    uint16 // Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability
-	FractionalCadence             uint8  // Scale: 128; Units: rpm;
+	FractionalCadence             uint8  // Scale: 128; Units: rpm
 	TotalHemoglobinConc           uint16 // Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
 	TotalHemoglobinConcMin        uint16 // Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 	TotalHemoglobinConcMax        uint16 // Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
@@ -70,38 +71,38 @@ type Record struct {
 	LeftPowerPhasePeak            []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
 	RightPowerPhase               []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
 	RightPowerPhasePeak           []uint8 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
-	EnhancedSpeed                 uint32  // Scale: 1000; Units: m/s;
-	EnhancedAltitude              uint32  // Scale: 5; Offset: 500; Units: m;
+	EnhancedSpeed                 uint32  // Scale: 1000; Units: m/s
+	EnhancedAltitude              uint32  // Scale: 5; Offset: 500; Units: m
 	BatterySoc                    uint8   // Scale: 2; Units: percent; lev battery state of charge
 	MotorPower                    uint16  // Units: watts; lev motor power
-	VerticalRatio                 uint16  // Scale: 100; Units: percent;
-	StanceTimeBalance             uint16  // Scale: 100; Units: percent;
-	StepLength                    uint16  // Scale: 10; Units: mm;
+	VerticalRatio                 uint16  // Scale: 100; Units: percent
+	StanceTimeBalance             uint16  // Scale: 100; Units: percent
+	StepLength                    uint16  // Scale: 10; Units: mm
 	CycleLength16                 uint16  // Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
 	AbsolutePressure              uint32  // Units: Pa; Includes atmospheric pressure
 	Depth                         uint32  // Scale: 1000; Units: m; 0 if above water
 	NextStopDepth                 uint32  // Scale: 1000; Units: m; 0 if above water
-	NextStopTime                  uint32  // Units: s;
-	TimeToSurface                 uint32  // Units: s;
-	NdlTime                       uint32  // Units: s;
-	CnsLoad                       uint8   // Units: percent;
-	N2Load                        uint16  // Units: percent;
-	RespirationRate               uint8   // Units: s;
-	EnhancedRespirationRate       uint16  // Scale: 100; Units: Breaths/min;
+	NextStopTime                  uint32  // Units: s
+	TimeToSurface                 uint32  // Units: s
+	NdlTime                       uint32  // Units: s
+	CnsLoad                       uint8   // Units: percent
+	N2Load                        uint16  // Units: percent
+	RespirationRate               uint8   // Units: s
+	EnhancedRespirationRate       uint16  // Scale: 100; Units: Breaths/min
 	Grit                          float32 // The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 	Flow                          float32 // The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 	CurrentStress                 uint16  // Scale: 100; Current Stress value
-	EbikeTravelRange              uint16  // Units: km;
-	EbikeBatteryLevel             uint8   // Units: percent;
-	EbikeAssistMode               uint8   // Units: depends on sensor;
-	EbikeAssistLevelPercent       uint8   // Units: percent;
-	AirTimeRemaining              uint32  // Units: s;
+	EbikeTravelRange              uint16  // Units: km
+	EbikeBatteryLevel             uint8   // Units: percent
+	EbikeAssistMode               uint8   // Units: depends on sensor
+	EbikeAssistLevelPercent       uint8   // Units: percent
+	AirTimeRemaining              uint32  // Units: s
 	PressureSac                   uint16  // Scale: 100; Units: bar/min; Pressure-based surface air consumption
 	VolumeSac                     uint16  // Scale: 100; Units: L/min; Volumetric surface air consumption
 	Rmv                           uint16  // Scale: 100; Units: L/min; Respiratory minute volume
-	AscentRate                    int32   // Scale: 1000; Units: m/s;
+	AscentRate                    int32   // Scale: 1000; Units: m/s
 	Po2                           uint8   // Scale: 100; Units: percent; Current partial pressure of oxygen
-	CoreTemperature               uint16  // Scale: 100; Units: C;
+	CoreTemperature               uint16  // Scale: 100; Units: C
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -224,10 +225,10 @@ func NewRecord(mesg *proto.Message) *Record {
 
 // ToMesg converts Record into proto.Message.
 func (m *Record) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumRecord)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -334,9 +335,9 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[29]
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.LeftRightBalance) != basetype.Uint8Invalid {
+	if uint8(m.LeftRightBalance) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 30)
-		field.Value = typeconv.ToUint8[uint8](m.LeftRightBalance)
+		field.Value = uint8(m.LeftRightBalance)
 		fields = append(fields, field)
 	}
 	if m.GpsAccuracy != basetype.Uint8Invalid {
@@ -369,9 +370,9 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.StanceTime
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.ActivityType) != basetype.EnumInvalid {
+	if byte(m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 42)
-		field.Value = typeconv.ToEnum[byte](m.ActivityType)
+		field.Value = byte(m.ActivityType)
 		fields = append(fields, field)
 	}
 	if m.LeftTorqueEffectiveness != basetype.Uint8Invalid {
@@ -404,9 +405,9 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Time128
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.StrokeType) != basetype.EnumInvalid {
+	if byte(m.StrokeType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 49)
-		field.Value = typeconv.ToEnum[byte](m.StrokeType)
+		field.Value = byte(m.StrokeType)
 		fields = append(fields, field)
 	}
 	if m.Zone != basetype.Uint8Invalid {
@@ -459,9 +460,9 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SaturatedHemoglobinPercentMax
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 62)
-		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		field.Value = uint8(m.DeviceIndex)
 		fields = append(fields, field)
 	}
 	if m.LeftPco != basetype.Sint8Invalid {
@@ -666,9 +667,489 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If Altitude value is invalid, float64 invalid value will be returned.
+func (m *Record) AltitudeScaled() float64 {
+	if m.Altitude == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Altitude, 5, 500)
+}
+
+// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m].
+//
+// If Distance value is invalid, float64 invalid value will be returned.
+func (m *Record) DistanceScaled() float64 {
+	if m.Distance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Distance, 100, 0)
+}
+
+// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If Speed value is invalid, float64 invalid value will be returned.
+func (m *Record) SpeedScaled() float64 {
+	if m.Speed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Speed, 1000, 0)
+}
+
+// CompressedSpeedDistanceScaled return CompressedSpeedDistance in its scaled value [Array: [3]; Scale: 100; Units: m/s,m].
+//
+// If CompressedSpeedDistance value is invalid, nil will be returned.
+func (m *Record) CompressedSpeedDistanceScaled() []float64 {
+	if m.CompressedSpeedDistance == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.CompressedSpeedDistance, 100, 0)
+}
+
+// GradeScaled return Grade in its scaled value [Scale: 100; Units: %].
+//
+// If Grade value is invalid, float64 invalid value will be returned.
+func (m *Record) GradeScaled() float64 {
+	if m.Grade == basetype.Sint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Grade, 100, 0)
+}
+
+// TimeFromCourseScaled return TimeFromCourse in its scaled value [Scale: 1000; Units: s].
+//
+// If TimeFromCourse value is invalid, float64 invalid value will be returned.
+func (m *Record) TimeFromCourseScaled() float64 {
+	if m.TimeFromCourse == basetype.Sint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TimeFromCourse, 1000, 0)
+}
+
+// CycleLengthScaled return CycleLength in its scaled value [Scale: 100; Units: m].
+//
+// If CycleLength value is invalid, float64 invalid value will be returned.
+func (m *Record) CycleLengthScaled() float64 {
+	if m.CycleLength == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CycleLength, 100, 0)
+}
+
+// Speed1SScaled return Speed1S in its scaled value [Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.].
+//
+// If Speed1S value is invalid, nil will be returned.
+func (m *Record) Speed1SScaled() []float64 {
+	if m.Speed1S == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Speed1S, 16, 0)
+}
+
+// VerticalSpeedScaled return VerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If VerticalSpeed value is invalid, float64 invalid value will be returned.
+func (m *Record) VerticalSpeedScaled() float64 {
+	if m.VerticalSpeed == basetype.Sint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VerticalSpeed, 1000, 0)
+}
+
+// VerticalOscillationScaled return VerticalOscillation in its scaled value [Scale: 10; Units: mm].
+//
+// If VerticalOscillation value is invalid, float64 invalid value will be returned.
+func (m *Record) VerticalOscillationScaled() float64 {
+	if m.VerticalOscillation == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VerticalOscillation, 10, 0)
+}
+
+// StanceTimePercentScaled return StanceTimePercent in its scaled value [Scale: 100; Units: percent].
+//
+// If StanceTimePercent value is invalid, float64 invalid value will be returned.
+func (m *Record) StanceTimePercentScaled() float64 {
+	if m.StanceTimePercent == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StanceTimePercent, 100, 0)
+}
+
+// StanceTimeScaled return StanceTime in its scaled value [Scale: 10; Units: ms].
+//
+// If StanceTime value is invalid, float64 invalid value will be returned.
+func (m *Record) StanceTimeScaled() float64 {
+	if m.StanceTime == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StanceTime, 10, 0)
+}
+
+// LeftTorqueEffectivenessScaled return LeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
+//
+// If LeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+func (m *Record) LeftTorqueEffectivenessScaled() float64 {
+	if m.LeftTorqueEffectiveness == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.LeftTorqueEffectiveness, 2, 0)
+}
+
+// RightTorqueEffectivenessScaled return RightTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
+//
+// If RightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+func (m *Record) RightTorqueEffectivenessScaled() float64 {
+	if m.RightTorqueEffectiveness == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.RightTorqueEffectiveness, 2, 0)
+}
+
+// LeftPedalSmoothnessScaled return LeftPedalSmoothness in its scaled value [Scale: 2; Units: percent].
+//
+// If LeftPedalSmoothness value is invalid, float64 invalid value will be returned.
+func (m *Record) LeftPedalSmoothnessScaled() float64 {
+	if m.LeftPedalSmoothness == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.LeftPedalSmoothness, 2, 0)
+}
+
+// RightPedalSmoothnessScaled return RightPedalSmoothness in its scaled value [Scale: 2; Units: percent].
+//
+// If RightPedalSmoothness value is invalid, float64 invalid value will be returned.
+func (m *Record) RightPedalSmoothnessScaled() float64 {
+	if m.RightPedalSmoothness == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.RightPedalSmoothness, 2, 0)
+}
+
+// CombinedPedalSmoothnessScaled return CombinedPedalSmoothness in its scaled value [Scale: 2; Units: percent].
+//
+// If CombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
+func (m *Record) CombinedPedalSmoothnessScaled() float64 {
+	if m.CombinedPedalSmoothness == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CombinedPedalSmoothness, 2, 0)
+}
+
+// Time128Scaled return Time128 in its scaled value [Scale: 128; Units: s].
+//
+// If Time128 value is invalid, float64 invalid value will be returned.
+func (m *Record) Time128Scaled() float64 {
+	if m.Time128 == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Time128, 128, 0)
+}
+
+// BallSpeedScaled return BallSpeed in its scaled value [Scale: 100; Units: m/s].
+//
+// If BallSpeed value is invalid, float64 invalid value will be returned.
+func (m *Record) BallSpeedScaled() float64 {
+	if m.BallSpeed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BallSpeed, 100, 0)
+}
+
+// Cadence256Scaled return Cadence256 in its scaled value [Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability].
+//
+// If Cadence256 value is invalid, float64 invalid value will be returned.
+func (m *Record) Cadence256Scaled() float64 {
+	if m.Cadence256 == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Cadence256, 256, 0)
+}
+
+// FractionalCadenceScaled return FractionalCadence in its scaled value [Scale: 128; Units: rpm].
+//
+// If FractionalCadence value is invalid, float64 invalid value will be returned.
+func (m *Record) FractionalCadenceScaled() float64 {
+	if m.FractionalCadence == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FractionalCadence, 128, 0)
+}
+
+// TotalHemoglobinConcScaled return TotalHemoglobinConc in its scaled value [Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin].
+//
+// If TotalHemoglobinConc value is invalid, float64 invalid value will be returned.
+func (m *Record) TotalHemoglobinConcScaled() float64 {
+	if m.TotalHemoglobinConc == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalHemoglobinConc, 100, 0)
+}
+
+// TotalHemoglobinConcMinScaled return TotalHemoglobinConcMin in its scaled value [Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin].
+//
+// If TotalHemoglobinConcMin value is invalid, float64 invalid value will be returned.
+func (m *Record) TotalHemoglobinConcMinScaled() float64 {
+	if m.TotalHemoglobinConcMin == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalHemoglobinConcMin, 100, 0)
+}
+
+// TotalHemoglobinConcMaxScaled return TotalHemoglobinConcMax in its scaled value [Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin].
+//
+// If TotalHemoglobinConcMax value is invalid, float64 invalid value will be returned.
+func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
+	if m.TotalHemoglobinConcMax == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalHemoglobinConcMax, 100, 0)
+}
+
+// SaturatedHemoglobinPercentScaled return SaturatedHemoglobinPercent in its scaled value [Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen].
+//
+// If SaturatedHemoglobinPercent value is invalid, float64 invalid value will be returned.
+func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
+	if m.SaturatedHemoglobinPercent == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SaturatedHemoglobinPercent, 10, 0)
+}
+
+// SaturatedHemoglobinPercentMinScaled return SaturatedHemoglobinPercentMin in its scaled value [Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen].
+//
+// If SaturatedHemoglobinPercentMin value is invalid, float64 invalid value will be returned.
+func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
+	if m.SaturatedHemoglobinPercentMin == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMin, 10, 0)
+}
+
+// SaturatedHemoglobinPercentMaxScaled return SaturatedHemoglobinPercentMax in its scaled value [Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen].
+//
+// If SaturatedHemoglobinPercentMax value is invalid, float64 invalid value will be returned.
+func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
+	if m.SaturatedHemoglobinPercentMax == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMax, 10, 0)
+}
+
+// LeftPowerPhaseScaled return LeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If LeftPowerPhase value is invalid, nil will be returned.
+func (m *Record) LeftPowerPhaseScaled() []float64 {
+	if m.LeftPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.LeftPowerPhase, 0.7111111, 0)
+}
+
+// LeftPowerPhasePeakScaled return LeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If LeftPowerPhasePeak value is invalid, nil will be returned.
+func (m *Record) LeftPowerPhasePeakScaled() []float64 {
+	if m.LeftPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.LeftPowerPhasePeak, 0.7111111, 0)
+}
+
+// RightPowerPhaseScaled return RightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If RightPowerPhase value is invalid, nil will be returned.
+func (m *Record) RightPowerPhaseScaled() []float64 {
+	if m.RightPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.RightPowerPhase, 0.7111111, 0)
+}
+
+// RightPowerPhasePeakScaled return RightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If RightPowerPhasePeak value is invalid, nil will be returned.
+func (m *Record) RightPowerPhasePeakScaled() []float64 {
+	if m.RightPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.RightPowerPhasePeak, 0.7111111, 0)
+}
+
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+func (m *Record) EnhancedSpeedScaled() float64 {
+	if m.EnhancedSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+}
+
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+func (m *Record) EnhancedAltitudeScaled() float64 {
+	if m.EnhancedAltitude == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+}
+
+// BatterySocScaled return BatterySoc in its scaled value [Scale: 2; Units: percent; lev battery state of charge].
+//
+// If BatterySoc value is invalid, float64 invalid value will be returned.
+func (m *Record) BatterySocScaled() float64 {
+	if m.BatterySoc == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BatterySoc, 2, 0)
+}
+
+// VerticalRatioScaled return VerticalRatio in its scaled value [Scale: 100; Units: percent].
+//
+// If VerticalRatio value is invalid, float64 invalid value will be returned.
+func (m *Record) VerticalRatioScaled() float64 {
+	if m.VerticalRatio == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VerticalRatio, 100, 0)
+}
+
+// StanceTimeBalanceScaled return StanceTimeBalance in its scaled value [Scale: 100; Units: percent].
+//
+// If StanceTimeBalance value is invalid, float64 invalid value will be returned.
+func (m *Record) StanceTimeBalanceScaled() float64 {
+	if m.StanceTimeBalance == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StanceTimeBalance, 100, 0)
+}
+
+// StepLengthScaled return StepLength in its scaled value [Scale: 10; Units: mm].
+//
+// If StepLength value is invalid, float64 invalid value will be returned.
+func (m *Record) StepLengthScaled() float64 {
+	if m.StepLength == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.StepLength, 10, 0)
+}
+
+// CycleLength16Scaled return CycleLength16 in its scaled value [Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35].
+//
+// If CycleLength16 value is invalid, float64 invalid value will be returned.
+func (m *Record) CycleLength16Scaled() float64 {
+	if m.CycleLength16 == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CycleLength16, 100, 0)
+}
+
+// DepthScaled return Depth in its scaled value [Scale: 1000; Units: m; 0 if above water].
+//
+// If Depth value is invalid, float64 invalid value will be returned.
+func (m *Record) DepthScaled() float64 {
+	if m.Depth == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Depth, 1000, 0)
+}
+
+// NextStopDepthScaled return NextStopDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
+//
+// If NextStopDepth value is invalid, float64 invalid value will be returned.
+func (m *Record) NextStopDepthScaled() float64 {
+	if m.NextStopDepth == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.NextStopDepth, 1000, 0)
+}
+
+// EnhancedRespirationRateScaled return EnhancedRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
+//
+// If EnhancedRespirationRate value is invalid, float64 invalid value will be returned.
+func (m *Record) EnhancedRespirationRateScaled() float64 {
+	if m.EnhancedRespirationRate == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedRespirationRate, 100, 0)
+}
+
+// CurrentStressScaled return CurrentStress in its scaled value [Scale: 100; Current Stress value].
+//
+// If CurrentStress value is invalid, float64 invalid value will be returned.
+func (m *Record) CurrentStressScaled() float64 {
+	if m.CurrentStress == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CurrentStress, 100, 0)
+}
+
+// PressureSacScaled return PressureSac in its scaled value [Scale: 100; Units: bar/min; Pressure-based surface air consumption].
+//
+// If PressureSac value is invalid, float64 invalid value will be returned.
+func (m *Record) PressureSacScaled() float64 {
+	if m.PressureSac == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.PressureSac, 100, 0)
+}
+
+// VolumeSacScaled return VolumeSac in its scaled value [Scale: 100; Units: L/min; Volumetric surface air consumption].
+//
+// If VolumeSac value is invalid, float64 invalid value will be returned.
+func (m *Record) VolumeSacScaled() float64 {
+	if m.VolumeSac == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VolumeSac, 100, 0)
+}
+
+// RmvScaled return Rmv in its scaled value [Scale: 100; Units: L/min; Respiratory minute volume].
+//
+// If Rmv value is invalid, float64 invalid value will be returned.
+func (m *Record) RmvScaled() float64 {
+	if m.Rmv == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Rmv, 100, 0)
+}
+
+// AscentRateScaled return AscentRate in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AscentRate value is invalid, float64 invalid value will be returned.
+func (m *Record) AscentRateScaled() float64 {
+	if m.AscentRate == basetype.Sint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AscentRate, 1000, 0)
+}
+
+// Po2Scaled return Po2 in its scaled value [Scale: 100; Units: percent; Current partial pressure of oxygen].
+//
+// If Po2 value is invalid, float64 invalid value will be returned.
+func (m *Record) Po2Scaled() float64 {
+	if m.Po2 == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Po2, 100, 0)
+}
+
+// CoreTemperatureScaled return CoreTemperature in its scaled value [Scale: 100; Units: C].
+//
+// If CoreTemperature value is invalid, float64 invalid value will be returned.
+func (m *Record) CoreTemperatureScaled() float64 {
+	if m.CoreTemperature == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CoreTemperature, 100, 0)
+}
+
 // SetTimestamp sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetTimestamp(v time.Time) *Record {
 	m.Timestamp = v
 	return m
@@ -676,7 +1157,7 @@ func (m *Record) SetTimestamp(v time.Time) *Record {
 
 // SetPositionLat sets Record value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Record) SetPositionLat(v int32) *Record {
 	m.PositionLat = v
 	return m
@@ -684,7 +1165,7 @@ func (m *Record) SetPositionLat(v int32) *Record {
 
 // SetPositionLong sets Record value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Record) SetPositionLong(v int32) *Record {
 	m.PositionLong = v
 	return m
@@ -692,7 +1173,7 @@ func (m *Record) SetPositionLong(v int32) *Record {
 
 // SetAltitude sets Record value.
 //
-// Scale: 5; Offset: 500; Units: m;
+// Scale: 5; Offset: 500; Units: m
 func (m *Record) SetAltitude(v uint16) *Record {
 	m.Altitude = v
 	return m
@@ -700,7 +1181,7 @@ func (m *Record) SetAltitude(v uint16) *Record {
 
 // SetHeartRate sets Record value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *Record) SetHeartRate(v uint8) *Record {
 	m.HeartRate = v
 	return m
@@ -708,7 +1189,7 @@ func (m *Record) SetHeartRate(v uint8) *Record {
 
 // SetCadence sets Record value.
 //
-// Units: rpm;
+// Units: rpm
 func (m *Record) SetCadence(v uint8) *Record {
 	m.Cadence = v
 	return m
@@ -716,7 +1197,7 @@ func (m *Record) SetCadence(v uint8) *Record {
 
 // SetDistance sets Record value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *Record) SetDistance(v uint32) *Record {
 	m.Distance = v
 	return m
@@ -724,7 +1205,7 @@ func (m *Record) SetDistance(v uint32) *Record {
 
 // SetSpeed sets Record value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Record) SetSpeed(v uint16) *Record {
 	m.Speed = v
 	return m
@@ -732,7 +1213,7 @@ func (m *Record) SetSpeed(v uint16) *Record {
 
 // SetPower sets Record value.
 //
-// Units: watts;
+// Units: watts
 func (m *Record) SetPower(v uint16) *Record {
 	m.Power = v
 	return m
@@ -740,7 +1221,7 @@ func (m *Record) SetPower(v uint16) *Record {
 
 // SetCompressedSpeedDistance sets Record value.
 //
-// Array: [3]; Scale: 100; Units: m/s,m;
+// Array: [3]; Scale: 100; Units: m/s,m
 func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
 	m.CompressedSpeedDistance = v
 	return m
@@ -748,7 +1229,7 @@ func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
 
 // SetGrade sets Record value.
 //
-// Scale: 100; Units: %;
+// Scale: 100; Units: %
 func (m *Record) SetGrade(v int16) *Record {
 	m.Grade = v
 	return m
@@ -764,7 +1245,7 @@ func (m *Record) SetResistance(v uint8) *Record {
 
 // SetTimeFromCourse sets Record value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Record) SetTimeFromCourse(v int32) *Record {
 	m.TimeFromCourse = v
 	return m
@@ -772,7 +1253,7 @@ func (m *Record) SetTimeFromCourse(v int32) *Record {
 
 // SetCycleLength sets Record value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *Record) SetCycleLength(v uint8) *Record {
 	m.CycleLength = v
 	return m
@@ -780,7 +1261,7 @@ func (m *Record) SetCycleLength(v uint8) *Record {
 
 // SetTemperature sets Record value.
 //
-// Units: C;
+// Units: C
 func (m *Record) SetTemperature(v int8) *Record {
 	m.Temperature = v
 	return m
@@ -796,7 +1277,7 @@ func (m *Record) SetSpeed1S(v []uint8) *Record {
 
 // SetCycles sets Record value.
 //
-// Units: cycles;
+// Units: cycles
 func (m *Record) SetCycles(v uint8) *Record {
 	m.Cycles = v
 	return m
@@ -804,7 +1285,7 @@ func (m *Record) SetCycles(v uint8) *Record {
 
 // SetTotalCycles sets Record value.
 //
-// Units: cycles;
+// Units: cycles
 func (m *Record) SetTotalCycles(v uint32) *Record {
 	m.TotalCycles = v
 	return m
@@ -812,7 +1293,7 @@ func (m *Record) SetTotalCycles(v uint32) *Record {
 
 // SetCompressedAccumulatedPower sets Record value.
 //
-// Units: watts;
+// Units: watts
 func (m *Record) SetCompressedAccumulatedPower(v uint16) *Record {
 	m.CompressedAccumulatedPower = v
 	return m
@@ -820,7 +1301,7 @@ func (m *Record) SetCompressedAccumulatedPower(v uint16) *Record {
 
 // SetAccumulatedPower sets Record value.
 //
-// Units: watts;
+// Units: watts
 func (m *Record) SetAccumulatedPower(v uint32) *Record {
 	m.AccumulatedPower = v
 	return m
@@ -834,7 +1315,7 @@ func (m *Record) SetLeftRightBalance(v typedef.LeftRightBalance) *Record {
 
 // SetGpsAccuracy sets Record value.
 //
-// Units: m;
+// Units: m
 func (m *Record) SetGpsAccuracy(v uint8) *Record {
 	m.GpsAccuracy = v
 	return m
@@ -842,7 +1323,7 @@ func (m *Record) SetGpsAccuracy(v uint8) *Record {
 
 // SetVerticalSpeed sets Record value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Record) SetVerticalSpeed(v int16) *Record {
 	m.VerticalSpeed = v
 	return m
@@ -850,7 +1331,7 @@ func (m *Record) SetVerticalSpeed(v int16) *Record {
 
 // SetCalories sets Record value.
 //
-// Units: kcal;
+// Units: kcal
 func (m *Record) SetCalories(v uint16) *Record {
 	m.Calories = v
 	return m
@@ -858,7 +1339,7 @@ func (m *Record) SetCalories(v uint16) *Record {
 
 // SetVerticalOscillation sets Record value.
 //
-// Scale: 10; Units: mm;
+// Scale: 10; Units: mm
 func (m *Record) SetVerticalOscillation(v uint16) *Record {
 	m.VerticalOscillation = v
 	return m
@@ -866,7 +1347,7 @@ func (m *Record) SetVerticalOscillation(v uint16) *Record {
 
 // SetStanceTimePercent sets Record value.
 //
-// Scale: 100; Units: percent;
+// Scale: 100; Units: percent
 func (m *Record) SetStanceTimePercent(v uint16) *Record {
 	m.StanceTimePercent = v
 	return m
@@ -874,7 +1355,7 @@ func (m *Record) SetStanceTimePercent(v uint16) *Record {
 
 // SetStanceTime sets Record value.
 //
-// Scale: 10; Units: ms;
+// Scale: 10; Units: ms
 func (m *Record) SetStanceTime(v uint16) *Record {
 	m.StanceTime = v
 	return m
@@ -888,7 +1369,7 @@ func (m *Record) SetActivityType(v typedef.ActivityType) *Record {
 
 // SetLeftTorqueEffectiveness sets Record value.
 //
-// Scale: 2; Units: percent;
+// Scale: 2; Units: percent
 func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
 	m.LeftTorqueEffectiveness = v
 	return m
@@ -896,7 +1377,7 @@ func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
 
 // SetRightTorqueEffectiveness sets Record value.
 //
-// Scale: 2; Units: percent;
+// Scale: 2; Units: percent
 func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
 	m.RightTorqueEffectiveness = v
 	return m
@@ -904,7 +1385,7 @@ func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
 
 // SetLeftPedalSmoothness sets Record value.
 //
-// Scale: 2; Units: percent;
+// Scale: 2; Units: percent
 func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
 	m.LeftPedalSmoothness = v
 	return m
@@ -912,7 +1393,7 @@ func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
 
 // SetRightPedalSmoothness sets Record value.
 //
-// Scale: 2; Units: percent;
+// Scale: 2; Units: percent
 func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
 	m.RightPedalSmoothness = v
 	return m
@@ -920,7 +1401,7 @@ func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
 
 // SetCombinedPedalSmoothness sets Record value.
 //
-// Scale: 2; Units: percent;
+// Scale: 2; Units: percent
 func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
 	m.CombinedPedalSmoothness = v
 	return m
@@ -928,7 +1409,7 @@ func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
 
 // SetTime128 sets Record value.
 //
-// Scale: 128; Units: s;
+// Scale: 128; Units: s
 func (m *Record) SetTime128(v uint8) *Record {
 	m.Time128 = v
 	return m
@@ -948,7 +1429,7 @@ func (m *Record) SetZone(v uint8) *Record {
 
 // SetBallSpeed sets Record value.
 //
-// Scale: 100; Units: m/s;
+// Scale: 100; Units: m/s
 func (m *Record) SetBallSpeed(v uint16) *Record {
 	m.BallSpeed = v
 	return m
@@ -964,7 +1445,7 @@ func (m *Record) SetCadence256(v uint16) *Record {
 
 // SetFractionalCadence sets Record value.
 //
-// Scale: 128; Units: rpm;
+// Scale: 128; Units: rpm
 func (m *Record) SetFractionalCadence(v uint8) *Record {
 	m.FractionalCadence = v
 	return m
@@ -1074,7 +1555,7 @@ func (m *Record) SetRightPowerPhasePeak(v []uint8) *Record {
 
 // SetEnhancedSpeed sets Record value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Record) SetEnhancedSpeed(v uint32) *Record {
 	m.EnhancedSpeed = v
 	return m
@@ -1082,7 +1563,7 @@ func (m *Record) SetEnhancedSpeed(v uint32) *Record {
 
 // SetEnhancedAltitude sets Record value.
 //
-// Scale: 5; Offset: 500; Units: m;
+// Scale: 5; Offset: 500; Units: m
 func (m *Record) SetEnhancedAltitude(v uint32) *Record {
 	m.EnhancedAltitude = v
 	return m
@@ -1106,7 +1587,7 @@ func (m *Record) SetMotorPower(v uint16) *Record {
 
 // SetVerticalRatio sets Record value.
 //
-// Scale: 100; Units: percent;
+// Scale: 100; Units: percent
 func (m *Record) SetVerticalRatio(v uint16) *Record {
 	m.VerticalRatio = v
 	return m
@@ -1114,7 +1595,7 @@ func (m *Record) SetVerticalRatio(v uint16) *Record {
 
 // SetStanceTimeBalance sets Record value.
 //
-// Scale: 100; Units: percent;
+// Scale: 100; Units: percent
 func (m *Record) SetStanceTimeBalance(v uint16) *Record {
 	m.StanceTimeBalance = v
 	return m
@@ -1122,7 +1603,7 @@ func (m *Record) SetStanceTimeBalance(v uint16) *Record {
 
 // SetStepLength sets Record value.
 //
-// Scale: 10; Units: mm;
+// Scale: 10; Units: mm
 func (m *Record) SetStepLength(v uint16) *Record {
 	m.StepLength = v
 	return m
@@ -1162,7 +1643,7 @@ func (m *Record) SetNextStopDepth(v uint32) *Record {
 
 // SetNextStopTime sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetNextStopTime(v uint32) *Record {
 	m.NextStopTime = v
 	return m
@@ -1170,7 +1651,7 @@ func (m *Record) SetNextStopTime(v uint32) *Record {
 
 // SetTimeToSurface sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetTimeToSurface(v uint32) *Record {
 	m.TimeToSurface = v
 	return m
@@ -1178,7 +1659,7 @@ func (m *Record) SetTimeToSurface(v uint32) *Record {
 
 // SetNdlTime sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetNdlTime(v uint32) *Record {
 	m.NdlTime = v
 	return m
@@ -1186,7 +1667,7 @@ func (m *Record) SetNdlTime(v uint32) *Record {
 
 // SetCnsLoad sets Record value.
 //
-// Units: percent;
+// Units: percent
 func (m *Record) SetCnsLoad(v uint8) *Record {
 	m.CnsLoad = v
 	return m
@@ -1194,7 +1675,7 @@ func (m *Record) SetCnsLoad(v uint8) *Record {
 
 // SetN2Load sets Record value.
 //
-// Units: percent;
+// Units: percent
 func (m *Record) SetN2Load(v uint16) *Record {
 	m.N2Load = v
 	return m
@@ -1202,7 +1683,7 @@ func (m *Record) SetN2Load(v uint16) *Record {
 
 // SetRespirationRate sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetRespirationRate(v uint8) *Record {
 	m.RespirationRate = v
 	return m
@@ -1210,7 +1691,7 @@ func (m *Record) SetRespirationRate(v uint8) *Record {
 
 // SetEnhancedRespirationRate sets Record value.
 //
-// Scale: 100; Units: Breaths/min;
+// Scale: 100; Units: Breaths/min
 func (m *Record) SetEnhancedRespirationRate(v uint16) *Record {
 	m.EnhancedRespirationRate = v
 	return m
@@ -1242,7 +1723,7 @@ func (m *Record) SetCurrentStress(v uint16) *Record {
 
 // SetEbikeTravelRange sets Record value.
 //
-// Units: km;
+// Units: km
 func (m *Record) SetEbikeTravelRange(v uint16) *Record {
 	m.EbikeTravelRange = v
 	return m
@@ -1250,7 +1731,7 @@ func (m *Record) SetEbikeTravelRange(v uint16) *Record {
 
 // SetEbikeBatteryLevel sets Record value.
 //
-// Units: percent;
+// Units: percent
 func (m *Record) SetEbikeBatteryLevel(v uint8) *Record {
 	m.EbikeBatteryLevel = v
 	return m
@@ -1258,7 +1739,7 @@ func (m *Record) SetEbikeBatteryLevel(v uint8) *Record {
 
 // SetEbikeAssistMode sets Record value.
 //
-// Units: depends on sensor;
+// Units: depends on sensor
 func (m *Record) SetEbikeAssistMode(v uint8) *Record {
 	m.EbikeAssistMode = v
 	return m
@@ -1266,7 +1747,7 @@ func (m *Record) SetEbikeAssistMode(v uint8) *Record {
 
 // SetEbikeAssistLevelPercent sets Record value.
 //
-// Units: percent;
+// Units: percent
 func (m *Record) SetEbikeAssistLevelPercent(v uint8) *Record {
 	m.EbikeAssistLevelPercent = v
 	return m
@@ -1274,7 +1755,7 @@ func (m *Record) SetEbikeAssistLevelPercent(v uint8) *Record {
 
 // SetAirTimeRemaining sets Record value.
 //
-// Units: s;
+// Units: s
 func (m *Record) SetAirTimeRemaining(v uint32) *Record {
 	m.AirTimeRemaining = v
 	return m
@@ -1306,7 +1787,7 @@ func (m *Record) SetRmv(v uint16) *Record {
 
 // SetAscentRate sets Record value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Record) SetAscentRate(v int32) *Record {
 	m.AscentRate = v
 	return m
@@ -1322,7 +1803,7 @@ func (m *Record) SetPo2(v uint8) *Record {
 
 // SetCoreTemperature sets Record value.
 //
-// Scale: 100; Units: C;
+// Scale: 100; Units: C
 func (m *Record) SetCoreTemperature(v uint16) *Record {
 	m.CoreTemperature = v
 	return m

@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -17,7 +18,7 @@ import (
 // Software is a Software message.
 type Software struct {
 	MessageIndex typedef.MessageIndex
-	Version      uint16 // Scale: 100;
+	Version      uint16 // Scale: 100
 	PartNumber   string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,15 +53,15 @@ func NewSoftware(mesg *proto.Message) *Software {
 
 // ToMesg converts Software into proto.Message.
 func (m *Software) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSoftware)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Version != basetype.Uint16Invalid {
@@ -82,6 +83,16 @@ func (m *Software) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// VersionScaled return Version in its scaled value [Scale: 100].
+//
+// If Version value is invalid, float64 invalid value will be returned.
+func (m *Software) VersionScaled() float64 {
+	if m.Version == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Version, 100, 0)
+}
+
 // SetMessageIndex sets Software value.
 func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
 	m.MessageIndex = v
@@ -90,7 +101,7 @@ func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
 
 // SetVersion sets Software value.
 //
-// Scale: 100;
+// Scale: 100
 func (m *Software) SetVersion(v uint16) *Software {
 	m.Version = v
 	return m

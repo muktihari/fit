@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,7 +21,7 @@ import (
 type DeviceAuxBatteryInfo struct {
 	Timestamp         time.Time
 	DeviceIndex       typedef.DeviceIndex
-	BatteryVoltage    uint16 // Scale: 256; Units: V;
+	BatteryVoltage    uint16 // Scale: 256; Units: V
 	BatteryStatus     typedef.BatteryStatus
 	BatteryIdentifier uint8
 
@@ -58,10 +59,10 @@ func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
 
 // ToMesg converts DeviceAuxBatteryInfo into proto.Message.
 func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceAuxBatteryInfo)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -69,9 +70,9 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		field.Value = uint8(m.DeviceIndex)
 		fields = append(fields, field)
 	}
 	if m.BatteryVoltage != basetype.Uint16Invalid {
@@ -79,9 +80,9 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BatteryVoltage
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
+	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint8[uint8](m.BatteryStatus)
+		field.Value = uint8(m.BatteryStatus)
 		fields = append(fields, field)
 	}
 	if m.BatteryIdentifier != basetype.Uint8Invalid {
@@ -98,6 +99,16 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// BatteryVoltageScaled return BatteryVoltage in its scaled value [Scale: 256; Units: V].
+//
+// If BatteryVoltage value is invalid, float64 invalid value will be returned.
+func (m *DeviceAuxBatteryInfo) BatteryVoltageScaled() float64 {
+	if m.BatteryVoltage == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
+}
+
 // SetTimestamp sets DeviceAuxBatteryInfo value.
 func (m *DeviceAuxBatteryInfo) SetTimestamp(v time.Time) *DeviceAuxBatteryInfo {
 	m.Timestamp = v
@@ -112,7 +123,7 @@ func (m *DeviceAuxBatteryInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceAuxB
 
 // SetBatteryVoltage sets DeviceAuxBatteryInfo value.
 //
-// Scale: 256; Units: V;
+// Scale: 256; Units: V
 func (m *DeviceAuxBatteryInfo) SetBatteryVoltage(v uint16) *DeviceAuxBatteryInfo {
 	m.BatteryVoltage = v
 	return m

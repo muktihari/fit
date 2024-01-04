@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -26,10 +27,10 @@ type AviationAttitude struct {
 	AccelLateral          []int16                    // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 	AccelNormal           []int16                    // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 	TurnRate              []int16                    // Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
-	Stage                 []typedef.AttitudeStage    // Array: [N];
+	Stage                 []typedef.AttitudeStage    // Array: [N]
 	AttitudeStageComplete []uint8                    // Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
 	Track                 []uint16                   // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
-	Validity              []typedef.AttitudeValidity // Array: [N];
+	Validity              []typedef.AttitudeValidity // Array: [N]
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -72,10 +73,10 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 
 // ToMesg converts AviationAttitude into proto.Message.
 func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAviationAttitude)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -147,6 +148,66 @@ func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// PitchScaled return Pitch in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2].
+//
+// If Pitch value is invalid, nil will be returned.
+func (m *AviationAttitude) PitchScaled() []float64 {
+	if m.Pitch == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Pitch, 10430.38, 0)
+}
+
+// RollScaled return Roll in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI].
+//
+// If Roll value is invalid, nil will be returned.
+func (m *AviationAttitude) RollScaled() []float64 {
+	if m.Roll == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Roll, 10430.38, 0)
+}
+
+// AccelLateralScaled return AccelLateral in its scaled value [Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)].
+//
+// If AccelLateral value is invalid, nil will be returned.
+func (m *AviationAttitude) AccelLateralScaled() []float64 {
+	if m.AccelLateral == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AccelLateral, 100, 0)
+}
+
+// AccelNormalScaled return AccelNormal in its scaled value [Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)].
+//
+// If AccelNormal value is invalid, nil will be returned.
+func (m *AviationAttitude) AccelNormalScaled() []float64 {
+	if m.AccelNormal == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AccelNormal, 100, 0)
+}
+
+// TurnRateScaled return TurnRate in its scaled value [Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)].
+//
+// If TurnRate value is invalid, nil will be returned.
+func (m *AviationAttitude) TurnRateScaled() []float64 {
+	if m.TurnRate == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TurnRate, 1024, 0)
+}
+
+// TrackScaled return Track in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi].
+//
+// If Track value is invalid, nil will be returned.
+func (m *AviationAttitude) TrackScaled() []float64 {
+	if m.Track == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Track, 10430.38, 0)
+}
+
 // SetTimestamp sets AviationAttitude value.
 //
 // Units: s; Timestamp message was output
@@ -213,7 +274,7 @@ func (m *AviationAttitude) SetTurnRate(v []int16) *AviationAttitude {
 
 // SetStage sets AviationAttitude value.
 //
-// Array: [N];
+// Array: [N]
 func (m *AviationAttitude) SetStage(v []typedef.AttitudeStage) *AviationAttitude {
 	m.Stage = v
 	return m
@@ -237,7 +298,7 @@ func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
 
 // SetValidity sets AviationAttitude value.
 //
-// Array: [N];
+// Array: [N]
 func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAttitude {
 	m.Validity = v
 	return m

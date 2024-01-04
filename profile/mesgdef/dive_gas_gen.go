@@ -17,8 +17,8 @@ import (
 // DiveGas is a DiveGas message.
 type DiveGas struct {
 	MessageIndex  typedef.MessageIndex
-	HeliumContent uint8 // Units: percent;
-	OxygenContent uint8 // Units: percent;
+	HeliumContent uint8 // Units: percent
+	OxygenContent uint8 // Units: percent
 	Status        typedef.DiveGasStatus
 	Mode          typedef.DiveGasMode
 
@@ -56,15 +56,15 @@ func NewDiveGas(mesg *proto.Message) *DiveGas {
 
 // ToMesg converts DiveGas into proto.Message.
 func (m *DiveGas) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveGas)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.HeliumContent != basetype.Uint8Invalid {
@@ -77,14 +77,14 @@ func (m *DiveGas) ToMesg(fac Factory) proto.Message {
 		field.Value = m.OxygenContent
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.Status)
+		field.Value = byte(m.Status)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
+	if byte(m.Mode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.Mode)
+		field.Value = byte(m.Mode)
 		fields = append(fields, field)
 	}
 
@@ -104,7 +104,7 @@ func (m *DiveGas) SetMessageIndex(v typedef.MessageIndex) *DiveGas {
 
 // SetHeliumContent sets DiveGas value.
 //
-// Units: percent;
+// Units: percent
 func (m *DiveGas) SetHeliumContent(v uint8) *DiveGas {
 	m.HeliumContent = v
 	return m
@@ -112,7 +112,7 @@ func (m *DiveGas) SetHeliumContent(v uint8) *DiveGas {
 
 // SetOxygenContent sets DiveGas value.
 //
-// Units: percent;
+// Units: percent
 func (m *DiveGas) SetOxygenContent(v uint8) *DiveGas {
 	m.OxygenContent = v
 	return m

@@ -76,10 +76,10 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 
 // ToMesg converts ExdDataConceptConfiguration into proto.Message.
 func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExdDataConceptConfiguration)
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
@@ -119,19 +119,19 @@ func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Scaling
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DataUnits) != basetype.EnumInvalid {
+	if byte(m.DataUnits) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = typeconv.ToEnum[byte](m.DataUnits)
+		field.Value = byte(m.DataUnits)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Qualifier) != basetype.EnumInvalid {
+	if byte(m.Qualifier) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = typeconv.ToEnum[byte](m.Qualifier)
+		field.Value = byte(m.Qualifier)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Descriptor) != basetype.EnumInvalid {
+	if byte(m.Descriptor) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = typeconv.ToEnum[byte](m.Descriptor)
+		field.Value = byte(m.Descriptor)
 		fields = append(fields, field)
 	}
 	if m.IsSigned != false {

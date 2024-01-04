@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -72,15 +73,15 @@ func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
 
 // ToMesg converts DiveApneaAlarm into proto.Message.
 func (m *DiveApneaAlarm) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveApneaAlarm)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Depth != basetype.Uint32Invalid {
@@ -98,14 +99,14 @@ func (m *DiveApneaAlarm) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.AlarmType) != basetype.EnumInvalid {
+	if byte(m.AlarmType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.AlarmType)
+		field.Value = byte(m.AlarmType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sound) != basetype.EnumInvalid {
+	if byte(m.Sound) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.Sound)
+		field.Value = byte(m.Sound)
 		fields = append(fields, field)
 	}
 	if typeconv.ToSliceEnum[byte](m.DiveTypes) != nil {
@@ -150,6 +151,26 @@ func (m *DiveApneaAlarm) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// DepthScaled return Depth in its scaled value [Scale: 1000; Units: m; Depth setting (m) for depth type alarms].
+//
+// If Depth value is invalid, float64 invalid value will be returned.
+func (m *DiveApneaAlarm) DepthScaled() float64 {
+	if m.Depth == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Depth, 1000, 0)
+}
+
+// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms].
+//
+// If Speed value is invalid, float64 invalid value will be returned.
+func (m *DiveApneaAlarm) SpeedScaled() float64 {
+	if m.Speed == basetype.Sint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
 // SetMessageIndex sets DiveApneaAlarm value.

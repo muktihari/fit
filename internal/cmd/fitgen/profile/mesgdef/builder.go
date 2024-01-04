@@ -133,6 +133,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
 				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
 				Comment:        field.Comment,
+				Array:          field.Array != "",
 			}
 
 			if _, ok := canExpandMap[field.Name]; ok {
@@ -149,19 +150,25 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				f.Comment = fmt.Sprintf("Units: %s; %s", field.Units, field.Comment)
 			}
 
-			offset := offsetOrDefault(field.Offsets, 0)
-			if offset != 0 {
-				f.Comment = fmt.Sprintf("Offset: %g; %s", offset, f.Comment)
+			f.Offset = offsetOrDefault(field.Offsets, 0)
+			if f.Offset != 0 {
+				f.Comment = fmt.Sprintf("Offset: %g; %s", f.Offset, f.Comment)
 			}
 
-			scale := scaleOrDefault(field.Scales, 0)
-			if scale != 1 {
-				f.Comment = fmt.Sprintf("Scale: %g; %s", scale, f.Comment)
+			f.Scale = scaleOrDefault(field.Scales, 0)
+			if f.Scale != 1 {
+				f.Comment = fmt.Sprintf("Scale: %g; %s", f.Scale, f.Comment)
+			}
+
+			if !(f.Scale == 1 && f.Offset == 0) {
+				imports["github.com/muktihari/fit/kit/scaleoffset"] = struct{}{}
 			}
 
 			if strings.HasPrefix(f.Type, "[]") {
 				f.Comment = fmt.Sprintf("Array: %s; %s", field.Array, f.Comment)
 			}
+
+			f.Comment = strings.Trim(f.Comment, "; ")
 
 			fields = append(fields, f)
 			if strings.HasPrefix(f.Type, "basetype") || strings.HasPrefix(f.InvalidValue, "basetype") {
@@ -229,6 +236,11 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 
 	if !strings.HasSuffix(fieldType, "z") && b.baseTypeMapByProfileType[fieldType] == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
+	}
+
+	goType := b.goTypesByProfileTypes[fieldType]
+	if array == "" && goType != "" {
+		return fmt.Sprintf("%s(m.%s)", goType, fieldName)
 	}
 
 	slicePrefix := ""

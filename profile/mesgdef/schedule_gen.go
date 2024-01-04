@@ -62,15 +62,15 @@ func NewSchedule(mesg *proto.Message) *Schedule {
 
 // ToMesg converts Schedule into proto.Message.
 func (m *Schedule) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSchedule)
 
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		field.Value = uint16(m.Manufacturer)
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
@@ -78,9 +78,9 @@ func (m *Schedule) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Product
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
+		field.Value = uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
@@ -93,9 +93,9 @@ func (m *Schedule) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Completed
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {

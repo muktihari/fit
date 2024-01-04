@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -60,15 +61,15 @@ func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
 
 // ToMesg converts SegmentLeaderboardEntry into proto.Message.
 func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentLeaderboardEntry)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
@@ -76,9 +77,9 @@ func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Name
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 	if m.GroupPrimaryKey != basetype.Uint32Invalid {
@@ -108,6 +109,16 @@ func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SegmentTimeScaled return SegmentTime in its scaled value [Scale: 1000; Units: s; Segment Time (includes pauses)].
+//
+// If SegmentTime value is invalid, float64 invalid value will be returned.
+func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
+	if m.SegmentTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SegmentTime, 1000, 0)
 }
 
 // SetMessageIndex sets SegmentLeaderboardEntry value.

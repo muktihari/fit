@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,16 +19,16 @@ import (
 
 // DeviceInfo is a DeviceInfo message.
 type DeviceInfo struct {
-	Timestamp           time.Time // Units: s;
+	Timestamp           time.Time // Units: s
 	DeviceIndex         typedef.DeviceIndex
 	DeviceType          uint8
 	Manufacturer        typedef.Manufacturer
 	SerialNumber        uint32
 	Product             uint16
-	SoftwareVersion     uint16 // Scale: 100;
+	SoftwareVersion     uint16 // Scale: 100
 	HardwareVersion     uint8
 	CumOperatingTime    uint32 // Units: s; Reset by new battery or charge.
-	BatteryVoltage      uint16 // Scale: 256; Units: V;
+	BatteryVoltage      uint16 // Scale: 256; Units: V
 	BatteryStatus       typedef.BatteryStatus
 	SensorPosition      typedef.BodyLocation // Indicates the location of the sensor
 	Descriptor          string               // Used to describe the sensor or location
@@ -36,7 +37,7 @@ type DeviceInfo struct {
 	AntNetwork          typedef.AntNetwork
 	SourceType          typedef.SourceType
 	ProductName         string // Optional free form string to indicate the devices name or model
-	BatteryLevel        uint8  // Units: %;
+	BatteryLevel        uint8  // Units: %
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -86,10 +87,10 @@ func NewDeviceInfo(mesg *proto.Message) *DeviceInfo {
 
 // ToMesg converts DeviceInfo into proto.Message.
 func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceInfo)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -97,9 +98,9 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.DeviceIndex) != basetype.Uint8Invalid {
+	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint8[uint8](m.DeviceIndex)
+		field.Value = uint8(m.DeviceIndex)
 		fields = append(fields, field)
 	}
 	if m.DeviceType != basetype.Uint8Invalid {
@@ -107,14 +108,14 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = m.DeviceType
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		field.Value = uint16(m.Manufacturer)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.SerialNumber) != basetype.Uint32zInvalid {
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint32z[uint32](m.SerialNumber)
+		field.Value = uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
@@ -142,14 +143,14 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BatteryVoltage
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.BatteryStatus) != basetype.Uint8Invalid {
+	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = typeconv.ToUint8[uint8](m.BatteryStatus)
+		field.Value = uint8(m.BatteryStatus)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SensorPosition) != basetype.EnumInvalid {
+	if byte(m.SensorPosition) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 18)
-		field.Value = typeconv.ToEnum[byte](m.SensorPosition)
+		field.Value = byte(m.SensorPosition)
 		fields = append(fields, field)
 	}
 	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
@@ -157,24 +158,24 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Descriptor
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.AntTransmissionType) != basetype.Uint8zInvalid {
+	if uint8(m.AntTransmissionType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 20)
-		field.Value = typeconv.ToUint8z[uint8](m.AntTransmissionType)
+		field.Value = uint8(m.AntTransmissionType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.AntDeviceNumber) != basetype.Uint16zInvalid {
+	if uint16(m.AntDeviceNumber) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = typeconv.ToUint16z[uint16](m.AntDeviceNumber)
+		field.Value = uint16(m.AntDeviceNumber)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.AntNetwork) != basetype.EnumInvalid {
+	if byte(m.AntNetwork) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = typeconv.ToEnum[byte](m.AntNetwork)
+		field.Value = byte(m.AntNetwork)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SourceType) != basetype.EnumInvalid {
+	if byte(m.SourceType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 25)
-		field.Value = typeconv.ToEnum[byte](m.SourceType)
+		field.Value = byte(m.SourceType)
 		fields = append(fields, field)
 	}
 	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
@@ -196,9 +197,29 @@ func (m *DeviceInfo) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SoftwareVersionScaled return SoftwareVersion in its scaled value [Scale: 100].
+//
+// If SoftwareVersion value is invalid, float64 invalid value will be returned.
+func (m *DeviceInfo) SoftwareVersionScaled() float64 {
+	if m.SoftwareVersion == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SoftwareVersion, 100, 0)
+}
+
+// BatteryVoltageScaled return BatteryVoltage in its scaled value [Scale: 256; Units: V].
+//
+// If BatteryVoltage value is invalid, float64 invalid value will be returned.
+func (m *DeviceInfo) BatteryVoltageScaled() float64 {
+	if m.BatteryVoltage == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
+}
+
 // SetTimestamp sets DeviceInfo value.
 //
-// Units: s;
+// Units: s
 func (m *DeviceInfo) SetTimestamp(v time.Time) *DeviceInfo {
 	m.Timestamp = v
 	return m
@@ -236,7 +257,7 @@ func (m *DeviceInfo) SetProduct(v uint16) *DeviceInfo {
 
 // SetSoftwareVersion sets DeviceInfo value.
 //
-// Scale: 100;
+// Scale: 100
 func (m *DeviceInfo) SetSoftwareVersion(v uint16) *DeviceInfo {
 	m.SoftwareVersion = v
 	return m
@@ -258,7 +279,7 @@ func (m *DeviceInfo) SetCumOperatingTime(v uint32) *DeviceInfo {
 
 // SetBatteryVoltage sets DeviceInfo value.
 //
-// Scale: 256; Units: V;
+// Scale: 256; Units: V
 func (m *DeviceInfo) SetBatteryVoltage(v uint16) *DeviceInfo {
 	m.BatteryVoltage = v
 	return m
@@ -320,7 +341,7 @@ func (m *DeviceInfo) SetProductName(v string) *DeviceInfo {
 
 // SetBatteryLevel sets DeviceInfo value.
 //
-// Units: %;
+// Units: %
 func (m *DeviceInfo) SetBatteryLevel(v uint8) *DeviceInfo {
 	m.BatteryLevel = v
 	return m

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -23,21 +24,21 @@ type Length struct {
 	Event                      typedef.Event
 	EventType                  typedef.EventType
 	StartTime                  time.Time
-	TotalElapsedTime           uint32             // Scale: 1000; Units: s;
-	TotalTimerTime             uint32             // Scale: 1000; Units: s;
-	TotalStrokes               uint16             // Units: strokes;
-	AvgSpeed                   uint16             // Scale: 1000; Units: m/s;
-	SwimStroke                 typedef.SwimStroke // Units: swim_stroke;
-	AvgSwimmingCadence         uint8              // Units: strokes/min;
+	TotalElapsedTime           uint32             // Scale: 1000; Units: s
+	TotalTimerTime             uint32             // Scale: 1000; Units: s
+	TotalStrokes               uint16             // Units: strokes
+	AvgSpeed                   uint16             // Scale: 1000; Units: m/s
+	SwimStroke                 typedef.SwimStroke // Units: swim_stroke
+	AvgSwimmingCadence         uint8              // Units: strokes/min
 	EventGroup                 uint8
-	TotalCalories              uint16 // Units: kcal;
+	TotalCalories              uint16 // Units: kcal
 	LengthType                 typedef.LengthType
 	PlayerScore                uint16
 	OpponentScore              uint16
 	StrokeCount                []uint16 // Array: [N]; Units: counts; stroke_type enum used as the index
 	ZoneCount                  []uint16 // Array: [N]; Units: counts; zone number used as the index
-	EnhancedAvgRespirationRate uint16   // Scale: 100; Units: Breaths/min;
-	EnhancedMaxRespirationRate uint16   // Scale: 100; Units: Breaths/min;
+	EnhancedAvgRespirationRate uint16   // Scale: 100; Units: Breaths/min
+	EnhancedMaxRespirationRate uint16   // Scale: 100; Units: Breaths/min
 	AvgRespirationRate         uint8
 	MaxRespirationRate         uint8
 
@@ -100,15 +101,15 @@ func NewLength(mesg *proto.Message) *Length {
 
 // ToMesg converts Length into proto.Message.
 func (m *Length) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumLength)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -116,14 +117,14 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Event) != basetype.EnumInvalid {
+	if byte(m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Event)
+		field.Value = byte(m.Event)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.EventType) != basetype.EnumInvalid {
+	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.EventType)
+		field.Value = byte(m.EventType)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
@@ -151,9 +152,9 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgSpeed
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SwimStroke) != basetype.EnumInvalid {
+	if byte(m.SwimStroke) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToEnum[byte](m.SwimStroke)
+		field.Value = byte(m.SwimStroke)
 		fields = append(fields, field)
 	}
 	if m.AvgSwimmingCadence != basetype.Uint8Invalid {
@@ -171,9 +172,9 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TotalCalories
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.LengthType) != basetype.EnumInvalid {
+	if byte(m.LengthType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToEnum[byte](m.LengthType)
+		field.Value = byte(m.LengthType)
 		fields = append(fields, field)
 	}
 	if m.PlayerScore != basetype.Uint16Invalid {
@@ -227,6 +228,56 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+func (m *Length) TotalElapsedTimeScaled() float64 {
+	if m.TotalElapsedTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
+}
+
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalTimerTime value is invalid, float64 invalid value will be returned.
+func (m *Length) TotalTimerTimeScaled() float64 {
+	if m.TotalTimerTime == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+}
+
+// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgSpeed value is invalid, float64 invalid value will be returned.
+func (m *Length) AvgSpeedScaled() float64 {
+	if m.AvgSpeed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+}
+
+// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
+//
+// If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
+func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
+	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
+}
+
+// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
+//
+// If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
+func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
+	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
+}
+
 // SetMessageIndex sets Length value.
 func (m *Length) SetMessageIndex(v typedef.MessageIndex) *Length {
 	m.MessageIndex = v
@@ -259,7 +310,7 @@ func (m *Length) SetStartTime(v time.Time) *Length {
 
 // SetTotalElapsedTime sets Length value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Length) SetTotalElapsedTime(v uint32) *Length {
 	m.TotalElapsedTime = v
 	return m
@@ -267,7 +318,7 @@ func (m *Length) SetTotalElapsedTime(v uint32) *Length {
 
 // SetTotalTimerTime sets Length value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Length) SetTotalTimerTime(v uint32) *Length {
 	m.TotalTimerTime = v
 	return m
@@ -275,7 +326,7 @@ func (m *Length) SetTotalTimerTime(v uint32) *Length {
 
 // SetTotalStrokes sets Length value.
 //
-// Units: strokes;
+// Units: strokes
 func (m *Length) SetTotalStrokes(v uint16) *Length {
 	m.TotalStrokes = v
 	return m
@@ -283,7 +334,7 @@ func (m *Length) SetTotalStrokes(v uint16) *Length {
 
 // SetAvgSpeed sets Length value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Length) SetAvgSpeed(v uint16) *Length {
 	m.AvgSpeed = v
 	return m
@@ -291,7 +342,7 @@ func (m *Length) SetAvgSpeed(v uint16) *Length {
 
 // SetSwimStroke sets Length value.
 //
-// Units: swim_stroke;
+// Units: swim_stroke
 func (m *Length) SetSwimStroke(v typedef.SwimStroke) *Length {
 	m.SwimStroke = v
 	return m
@@ -299,7 +350,7 @@ func (m *Length) SetSwimStroke(v typedef.SwimStroke) *Length {
 
 // SetAvgSwimmingCadence sets Length value.
 //
-// Units: strokes/min;
+// Units: strokes/min
 func (m *Length) SetAvgSwimmingCadence(v uint8) *Length {
 	m.AvgSwimmingCadence = v
 	return m
@@ -313,7 +364,7 @@ func (m *Length) SetEventGroup(v uint8) *Length {
 
 // SetTotalCalories sets Length value.
 //
-// Units: kcal;
+// Units: kcal
 func (m *Length) SetTotalCalories(v uint16) *Length {
 	m.TotalCalories = v
 	return m
@@ -355,7 +406,7 @@ func (m *Length) SetZoneCount(v []uint16) *Length {
 
 // SetEnhancedAvgRespirationRate sets Length value.
 //
-// Scale: 100; Units: Breaths/min;
+// Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
 	m.EnhancedAvgRespirationRate = v
 	return m
@@ -363,7 +414,7 @@ func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
 
 // SetEnhancedMaxRespirationRate sets Length value.
 //
-// Scale: 100; Units: Breaths/min;
+// Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
 	m.EnhancedMaxRespirationRate = v
 	return m

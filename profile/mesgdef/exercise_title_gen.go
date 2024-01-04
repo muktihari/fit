@@ -19,7 +19,7 @@ type ExerciseTitle struct {
 	MessageIndex     typedef.MessageIndex
 	ExerciseCategory typedef.ExerciseCategory
 	ExerciseName     uint16
-	WktStepName      []string // Array: [N];
+	WktStepName      []string // Array: [N]
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -54,20 +54,20 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 
 // ToMesg converts ExerciseTitle into proto.Message.
 func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExerciseTitle)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.ExerciseCategory) != basetype.Uint16Invalid {
+	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint16[uint16](m.ExerciseCategory)
+		field.Value = uint16(m.ExerciseCategory)
 		fields = append(fields, field)
 	}
 	if m.ExerciseName != basetype.Uint16Invalid {
@@ -109,7 +109,7 @@ func (m *ExerciseTitle) SetExerciseName(v uint16) *ExerciseTitle {
 
 // SetWktStepName sets ExerciseTitle value.
 //
-// Array: [N];
+// Array: [N]
 func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
 	m.WktStepName = v
 	return m

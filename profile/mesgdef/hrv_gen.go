@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -47,10 +48,10 @@ func NewHrv(mesg *proto.Message) *Hrv {
 
 // ToMesg converts Hrv into proto.Message.
 func (m *Hrv) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrv)
 
 	if m.Time != nil {
@@ -65,6 +66,16 @@ func (m *Hrv) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// TimeScaled return Time in its scaled value [Array: [N]; Scale: 1000; Units: s; Time between beats].
+//
+// If Time value is invalid, nil will be returned.
+func (m *Hrv) TimeScaled() []float64 {
+	if m.Time == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Time, 1000, 0)
 }
 
 // SetTime sets Hrv value.

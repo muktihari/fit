@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -62,10 +63,10 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 
 // ToMesg converts ThreeDSensorCalibration into proto.Message.
 func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumThreeDSensorCalibration)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -73,9 +74,9 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SensorType) != basetype.EnumInvalid {
+	if byte(m.SensorType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.SensorType)
+		field.Value = byte(m.SensorType)
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
@@ -110,6 +111,16 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// OrientationMatrixScaled return OrientationMatrix in its scaled value [Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)].
+//
+// If OrientationMatrix value is invalid, nil will be returned.
+func (m *ThreeDSensorCalibration) OrientationMatrixScaled() []float64 {
+	if m.OrientationMatrix == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.OrientationMatrix, 65535, 0)
 }
 
 // SetTimestamp sets ThreeDSensorCalibration value.

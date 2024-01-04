@@ -60,10 +60,10 @@ func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 
 // ToMesg converts WeatherAlert into proto.Message.
 func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherAlert)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -86,14 +86,14 @@ func (m *WeatherAlert) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.ExpireTime)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Severity) != basetype.EnumInvalid {
+	if byte(m.Severity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.Severity)
+		field.Value = byte(m.Severity)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 

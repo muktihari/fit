@@ -82,10 +82,10 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 
 // ToMesg converts {{ .Name }} into proto.Message.
 func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
-    fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-    defer fieldsPool.Put(fieldsPtr)
+    fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+    defer fieldsPool.Put(fieldsArray)
     
-    fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+    fields := (*fieldsArray)[:0] // Create slice from array with zero len.
     mesg := fac.CreateMesgOnly(typedef.MesgNum{{ .Name }})
 	
     {{ range .Fields -}}
@@ -108,6 +108,22 @@ func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
 
 	return mesg
 }
+
+{{ range .Fields -}}
+{{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) }}
+// {{ .Name }}Scaled return {{ .Name }} in its scaled value [{{ .Comment }}].
+// 
+// If {{ .Name }} value is invalid,{{ if eq .Array true }} nil {{ else }} float64 invalid value {{ end -}} will be returned.
+func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ else }} float64 {{ end -}} {
+	if {{ .ComparableValue }} == {{ .InvalidValue }} {
+		return {{ if eq .Array true }} nil {{ else }} basetype.Float64InvalidInFloatForm() {{ end -}}
+	}
+	{{ if eq .Array true }} return scaleoffset.ApplySlice(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
+	{{ else }} return scaleoffset.Apply(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
+	{{ end -}}
+}
+{{ end }}
+{{ end }}
 
 {{ range .Fields -}}
 // Set{{ .Name }} sets {{ $.Name }} value.

@@ -19,12 +19,12 @@ type FieldDescription struct {
 	DeveloperDataIndex    uint8
 	FieldDefinitionNumber uint8
 	FitBaseTypeId         basetype.BaseType
-	FieldName             []string // Array: [N];
+	FieldName             []string // Array: [N]
 	Array                 uint8
 	Components            string
 	Scale                 uint8
 	Offset                int8
-	Units                 []string // Array: [N];
+	Units                 []string // Array: [N]
 	Bits                  string
 	Accumulate            string
 	FitBaseUnitId         typedef.FitBaseUnit
@@ -66,10 +66,10 @@ func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 
 // ToMesg converts FieldDescription into proto.Message.
 func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFieldDescription)
 
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
@@ -82,9 +82,9 @@ func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FieldDefinitionNumber
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.FitBaseTypeId) != basetype.Uint8Invalid {
+	if uint8(m.FitBaseTypeId) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint8[uint8](m.FitBaseTypeId)
+		field.Value = uint8(m.FitBaseTypeId)
 		fields = append(fields, field)
 	}
 	if m.FieldName != nil {
@@ -127,14 +127,14 @@ func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Accumulate
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.FitBaseUnitId) != basetype.Uint16Invalid {
+	if uint16(m.FitBaseUnitId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = typeconv.ToUint16[uint16](m.FitBaseUnitId)
+		field.Value = uint16(m.FitBaseUnitId)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.NativeMesgNum) != basetype.Uint16Invalid {
+	if uint16(m.NativeMesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = typeconv.ToUint16[uint16](m.NativeMesgNum)
+		field.Value = uint16(m.NativeMesgNum)
 		fields = append(fields, field)
 	}
 	if m.NativeFieldNum != basetype.Uint8Invalid {
@@ -169,7 +169,7 @@ func (m *FieldDescription) SetFitBaseTypeId(v basetype.BaseType) *FieldDescripti
 
 // SetFieldName sets FieldDescription value.
 //
-// Array: [N];
+// Array: [N]
 func (m *FieldDescription) SetFieldName(v []string) *FieldDescription {
 	m.FieldName = v
 	return m
@@ -201,7 +201,7 @@ func (m *FieldDescription) SetOffset(v int8) *FieldDescription {
 
 // SetUnits sets FieldDescription value.
 //
-// Array: [N];
+// Array: [N]
 func (m *FieldDescription) SetUnits(v []string) *FieldDescription {
 	m.Units = v
 	return m

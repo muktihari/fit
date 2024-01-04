@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,12 +19,12 @@ import (
 
 // MonitoringInfo is a MonitoringInfo message.
 type MonitoringInfo struct {
-	Timestamp            time.Time              // Units: s;
+	Timestamp            time.Time              // Units: s
 	LocalTimestamp       time.Time              // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
-	ActivityType         []typedef.ActivityType // Array: [N];
+	ActivityType         []typedef.ActivityType // Array: [N]
 	CyclesToDistance     []uint16               // Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
 	CyclesToCalories     []uint16               // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
-	RestingMetabolicRate uint16                 // Units: kcal / day;
+	RestingMetabolicRate uint16                 // Units: kcal / day
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -60,10 +61,10 @@ func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 
 // ToMesg converts MonitoringInfo into proto.Message.
 func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringInfo)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -105,9 +106,29 @@ func (m *MonitoringInfo) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// CyclesToDistanceScaled return CyclesToDistance in its scaled value [Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type].
+//
+// If CyclesToDistance value is invalid, nil will be returned.
+func (m *MonitoringInfo) CyclesToDistanceScaled() []float64 {
+	if m.CyclesToDistance == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.CyclesToDistance, 5000, 0)
+}
+
+// CyclesToCaloriesScaled return CyclesToCalories in its scaled value [Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type].
+//
+// If CyclesToCalories value is invalid, nil will be returned.
+func (m *MonitoringInfo) CyclesToCaloriesScaled() []float64 {
+	if m.CyclesToCalories == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.CyclesToCalories, 5000, 0)
+}
+
 // SetTimestamp sets MonitoringInfo value.
 //
-// Units: s;
+// Units: s
 func (m *MonitoringInfo) SetTimestamp(v time.Time) *MonitoringInfo {
 	m.Timestamp = v
 	return m
@@ -123,7 +144,7 @@ func (m *MonitoringInfo) SetLocalTimestamp(v time.Time) *MonitoringInfo {
 
 // SetActivityType sets MonitoringInfo value.
 //
-// Array: [N];
+// Array: [N]
 func (m *MonitoringInfo) SetActivityType(v []typedef.ActivityType) *MonitoringInfo {
 	m.ActivityType = v
 	return m
@@ -147,7 +168,7 @@ func (m *MonitoringInfo) SetCyclesToCalories(v []uint16) *MonitoringInfo {
 
 // SetRestingMetabolicRate sets MonitoringInfo value.
 //
-// Units: kcal / day;
+// Units: kcal / day
 func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {
 	m.RestingMetabolicRate = v
 	return m

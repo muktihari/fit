@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -22,13 +23,13 @@ type DiveSettings struct {
 	MessageIndex              typedef.MessageIndex
 	Name                      string
 	Model                     typedef.TissueModelType
-	GfLow                     uint8 // Units: percent;
-	GfHigh                    uint8 // Units: percent;
+	GfLow                     uint8 // Units: percent
+	GfHigh                    uint8 // Units: percent
 	WaterType                 typedef.WaterType
 	WaterDensity              float32 // Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
 	Po2Warn                   uint8   // Scale: 100; Units: percent; Typically 1.40
 	Po2Critical               uint8   // Scale: 100; Units: percent; Typically 1.60
-	Po2Deco                   uint8   // Scale: 100; Units: percent;
+	Po2Deco                   uint8   // Scale: 100; Units: percent
 	SafetyStopEnabled         bool
 	BottomDepth               float32
 	BottomTime                uint32
@@ -118,10 +119,10 @@ func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 
 // ToMesg converts DiveSettings into proto.Message.
 func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveSettings)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -129,9 +130,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
@@ -139,9 +140,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Name
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Model) != basetype.EnumInvalid {
+	if byte(m.Model) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.Model)
+		field.Value = byte(m.Model)
 		fields = append(fields, field)
 	}
 	if m.GfLow != basetype.Uint8Invalid {
@@ -154,9 +155,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.GfHigh
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.WaterType) != basetype.EnumInvalid {
+	if byte(m.WaterType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.WaterType)
+		field.Value = byte(m.WaterType)
 		fields = append(fields, field)
 	}
 	if typeconv.ToUint32[uint32](m.WaterDensity) != basetype.Uint32Invalid {
@@ -204,9 +205,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ApneaCountdownTime
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.BacklightMode) != basetype.EnumInvalid {
+	if byte(m.BacklightMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = typeconv.ToEnum[byte](m.BacklightMode)
+		field.Value = byte(m.BacklightMode)
 		fields = append(fields, field)
 	}
 	if m.BacklightBrightness != basetype.Uint8Invalid {
@@ -214,9 +215,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BacklightBrightness
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.BacklightTimeout) != basetype.Uint8Invalid {
+	if uint8(m.BacklightTimeout) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 16)
-		field.Value = typeconv.ToUint8[uint8](m.BacklightTimeout)
+		field.Value = uint8(m.BacklightTimeout)
 		fields = append(fields, field)
 	}
 	if m.RepeatDiveInterval != basetype.Uint16Invalid {
@@ -229,9 +230,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SafetyStopTime
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HeartRateSourceType) != basetype.EnumInvalid {
+	if byte(m.HeartRateSourceType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 19)
-		field.Value = typeconv.ToEnum[byte](m.HeartRateSourceType)
+		field.Value = byte(m.HeartRateSourceType)
 		fields = append(fields, field)
 	}
 	if m.HeartRateSource != basetype.Uint8Invalid {
@@ -239,14 +240,14 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.HeartRateSource
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.TravelGas) != basetype.Uint16Invalid {
+	if uint16(m.TravelGas) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = typeconv.ToUint16[uint16](m.TravelGas)
+		field.Value = uint16(m.TravelGas)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
+	if byte(m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = typeconv.ToEnum[byte](m.CcrLowSetpointSwitchMode)
+		field.Value = byte(m.CcrLowSetpointSwitchMode)
 		fields = append(fields, field)
 	}
 	if m.CcrLowSetpoint != basetype.Uint8Invalid {
@@ -259,9 +260,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CcrLowSetpointDepth
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
+	if byte(m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 25)
-		field.Value = typeconv.ToEnum[byte](m.CcrHighSetpointSwitchMode)
+		field.Value = byte(m.CcrHighSetpointSwitchMode)
 		fields = append(fields, field)
 	}
 	if m.CcrHighSetpoint != basetype.Uint8Invalid {
@@ -274,9 +275,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CcrHighSetpointDepth
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.GasConsumptionDisplay) != basetype.EnumInvalid {
+	if byte(m.GasConsumptionDisplay) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 29)
-		field.Value = typeconv.ToEnum[byte](m.GasConsumptionDisplay)
+		field.Value = byte(m.GasConsumptionDisplay)
 		fields = append(fields, field)
 	}
 	if m.UpKeyEnabled != false {
@@ -284,9 +285,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.UpKeyEnabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DiveSounds) != basetype.EnumInvalid {
+	if byte(m.DiveSounds) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 35)
-		field.Value = typeconv.ToEnum[byte](m.DiveSounds)
+		field.Value = byte(m.DiveSounds)
 		fields = append(fields, field)
 	}
 	if m.LastStopMultiple != basetype.Uint8Invalid {
@@ -294,9 +295,9 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 		field.Value = m.LastStopMultiple
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.NoFlyTimeMode) != basetype.EnumInvalid {
+	if byte(m.NoFlyTimeMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 37)
-		field.Value = typeconv.ToEnum[byte](m.NoFlyTimeMode)
+		field.Value = byte(m.NoFlyTimeMode)
 		fields = append(fields, field)
 	}
 
@@ -306,6 +307,86 @@ func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// Po2WarnScaled return Po2Warn in its scaled value [Scale: 100; Units: percent; Typically 1.40].
+//
+// If Po2Warn value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) Po2WarnScaled() float64 {
+	if m.Po2Warn == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Po2Warn, 100, 0)
+}
+
+// Po2CriticalScaled return Po2Critical in its scaled value [Scale: 100; Units: percent; Typically 1.60].
+//
+// If Po2Critical value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) Po2CriticalScaled() float64 {
+	if m.Po2Critical == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Po2Critical, 100, 0)
+}
+
+// Po2DecoScaled return Po2Deco in its scaled value [Scale: 100; Units: percent].
+//
+// If Po2Deco value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) Po2DecoScaled() float64 {
+	if m.Po2Deco == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Po2Deco, 100, 0)
+}
+
+// CcrLowSetpointScaled return CcrLowSetpoint in its scaled value [Scale: 100; Units: percent; Target PO2 when using low setpoint].
+//
+// If CcrLowSetpoint value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrLowSetpointScaled() float64 {
+	if m.CcrLowSetpoint == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CcrLowSetpoint, 100, 0)
+}
+
+// CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode].
+//
+// If CcrLowSetpointDepth value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
+	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
+}
+
+// CcrHighSetpointScaled return CcrHighSetpoint in its scaled value [Scale: 100; Units: percent; Target PO2 when using high setpoint].
+//
+// If CcrHighSetpoint value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrHighSetpointScaled() float64 {
+	if m.CcrHighSetpoint == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CcrHighSetpoint, 100, 0)
+}
+
+// CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode].
+//
+// If CcrHighSetpointDepth value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
+	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
+}
+
+// LastStopMultipleScaled return LastStopMultiple in its scaled value [Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft].
+//
+// If LastStopMultiple value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) LastStopMultipleScaled() float64 {
+	if m.LastStopMultiple == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.LastStopMultiple, 10, 0)
 }
 
 // SetTimestamp sets DiveSettings value.
@@ -334,7 +415,7 @@ func (m *DiveSettings) SetModel(v typedef.TissueModelType) *DiveSettings {
 
 // SetGfLow sets DiveSettings value.
 //
-// Units: percent;
+// Units: percent
 func (m *DiveSettings) SetGfLow(v uint8) *DiveSettings {
 	m.GfLow = v
 	return m
@@ -342,7 +423,7 @@ func (m *DiveSettings) SetGfLow(v uint8) *DiveSettings {
 
 // SetGfHigh sets DiveSettings value.
 //
-// Units: percent;
+// Units: percent
 func (m *DiveSettings) SetGfHigh(v uint8) *DiveSettings {
 	m.GfHigh = v
 	return m
@@ -380,7 +461,7 @@ func (m *DiveSettings) SetPo2Critical(v uint8) *DiveSettings {
 
 // SetPo2Deco sets DiveSettings value.
 //
-// Scale: 100; Units: percent;
+// Scale: 100; Units: percent
 func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
 	m.Po2Deco = v
 	return m

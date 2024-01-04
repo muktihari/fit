@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -52,10 +53,10 @@ func NewHrvValue(mesg *proto.Message) *HrvValue {
 
 // ToMesg converts HrvValue into proto.Message.
 func (m *HrvValue) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrvValue)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -75,6 +76,16 @@ func (m *HrvValue) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// ValueScaled return Value in its scaled value [Scale: 128; Units: ms; 5 minute RMSSD].
+//
+// If Value value is invalid, float64 invalid value will be returned.
+func (m *HrvValue) ValueScaled() float64 {
+	if m.Value == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Value, 128, 0)
 }
 
 // SetTimestamp sets HrvValue value.

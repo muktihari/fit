@@ -17,7 +17,7 @@ import (
 // HrZone is a HrZone message.
 type HrZone struct {
 	MessageIndex typedef.MessageIndex
-	HighBpm      uint8 // Units: bpm;
+	HighBpm      uint8 // Units: bpm
 	Name         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,15 +52,15 @@ func NewHrZone(mesg *proto.Message) *HrZone {
 
 // ToMesg converts HrZone into proto.Message.
 func (m *HrZone) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrZone)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.HighBpm != basetype.Uint8Invalid {
@@ -90,7 +90,7 @@ func (m *HrZone) SetMessageIndex(v typedef.MessageIndex) *HrZone {
 
 // SetHighBpm sets HrZone value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *HrZone) SetHighBpm(v uint8) *HrZone {
 	m.HighBpm = v
 	return m

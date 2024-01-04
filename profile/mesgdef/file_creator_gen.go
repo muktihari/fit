@@ -50,10 +50,10 @@ func NewFileCreator(mesg *proto.Message) *FileCreator {
 
 // ToMesg converts FileCreator into proto.Message.
 func (m *FileCreator) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFileCreator)
 
 	if m.SoftwareVersion != basetype.Uint16Invalid {
