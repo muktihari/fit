@@ -366,7 +366,7 @@ func TestCheckIntegrity(t *testing.T) {
 				bb := slices.Clone(b)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur > 14 {
+					if cur == 14 {
 						return 0, io.EOF
 					}
 					cur += copy(b, bb[cur:cur+len(b)])
@@ -425,11 +425,9 @@ func TestCheckIntegrity(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
 			err := dec.CheckIntegrity()
-			// fmt.Println(err)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
-			// t.Fail()
 		})
 	}
 }
@@ -1805,12 +1803,39 @@ func BenchmarkDecode(b *testing.B) {
 	}
 	b.StartTimer()
 
-	dec := New(nil)
+	buf := bytes.NewBuffer(all)
+	dec := New(buf)
 	for i := 0; i < b.N; i++ {
-		dec.r = bytes.NewBuffer(all)
+		buf.Reset()
+		buf.Write(all)
 		for dec.Next() {
 			_, _ = dec.Decode()
 		}
 		dec.reset()
+	}
+}
+
+func BenchmarkCheckIntegrity(b *testing.B) {
+	b.StopTimer()
+	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// But since it's big, it's should be good to benchmark.
+	f, err := os.Open("../testdata/big_activity.fit")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	all, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	b.StartTimer()
+
+	buf := bytes.NewBuffer(all)
+	dec := New(buf)
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.Write(all)
+		_ = dec.CheckIntegrity()
 	}
 }
