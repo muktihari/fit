@@ -238,25 +238,26 @@ func (d *Decoder) CheckIntegrity() (err error) {
 	shouldChecksum := d.options.shouldChecksum
 	d.options.shouldChecksum = true
 	sequenceCompletedCount := 0
-	nCount := int64(0)
 
 	defer func() {
 		if err != nil { // When there is an error, wrap it with informative message before return.
 			err = fmt.Errorf("sequence index: %d, byte pos: %d: %w", sequenceCompletedCount, d.n, err)
 		}
-		// Reset everything so that the decoder can be reused by the same reader.
-		d.reset()
-		d.n = 0
+		// Reset used variables so that the decoder can be reused by the same reader.
+		d.crc16.Reset()
+		d.n, d.cur, d.crc = 0, 0, 0
 		d.options.shouldChecksum = shouldChecksum
 	}()
 
-	for d.Next() {
+	for {
 		// Check Header Integrity
-		if err = d.decodeHeaderOnce(); err != nil {
-			return
-		}
-		if d.fileHeader.DataSize == 0 {
-			err = ErrDataSizeZero
+		n := d.n
+		if err = d.decodeHeader(); err != nil {
+			if n != 0 && n == d.n && err == io.EOF {
+				// When EOF error occurs exactly after a sequence has been completed,
+				// make the error as nil, it means we have reached the desirable EOF.
+				err = nil
+			}
 			return
 		}
 		// Read bytes acquired by messages to calculate crc checksum of its contents
@@ -277,19 +278,10 @@ func (d *Decoder) CheckIntegrity() (err error) {
 			err = ErrCRCChecksumMismatch
 			return
 		}
-		d.sequenceCompleted = true
+		d.crc16.Reset()
+		d.cur = 0
 		sequenceCompletedCount++
-		nCount += int64(d.fileHeader.Size) + int64(d.fileHeader.DataSize) + 2
 	}
-
-	// When nCount == d.n, it means EOF occurs exactly after sequence completed, error is not counted.
-	// Otherwise, error occurs in the middle of decoding process, mark it as error.
-	if nCount != d.n {
-		err = d.decodeHeaderOnce() // Retrieve error that occurs in decode header
-		return
-	}
-
-	return err
 }
 
 // Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
@@ -317,7 +309,7 @@ func (d *Decoder) reset() {
 	d.crc16.Reset()
 	d.fileHeader = proto.FileHeader{}
 	if !d.options.broadcastOnly {
-		d.messages = make([]proto.Message, 0) // Must create new.
+		d.messages = nil // Must create new.
 	}
 	d.fileId = nil
 	d.developerDataIds = d.developerDataIds[:0]
@@ -389,6 +381,10 @@ func (d *Decoder) decodeHeader() error {
 		ProfileVersion:  binary.LittleEndian.Uint16(b[1:3]),
 		DataSize:        binary.LittleEndian.Uint32(b[3:7]),
 		DataType:        string(b[7:11]),
+	}
+
+	if d.fileHeader.DataSize == 0 {
+		return ErrDataSizeZero
 	}
 
 	if err := proto.Validate(d.fileHeader.ProtocolVersion); err != nil {
@@ -591,6 +587,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 
 		if d.options.shouldExpandComponent && field.Accumulate {
 			if val, ok := bitsFromValue(field.Value); ok {
+				// fmt.Println("val", val)
 				d.accumulator.Collect(mesg.Num, field.Num, val) // Collect the field values to be used in component expansion.
 			}
 		}
