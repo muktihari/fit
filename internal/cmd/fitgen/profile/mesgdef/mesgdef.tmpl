@@ -120,7 +120,7 @@ func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ 
 	}
 	{{ if eq .Array true }} return scaleoffset.ApplySlice(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
 	{{ else }} return scaleoffset.Apply(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
-	{{ end }}
+	{{ end -}}
 }
 {{ end }}
 {{ end }}
