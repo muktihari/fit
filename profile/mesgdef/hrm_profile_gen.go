@@ -56,15 +56,15 @@ func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 
 // ToMesg converts HrmProfile into proto.Message.
 func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrmProfile)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
@@ -72,9 +72,9 @@ func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16z[uint16](m.HrmAntId) != basetype.Uint16zInvalid {
+	if uint16(m.HrmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint16z[uint16](m.HrmAntId)
+		field.Value = uint16(m.HrmAntId)
 		fields = append(fields, field)
 	}
 	if m.LogHrv != false {
@@ -82,9 +82,9 @@ func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.LogHrv
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.HrmAntIdTransType) != basetype.Uint8zInvalid {
+	if uint8(m.HrmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToUint8z[uint8](m.HrmAntIdTransType)
+		field.Value = uint8(m.HrmAntIdTransType)
 		fields = append(fields, field)
 	}
 

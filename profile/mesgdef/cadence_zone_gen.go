@@ -17,7 +17,7 @@ import (
 // CadenceZone is a CadenceZone message.
 type CadenceZone struct {
 	MessageIndex typedef.MessageIndex
-	HighValue    uint8 // Units: rpm;
+	HighValue    uint8 // Units: rpm
 	Name         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -52,15 +52,15 @@ func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 
 // ToMesg converts CadenceZone into proto.Message.
 func (m *CadenceZone) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCadenceZone)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.HighValue != basetype.Uint8Invalid {
@@ -90,7 +90,7 @@ func (m *CadenceZone) SetMessageIndex(v typedef.MessageIndex) *CadenceZone {
 
 // SetHighValue sets CadenceZone value.
 //
-// Units: rpm;
+// Units: rpm
 func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
 	m.HighValue = v
 	return m

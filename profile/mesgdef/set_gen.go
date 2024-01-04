@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,12 +20,12 @@ import (
 // Set is a Set message.
 type Set struct {
 	Timestamp         time.Time // Timestamp of the set
-	Duration          uint32    // Scale: 1000; Units: s;
+	Duration          uint32    // Scale: 1000; Units: s
 	Repetitions       uint16    // # of repitions of the movement
 	Weight            uint16    // Scale: 16; Units: kg; Amount of weight applied for the set
 	SetType           typedef.SetType
 	StartTime         time.Time                  // Start time of the set
-	Category          []typedef.ExerciseCategory // Array: [N];
+	Category          []typedef.ExerciseCategory // Array: [N]
 	CategorySubtype   []uint16                   // Array: [N]; Based on the associated category, see [category]_exercise_names
 	WeightDisplayUnit typedef.FitBaseUnit
 	MessageIndex      typedef.MessageIndex
@@ -70,10 +71,10 @@ func NewSet(mesg *proto.Message) *Set {
 
 // ToMesg converts Set into proto.Message.
 func (m *Set) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSet)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -96,9 +97,9 @@ func (m *Set) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Weight
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8[uint8](m.SetType) != basetype.Uint8Invalid {
+	if uint8(m.SetType) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToUint8[uint8](m.SetType)
+		field.Value = uint8(m.SetType)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
@@ -116,19 +117,19 @@ func (m *Set) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CategorySubtype
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.WeightDisplayUnit) != basetype.Uint16Invalid {
+	if uint16(m.WeightDisplayUnit) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = typeconv.ToUint16[uint16](m.WeightDisplayUnit)
+		field.Value = uint16(m.WeightDisplayUnit)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.WktStepIndex) != basetype.Uint16Invalid {
+	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = typeconv.ToUint16[uint16](m.WktStepIndex)
+		field.Value = uint16(m.WktStepIndex)
 		fields = append(fields, field)
 	}
 
@@ -138,6 +139,26 @@ func (m *Set) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// DurationScaled return Duration in its scaled value [Scale: 1000; Units: s].
+//
+// If Duration value is invalid, float64 invalid value will be returned.
+func (m *Set) DurationScaled() float64 {
+	if m.Duration == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Duration, 1000, 0)
+}
+
+// WeightScaled return Weight in its scaled value [Scale: 16; Units: kg; Amount of weight applied for the set].
+//
+// If Weight value is invalid, float64 invalid value will be returned.
+func (m *Set) WeightScaled() float64 {
+	if m.Weight == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Weight, 16, 0)
 }
 
 // SetTimestamp sets Set value.
@@ -150,7 +171,7 @@ func (m *Set) SetTimestamp(v time.Time) *Set {
 
 // SetDuration sets Set value.
 //
-// Scale: 1000; Units: s;
+// Scale: 1000; Units: s
 func (m *Set) SetDuration(v uint32) *Set {
 	m.Duration = v
 	return m
@@ -188,7 +209,7 @@ func (m *Set) SetStartTime(v time.Time) *Set {
 
 // SetCategory sets Set value.
 //
-// Array: [N];
+// Array: [N]
 func (m *Set) SetCategory(v []typedef.ExerciseCategory) *Set {
 	m.Category = v
 	return m

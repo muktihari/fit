@@ -54,10 +54,10 @@ func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 
 // ToMesg converts ExdScreenConfiguration into proto.Message.
 func (m *ExdScreenConfiguration) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExdScreenConfiguration)
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
@@ -70,9 +70,9 @@ func (m *ExdScreenConfiguration) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FieldCount
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Layout) != basetype.EnumInvalid {
+	if byte(m.Layout) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.Layout)
+		field.Value = byte(m.Layout)
 		fields = append(fields, field)
 	}
 	if m.ScreenEnabled != false {

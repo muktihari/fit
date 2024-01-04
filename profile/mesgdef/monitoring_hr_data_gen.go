@@ -54,10 +54,10 @@ func NewMonitoringHrData(mesg *proto.Message) *MonitoringHrData {
 
 // ToMesg converts MonitoringHrData into proto.Message.
 func (m *MonitoringHrData) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringHrData)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {

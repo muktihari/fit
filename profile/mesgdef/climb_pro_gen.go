@@ -18,13 +18,13 @@ import (
 
 // ClimbPro is a ClimbPro message.
 type ClimbPro struct {
-	Timestamp     time.Time // Units: s;
-	PositionLat   int32     // Units: semicircles;
-	PositionLong  int32     // Units: semicircles;
+	Timestamp     time.Time // Units: s
+	PositionLat   int32     // Units: semicircles
+	PositionLong  int32     // Units: semicircles
 	ClimbProEvent typedef.ClimbProEvent
 	ClimbNumber   uint16
 	ClimbCategory uint8
-	CurrentDist   float32 // Units: m;
+	CurrentDist   float32 // Units: m
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -62,10 +62,10 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 
 // ToMesg converts ClimbPro into proto.Message.
 func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumClimbPro)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -83,9 +83,9 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PositionLong
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.ClimbProEvent) != basetype.EnumInvalid {
+	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.ClimbProEvent)
+		field.Value = byte(m.ClimbProEvent)
 		fields = append(fields, field)
 	}
 	if m.ClimbNumber != basetype.Uint16Invalid {
@@ -114,7 +114,7 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 
 // SetTimestamp sets ClimbPro value.
 //
-// Units: s;
+// Units: s
 func (m *ClimbPro) SetTimestamp(v time.Time) *ClimbPro {
 	m.Timestamp = v
 	return m
@@ -122,7 +122,7 @@ func (m *ClimbPro) SetTimestamp(v time.Time) *ClimbPro {
 
 // SetPositionLat sets ClimbPro value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *ClimbPro) SetPositionLat(v int32) *ClimbPro {
 	m.PositionLat = v
 	return m
@@ -130,7 +130,7 @@ func (m *ClimbPro) SetPositionLat(v int32) *ClimbPro {
 
 // SetPositionLong sets ClimbPro value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
 	m.PositionLong = v
 	return m
@@ -156,7 +156,7 @@ func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
 
 // SetCurrentDist sets ClimbPro value.
 //
-// Units: m;
+// Units: m
 func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
 	m.CurrentDist = v
 	return m

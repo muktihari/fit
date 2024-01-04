@@ -18,8 +18,8 @@ import (
 
 // Spo2Data is a Spo2Data message.
 type Spo2Data struct {
-	Timestamp         time.Time // Units: s;
-	ReadingSpo2       uint8     // Units: percent;
+	Timestamp         time.Time // Units: s
+	ReadingSpo2       uint8     // Units: percent
 	ReadingConfidence uint8
 	Mode              typedef.Spo2MeasurementType // Mode when data was captured
 
@@ -56,10 +56,10 @@ func NewSpo2Data(mesg *proto.Message) *Spo2Data {
 
 // ToMesg converts Spo2Data into proto.Message.
 func (m *Spo2Data) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSpo2Data)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -77,9 +77,9 @@ func (m *Spo2Data) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ReadingConfidence
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Mode) != basetype.EnumInvalid {
+	if byte(m.Mode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.Mode)
+		field.Value = byte(m.Mode)
 		fields = append(fields, field)
 	}
 
@@ -93,7 +93,7 @@ func (m *Spo2Data) ToMesg(fac Factory) proto.Message {
 
 // SetTimestamp sets Spo2Data value.
 //
-// Units: s;
+// Units: s
 func (m *Spo2Data) SetTimestamp(v time.Time) *Spo2Data {
 	m.Timestamp = v
 	return m
@@ -101,7 +101,7 @@ func (m *Spo2Data) SetTimestamp(v time.Time) *Spo2Data {
 
 // SetReadingSpo2 sets Spo2Data value.
 //
-// Units: percent;
+// Units: percent
 func (m *Spo2Data) SetReadingSpo2(v uint8) *Spo2Data {
 	m.ReadingSpo2 = v
 	return m

@@ -19,14 +19,14 @@ import (
 // Totals is a Totals message.
 type Totals struct {
 	MessageIndex typedef.MessageIndex
-	Timestamp    time.Time // Units: s;
+	Timestamp    time.Time // Units: s
 	TimerTime    uint32    // Units: s; Excludes pauses
-	Distance     uint32    // Units: m;
-	Calories     uint32    // Units: kcal;
+	Distance     uint32    // Units: m
+	Calories     uint32    // Units: kcal
 	Sport        typedef.Sport
 	ElapsedTime  uint32 // Units: s; Includes pauses
 	Sessions     uint16
-	ActiveTime   uint32 // Units: s;
+	ActiveTime   uint32 // Units: s
 	SportIndex   uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -68,15 +68,15 @@ func NewTotals(mesg *proto.Message) *Totals {
 
 // ToMesg converts Totals into proto.Message.
 func (m *Totals) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTotals)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -99,9 +99,9 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Calories
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
 	if m.ElapsedTime != basetype.Uint32Invalid {
@@ -141,7 +141,7 @@ func (m *Totals) SetMessageIndex(v typedef.MessageIndex) *Totals {
 
 // SetTimestamp sets Totals value.
 //
-// Units: s;
+// Units: s
 func (m *Totals) SetTimestamp(v time.Time) *Totals {
 	m.Timestamp = v
 	return m
@@ -157,7 +157,7 @@ func (m *Totals) SetTimerTime(v uint32) *Totals {
 
 // SetDistance sets Totals value.
 //
-// Units: m;
+// Units: m
 func (m *Totals) SetDistance(v uint32) *Totals {
 	m.Distance = v
 	return m
@@ -165,7 +165,7 @@ func (m *Totals) SetDistance(v uint32) *Totals {
 
 // SetCalories sets Totals value.
 //
-// Units: kcal;
+// Units: kcal
 func (m *Totals) SetCalories(v uint32) *Totals {
 	m.Calories = v
 	return m
@@ -193,7 +193,7 @@ func (m *Totals) SetSessions(v uint16) *Totals {
 
 // SetActiveTime sets Totals value.
 //
-// Units: s;
+// Units: s
 func (m *Totals) SetActiveTime(v uint32) *Totals {
 	m.ActiveTime = v
 	return m

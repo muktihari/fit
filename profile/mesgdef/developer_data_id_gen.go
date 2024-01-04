@@ -16,8 +16,8 @@ import (
 
 // DeveloperDataId is a DeveloperDataId message.
 type DeveloperDataId struct {
-	DeveloperId        []byte // Array: [N];
-	ApplicationId      []byte // Array: [N];
+	DeveloperId        []byte // Array: [N]
+	ApplicationId      []byte // Array: [N]
 	ManufacturerId     typedef.Manufacturer
 	DeveloperDataIndex uint8
 	ApplicationVersion uint32
@@ -48,10 +48,10 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 
 // ToMesg converts DeveloperDataId into proto.Message.
 func (m *DeveloperDataId) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDeveloperDataId)
 
 	if m.DeveloperId != nil {
@@ -64,9 +64,9 @@ func (m *DeveloperDataId) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ApplicationId
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.ManufacturerId) != basetype.Uint16Invalid {
+	if uint16(m.ManufacturerId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint16[uint16](m.ManufacturerId)
+		field.Value = uint16(m.ManufacturerId)
 		fields = append(fields, field)
 	}
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
@@ -88,7 +88,7 @@ func (m *DeveloperDataId) ToMesg(fac Factory) proto.Message {
 
 // SetDeveloperId sets DeveloperDataId value.
 //
-// Array: [N];
+// Array: [N]
 func (m *DeveloperDataId) SetDeveloperId(v []byte) *DeveloperDataId {
 	m.DeveloperId = v
 	return m
@@ -96,7 +96,7 @@ func (m *DeveloperDataId) SetDeveloperId(v []byte) *DeveloperDataId {
 
 // SetApplicationId sets DeveloperDataId value.
 //
-// Array: [N];
+// Array: [N]
 func (m *DeveloperDataId) SetApplicationId(v []byte) *DeveloperDataId {
 	m.ApplicationId = v
 	return m

@@ -50,15 +50,15 @@ func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
 
 // ToMesg converts SlaveDevice into proto.Message.
 func (m *SlaveDevice) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSlaveDevice)
 
-	if typeconv.ToUint16[uint16](m.Manufacturer) != basetype.Uint16Invalid {
+	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint16[uint16](m.Manufacturer)
+		field.Value = uint16(m.Manufacturer)
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {

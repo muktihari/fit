@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,11 +21,11 @@ import (
 type GpsMetadata struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
-	PositionLat      int32     // Units: semicircles;
-	PositionLong     int32     // Units: semicircles;
-	EnhancedAltitude uint32    // Scale: 5; Offset: 500; Units: m;
-	EnhancedSpeed    uint32    // Scale: 1000; Units: m/s;
-	Heading          uint16    // Scale: 100; Units: degrees;
+	PositionLat      int32     // Units: semicircles
+	PositionLong     int32     // Units: semicircles
+	EnhancedAltitude uint32    // Scale: 5; Offset: 500; Units: m
+	EnhancedSpeed    uint32    // Scale: 1000; Units: m/s
+	Heading          uint16    // Scale: 100; Units: degrees
 	UtcTimestamp     time.Time // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
 	Velocity         []int16   // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 
@@ -66,10 +67,10 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 
 // ToMesg converts GpsMetadata into proto.Message.
 func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumGpsMetadata)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -126,6 +127,46 @@ func (m *GpsMetadata) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
+	if m.EnhancedAltitude == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+}
+
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
+	if m.EnhancedSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+}
+
+// HeadingScaled return Heading in its scaled value [Scale: 100; Units: degrees].
+//
+// If Heading value is invalid, float64 invalid value will be returned.
+func (m *GpsMetadata) HeadingScaled() float64 {
+	if m.Heading == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Heading, 100, 0)
+}
+
+// VelocityScaled return Velocity in its scaled value [Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.].
+//
+// If Velocity value is invalid, nil will be returned.
+func (m *GpsMetadata) VelocityScaled() []float64 {
+	if m.Velocity == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Velocity, 100, 0)
+}
+
 // SetTimestamp sets GpsMetadata value.
 //
 // Units: s; Whole second part of the timestamp.
@@ -144,7 +185,7 @@ func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
 
 // SetPositionLat sets GpsMetadata value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *GpsMetadata) SetPositionLat(v int32) *GpsMetadata {
 	m.PositionLat = v
 	return m
@@ -152,7 +193,7 @@ func (m *GpsMetadata) SetPositionLat(v int32) *GpsMetadata {
 
 // SetPositionLong sets GpsMetadata value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *GpsMetadata) SetPositionLong(v int32) *GpsMetadata {
 	m.PositionLong = v
 	return m
@@ -160,7 +201,7 @@ func (m *GpsMetadata) SetPositionLong(v int32) *GpsMetadata {
 
 // SetEnhancedAltitude sets GpsMetadata value.
 //
-// Scale: 5; Offset: 500; Units: m;
+// Scale: 5; Offset: 500; Units: m
 func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
 	m.EnhancedAltitude = v
 	return m
@@ -168,7 +209,7 @@ func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
 
 // SetEnhancedSpeed sets GpsMetadata value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
 	m.EnhancedSpeed = v
 	return m
@@ -176,7 +217,7 @@ func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
 
 // SetHeading sets GpsMetadata value.
 //
-// Scale: 100; Units: degrees;
+// Scale: 100; Units: degrees
 func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
 	m.Heading = v
 	return m

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,7 +20,7 @@ import (
 // MaxMetData is a MaxMetData message.
 type MaxMetData struct {
 	UpdateTime     time.Time // Time maxMET and vo2 were calculated
-	Vo2Max         uint16    // Scale: 10; Units: mL/kg/min;
+	Vo2Max         uint16    // Scale: 10; Units: mL/kg/min
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	MaxMetCategory typedef.MaxMetCategory
@@ -64,10 +65,10 @@ func NewMaxMetData(mesg *proto.Message) *MaxMetData {
 
 // ToMesg converts MaxMetData into proto.Message.
 func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMaxMetData)
 
 	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
@@ -80,19 +81,19 @@ func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Vo2Max
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.MaxMetCategory) != basetype.EnumInvalid {
+	if byte(m.MaxMetCategory) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = typeconv.ToEnum[byte](m.MaxMetCategory)
+		field.Value = byte(m.MaxMetCategory)
 		fields = append(fields, field)
 	}
 	if m.CalibratedData != false {
@@ -100,14 +101,14 @@ func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CalibratedData
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HrSource) != basetype.EnumInvalid {
+	if byte(m.HrSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToEnum[byte](m.HrSource)
+		field.Value = byte(m.HrSource)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SpeedSource) != basetype.EnumInvalid {
+	if byte(m.SpeedSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = typeconv.ToEnum[byte](m.SpeedSource)
+		field.Value = byte(m.SpeedSource)
 		fields = append(fields, field)
 	}
 
@@ -117,6 +118,16 @@ func (m *MaxMetData) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// Vo2MaxScaled return Vo2Max in its scaled value [Scale: 10; Units: mL/kg/min].
+//
+// If Vo2Max value is invalid, float64 invalid value will be returned.
+func (m *MaxMetData) Vo2MaxScaled() float64 {
+	if m.Vo2Max == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Vo2Max, 10, 0)
 }
 
 // SetUpdateTime sets MaxMetData value.
@@ -129,7 +140,7 @@ func (m *MaxMetData) SetUpdateTime(v time.Time) *MaxMetData {
 
 // SetVo2Max sets MaxMetData value.
 //
-// Scale: 10; Units: mL/kg/min;
+// Scale: 10; Units: mL/kg/min
 func (m *MaxMetData) SetVo2Max(v uint16) *MaxMetData {
 	m.Vo2Max = v
 	return m

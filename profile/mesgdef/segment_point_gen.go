@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -17,8 +18,8 @@ import (
 // SegmentPoint is a SegmentPoint message.
 type SegmentPoint struct {
 	MessageIndex     typedef.MessageIndex
-	PositionLat      int32    // Units: semicircles;
-	PositionLong     int32    // Units: semicircles;
+	PositionLat      int32    // Units: semicircles
+	PositionLong     int32    // Units: semicircles
 	Distance         uint32   // Scale: 100; Units: m; Accumulated distance along the segment at the described point
 	Altitude         uint16   // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
@@ -68,15 +69,15 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 
 // ToMesg converts SegmentPoint into proto.Message.
 func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentPoint)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -119,6 +120,46 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance along the segment at the described point].
+//
+// If Distance value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) DistanceScaled() float64 {
+	if m.Distance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Distance, 100, 0)
+}
+
+// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
+//
+// If Altitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) AltitudeScaled() float64 {
+	if m.Altitude == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Altitude, 5, 500)
+}
+
+// LeaderTimeScaled return LeaderTime in its scaled value [Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.].
+//
+// If LeaderTime value is invalid, nil will be returned.
+func (m *SegmentPoint) LeaderTimeScaled() []float64 {
+	if m.LeaderTime == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
+}
+
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
+//
+// If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
+	if m.EnhancedAltitude == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+}
+
 // SetMessageIndex sets SegmentPoint value.
 func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
 	m.MessageIndex = v
@@ -127,7 +168,7 @@ func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
 
 // SetPositionLat sets SegmentPoint value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *SegmentPoint) SetPositionLat(v int32) *SegmentPoint {
 	m.PositionLat = v
 	return m
@@ -135,7 +176,7 @@ func (m *SegmentPoint) SetPositionLat(v int32) *SegmentPoint {
 
 // SetPositionLong sets SegmentPoint value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *SegmentPoint) SetPositionLong(v int32) *SegmentPoint {
 	m.PositionLong = v
 	return m

@@ -52,20 +52,20 @@ func NewSport(mesg *proto.Message) *Sport {
 
 // ToMesg converts Sport into proto.Message.
 func (m *Sport) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSport)
 
-	if typeconv.ToEnum[byte](m.Sport) != basetype.EnumInvalid {
+	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Sport)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.SubSport) != basetype.EnumInvalid {
+	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.SubSport)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {

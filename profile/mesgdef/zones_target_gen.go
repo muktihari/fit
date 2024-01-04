@@ -56,10 +56,10 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 
 // ToMesg converts ZonesTarget into proto.Message.
 func (m *ZonesTarget) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumZonesTarget)
 
 	if m.MaxHeartRate != basetype.Uint8Invalid {
@@ -77,14 +77,14 @@ func (m *ZonesTarget) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FunctionalThresholdPower
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HrCalcType) != basetype.EnumInvalid {
+	if byte(m.HrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToEnum[byte](m.HrCalcType)
+		field.Value = byte(m.HrCalcType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.PwrCalcType) != basetype.EnumInvalid {
+	if byte(m.PwrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToEnum[byte](m.PwrCalcType)
+		field.Value = byte(m.PwrCalcType)
 		fields = append(fields, field)
 	}
 

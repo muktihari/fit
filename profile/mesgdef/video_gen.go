@@ -52,10 +52,10 @@ func NewVideo(mesg *proto.Message) *Video {
 
 // ToMesg converts Video into proto.Message.
 func (m *Video) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumVideo)
 
 	if m.Url != basetype.StringInvalid && m.Url != "" {

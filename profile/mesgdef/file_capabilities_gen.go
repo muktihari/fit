@@ -21,7 +21,7 @@ type FileCapabilities struct {
 	Flags        typedef.FileFlags
 	Directory    string
 	MaxCount     uint16
-	MaxSize      uint32 // Units: bytes;
+	MaxSize      uint32 // Units: bytes
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -58,25 +58,25 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 
 // ToMesg converts FileCapabilities into proto.Message.
 func (m *FileCapabilities) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFileCapabilities)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint8z[uint8](m.Flags) != basetype.Uint8zInvalid {
+	if uint8(m.Flags) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint8z[uint8](m.Flags)
+		field.Value = uint8(m.Flags)
 		fields = append(fields, field)
 	}
 	if m.Directory != basetype.StringInvalid && m.Directory != "" {
@@ -135,7 +135,7 @@ func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
 
 // SetMaxSize sets FileCapabilities value.
 //
-// Units: bytes;
+// Units: bytes
 func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
 	m.MaxSize = v
 	return m

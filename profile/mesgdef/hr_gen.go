@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -19,11 +20,11 @@ import (
 // Hr is a Hr message.
 type Hr struct {
 	Timestamp           time.Time
-	FractionalTimestamp uint16   // Scale: 32768; Units: s;
-	Time256             uint8    // Scale: 256; Units: s;
-	FilteredBpm         []uint8  // Array: [N]; Units: bpm;
-	EventTimestamp      []uint32 // Array: [N]; Scale: 1024; Units: s;
-	EventTimestamp12    []byte   // Array: [N]; Scale: 1024; Units: s;
+	FractionalTimestamp uint16   // Scale: 32768; Units: s
+	Time256             uint8    // Scale: 256; Units: s
+	FilteredBpm         []uint8  // Array: [N]; Units: bpm
+	EventTimestamp      []uint32 // Array: [N]; Scale: 1024; Units: s
+	EventTimestamp12    []byte   // Array: [N]; Scale: 1024; Units: s
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -68,10 +69,10 @@ func NewHr(mesg *proto.Message) *Hr {
 
 // ToMesg converts Hr into proto.Message.
 func (m *Hr) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHr)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -115,6 +116,46 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
+//
+// If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+func (m *Hr) FractionalTimestampScaled() float64 {
+	if m.FractionalTimestamp == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+}
+
+// Time256Scaled return Time256 in its scaled value [Scale: 256; Units: s].
+//
+// If Time256 value is invalid, float64 invalid value will be returned.
+func (m *Hr) Time256Scaled() float64 {
+	if m.Time256 == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Time256, 256, 0)
+}
+
+// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
+//
+// If EventTimestamp value is invalid, nil will be returned.
+func (m *Hr) EventTimestampScaled() []float64 {
+	if m.EventTimestamp == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
+}
+
+// EventTimestamp12Scaled return EventTimestamp12 in its scaled value [Array: [N]; Scale: 1024; Units: s].
+//
+// If EventTimestamp12 value is invalid, nil will be returned.
+func (m *Hr) EventTimestamp12Scaled() []float64 {
+	if m.EventTimestamp12 == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.EventTimestamp12, 1024, 0)
+}
+
 // SetTimestamp sets Hr value.
 func (m *Hr) SetTimestamp(v time.Time) *Hr {
 	m.Timestamp = v
@@ -123,7 +164,7 @@ func (m *Hr) SetTimestamp(v time.Time) *Hr {
 
 // SetFractionalTimestamp sets Hr value.
 //
-// Scale: 32768; Units: s;
+// Scale: 32768; Units: s
 func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
 	m.FractionalTimestamp = v
 	return m
@@ -131,7 +172,7 @@ func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
 
 // SetTime256 sets Hr value.
 //
-// Scale: 256; Units: s;
+// Scale: 256; Units: s
 func (m *Hr) SetTime256(v uint8) *Hr {
 	m.Time256 = v
 	return m
@@ -139,7 +180,7 @@ func (m *Hr) SetTime256(v uint8) *Hr {
 
 // SetFilteredBpm sets Hr value.
 //
-// Array: [N]; Units: bpm;
+// Array: [N]; Units: bpm
 func (m *Hr) SetFilteredBpm(v []uint8) *Hr {
 	m.FilteredBpm = v
 	return m
@@ -147,7 +188,7 @@ func (m *Hr) SetFilteredBpm(v []uint8) *Hr {
 
 // SetEventTimestamp sets Hr value.
 //
-// Array: [N]; Scale: 1024; Units: s;
+// Array: [N]; Scale: 1024; Units: s
 func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 	m.EventTimestamp = v
 	return m
@@ -155,7 +196,7 @@ func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 
 // SetEventTimestamp12 sets Hr value.
 //
-// Array: [N]; Scale: 1024; Units: s;
+// Array: [N]; Scale: 1024; Units: s
 func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	m.EventTimestamp12 = v
 	return m

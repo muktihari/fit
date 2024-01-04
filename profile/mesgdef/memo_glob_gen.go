@@ -58,10 +58,10 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 
 // ToMesg converts MemoGlob into proto.Message.
 func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMemoGlob)
 
 	if m.PartIndex != basetype.Uint32Invalid {
@@ -74,14 +74,14 @@ func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Memo
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+	if uint16(m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint16[uint16](m.MesgNum)
+		field.Value = uint16(m.MesgNum)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.ParentIndex) != basetype.Uint16Invalid {
+	if uint16(m.ParentIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToUint16[uint16](m.ParentIndex)
+		field.Value = uint16(m.ParentIndex)
 		fields = append(fields, field)
 	}
 	if m.FieldNum != basetype.Uint8Invalid {

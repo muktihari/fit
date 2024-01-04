@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,12 +19,12 @@ import (
 
 // AntRx is a AntRx message.
 type AntRx struct {
-	Timestamp           time.Time // Units: s;
-	FractionalTimestamp uint16    // Scale: 32768; Units: s;
+	Timestamp           time.Time // Units: s
+	FractionalTimestamp uint16    // Scale: 32768; Units: s
 	MesgId              byte
-	MesgData            []byte // Array: [N];
+	MesgData            []byte // Array: [N]
 	ChannelNumber       uint8
-	Data                []byte // Array: [N];
+	Data                []byte // Array: [N]
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -68,10 +69,10 @@ func NewAntRx(mesg *proto.Message) *AntRx {
 
 // ToMesg converts AntRx into proto.Message.
 func (m *AntRx) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAntRx)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -115,9 +116,19 @@ func (m *AntRx) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
+//
+// If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+func (m *AntRx) FractionalTimestampScaled() float64 {
+	if m.FractionalTimestamp == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+}
+
 // SetTimestamp sets AntRx value.
 //
-// Units: s;
+// Units: s
 func (m *AntRx) SetTimestamp(v time.Time) *AntRx {
 	m.Timestamp = v
 	return m
@@ -125,7 +136,7 @@ func (m *AntRx) SetTimestamp(v time.Time) *AntRx {
 
 // SetFractionalTimestamp sets AntRx value.
 //
-// Scale: 32768; Units: s;
+// Scale: 32768; Units: s
 func (m *AntRx) SetFractionalTimestamp(v uint16) *AntRx {
 	m.FractionalTimestamp = v
 	return m
@@ -139,7 +150,7 @@ func (m *AntRx) SetMesgId(v byte) *AntRx {
 
 // SetMesgData sets AntRx value.
 //
-// Array: [N];
+// Array: [N]
 func (m *AntRx) SetMesgData(v []byte) *AntRx {
 	m.MesgData = v
 	return m
@@ -153,7 +164,7 @@ func (m *AntRx) SetChannelNumber(v uint8) *AntRx {
 
 // SetData sets AntRx value.
 //
-// Array: [N];
+// Array: [N]
 func (m *AntRx) SetData(v []byte) *AntRx {
 	m.Data = v
 	return m

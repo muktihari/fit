@@ -8,6 +8,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -74,10 +75,10 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 
 // ToMesg converts SleepAssessment into proto.Message.
 func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepAssessment)
 
 	if m.CombinedAwakeScore != basetype.Uint8Invalid {
@@ -157,6 +158,16 @@ func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// AverageStressDuringSleepScaled return AverageStressDuringSleep in its scaled value [Scale: 100; Excludes stress during awake periods in the sleep window].
+//
+// If AverageStressDuringSleep value is invalid, float64 invalid value will be returned.
+func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
+	if m.AverageStressDuringSleep == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
 }
 
 // SetCombinedAwakeScore sets SleepAssessment value.

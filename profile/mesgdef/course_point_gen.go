@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,9 +21,9 @@ import (
 type CoursePoint struct {
 	MessageIndex typedef.MessageIndex
 	Timestamp    time.Time
-	PositionLat  int32  // Units: semicircles;
-	PositionLong int32  // Units: semicircles;
-	Distance     uint32 // Scale: 100; Units: m;
+	PositionLat  int32  // Units: semicircles
+	PositionLong int32  // Units: semicircles
+	Distance     uint32 // Scale: 100; Units: m
 	Type         typedef.CoursePoint
 	Name         string
 	Favorite     bool
@@ -64,15 +65,15 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 
 // ToMesg converts CoursePoint into proto.Message.
 func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCoursePoint)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -95,9 +96,9 @@ func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Distance
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Type) != basetype.EnumInvalid {
+	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToEnum[byte](m.Type)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
@@ -119,6 +120,16 @@ func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m].
+//
+// If Distance value is invalid, float64 invalid value will be returned.
+func (m *CoursePoint) DistanceScaled() float64 {
+	if m.Distance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Distance, 100, 0)
+}
+
 // SetMessageIndex sets CoursePoint value.
 func (m *CoursePoint) SetMessageIndex(v typedef.MessageIndex) *CoursePoint {
 	m.MessageIndex = v
@@ -133,7 +144,7 @@ func (m *CoursePoint) SetTimestamp(v time.Time) *CoursePoint {
 
 // SetPositionLat sets CoursePoint value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *CoursePoint) SetPositionLat(v int32) *CoursePoint {
 	m.PositionLat = v
 	return m
@@ -141,7 +152,7 @@ func (m *CoursePoint) SetPositionLat(v int32) *CoursePoint {
 
 // SetPositionLong sets CoursePoint value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *CoursePoint) SetPositionLong(v int32) *CoursePoint {
 	m.PositionLong = v
 	return m
@@ -149,7 +160,7 @@ func (m *CoursePoint) SetPositionLong(v int32) *CoursePoint {
 
 // SetDistance sets CoursePoint value.
 //
-// Scale: 100; Units: m;
+// Scale: 100; Units: m
 func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
 	m.Distance = v
 	return m

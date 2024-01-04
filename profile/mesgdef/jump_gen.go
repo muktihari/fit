@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,16 +19,16 @@ import (
 
 // Jump is a Jump message.
 type Jump struct {
-	Timestamp     time.Time // Units: s;
-	Distance      float32   // Units: m;
-	Height        float32   // Units: m;
+	Timestamp     time.Time // Units: s
+	Distance      float32   // Units: m
+	Height        float32   // Units: m
 	Rotations     uint8
-	HangTime      float32 // Units: s;
+	HangTime      float32 // Units: s
 	Score         float32 // A score for a jump calculated based on hang time, rotations, and distance.
-	PositionLat   int32   // Units: semicircles;
-	PositionLong  int32   // Units: semicircles;
-	Speed         uint16  // Scale: 1000; Units: m/s;
-	EnhancedSpeed uint32  // Scale: 1000; Units: m/s;
+	PositionLat   int32   // Units: semicircles
+	PositionLong  int32   // Units: semicircles
+	Speed         uint16  // Scale: 1000; Units: m/s
+	EnhancedSpeed uint32  // Scale: 1000; Units: m/s
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -76,10 +77,10 @@ func NewJump(mesg *proto.Message) *Jump {
 
 // ToMesg converts Jump into proto.Message.
 func (m *Jump) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumJump)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -142,9 +143,29 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If Speed value is invalid, float64 invalid value will be returned.
+func (m *Jump) SpeedScaled() float64 {
+	if m.Speed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Speed, 1000, 0)
+}
+
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+func (m *Jump) EnhancedSpeedScaled() float64 {
+	if m.EnhancedSpeed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+}
+
 // SetTimestamp sets Jump value.
 //
-// Units: s;
+// Units: s
 func (m *Jump) SetTimestamp(v time.Time) *Jump {
 	m.Timestamp = v
 	return m
@@ -152,7 +173,7 @@ func (m *Jump) SetTimestamp(v time.Time) *Jump {
 
 // SetDistance sets Jump value.
 //
-// Units: m;
+// Units: m
 func (m *Jump) SetDistance(v float32) *Jump {
 	m.Distance = v
 	return m
@@ -160,7 +181,7 @@ func (m *Jump) SetDistance(v float32) *Jump {
 
 // SetHeight sets Jump value.
 //
-// Units: m;
+// Units: m
 func (m *Jump) SetHeight(v float32) *Jump {
 	m.Height = v
 	return m
@@ -174,7 +195,7 @@ func (m *Jump) SetRotations(v uint8) *Jump {
 
 // SetHangTime sets Jump value.
 //
-// Units: s;
+// Units: s
 func (m *Jump) SetHangTime(v float32) *Jump {
 	m.HangTime = v
 	return m
@@ -190,7 +211,7 @@ func (m *Jump) SetScore(v float32) *Jump {
 
 // SetPositionLat sets Jump value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Jump) SetPositionLat(v int32) *Jump {
 	m.PositionLat = v
 	return m
@@ -198,7 +219,7 @@ func (m *Jump) SetPositionLat(v int32) *Jump {
 
 // SetPositionLong sets Jump value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *Jump) SetPositionLong(v int32) *Jump {
 	m.PositionLong = v
 	return m
@@ -206,7 +227,7 @@ func (m *Jump) SetPositionLong(v int32) *Jump {
 
 // SetSpeed sets Jump value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Jump) SetSpeed(v uint16) *Jump {
 	m.Speed = v
 	return m
@@ -214,7 +235,7 @@ func (m *Jump) SetSpeed(v uint16) *Jump {
 
 // SetEnhancedSpeed sets Jump value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
 	m.EnhancedSpeed = v
 	return m

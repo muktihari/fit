@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -18,9 +19,9 @@ import (
 
 // TankUpdate is a TankUpdate message.
 type TankUpdate struct {
-	Timestamp time.Time // Units: s;
+	Timestamp time.Time // Units: s
 	Sensor    typedef.AntChannelId
-	Pressure  uint16 // Scale: 100; Units: bar;
+	Pressure  uint16 // Scale: 100; Units: bar
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -54,10 +55,10 @@ func NewTankUpdate(mesg *proto.Message) *TankUpdate {
 
 // ToMesg converts TankUpdate into proto.Message.
 func (m *TankUpdate) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTankUpdate)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -65,9 +66,9 @@ func (m *TankUpdate) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32z[uint32](m.Sensor) != basetype.Uint32zInvalid {
+	if uint32(m.Sensor) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToUint32z[uint32](m.Sensor)
+		field.Value = uint32(m.Sensor)
 		fields = append(fields, field)
 	}
 	if m.Pressure != basetype.Uint16Invalid {
@@ -84,9 +85,19 @@ func (m *TankUpdate) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// PressureScaled return Pressure in its scaled value [Scale: 100; Units: bar].
+//
+// If Pressure value is invalid, float64 invalid value will be returned.
+func (m *TankUpdate) PressureScaled() float64 {
+	if m.Pressure == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Pressure, 100, 0)
+}
+
 // SetTimestamp sets TankUpdate value.
 //
-// Units: s;
+// Units: s
 func (m *TankUpdate) SetTimestamp(v time.Time) *TankUpdate {
 	m.Timestamp = v
 	return m
@@ -100,7 +111,7 @@ func (m *TankUpdate) SetSensor(v typedef.AntChannelId) *TankUpdate {
 
 // SetPressure sets TankUpdate value.
 //
-// Scale: 100; Units: bar;
+// Scale: 100; Units: bar
 func (m *TankUpdate) SetPressure(v uint16) *TankUpdate {
 	m.Pressure = v
 	return m

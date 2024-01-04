@@ -56,30 +56,30 @@ func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 
 // ToMesg converts MesgCapabilities into proto.Message.
 func (m *MesgCapabilities) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMesgCapabilities)
 
-	if typeconv.ToUint16[uint16](m.MessageIndex) != basetype.Uint16Invalid {
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = typeconv.ToUint16[uint16](m.MessageIndex)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.File) != basetype.EnumInvalid {
+	if byte(m.File) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.File)
+		field.Value = byte(m.File)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.MesgNum) != basetype.Uint16Invalid {
+	if uint16(m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToUint16[uint16](m.MesgNum)
+		field.Value = uint16(m.MesgNum)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.CountType) != basetype.EnumInvalid {
+	if byte(m.CountType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.CountType)
+		field.Value = byte(m.CountType)
 		fields = append(fields, field)
 	}
 	if m.Count != basetype.Uint16Invalid {

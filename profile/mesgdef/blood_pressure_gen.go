@@ -18,14 +18,14 @@ import (
 
 // BloodPressure is a BloodPressure message.
 type BloodPressure struct {
-	Timestamp            time.Time // Units: s;
-	SystolicPressure     uint16    // Units: mmHg;
-	DiastolicPressure    uint16    // Units: mmHg;
-	MeanArterialPressure uint16    // Units: mmHg;
-	Map3SampleMean       uint16    // Units: mmHg;
-	MapMorningValues     uint16    // Units: mmHg;
-	MapEveningValues     uint16    // Units: mmHg;
-	HeartRate            uint8     // Units: bpm;
+	Timestamp            time.Time // Units: s
+	SystolicPressure     uint16    // Units: mmHg
+	DiastolicPressure    uint16    // Units: mmHg
+	MeanArterialPressure uint16    // Units: mmHg
+	Map3SampleMean       uint16    // Units: mmHg
+	MapMorningValues     uint16    // Units: mmHg
+	MapEveningValues     uint16    // Units: mmHg
+	HeartRate            uint8     // Units: bpm
 	HeartRateType        typedef.HrType
 	Status               typedef.BpStatus
 	UserProfileIndex     typedef.MessageIndex // Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
@@ -70,10 +70,10 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 
 // ToMesg converts BloodPressure into proto.Message.
 func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBloodPressure)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -116,19 +116,19 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 		field.Value = m.HeartRate
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.HeartRateType) != basetype.EnumInvalid {
+	if byte(m.HeartRateType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToEnum[byte](m.HeartRateType)
+		field.Value = byte(m.HeartRateType)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = typeconv.ToEnum[byte](m.Status)
+		field.Value = byte(m.Status)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint16[uint16](m.UserProfileIndex) != basetype.Uint16Invalid {
+	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = typeconv.ToUint16[uint16](m.UserProfileIndex)
+		field.Value = uint16(m.UserProfileIndex)
 		fields = append(fields, field)
 	}
 
@@ -142,7 +142,7 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 
 // SetTimestamp sets BloodPressure value.
 //
-// Units: s;
+// Units: s
 func (m *BloodPressure) SetTimestamp(v time.Time) *BloodPressure {
 	m.Timestamp = v
 	return m
@@ -150,7 +150,7 @@ func (m *BloodPressure) SetTimestamp(v time.Time) *BloodPressure {
 
 // SetSystolicPressure sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetSystolicPressure(v uint16) *BloodPressure {
 	m.SystolicPressure = v
 	return m
@@ -158,7 +158,7 @@ func (m *BloodPressure) SetSystolicPressure(v uint16) *BloodPressure {
 
 // SetDiastolicPressure sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetDiastolicPressure(v uint16) *BloodPressure {
 	m.DiastolicPressure = v
 	return m
@@ -166,7 +166,7 @@ func (m *BloodPressure) SetDiastolicPressure(v uint16) *BloodPressure {
 
 // SetMeanArterialPressure sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetMeanArterialPressure(v uint16) *BloodPressure {
 	m.MeanArterialPressure = v
 	return m
@@ -174,7 +174,7 @@ func (m *BloodPressure) SetMeanArterialPressure(v uint16) *BloodPressure {
 
 // SetMap3SampleMean sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetMap3SampleMean(v uint16) *BloodPressure {
 	m.Map3SampleMean = v
 	return m
@@ -182,7 +182,7 @@ func (m *BloodPressure) SetMap3SampleMean(v uint16) *BloodPressure {
 
 // SetMapMorningValues sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetMapMorningValues(v uint16) *BloodPressure {
 	m.MapMorningValues = v
 	return m
@@ -190,7 +190,7 @@ func (m *BloodPressure) SetMapMorningValues(v uint16) *BloodPressure {
 
 // SetMapEveningValues sets BloodPressure value.
 //
-// Units: mmHg;
+// Units: mmHg
 func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
 	m.MapEveningValues = v
 	return m
@@ -198,7 +198,7 @@ func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
 
 // SetHeartRate sets BloodPressure value.
 //
-// Units: bpm;
+// Units: bpm
 func (m *BloodPressure) SetHeartRate(v uint8) *BloodPressure {
 	m.HeartRate = v
 	return m

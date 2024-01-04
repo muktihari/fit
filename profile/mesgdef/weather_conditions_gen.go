@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -20,20 +21,20 @@ import (
 type WeatherConditions struct {
 	Timestamp                time.Time             // time of update for current conditions, else forecast time
 	WeatherReport            typedef.WeatherReport // Current or forecast
-	Temperature              int8                  // Units: C;
+	Temperature              int8                  // Units: C
 	Condition                typedef.WeatherStatus // Corresponds to GSC Response weatherIcon field
-	WindDirection            uint16                // Units: degrees;
-	WindSpeed                uint16                // Scale: 1000; Units: m/s;
+	WindDirection            uint16                // Units: degrees
+	WindSpeed                uint16                // Scale: 1000; Units: m/s
 	PrecipitationProbability uint8                 // range 0-100
 	TemperatureFeelsLike     int8                  // Units: C; Heat Index if GCS heatIdx above or equal to 90F or wind chill if GCS windChill below or equal to 32F
 	RelativeHumidity         uint8
 	Location                 string // string corresponding to GCS response location string
 	ObservedAtTime           time.Time
-	ObservedLocationLat      int32 // Units: semicircles;
-	ObservedLocationLong     int32 // Units: semicircles;
+	ObservedLocationLat      int32 // Units: semicircles
+	ObservedLocationLong     int32 // Units: semicircles
 	DayOfWeek                typedef.DayOfWeek
-	HighTemperature          int8 // Units: C;
-	LowTemperature           int8 // Units: C;
+	HighTemperature          int8 // Units: C
+	LowTemperature           int8 // Units: C
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -80,10 +81,10 @@ func NewWeatherConditions(mesg *proto.Message) *WeatherConditions {
 
 // ToMesg converts WeatherConditions into proto.Message.
 func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWeatherConditions)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -91,9 +92,9 @@ func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.WeatherReport) != basetype.EnumInvalid {
+	if byte(m.WeatherReport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToEnum[byte](m.WeatherReport)
+		field.Value = byte(m.WeatherReport)
 		fields = append(fields, field)
 	}
 	if m.Temperature != basetype.Sint8Invalid {
@@ -101,9 +102,9 @@ func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Temperature
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Condition) != basetype.EnumInvalid {
+	if byte(m.Condition) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = typeconv.ToEnum[byte](m.Condition)
+		field.Value = byte(m.Condition)
 		fields = append(fields, field)
 	}
 	if m.WindDirection != basetype.Uint16Invalid {
@@ -151,9 +152,9 @@ func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ObservedLocationLong
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DayOfWeek) != basetype.EnumInvalid {
+	if byte(m.DayOfWeek) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = typeconv.ToEnum[byte](m.DayOfWeek)
+		field.Value = byte(m.DayOfWeek)
 		fields = append(fields, field)
 	}
 	if m.HighTemperature != basetype.Sint8Invalid {
@@ -175,6 +176,16 @@ func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// WindSpeedScaled return WindSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If WindSpeed value is invalid, float64 invalid value will be returned.
+func (m *WeatherConditions) WindSpeedScaled() float64 {
+	if m.WindSpeed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.WindSpeed, 1000, 0)
+}
+
 // SetTimestamp sets WeatherConditions value.
 //
 // time of update for current conditions, else forecast time
@@ -193,7 +204,7 @@ func (m *WeatherConditions) SetWeatherReport(v typedef.WeatherReport) *WeatherCo
 
 // SetTemperature sets WeatherConditions value.
 //
-// Units: C;
+// Units: C
 func (m *WeatherConditions) SetTemperature(v int8) *WeatherConditions {
 	m.Temperature = v
 	return m
@@ -209,7 +220,7 @@ func (m *WeatherConditions) SetCondition(v typedef.WeatherStatus) *WeatherCondit
 
 // SetWindDirection sets WeatherConditions value.
 //
-// Units: degrees;
+// Units: degrees
 func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
 	m.WindDirection = v
 	return m
@@ -217,7 +228,7 @@ func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
 
 // SetWindSpeed sets WeatherConditions value.
 //
-// Scale: 1000; Units: m/s;
+// Scale: 1000; Units: m/s
 func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
 	m.WindSpeed = v
 	return m
@@ -261,7 +272,7 @@ func (m *WeatherConditions) SetObservedAtTime(v time.Time) *WeatherConditions {
 
 // SetObservedLocationLat sets WeatherConditions value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *WeatherConditions) SetObservedLocationLat(v int32) *WeatherConditions {
 	m.ObservedLocationLat = v
 	return m
@@ -269,7 +280,7 @@ func (m *WeatherConditions) SetObservedLocationLat(v int32) *WeatherConditions {
 
 // SetObservedLocationLong sets WeatherConditions value.
 //
-// Units: semicircles;
+// Units: semicircles
 func (m *WeatherConditions) SetObservedLocationLong(v int32) *WeatherConditions {
 	m.ObservedLocationLong = v
 	return m
@@ -283,7 +294,7 @@ func (m *WeatherConditions) SetDayOfWeek(v typedef.DayOfWeek) *WeatherConditions
 
 // SetHighTemperature sets WeatherConditions value.
 //
-// Units: C;
+// Units: C
 func (m *WeatherConditions) SetHighTemperature(v int8) *WeatherConditions {
 	m.HighTemperature = v
 	return m
@@ -291,7 +302,7 @@ func (m *WeatherConditions) SetHighTemperature(v int8) *WeatherConditions {
 
 // SetLowTemperature sets WeatherConditions value.
 //
-// Units: C;
+// Units: C
 func (m *WeatherConditions) SetLowTemperature(v int8) *WeatherConditions {
 	m.LowTemperature = v
 	return m

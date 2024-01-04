@@ -58,10 +58,10 @@ func NewCameraEvent(mesg *proto.Message) *CameraEvent {
 
 // ToMesg converts CameraEvent into proto.Message.
 func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCameraEvent)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -74,9 +74,9 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.CameraEventType) != basetype.EnumInvalid {
+	if byte(m.CameraEventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToEnum[byte](m.CameraEventType)
+		field.Value = byte(m.CameraEventType)
 		fields = append(fields, field)
 	}
 	if m.CameraFileUuid != basetype.StringInvalid && m.CameraFileUuid != "" {
@@ -84,9 +84,9 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CameraFileUuid
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.CameraOrientation) != basetype.EnumInvalid {
+	if byte(m.CameraOrientation) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = typeconv.ToEnum[byte](m.CameraOrientation)
+		field.Value = byte(m.CameraOrientation)
 		fields = append(fields, field)
 	}
 

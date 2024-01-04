@@ -21,7 +21,7 @@ type ExdDataFieldConfiguration struct {
 	FieldId      uint8
 	ConceptCount uint8
 	DisplayType  typedef.ExdDisplayType
-	Title        []string // Array: [32];
+	Title        []string // Array: [32]
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -66,10 +66,10 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 
 // ToMesg converts ExdDataFieldConfiguration into proto.Message.
 func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExdDataFieldConfiguration)
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
@@ -94,9 +94,9 @@ func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.DisplayType) != basetype.EnumInvalid {
+	if byte(m.DisplayType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToEnum[byte](m.DisplayType)
+		field.Value = byte(m.DisplayType)
 		fields = append(fields, field)
 	}
 	if m.Title != nil {
@@ -145,7 +145,7 @@ func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *Ex
 
 // SetTitle sets ExdDataFieldConfiguration value.
 //
-// Array: [32];
+// Array: [32]
 func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
 	m.Title = v
 	return m

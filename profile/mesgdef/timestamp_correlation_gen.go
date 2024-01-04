@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -62,10 +63,10 @@ func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 
 // ToMesg converts TimestampCorrelation into proto.Message.
 func (m *TimestampCorrelation) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTimestampCorrelation)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -110,6 +111,26 @@ func (m *TimestampCorrelation) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.].
+//
+// If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
+	if m.FractionalTimestamp == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+}
+
+// FractionalSystemTimestampScaled return FractionalSystemTimestamp in its scaled value [Scale: 32768; Units: s; Fractional part of the system timestamp].
+//
+// If FractionalSystemTimestamp value is invalid, float64 invalid value will be returned.
+func (m *TimestampCorrelation) FractionalSystemTimestampScaled() float64 {
+	if m.FractionalSystemTimestamp == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.FractionalSystemTimestamp, 32768, 0)
 }
 
 // SetTimestamp sets TimestampCorrelation value.

@@ -9,6 +9,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -64,10 +65,10 @@ func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
 
 // ToMesg converts HrvStatusSummary into proto.Message.
 func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
-	fieldsPtr := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsPtr)
+	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
+	defer fieldsPool.Put(fieldsArray)
 
-	fields := (*fieldsPtr)[:0] // Create slice from array with zero len.
+	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrvStatusSummary)
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -105,9 +106,9 @@ func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BaselineBalancedUpper
 		fields = append(fields, field)
 	}
-	if typeconv.ToEnum[byte](m.Status) != basetype.EnumInvalid {
+	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = typeconv.ToEnum[byte](m.Status)
+		field.Value = byte(m.Status)
 		fields = append(fields, field)
 	}
 
@@ -117,6 +118,66 @@ func (m *HrvStatusSummary) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// WeeklyAverageScaled return WeeklyAverage in its scaled value [Scale: 128; Units: ms; 7 day RMSSD average over sleep].
+//
+// If WeeklyAverage value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
+	if m.WeeklyAverage == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.WeeklyAverage, 128, 0)
+}
+
+// LastNightAverageScaled return LastNightAverage in its scaled value [Scale: 128; Units: ms; Last night RMSSD average over sleep].
+//
+// If LastNightAverage value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
+	if m.LastNightAverage == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.LastNightAverage, 128, 0)
+}
+
+// LastNight5MinHighScaled return LastNight5MinHigh in its scaled value [Scale: 128; Units: ms; 5 minute high RMSSD value over sleep].
+//
+// If LastNight5MinHigh value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
+	if m.LastNight5MinHigh == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.LastNight5MinHigh, 128, 0)
+}
+
+// BaselineLowUpperScaled return BaselineLowUpper in its scaled value [Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status].
+//
+// If BaselineLowUpper value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
+	if m.BaselineLowUpper == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BaselineLowUpper, 128, 0)
+}
+
+// BaselineBalancedLowerScaled return BaselineBalancedLower in its scaled value [Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status].
+//
+// If BaselineBalancedLower value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
+	if m.BaselineBalancedLower == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BaselineBalancedLower, 128, 0)
+}
+
+// BaselineBalancedUpperScaled return BaselineBalancedUpper in its scaled value [Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status].
+//
+// If BaselineBalancedUpper value is invalid, float64 invalid value will be returned.
+func (m *HrvStatusSummary) BaselineBalancedUpperScaled() float64 {
+	if m.BaselineBalancedUpper == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.BaselineBalancedUpper, 128, 0)
 }
 
 // SetTimestamp sets HrvStatusSummary value.
