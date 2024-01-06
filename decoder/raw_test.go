@@ -516,7 +516,7 @@ func TestRawDecoderDecode(t *testing.T) {
 	}
 }
 
-func BenchmarkDecodeRaw(b *testing.B) {
+func BenchmarkRawDecoderDecode(b *testing.B) {
 	b.StopTimer()
 
 	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
