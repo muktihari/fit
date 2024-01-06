@@ -13,13 +13,14 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// RawFlag is the kind of the incomming bytes, the size of the incomming bytes is vary but the the size is guaranteed
-// by the corresponding RawFlag.
+// RawFlag is the kind of the incomming bytes, the size of the incomming bytes is vary but
+// the the size is guaranteed by the corresponding RawFlag.
 type RawFlag byte
 
 const (
 	// RawFlagFileHeader is guaranteed to have either 12 or 14 bytes (all in little-endian byte order):
-	// Size + ProtocolVersion + ProfileVersion (2 bytes) +  DataSize (4 bytes) + DataType (4 bytes) + (only if Size is 14) CRC (2 bytes)
+	// Size + ProtocolVersion + ProfileVersion (2 bytes) +  DataSize (4 bytes) + DataType (4 bytes) +
+	// (only if Size is 14) CRC (2 bytes)
 	RawFlagFileHeader RawFlag = iota
 
 	// RawFlagMesgDef is guaranteed to have:
@@ -28,7 +29,8 @@ const (
 	RawFlagMesgDef
 
 	// RawFlagMesgData is guaranteed to have:
-	// Header + Fields' value represented by its Message Definition + (only if it has developer fields) Developer Fields' value.
+	// Header + Fields' value represented by its Message Definition + (only if it has developer fields)
+	// Developer Fields' value.
 	RawFlagMesgData
 
 	// RawFlagCRC is guaranteed to have:
@@ -52,35 +54,40 @@ func (f RawFlag) String() string {
 
 // RawDecoder is a sequence of FIT bytes decoder. See NewRaw() for details.
 type RawDecoder struct {
-	bytesArray [255 * 255 * 2]byte // [MesgDef: 6 + 255 * 3 = 771] < [Mesg: (255 * 255) * 2 = 130050]. Use bigger capacity.
+	// [MesgDef: 6 + 255 * 3 = 771] < [Mesg: (255 * 255) * 2 = 130050]. Use bigger capacity.
+	bytesArray [255 * 255 * 2]byte
 	lenMesgs   [proto.LocalMesgNumMask + 1]uint32
 }
 
-// NewRaw creates new RawDecoder which provides low-level building block to work with FIT bytes for the maximum performance gain.
-// RawDecoder will split bytes by its corresponding RawFlag (FileHeader, MessageDefinition, MessageData and CRC) for scoping the operation.
+// NewRaw creates new RawDecoder which provides low-level building block to work with FIT bytes for the
+// maximum performance gain. RawDecoder will split bytes by its corresponding RawFlag (FileHeader,
+// MessageDefinition, MessageData and CRC) for scoping the operation.
 //
-// However, this is still considered unsafe operation since we work with bytes directly and the responsibility for validation now placed on the user-space. The only thing that this validates is
-// the reader should be a FIT (FileHeader: has valid Size, bytes 8-12 is ".FIT", ProtocolVersion is supported and DataSize > 0).
+// However, this is still considered unsafe operation since we work with bytes directly and the responsibility
+// for validation now placed on the user-space.  The only thing that this validates is the reader should be a FIT
+// (FileHeader: has valid Size, bytes 8-12 is ".FIT", ProtocolVersion is supported and DataSize > 0).
 //
-// This is only intended to be used for performance and memory critical situation where every computation or memory usage is constrained
-// (RawDecoder itself is using constant memory < 131 KB and the Decode method has zero heap alloc (except errors) while it may use additional small stack memory).
-// The implementation of the callback function is also expected to have minimal overhead.
+// This is only intended to be used for performance and memory critical situation where every computation or
+// memory usage is constrained (RawDecoder itself is using constant memory < 131 KB and the Decode method has
+// zero heap alloc (except errors) while it may use additional small stack memory). The implementation of the
+// callback function is also expected to have minimal overhead.
 //
 // For general purpose usage, use Decoder instead.
 func NewRaw() *RawDecoder {
 	return &RawDecoder{}
 }
 
-// Decode decodes r reader into sequence of FIT bytes splitted by its corresponding RawFlag (FileHeader, MessageDefinition, MessageData and CRC)
-// for every FIT sequences in the reader, until it reaches EOF. It returns the number of bytes read and any error encountered.
-// When fn returns an error, Decode will immediately return the error.
+// Decode decodes r reader into sequence of FIT bytes splitted by its corresponding RawFlag (FileHeader,
+// MessageDefinition, MessageData and CRC) for every FIT sequences in the reader, until it reaches EOF.
+// It returns the number of bytes read and any error encountered. When fn returns an error, Decode will
+// immediately return the error.
 //
-// For performance, the b is not copied and the underlying array's values will be replaced each fn call. If you need
-// to work with b in its slice form later on, it should be cloned.
+// For performance, the b is not copied and the underlying array's values will be replaced each fn call.
+// If you need to work with b in its slice form later on, it should be copied.
 //
-// Note: We encourage wrapping r into a buffered reader such as bufio.NewReader(r),
-// decode process requires byte by byte reading and having frequent read on non-buffered reader might impact performance,
-// especially if it involves syscall such as reading a file.
+// Note: We encourage wrapping r into a buffered reader such as bufio.NewReader(r), decode process requires
+// byte by byte reading and having frequent read on non-buffered reader might impact performance, especially
+// if it involves syscall such as reading a file.
 func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) (n int64, err error) {
 	defer d.reset() // Must reset before return, so we can invoke Decode again for the next reader.
 
@@ -96,12 +103,12 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			return n, err
 		}
 
-		headerSize := d.bytesArray[0]
-		if headerSize != 12 && headerSize != 14 {
-			return n, fmt.Errorf("header size [%d]: %w", headerSize, ErrNotAFitFile)
+		fileHeaderSize := d.bytesArray[0]
+		if fileHeaderSize != 12 && fileHeaderSize != 14 {
+			return n, fmt.Errorf("file header's size [%d]: %w", fileHeaderSize, ErrNotAFitFile)
 		}
 
-		nr, err = io.ReadFull(r, d.bytesArray[1:headerSize])
+		nr, err = io.ReadFull(r, d.bytesArray[1:fileHeaderSize])
 		n += int64(nr)
 		if err != nil {
 			return n, err
@@ -115,18 +122,18 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			return n, err
 		}
 
-		dataSize := binary.LittleEndian.Uint32(d.bytesArray[4:8])
-		if dataSize == 0 {
+		fileHeaderDataSize := binary.LittleEndian.Uint32(d.bytesArray[4:8])
+		if fileHeaderDataSize == 0 {
 			return n, ErrDataSizeZero
 		}
 
-		if err := fn(RawFlagFileHeader, d.bytesArray[:headerSize]); err != nil {
+		if err := fn(RawFlagFileHeader, d.bytesArray[:fileHeaderSize]); err != nil {
 			return n, err
 		}
 
 		// 2. Decode Messages
 		var pos = int64(n)
-		for uint32(n-pos) < dataSize {
+		for uint32(n-pos) < fileHeaderDataSize {
 			nr, err = io.ReadFull(r, d.bytesArray[:1])
 			n += int64(nr)
 			if err != nil {
