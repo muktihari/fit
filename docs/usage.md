@@ -448,10 +448,10 @@ func main() {
         switch flag {
         case decoder.RawFlagFileHeader:
             if err := proto.Validate(b[1]); err != nil {
-                return n, err
+                return err
             }
             if binary.LittleEndian.Uint32(b[4:8]) == 0 {
-                return n, decoder.ErrDataSizeZero
+                return decoder.ErrDataSizeZero
             }
             if b[0] == 14 {
                 hash16.Write(b[:12])
