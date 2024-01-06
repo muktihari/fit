@@ -201,11 +201,10 @@ func New(r io.Reader, opts ...Option) *Decoder {
 // initDecodeHeaderOnce initializes decodeHeaderOnce() to decode the header exactly once, if error occur
 // during the first invocation, the error will be returned everytime decodeHeaderOnce() is invoked.
 func (d *Decoder) initDecodeHeaderOnce() {
-	var once, err = sync.Once{}, error(nil)
-	var f = func() { err = d.decodeHeader() }
+	var once = sync.Once{}
 	d.decodeHeaderOnce = func() error {
-		once.Do(f)
-		return err
+		once.Do(func() { d.err = d.decodeHeader() })
+		return d.err
 	}
 }
 
@@ -227,38 +226,30 @@ func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 	return d.fileId, nil
 }
 
-// CheckIntegrity checks whether given reader is a valid FIT File determined by these following checks:
+// CheckIntegrity checks all FIT sequences of given reader are valid determined by these following checks:
 //  1. Has valid FileHeader's size and bytes 8–11 of the FileHeader is “.FIT”
 //  2. FileHeader's DataSize > 0
 //  3. CRC checksum of messages should match with File's CRC value.
 //
-// After invoking this method, the Decoder can be reused again only if reader has been reset (since reader has been fully read).
-// If the reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
-func (d *Decoder) CheckIntegrity() (err error) {
+// It returns the number of sequences completed and any error encountered. The number of sequences completed can help recovering
+// valid FIT sequences in a chained FIT that contains invalid or corrupted data.
+//
+// After invoking this method, the underlying reader should be reset afterward as the reader has been fully read.
+// If the underlying reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
+func (d *Decoder) CheckIntegrity() (seq int, err error) {
 	shouldChecksum := d.options.shouldChecksum
-	d.options.shouldChecksum = true
-	sequenceCompletedCount := 0
-
-	defer func() {
-		if err != nil { // When there is an error, wrap it with informative message before return.
-			err = fmt.Errorf("sequence index: %d, byte pos: %d: %w", sequenceCompletedCount, d.n, err)
-		}
-		// Reset used variables so that the decoder can be reused by the same reader.
-		d.crc16.Reset()
-		d.n, d.cur, d.crc = 0, 0, 0
-		d.options.shouldChecksum = shouldChecksum
-	}()
+	d.options.shouldChecksum = true // Must checksum
 
 	for {
 		// Check Header Integrity
-		n := d.n
-		if err = d.decodeHeader(); err != nil {
-			if n != 0 && n == d.n && err == io.EOF {
+		pos := d.n
+		if err = d.decodeHeaderOnce(); err != nil {
+			if pos != 0 && pos == d.n && err == io.EOF {
 				// When EOF error occurs exactly after a sequence has been completed,
 				// make the error as nil, it means we have reached the desirable EOF.
 				err = nil
 			}
-			return
+			break
 		}
 		// Read bytes acquired by messages to calculate crc checksum of its contents
 		for d.cur < d.fileHeader.DataSize {
@@ -267,21 +258,33 @@ func (d *Decoder) CheckIntegrity() (err error) {
 				size = arraySize
 			}
 			if err = d.read(d.bytesArray[:size]); err != nil { // Discard bytes
-				return
+				break
 			}
 		}
 		if err = d.decodeCRC(); err != nil {
-			return
+			break
 		}
 		// Check crc checksum of messages should match with file's crc.
 		if d.crc16.Sum16() != d.crc {
 			err = ErrCRCChecksumMismatch
-			return
+			break
 		}
+		d.initDecodeHeaderOnce()
 		d.crc16.Reset()
 		d.cur = 0
-		sequenceCompletedCount++
+		seq++
 	}
+
+	if err != nil { // When there is an error, wrap it with informative message before return.
+		err = fmt.Errorf("byte pos: %d: %w", d.n, err)
+	}
+
+	// Reset used variables so that the decoder can be reused by the same reader.
+	d.reset()
+	d.err = nil
+	d.options.shouldChecksum = shouldChecksum
+
+	return seq, err
 }
 
 // Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
@@ -345,7 +348,8 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 		return nil, err
 	}
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		return nil, ErrCRCChecksumMismatch
+		return nil, fmt.Errorf("expected crc %d, got: %d: %w",
+			d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
 	d.sequenceCompleted = true
 	return &proto.Fit{
@@ -383,16 +387,16 @@ func (d *Decoder) decodeHeader() error {
 		DataType:        string(b[7:11]),
 	}
 
-	if d.fileHeader.DataSize == 0 {
-		return ErrDataSizeZero
+	if d.fileHeader.DataType != proto.DataTypeFIT {
+		return ErrNotAFitFile
 	}
 
 	if err := proto.Validate(d.fileHeader.ProtocolVersion); err != nil {
 		return err
 	}
 
-	if d.fileHeader.DataType != proto.DataTypeFIT {
-		return ErrNotAFitFile
+	if d.fileHeader.DataSize == 0 {
+		return ErrDataSizeZero
 	}
 
 	if size == 14 {
@@ -405,7 +409,7 @@ func (d *Decoder) decodeHeader() error {
 
 	_, _ = d.crc16.Write(d.bytesArray[:12])
 	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
-		return ErrCRCChecksumMismatch
+		return fmt.Errorf("expected header's crc: %d, got: %d: %w", d.fileHeader.CRC, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
 
 	d.crc16.Reset() // this hash will be re-used for calculating data integrity.
@@ -799,7 +803,8 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 		return nil, err
 	}
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		return nil, ErrCRCChecksumMismatch
+		return nil, fmt.Errorf("expected crc %d, got: %d: %w",
+			d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
 	d.sequenceCompleted = true
 	return &proto.Fit{

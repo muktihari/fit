@@ -283,6 +283,8 @@ func main() {
 
 Check integrity checks whether FIT File is not corrupted or contains missing data that can invalidates the entire file. Example of when we need to check the integrity is when dealing with **Course File** that contains turn-by-turn navigation, we don't want to guide a person halfway to their destination or guide them to unintended route, do we? The same applies for other file types where it is critical that the contents of the file should be valid, such as Workout, User Profile, Device Settings, etc. For Activity File, most cases, we don't need to check the integrity.
 
+This returns the number of sequences completed and any error encountered. The number of sequences completed can help recovering valid FIT sequences in a chained FIT that contains invalid or corrupted data.
+
 More about this: [https://developer.garmin.com/fit/cookbook/isfit-checkintegrity-read/](https://developer.garmin.com/fit/cookbook/isfit-checkintegrity-read/)
 
 ```go
@@ -290,7 +292,7 @@ package main
 
 import (
 	"bufio"
-        "io"
+    "io"
 	"os"
 
 	"github.com/muktihari/fit/decoder"
@@ -305,11 +307,10 @@ func main() {
 
     dec := decoder.New(bufio.NewReader(f))
 
-    // Fyi, we can invoke PeekFileId() first to check the type of the file before checking the integrity.
+    // Fyi, we can invoke PeekFileId() first to check the type of the first FIT File sequence before checking the integrity.
     // For most cases, we wouldn't want to check integrity of Activity File.
-    // But it's up to the users to decide.
-
-    if err := dec.CheckIntegrity(); err != nil {
+    // However, you can only Peek FileId of the first FIT sequence if it's a chained FIT files.
+    if _, err := dec.CheckIntegrity(); err != nil {
         panic(err)
     }
 
