@@ -28,6 +28,7 @@ import (
 	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/filedef"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -324,6 +325,7 @@ func TestCheckIntegrity(t *testing.T) {
 	tt := []struct {
 		name string
 		r    io.Reader
+		n    int
 		err  error
 	}{
 		{
@@ -335,11 +337,13 @@ func TestCheckIntegrity(t *testing.T) {
 				b = append(b, nextb...)
 				return bytes.NewReader(b)
 			}(),
+			n:   2,
 			err: nil,
 		},
 		{
 			name: "decode header return io.EOF on first sequence",
 			r:    fnReaderErr,
+			n:    0,
 			err:  io.EOF,
 		},
 		{
@@ -358,6 +362,7 @@ func TestCheckIntegrity(t *testing.T) {
 				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
 				return bytes.NewReader(b)
 			}(),
+			n:   0,
 			err: ErrDataSizeZero,
 		},
 		{
@@ -373,6 +378,7 @@ func TestCheckIntegrity(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
+			n:   0,
 			err: io.EOF,
 		},
 		{
@@ -388,6 +394,7 @@ func TestCheckIntegrity(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
+			n:   0,
 			err: io.EOF,
 		},
 		{
@@ -404,6 +411,7 @@ func TestCheckIntegrity(t *testing.T) {
 					return len(b), nil
 				})
 			}(),
+			n:   0,
 			err: ErrCRCChecksumMismatch,
 		},
 		{
@@ -417,6 +425,7 @@ func TestCheckIntegrity(t *testing.T) {
 				b = append(b, nextb...)
 				return bytes.NewReader(b)
 			}(),
+			n:   1,
 			err: ErrNotAFitFile,
 		},
 	}
@@ -424,9 +433,12 @@ func TestCheckIntegrity(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			err := dec.CheckIntegrity()
+			n, err := dec.CheckIntegrity()
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+			if n != tc.n {
+				t.Fatalf("expected n sequence of FIT: %d, got: %d", tc.n, n)
 			}
 		})
 	}
@@ -467,6 +479,7 @@ func createFitForTest() (proto.Fit, []byte) {
 			),
 			factory.CreateMesgOnly(mesgnum.Record).
 				WithFields(
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(0)),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(77)),
 				).
 				WithDeveloperFields(
@@ -487,6 +500,7 @@ func createFitForTest() (proto.Fit, []byte) {
 	for i := 0; i < 100; i++ {
 		fit.Messages = append(fit.Messages,
 			factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32((i+1)*1000)),
 				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
 			),
 		)
@@ -579,9 +593,6 @@ func TestNext(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Manually add accumulated value
-	dec.accumulator.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
 
 	// Check whether after decode, fields are reset and next sequence is retrieved.
 
@@ -1792,6 +1803,7 @@ func BenchmarkDecode(b *testing.B) {
 	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
+	// f, err := os.Open("../testdata/local/klaten-nganjuk.fit")
 	if err != nil {
 		panic(err)
 	}
@@ -1803,14 +1815,17 @@ func BenchmarkDecode(b *testing.B) {
 	}
 	b.StartTimer()
 
+	al := filedef.NewListener()
 	buf := bytes.NewBuffer(all)
-	dec := New(buf)
+	dec := New(buf, WithMesgListener(al), WithBroadcastOnly())
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
 		buf.Write(all)
-		for dec.Next() {
-			_, _ = dec.Decode()
+		_, err = dec.Decode()
+		if err != nil {
+			b.Fatal(err)
 		}
+		_ = al.File()
 		dec.reset()
 	}
 }
@@ -1836,6 +1851,25 @@ func BenchmarkCheckIntegrity(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
 		buf.Write(all)
-		_ = dec.CheckIntegrity()
+		_, err = dec.CheckIntegrity()
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkCheckIntegrity2(b *testing.B) {
+	b.StartTimer()
+	f, err := os.Open("../testdata/local/klaten-nganjuk.fit")
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer f.Close()
+
+	dec := New(bufio.NewReader(f))
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		dec.CheckIntegrity()
+		f.Seek(0, io.SeekStart)
 	}
 }
