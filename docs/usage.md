@@ -447,6 +447,12 @@ func main() {
     _, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
         switch flag {
         case decoder.RawFlagFileHeader:
+            if err := proto.Validate(d.BytesArray[1]); err != nil {
+                return n, err
+            }
+            if binary.LittleEndian.Uint32(d.BytesArray[4:8]) == 0 {
+                return n, decoder.ErrDataSizeZero
+            }
             if b[0] == 14 {
                 hash16.Write(b[:12])
                 if binary.LittleEndian.Uint16(b[12:14]) != hash16.Sum16() {
