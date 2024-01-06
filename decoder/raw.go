@@ -54,11 +54,11 @@ func (f RawFlag) String() string {
 
 // RawDecoder is a sequence of FIT bytes decoder. See NewRaw() for details.
 type RawDecoder struct {
-	// [MesgDef: 6 + 255 * 3 = 771] < [Mesg: (255 * 255) * 2 = 130050]. Use bigger capacity.
+	// [MesgDef: 6 + 255 * 3 = 771] < [Mesg: 1 + (255 * 255 * 2) = 130051]. Use bigger capacity.
 	//
 	// This is exported to allow the unused space to be utilized in a tight RAM, for instance, an embedded device.
 	// Using Index >= len(b) is safe on each Decode's callback function call.
-	BytesArray [255 * 255 * 2]byte
+	BytesArray [1 + (255 * 255 * 2)]byte
 
 	lenMesgs [proto.LocalMesgNumMask + 1]uint32
 }
