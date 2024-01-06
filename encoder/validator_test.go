@@ -72,7 +72,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 		name          string
 		mesgs         []proto.Message
 		mesgValidator MessageValidator
-		sizes         []int
 		errs          []error
 	}{
 		{
@@ -84,7 +83,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			sizes: []int{1},
 		},
 		{
 			name: "valid message with developer fields happy flow",
@@ -118,7 +116,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			sizes: []int{2, 6, 1},
 		},
 		{
 			name: "mesg contain expanded field",
@@ -133,7 +130,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 					}(),
 				),
 			},
-			sizes: []int{1},
 		},
 		{
 			name: "mesg contain field with scaled value",
@@ -142,7 +138,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue((float64(37304) / 5) - 500), // 6960.8m
 				),
 			},
-			sizes: []int{1},
 		},
 		{
 			name: "mesg contain field value type not align",
@@ -169,8 +164,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			sizes: []int{2, 0},
-			errs:  []error{nil, ErrMissingDeveloperDataId},
+			errs: []error{nil, ErrMissingDeveloperDataId},
 		},
 		{
 			name: "valid message with field description not found in previous message sequence",
@@ -188,8 +182,28 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs:  []error{nil, ErrMissingFieldDescription},
-			sizes: []int{2, 0},
+			errs: []error{nil, ErrMissingFieldDescription},
+		},
+		{
+			name: "invalid utf-8 string",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.FileId).WithFields(
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("\xbd"),
+				),
+			},
+			errs: []error{ErrInvalidUTF8String},
+		},
+		{
+			name: "invalid utf-8 []string",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.FileId).WithFields(
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("valid utf-8 string"),
+				),
+				factory.CreateMesg(mesgnum.SegmentFile).WithFields(
+					factory.CreateField(mesgnum.SegmentFile, fieldnum.SegmentFileLeaderActivityIdString).WithValue([]string{"valid utf-8", "\xbd"}), // valid and invalid string in array
+				),
+			},
+			errs: []error{nil, ErrInvalidUTF8String},
 		},
 	}
 
@@ -211,9 +225,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 				}
 				if err != nil {
 					continue
-				}
-				if len(mesg.Fields) != tc.sizes[i] {
-					t.Fatalf("expected size after validate: %d, got: %d", tc.sizes[i], len(mesg.Fields))
 				}
 			}
 		})

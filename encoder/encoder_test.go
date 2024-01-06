@@ -574,18 +574,14 @@ func TestEncodeMessage(t *testing.T) {
 			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 				fieldnum.FileIdType: typedef.FileActivity,
 			}),
-			w: fnWriter(func(b []byte) (n int, err error) {
-				return 0, nil
-			}),
+			w: fnWriteOK,
 		},
 		{
 			name: "encode message with big-endian",
 			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 				fieldnum.FileIdType: typedef.FileActivity,
 			}),
-			w: fnWriter(func(b []byte) (n int, err error) {
-				return 0, nil
-			}),
+			w:          fnWriteOK,
 			opts:       []Option{WithBigEndian()},
 			endianness: bigEndian,
 		},
@@ -597,9 +593,7 @@ func TestEncodeMessage(t *testing.T) {
 			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 				fieldnum.FileIdType: typedef.FileActivity,
 			}),
-			w: fnWriter(func(b []byte) (n int, err error) {
-				return 0, nil
-			}),
+			w: fnWriteOK,
 		},
 		{
 			name: "encode message with compressed timestamp header happy flow",
@@ -609,9 +603,7 @@ func TestEncodeMessage(t *testing.T) {
 			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 				fieldnum.FileIdType: typedef.FileActivity,
 			}),
-			w: fnWriter(func(b []byte) (n int, err error) {
-				return 0, nil
-			}),
+			w: fnWriteOK,
 		},
 		{
 			name: "message validator's validate return error",
