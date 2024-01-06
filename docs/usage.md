@@ -8,6 +8,7 @@ Table of Contents:
    - [Peek FileId](#Peek-FileId)
    - [Check Integrity](#Check-Integrity)
    - [Available Decode Options](#Available-Decode-Options)
+   - [RawDecoder (Low-Level Abstraction)](#RawDecoder-Low-Level-Abstraction)
 2. [Encoding](#Encoding)
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
    - [Encode Common File Types](#Encode-Common-File-Types)
@@ -291,11 +292,11 @@ More about this: [https://developer.garmin.com/fit/cookbook/isfit-checkintegrity
 package main
 
 import (
-	"bufio"
+    "bufio"
     "io"
-	"os"
+    "os"
 
-	"github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/decoder"
 )
 
 func main() {
@@ -413,6 +414,70 @@ func main() {
    dec := decoder.New(f, decoder.WithNoComponentExpansion())
    ```
 
+### RawDecoder (Low-Level Abstraction)
+
+Raw Decoder provides a way to split the bytes based on its scope (File Header, Message Definition, Message Data and CRC) as the building block to work with the FIT data in its scoped bytes.
+
+The idea is to allow us to use a minimal viable decoder for performance and memory-critical situations, where every computation or memory usage is constrained. RawDecoder itself is using constant memory < 131 KB and the Decode method has zero heap alloc (except errors) while it may use additional small stack memory. The implementation of the callback function is also expected to have minimal overhead. Theoretically, from the memory usage alone, this can run on an embedded device, for instance, using [tinygo](https://tinygo.org) or other compilers, but no attempt has been made.
+
+Here is the simple example to check integrity using this building block:
+
+```go
+package main
+
+import (
+    "bufio"
+    "encoding/binary"
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/kit/hash/crc16"
+)
+
+func main() {
+    f, err := os.Open("./testdata/from_garmin_forums/triathlon_summary_first.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    dec := decoder.NewRaw()
+    hash16 := crc16.New(crc16.MakeFitTable())
+
+    _, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
+        switch flag {
+        case decoder.RawFlagFileHeader:
+            if err := proto.Validate(b[1]); err != nil {
+                return err
+            }
+            if binary.LittleEndian.Uint32(b[4:8]) == 0 {
+                return decoder.ErrDataSizeZero
+            }
+            if b[0] == 14 {
+                hash16.Write(b[:12])
+                if binary.LittleEndian.Uint16(b[12:14]) != hash16.Sum16() {
+                    return decoder.ErrCRCChecksumMismatch
+                }
+                hash16.Reset()
+            }
+        case decoder.RawFlagMesgDef, decoder.RawFlagMesgData:
+            hash16.Write(b)
+        case decoder.RawFlagCRC:
+            if binary.LittleEndian.Uint16(b[:2]) != hash16.Sum16() {
+                return decoder.ErrCRCChecksumMismatch
+            }
+            hash16.Reset()
+        }
+        return nil
+    })
+
+    if err != nil {
+        panic(err)
+    }
+}
+
+```
+
 ## Encoding
 
 Note: By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
@@ -426,18 +491,18 @@ Example of encoding fit by self declaring the protocol messages, this is to show
 package main
 
 import (
-	"context"
-	"os"
-	"time"
+    "context"
+    "os"
+    "time"
 
-	"github.com/muktihari/fit/encoder"
-	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/bufferedwriter"
-	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/profile/untyped/fieldnum"
-	"github.com/muktihari/fit/profile/untyped/mesgnum"
-	"github.com/muktihari/fit/proto"
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/factory"
+    "github.com/muktihari/fit/kit/bufferedwriter"
+    "github.com/muktihari/fit/kit/datetime"
+    "github.com/muktihari/fit/profile/typedef"
+    "github.com/muktihari/fit/profile/untyped/fieldnum"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
 )
 
 func main() {
@@ -460,7 +525,7 @@ func main() {
                 fieldnum.ActivityType:        typedef.ActivityManual,
                 fieldnum.ActivityTimestamp:   datetime.ToUint32(now),
                 fieldnum.ActivityNumSessions: uint16(1),
-			}),
+            }),
             factory.CreateMesg(mesgnum.Session).WithFieldValues(map[byte]any{
                 fieldnum.SessionAvgSpeed:     uint16(1000),
                 fieldnum.SessionAvgCadence:   uint8(78),
@@ -495,15 +560,15 @@ Example of encoding fit by self declaring the protocol messages but using common
 package main
 
 import (
-	"os"
-	"time"
+    "os"
+    "time"
 
-	"github.com/muktihari/fit/encoder"
-	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/bufferedwriter"
-	"github.com/muktihari/fit/profile/filedef"
-	"github.com/muktihari/fit/profile/mesgdef"
-	"github.com/muktihari/fit/profile/typedef"
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/factory"
+    "github.com/muktihari/fit/kit/bufferedwriter"
+    "github.com/muktihari/fit/profile/filedef"
+    "github.com/muktihari/fit/profile/mesgdef"
+    "github.com/muktihari/fit/profile/typedef"
 )
 
 func main() {

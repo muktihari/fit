@@ -1857,19 +1857,3 @@ func BenchmarkCheckIntegrity(b *testing.B) {
 		}
 	}
 }
-
-func BenchmarkCheckIntegrity2(b *testing.B) {
-	b.StartTimer()
-	f, err := os.Open("../testdata/local/klaten-nganjuk.fit")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer f.Close()
-
-	dec := New(bufio.NewReader(f))
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		dec.CheckIntegrity()
-		f.Seek(0, io.SeekStart)
-	}
-}
