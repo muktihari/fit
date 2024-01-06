@@ -69,7 +69,7 @@ type RawDecoder struct {
 //
 // However, this is still considered unsafe operation since we work with bytes directly and the responsibility
 // for validation now placed on the user-space.  The only thing that this validates is the reader should be a FIT
-// (FileHeader: has valid Size, bytes 8-12 is ".FIT", ProtocolVersion is supported and DataSize > 0).
+// (FileHeader: has valid Size and bytes 8-12 is ".FIT").
 //
 // The idea is to allow us to use a minimal viable decoder for performance and memory-critical situations,
 // where every computation or memory usage is constrained. RawDecoder itself is using constant memory < 131 KB and
@@ -122,14 +122,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			return n, ErrNotAFitFile
 		}
 
-		if err := proto.Validate(d.BytesArray[1]); err != nil {
-			return n, err
-		}
-
 		fileHeaderDataSize := binary.LittleEndian.Uint32(d.BytesArray[4:8])
-		if fileHeaderDataSize == 0 {
-			return n, ErrDataSizeZero
-		}
 
 		if err := fn(RawFlagFileHeader, d.BytesArray[:fileHeaderSize]); err != nil {
 			return n, err

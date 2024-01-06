@@ -153,40 +153,6 @@ func TestRawDecoderDecode(t *testing.T) {
 			err: ErrNotAFitFile,
 		},
 		{
-			name: "unsupported protocol version",
-			r: func() io.Reader {
-				buf := slices.Clone(buf)
-				buf[1] = 255
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
-						return 0, io.EOF
-					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
-				})
-			}(),
-			fn:  fnDecodeRawOK,
-			err: proto.ErrProtocolVersionNotSupported,
-		},
-		{
-			name: "FileHeader's DataSize is 0",
-			r: func() io.Reader {
-				buf := slices.Clone(buf)
-				copy(buf[4:8], []byte{0, 0, 0, 0})
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
-						return 0, io.EOF
-					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
-				})
-			}(),
-			fn:  fnDecodeRawOK,
-			err: ErrDataSizeZero,
-		},
-		{
 			name: "fn FileHeader returns io.EOF",
 			r: func() io.Reader {
 				buf := slices.Clone(buf)
