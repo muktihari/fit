@@ -55,8 +55,12 @@ func (f RawFlag) String() string {
 // RawDecoder is a sequence of FIT bytes decoder. See NewRaw() for details.
 type RawDecoder struct {
 	// [MesgDef: 6 + 255 * 3 = 771] < [Mesg: (255 * 255) * 2 = 130050]. Use bigger capacity.
-	bytesArray [255 * 255 * 2]byte
-	lenMesgs   [proto.LocalMesgNumMask + 1]uint32
+	//
+	// This is exported to allow the unused space to be utilized in a tight RAM, for instance, an embedded device.
+	// Using Index >= len(b) is safe on each Decode's callback function call.
+	BytesArray [255 * 255 * 2]byte
+
+	lenMesgs [proto.LocalMesgNumMask + 1]uint32
 }
 
 // NewRaw creates new RawDecoder which provides low-level building block to work with FIT bytes for the
@@ -94,7 +98,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 	var seq int
 	for {
 		// 1. Decode File Header
-		nr, err := io.ReadFull(r, d.bytesArray[:1])
+		nr, err := io.ReadFull(r, d.BytesArray[:1])
 		n += int64(nr)
 		if seq != 0 && err == io.EOF {
 			return n, nil // Reach desirable EOF.
@@ -103,55 +107,55 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			return n, err
 		}
 
-		fileHeaderSize := d.bytesArray[0]
+		fileHeaderSize := d.BytesArray[0]
 		if fileHeaderSize != 12 && fileHeaderSize != 14 {
 			return n, fmt.Errorf("file header's size [%d]: %w", fileHeaderSize, ErrNotAFitFile)
 		}
 
-		nr, err = io.ReadFull(r, d.bytesArray[1:fileHeaderSize])
+		nr, err = io.ReadFull(r, d.BytesArray[1:fileHeaderSize])
 		n += int64(nr)
 		if err != nil {
 			return n, err
 		}
 
-		if string(d.bytesArray[8:12]) != proto.DataTypeFIT {
+		if string(d.BytesArray[8:12]) != proto.DataTypeFIT {
 			return n, ErrNotAFitFile
 		}
 
-		if err := proto.Validate(d.bytesArray[1]); err != nil {
+		if err := proto.Validate(d.BytesArray[1]); err != nil {
 			return n, err
 		}
 
-		fileHeaderDataSize := binary.LittleEndian.Uint32(d.bytesArray[4:8])
+		fileHeaderDataSize := binary.LittleEndian.Uint32(d.BytesArray[4:8])
 		if fileHeaderDataSize == 0 {
 			return n, ErrDataSizeZero
 		}
 
-		if err := fn(RawFlagFileHeader, d.bytesArray[:fileHeaderSize]); err != nil {
+		if err := fn(RawFlagFileHeader, d.BytesArray[:fileHeaderSize]); err != nil {
 			return n, err
 		}
 
 		// 2. Decode Messages
 		var pos = int64(n)
 		for uint32(n-pos) < fileHeaderDataSize {
-			nr, err = io.ReadFull(r, d.bytesArray[:1])
+			nr, err = io.ReadFull(r, d.BytesArray[:1])
 			n += int64(nr)
 			if err != nil {
 				return n, fmt.Errorf("mesg's header: %w", err)
 			}
 
 			// 2. a. Decode Message Definition
-			if (d.bytesArray[0] & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
+			if (d.BytesArray[0] & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
 				const fixedSize = uint16(6) //  Header + Reserved + Architecture + MesgNum (2 bytes) + n Fields
-				nr, err = io.ReadFull(r, d.bytesArray[1:fixedSize])
+				nr, err = io.ReadFull(r, d.BytesArray[1:fixedSize])
 				n += int64(nr)
 				if err != nil {
 					return n, fmt.Errorf("mesgDef bytes 1-5: %w", err)
 				}
 				lenMesgDef := fixedSize
 
-				nFields := uint16(d.bytesArray[5])
-				nr, err = io.ReadFull(r, d.bytesArray[lenMesgDef:lenMesgDef+nFields*3])
+				nFields := uint16(d.BytesArray[5])
+				nr, err = io.ReadFull(r, d.BytesArray[lenMesgDef:lenMesgDef+nFields*3])
 				n += int64(nr)
 				if err != nil {
 					return n, fmt.Errorf("fieldDefs: %w", err)
@@ -162,20 +166,20 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 				lenMesg := uint32(1) // Header
 				const fieldFirstIndex = fixedSize
 				for i := uint16(0); i < nFields*3; i += 3 {
-					lenMesg += uint32(d.bytesArray[fieldFirstIndex+i+1]) // // [0, |1|, 2] -> [Num, |Size|, Type]
+					lenMesg += uint32(d.BytesArray[fieldFirstIndex+i+1]) // // [0, |1|, 2] -> [Num, |Size|, Type]
 				}
 
-				if (d.bytesArray[0] & proto.DevDataMask) == proto.DevDataMask {
-					nr, err = io.ReadFull(r, d.bytesArray[lenMesgDef:lenMesgDef+1])
+				if (d.BytesArray[0] & proto.DevDataMask) == proto.DevDataMask {
+					nr, err = io.ReadFull(r, d.BytesArray[lenMesgDef:lenMesgDef+1])
 					n += int64(nr)
 					if err != nil {
 						return n, fmt.Errorf("nDevFieldDef: %w", err)
 					}
 
-					nDevFields := uint16(d.bytesArray[lenMesgDef])
+					nDevFields := uint16(d.BytesArray[lenMesgDef])
 					lenMesgDef += 1
 					devFieldFirstIndex := lenMesgDef
-					nr, err = io.ReadFull(r, d.bytesArray[devFieldFirstIndex:devFieldFirstIndex+nDevFields*3])
+					nr, err = io.ReadFull(r, d.BytesArray[devFieldFirstIndex:devFieldFirstIndex+nDevFields*3])
 					n += int64(nr)
 					if err != nil {
 						return n, fmt.Errorf("devFieldDefs: %w", err)
@@ -183,14 +187,14 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 					lenMesgDef += nDevFields * 3 // 3 bytes per field
 
 					for i := uint16(0); i < nDevFields*3; i += 3 {
-						lenMesg += uint32(d.bytesArray[devFieldFirstIndex+i+1]) // [0, |1|, 2] -> [Num, |Size|, Type]
+						lenMesg += uint32(d.BytesArray[devFieldFirstIndex+i+1]) // [0, |1|, 2] -> [Num, |Size|, Type]
 					}
 				}
 
-				localMesgNum := d.bytesArray[0] & proto.LocalMesgNumMask
+				localMesgNum := d.BytesArray[0] & proto.LocalMesgNumMask
 				d.lenMesgs[localMesgNum] = lenMesg
 
-				if err := fn(RawFlagMesgDef, d.bytesArray[:lenMesgDef]); err != nil {
+				if err := fn(RawFlagMesgDef, d.BytesArray[:lenMesgDef]); err != nil {
 					return n, err
 				}
 
@@ -198,31 +202,31 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			}
 
 			// 2. b. Decode Message Data
-			localMesgNum := proto.LocalMesgNum(d.bytesArray[0])
+			localMesgNum := proto.LocalMesgNum(d.BytesArray[0])
 			lenMesg := d.lenMesgs[localMesgNum]
 			if lenMesg == 0 {
 				return n, fmt.Errorf("localMesgNum: %d: %w", localMesgNum, ErrMesgDefMissing)
 			}
 
-			nr, err = io.ReadFull(r, d.bytesArray[1:lenMesg])
+			nr, err = io.ReadFull(r, d.BytesArray[1:lenMesg])
 			n += int64(nr)
 			if err != nil {
 				return n, fmt.Errorf("mesg: %w", err)
 			}
 
-			if err = fn(RawFlagMesgData, d.bytesArray[:lenMesg]); err != nil {
+			if err = fn(RawFlagMesgData, d.BytesArray[:lenMesg]); err != nil {
 				return n, err
 			}
 		}
 
 		// 3. Decode File CRC
-		nr, err = io.ReadFull(r, d.bytesArray[:2])
+		nr, err = io.ReadFull(r, d.BytesArray[:2])
 		n += int64(nr)
 		if err != nil {
 			return n, err
 		}
 
-		if err = fn(RawFlagCRC, d.bytesArray[:2]); err != nil {
+		if err = fn(RawFlagCRC, d.BytesArray[:2]); err != nil {
 			return n, err
 		}
 
