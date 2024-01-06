@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"unicode/utf8"
 
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
@@ -18,6 +19,7 @@ import (
 )
 
 var (
+	ErrInvalidUTF8String       = errors.New("invalid UTF-8 string")
 	ErrValueTypeMismatch       = errors.New("value type mismatch")
 	ErrNoFields                = errors.New("no fields")
 	ErrMissingDeveloperDataId  = errors.New("missing developer data id")
@@ -108,6 +110,22 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			return fmt.Errorf(
 				"type '%T' is not align with the expected type '%s' for fieldIndex: %d, fieldNum: %d, fieldName: %q, fieldValue: '%v': %w",
 				field.Value, field.Type, i, field.Num, field.Name, field.Value, ErrValueTypeMismatch)
+		}
+
+		// UTF-8 String Validation
+		switch val := field.Value.(type) {
+		case string:
+			if !utf8.ValidString(val) {
+				return fmt.Errorf("%q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
+					val, i, field.Num, field.Name, ErrInvalidUTF8String)
+			}
+		case []string:
+			for j := range val {
+				if !utf8.ValidString(val[j]) {
+					return fmt.Errorf("[valueIndex: %d] %q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
+						j, val[j], i, field.Num, field.Name, ErrInvalidUTF8String)
+				}
+			}
 		}
 	}
 
