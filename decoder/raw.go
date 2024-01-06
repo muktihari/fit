@@ -71,10 +71,10 @@ type RawDecoder struct {
 // for validation now placed on the user-space.  The only thing that this validates is the reader should be a FIT
 // (FileHeader: has valid Size, bytes 8-12 is ".FIT", ProtocolVersion is supported and DataSize > 0).
 //
-// This is only intended to be used for performance and memory critical situation where every computation or
-// memory usage is constrained (RawDecoder itself is using constant memory < 131 KB and the Decode method has
-// zero heap alloc (except errors) while it may use additional small stack memory). The implementation of the
-// callback function is also expected to have minimal overhead.
+// The idea is to allow us to use a minimal viable decoder for performance and memory-critical situations,
+// where every computation or memory usage is constrained. RawDecoder itself is using constant memory < 131 KB and
+// the Decode method has zero heap alloc (except errors) while it may use additional small stack memory.
+// The implementation of the callback function is also expected to have minimal overhead.
 //
 // For general purpose usage, use Decoder instead.
 func NewRaw() *RawDecoder {
