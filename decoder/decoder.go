@@ -58,7 +58,7 @@ type Decoder struct {
 	options *options
 
 	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
-	n                 int64        // The n read bytes counter, always moving forward, do not reset
+	n                 int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
 	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained Fit file.
 	timestamp         uint32       // Active timestamp
 	lastTimeOffset    byte         // Last time offset
@@ -281,6 +281,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 
 	// Reset used variables so that the decoder can be reused by the same reader.
 	d.reset()
+	d.n = 0 // Must reset bytes counter
 	d.err = nil
 	d.options.shouldChecksum = shouldChecksum
 
