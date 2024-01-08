@@ -23,7 +23,7 @@ Please see [Usage](/docs/usage.md).
 
 1. You have full control over the data since by default it uses FIT protocol messages semantic instead of direct mapping to user-defined struct. However, we still offer the user-defined struct mapping for someone who prefer to interact with FIT that way. See [Usage](/docs/usage.md) for details.
 1. Receive the message as soon as it is decoded by registering listeners to the decoder. The decoder will broadcast every message to all registered listeners.
-1. Decoding and Encoding **Developer Fields** since [Protocol Version 2.0 is supported](#Protocol-Version-2.0-is-supported)
+1. Decoding and Encoding **Developer Fields** since [Protocol Version 2.0 is supported](#Protocol-Version-20-is-supported)
 1. Encoding **multiple local message type** and **compressed message** are supported, it means, you can create the smallest binary size as possible than just using localMesgNum 0.
 
 ## Protocol Version 2.0 is supported
