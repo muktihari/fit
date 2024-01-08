@@ -67,269 +67,287 @@ func Float32InvalidInFloatForm() float32 { return float32InvalidInFloatForm }
 // Float64InvalidInFloatForm is math.Float64frombits(Float64Invalid)
 func Float64InvalidInFloatForm() float64 { return float64InvalidInFloatForm }
 
-type typestruct struct {
-	base          BaseType
-	stringer      string
-	size          byte
-	endianAbility byte
-	invalid       any
-	goType        string
-	isInteger     bool
-	kind          reflect.Kind
-}
-
-var basetypes = [...]typestruct{
-	{
-		base:          Enum,
-		stringer:      "enum",
-		size:          1,
-		endianAbility: 0,
-		invalid:       EnumInvalid,
-		goType:        "byte", /* treat it as byte */
-		isInteger:     true,
-		kind:          reflect.Uint8,
-	},
-	{
-		base:          Sint8,
-		stringer:      "sint8",
-		size:          1,
-		endianAbility: 0,
-		invalid:       Sint8Invalid,
-		goType:        "int8",
-		isInteger:     true,
-		kind:          reflect.Int8,
-	},
-	{
-		base:          Uint8,
-		stringer:      "uint8",
-		size:          1,
-		endianAbility: 0,
-		invalid:       Uint8Invalid,
-		goType:        "uint8",
-		isInteger:     true,
-		kind:          reflect.Uint8,
-	},
-	{
-		base:          Sint16,
-		stringer:      "sint16",
-		size:          2,
-		endianAbility: 1,
-		invalid:       Sint16Invalid,
-		goType:        "int16",
-		isInteger:     true,
-		kind:          reflect.Int16,
-	},
-	{
-		base:          Uint16,
-		stringer:      "uint16",
-		size:          2,
-		endianAbility: 1,
-		invalid:       Uint16Invalid,
-		goType:        "uint16",
-		isInteger:     true,
-		kind:          reflect.Uint16,
-	},
-	{
-		base:          Sint32,
-		stringer:      "sint32",
-		size:          4,
-		endianAbility: 1,
-		invalid:       Sint32Invalid,
-		goType:        "int32",
-		isInteger:     true,
-		kind:          reflect.Int32,
-	},
-	{
-		base:          Uint32,
-		stringer:      "uint32",
-		size:          4,
-		endianAbility: 1,
-		invalid:       Uint32Invalid,
-		goType:        "uint32",
-		isInteger:     true,
-		kind:          reflect.Uint32,
-	},
-	{
-		base:          String,
-		stringer:      "string",
-		size:          1,
-		endianAbility: 0,
-		invalid:       StringInvalid,
-		goType:        "string",
-		isInteger:     false,
-		kind:          reflect.String,
-	},
-	{
-		base:          Float32,
-		stringer:      "float32",
-		size:          4,
-		endianAbility: 1,
-		invalid:       float32InvalidInFloatForm,
-		goType:        "float32",
-		isInteger:     false,
-		kind:          reflect.Float32,
-	},
-	{
-		base:          Float64,
-		stringer:      "float64",
-		size:          8,
-		endianAbility: 1,
-		invalid:       float64InvalidInFloatForm,
-		goType:        "float64",
-		isInteger:     false,
-		kind:          reflect.Float64,
-	},
-	{
-		base:          Uint8z,
-		stringer:      "uint8z",
-		size:          1,
-		endianAbility: 0,
-		invalid:       Uint8zInvalid,
-		goType:        "uint8",
-		isInteger:     true,
-		kind:          reflect.Uint8,
-	},
-	{
-		base:          Uint16z,
-		stringer:      "uint16z",
-		size:          2,
-		endianAbility: 1,
-		invalid:       Uint16zInvalid,
-		goType:        "uint16",
-		isInteger:     true,
-		kind:          reflect.Uint16,
-	},
-	{
-		base:          Uint32z,
-		stringer:      "uint32z",
-		size:          4,
-		endianAbility: 1,
-		invalid:       Uint32zInvalid,
-		goType:        "uint32",
-		isInteger:     true,
-		kind:          reflect.Uint32,
-	},
-	{
-		base:          Byte,
-		stringer:      "byte",
-		size:          1,
-		endianAbility: 0,
-		invalid:       ByteInvalid,
-		goType:        "byte",
-		isInteger:     true,
-		kind:          reflect.Uint8,
-	},
-	{
-		base:          Sint64,
-		stringer:      "sint64",
-		size:          8,
-		endianAbility: 1,
-		invalid:       Sint64Invalid,
-		goType:        "int64",
-		isInteger:     true,
-		kind:          reflect.Int64,
-	},
-	{
-		base:          Uint64,
-		stringer:      "uint64",
-		size:          8,
-		endianAbility: 1,
-		invalid:       Uint64Invalid,
-		goType:        "uint64",
-		isInteger:     true,
-		kind:          reflect.Uint64,
-	},
-	{
-		base:          Uint64z,
-		stringer:      "uint64z",
-		size:          8,
-		endianAbility: 1,
-		invalid:       Uint64zInvalid,
-		goType:        "uint64",
-		isInteger:     true,
-		kind:          reflect.Uint64,
-	},
-}
-
 // FromString convert given s into BaseType, if not valid 255 will be returned.
 func FromString(s string) BaseType {
-	v, ok := stringmap[s]
-	if !ok {
-		return 255 // invalid, highest value of byte.
+	switch s {
+	case "enum":
+		return Enum
+	case "sint8":
+		return Sint8
+	case "uint8":
+		return Uint8
+	case "sint16":
+		return Sint16
+	case "uint16":
+		return Uint16
+	case "sint32":
+		return Sint32
+	case "uint32":
+		return Uint32
+	case "string":
+		return String
+	case "float32":
+		return Float32
+	case "float64":
+		return Float64
+	case "uint8z":
+		return Uint8z
+	case "uint16z":
+		return Uint16z
+	case "uint32z":
+		return Uint32z
+	case "byte":
+		return Byte
+	case "sint64":
+		return Sint64
+	case "uint64":
+		return Uint64
+	case "uint64z":
+		return Uint64z
 	}
-	return v
+	return 255
 }
 
 // List returns all constants.
 func List() []BaseType {
-	// no need to be reserved in memory, retrieve from existing variable only when needed.
-	vs := make([]BaseType, 0, len(basetypes))
-	for _, v := range basetypes {
-		vs = append(vs, BaseType(v.base))
+	return []BaseType{
+		Enum,
+		Sint8,
+		Uint8,
+		Sint16,
+		Uint16,
+		Sint32,
+		Uint32,
+		String,
+		Float32,
+		Float64,
+		Uint8z,
+		Uint16z,
+		Uint32z,
+		Byte,
+		Sint64,
+		Uint64,
+		Uint64z,
 	}
-	return vs
 }
 
 // String returns string representation of t.
 func (t BaseType) String() string {
-	if !valid(t) {
-		return "invalid"
+	switch t {
+	case Enum:
+		return "enum"
+	case Sint8:
+		return "sint8"
+	case Uint8:
+		return "uint8"
+	case Sint16:
+		return "sint16"
+	case Uint16:
+		return "uint16"
+	case Sint32:
+		return "sint32"
+	case Uint32:
+		return "uint32"
+	case String:
+		return "string"
+	case Float32:
+		return "float32"
+	case Float64:
+		return "float64"
+	case Uint8z:
+		return "uint8z"
+	case Uint16z:
+		return "uint16z"
+	case Uint32z:
+		return "uint32z"
+	case Byte:
+		return "byte"
+	case Sint64:
+		return "sint64"
+	case Uint64:
+		return "uint64"
+	case Uint64z:
+		return "uint64z"
 	}
-	return basetypes[t&BaseTypeNumMask].stringer
+	return "invalid"
 }
-
-var stringmap = func() map[string]BaseType {
-	m := make(map[string]BaseType, len(basetypes))
-	for key, val := range basetypes {
-		m[val.stringer] = BaseType(key)
-	}
-	return m
-}()
 
 // Size returns how many bytes the value need in binary form.
 func (t BaseType) Size() byte {
-	if !valid(t) {
-		return 0
+	switch t {
+	case Enum, Byte, Sint8, Uint8, Uint8z:
+		return 1
+	case Sint16, Uint16, Uint16z:
+		return 2
+	case Sint32, Uint32, Uint32z:
+		return 4
+	case String:
+		return 1
+	case Float32:
+		return 4
+	case Float64:
+		return 8
+	case Sint64, Uint64, Uint64z:
+		return 8
 	}
-	return basetypes[t&BaseTypeNumMask].size
+	return 0
 }
 
 // GoType returns go equivalent type in string.
 func (t BaseType) GoType() string {
-	if !valid(t) {
-		return "invalid"
+	switch t {
+	case Enum:
+		return "byte"
+	case Sint8:
+		return "int8"
+	case Uint8, Uint8z:
+		return "uint8"
+	case Sint16:
+		return "int16"
+	case Uint16, Uint16z:
+		return "uint16"
+	case Sint32:
+		return "int32"
+	case Uint32, Uint32z:
+		return "uint32"
+	case String:
+		return "string"
+	case Float32:
+		return "float32"
+	case Float64:
+		return "float64"
+	case Byte:
+		return "byte"
+	case Sint64:
+		return "int64"
+	case Uint64, Uint64z:
+		return "uint64"
 	}
-	return basetypes[t&BaseTypeNumMask].goType
+	return "invalid"
 }
 
 func (t BaseType) Kind() reflect.Kind {
-	if !valid(t) {
-		return reflect.Invalid
+	switch t {
+	case Enum, Byte, Uint8, Uint8z:
+		return reflect.Uint8
+	case Sint8:
+		return reflect.Int8
+	case Sint16:
+		return reflect.Int16
+	case Uint16, Uint16z:
+		return reflect.Uint16
+	case Sint32:
+		return reflect.Int32
+	case Uint32, Uint32z:
+		return reflect.Uint32
+	case String:
+		return reflect.String
+	case Float32:
+		return reflect.Float32
+	case Float64:
+		return reflect.Float64
+	case Sint64:
+		return reflect.Int64
+	case Uint64, Uint64z:
+		return reflect.Uint64
 	}
-	return basetypes[t&BaseTypeNumMask].kind
+	return reflect.Invalid
 }
 
 // EndianAbility return whether t have endianness.
 func (t BaseType) EndianAbility() byte {
-	if !valid(t) {
+	switch t {
+	case Enum, Byte, Uint8, Uint8z:
 		return 0
+	case Sint8:
+		return 0
+	case Sint16:
+		return 1
+	case Uint16, Uint16z:
+		return 1
+	case Sint32:
+		return 1
+	case Uint32, Uint32z:
+		return 1
+	case String:
+		return 0
+	case Float32:
+		return 1
+	case Float64:
+		return 1
+	case Sint64:
+		return 1
+	case Uint64, Uint64z:
+		return 1
 	}
-	return basetypes[t&BaseTypeNumMask].endianAbility
+	return 0
 }
 
 func (t BaseType) IsInteger() bool {
-	if !valid(t) {
+	switch t {
+	case Enum, Byte, Uint8, Uint8z:
+		return true
+	case Sint8:
+		return true
+	case Sint16:
+		return true
+	case Uint16, Uint16z:
+		return true
+	case Sint32:
+		return true
+	case Uint32, Uint32z:
+		return true
+	case String:
 		return false
+	case Float32:
+		return false
+	case Float64:
+		return false
+	case Sint64:
+		return true
+	case Uint64, Uint64z:
+		return true
 	}
-	return basetypes[t&BaseTypeNumMask].isInteger
+	return false
 }
 
 // Invalid returns invalid value of t. e.g. Byte is 255 (its highest value).
 func (t BaseType) Invalid() any {
-	if !valid(t) {
-		return "invalid"
+	switch t {
+	case Enum:
+		return EnumInvalid
+	case Sint8:
+		return Sint8Invalid
+	case Uint8:
+		return Uint8Invalid
+	case Sint16:
+		return Sint16Invalid
+	case Uint16:
+		return Uint16Invalid
+	case Sint32:
+		return Sint32Invalid
+	case Uint32:
+		return Uint32Invalid
+	case String:
+		return StringInvalid
+	case Float32:
+		return float32InvalidInFloatForm
+	case Float64:
+		return float64InvalidInFloatForm
+	case Uint8z:
+		return Uint8zInvalid
+	case Uint16z:
+		return Uint16zInvalid
+	case Uint32z:
+		return Uint32zInvalid
+	case Byte:
+		return ByteInvalid
+	case Sint64:
+		return Sint64Invalid
+	case Uint64:
+		return Uint64Invalid
+	case Uint64z:
+		return Uint64zInvalid
 	}
-	return basetypes[t&BaseTypeNumMask].invalid
+	return "invalid"
 }
-
-func valid(t BaseType) bool { return t&BaseTypeNumMask < BaseType(len(basetypes)) }

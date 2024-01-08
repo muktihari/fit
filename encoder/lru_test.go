@@ -16,7 +16,9 @@ func TestLRU(t *testing.T) {
 
 	// place (size * 10) different items, the lru will be shifted in roundroubin order.
 	for i := byte(0); i < size*10; i++ {
-		localMesgNum, isNew := l.Put([]byte{i})
+		b := make([]byte, i+1)
+		b[0] = byte(i)
+		localMesgNum, isNew := l.Put(b)
 		if localMesgNum != i%size {
 			t.Fatalf("expected: %d, got: %d", i, localMesgNum)
 		}
@@ -76,12 +78,15 @@ func BenchmarkLRU(b *testing.B) {
 			}
 		}
 	})
-	b.Run("100k items, alloc since we clone the item", func(b *testing.B) {
+	b.Run("100k items, should copy to existing backing array when possible", func(b *testing.B) {
 		b.StopTimer()
 		l := newLRU(size)
 		items := make([][]byte, 100_000)
 		for i := range items {
-			items[i] = []byte{byte(i)}
+			items[i] = make([]byte, i&int(size))
+			for j := range items[i] {
+				items[i][j] = byte(i)
+			}
 		}
 		b.StartTimer()
 

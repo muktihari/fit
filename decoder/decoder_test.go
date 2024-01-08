@@ -1803,7 +1803,7 @@ func BenchmarkDecode(b *testing.B) {
 	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
-	// f, err := os.Open("../testdata/local/klaten-nganjuk.fit")
+	// f, err := os.Open("../testdata/from_official_sdk/activity_lowbattery.fit")
 	if err != nil {
 		panic(err)
 	}

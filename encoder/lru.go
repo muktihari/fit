@@ -4,7 +4,9 @@
 
 package encoder
 
-import "golang.org/x/exp/slices"
+import (
+	"golang.org/x/exp/slices"
+)
 
 // lru implements simple lru algorithm. Item search best case: O(1), worst case: O(n), depends how recently used is it.
 type lru struct {
@@ -16,7 +18,7 @@ type lru struct {
 	bucket []byte
 }
 
-// newLRU creates new lru with fixed size, where should be > 0.
+// newLRU creates new lru with fixed size, where size should be > 0.
 func newLRU(size byte) *lru {
 	return &lru{
 		items:  make([][]byte, size),
@@ -61,7 +63,15 @@ func (l *lru) replaceLeastRecentlyUsed(item []byte) (itemIndex byte) {
 	itemIndex = l.bucket[0]                        // take item's index out of bucket
 	copy(l.bucket[:len(l.bucket)-1], l.bucket[1:]) // left shift bucket
 	l.bucket[len(l.bucket)-1] = itemIndex          // place at most recent index
-	l.items[itemIndex] = slices.Clone(item)
+
+	// PERF: Only alloc when not enough capacity
+	if cap(l.items[itemIndex]) < len(item) {
+		l.items[itemIndex] = make([]byte, len(item))
+	} else {
+		l.items[itemIndex] = l.items[itemIndex][:len(item)]
+	}
+	copy(l.items[itemIndex], item)
+
 	return
 }
 

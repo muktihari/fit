@@ -478,6 +478,61 @@ func main() {
 
 ```
 
+Example of using RawDecoder to count how many messages in a FIT File (in case it matters):
+
+```go
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+    "time"
+
+    "github.com/muktihari/fit/decoder"
+)
+
+func main() {
+    defer func(begin time.Time) {
+        fmt.Printf("took: %s\n", time.Since(begin))
+    }(time.Now())
+
+    f, err := os.Open("./testdata/from_garmin_forums/triathlon_summary_first.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    dec := decoder.NewRaw()
+
+    var lenMesgsPerSequence []int
+    var lenMesgs int
+
+    _, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
+        switch flag {
+        case decoder.RawFlagFileHeader:
+            lenMesgs = 0
+        case decoder.RawFlagMesgData:
+            lenMesgs++
+        case decoder.RawFlagCRC:
+            lenMesgsPerSequence = append(lenMesgsPerSequence, lenMesgs)
+        }
+        return nil
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    for i := range lenMesgsPerSequence {
+        fmt.Printf("seq[%d] has %d messages\n", i, lenMesgsPerSequence[i])
+    }
+
+    // Output:
+    // seq[0] has 4177 messages
+    // took: 312.651µs
+}
+```
+
 ## Encoding
 
 Note: By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)

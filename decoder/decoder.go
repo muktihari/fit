@@ -445,12 +445,17 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		return err
 	}
 
-	mesgDef := proto.MessageDefinition{
-		Header:       header,
-		Reserved:     b[0],
-		Architecture: b[1],
-		MesgNum:      typedef.MesgNum(byteorder.Select(b[1]).Uint16(b[2:4])),
+	// PERF: Reuse existing object when possible, as it is intended solely for temporary use.
+	localMesgNum := header & proto.LocalMesgNumMask
+	mesgDef := d.localMessageDefinitions[localMesgNum]
+	if mesgDef == nil {
+		mesgDef = &proto.MessageDefinition{}
 	}
+
+	mesgDef.Header = header
+	mesgDef.Reserved = b[0]
+	mesgDef.Architecture = b[1]
+	mesgDef.MesgNum = typedef.MesgNum(byteorder.Select(b[1]).Uint16(b[2:4]))
 
 	n := b[4]
 	b = d.bytesArray[:uint16(n)*3] // 3 byte per field
@@ -458,7 +463,11 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		return err
 	}
 
-	mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
+	mesgDef.FieldDefinitions = mesgDef.FieldDefinitions[:0]
+	if byte(cap(mesgDef.FieldDefinitions)) < n { // PERF: Only alloc when necessary
+		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
+	}
+
 	for i := 0; i < len(b); i += 3 {
 		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, proto.FieldDefinition{
 			Num:      b[i],
@@ -467,6 +476,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		})
 	}
 
+	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
 	if (header & proto.DevDataMask) == proto.DevDataMask {
 		n, err := d.readByte()
 		if err != nil {
@@ -478,7 +488,10 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			return err
 		}
 
-		mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
+		if byte(cap(mesgDef.DeveloperFieldDefinitions)) < n { // PERF: Only alloc when necessary
+			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
+		}
+
 		for i := 0; i < len(b); i += 3 {
 			mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
 				Num:                b[i],
@@ -488,11 +501,13 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		}
 	}
 
-	localMesgNum := header & proto.LocalMesgNumMask
-	d.localMessageDefinitions[localMesgNum] = &mesgDef
+	d.localMessageDefinitions[localMesgNum] = mesgDef
 
-	for _, mesgDefListener := range d.mesgDefListeners {
-		mesgDefListener.OnMesgDef(mesgDef) // blocking or non-blocking depends on listeners' implementation.
+	if len(d.mesgDefListeners) > 0 {
+		mesgDef := mesgDef.Clone() // Clone since we don't have control of the object lifecycle outside Decoder.
+		for _, mesgDefListener := range d.mesgDefListeners {
+			mesgDefListener.OnMesgDef(mesgDef) // blocking or non-blocking depends on listeners' implementation.
+		}
 	}
 
 	return nil
@@ -568,6 +583,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		if field.Name == factory.NameUnknown {
 			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
 			field.Type = profile.ProfileTypeFromString(fieldDef.BaseType.String())
+			// Check if the size corresponds to an array.
+			field.Array = fieldDef.Size > fieldDef.BaseType.Size() && fieldDef.Size%fieldDef.BaseType.Size() == 0
 		}
 
 		val, err := d.readValue(fieldDef.Size, fieldDef.BaseType, field.Array, mesgDef.Architecture)
@@ -591,7 +608,6 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 
 		if d.options.shouldExpandComponent && field.Accumulate {
 			if val, ok := bitsFromValue(field.Value); ok {
-				// fmt.Println("val", val)
 				d.accumulator.Collect(mesg.Num, field.Num, val) // Collect the field values to be used in component expansion.
 			}
 		}
