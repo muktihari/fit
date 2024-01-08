@@ -18,8 +18,8 @@ import (
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
-// m.Header + ((max cap of m.Fields) * (n value)) + ((max cap of m.DeveloperFields) * (n value)) + cap
-const MaxBytesPerMessage = 1 + (255 * 255) + (255 * 255) + 1
+// m.Header + ((max cap of m.Fields) * (n value)) + ((max cap of m.DeveloperFields) * (n value))
+const MaxBytesPerMessage = 1 + (255*255)*2
 
 var arrayPool = sync.Pool{
 	New: func() any {
