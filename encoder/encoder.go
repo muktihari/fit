@@ -76,9 +76,12 @@ type Encoder struct {
 	// This reference only serves as a flag and might be helpful for debugging purposes.
 	timestampReference uint32
 
-	// Temporary buffer to hold message binary form to reduce alloc.
-	// Reminder: Any bytes manipulation on buf.Bytes() should perform a copy, e.g. copy bytes before put it on LRU.
-	buf *bytes.Buffer
+	mesgDef    *proto.MessageDefinition // Temporary message definition to reduce alloc.
+	mesgDefBuf *bytes.Buffer            // Temporary message definition bytes buffer to reduce alloc (Only used for LRU).
+
+	// A wrapper that act as a multi writer for writing message definitions and messages to w and crc16 simultaneously.
+	// We don't use io.MultiWriter since we need to change w on every encode message.
+	wrapWriterAndCrc16 *wrapWriterAndCrc16
 }
 
 type options struct {
@@ -181,10 +184,11 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		lruCapacity = options.multipleLocalMessageType + 1
 	}
 
+	crc16 := crc16.New(crc16.MakeFitTable())
 	return &Encoder{
 		w:                 w,
 		options:           options,
-		crc16:             crc16.New(crc16.MakeFitTable()),
+		crc16:             crc16,
 		protocolValidator: proto.NewValidator(options.protocolVersion),
 		messageValidator:  options.messageValidator,
 		localMesgNumLRU:   newLRU(lruCapacity),
@@ -196,7 +200,9 @@ func New(w io.Writer, opts ...Option) *Encoder {
 			DataType:        proto.DataTypeFIT,
 			CRC:             0, // calculated during encoding
 		},
-		buf: bytes.NewBuffer(make([]byte, proto.MaxBytesPerMessage)),
+		mesgDef:            &proto.MessageDefinition{},
+		mesgDefBuf:         bytes.NewBuffer(make([]byte, proto.MaxBytesPerMessageDefinition)),
+		wrapWriterAndCrc16: &wrapWriterAndCrc16{writer: w, crc16: crc16},
 	}
 }
 
@@ -382,50 +388,52 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	}
 
 	var isNewMesgDef bool
-	e.buf.Reset()
+	e.mesgDefBuf.Reset()
 
 	// Writing strategy based on the selected header option:
 	switch e.options.headerOption {
 	case headerOptionNormal:
-		mesgDef := proto.CreateMessageDefinition(mesg)
-		if err := e.protocolValidator.ValidateMessageDefinition(&mesgDef); err != nil {
+		proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
+		if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
 			return err
 		}
 
-		_, _ = mesgDef.WriteTo(e.buf)
-		b := e.buf.Bytes()
-
 		var localMesgNum byte
-		localMesgNum, isNewMesgDef = e.localMesgNumLRU.Put(b)
-		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // update the message definition header.
+		_, _ = e.mesgDef.WriteTo(e.mesgDefBuf)
+		localMesgNum, isNewMesgDef = e.localMesgNumLRU.Put(e.mesgDefBuf.Bytes())
+		e.mesgDef.Header = (e.mesgDef.Header &^ proto.LocalMesgNumMask) | localMesgNum // update the message definition header.
 
 		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
 	case headerOptionCompressedTimestamp:
 		e.compressTimestampIntoHeader(mesg)
 
-		mesgDef := proto.CreateMessageDefinition(mesg)
-		if err := e.protocolValidator.ValidateMessageDefinition(&mesgDef); err != nil {
+		proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
+		if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
 			return err
 		}
 
-		_, _ = mesgDef.WriteTo(e.buf)
-		_, isNewMesgDef = e.localMesgNumLRU.Put(e.buf.Bytes())
+		_, _ = e.mesgDef.WriteTo(e.mesgDefBuf)
+		_, isNewMesgDef = e.localMesgNumLRU.Put(e.mesgDefBuf.Bytes())
 	}
 
 	if isNewMesgDef {
-		if err := e.writeMessage(w, e.buf.Bytes()); err != nil {
-			return fmt.Errorf("write message definition failed: %w", err)
+		e.wrapWriterAndCrc16.writer = w // Change writer
+		n, err := e.mesgDef.WriteTo(e.wrapWriterAndCrc16)
+		e.dataSize += uint32(n)
+		e.n += int64(n)
+		if err != nil {
+			return fmt.Errorf("write message failed: %w", err)
 		}
 	}
 
-	e.buf.Reset()
-	_, err := mesg.WriteTo(e.buf)
+	e.wrapWriterAndCrc16.writer = w // Change writer
+	n, err := mesg.WriteTo(e.wrapWriterAndCrc16)
+	e.dataSize += uint32(n)
+	e.n += int64(n)
 	if err != nil {
-		return fmt.Errorf("marshal failed: %w", err)
-	}
-	if err := e.writeMessage(w, e.buf.Bytes()); err != nil {
 		return fmt.Errorf("write message failed: %w", err)
 	}
+
 	return nil
 }
 
@@ -464,18 +472,18 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 }
 
-// writeMessage writes buf (marshaled message) to given w, and counts the total data size of all messages.
-func (e *Encoder) writeMessage(w io.Writer, buf []byte) error {
-	n, err := w.Write(buf)
+type wrapWriterAndCrc16 struct {
+	writer io.Writer
+	crc16  hash.Hash16
+}
+
+func (w *wrapWriterAndCrc16) Write(p []byte) (n int, err error) {
+	n, err = w.writer.Write(p)
 	if err != nil {
-		return err
+		return
 	}
-
-	e.dataSize += uint32(n)
-	e.n += int64(n)
-	_, _ = e.crc16.Write(buf)
-
-	return nil
+	_, _ = w.crc16.Write(p)
+	return
 }
 
 func (e *Encoder) encodeCRC() error {

@@ -18,8 +18,11 @@ import (
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
-// m.Header + ((max cap of m.Fields) * (n value)) + ((max cap of m.DeveloperFields) * (n value))
+// Header + ((max n Fields) * (n value)) + ((max n DeveloperFields) * (n value))
 const MaxBytesPerMessage = 1 + (255*255)*2
+
+// Header + Reserved + Architecture + MesgNum (2 bytes) + n Fields + (Max n Fields * 3) + n DevFields + (Max n DevFields * 3).
+const MaxBytesPerMessageDefinition = 5 + 1 + (255 * 3) + 1 + (255 * 3)
 
 var arrayPool = sync.Pool{
 	New: func() any {
@@ -55,7 +58,7 @@ func (h *FileHeader) MarshalBinary() ([]byte, error) {
 	binary.LittleEndian.PutUint16(b[2:4], h.ProfileVersion)
 	binary.LittleEndian.PutUint32(b[4:8], h.DataSize)
 
-	copy(b[8:12], []byte(h.DataType))
+	copy(b[8:12], h.DataType)
 
 	if h.Size < 14 {
 		return b, nil
