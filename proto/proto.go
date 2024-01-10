@@ -40,41 +40,50 @@ func LocalMesgNum(header byte) byte {
 }
 
 // CreateMessageDefinition creates new MessageDefinition base on given Message.
+// It will panic if mesg is nil.
 func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
-	mesgDef = MessageDefinition{
-		Header:       MesgDefinitionMask,
-		Reserved:     mesg.Reserved,
-		Architecture: mesg.Architecture,
-		MesgNum:      mesg.Num,
+	CreateMessageDefinitionTo(&mesgDef, mesg)
+	return
+}
+
+// CreateMessageDefinitionTo create MessageDefinition base on given Message and put it at target object to avoid allocation.
+// It will panic if either target or mesg is nil.
+func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
+	target.Header = MesgDefinitionMask
+	target.Reserved = mesg.Reserved
+	target.Architecture = mesg.Architecture
+	target.MesgNum = mesg.Num
+
+	target.FieldDefinitions = target.FieldDefinitions[:0]
+	if cap(target.FieldDefinitions) < len(mesg.Fields) {
+		target.FieldDefinitions = make([]FieldDefinition, 0, len(mesg.Fields))
 	}
 
-	fieldDefinitions := make([]FieldDefinition, 0, len(mesg.Fields))
-	for _, field := range mesg.Fields {
-		fieldDefinitions = append(fieldDefinitions, FieldDefinition{
-			Num:      field.Num,
-			Size:     field.Type.BaseType().Size() * typedef.Len(field.Value),
-			BaseType: field.Type.BaseType(),
+	for i := range mesg.Fields {
+		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     mesg.Fields[i].Type.BaseType().Size() * typedef.Len(mesg.Fields[i].Value),
+			BaseType: mesg.Fields[i].Type.BaseType(),
 		})
 	}
-	mesgDef.FieldDefinitions = fieldDefinitions
 
 	if len(mesg.DeveloperFields) == 0 {
 		return
 	}
 
-	mesgDef.Header |= DevDataMask
-	developerFieldDefinitions := make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
-	for _, developerField := range mesg.DeveloperFields {
-		developerFieldDefinitions = append(developerFieldDefinitions, DeveloperFieldDefinition{
-			Num:                developerField.Num,
-			Size:               developerField.Type.Size(),
-			DeveloperDataIndex: developerField.DeveloperDataIndex,
+	target.Header |= DevDataMask
+
+	target.DeveloperFieldDefinitions = target.DeveloperFieldDefinitions[:0]
+	if cap(target.DeveloperFieldDefinitions) < len(mesg.DeveloperFields) {
+		target.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
+	}
+	for i := range mesg.DeveloperFields {
+		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               mesg.DeveloperFields[i].Type.Size(),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
 		})
 	}
-
-	mesgDef.DeveloperFieldDefinitions = developerFieldDefinitions
-
-	return
 }
 
 // Fit represents a structure for Fit Files.

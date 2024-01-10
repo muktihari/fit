@@ -1095,3 +1095,52 @@ func BenchmarkEncode(b *testing.B) {
 		}
 	})
 }
+
+var discard = discardAt{}
+
+type discardAt struct{}
+
+var _ io.Writer = discardAt{}
+var _ io.WriterAt = discardAt{}
+
+func (discardAt) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+func (discardAt) WriteAt(p []byte, off int64) (n int, err error) {
+	return len(p), nil
+}
+
+func BenchmarkEncodeWriterAt(b *testing.B) {
+	b.StopTimer()
+	fit := createFitForBenchmark(100_000)
+	b.StartTimer()
+
+	b.Run("normal header zero", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(discard)
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
+	b.Run("normal header 15", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(discard, WithNormalHeader(15))
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
+	b.Run("compressed timestamp header", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(discard, WithCompressedTimestampHeader())
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = enc.Encode(fit)
+			enc.reset()
+		}
+	})
+}
