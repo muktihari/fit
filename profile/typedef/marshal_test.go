@@ -17,21 +17,19 @@ import (
 	"github.com/muktihari/fit/kit"
 )
 
-type DefinedBool bool
-type DefinedInt8 int8
-type DefinedUint8 uint8
-type DefinedInt16 int16
-type DefinedUint16 uint16
-type DefinedInt32 int32
-type DefinedUint32 uint32
-type DefinedInt64 int64
-type DefinedUint64 uint64
-type DefinedFloat32 float32
-type DefinedFloat64 float64
-type DefinedString string
-type DefinedAny any
-
-type privateDefinedFloat64 float64
+type test_bool bool
+type test_int8 int8
+type test_uint8 uint8
+type test_int16 int16
+type test_uint16 uint16
+type test_int32 int32
+type test_uint32 uint32
+type test_int64 int64
+type test_uint64 uint64
+type test_float32 float32
+type test_float64 float64
+type test_string string
+type test_any any
 
 func TestMarshal(t *testing.T) {
 	tt := []struct {
@@ -105,6 +103,8 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: []uint32{9929}},
 		{b: kit.Ptr([]byte{}), value: []string{"supported"}},
 		{b: kit.Ptr([]byte{}), value: []string{""}},
+		{b: kit.Ptr([]byte{}), value: []string{"\x00"}},
+		{b: kit.Ptr([]byte{}), value: []string{"\x00", "\x00"}},
 		{b: kit.Ptr([]byte{}), value: []string{string([]byte{'\x00'})}},
 		{b: kit.Ptr([]byte{}), value: []int64{819293429}},
 		{b: kit.Ptr([]byte{}), value: []int64{-8979123}},
@@ -115,8 +115,8 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: []float64{-897912398989898.546734}},
 		{b: kit.Ptr([]byte{}), value: []any{-897912398989898.546734}, err: ErrTypeNotSupported},
 
-		// Defined Types
-		{b: kit.Ptr([]byte{}), value: []DefinedInt8{DefinedInt8(1), DefinedInt8(2)}},
+		// test_ Types
+		{b: kit.Ptr([]byte{}), value: []test_int8{test_int8(1), test_int8(2)}},
 
 		// Types genenerated by fitgen:
 		{b: kit.Ptr([]byte{}), value: File(1)},
@@ -124,20 +124,20 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: Checksum(1)},
 		{b: kit.Ptr([]byte{}), value: FileFlags(1)},
 
-		// User defined type marshaled using reflection:
-		{b: kit.Ptr([]byte{}), value: DefinedBool(true)},
-		{b: kit.Ptr([]byte{}), value: DefinedInt8(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedUint8(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedInt16(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedUint16(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedInt32(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedUint32(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedInt64(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedUint64(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedFloat32(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedFloat64(123)},
-		{b: kit.Ptr([]byte{}), value: DefinedString("Fit SDK")},
-		{b: kit.Ptr([]byte{}), value: DefinedString("")},
+		// User test_ type marshaled using reflection:
+		{b: kit.Ptr([]byte{}), value: test_bool(true)},
+		{b: kit.Ptr([]byte{}), value: test_int8(123)},
+		{b: kit.Ptr([]byte{}), value: test_uint8(123)},
+		{b: kit.Ptr([]byte{}), value: test_int16(123)},
+		{b: kit.Ptr([]byte{}), value: test_uint16(123)},
+		{b: kit.Ptr([]byte{}), value: test_int32(123)},
+		{b: kit.Ptr([]byte{}), value: test_uint32(123)},
+		{b: kit.Ptr([]byte{}), value: test_int64(123)},
+		{b: kit.Ptr([]byte{}), value: test_uint64(123)},
+		{b: kit.Ptr([]byte{}), value: test_float32(123)},
+		{b: kit.Ptr([]byte{}), value: test_float64(123)},
+		{b: kit.Ptr([]byte{}), value: test_string("Fit SDK")},
+		{b: kit.Ptr([]byte{}), value: test_string("")},
 
 		// Unsupported types:
 		{b: kit.Ptr([]byte{}), value: nil, err: ErrNilValue},
@@ -148,11 +148,11 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: []*int16{&i16}},
 		{b: kit.Ptr([]byte{}), value: []*int16{nilptri16}, err: ErrTypeNotSupported},
 		{b: kit.Ptr([]byte{}), value: []*int16{nil}, err: ErrTypeNotSupported},
-		{b: kit.Ptr([]byte{}), value: []DefinedAny{int16(129)}},
-		{b: kit.Ptr([]byte{}), value: []DefinedAny{func() {}}, err: ErrTypeNotSupported},
-		{b: kit.Ptr([]byte{}), value: []DefinedAny{DefinedAny(nil)}, err: ErrTypeNotSupported},
-		{b: kit.Ptr([]byte{}), value: []DefinedAny{[]DefinedAny{}}, err: ErrTypeNotSupported},
-		{b: kit.Ptr([]byte{}), value: []privateDefinedFloat64{8.234}},
+		{b: kit.Ptr([]byte{}), value: []test_any{int16(129)}},
+		{b: kit.Ptr([]byte{}), value: []test_any{func() {}}, err: ErrTypeNotSupported},
+		{b: kit.Ptr([]byte{}), value: []test_any{test_any(nil)}, err: ErrTypeNotSupported},
+		{b: kit.Ptr([]byte{}), value: []test_any{[]test_any{}}, err: ErrTypeNotSupported},
+		{b: kit.Ptr([]byte{}), value: []test_float64{8.234}},
 
 		{b: nil, value: uint8(129), err: ErrNilDest},
 	}
@@ -203,10 +203,7 @@ func marshalWithReflectionForTest(w io.Writer, value any) error {
 			if rv.Index(i).Kind() == reflect.String {
 				value := rv.Index(i).String()
 				if len(value) == 0 {
-					continue
-				}
-				if value[len(value)-1] == '\x00' {
-					continue
+					rv.Index(i).SetString("\x00")
 				}
 			}
 			if err := marshalWithReflectionForTest(w, rv.Index(i).Interface()); err != nil {
