@@ -94,6 +94,7 @@ func TestEncodeRealFiles(t *testing.T) {
 type fnValidate func(mesg *proto.Message) error
 
 func (f fnValidate) Validate(mesg *proto.Message) error { return f(mesg) }
+func (f fnValidate) Reset()                             {}
 
 var (
 	fnValidateOK  = fnValidate(func(mesg *proto.Message) error { return nil })
@@ -978,6 +979,46 @@ func TestStreamEncoder(t *testing.T) {
 	}
 }
 
+func TestReset(t *testing.T) {
+	tt := []struct {
+		name     string
+		opts     []Option
+		expected *Encoder
+	}{
+		{
+			name: "reset with options",
+			opts: []Option{
+				WithBigEndian(),
+				WithProtocolVersion(proto.V2),
+				WithNormalHeader(15),
+				WithMessageValidator(fnValidateOK),
+			},
+			expected: New(nil,
+				WithBigEndian(),
+				WithProtocolVersion(proto.V2),
+				WithNormalHeader(15),
+				WithMessageValidator(fnValidateOK)),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(io.Discard)
+			enc.Reset(io.Discard, tc.opts...)
+			if diff := cmp.Diff(enc, tc.expected,
+				cmp.AllowUnexported(options{}),
+				cmp.AllowUnexported(Encoder{}),
+				cmp.FilterValues(func(x, y MessageValidator) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y io.Writer) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y *proto.Validator) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y *lru) bool { return true }, cmp.Ignore()),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
 func createFitForBenchmark(recodSize int) *proto.Fit {
 	now := time.Now()
 	fit := new(proto.Fit)
@@ -1141,6 +1182,23 @@ func BenchmarkEncodeWriterAt(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			_ = enc.Encode(fit)
 			enc.reset()
+		}
+	})
+}
+
+func BenchmarkReset(b *testing.B) {
+	b.Run("benchmark New()", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_ = New(nil)
+		}
+	})
+	b.Run("benchmark Reset()", func(b *testing.B) {
+		b.StopTimer()
+		enc := New(nil)
+		b.StartTimer()
+
+		for i := 0; i < b.N; i++ {
+			enc.Reset(nil)
 		}
 	})
 }

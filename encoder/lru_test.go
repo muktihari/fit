@@ -52,12 +52,22 @@ func TestLRU(t *testing.T) {
 
 	l.Reset()
 	if len(l.bucket) != 0 {
-		t.Fatalf("expected lruBuckt is %d, got: %d", 0, len(l.bucket))
+		t.Fatalf("expected lruBucket is %d, got: %d", 0, len(l.bucket))
 	}
 	for i := range l.items {
 		if l.items[i] != nil {
 			t.Fatalf("[%d] expected nil, got: %v", i, l.items[i])
 		}
+	}
+
+	l.ResetWithNewSize(10) // Only reslice
+	if len(l.items) != 10 {
+		t.Fatalf("expected items is %d, got: %d", 10, len(l.items))
+	}
+
+	l.ResetWithNewSize(20) // New allocs
+	if len(l.items) != 20 {
+		t.Fatalf("expected items is %d, got: %d", 20, len(l.items))
 	}
 }
 
@@ -94,6 +104,41 @@ func BenchmarkLRU(b *testing.B) {
 			for i := range items {
 				l.Put(items[i])
 			}
+		}
+	})
+}
+
+func BenchmarkLRUReset(b *testing.B) {
+	b.Run("benchmark newLRU()", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_ = newLRU(10)
+		}
+	})
+	b.Run("benchmark Reset()", func(b *testing.B) {
+		b.StopTimer()
+		lru := newLRU(10)
+		b.StartTimer()
+
+		for i := 0; i < b.N; i++ {
+			lru.Reset()
+		}
+	})
+	b.Run("benchmark ResetWithNewSize() shrink", func(b *testing.B) {
+		b.StopTimer()
+		lru := newLRU(10)
+		b.StartTimer()
+
+		for i := 0; i < b.N; i++ {
+			lru.ResetWithNewSize(5)
+		}
+	})
+	b.Run("benchmark ResetWithNewSize() grow", func(b *testing.B) {
+		b.StopTimer()
+		lru := newLRU(10)
+		b.StartTimer()
+
+		for i := 0; i < b.N; i++ {
+			lru.ResetWithNewSize(50)
 		}
 	})
 }

@@ -36,6 +36,9 @@ type MessageValidator interface {
 	//   3. Restoring float64-scaled field values to their binary forms (sint, uint, etc.).
 	//   4. Verifying whether the type and value are in alignment.
 	Validate(mesg *proto.Message) error
+
+	// Reset the message validator.
+	Reset()
 }
 
 type validatorOptions struct {
@@ -174,6 +177,11 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	}
 
 	return nil
+}
+
+func (v *messageValidator) Reset() {
+	v.developerDataIds = v.developerDataIds[:0]
+	v.fieldDescriptions = v.fieldDescriptions[:0]
 }
 
 // isValueTypeAligned checks whether the value is aligned with type. The value should be a concrete type not pointer to a value.

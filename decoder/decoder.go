@@ -126,21 +126,19 @@ func WithFactory(factory Factory) Option {
 	})
 }
 
-// WithMesgListener adds a listener to the listener pool, where each listener is broadcasted every message.
-func WithMesgListener(lis listener.MesgListener) Option {
+// WithMesgListener adds listeners to the listener pool, where each listener is broadcasted every message.
+// The listeners will be appended not replaced. If users need to reset use Reset().
+func WithMesgListener(listeners ...listener.MesgListener) Option {
 	return fnApply(func(o *options) {
-		if lis != nil {
-			o.mesgListeners = append(o.mesgListeners, lis)
-		}
+		o.mesgListeners = append(o.mesgListeners, listeners...)
 	})
 }
 
-// WithMesgDefListener adds a listener to the listener pool, where each listener is broadcasted every message definition .
-func WithMesgDefListener(lis listener.MesgDefListener) Option {
+// WithMesgDefListener adds listeners to the listener pool, where each listener is broadcasted every message definition.
+// The listeners will be appended not replaced. If users need to reset use Reset().
+func WithMesgDefListener(listeners ...listener.MesgDefListener) Option {
 	return fnApply(func(o *options) {
-		if lis != nil {
-			o.mesgDefListeners = append(o.mesgDefListeners, lis)
-		}
+		o.mesgDefListeners = append(o.mesgDefListeners, listeners...)
 	})
 }
 
@@ -177,8 +175,8 @@ func WithNoComponentExpansion() Option {
 // especially if it involves syscall such as reading a file.
 func New(r io.Reader, opts ...Option) *Decoder {
 	options := defaultOptions()
-	for _, o := range opts {
-		o.apply(options)
+	for i := range opts {
+		opts[i].apply(options)
 	}
 
 	d := &Decoder{
@@ -325,6 +323,26 @@ func (d *Decoder) reset() {
 	d.sequenceCompleted = false
 
 	d.initDecodeHeaderOnce() // reset to enable invocation.
+}
+
+// Reset resets the Decoder to read its input from r, clear any error and
+// reset previous options to default options so any options needs to be inputed again.
+// It is similar to New() but it retains the underlying storage for use by
+// future decode to reduce memory allocs (except messages need to be re-allocated).
+func (d *Decoder) Reset(r io.Reader, opts ...Option) {
+	d.reset()
+	d.n = 0 // Must reset bytes counter since it's a full reset.
+	d.err = nil
+	d.r = r
+
+	d.options = defaultOptions()
+	for i := range opts {
+		opts[i].apply(d.options)
+	}
+
+	d.factory = d.options.factory
+	d.mesgListeners = d.options.mesgListeners
+	d.mesgDefListeners = d.options.mesgDefListeners
 }
 
 // Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.

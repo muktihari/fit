@@ -108,9 +108,15 @@ type fnApply func(o *options)
 func (f fnApply) apply(o *options) { f(o) }
 
 // WithProtocolVersion directs the Encoder to use specific Protocol Version (default: proto.V1).
+// If the given protocolVersion is not supported, the Protocol Version will not be changed.
+// Please validate using proto.Validate when putting user-defined Protocol Version to check
+// whether it is supported or not. Or just use predefined Protocol Version constants such as
+// proto.V1, proto.V2, etc, which the validity is ensured.
 func WithProtocolVersion(protocolVersion proto.Version) Option {
 	return fnApply(func(o *options) {
-		o.protocolVersion = protocolVersion
+		if proto.Validate(byte(protocolVersion)) == nil {
+			o.protocolVersion = protocolVersion
+		}
 	})
 }
 
@@ -175,8 +181,8 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 // especially if it involves syscall such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
 func New(w io.Writer, opts ...Option) *Encoder {
 	options := defaultOptions()
-	for _, opt := range opts {
-		opt.apply(options)
+	for i := range opts {
+		opts[i].apply(options)
 	}
 
 	var lruCapacity byte = 1
@@ -322,10 +328,8 @@ func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
 		fit.FileHeader = e.defaultFileHeader
 	}
 	fit.FileHeader.DataSize = e.dataSize // update Header's DataSize of the actual messages size
-	e.dataSize = 0
+	e.reset()
 	e.n = n
-	e.crc16.Reset()
-	e.localMesgNumLRU.Reset()
 
 	return nil
 }
@@ -507,7 +511,33 @@ func (e *Encoder) reset() {
 	e.dataSize = 0
 	e.crc16.Reset()
 	e.localMesgNumLRU.Reset()
+	e.messageValidator.Reset()
 	e.timestampReference = 0
+}
+
+// Reset resets the Encoder to write its output to w and reset previous options to
+// default options so any options needs to be inputed again. It is similar to New()
+// but it retains the underlying storage for use by future encode to reduce memory allocs.
+func (e *Encoder) Reset(w io.Writer, opts ...Option) {
+	e.reset()
+	e.n = 0
+	e.lastHeaderPos = 0
+
+	e.options = defaultOptions()
+	for i := range opts {
+		opts[i].apply(e.options)
+	}
+
+	var lruCapacity byte = 1
+	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
+		lruCapacity = e.options.multipleLocalMessageType + 1
+	}
+	e.localMesgNumLRU.ResetWithNewSize(lruCapacity)
+
+	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
+	e.defaultFileHeader.ProtocolVersion = byte(e.options.protocolVersion)
+	e.messageValidator = e.options.messageValidator
+	e.wrapWriterAndCrc16.writer = w
 }
 
 // EncodeWithContext is similiar to Encode but with respect to context propagation.

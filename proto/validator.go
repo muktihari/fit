@@ -36,3 +36,9 @@ func (p *Validator) ValidateMessageDefinition(mesgDef *MessageDefinition) error 
 	}
 	return nil
 }
+
+// ProtocolVersion returns the protocol version that this validator validates.
+func (p *Validator) ProtocolVersion() Version { return p.version }
+
+// SetProtocolVersion sets new protocol version to validate.
+func (p *Validator) SetProtocolVersion(version Version) { p.version = version }

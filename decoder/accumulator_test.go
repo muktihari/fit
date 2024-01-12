@@ -12,7 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 )
 
-func TestCollect(t *testing.T) {
+func TestAccumulatorCollect(t *testing.T) {
 	type value struct {
 		mesgNum      typedef.MesgNum
 		destFieldNum byte
@@ -86,7 +86,7 @@ func TestCollect(t *testing.T) {
 	}
 }
 
-func TestReset(t *testing.T) {
+func TestAccumulatorReset(t *testing.T) {
 	accumu := NewAccumulator()
 	accumu.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
 

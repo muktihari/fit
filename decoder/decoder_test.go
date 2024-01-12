@@ -24,6 +24,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit"
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
@@ -148,8 +149,8 @@ func TestOptions(t *testing.T) {
 			opts: []Option{
 				WithFactory(decoderFactory),
 				WithIgnoreChecksum(),
-				WithMesgListener(mesglis), WithMesgListener(mesglis),
-				WithMesgDefListener(mesgDefLis), WithMesgDefListener(mesgDefLis),
+				WithMesgListener(mesglis, mesglis),
+				WithMesgDefListener(mesgDefLis, mesgDefLis),
 				WithBroadcastOnly(),
 				WithNoComponentExpansion(),
 			},
@@ -1780,6 +1781,83 @@ func TestDecodeMessagesWithContext(t *testing.T) {
 	}
 }
 
+func TestReset(t *testing.T) {
+	// predefined
+	decoderFactory := factory.New()
+	mesglis := fnMesgListener(func(mesg proto.Message) {})
+	mesgDefLis := fnMesgDefListener(func(mesgDef proto.MessageDefinition) {})
+
+	tt := []struct {
+		name string
+		opts []Option
+		dec  *Decoder
+	}{
+		{
+			name: "reset with options",
+			opts: []Option{
+				WithFactory(decoderFactory),
+				WithIgnoreChecksum(),
+				WithMesgListener(mesglis, mesglis),
+				WithMesgDefListener(mesgDefLis, mesgDefLis),
+				WithBroadcastOnly(),
+				WithNoComponentExpansion(),
+			},
+			dec: New(nil,
+				WithFactory(decoderFactory),
+				WithIgnoreChecksum(),
+				WithMesgListener(mesglis, mesglis),
+				WithMesgDefListener(mesgDefLis, mesgDefLis),
+				WithBroadcastOnly(),
+				WithNoComponentExpansion(),
+			),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			dec := New(buf, tc.opts...)
+
+			dec.Reset(buf, tc.opts...)
+
+			if diff := cmp.Diff(dec, tc.dec,
+				cmp.AllowUnexported(options{}),
+				cmp.AllowUnexported(Decoder{}),
+				cmp.FilterValues(func(x, y io.Reader) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y func() error) bool { return true }, cmp.Ignore()),
+				cmp.Transformer("factory", func(t Factory) uintptr {
+					return reflect.ValueOf(t).Pointer()
+				}),
+				cmp.Comparer(func(a, b []listener.MesgListener) bool {
+					if len(a) != len(b) {
+						return false
+					}
+					for i := range a {
+						if reflect.ValueOf(a[i]).Pointer() != reflect.ValueOf(b[i]).Pointer() {
+							return false
+						}
+					}
+					return true
+				}),
+				cmp.Comparer(func(a, b []listener.MesgDefListener) bool {
+					if len(a) != len(b) {
+						return false
+					}
+					for i := range a {
+						if reflect.ValueOf(a[i]).Pointer() != reflect.ValueOf(b[i]).Pointer() {
+							return false
+						}
+					}
+					return true
+				}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
 func BenchmarkDecodeMessageData(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(typedef.MesgNumRecord)
@@ -1856,4 +1934,21 @@ func BenchmarkCheckIntegrity(b *testing.B) {
 			b.Fatal(err)
 		}
 	}
+}
+
+func BenchmarkReset(b *testing.B) {
+	b.Run("benchmark New()", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_ = New(nil)
+		}
+	})
+	b.Run("benchmark Reset()", func(b *testing.B) {
+		b.StopTimer()
+		dec := New(nil)
+		b.StartTimer()
+
+		for i := 0; i < b.N; i++ {
+			dec.Reset(nil)
+		}
+	})
 }

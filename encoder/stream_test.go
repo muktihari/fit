@@ -161,3 +161,35 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 		t.Fatalf("expected err: %v, got: %v", io.EOF, err)
 	}
 }
+
+func TestStreamEncoderReset(t *testing.T) {
+	tt := []struct {
+		name string
+		w1   io.Writer
+		w2   io.Writer
+		err  error
+	}{
+		{
+			name: "io.WriteSeeker reset with io.WriteSeeker",
+			w1:   mockWriteSeeker{fnWriteOK, fnSeekOK},
+			w2:   mockWriteSeeker{fnWriteOK, fnSeekOK},
+			err:  nil,
+		},
+		{
+			name: "io.WriteSeeker reset with io.Writer",
+			w1:   mockWriteSeeker{fnWriteOK, fnSeekOK},
+			w2:   fnWriteOK,
+			err:  ErrWriterAtOrWriteSeekerIsExpected,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			streamEnc, _ := New(tc.w1).StreamEncoder()
+			err := streamEnc.Reset(tc.w2)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+		})
+	}
+}
