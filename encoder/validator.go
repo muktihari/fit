@@ -14,6 +14,7 @@ import (
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -24,6 +25,7 @@ var (
 	ErrNoFields                = errors.New("no fields")
 	ErrMissingDeveloperDataId  = errors.New("missing developer data id")
 	ErrMissingFieldDescription = errors.New("missing field description")
+	ErrExceedMaxAllowed        = errors.New("exceed max allowed")
 )
 
 // MessageValidator is an interface for implementing message validation before encoding the message.
@@ -130,10 +132,20 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 				}
 			}
 		}
+
+		// Size of value should not exceed 255 bytes since proto.FieldDefinition's Size is a type of byte.
+		valBytes := typedef.Sizeof(field.Value, field.Type.BaseType())
+		if valBytes > 255 {
+			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
+		}
 	}
 
 	if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
 		return ErrNoFields
+	}
+
+	if len(mesg.Fields) > 255 {
+		return fmt.Errorf("max n fields is 255, got: %d: %w", len(mesg.Fields), ErrExceedMaxAllowed)
 	}
 
 	switch mesg.Num {
@@ -174,6 +186,16 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		if !isFieldDescriptionPresent {
 			return fmt.Errorf("developer field index: %d, num: %d: %w", i, devField.Num, ErrMissingFieldDescription)
 		}
+
+		// Size of value should not exceed 255 bytes since proto.DeveloperFieldDefinition's Size is a type of byte.
+		valBytes := typedef.Sizeof(devField.Value, devField.Type)
+		if valBytes > 255 {
+			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
+		}
+	}
+
+	if len(mesg.DeveloperFields) > 255 {
+		return fmt.Errorf("max n developer fields is 255, got: %d: %w", len(mesg.DeveloperFields), ErrExceedMaxAllowed)
 	}
 
 	return nil

@@ -196,9 +196,7 @@ func MarshalTo(dest *[]byte, value any, bo binary.ByteOrder) error {
 	case []string:
 		for i := range val {
 			if len(val[i]) == 0 {
-				continue
-			}
-			if len(val[i]) == 1 && val[i][0] == '\x00' {
+				*dest = append(*dest, '\x00')
 				continue
 			}
 			*dest = append(*dest, val[i]...)

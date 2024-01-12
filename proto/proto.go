@@ -62,7 +62,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.Fields {
 		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
 			Num:      mesg.Fields[i].Num,
-			Size:     mesg.Fields[i].Type.BaseType().Size() * typedef.Len(mesg.Fields[i].Value),
+			Size:     byte(typedef.Sizeof(mesg.Fields[i].Value, mesg.Fields[i].Type.BaseType())),
 			BaseType: mesg.Fields[i].Type.BaseType(),
 		})
 	}

@@ -8,13 +8,16 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -204,6 +207,121 @@ func TestMessageValidatorValidate(t *testing.T) {
 				),
 			},
 			errs: []error{nil, ErrInvalidUTF8String},
+		},
+		{
+			name: "n fields exceed allowed",
+			mesgs: []proto.Message{
+				{
+					Num: 20,
+					Fields: func() []proto.Field {
+						fields := make([]proto.Field, 256)
+						for i := range fields {
+							fields[i] = factory.CreateField(mesgnum.Record, 255)
+							fields[i].FieldBase = &proto.FieldBase{
+								Num:    255,
+								Name:   factory.NameUnknown,
+								Type:   profile.Byte,
+								Scale:  1,
+								Offset: 0,
+							}
+							fields[i].Value = byte(1)
+						}
+						return fields
+					}(),
+				},
+			},
+			errs: []error{ErrExceedMaxAllowed},
+		},
+		{
+			name: "n developer fields exceed allowed",
+			mesgs: []proto.Message{
+				{
+					Num: mesgnum.Record,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: func() []proto.DeveloperField {
+						devFields := make([]proto.DeveloperField, 256)
+						for i := range devFields {
+							devFields[i].DeveloperDataIndex = 0
+							devFields[i].Num = 255
+						}
+						return devFields
+					}(),
+				},
+			},
+			mesgValidator: func() MessageValidator {
+				mesgValidator := NewMessageValidator().(*messageValidator)
+				developerDataId := proto.Message{
+					Num: mesgnum.DeveloperDataId,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					},
+				}
+				mesgValidator.developerDataIds = []*mesgdef.DeveloperDataId{
+					mesgdef.NewDeveloperDataId(&developerDataId),
+				}
+
+				fieldDescription := proto.Message{
+					Num: mesgnum.FieldDescription,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(255)),
+					},
+				}
+				mesgValidator.fieldDescriptions = []*mesgdef.FieldDescription{
+					mesgdef.NewFieldDescription(&fieldDescription),
+				}
+				return mesgValidator
+			}(),
+			errs: []error{ErrExceedMaxAllowed},
+		},
+		{
+			name: "field value size exceed max allowed",
+			mesgs: []proto.Message{
+				factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue(strings.Repeat("a", 256)),
+				),
+			},
+			errs: []error{ErrExceedMaxAllowed},
+		},
+		{
+			name: "developer field value size exceed max allowed",
+			mesgValidator: func() MessageValidator {
+				mesgValidator := NewMessageValidator().(*messageValidator)
+				developerDataId := proto.Message{
+					Num: mesgnum.DeveloperDataId,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					},
+				}
+				mesgValidator.developerDataIds = []*mesgdef.DeveloperDataId{
+					mesgdef.NewDeveloperDataId(&developerDataId),
+				}
+
+				fieldDescription := proto.Message{
+					Num: mesgnum.FieldDescription,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(1)),
+					},
+				}
+				mesgValidator.fieldDescriptions = []*mesgdef.FieldDescription{
+					mesgdef.NewFieldDescription(&fieldDescription),
+				}
+				return mesgValidator
+			}(),
+			mesgs: []proto.Message{
+				factory.CreateMesgOnly(mesgnum.FileId).WithDeveloperFields(
+					proto.DeveloperField{
+						DeveloperDataIndex: 0,
+						Num:                1,
+						Type:               basetype.String,
+						Value:              strings.Repeat("a", 256),
+					},
+				),
+			},
+			errs: []error{ErrExceedMaxAllowed},
 		},
 	}
 
