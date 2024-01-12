@@ -34,6 +34,17 @@ func (l *lru) Reset() {
 	l.bucket = l.bucket[:0]
 }
 
+// ResetWithNewSize sets new LRU size and then reset the LRU. If the new size is more than previous size it will re-allocs new storage
+// with the new capacity. If the new size is less than previous size it will reslice without re-allocs. Otherwise, only reset.
+func (l *lru) ResetWithNewSize(size byte) {
+	if size > byte(cap(l.items)) {
+		l.items = make([][]byte, size)
+	} else if size < byte(cap(l.items)) {
+		l.items = l.items[:size]
+	}
+	l.Reset()
+}
+
 // Put will compare the equality of item with lru' items and store the item accordingly.
 func (l *lru) Put(item []byte) (itemIndex byte, isNewItem bool) {
 	if bucketIndex := l.bucketIndex(item); bucketIndex != -1 {
