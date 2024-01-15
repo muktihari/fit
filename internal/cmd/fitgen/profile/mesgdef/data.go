@@ -18,6 +18,9 @@ type Field struct {
 	Num             byte
 	Name            string
 	String          string
+	ProfileType     string
+	BaseType        string
+	Size            int
 	Type            string
 	TypedValue      string
 	PrimitiveValue  string

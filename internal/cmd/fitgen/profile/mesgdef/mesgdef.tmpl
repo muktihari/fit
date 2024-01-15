@@ -25,15 +25,14 @@ type {{ .Name }} struct {
 	{{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
 	{{ end }}
 
+	{{ if gt .MaxFieldExpandNum 1 }}
+	IsExpandedFields [{{ .MaxFieldExpandNum }}]bool // Used for tracking expanded fields, field.Num as index.
+	{{ end -}}
+
 	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 	// Developer Fields are dynamic, can't be mapped as struct's fields. 
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-	{{ end -}}
-
-	{{ if gt .MaxFieldExpandNum 1 }}
-
-	IsExpandedFields [{{ .MaxFieldExpandNum }}]bool // Used for tracking expanded fields, field.Num as index.
 	{{ end -}}
 }
 
@@ -69,14 +68,13 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 	return &{{ .Name }}{
 		{{ range .Fields -}}
 			{{ .Name }}: {{ .TypedValue }},
-		{{ end -}}
-
-		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-		DeveloperFields: developerFields,
 		{{ end }}
 		{{ if gt .MaxFieldExpandNum 1 -}}
 		IsExpandedFields: isExpandedFields,
-		{{ end -}}
+		{{ end }}
+		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+		DeveloperFields: developerFields,
+		{{ end }}
 	}
 }
 
