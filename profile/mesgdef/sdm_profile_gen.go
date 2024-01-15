@@ -17,14 +17,14 @@ import (
 
 // SdmProfile is a SdmProfile message.
 type SdmProfile struct {
+	Odometer          uint32 // Scale: 100; Units: m
 	MessageIndex      typedef.MessageIndex
-	Enabled           bool
 	SdmAntId          uint16
 	SdmCalFactor      uint16 // Scale: 10; Units: %
-	Odometer          uint32 // Scale: 100; Units: m
-	SpeedSource       bool   // Use footpod for speed source instead of GPS
 	SdmAntIdTransType uint8
 	OdometerRollover  uint8 // Rollover counter that can be used to extend the odometer
+	Enabled           bool
+	SpeedSource       bool // Use footpod for speed source instead of GPS
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -48,14 +48,14 @@ func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 	}
 
 	return &SdmProfile{
+		Odometer:          typeconv.ToUint32[uint32](vals[3]),
 		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Enabled:           typeconv.ToBool[bool](vals[0]),
 		SdmAntId:          typeconv.ToUint16z[uint16](vals[1]),
 		SdmCalFactor:      typeconv.ToUint16[uint16](vals[2]),
-		Odometer:          typeconv.ToUint32[uint32](vals[3]),
-		SpeedSource:       typeconv.ToBool[bool](vals[4]),
 		SdmAntIdTransType: typeconv.ToUint8z[uint8](vals[5]),
 		OdometerRollover:  typeconv.ToUint8[uint8](vals[7]),
+		Enabled:           typeconv.ToBool[bool](vals[0]),
+		SpeedSource:       typeconv.ToBool[bool](vals[4]),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,14 +69,14 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSdmProfile)
 
+	if m.Odometer != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Odometer
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
 	if uint16(m.SdmAntId) != basetype.Uint16zInvalid {
@@ -89,16 +89,6 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SdmCalFactor
 		fields = append(fields, field)
 	}
-	if m.Odometer != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Odometer
-		fields = append(fields, field)
-	}
-	if m.SpeedSource != false {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.SpeedSource
-		fields = append(fields, field)
-	}
 	if uint8(m.SdmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = uint8(m.SdmAntIdTransType)
@@ -109,6 +99,16 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.OdometerRollover
 		fields = append(fields, field)
 	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Enabled
+		fields = append(fields, field)
+	}
+	if m.SpeedSource != false {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.SpeedSource
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -116,16 +116,6 @@ func (m *SdmProfile) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SdmCalFactorScaled return SdmCalFactor in its scaled value [Scale: 10; Units: %].
-//
-// If SdmCalFactor value is invalid, float64 invalid value will be returned.
-func (m *SdmProfile) SdmCalFactorScaled() float64 {
-	if m.SdmCalFactor == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
 }
 
 // OdometerScaled return Odometer in its scaled value [Scale: 100; Units: m].
@@ -138,15 +128,27 @@ func (m *SdmProfile) OdometerScaled() float64 {
 	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
 
-// SetMessageIndex sets SdmProfile value.
-func (m *SdmProfile) SetMessageIndex(v typedef.MessageIndex) *SdmProfile {
-	m.MessageIndex = v
+// SdmCalFactorScaled return SdmCalFactor in its scaled value [Scale: 10; Units: %].
+//
+// If SdmCalFactor value is invalid, float64 invalid value will be returned.
+func (m *SdmProfile) SdmCalFactorScaled() float64 {
+	if m.SdmCalFactor == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
+}
+
+// SetOdometer sets SdmProfile value.
+//
+// Scale: 100; Units: m
+func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
+	m.Odometer = v
 	return m
 }
 
-// SetEnabled sets SdmProfile value.
-func (m *SdmProfile) SetEnabled(v bool) *SdmProfile {
-	m.Enabled = v
+// SetMessageIndex sets SdmProfile value.
+func (m *SdmProfile) SetMessageIndex(v typedef.MessageIndex) *SdmProfile {
+	m.MessageIndex = v
 	return m
 }
 
@@ -164,22 +166,6 @@ func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
 	return m
 }
 
-// SetOdometer sets SdmProfile value.
-//
-// Scale: 100; Units: m
-func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
-	m.Odometer = v
-	return m
-}
-
-// SetSpeedSource sets SdmProfile value.
-//
-// Use footpod for speed source instead of GPS
-func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
-	m.SpeedSource = v
-	return m
-}
-
 // SetSdmAntIdTransType sets SdmProfile value.
 func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
 	m.SdmAntIdTransType = v
@@ -191,6 +177,20 @@ func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
 // Rollover counter that can be used to extend the odometer
 func (m *SdmProfile) SetOdometerRollover(v uint8) *SdmProfile {
 	m.OdometerRollover = v
+	return m
+}
+
+// SetEnabled sets SdmProfile value.
+func (m *SdmProfile) SetEnabled(v bool) *SdmProfile {
+	m.Enabled = v
+	return m
+}
+
+// SetSpeedSource sets SdmProfile value.
+//
+// Use footpod for speed source instead of GPS
+func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
+	m.SpeedSource = v
 	return m
 }
 

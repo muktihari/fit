@@ -19,7 +19,6 @@ import (
 // MagnetometerData is a MagnetometerData message.
 type MagnetometerData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
 	MagX             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	MagY             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
@@ -27,6 +26,7 @@ type MagnetometerData struct {
 	CalibratedMagX   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
 	CalibratedMagY   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
 	CalibratedMagZ   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -51,7 +51,6 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 
 	return &MagnetometerData{
 		Timestamp:        datetime.ToTime(vals[253]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		MagX:             typeconv.ToSliceUint16[uint16](vals[2]),
 		MagY:             typeconv.ToSliceUint16[uint16](vals[3]),
@@ -59,6 +58,7 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 		CalibratedMagX:   typeconv.ToSliceFloat32[float32](vals[5]),
 		CalibratedMagY:   typeconv.ToSliceFloat32[float32](vals[6]),
 		CalibratedMagZ:   typeconv.ToSliceFloat32[float32](vals[7]),
+		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,11 +75,6 @@ func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
@@ -117,6 +112,11 @@ func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CalibratedMagZ
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -131,14 +131,6 @@ func (m *MagnetometerData) ToMesg(fac Factory) proto.Message {
 // Units: s; Whole second part of the timestamp
 func (m *MagnetometerData) SetTimestamp(v time.Time) *MagnetometerData {
 	m.Timestamp = v
-	return m
-}
-
-// SetTimestampMs sets MagnetometerData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
-	m.TimestampMs = v
 	return m
 }
 
@@ -195,6 +187,14 @@ func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagZ(v []float32) *MagnetometerData {
 	m.CalibratedMagZ = v
+	return m
+}
+
+// SetTimestampMs sets MagnetometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
+	m.TimestampMs = v
 	return m
 }
 

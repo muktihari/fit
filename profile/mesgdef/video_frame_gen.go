@@ -19,8 +19,8 @@ import (
 // VideoFrame is a VideoFrame message.
 type VideoFrame struct {
 	Timestamp   time.Time // Units: s; Whole second part of the timestamp
-	TimestampMs uint16    // Units: ms; Millisecond part of the timestamp.
 	FrameNumber uint32    // Number of the frame that the timestamp and timestamp_ms correlate to
+	TimestampMs uint16    // Units: ms; Millisecond part of the timestamp.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,8 +45,8 @@ func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 
 	return &VideoFrame{
 		Timestamp:   datetime.ToTime(vals[253]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		FrameNumber: typeconv.ToUint32[uint32](vals[1]),
+		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,14 +65,14 @@ func (m *VideoFrame) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
-		fields = append(fields, field)
-	}
 	if m.FrameNumber != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.FrameNumber
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 
@@ -92,19 +92,19 @@ func (m *VideoFrame) SetTimestamp(v time.Time) *VideoFrame {
 	return m
 }
 
-// SetTimestampMs sets VideoFrame value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
-	m.TimestampMs = v
-	return m
-}
-
 // SetFrameNumber sets VideoFrame value.
 //
 // Number of the frame that the timestamp and timestamp_ms correlate to
 func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
 	m.FrameNumber = v
+	return m
+}
+
+// SetTimestampMs sets VideoFrame value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
+	m.TimestampMs = v
 	return m
 }
 

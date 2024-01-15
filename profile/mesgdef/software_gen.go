@@ -17,9 +17,9 @@ import (
 
 // Software is a Software message.
 type Software struct {
+	PartNumber   string
 	MessageIndex typedef.MessageIndex
 	Version      uint16 // Scale: 100
-	PartNumber   string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -43,9 +43,9 @@ func NewSoftware(mesg *proto.Message) *Software {
 	}
 
 	return &Software{
+		PartNumber:   typeconv.ToString[string](vals[5]),
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Version:      typeconv.ToUint16[uint16](vals[3]),
-		PartNumber:   typeconv.ToString[string](vals[5]),
 
 		DeveloperFields: developerFields,
 	}
@@ -59,6 +59,11 @@ func (m *Software) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSoftware)
 
+	if m.PartNumber != basetype.StringInvalid && m.PartNumber != "" {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.PartNumber
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
@@ -67,11 +72,6 @@ func (m *Software) ToMesg(fac Factory) proto.Message {
 	if m.Version != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Version
-		fields = append(fields, field)
-	}
-	if m.PartNumber != basetype.StringInvalid && m.PartNumber != "" {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.PartNumber
 		fields = append(fields, field)
 	}
 
@@ -93,6 +93,12 @@ func (m *Software) VersionScaled() float64 {
 	return scaleoffset.Apply(m.Version, 100, 0)
 }
 
+// SetPartNumber sets Software value.
+func (m *Software) SetPartNumber(v string) *Software {
+	m.PartNumber = v
+	return m
+}
+
 // SetMessageIndex sets Software value.
 func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
 	m.MessageIndex = v
@@ -104,12 +110,6 @@ func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
 // Scale: 100
 func (m *Software) SetVersion(v uint16) *Software {
 	m.Version = v
-	return m
-}
-
-// SetPartNumber sets Software value.
-func (m *Software) SetPartNumber(v string) *Software {
-	m.PartNumber = v
 	return m
 }
 

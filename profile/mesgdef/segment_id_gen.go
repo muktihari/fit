@@ -18,13 +18,13 @@ import (
 type SegmentId struct {
 	Name                  string                       // Friendly name assigned to segment
 	Uuid                  string                       // UUID of the segment
-	Sport                 typedef.Sport                // Sport associated with the segment
-	Enabled               bool                         // Segment enabled for evaluation
 	UserProfilePrimaryKey uint32                       // Primary key of the user that created the segment
 	DeviceId              uint32                       // ID of the device that created the segment
+	Sport                 typedef.Sport                // Sport associated with the segment
 	DefaultRaceLeader     uint8                        // Index for the Leader Board entry selected as the default race participant
 	DeleteStatus          typedef.SegmentDeleteStatus  // Indicates if any segments should be deleted
 	SelectionType         typedef.SegmentSelectionType // Indicates how the segment was selected to be sent to the device
+	Enabled               bool                         // Segment enabled for evaluation
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -50,13 +50,13 @@ func NewSegmentId(mesg *proto.Message) *SegmentId {
 	return &SegmentId{
 		Name:                  typeconv.ToString[string](vals[0]),
 		Uuid:                  typeconv.ToString[string](vals[1]),
-		Sport:                 typeconv.ToEnum[typedef.Sport](vals[2]),
-		Enabled:               typeconv.ToBool[bool](vals[3]),
 		UserProfilePrimaryKey: typeconv.ToUint32[uint32](vals[4]),
 		DeviceId:              typeconv.ToUint32[uint32](vals[5]),
+		Sport:                 typeconv.ToEnum[typedef.Sport](vals[2]),
 		DefaultRaceLeader:     typeconv.ToUint8[uint8](vals[6]),
 		DeleteStatus:          typeconv.ToEnum[typedef.SegmentDeleteStatus](vals[7]),
 		SelectionType:         typeconv.ToEnum[typedef.SegmentSelectionType](vals[8]),
+		Enabled:               typeconv.ToBool[bool](vals[3]),
 
 		DeveloperFields: developerFields,
 	}
@@ -80,16 +80,6 @@ func (m *SegmentId) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Uuid
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.Sport)
-		fields = append(fields, field)
-	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Enabled
-		fields = append(fields, field)
-	}
 	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.UserProfilePrimaryKey
@@ -98,6 +88,11 @@ func (m *SegmentId) ToMesg(fac Factory) proto.Message {
 	if m.DeviceId != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.DeviceId
+		fields = append(fields, field)
+	}
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
@@ -113,6 +108,11 @@ func (m *SegmentId) ToMesg(fac Factory) proto.Message {
 	if byte(m.SelectionType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = byte(m.SelectionType)
+		fields = append(fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
 
@@ -140,22 +140,6 @@ func (m *SegmentId) SetUuid(v string) *SegmentId {
 	return m
 }
 
-// SetSport sets SegmentId value.
-//
-// Sport associated with the segment
-func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
-	m.Sport = v
-	return m
-}
-
-// SetEnabled sets SegmentId value.
-//
-// Segment enabled for evaluation
-func (m *SegmentId) SetEnabled(v bool) *SegmentId {
-	m.Enabled = v
-	return m
-}
-
 // SetUserProfilePrimaryKey sets SegmentId value.
 //
 // Primary key of the user that created the segment
@@ -169,6 +153,14 @@ func (m *SegmentId) SetUserProfilePrimaryKey(v uint32) *SegmentId {
 // ID of the device that created the segment
 func (m *SegmentId) SetDeviceId(v uint32) *SegmentId {
 	m.DeviceId = v
+	return m
+}
+
+// SetSport sets SegmentId value.
+//
+// Sport associated with the segment
+func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
+	m.Sport = v
 	return m
 }
 
@@ -193,6 +185,14 @@ func (m *SegmentId) SetDeleteStatus(v typedef.SegmentDeleteStatus) *SegmentId {
 // Indicates how the segment was selected to be sent to the device
 func (m *SegmentId) SetSelectionType(v typedef.SegmentSelectionType) *SegmentId {
 	m.SelectionType = v
+	return m
+}
+
+// SetEnabled sets SegmentId value.
+//
+// Segment enabled for evaluation
+func (m *SegmentId) SetEnabled(v bool) *SegmentId {
+	m.Enabled = v
 	return m
 }
 

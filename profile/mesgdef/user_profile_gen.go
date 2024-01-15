@@ -17,12 +17,19 @@ import (
 
 // UserProfile is a UserProfile message.
 type UserProfile struct {
+	FriendlyName               string                   // Used for Morning Report greeting
+	GlobalId                   []byte                   // Array: [6]
+	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
+	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
+	DiveCount                  uint32
 	MessageIndex               typedef.MessageIndex
-	FriendlyName               string // Used for Morning Report greeting
-	Gender                     typedef.Gender
-	Age                        uint8  // Units: years
-	Height                     uint8  // Scale: 100; Units: m
 	Weight                     uint16 // Scale: 10; Units: kg
+	LocalId                    typedef.UserLocalId
+	UserRunningStepLength      uint16 // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
+	UserWalkingStepLength      uint16 // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+	Gender                     typedef.Gender
+	Age                        uint8 // Units: years
+	Height                     uint8 // Scale: 100; Units: m
 	Language                   typedef.Language
 	ElevSetting                typedef.DisplayMeasure
 	WeightSetting              typedef.DisplayMeasure
@@ -37,15 +44,8 @@ type UserProfile struct {
 	ActivityClass              typedef.ActivityClass
 	PositionSetting            typedef.DisplayPosition
 	TemperatureSetting         typedef.DisplayMeasure
-	LocalId                    typedef.UserLocalId
-	GlobalId                   []byte                   // Array: [6]
-	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
-	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
 	HeightSetting              typedef.DisplayMeasure
-	UserRunningStepLength      uint16 // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
-	UserWalkingStepLength      uint16 // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
 	DepthSetting               typedef.DisplayMeasure
-	DiveCount                  uint32
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -69,12 +69,19 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 	}
 
 	return &UserProfile{
-		MessageIndex:               typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		FriendlyName:               typeconv.ToString[string](vals[0]),
+		GlobalId:                   typeconv.ToSliceByte[byte](vals[23]),
+		WakeTime:                   typeconv.ToUint32[typedef.LocaltimeIntoDay](vals[28]),
+		SleepTime:                  typeconv.ToUint32[typedef.LocaltimeIntoDay](vals[29]),
+		DiveCount:                  typeconv.ToUint32[uint32](vals[49]),
+		MessageIndex:               typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		Weight:                     typeconv.ToUint16[uint16](vals[4]),
+		LocalId:                    typeconv.ToUint16[typedef.UserLocalId](vals[22]),
+		UserRunningStepLength:      typeconv.ToUint16[uint16](vals[31]),
+		UserWalkingStepLength:      typeconv.ToUint16[uint16](vals[32]),
 		Gender:                     typeconv.ToEnum[typedef.Gender](vals[1]),
 		Age:                        typeconv.ToUint8[uint8](vals[2]),
 		Height:                     typeconv.ToUint8[uint8](vals[3]),
-		Weight:                     typeconv.ToUint16[uint16](vals[4]),
 		Language:                   typeconv.ToEnum[typedef.Language](vals[5]),
 		ElevSetting:                typeconv.ToEnum[typedef.DisplayMeasure](vals[6]),
 		WeightSetting:              typeconv.ToEnum[typedef.DisplayMeasure](vals[7]),
@@ -89,15 +96,8 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 		ActivityClass:              typeconv.ToEnum[typedef.ActivityClass](vals[17]),
 		PositionSetting:            typeconv.ToEnum[typedef.DisplayPosition](vals[18]),
 		TemperatureSetting:         typeconv.ToEnum[typedef.DisplayMeasure](vals[21]),
-		LocalId:                    typeconv.ToUint16[typedef.UserLocalId](vals[22]),
-		GlobalId:                   typeconv.ToSliceByte[byte](vals[23]),
-		WakeTime:                   typeconv.ToUint32[typedef.LocaltimeIntoDay](vals[28]),
-		SleepTime:                  typeconv.ToUint32[typedef.LocaltimeIntoDay](vals[29]),
 		HeightSetting:              typeconv.ToEnum[typedef.DisplayMeasure](vals[30]),
-		UserRunningStepLength:      typeconv.ToUint16[uint16](vals[31]),
-		UserWalkingStepLength:      typeconv.ToUint16[uint16](vals[32]),
 		DepthSetting:               typeconv.ToEnum[typedef.DisplayMeasure](vals[47]),
-		DiveCount:                  typeconv.ToUint32[uint32](vals[49]),
 
 		DeveloperFields: developerFields,
 	}
@@ -111,14 +111,54 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumUserProfile)
 
+	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.FriendlyName
+		fields = append(fields, field)
+	}
+	if m.GlobalId != nil {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = m.GlobalId
+		fields = append(fields, field)
+	}
+	if uint32(m.WakeTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 28)
+		field.Value = uint32(m.WakeTime)
+		fields = append(fields, field)
+	}
+	if uint32(m.SleepTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 29)
+		field.Value = uint32(m.SleepTime)
+		fields = append(fields, field)
+	}
+	if m.DiveCount != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 49)
+		field.Value = m.DiveCount
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FriendlyName
+	if m.Weight != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Weight
+		fields = append(fields, field)
+	}
+	if uint16(m.LocalId) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = uint16(m.LocalId)
+		fields = append(fields, field)
+	}
+	if m.UserRunningStepLength != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 31)
+		field.Value = m.UserRunningStepLength
+		fields = append(fields, field)
+	}
+	if m.UserWalkingStepLength != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 32)
+		field.Value = m.UserWalkingStepLength
 		fields = append(fields, field)
 	}
 	if byte(m.Gender) != basetype.EnumInvalid {
@@ -134,11 +174,6 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 	if m.Height != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Height
-		fields = append(fields, field)
-	}
-	if m.Weight != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Weight
 		fields = append(fields, field)
 	}
 	if byte(m.Language) != basetype.EnumInvalid {
@@ -211,49 +246,14 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = byte(m.TemperatureSetting)
 		fields = append(fields, field)
 	}
-	if uint16(m.LocalId) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = uint16(m.LocalId)
-		fields = append(fields, field)
-	}
-	if m.GlobalId != nil {
-		field := fac.CreateField(mesg.Num, 23)
-		field.Value = m.GlobalId
-		fields = append(fields, field)
-	}
-	if uint32(m.WakeTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 28)
-		field.Value = uint32(m.WakeTime)
-		fields = append(fields, field)
-	}
-	if uint32(m.SleepTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 29)
-		field.Value = uint32(m.SleepTime)
-		fields = append(fields, field)
-	}
 	if byte(m.HeightSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = byte(m.HeightSetting)
 		fields = append(fields, field)
 	}
-	if m.UserRunningStepLength != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 31)
-		field.Value = m.UserRunningStepLength
-		fields = append(fields, field)
-	}
-	if m.UserWalkingStepLength != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 32)
-		field.Value = m.UserWalkingStepLength
-		fields = append(fields, field)
-	}
 	if byte(m.DepthSetting) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 47)
 		field.Value = byte(m.DepthSetting)
-		fields = append(fields, field)
-	}
-	if m.DiveCount != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 49)
-		field.Value = m.DiveCount
 		fields = append(fields, field)
 	}
 
@@ -263,16 +263,6 @@ func (m *UserProfile) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// HeightScaled return Height in its scaled value [Scale: 100; Units: m].
-//
-// If Height value is invalid, float64 invalid value will be returned.
-func (m *UserProfile) HeightScaled() float64 {
-	if m.Height == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.Height, 100, 0)
 }
 
 // WeightScaled return Weight in its scaled value [Scale: 10; Units: kg].
@@ -305,10 +295,14 @@ func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 	return scaleoffset.Apply(m.UserWalkingStepLength, 1000, 0)
 }
 
-// SetMessageIndex sets UserProfile value.
-func (m *UserProfile) SetMessageIndex(v typedef.MessageIndex) *UserProfile {
-	m.MessageIndex = v
-	return m
+// HeightScaled return Height in its scaled value [Scale: 100; Units: m].
+//
+// If Height value is invalid, float64 invalid value will be returned.
+func (m *UserProfile) HeightScaled() float64 {
+	if m.Height == basetype.Uint8Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Height, 100, 0)
 }
 
 // SetFriendlyName sets UserProfile value.
@@ -316,6 +310,72 @@ func (m *UserProfile) SetMessageIndex(v typedef.MessageIndex) *UserProfile {
 // Used for Morning Report greeting
 func (m *UserProfile) SetFriendlyName(v string) *UserProfile {
 	m.FriendlyName = v
+	return m
+}
+
+// SetGlobalId sets UserProfile value.
+//
+// Array: [6]
+func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
+	m.GlobalId = v
+	return m
+}
+
+// SetWakeTime sets UserProfile value.
+//
+// Typical wake time
+func (m *UserProfile) SetWakeTime(v typedef.LocaltimeIntoDay) *UserProfile {
+	m.WakeTime = v
+	return m
+}
+
+// SetSleepTime sets UserProfile value.
+//
+// Typical bed time
+func (m *UserProfile) SetSleepTime(v typedef.LocaltimeIntoDay) *UserProfile {
+	m.SleepTime = v
+	return m
+}
+
+// SetDiveCount sets UserProfile value.
+func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
+	m.DiveCount = v
+	return m
+}
+
+// SetMessageIndex sets UserProfile value.
+func (m *UserProfile) SetMessageIndex(v typedef.MessageIndex) *UserProfile {
+	m.MessageIndex = v
+	return m
+}
+
+// SetWeight sets UserProfile value.
+//
+// Scale: 10; Units: kg
+func (m *UserProfile) SetWeight(v uint16) *UserProfile {
+	m.Weight = v
+	return m
+}
+
+// SetLocalId sets UserProfile value.
+func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
+	m.LocalId = v
+	return m
+}
+
+// SetUserRunningStepLength sets UserProfile value.
+//
+// Scale: 1000; Units: m; User defined running step length set to 0 for auto length
+func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
+	m.UserRunningStepLength = v
+	return m
+}
+
+// SetUserWalkingStepLength sets UserProfile value.
+//
+// Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
+	m.UserWalkingStepLength = v
 	return m
 }
 
@@ -338,14 +398,6 @@ func (m *UserProfile) SetAge(v uint8) *UserProfile {
 // Scale: 100; Units: m
 func (m *UserProfile) SetHeight(v uint8) *UserProfile {
 	m.Height = v
-	return m
-}
-
-// SetWeight sets UserProfile value.
-//
-// Scale: 10; Units: kg
-func (m *UserProfile) SetWeight(v uint16) *UserProfile {
-	m.Weight = v
 	return m
 }
 
@@ -441,67 +493,15 @@ func (m *UserProfile) SetTemperatureSetting(v typedef.DisplayMeasure) *UserProfi
 	return m
 }
 
-// SetLocalId sets UserProfile value.
-func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
-	m.LocalId = v
-	return m
-}
-
-// SetGlobalId sets UserProfile value.
-//
-// Array: [6]
-func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
-	m.GlobalId = v
-	return m
-}
-
-// SetWakeTime sets UserProfile value.
-//
-// Typical wake time
-func (m *UserProfile) SetWakeTime(v typedef.LocaltimeIntoDay) *UserProfile {
-	m.WakeTime = v
-	return m
-}
-
-// SetSleepTime sets UserProfile value.
-//
-// Typical bed time
-func (m *UserProfile) SetSleepTime(v typedef.LocaltimeIntoDay) *UserProfile {
-	m.SleepTime = v
-	return m
-}
-
 // SetHeightSetting sets UserProfile value.
 func (m *UserProfile) SetHeightSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.HeightSetting = v
 	return m
 }
 
-// SetUserRunningStepLength sets UserProfile value.
-//
-// Scale: 1000; Units: m; User defined running step length set to 0 for auto length
-func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
-	m.UserRunningStepLength = v
-	return m
-}
-
-// SetUserWalkingStepLength sets UserProfile value.
-//
-// Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
-func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
-	m.UserWalkingStepLength = v
-	return m
-}
-
 // SetDepthSetting sets UserProfile value.
 func (m *UserProfile) SetDepthSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.DepthSetting = v
-	return m
-}
-
-// SetDiveCount sets UserProfile value.
-func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
-	m.DiveCount = v
 	return m
 }
 

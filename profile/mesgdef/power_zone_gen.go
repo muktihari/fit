@@ -16,9 +16,9 @@ import (
 
 // PowerZone is a PowerZone message.
 type PowerZone struct {
+	Name         string
 	MessageIndex typedef.MessageIndex
 	HighValue    uint16 // Units: watts
-	Name         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -42,9 +42,9 @@ func NewPowerZone(mesg *proto.Message) *PowerZone {
 	}
 
 	return &PowerZone{
+		Name:         typeconv.ToString[string](vals[2]),
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		HighValue:    typeconv.ToUint16[uint16](vals[1]),
-		Name:         typeconv.ToString[string](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -58,6 +58,11 @@ func (m *PowerZone) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumPowerZone)
 
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Name
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
@@ -68,11 +73,6 @@ func (m *PowerZone) ToMesg(fac Factory) proto.Message {
 		field.Value = m.HighValue
 		fields = append(fields, field)
 	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Name
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -80,6 +80,12 @@ func (m *PowerZone) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SetName sets PowerZone value.
+func (m *PowerZone) SetName(v string) *PowerZone {
+	m.Name = v
+	return m
 }
 
 // SetMessageIndex sets PowerZone value.
@@ -93,12 +99,6 @@ func (m *PowerZone) SetMessageIndex(v typedef.MessageIndex) *PowerZone {
 // Units: watts
 func (m *PowerZone) SetHighValue(v uint16) *PowerZone {
 	m.HighValue = v
-	return m
-}
-
-// SetName sets PowerZone value.
-func (m *PowerZone) SetName(v string) *PowerZone {
-	m.Name = v
 	return m
 }
 

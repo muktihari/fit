@@ -17,10 +17,10 @@ import (
 // FieldCapabilities is a FieldCapabilities message.
 type FieldCapabilities struct {
 	MessageIndex typedef.MessageIndex
-	File         typedef.File
 	MesgNum      typedef.MesgNum
-	FieldNum     uint8
 	Count        uint16
+	File         typedef.File
+	FieldNum     uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,10 +45,10 @@ func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 
 	return &FieldCapabilities{
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		File:         typeconv.ToEnum[typedef.File](vals[0]),
 		MesgNum:      typeconv.ToUint16[typedef.MesgNum](vals[1]),
-		FieldNum:     typeconv.ToUint8[uint8](vals[2]),
 		Count:        typeconv.ToUint16[uint16](vals[3]),
+		File:         typeconv.ToEnum[typedef.File](vals[0]),
+		FieldNum:     typeconv.ToUint8[uint8](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,24 +67,24 @@ func (m *FieldCapabilities) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if byte(m.File) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.File)
-		fields = append(fields, field)
-	}
 	if uint16(m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = uint16(m.MesgNum)
 		fields = append(fields, field)
 	}
-	if m.FieldNum != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.FieldNum
-		fields = append(fields, field)
-	}
 	if m.Count != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Count
+		fields = append(fields, field)
+	}
+	if byte(m.File) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.File)
+		fields = append(fields, field)
+	}
+	if m.FieldNum != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.FieldNum
 		fields = append(fields, field)
 	}
 
@@ -102,27 +102,27 @@ func (m *FieldCapabilities) SetMessageIndex(v typedef.MessageIndex) *FieldCapabi
 	return m
 }
 
-// SetFile sets FieldCapabilities value.
-func (m *FieldCapabilities) SetFile(v typedef.File) *FieldCapabilities {
-	m.File = v
-	return m
-}
-
 // SetMesgNum sets FieldCapabilities value.
 func (m *FieldCapabilities) SetMesgNum(v typedef.MesgNum) *FieldCapabilities {
 	m.MesgNum = v
 	return m
 }
 
-// SetFieldNum sets FieldCapabilities value.
-func (m *FieldCapabilities) SetFieldNum(v uint8) *FieldCapabilities {
-	m.FieldNum = v
-	return m
-}
-
 // SetCount sets FieldCapabilities value.
 func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
 	m.Count = v
+	return m
+}
+
+// SetFile sets FieldCapabilities value.
+func (m *FieldCapabilities) SetFile(v typedef.File) *FieldCapabilities {
+	m.File = v
+	return m
+}
+
+// SetFieldNum sets FieldCapabilities value.
+func (m *FieldCapabilities) SetFieldNum(v uint8) *FieldCapabilities {
+	m.FieldNum = v
 	return m
 }
 

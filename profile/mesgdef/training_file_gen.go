@@ -19,11 +19,11 @@ import (
 // TrainingFile is a TrainingFile message.
 type TrainingFile struct {
 	Timestamp    time.Time
-	Type         typedef.File
+	TimeCreated  time.Time
+	SerialNumber uint32
 	Manufacturer typedef.Manufacturer
 	Product      uint16
-	SerialNumber uint32
-	TimeCreated  time.Time
+	Type         typedef.File
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -48,11 +48,11 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 
 	return &TrainingFile{
 		Timestamp:    datetime.ToTime(vals[253]),
-		Type:         typeconv.ToEnum[typedef.File](vals[0]),
+		TimeCreated:  datetime.ToTime(vals[4]),
+		SerialNumber: typeconv.ToUint32z[uint32](vals[3]),
 		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[1]),
 		Product:      typeconv.ToUint16[uint16](vals[2]),
-		SerialNumber: typeconv.ToUint32z[uint32](vals[3]),
-		TimeCreated:  datetime.ToTime(vals[4]),
+		Type:         typeconv.ToEnum[typedef.File](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,9 +71,14 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Type)
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = datetime.ToUint32(m.TimeCreated)
+		fields = append(fields, field)
+	}
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
@@ -86,14 +91,9 @@ func (m *TrainingFile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Product
 		fields = append(fields, field)
 	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = uint32(m.SerialNumber)
-		fields = append(fields, field)
-	}
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = datetime.ToUint32(m.TimeCreated)
+	if byte(m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 
@@ -111,9 +111,15 @@ func (m *TrainingFile) SetTimestamp(v time.Time) *TrainingFile {
 	return m
 }
 
-// SetType sets TrainingFile value.
-func (m *TrainingFile) SetType(v typedef.File) *TrainingFile {
-	m.Type = v
+// SetTimeCreated sets TrainingFile value.
+func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
+	m.TimeCreated = v
+	return m
+}
+
+// SetSerialNumber sets TrainingFile value.
+func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
+	m.SerialNumber = v
 	return m
 }
 
@@ -129,15 +135,9 @@ func (m *TrainingFile) SetProduct(v uint16) *TrainingFile {
 	return m
 }
 
-// SetSerialNumber sets TrainingFile value.
-func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
-	m.SerialNumber = v
-	return m
-}
-
-// SetTimeCreated sets TrainingFile value.
-func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
-	m.TimeCreated = v
+// SetType sets TrainingFile value.
+func (m *TrainingFile) SetType(v typedef.File) *TrainingFile {
+	m.Type = v
 	return m
 }
 

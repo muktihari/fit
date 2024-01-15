@@ -18,17 +18,17 @@ import (
 
 // BloodPressure is a BloodPressure message.
 type BloodPressure struct {
-	Timestamp            time.Time // Units: s
-	SystolicPressure     uint16    // Units: mmHg
-	DiastolicPressure    uint16    // Units: mmHg
-	MeanArterialPressure uint16    // Units: mmHg
-	Map3SampleMean       uint16    // Units: mmHg
-	MapMorningValues     uint16    // Units: mmHg
-	MapEveningValues     uint16    // Units: mmHg
-	HeartRate            uint8     // Units: bpm
+	Timestamp            time.Time            // Units: s
+	SystolicPressure     uint16               // Units: mmHg
+	DiastolicPressure    uint16               // Units: mmHg
+	MeanArterialPressure uint16               // Units: mmHg
+	Map3SampleMean       uint16               // Units: mmHg
+	MapMorningValues     uint16               // Units: mmHg
+	MapEveningValues     uint16               // Units: mmHg
+	UserProfileIndex     typedef.MessageIndex // Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
+	HeartRate            uint8                // Units: bpm
 	HeartRateType        typedef.HrType
 	Status               typedef.BpStatus
-	UserProfileIndex     typedef.MessageIndex // Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -59,10 +59,10 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 		Map3SampleMean:       typeconv.ToUint16[uint16](vals[3]),
 		MapMorningValues:     typeconv.ToUint16[uint16](vals[4]),
 		MapEveningValues:     typeconv.ToUint16[uint16](vals[5]),
+		UserProfileIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[9]),
 		HeartRate:            typeconv.ToUint8[uint8](vals[6]),
 		HeartRateType:        typeconv.ToEnum[typedef.HrType](vals[7]),
 		Status:               typeconv.ToEnum[typedef.BpStatus](vals[8]),
-		UserProfileIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[9]),
 
 		DeveloperFields: developerFields,
 	}
@@ -111,6 +111,11 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MapEveningValues
 		fields = append(fields, field)
 	}
+	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = uint16(m.UserProfileIndex)
+		fields = append(fields, field)
+	}
 	if m.HeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.HeartRate
@@ -124,11 +129,6 @@ func (m *BloodPressure) ToMesg(fac Factory) proto.Message {
 	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = byte(m.Status)
-		fields = append(fields, field)
-	}
-	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = uint16(m.UserProfileIndex)
 		fields = append(fields, field)
 	}
 
@@ -196,6 +196,14 @@ func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
 	return m
 }
 
+// SetUserProfileIndex sets BloodPressure value.
+//
+// Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
+func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {
+	m.UserProfileIndex = v
+	return m
+}
+
 // SetHeartRate sets BloodPressure value.
 //
 // Units: bpm
@@ -213,14 +221,6 @@ func (m *BloodPressure) SetHeartRateType(v typedef.HrType) *BloodPressure {
 // SetStatus sets BloodPressure value.
 func (m *BloodPressure) SetStatus(v typedef.BpStatus) *BloodPressure {
 	m.Status = v
-	return m
-}
-
-// SetUserProfileIndex sets BloodPressure value.
-//
-// Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
-func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {
-	m.UserProfileIndex = v
 	return m
 }
 

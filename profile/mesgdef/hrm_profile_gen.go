@@ -17,10 +17,10 @@ import (
 // HrmProfile is a HrmProfile message.
 type HrmProfile struct {
 	MessageIndex      typedef.MessageIndex
-	Enabled           bool
 	HrmAntId          uint16
-	LogHrv            bool
 	HrmAntIdTransType uint8
+	Enabled           bool
+	LogHrv            bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,10 +45,10 @@ func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 
 	return &HrmProfile{
 		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Enabled:           typeconv.ToBool[bool](vals[0]),
 		HrmAntId:          typeconv.ToUint16z[uint16](vals[1]),
-		LogHrv:            typeconv.ToBool[bool](vals[2]),
 		HrmAntIdTransType: typeconv.ToUint8z[uint8](vals[3]),
+		Enabled:           typeconv.ToBool[bool](vals[0]),
+		LogHrv:            typeconv.ToBool[bool](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,24 +67,24 @@ func (m *HrmProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Enabled
-		fields = append(fields, field)
-	}
 	if uint16(m.HrmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = uint16(m.HrmAntId)
 		fields = append(fields, field)
 	}
-	if m.LogHrv != false {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.LogHrv
-		fields = append(fields, field)
-	}
 	if uint8(m.HrmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = uint8(m.HrmAntIdTransType)
+		fields = append(fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.Enabled
+		fields = append(fields, field)
+	}
+	if m.LogHrv != false {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.LogHrv
 		fields = append(fields, field)
 	}
 
@@ -102,27 +102,27 @@ func (m *HrmProfile) SetMessageIndex(v typedef.MessageIndex) *HrmProfile {
 	return m
 }
 
-// SetEnabled sets HrmProfile value.
-func (m *HrmProfile) SetEnabled(v bool) *HrmProfile {
-	m.Enabled = v
-	return m
-}
-
 // SetHrmAntId sets HrmProfile value.
 func (m *HrmProfile) SetHrmAntId(v uint16) *HrmProfile {
 	m.HrmAntId = v
 	return m
 }
 
-// SetLogHrv sets HrmProfile value.
-func (m *HrmProfile) SetLogHrv(v bool) *HrmProfile {
-	m.LogHrv = v
-	return m
-}
-
 // SetHrmAntIdTransType sets HrmProfile value.
 func (m *HrmProfile) SetHrmAntIdTransType(v uint8) *HrmProfile {
 	m.HrmAntIdTransType = v
+	return m
+}
+
+// SetEnabled sets HrmProfile value.
+func (m *HrmProfile) SetEnabled(v bool) *HrmProfile {
+	m.Enabled = v
+	return m
+}
+
+// SetLogHrv sets HrmProfile value.
+func (m *HrmProfile) SetLogHrv(v bool) *HrmProfile {
+	m.LogHrv = v
 	return m
 }
 

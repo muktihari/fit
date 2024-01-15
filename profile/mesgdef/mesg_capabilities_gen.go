@@ -17,10 +17,10 @@ import (
 // MesgCapabilities is a MesgCapabilities message.
 type MesgCapabilities struct {
 	MessageIndex typedef.MessageIndex
-	File         typedef.File
 	MesgNum      typedef.MesgNum
-	CountType    typedef.MesgCount
 	Count        uint16
+	File         typedef.File
+	CountType    typedef.MesgCount
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,10 +45,10 @@ func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 
 	return &MesgCapabilities{
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		File:         typeconv.ToEnum[typedef.File](vals[0]),
 		MesgNum:      typeconv.ToUint16[typedef.MesgNum](vals[1]),
-		CountType:    typeconv.ToEnum[typedef.MesgCount](vals[2]),
 		Count:        typeconv.ToUint16[uint16](vals[3]),
+		File:         typeconv.ToEnum[typedef.File](vals[0]),
+		CountType:    typeconv.ToEnum[typedef.MesgCount](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,24 +67,24 @@ func (m *MesgCapabilities) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if byte(m.File) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.File)
-		fields = append(fields, field)
-	}
 	if uint16(m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = uint16(m.MesgNum)
 		fields = append(fields, field)
 	}
-	if byte(m.CountType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.CountType)
-		fields = append(fields, field)
-	}
 	if m.Count != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Count
+		fields = append(fields, field)
+	}
+	if byte(m.File) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.File)
+		fields = append(fields, field)
+	}
+	if byte(m.CountType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = byte(m.CountType)
 		fields = append(fields, field)
 	}
 
@@ -102,27 +102,27 @@ func (m *MesgCapabilities) SetMessageIndex(v typedef.MessageIndex) *MesgCapabili
 	return m
 }
 
-// SetFile sets MesgCapabilities value.
-func (m *MesgCapabilities) SetFile(v typedef.File) *MesgCapabilities {
-	m.File = v
-	return m
-}
-
 // SetMesgNum sets MesgCapabilities value.
 func (m *MesgCapabilities) SetMesgNum(v typedef.MesgNum) *MesgCapabilities {
 	m.MesgNum = v
 	return m
 }
 
-// SetCountType sets MesgCapabilities value.
-func (m *MesgCapabilities) SetCountType(v typedef.MesgCount) *MesgCapabilities {
-	m.CountType = v
-	return m
-}
-
 // SetCount sets MesgCapabilities value.
 func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
 	m.Count = v
+	return m
+}
+
+// SetFile sets MesgCapabilities value.
+func (m *MesgCapabilities) SetFile(v typedef.File) *MesgCapabilities {
+	m.File = v
+	return m
+}
+
+// SetCountType sets MesgCapabilities value.
+func (m *MesgCapabilities) SetCountType(v typedef.MesgCount) *MesgCapabilities {
+	m.CountType = v
 	return m
 }
 

@@ -16,9 +16,9 @@ import (
 
 // HrZone is a HrZone message.
 type HrZone struct {
+	Name         string
 	MessageIndex typedef.MessageIndex
 	HighBpm      uint8 // Units: bpm
-	Name         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -42,9 +42,9 @@ func NewHrZone(mesg *proto.Message) *HrZone {
 	}
 
 	return &HrZone{
+		Name:         typeconv.ToString[string](vals[2]),
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
-		Name:         typeconv.ToString[string](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -58,6 +58,11 @@ func (m *HrZone) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumHrZone)
 
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Name
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
@@ -68,11 +73,6 @@ func (m *HrZone) ToMesg(fac Factory) proto.Message {
 		field.Value = m.HighBpm
 		fields = append(fields, field)
 	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Name
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -80,6 +80,12 @@ func (m *HrZone) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SetName sets HrZone value.
+func (m *HrZone) SetName(v string) *HrZone {
+	m.Name = v
+	return m
 }
 
 // SetMessageIndex sets HrZone value.
@@ -93,12 +99,6 @@ func (m *HrZone) SetMessageIndex(v typedef.MessageIndex) *HrZone {
 // Units: bpm
 func (m *HrZone) SetHighBpm(v uint8) *HrZone {
 	m.HighBpm = v
-	return m
-}
-
-// SetName sets HrZone value.
-func (m *HrZone) SetName(v string) *HrZone {
-	m.Name = v
 	return m
 }
 

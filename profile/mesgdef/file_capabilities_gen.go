@@ -16,12 +16,12 @@ import (
 
 // FileCapabilities is a FileCapabilities message.
 type FileCapabilities struct {
+	Directory    string
+	MaxSize      uint32 // Units: bytes
 	MessageIndex typedef.MessageIndex
+	MaxCount     uint16
 	Type         typedef.File
 	Flags        typedef.FileFlags
-	Directory    string
-	MaxCount     uint16
-	MaxSize      uint32 // Units: bytes
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,12 +45,12 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 	}
 
 	return &FileCapabilities{
+		Directory:    typeconv.ToString[string](vals[2]),
+		MaxSize:      typeconv.ToUint32[uint32](vals[4]),
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		MaxCount:     typeconv.ToUint16[uint16](vals[3]),
 		Type:         typeconv.ToEnum[typedef.File](vals[0]),
 		Flags:        typeconv.ToUint8z[typedef.FileFlags](vals[1]),
-		Directory:    typeconv.ToString[string](vals[2]),
-		MaxCount:     typeconv.ToUint16[uint16](vals[3]),
-		MaxSize:      typeconv.ToUint32[uint32](vals[4]),
 
 		DeveloperFields: developerFields,
 	}
@@ -64,9 +64,24 @@ func (m *FileCapabilities) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFileCapabilities)
 
+	if m.Directory != basetype.StringInvalid && m.Directory != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Directory
+		fields = append(fields, field)
+	}
+	if m.MaxSize != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.MaxSize
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
+		fields = append(fields, field)
+	}
+	if m.MaxCount != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.MaxCount
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
@@ -79,21 +94,6 @@ func (m *FileCapabilities) ToMesg(fac Factory) proto.Message {
 		field.Value = uint8(m.Flags)
 		fields = append(fields, field)
 	}
-	if m.Directory != basetype.StringInvalid && m.Directory != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Directory
-		fields = append(fields, field)
-	}
-	if m.MaxCount != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.MaxCount
-		fields = append(fields, field)
-	}
-	if m.MaxSize != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.MaxSize
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -103,9 +103,29 @@ func (m *FileCapabilities) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SetDirectory sets FileCapabilities value.
+func (m *FileCapabilities) SetDirectory(v string) *FileCapabilities {
+	m.Directory = v
+	return m
+}
+
+// SetMaxSize sets FileCapabilities value.
+//
+// Units: bytes
+func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
+	m.MaxSize = v
+	return m
+}
+
 // SetMessageIndex sets FileCapabilities value.
 func (m *FileCapabilities) SetMessageIndex(v typedef.MessageIndex) *FileCapabilities {
 	m.MessageIndex = v
+	return m
+}
+
+// SetMaxCount sets FileCapabilities value.
+func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
+	m.MaxCount = v
 	return m
 }
 
@@ -118,26 +138,6 @@ func (m *FileCapabilities) SetType(v typedef.File) *FileCapabilities {
 // SetFlags sets FileCapabilities value.
 func (m *FileCapabilities) SetFlags(v typedef.FileFlags) *FileCapabilities {
 	m.Flags = v
-	return m
-}
-
-// SetDirectory sets FileCapabilities value.
-func (m *FileCapabilities) SetDirectory(v string) *FileCapabilities {
-	m.Directory = v
-	return m
-}
-
-// SetMaxCount sets FileCapabilities value.
-func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
-	m.MaxCount = v
-	return m
-}
-
-// SetMaxSize sets FileCapabilities value.
-//
-// Units: bytes
-func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
-	m.MaxSize = v
 	return m
 }
 

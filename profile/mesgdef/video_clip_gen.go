@@ -18,13 +18,13 @@ import (
 
 // VideoClip is a VideoClip message.
 type VideoClip struct {
-	ClipNumber       uint16
 	StartTimestamp   time.Time
-	StartTimestampMs uint16
 	EndTimestamp     time.Time
-	EndTimestampMs   uint16
 	ClipStart        uint32 // Units: ms; Start of clip in video time
 	ClipEnd          uint32 // Units: ms; End of clip in video time
+	ClipNumber       uint16
+	StartTimestampMs uint16
+	EndTimestampMs   uint16
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -48,13 +48,13 @@ func NewVideoClip(mesg *proto.Message) *VideoClip {
 	}
 
 	return &VideoClip{
-		ClipNumber:       typeconv.ToUint16[uint16](vals[0]),
 		StartTimestamp:   datetime.ToTime(vals[1]),
-		StartTimestampMs: typeconv.ToUint16[uint16](vals[2]),
 		EndTimestamp:     datetime.ToTime(vals[3]),
-		EndTimestampMs:   typeconv.ToUint16[uint16](vals[4]),
 		ClipStart:        typeconv.ToUint32[uint32](vals[6]),
 		ClipEnd:          typeconv.ToUint32[uint32](vals[7]),
+		ClipNumber:       typeconv.ToUint16[uint16](vals[0]),
+		StartTimestampMs: typeconv.ToUint16[uint16](vals[2]),
+		EndTimestampMs:   typeconv.ToUint16[uint16](vals[4]),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,29 +68,14 @@ func (m *VideoClip) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoClip)
 
-	if m.ClipNumber != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ClipNumber
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.StartTimestamp)
 		fields = append(fields, field)
 	}
-	if m.StartTimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.StartTimestampMs
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = datetime.ToUint32(m.EndTimestamp)
-		fields = append(fields, field)
-	}
-	if m.EndTimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.EndTimestampMs
 		fields = append(fields, field)
 	}
 	if m.ClipStart != basetype.Uint32Invalid {
@@ -103,6 +88,21 @@ func (m *VideoClip) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ClipEnd
 		fields = append(fields, field)
 	}
+	if m.ClipNumber != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.ClipNumber
+		fields = append(fields, field)
+	}
+	if m.StartTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.StartTimestampMs
+		fields = append(fields, field)
+	}
+	if m.EndTimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.EndTimestampMs
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -112,33 +112,15 @@ func (m *VideoClip) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SetClipNumber sets VideoClip value.
-func (m *VideoClip) SetClipNumber(v uint16) *VideoClip {
-	m.ClipNumber = v
-	return m
-}
-
 // SetStartTimestamp sets VideoClip value.
 func (m *VideoClip) SetStartTimestamp(v time.Time) *VideoClip {
 	m.StartTimestamp = v
 	return m
 }
 
-// SetStartTimestampMs sets VideoClip value.
-func (m *VideoClip) SetStartTimestampMs(v uint16) *VideoClip {
-	m.StartTimestampMs = v
-	return m
-}
-
 // SetEndTimestamp sets VideoClip value.
 func (m *VideoClip) SetEndTimestamp(v time.Time) *VideoClip {
 	m.EndTimestamp = v
-	return m
-}
-
-// SetEndTimestampMs sets VideoClip value.
-func (m *VideoClip) SetEndTimestampMs(v uint16) *VideoClip {
-	m.EndTimestampMs = v
 	return m
 }
 
@@ -155,6 +137,24 @@ func (m *VideoClip) SetClipStart(v uint32) *VideoClip {
 // Units: ms; End of clip in video time
 func (m *VideoClip) SetClipEnd(v uint32) *VideoClip {
 	m.ClipEnd = v
+	return m
+}
+
+// SetClipNumber sets VideoClip value.
+func (m *VideoClip) SetClipNumber(v uint16) *VideoClip {
+	m.ClipNumber = v
+	return m
+}
+
+// SetStartTimestampMs sets VideoClip value.
+func (m *VideoClip) SetStartTimestampMs(v uint16) *VideoClip {
+	m.StartTimestampMs = v
+	return m
+}
+
+// SetEndTimestampMs sets VideoClip value.
+func (m *VideoClip) SetEndTimestampMs(v uint16) *VideoClip {
+	m.EndTimestampMs = v
 	return m
 }
 

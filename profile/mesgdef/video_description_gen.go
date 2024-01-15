@@ -16,9 +16,9 @@ import (
 
 // VideoDescription is a VideoDescription message.
 type VideoDescription struct {
+	Text         string
 	MessageIndex typedef.MessageIndex // Long descriptions will be split into multiple parts
 	MessageCount uint16               // Total number of description parts
-	Text         string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -42,9 +42,9 @@ func NewVideoDescription(mesg *proto.Message) *VideoDescription {
 	}
 
 	return &VideoDescription{
+		Text:         typeconv.ToString[string](vals[1]),
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		MessageCount: typeconv.ToUint16[uint16](vals[0]),
-		Text:         typeconv.ToString[string](vals[1]),
 
 		DeveloperFields: developerFields,
 	}
@@ -58,6 +58,11 @@ func (m *VideoDescription) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoDescription)
 
+	if m.Text != basetype.StringInvalid && m.Text != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Text
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
@@ -68,11 +73,6 @@ func (m *VideoDescription) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MessageCount
 		fields = append(fields, field)
 	}
-	if m.Text != basetype.StringInvalid && m.Text != "" {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Text
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -80,6 +80,12 @@ func (m *VideoDescription) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SetText sets VideoDescription value.
+func (m *VideoDescription) SetText(v string) *VideoDescription {
+	m.Text = v
+	return m
 }
 
 // SetMessageIndex sets VideoDescription value.
@@ -95,12 +101,6 @@ func (m *VideoDescription) SetMessageIndex(v typedef.MessageIndex) *VideoDescrip
 // Total number of description parts
 func (m *VideoDescription) SetMessageCount(v uint16) *VideoDescription {
 	m.MessageCount = v
-	return m
-}
-
-// SetText sets VideoDescription value.
-func (m *VideoDescription) SetText(v string) *VideoDescription {
-	m.Text = v
 	return m
 }
 

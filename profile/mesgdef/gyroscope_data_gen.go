@@ -19,7 +19,6 @@ import (
 // GyroscopeData is a GyroscopeData message.
 type GyroscopeData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
 	GyroX            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	GyroY            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
@@ -27,6 +26,7 @@ type GyroscopeData struct {
 	CalibratedGyroX  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
 	CalibratedGyroY  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
 	CalibratedGyroZ  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -51,7 +51,6 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 
 	return &GyroscopeData{
 		Timestamp:        datetime.ToTime(vals[253]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		GyroX:            typeconv.ToSliceUint16[uint16](vals[2]),
 		GyroY:            typeconv.ToSliceUint16[uint16](vals[3]),
@@ -59,6 +58,7 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 		CalibratedGyroX:  typeconv.ToSliceFloat32[float32](vals[5]),
 		CalibratedGyroY:  typeconv.ToSliceFloat32[float32](vals[6]),
 		CalibratedGyroZ:  typeconv.ToSliceFloat32[float32](vals[7]),
+		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,11 +75,6 @@ func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
@@ -117,6 +112,11 @@ func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CalibratedGyroZ
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -131,14 +131,6 @@ func (m *GyroscopeData) ToMesg(fac Factory) proto.Message {
 // Units: s; Whole second part of the timestamp
 func (m *GyroscopeData) SetTimestamp(v time.Time) *GyroscopeData {
 	m.Timestamp = v
-	return m
-}
-
-// SetTimestampMs sets GyroscopeData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
-	m.TimestampMs = v
 	return m
 }
 
@@ -195,6 +187,14 @@ func (m *GyroscopeData) SetCalibratedGyroY(v []float32) *GyroscopeData {
 // Array: [N]; Units: deg/s; Calibrated gyro reading
 func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {
 	m.CalibratedGyroZ = v
+	return m
+}
+
+// SetTimestampMs sets GyroscopeData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
+	m.TimestampMs = v
 	return m
 }
 

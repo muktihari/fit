@@ -17,13 +17,13 @@ import (
 
 // SegmentLeaderboardEntry is a SegmentLeaderboardEntry message.
 type SegmentLeaderboardEntry struct {
+	Name             string // Friendly name assigned to leader
+	ActivityIdString string // String version of the activity_id. 21 characters long, express in decimal
+	GroupPrimaryKey  uint32 // Primary user ID of this leader
+	ActivityId       uint32 // ID of the activity associated with this leader time
+	SegmentTime      uint32 // Scale: 1000; Units: s; Segment Time (includes pauses)
 	MessageIndex     typedef.MessageIndex
-	Name             string                         // Friendly name assigned to leader
 	Type             typedef.SegmentLeaderboardType // Leader classification
-	GroupPrimaryKey  uint32                         // Primary user ID of this leader
-	ActivityId       uint32                         // ID of the activity associated with this leader time
-	SegmentTime      uint32                         // Scale: 1000; Units: s; Segment Time (includes pauses)
-	ActivityIdString string                         // String version of the activity_id. 21 characters long, express in decimal
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -47,13 +47,13 @@ func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
 	}
 
 	return &SegmentLeaderboardEntry{
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Name:             typeconv.ToString[string](vals[0]),
-		Type:             typeconv.ToEnum[typedef.SegmentLeaderboardType](vals[1]),
+		ActivityIdString: typeconv.ToString[string](vals[5]),
 		GroupPrimaryKey:  typeconv.ToUint32[uint32](vals[2]),
 		ActivityId:       typeconv.ToUint32[uint32](vals[3]),
 		SegmentTime:      typeconv.ToUint32[uint32](vals[4]),
-		ActivityIdString: typeconv.ToString[string](vals[5]),
+		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		Type:             typeconv.ToEnum[typedef.SegmentLeaderboardType](vals[1]),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,19 +67,14 @@ func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentLeaderboardEntry)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Name
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.Type)
+	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.ActivityIdString
 		fields = append(fields, field)
 	}
 	if m.GroupPrimaryKey != basetype.Uint32Invalid {
@@ -97,9 +92,14 @@ func (m *SegmentLeaderboardEntry) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SegmentTime
 		fields = append(fields, field)
 	}
-	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.ActivityIdString
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
+		fields = append(fields, field)
+	}
+	if byte(m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = byte(m.Type)
 		fields = append(fields, field)
 	}
 
@@ -121,12 +121,6 @@ func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
 	return scaleoffset.Apply(m.SegmentTime, 1000, 0)
 }
 
-// SetMessageIndex sets SegmentLeaderboardEntry value.
-func (m *SegmentLeaderboardEntry) SetMessageIndex(v typedef.MessageIndex) *SegmentLeaderboardEntry {
-	m.MessageIndex = v
-	return m
-}
-
 // SetName sets SegmentLeaderboardEntry value.
 //
 // Friendly name assigned to leader
@@ -135,11 +129,11 @@ func (m *SegmentLeaderboardEntry) SetName(v string) *SegmentLeaderboardEntry {
 	return m
 }
 
-// SetType sets SegmentLeaderboardEntry value.
+// SetActivityIdString sets SegmentLeaderboardEntry value.
 //
-// Leader classification
-func (m *SegmentLeaderboardEntry) SetType(v typedef.SegmentLeaderboardType) *SegmentLeaderboardEntry {
-	m.Type = v
+// String version of the activity_id. 21 characters long, express in decimal
+func (m *SegmentLeaderboardEntry) SetActivityIdString(v string) *SegmentLeaderboardEntry {
+	m.ActivityIdString = v
 	return m
 }
 
@@ -167,11 +161,17 @@ func (m *SegmentLeaderboardEntry) SetSegmentTime(v uint32) *SegmentLeaderboardEn
 	return m
 }
 
-// SetActivityIdString sets SegmentLeaderboardEntry value.
+// SetMessageIndex sets SegmentLeaderboardEntry value.
+func (m *SegmentLeaderboardEntry) SetMessageIndex(v typedef.MessageIndex) *SegmentLeaderboardEntry {
+	m.MessageIndex = v
+	return m
+}
+
+// SetType sets SegmentLeaderboardEntry value.
 //
-// String version of the activity_id. 21 characters long, express in decimal
-func (m *SegmentLeaderboardEntry) SetActivityIdString(v string) *SegmentLeaderboardEntry {
-	m.ActivityIdString = v
+// Leader classification
+func (m *SegmentLeaderboardEntry) SetType(v typedef.SegmentLeaderboardType) *SegmentLeaderboardEntry {
+	m.Type = v
 	return m
 }
 

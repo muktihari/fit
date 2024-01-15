@@ -28,11 +28,11 @@ type ExdDataConceptConfiguration struct {
 	Descriptor   typedef.ExdDescriptors
 	IsSigned     bool
 
+	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
+
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewExdDataConceptConfiguration creates new ExdDataConceptConfiguration struct based on given mesg.
@@ -68,9 +68,9 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 		Descriptor:   typeconv.ToEnum[typedef.ExdDescriptors](vals[10]),
 		IsSigned:     typeconv.ToBool[bool](vals[11]),
 
-		DeveloperFields: developerFields,
-
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 

@@ -19,25 +19,25 @@ import (
 
 // Split is a Split message.
 type Split struct {
-	MessageIndex      typedef.MessageIndex
-	SplitType         typedef.SplitType
+	StartTime         time.Time
+	EndTime           time.Time
 	TotalElapsedTime  uint32 // Scale: 1000; Units: s
 	TotalTimerTime    uint32 // Scale: 1000; Units: s
 	TotalDistance     uint32 // Scale: 100; Units: m
 	AvgSpeed          uint32 // Scale: 1000; Units: m/s
-	StartTime         time.Time
-	TotalAscent       uint16 // Units: m
-	TotalDescent      uint16 // Units: m
 	StartPositionLat  int32  // Units: semicircles
 	StartPositionLong int32  // Units: semicircles
 	EndPositionLat    int32  // Units: semicircles
 	EndPositionLong   int32  // Units: semicircles
 	MaxSpeed          uint32 // Scale: 1000; Units: m/s
 	AvgVertSpeed      int32  // Scale: 1000; Units: m/s
-	EndTime           time.Time
 	TotalCalories     uint32 // Units: kcal
 	StartElevation    uint32 // Scale: 5; Offset: 500; Units: m
 	TotalMovingTime   uint32 // Scale: 1000; Units: s
+	MessageIndex      typedef.MessageIndex
+	TotalAscent       uint16 // Units: m
+	TotalDescent      uint16 // Units: m
+	SplitType         typedef.SplitType
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -61,25 +61,25 @@ func NewSplit(mesg *proto.Message) *Split {
 	}
 
 	return &Split{
-		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		SplitType:         typeconv.ToEnum[typedef.SplitType](vals[0]),
+		StartTime:         datetime.ToTime(vals[9]),
+		EndTime:           datetime.ToTime(vals[27]),
 		TotalElapsedTime:  typeconv.ToUint32[uint32](vals[1]),
 		TotalTimerTime:    typeconv.ToUint32[uint32](vals[2]),
 		TotalDistance:     typeconv.ToUint32[uint32](vals[3]),
 		AvgSpeed:          typeconv.ToUint32[uint32](vals[4]),
-		StartTime:         datetime.ToTime(vals[9]),
-		TotalAscent:       typeconv.ToUint16[uint16](vals[13]),
-		TotalDescent:      typeconv.ToUint16[uint16](vals[14]),
 		StartPositionLat:  typeconv.ToSint32[int32](vals[21]),
 		StartPositionLong: typeconv.ToSint32[int32](vals[22]),
 		EndPositionLat:    typeconv.ToSint32[int32](vals[23]),
 		EndPositionLong:   typeconv.ToSint32[int32](vals[24]),
 		MaxSpeed:          typeconv.ToUint32[uint32](vals[25]),
 		AvgVertSpeed:      typeconv.ToSint32[int32](vals[26]),
-		EndTime:           datetime.ToTime(vals[27]),
 		TotalCalories:     typeconv.ToUint32[uint32](vals[28]),
 		StartElevation:    typeconv.ToUint32[uint32](vals[74]),
 		TotalMovingTime:   typeconv.ToUint32[uint32](vals[110]),
+		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		TotalAscent:       typeconv.ToUint16[uint16](vals[13]),
+		TotalDescent:      typeconv.ToUint16[uint16](vals[14]),
+		SplitType:         typeconv.ToEnum[typedef.SplitType](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -93,14 +93,14 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSplit)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = datetime.ToUint32(m.StartTime)
 		fields = append(fields, field)
 	}
-	if byte(m.SplitType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SplitType)
+	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 27)
+		field.Value = datetime.ToUint32(m.EndTime)
 		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
@@ -121,21 +121,6 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 	if m.AvgSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.AvgSpeed
-		fields = append(fields, field)
-	}
-	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = datetime.ToUint32(m.StartTime)
-		fields = append(fields, field)
-	}
-	if m.TotalAscent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.TotalAscent
-		fields = append(fields, field)
-	}
-	if m.TotalDescent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
-		field.Value = m.TotalDescent
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -168,11 +153,6 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgVertSpeed
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 27)
-		field.Value = datetime.ToUint32(m.EndTime)
-		fields = append(fields, field)
-	}
 	if m.TotalCalories != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = m.TotalCalories
@@ -186,6 +166,26 @@ func (m *Split) ToMesg(fac Factory) proto.Message {
 	if m.TotalMovingTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 110)
 		field.Value = m.TotalMovingTime
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
+		fields = append(fields, field)
+	}
+	if m.TotalAscent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.TotalAscent
+		fields = append(fields, field)
+	}
+	if m.TotalDescent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.TotalDescent
+		fields = append(fields, field)
+	}
+	if byte(m.SplitType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.SplitType)
 		fields = append(fields, field)
 	}
 
@@ -277,15 +277,15 @@ func (m *Split) TotalMovingTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
 
-// SetMessageIndex sets Split value.
-func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
-	m.MessageIndex = v
+// SetStartTime sets Split value.
+func (m *Split) SetStartTime(v time.Time) *Split {
+	m.StartTime = v
 	return m
 }
 
-// SetSplitType sets Split value.
-func (m *Split) SetSplitType(v typedef.SplitType) *Split {
-	m.SplitType = v
+// SetEndTime sets Split value.
+func (m *Split) SetEndTime(v time.Time) *Split {
+	m.EndTime = v
 	return m
 }
 
@@ -318,28 +318,6 @@ func (m *Split) SetTotalDistance(v uint32) *Split {
 // Scale: 1000; Units: m/s
 func (m *Split) SetAvgSpeed(v uint32) *Split {
 	m.AvgSpeed = v
-	return m
-}
-
-// SetStartTime sets Split value.
-func (m *Split) SetStartTime(v time.Time) *Split {
-	m.StartTime = v
-	return m
-}
-
-// SetTotalAscent sets Split value.
-//
-// Units: m
-func (m *Split) SetTotalAscent(v uint16) *Split {
-	m.TotalAscent = v
-	return m
-}
-
-// SetTotalDescent sets Split value.
-//
-// Units: m
-func (m *Split) SetTotalDescent(v uint16) *Split {
-	m.TotalDescent = v
 	return m
 }
 
@@ -391,12 +369,6 @@ func (m *Split) SetAvgVertSpeed(v int32) *Split {
 	return m
 }
 
-// SetEndTime sets Split value.
-func (m *Split) SetEndTime(v time.Time) *Split {
-	m.EndTime = v
-	return m
-}
-
 // SetTotalCalories sets Split value.
 //
 // Units: kcal
@@ -418,6 +390,34 @@ func (m *Split) SetStartElevation(v uint32) *Split {
 // Scale: 1000; Units: s
 func (m *Split) SetTotalMovingTime(v uint32) *Split {
 	m.TotalMovingTime = v
+	return m
+}
+
+// SetMessageIndex sets Split value.
+func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
+	m.MessageIndex = v
+	return m
+}
+
+// SetTotalAscent sets Split value.
+//
+// Units: m
+func (m *Split) SetTotalAscent(v uint16) *Split {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets Split value.
+//
+// Units: m
+func (m *Split) SetTotalDescent(v uint16) *Split {
+	m.TotalDescent = v
+	return m
+}
+
+// SetSplitType sets Split value.
+func (m *Split) SetSplitType(v typedef.SplitType) *Split {
+	m.SplitType = v
 	return m
 }
 

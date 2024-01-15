@@ -20,12 +20,12 @@ import (
 // Activity is a Activity message.
 type Activity struct {
 	Timestamp      time.Time
-	TotalTimerTime uint32 // Scale: 1000; Units: s; Exclude pauses
+	LocalTimestamp time.Time // timestamp epoch expressed in local time, used to convert activity timestamps to local time
+	TotalTimerTime uint32    // Scale: 1000; Units: s; Exclude pauses
 	NumSessions    uint16
 	Type           typedef.Activity
 	Event          typedef.Event
 	EventType      typedef.EventType
-	LocalTimestamp time.Time // timestamp epoch expressed in local time, used to convert activity timestamps to local time
 	EventGroup     uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -51,12 +51,12 @@ func NewActivity(mesg *proto.Message) *Activity {
 
 	return &Activity{
 		Timestamp:      datetime.ToTime(vals[253]),
+		LocalTimestamp: datetime.ToTime(vals[5]),
 		TotalTimerTime: typeconv.ToUint32[uint32](vals[0]),
 		NumSessions:    typeconv.ToUint16[uint16](vals[1]),
 		Type:           typeconv.ToEnum[typedef.Activity](vals[2]),
 		Event:          typeconv.ToEnum[typedef.Event](vals[3]),
 		EventType:      typeconv.ToEnum[typedef.EventType](vals[4]),
-		LocalTimestamp: datetime.ToTime(vals[5]),
 		EventGroup:     typeconv.ToUint8[uint8](vals[6]),
 
 		DeveloperFields: developerFields,
@@ -74,6 +74,11 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = datetime.ToUint32(m.LocalTimestamp)
 		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
@@ -99,11 +104,6 @@ func (m *Activity) ToMesg(fac Factory) proto.Message {
 	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = byte(m.EventType)
-		fields = append(fields, field)
-	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = datetime.ToUint32(m.LocalTimestamp)
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
@@ -136,6 +136,14 @@ func (m *Activity) SetTimestamp(v time.Time) *Activity {
 	return m
 }
 
+// SetLocalTimestamp sets Activity value.
+//
+// timestamp epoch expressed in local time, used to convert activity timestamps to local time
+func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
+	m.LocalTimestamp = v
+	return m
+}
+
 // SetTotalTimerTime sets Activity value.
 //
 // Scale: 1000; Units: s; Exclude pauses
@@ -165,14 +173,6 @@ func (m *Activity) SetEvent(v typedef.Event) *Activity {
 // SetEventType sets Activity value.
 func (m *Activity) SetEventType(v typedef.EventType) *Activity {
 	m.EventType = v
-	return m
-}
-
-// SetLocalTimestamp sets Activity value.
-//
-// timestamp epoch expressed in local time, used to convert activity timestamps to local time
-func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
-	m.LocalTimestamp = v
 	return m
 }
 

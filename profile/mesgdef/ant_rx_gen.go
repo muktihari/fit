@@ -20,17 +20,17 @@ import (
 // AntRx is a AntRx message.
 type AntRx struct {
 	Timestamp           time.Time // Units: s
+	MesgData            []byte    // Array: [N]
+	Data                []byte    // Array: [N]
 	FractionalTimestamp uint16    // Scale: 32768; Units: s
 	MesgId              byte
-	MesgData            []byte // Array: [N]
 	ChannelNumber       uint8
-	Data                []byte // Array: [N]
+
+	IsExpandedFields [5]bool // Used for tracking expanded fields, field.Num as index.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [5]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewAntRx creates new AntRx struct based on given mesg.
@@ -55,15 +55,15 @@ func NewAntRx(mesg *proto.Message) *AntRx {
 
 	return &AntRx{
 		Timestamp:           datetime.ToTime(vals[253]),
+		MesgData:            typeconv.ToSliceByte[byte](vals[2]),
+		Data:                typeconv.ToSliceByte[byte](vals[4]),
 		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
 		MesgId:              typeconv.ToByte[byte](vals[1]),
-		MesgData:            typeconv.ToSliceByte[byte](vals[2]),
 		ChannelNumber:       typeconv.ToUint8[uint8](vals[3]),
-		Data:                typeconv.ToSliceByte[byte](vals[4]),
-
-		DeveloperFields: developerFields,
 
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -80,6 +80,17 @@ func (m *AntRx) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
+	if m.MesgData != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.MesgData
+		fields = append(fields, field)
+	}
+	if m.Data != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Data
+		field.IsExpandedField = m.IsExpandedFields[4]
+		fields = append(fields, field)
+	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FractionalTimestamp
@@ -90,21 +101,10 @@ func (m *AntRx) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MesgId
 		fields = append(fields, field)
 	}
-	if m.MesgData != nil {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.MesgData
-		fields = append(fields, field)
-	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ChannelNumber
 		field.IsExpandedField = m.IsExpandedFields[3]
-		fields = append(fields, field)
-	}
-	if m.Data != nil {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Data
-		field.IsExpandedField = m.IsExpandedFields[4]
 		fields = append(fields, field)
 	}
 
@@ -134,6 +134,22 @@ func (m *AntRx) SetTimestamp(v time.Time) *AntRx {
 	return m
 }
 
+// SetMesgData sets AntRx value.
+//
+// Array: [N]
+func (m *AntRx) SetMesgData(v []byte) *AntRx {
+	m.MesgData = v
+	return m
+}
+
+// SetData sets AntRx value.
+//
+// Array: [N]
+func (m *AntRx) SetData(v []byte) *AntRx {
+	m.Data = v
+	return m
+}
+
 // SetFractionalTimestamp sets AntRx value.
 //
 // Scale: 32768; Units: s
@@ -148,25 +164,9 @@ func (m *AntRx) SetMesgId(v byte) *AntRx {
 	return m
 }
 
-// SetMesgData sets AntRx value.
-//
-// Array: [N]
-func (m *AntRx) SetMesgData(v []byte) *AntRx {
-	m.MesgData = v
-	return m
-}
-
 // SetChannelNumber sets AntRx value.
 func (m *AntRx) SetChannelNumber(v uint8) *AntRx {
 	m.ChannelNumber = v
-	return m
-}
-
-// SetData sets AntRx value.
-//
-// Array: [N]
-func (m *AntRx) SetData(v []byte) *AntRx {
-	m.Data = v
 	return m
 }
 

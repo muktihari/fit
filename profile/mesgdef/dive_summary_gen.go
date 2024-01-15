@@ -20,21 +20,11 @@ import (
 // DiveSummary is a DiveSummary message.
 type DiveSummary struct {
 	Timestamp       time.Time // Units: s
-	ReferenceMesg   typedef.MesgNum
-	ReferenceIndex  typedef.MessageIndex
-	AvgDepth        uint32 // Scale: 1000; Units: m; 0 if above water
-	MaxDepth        uint32 // Scale: 1000; Units: m; 0 if above water
-	SurfaceInterval uint32 // Units: s; Time since end of last dive
-	StartCns        uint8  // Units: percent
-	EndCns          uint8  // Units: percent
-	StartN2         uint16 // Units: percent
-	EndN2           uint16 // Units: percent
-	O2Toxicity      uint16 // Units: OTUs
+	AvgDepth        uint32    // Scale: 1000; Units: m; 0 if above water
+	MaxDepth        uint32    // Scale: 1000; Units: m; 0 if above water
+	SurfaceInterval uint32    // Units: s; Time since end of last dive
 	DiveNumber      uint32
 	BottomTime      uint32 // Scale: 1000; Units: s
-	AvgPressureSac  uint16 // Scale: 100; Units: bar/min; Average pressure-based surface air consumption
-	AvgVolumeSac    uint16 // Scale: 100; Units: L/min; Average volumetric surface air consumption
-	AvgRmv          uint16 // Scale: 100; Units: L/min; Average respiratory minute volume
 	DescentTime     uint32 // Scale: 1000; Units: s; Time to reach deepest level stop
 	AscentTime      uint32 // Scale: 1000; Units: s; Time after leaving bottom until reaching surface
 	AvgAscentRate   int32  // Scale: 1000; Units: m/s; Average ascent rate, not including descents or stops
@@ -42,6 +32,16 @@ type DiveSummary struct {
 	MaxAscentRate   uint32 // Scale: 1000; Units: m/s; Maximum ascent rate
 	MaxDescentRate  uint32 // Scale: 1000; Units: m/s; Maximum descent rate
 	HangTime        uint32 // Scale: 1000; Units: s; Time spent neither ascending nor descending
+	ReferenceMesg   typedef.MesgNum
+	ReferenceIndex  typedef.MessageIndex
+	StartN2         uint16 // Units: percent
+	EndN2           uint16 // Units: percent
+	O2Toxicity      uint16 // Units: OTUs
+	AvgPressureSac  uint16 // Scale: 100; Units: bar/min; Average pressure-based surface air consumption
+	AvgVolumeSac    uint16 // Scale: 100; Units: L/min; Average volumetric surface air consumption
+	AvgRmv          uint16 // Scale: 100; Units: L/min; Average respiratory minute volume
+	StartCns        uint8  // Units: percent
+	EndCns          uint8  // Units: percent
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -66,21 +66,11 @@ func NewDiveSummary(mesg *proto.Message) *DiveSummary {
 
 	return &DiveSummary{
 		Timestamp:       datetime.ToTime(vals[253]),
-		ReferenceMesg:   typeconv.ToUint16[typedef.MesgNum](vals[0]),
-		ReferenceIndex:  typeconv.ToUint16[typedef.MessageIndex](vals[1]),
 		AvgDepth:        typeconv.ToUint32[uint32](vals[2]),
 		MaxDepth:        typeconv.ToUint32[uint32](vals[3]),
 		SurfaceInterval: typeconv.ToUint32[uint32](vals[4]),
-		StartCns:        typeconv.ToUint8[uint8](vals[5]),
-		EndCns:          typeconv.ToUint8[uint8](vals[6]),
-		StartN2:         typeconv.ToUint16[uint16](vals[7]),
-		EndN2:           typeconv.ToUint16[uint16](vals[8]),
-		O2Toxicity:      typeconv.ToUint16[uint16](vals[9]),
 		DiveNumber:      typeconv.ToUint32[uint32](vals[10]),
 		BottomTime:      typeconv.ToUint32[uint32](vals[11]),
-		AvgPressureSac:  typeconv.ToUint16[uint16](vals[12]),
-		AvgVolumeSac:    typeconv.ToUint16[uint16](vals[13]),
-		AvgRmv:          typeconv.ToUint16[uint16](vals[14]),
 		DescentTime:     typeconv.ToUint32[uint32](vals[15]),
 		AscentTime:      typeconv.ToUint32[uint32](vals[16]),
 		AvgAscentRate:   typeconv.ToSint32[int32](vals[17]),
@@ -88,6 +78,16 @@ func NewDiveSummary(mesg *proto.Message) *DiveSummary {
 		MaxAscentRate:   typeconv.ToUint32[uint32](vals[23]),
 		MaxDescentRate:  typeconv.ToUint32[uint32](vals[24]),
 		HangTime:        typeconv.ToUint32[uint32](vals[25]),
+		ReferenceMesg:   typeconv.ToUint16[typedef.MesgNum](vals[0]),
+		ReferenceIndex:  typeconv.ToUint16[typedef.MessageIndex](vals[1]),
+		StartN2:         typeconv.ToUint16[uint16](vals[7]),
+		EndN2:           typeconv.ToUint16[uint16](vals[8]),
+		O2Toxicity:      typeconv.ToUint16[uint16](vals[9]),
+		AvgPressureSac:  typeconv.ToUint16[uint16](vals[12]),
+		AvgVolumeSac:    typeconv.ToUint16[uint16](vals[13]),
+		AvgRmv:          typeconv.ToUint16[uint16](vals[14]),
+		StartCns:        typeconv.ToUint8[uint8](vals[5]),
+		EndCns:          typeconv.ToUint8[uint8](vals[6]),
 
 		DeveloperFields: developerFields,
 	}
@@ -106,16 +106,6 @@ func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.ReferenceMesg)
-		fields = append(fields, field)
-	}
-	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.ReferenceIndex)
-		fields = append(fields, field)
-	}
 	if m.AvgDepth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.AvgDepth
@@ -131,31 +121,6 @@ func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = m.SurfaceInterval
 		fields = append(fields, field)
 	}
-	if m.StartCns != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.StartCns
-		fields = append(fields, field)
-	}
-	if m.EndCns != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.EndCns
-		fields = append(fields, field)
-	}
-	if m.StartN2 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.StartN2
-		fields = append(fields, field)
-	}
-	if m.EndN2 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.EndN2
-		fields = append(fields, field)
-	}
-	if m.O2Toxicity != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.O2Toxicity
-		fields = append(fields, field)
-	}
 	if m.DiveNumber != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = m.DiveNumber
@@ -164,21 +129,6 @@ func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
 	if m.BottomTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = m.BottomTime
-		fields = append(fields, field)
-	}
-	if m.AvgPressureSac != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = m.AvgPressureSac
-		fields = append(fields, field)
-	}
-	if m.AvgVolumeSac != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.AvgVolumeSac
-		fields = append(fields, field)
-	}
-	if m.AvgRmv != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
-		field.Value = m.AvgRmv
 		fields = append(fields, field)
 	}
 	if m.DescentTime != basetype.Uint32Invalid {
@@ -214,6 +164,56 @@ func (m *DiveSummary) ToMesg(fac Factory) proto.Message {
 	if m.HangTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = m.HangTime
+		fields = append(fields, field)
+	}
+	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = uint16(m.ReferenceMesg)
+		fields = append(fields, field)
+	}
+	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = uint16(m.ReferenceIndex)
+		fields = append(fields, field)
+	}
+	if m.StartN2 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.StartN2
+		fields = append(fields, field)
+	}
+	if m.EndN2 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.EndN2
+		fields = append(fields, field)
+	}
+	if m.O2Toxicity != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.O2Toxicity
+		fields = append(fields, field)
+	}
+	if m.AvgPressureSac != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.AvgPressureSac
+		fields = append(fields, field)
+	}
+	if m.AvgVolumeSac != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.AvgVolumeSac
+		fields = append(fields, field)
+	}
+	if m.AvgRmv != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = m.AvgRmv
+		fields = append(fields, field)
+	}
+	if m.StartCns != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.StartCns
+		fields = append(fields, field)
+	}
+	if m.EndCns != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.EndCns
 		fields = append(fields, field)
 	}
 
@@ -253,36 +253,6 @@ func (m *DiveSummary) BottomTimeScaled() float64 {
 		return basetype.Float64InvalidInFloatForm()
 	}
 	return scaleoffset.Apply(m.BottomTime, 1000, 0)
-}
-
-// AvgPressureSacScaled return AvgPressureSac in its scaled value [Scale: 100; Units: bar/min; Average pressure-based surface air consumption].
-//
-// If AvgPressureSac value is invalid, float64 invalid value will be returned.
-func (m *DiveSummary) AvgPressureSacScaled() float64 {
-	if m.AvgPressureSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.AvgPressureSac, 100, 0)
-}
-
-// AvgVolumeSacScaled return AvgVolumeSac in its scaled value [Scale: 100; Units: L/min; Average volumetric surface air consumption].
-//
-// If AvgVolumeSac value is invalid, float64 invalid value will be returned.
-func (m *DiveSummary) AvgVolumeSacScaled() float64 {
-	if m.AvgVolumeSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.AvgVolumeSac, 100, 0)
-}
-
-// AvgRmvScaled return AvgRmv in its scaled value [Scale: 100; Units: L/min; Average respiratory minute volume].
-//
-// If AvgRmv value is invalid, float64 invalid value will be returned.
-func (m *DiveSummary) AvgRmvScaled() float64 {
-	if m.AvgRmv == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.AvgRmv, 100, 0)
 }
 
 // DescentTimeScaled return DescentTime in its scaled value [Scale: 1000; Units: s; Time to reach deepest level stop].
@@ -355,23 +325,41 @@ func (m *DiveSummary) HangTimeScaled() float64 {
 	return scaleoffset.Apply(m.HangTime, 1000, 0)
 }
 
+// AvgPressureSacScaled return AvgPressureSac in its scaled value [Scale: 100; Units: bar/min; Average pressure-based surface air consumption].
+//
+// If AvgPressureSac value is invalid, float64 invalid value will be returned.
+func (m *DiveSummary) AvgPressureSacScaled() float64 {
+	if m.AvgPressureSac == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgPressureSac, 100, 0)
+}
+
+// AvgVolumeSacScaled return AvgVolumeSac in its scaled value [Scale: 100; Units: L/min; Average volumetric surface air consumption].
+//
+// If AvgVolumeSac value is invalid, float64 invalid value will be returned.
+func (m *DiveSummary) AvgVolumeSacScaled() float64 {
+	if m.AvgVolumeSac == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgVolumeSac, 100, 0)
+}
+
+// AvgRmvScaled return AvgRmv in its scaled value [Scale: 100; Units: L/min; Average respiratory minute volume].
+//
+// If AvgRmv value is invalid, float64 invalid value will be returned.
+func (m *DiveSummary) AvgRmvScaled() float64 {
+	if m.AvgRmv == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.AvgRmv, 100, 0)
+}
+
 // SetTimestamp sets DiveSummary value.
 //
 // Units: s
 func (m *DiveSummary) SetTimestamp(v time.Time) *DiveSummary {
 	m.Timestamp = v
-	return m
-}
-
-// SetReferenceMesg sets DiveSummary value.
-func (m *DiveSummary) SetReferenceMesg(v typedef.MesgNum) *DiveSummary {
-	m.ReferenceMesg = v
-	return m
-}
-
-// SetReferenceIndex sets DiveSummary value.
-func (m *DiveSummary) SetReferenceIndex(v typedef.MessageIndex) *DiveSummary {
-	m.ReferenceIndex = v
 	return m
 }
 
@@ -399,46 +387,6 @@ func (m *DiveSummary) SetSurfaceInterval(v uint32) *DiveSummary {
 	return m
 }
 
-// SetStartCns sets DiveSummary value.
-//
-// Units: percent
-func (m *DiveSummary) SetStartCns(v uint8) *DiveSummary {
-	m.StartCns = v
-	return m
-}
-
-// SetEndCns sets DiveSummary value.
-//
-// Units: percent
-func (m *DiveSummary) SetEndCns(v uint8) *DiveSummary {
-	m.EndCns = v
-	return m
-}
-
-// SetStartN2 sets DiveSummary value.
-//
-// Units: percent
-func (m *DiveSummary) SetStartN2(v uint16) *DiveSummary {
-	m.StartN2 = v
-	return m
-}
-
-// SetEndN2 sets DiveSummary value.
-//
-// Units: percent
-func (m *DiveSummary) SetEndN2(v uint16) *DiveSummary {
-	m.EndN2 = v
-	return m
-}
-
-// SetO2Toxicity sets DiveSummary value.
-//
-// Units: OTUs
-func (m *DiveSummary) SetO2Toxicity(v uint16) *DiveSummary {
-	m.O2Toxicity = v
-	return m
-}
-
 // SetDiveNumber sets DiveSummary value.
 func (m *DiveSummary) SetDiveNumber(v uint32) *DiveSummary {
 	m.DiveNumber = v
@@ -450,30 +398,6 @@ func (m *DiveSummary) SetDiveNumber(v uint32) *DiveSummary {
 // Scale: 1000; Units: s
 func (m *DiveSummary) SetBottomTime(v uint32) *DiveSummary {
 	m.BottomTime = v
-	return m
-}
-
-// SetAvgPressureSac sets DiveSummary value.
-//
-// Scale: 100; Units: bar/min; Average pressure-based surface air consumption
-func (m *DiveSummary) SetAvgPressureSac(v uint16) *DiveSummary {
-	m.AvgPressureSac = v
-	return m
-}
-
-// SetAvgVolumeSac sets DiveSummary value.
-//
-// Scale: 100; Units: L/min; Average volumetric surface air consumption
-func (m *DiveSummary) SetAvgVolumeSac(v uint16) *DiveSummary {
-	m.AvgVolumeSac = v
-	return m
-}
-
-// SetAvgRmv sets DiveSummary value.
-//
-// Scale: 100; Units: L/min; Average respiratory minute volume
-func (m *DiveSummary) SetAvgRmv(v uint16) *DiveSummary {
-	m.AvgRmv = v
 	return m
 }
 
@@ -530,6 +454,82 @@ func (m *DiveSummary) SetMaxDescentRate(v uint32) *DiveSummary {
 // Scale: 1000; Units: s; Time spent neither ascending nor descending
 func (m *DiveSummary) SetHangTime(v uint32) *DiveSummary {
 	m.HangTime = v
+	return m
+}
+
+// SetReferenceMesg sets DiveSummary value.
+func (m *DiveSummary) SetReferenceMesg(v typedef.MesgNum) *DiveSummary {
+	m.ReferenceMesg = v
+	return m
+}
+
+// SetReferenceIndex sets DiveSummary value.
+func (m *DiveSummary) SetReferenceIndex(v typedef.MessageIndex) *DiveSummary {
+	m.ReferenceIndex = v
+	return m
+}
+
+// SetStartN2 sets DiveSummary value.
+//
+// Units: percent
+func (m *DiveSummary) SetStartN2(v uint16) *DiveSummary {
+	m.StartN2 = v
+	return m
+}
+
+// SetEndN2 sets DiveSummary value.
+//
+// Units: percent
+func (m *DiveSummary) SetEndN2(v uint16) *DiveSummary {
+	m.EndN2 = v
+	return m
+}
+
+// SetO2Toxicity sets DiveSummary value.
+//
+// Units: OTUs
+func (m *DiveSummary) SetO2Toxicity(v uint16) *DiveSummary {
+	m.O2Toxicity = v
+	return m
+}
+
+// SetAvgPressureSac sets DiveSummary value.
+//
+// Scale: 100; Units: bar/min; Average pressure-based surface air consumption
+func (m *DiveSummary) SetAvgPressureSac(v uint16) *DiveSummary {
+	m.AvgPressureSac = v
+	return m
+}
+
+// SetAvgVolumeSac sets DiveSummary value.
+//
+// Scale: 100; Units: L/min; Average volumetric surface air consumption
+func (m *DiveSummary) SetAvgVolumeSac(v uint16) *DiveSummary {
+	m.AvgVolumeSac = v
+	return m
+}
+
+// SetAvgRmv sets DiveSummary value.
+//
+// Scale: 100; Units: L/min; Average respiratory minute volume
+func (m *DiveSummary) SetAvgRmv(v uint16) *DiveSummary {
+	m.AvgRmv = v
+	return m
+}
+
+// SetStartCns sets DiveSummary value.
+//
+// Units: percent
+func (m *DiveSummary) SetStartCns(v uint8) *DiveSummary {
+	m.StartCns = v
+	return m
+}
+
+// SetEndCns sets DiveSummary value.
+//
+// Units: percent
+func (m *DiveSummary) SetEndCns(v uint8) *DiveSummary {
+	m.EndCns = v
 	return m
 }
 

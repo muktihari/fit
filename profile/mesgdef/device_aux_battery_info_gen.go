@@ -20,8 +20,8 @@ import (
 // DeviceAuxBatteryInfo is a DeviceAuxBatteryInfo message.
 type DeviceAuxBatteryInfo struct {
 	Timestamp         time.Time
-	DeviceIndex       typedef.DeviceIndex
 	BatteryVoltage    uint16 // Scale: 256; Units: V
+	DeviceIndex       typedef.DeviceIndex
 	BatteryStatus     typedef.BatteryStatus
 	BatteryIdentifier uint8
 
@@ -48,8 +48,8 @@ func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
 
 	return &DeviceAuxBatteryInfo{
 		Timestamp:         datetime.ToTime(vals[253]),
-		DeviceIndex:       typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
 		BatteryVoltage:    typeconv.ToUint16[uint16](vals[1]),
+		DeviceIndex:       typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
 		BatteryStatus:     typeconv.ToUint8[typedef.BatteryStatus](vals[2]),
 		BatteryIdentifier: typeconv.ToUint8[uint8](vals[3]),
 
@@ -70,14 +70,14 @@ func (m *DeviceAuxBatteryInfo) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint8(m.DeviceIndex)
-		fields = append(fields, field)
-	}
 	if m.BatteryVoltage != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.BatteryVoltage
+		fields = append(fields, field)
+	}
+	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = uint8(m.DeviceIndex)
 		fields = append(fields, field)
 	}
 	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
@@ -115,17 +115,17 @@ func (m *DeviceAuxBatteryInfo) SetTimestamp(v time.Time) *DeviceAuxBatteryInfo {
 	return m
 }
 
-// SetDeviceIndex sets DeviceAuxBatteryInfo value.
-func (m *DeviceAuxBatteryInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceAuxBatteryInfo {
-	m.DeviceIndex = v
-	return m
-}
-
 // SetBatteryVoltage sets DeviceAuxBatteryInfo value.
 //
 // Scale: 256; Units: V
 func (m *DeviceAuxBatteryInfo) SetBatteryVoltage(v uint16) *DeviceAuxBatteryInfo {
 	m.BatteryVoltage = v
+	return m
+}
+
+// SetDeviceIndex sets DeviceAuxBatteryInfo value.
+func (m *DeviceAuxBatteryInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceAuxBatteryInfo {
+	m.DeviceIndex = v
 	return m
 }
 

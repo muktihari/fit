@@ -17,25 +17,25 @@ import (
 
 // WorkoutStep is a WorkoutStep message.
 type WorkoutStep struct {
-	MessageIndex                   typedef.MessageIndex
 	WktStepName                    string
-	DurationType                   typedef.WktStepDuration
+	Notes                          string
 	DurationValue                  uint32
-	TargetType                     typedef.WktStepTarget
 	TargetValue                    uint32
 	CustomTargetValueLow           uint32
 	CustomTargetValueHigh          uint32
-	Intensity                      typedef.Intensity
-	Notes                          string
-	Equipment                      typedef.WorkoutEquipment
+	SecondaryTargetValue           uint32
+	SecondaryCustomTargetValueLow  uint32
+	SecondaryCustomTargetValueHigh uint32
+	MessageIndex                   typedef.MessageIndex
 	ExerciseCategory               typedef.ExerciseCategory
 	ExerciseName                   uint16
 	ExerciseWeight                 uint16 // Scale: 100; Units: kg
 	WeightDisplayUnit              typedef.FitBaseUnit
+	DurationType                   typedef.WktStepDuration
+	TargetType                     typedef.WktStepTarget
+	Intensity                      typedef.Intensity
+	Equipment                      typedef.WorkoutEquipment
 	SecondaryTargetType            typedef.WktStepTarget
-	SecondaryTargetValue           uint32
-	SecondaryCustomTargetValueLow  uint32
-	SecondaryCustomTargetValueHigh uint32
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -59,25 +59,25 @@ func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 	}
 
 	return &WorkoutStep{
-		MessageIndex:                   typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		WktStepName:                    typeconv.ToString[string](vals[0]),
-		DurationType:                   typeconv.ToEnum[typedef.WktStepDuration](vals[1]),
+		Notes:                          typeconv.ToString[string](vals[8]),
 		DurationValue:                  typeconv.ToUint32[uint32](vals[2]),
-		TargetType:                     typeconv.ToEnum[typedef.WktStepTarget](vals[3]),
 		TargetValue:                    typeconv.ToUint32[uint32](vals[4]),
 		CustomTargetValueLow:           typeconv.ToUint32[uint32](vals[5]),
 		CustomTargetValueHigh:          typeconv.ToUint32[uint32](vals[6]),
-		Intensity:                      typeconv.ToEnum[typedef.Intensity](vals[7]),
-		Notes:                          typeconv.ToString[string](vals[8]),
-		Equipment:                      typeconv.ToEnum[typedef.WorkoutEquipment](vals[9]),
+		SecondaryTargetValue:           typeconv.ToUint32[uint32](vals[20]),
+		SecondaryCustomTargetValueLow:  typeconv.ToUint32[uint32](vals[21]),
+		SecondaryCustomTargetValueHigh: typeconv.ToUint32[uint32](vals[22]),
+		MessageIndex:                   typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		ExerciseCategory:               typeconv.ToUint16[typedef.ExerciseCategory](vals[10]),
 		ExerciseName:                   typeconv.ToUint16[uint16](vals[11]),
 		ExerciseWeight:                 typeconv.ToUint16[uint16](vals[12]),
 		WeightDisplayUnit:              typeconv.ToUint16[typedef.FitBaseUnit](vals[13]),
+		DurationType:                   typeconv.ToEnum[typedef.WktStepDuration](vals[1]),
+		TargetType:                     typeconv.ToEnum[typedef.WktStepTarget](vals[3]),
+		Intensity:                      typeconv.ToEnum[typedef.Intensity](vals[7]),
+		Equipment:                      typeconv.ToEnum[typedef.WorkoutEquipment](vals[9]),
 		SecondaryTargetType:            typeconv.ToEnum[typedef.WktStepTarget](vals[19]),
-		SecondaryTargetValue:           typeconv.ToUint32[uint32](vals[20]),
-		SecondaryCustomTargetValueLow:  typeconv.ToUint32[uint32](vals[21]),
-		SecondaryCustomTargetValueHigh: typeconv.ToUint32[uint32](vals[22]),
 
 		DeveloperFields: developerFields,
 	}
@@ -91,29 +91,19 @@ func (m *WorkoutStep) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkoutStep)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
 	if m.WktStepName != basetype.StringInvalid && m.WktStepName != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.WktStepName
 		fields = append(fields, field)
 	}
-	if byte(m.DurationType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.DurationType)
+	if m.Notes != basetype.StringInvalid && m.Notes != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.Notes
 		fields = append(fields, field)
 	}
 	if m.DurationValue != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.DurationValue
-		fields = append(fields, field)
-	}
-	if byte(m.TargetType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = byte(m.TargetType)
 		fields = append(fields, field)
 	}
 	if m.TargetValue != basetype.Uint32Invalid {
@@ -131,19 +121,24 @@ func (m *WorkoutStep) ToMesg(fac Factory) proto.Message {
 		field.Value = m.CustomTargetValueHigh
 		fields = append(fields, field)
 	}
-	if byte(m.Intensity) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = byte(m.Intensity)
+	if m.SecondaryTargetValue != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = m.SecondaryTargetValue
 		fields = append(fields, field)
 	}
-	if m.Notes != basetype.StringInvalid && m.Notes != "" {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.Notes
+	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = m.SecondaryCustomTargetValueLow
 		fields = append(fields, field)
 	}
-	if byte(m.Equipment) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = byte(m.Equipment)
+	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = m.SecondaryCustomTargetValueHigh
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
@@ -166,24 +161,29 @@ func (m *WorkoutStep) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.WeightDisplayUnit)
 		fields = append(fields, field)
 	}
+	if byte(m.DurationType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = byte(m.DurationType)
+		fields = append(fields, field)
+	}
+	if byte(m.TargetType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = byte(m.TargetType)
+		fields = append(fields, field)
+	}
+	if byte(m.Intensity) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = byte(m.Intensity)
+		fields = append(fields, field)
+	}
+	if byte(m.Equipment) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = byte(m.Equipment)
+		fields = append(fields, field)
+	}
 	if byte(m.SecondaryTargetType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = byte(m.SecondaryTargetType)
-		fields = append(fields, field)
-	}
-	if m.SecondaryTargetValue != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 20)
-		field.Value = m.SecondaryTargetValue
-		fields = append(fields, field)
-	}
-	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 21)
-		field.Value = m.SecondaryCustomTargetValueLow
-		fields = append(fields, field)
-	}
-	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = m.SecondaryCustomTargetValueHigh
 		fields = append(fields, field)
 	}
 
@@ -205,33 +205,21 @@ func (m *WorkoutStep) ExerciseWeightScaled() float64 {
 	return scaleoffset.Apply(m.ExerciseWeight, 100, 0)
 }
 
-// SetMessageIndex sets WorkoutStep value.
-func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
-	m.MessageIndex = v
-	return m
-}
-
 // SetWktStepName sets WorkoutStep value.
 func (m *WorkoutStep) SetWktStepName(v string) *WorkoutStep {
 	m.WktStepName = v
 	return m
 }
 
-// SetDurationType sets WorkoutStep value.
-func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
-	m.DurationType = v
+// SetNotes sets WorkoutStep value.
+func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
+	m.Notes = v
 	return m
 }
 
 // SetDurationValue sets WorkoutStep value.
 func (m *WorkoutStep) SetDurationValue(v uint32) *WorkoutStep {
 	m.DurationValue = v
-	return m
-}
-
-// SetTargetType sets WorkoutStep value.
-func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
-	m.TargetType = v
 	return m
 }
 
@@ -253,21 +241,27 @@ func (m *WorkoutStep) SetCustomTargetValueHigh(v uint32) *WorkoutStep {
 	return m
 }
 
-// SetIntensity sets WorkoutStep value.
-func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
-	m.Intensity = v
+// SetSecondaryTargetValue sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
+	m.SecondaryTargetValue = v
 	return m
 }
 
-// SetNotes sets WorkoutStep value.
-func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
-	m.Notes = v
+// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueLow = v
 	return m
 }
 
-// SetEquipment sets WorkoutStep value.
-func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
-	m.Equipment = v
+// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueHigh = v
+	return m
+}
+
+// SetMessageIndex sets WorkoutStep value.
+func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
+	m.MessageIndex = v
 	return m
 }
 
@@ -297,27 +291,33 @@ func (m *WorkoutStep) SetWeightDisplayUnit(v typedef.FitBaseUnit) *WorkoutStep {
 	return m
 }
 
+// SetDurationType sets WorkoutStep value.
+func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
+	m.DurationType = v
+	return m
+}
+
+// SetTargetType sets WorkoutStep value.
+func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
+	m.TargetType = v
+	return m
+}
+
+// SetIntensity sets WorkoutStep value.
+func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
+	m.Intensity = v
+	return m
+}
+
+// SetEquipment sets WorkoutStep value.
+func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
+	m.Equipment = v
+	return m
+}
+
 // SetSecondaryTargetType sets WorkoutStep value.
 func (m *WorkoutStep) SetSecondaryTargetType(v typedef.WktStepTarget) *WorkoutStep {
 	m.SecondaryTargetType = v
-	return m
-}
-
-// SetSecondaryTargetValue sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
-	m.SecondaryTargetValue = v
-	return m
-}
-
-// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
-	m.SecondaryCustomTargetValueLow = v
-	return m
-}
-
-// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
-	m.SecondaryCustomTargetValueHigh = v
 	return m
 }
 

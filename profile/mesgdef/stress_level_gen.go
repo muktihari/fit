@@ -18,8 +18,8 @@ import (
 
 // StressLevel is a StressLevel message.
 type StressLevel struct {
-	StressLevelValue int16
 	StressLevelTime  time.Time // Units: s; Time stress score was calculated
+	StressLevelValue int16
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -43,8 +43,8 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 	}
 
 	return &StressLevel{
-		StressLevelValue: typeconv.ToSint16[int16](vals[0]),
 		StressLevelTime:  datetime.ToTime(vals[1]),
+		StressLevelValue: typeconv.ToSint16[int16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -58,14 +58,14 @@ func (m *StressLevel) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumStressLevel)
 
-	if m.StressLevelValue != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.StressLevelValue
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.StressLevelTime)
+		fields = append(fields, field)
+	}
+	if m.StressLevelValue != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.StressLevelValue
 		fields = append(fields, field)
 	}
 
@@ -77,17 +77,17 @@ func (m *StressLevel) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SetStressLevelValue sets StressLevel value.
-func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
-	m.StressLevelValue = v
-	return m
-}
-
 // SetStressLevelTime sets StressLevel value.
 //
 // Units: s; Time stress score was calculated
 func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
 	m.StressLevelTime = v
+	return m
+}
+
+// SetStressLevelValue sets StressLevel value.
+func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
+	m.StressLevelValue = v
 	return m
 }
 

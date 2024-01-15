@@ -16,10 +16,10 @@ import (
 
 // Connectivity is a Connectivity message.
 type Connectivity struct {
+	Name                        string
 	BluetoothEnabled            bool // Use Bluetooth for connectivity features
 	BluetoothLeEnabled          bool // Use Bluetooth Low Energy for connectivity features
 	AntEnabled                  bool // Use ANT for connectivity features
-	Name                        string
 	LiveTrackingEnabled         bool
 	WeatherConditionsEnabled    bool
 	WeatherAlertsEnabled        bool
@@ -52,10 +52,10 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 	}
 
 	return &Connectivity{
+		Name:                        typeconv.ToString[string](vals[3]),
 		BluetoothEnabled:            typeconv.ToBool[bool](vals[0]),
 		BluetoothLeEnabled:          typeconv.ToBool[bool](vals[1]),
 		AntEnabled:                  typeconv.ToBool[bool](vals[2]),
-		Name:                        typeconv.ToString[string](vals[3]),
 		LiveTrackingEnabled:         typeconv.ToBool[bool](vals[4]),
 		WeatherConditionsEnabled:    typeconv.ToBool[bool](vals[5]),
 		WeatherAlertsEnabled:        typeconv.ToBool[bool](vals[6]),
@@ -78,6 +78,11 @@ func (m *Connectivity) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumConnectivity)
 
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Name
+		fields = append(fields, field)
+	}
 	if m.BluetoothEnabled != false {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.BluetoothEnabled
@@ -91,11 +96,6 @@ func (m *Connectivity) ToMesg(fac Factory) proto.Message {
 	if m.AntEnabled != false {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.AntEnabled
-		fields = append(fields, field)
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Name
 		fields = append(fields, field)
 	}
 	if m.LiveTrackingEnabled != false {
@@ -152,6 +152,12 @@ func (m *Connectivity) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SetName sets Connectivity value.
+func (m *Connectivity) SetName(v string) *Connectivity {
+	m.Name = v
+	return m
+}
+
 // SetBluetoothEnabled sets Connectivity value.
 //
 // Use Bluetooth for connectivity features
@@ -173,12 +179,6 @@ func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
 // Use ANT for connectivity features
 func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
 	m.AntEnabled = v
-	return m
-}
-
-// SetName sets Connectivity value.
-func (m *Connectivity) SetName(v string) *Connectivity {
-	m.Name = v
 	return m
 }
 

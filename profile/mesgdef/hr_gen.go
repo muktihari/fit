@@ -20,17 +20,17 @@ import (
 // Hr is a Hr message.
 type Hr struct {
 	Timestamp           time.Time
-	FractionalTimestamp uint16   // Scale: 32768; Units: s
-	Time256             uint8    // Scale: 256; Units: s
 	FilteredBpm         []uint8  // Array: [N]; Units: bpm
 	EventTimestamp      []uint32 // Array: [N]; Scale: 1024; Units: s
-	EventTimestamp12    []byte   // Array: [N]; Scale: 1024; Units: s
+	EventTimestamp12    []byte   // Array: [N]; Units: s
+	FractionalTimestamp uint16   // Scale: 32768; Units: s
+	Time256             uint8    // Scale: 256; Units: s
+
+	IsExpandedFields [10]bool // Used for tracking expanded fields, field.Num as index.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [10]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewHr creates new Hr struct based on given mesg.
@@ -55,15 +55,15 @@ func NewHr(mesg *proto.Message) *Hr {
 
 	return &Hr{
 		Timestamp:           datetime.ToTime(vals[253]),
-		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
-		Time256:             typeconv.ToUint8[uint8](vals[1]),
 		FilteredBpm:         typeconv.ToSliceUint8[uint8](vals[6]),
 		EventTimestamp:      typeconv.ToSliceUint32[uint32](vals[9]),
 		EventTimestamp12:    typeconv.ToSliceByte[byte](vals[10]),
-
-		DeveloperFields: developerFields,
+		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
+		Time256:             typeconv.ToUint8[uint8](vals[1]),
 
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -78,17 +78,6 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FractionalTimestamp
-		field.IsExpandedField = m.IsExpandedFields[0]
-		fields = append(fields, field)
-	}
-	if m.Time256 != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Time256
 		fields = append(fields, field)
 	}
 	if m.FilteredBpm != nil {
@@ -107,6 +96,17 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 		field.Value = m.EventTimestamp12
 		fields = append(fields, field)
 	}
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.FractionalTimestamp
+		field.IsExpandedField = m.IsExpandedFields[0]
+		fields = append(fields, field)
+	}
+	if m.Time256 != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.Time256
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -114,6 +114,16 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
+//
+// If EventTimestamp value is invalid, nil will be returned.
+func (m *Hr) EventTimestampScaled() []float64 {
+	if m.EventTimestamp == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
 }
 
 // FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
@@ -136,45 +146,9 @@ func (m *Hr) Time256Scaled() float64 {
 	return scaleoffset.Apply(m.Time256, 256, 0)
 }
 
-// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
-//
-// If EventTimestamp value is invalid, nil will be returned.
-func (m *Hr) EventTimestampScaled() []float64 {
-	if m.EventTimestamp == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
-}
-
-// EventTimestamp12Scaled return EventTimestamp12 in its scaled value [Array: [N]; Scale: 1024; Units: s].
-//
-// If EventTimestamp12 value is invalid, nil will be returned.
-func (m *Hr) EventTimestamp12Scaled() []float64 {
-	if m.EventTimestamp12 == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.EventTimestamp12, 1024, 0)
-}
-
 // SetTimestamp sets Hr value.
 func (m *Hr) SetTimestamp(v time.Time) *Hr {
 	m.Timestamp = v
-	return m
-}
-
-// SetFractionalTimestamp sets Hr value.
-//
-// Scale: 32768; Units: s
-func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
-	m.FractionalTimestamp = v
-	return m
-}
-
-// SetTime256 sets Hr value.
-//
-// Scale: 256; Units: s
-func (m *Hr) SetTime256(v uint8) *Hr {
-	m.Time256 = v
 	return m
 }
 
@@ -196,9 +170,25 @@ func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 
 // SetEventTimestamp12 sets Hr value.
 //
-// Array: [N]; Scale: 1024; Units: s
+// Array: [N]; Units: s
 func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	m.EventTimestamp12 = v
+	return m
+}
+
+// SetFractionalTimestamp sets Hr value.
+//
+// Scale: 32768; Units: s
+func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
+	m.FractionalTimestamp = v
+	return m
+}
+
+// SetTime256 sets Hr value.
+//
+// Scale: 256; Units: s
+func (m *Hr) SetTime256(v uint8) *Hr {
+	m.Time256 = v
 	return m
 }
 

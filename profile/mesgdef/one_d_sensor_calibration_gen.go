@@ -19,11 +19,11 @@ import (
 // OneDSensorCalibration is a OneDSensorCalibration message.
 type OneDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
-	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
 	OffsetCal          int32              // Internal Calibration factor
+	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -48,11 +48,11 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 
 	return &OneDSensorCalibration{
 		Timestamp:          datetime.ToTime(vals[253]),
-		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
 		CalibrationFactor:  typeconv.ToUint32[uint32](vals[1]),
 		CalibrationDivisor: typeconv.ToUint32[uint32](vals[2]),
 		LevelShift:         typeconv.ToUint32[uint32](vals[3]),
 		OffsetCal:          typeconv.ToSint32[int32](vals[4]),
+		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,11 +69,6 @@ func (m *OneDSensorCalibration) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if byte(m.SensorType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SensorType)
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
@@ -96,6 +91,11 @@ func (m *OneDSensorCalibration) ToMesg(fac Factory) proto.Message {
 		field.Value = m.OffsetCal
 		fields = append(fields, field)
 	}
+	if byte(m.SensorType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.SensorType)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -110,14 +110,6 @@ func (m *OneDSensorCalibration) ToMesg(fac Factory) proto.Message {
 // Units: s; Whole second part of the timestamp
 func (m *OneDSensorCalibration) SetTimestamp(v time.Time) *OneDSensorCalibration {
 	m.Timestamp = v
-	return m
-}
-
-// SetSensorType sets OneDSensorCalibration value.
-//
-// Indicates which sensor the calibration is for
-func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorCalibration {
-	m.SensorType = v
 	return m
 }
 
@@ -150,6 +142,14 @@ func (m *OneDSensorCalibration) SetLevelShift(v uint32) *OneDSensorCalibration {
 // Internal Calibration factor
 func (m *OneDSensorCalibration) SetOffsetCal(v int32) *OneDSensorCalibration {
 	m.OffsetCal = v
+	return m
+}
+
+// SetSensorType sets OneDSensorCalibration value.
+//
+// Indicates which sensor the calibration is for
+func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorCalibration {
+	m.SensorType = v
 	return m
 }
 

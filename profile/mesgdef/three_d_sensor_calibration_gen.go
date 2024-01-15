@@ -20,12 +20,12 @@ import (
 // ThreeDSensorCalibration is a ThreeDSensorCalibration message.
 type ThreeDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
-	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
+	OffsetCal          []int32            // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
+	OrientationMatrix  []int32            // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
-	OffsetCal          []int32            // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-	OrientationMatrix  []int32            // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -50,12 +50,12 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 
 	return &ThreeDSensorCalibration{
 		Timestamp:          datetime.ToTime(vals[253]),
-		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
+		OffsetCal:          typeconv.ToSliceSint32[int32](vals[4]),
+		OrientationMatrix:  typeconv.ToSliceSint32[int32](vals[5]),
 		CalibrationFactor:  typeconv.ToUint32[uint32](vals[1]),
 		CalibrationDivisor: typeconv.ToUint32[uint32](vals[2]),
 		LevelShift:         typeconv.ToUint32[uint32](vals[3]),
-		OffsetCal:          typeconv.ToSliceSint32[int32](vals[4]),
-		OrientationMatrix:  typeconv.ToSliceSint32[int32](vals[5]),
+		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,9 +74,14 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if byte(m.SensorType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SensorType)
+	if m.OffsetCal != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.OffsetCal
+		fields = append(fields, field)
+	}
+	if m.OrientationMatrix != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.OrientationMatrix
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
@@ -94,14 +99,9 @@ func (m *ThreeDSensorCalibration) ToMesg(fac Factory) proto.Message {
 		field.Value = m.LevelShift
 		fields = append(fields, field)
 	}
-	if m.OffsetCal != nil {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.OffsetCal
-		fields = append(fields, field)
-	}
-	if m.OrientationMatrix != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.OrientationMatrix
+	if byte(m.SensorType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.SensorType)
 		fields = append(fields, field)
 	}
 
@@ -131,11 +131,19 @@ func (m *ThreeDSensorCalibration) SetTimestamp(v time.Time) *ThreeDSensorCalibra
 	return m
 }
 
-// SetSensorType sets ThreeDSensorCalibration value.
+// SetOffsetCal sets ThreeDSensorCalibration value.
 //
-// Indicates which sensor the calibration is for
-func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
-	m.SensorType = v
+// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
+func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
+	m.OffsetCal = v
+	return m
+}
+
+// SetOrientationMatrix sets ThreeDSensorCalibration value.
+//
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
+	m.OrientationMatrix = v
 	return m
 }
 
@@ -163,19 +171,11 @@ func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibrati
 	return m
 }
 
-// SetOffsetCal sets ThreeDSensorCalibration value.
+// SetSensorType sets ThreeDSensorCalibration value.
 //
-// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
-	m.OffsetCal = v
-	return m
-}
-
-// SetOrientationMatrix sets ThreeDSensorCalibration value.
-//
-// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
-func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
-	m.OrientationMatrix = v
+// Indicates which sensor the calibration is for
+func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
+	m.SensorType = v
 	return m
 }
 
