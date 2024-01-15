@@ -75,6 +75,10 @@ func TestMonitoringABCorrectness(t *testing.T) {
 
 	fit := monitoringA.ToFit(nil) // use standard factory
 
+	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
+	sortFields(mesgsA)
+	sortFields(fit.Messages)
+
 	if diff := cmp.Diff(mesgsA, fit.Messages, createFieldComparer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
@@ -95,6 +99,10 @@ func TestMonitoringABCorrectness(t *testing.T) {
 	}
 
 	fit = monitoringB.ToFit(nil) // use standard factory
+
+	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
+	sortFields(mesgsB)
+	sortFields(fit.Messages)
 
 	if diff := cmp.Diff(mesgsB, fit.Messages, createFieldComparer()); diff != "" {
 		fmt.Println("messages order:")

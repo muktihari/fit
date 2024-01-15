@@ -18,7 +18,22 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
+
+func sortFields(mesgs []proto.Message) {
+	for i := range mesgs {
+		slices.SortStableFunc(mesgs[i].Fields, func(field1, field2 proto.Field) int {
+			if field1.Num < field2.Num {
+				return -1
+			}
+			if field1.Num > field2.Num {
+				return 1
+			}
+			return 0
+		})
+	}
+}
 
 func createFieldComparer() cmp.Option {
 	return cmp.Comparer(func(field1, field2 proto.Field) bool {
@@ -136,6 +151,10 @@ func TestActivityCorrectness(t *testing.T) {
 	}
 
 	fit := activity.ToFit(nil) // use standard factory
+
+	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
+	sortFields(mesgs)
+	sortFields(fit.Messages)
 
 	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
 		fmt.Println("messages order:")
