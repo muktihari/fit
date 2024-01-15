@@ -19,9 +19,9 @@ import (
 // CameraEvent is a CameraEvent message.
 type CameraEvent struct {
 	Timestamp         time.Time // Units: s; Whole second part of the timestamp.
-	TimestampMs       uint16    // Units: ms; Millisecond part of the timestamp.
-	CameraEventType   typedef.CameraEventType
 	CameraFileUuid    string
+	TimestampMs       uint16 // Units: ms; Millisecond part of the timestamp.
+	CameraEventType   typedef.CameraEventType
 	CameraOrientation typedef.CameraOrientationType
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -47,9 +47,9 @@ func NewCameraEvent(mesg *proto.Message) *CameraEvent {
 
 	return &CameraEvent{
 		Timestamp:         datetime.ToTime(vals[253]),
+		CameraFileUuid:    typeconv.ToString[string](vals[2]),
 		TimestampMs:       typeconv.ToUint16[uint16](vals[0]),
 		CameraEventType:   typeconv.ToEnum[typedef.CameraEventType](vals[1]),
-		CameraFileUuid:    typeconv.ToString[string](vals[2]),
 		CameraOrientation: typeconv.ToEnum[typedef.CameraOrientationType](vals[3]),
 
 		DeveloperFields: developerFields,
@@ -69,6 +69,11 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
+	if m.CameraFileUuid != basetype.StringInvalid && m.CameraFileUuid != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.CameraFileUuid
+		fields = append(fields, field)
+	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.TimestampMs
@@ -77,11 +82,6 @@ func (m *CameraEvent) ToMesg(fac Factory) proto.Message {
 	if byte(m.CameraEventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = byte(m.CameraEventType)
-		fields = append(fields, field)
-	}
-	if m.CameraFileUuid != basetype.StringInvalid && m.CameraFileUuid != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.CameraFileUuid
 		fields = append(fields, field)
 	}
 	if byte(m.CameraOrientation) != basetype.EnumInvalid {
@@ -106,6 +106,12 @@ func (m *CameraEvent) SetTimestamp(v time.Time) *CameraEvent {
 	return m
 }
 
+// SetCameraFileUuid sets CameraEvent value.
+func (m *CameraEvent) SetCameraFileUuid(v string) *CameraEvent {
+	m.CameraFileUuid = v
+	return m
+}
+
 // SetTimestampMs sets CameraEvent value.
 //
 // Units: ms; Millisecond part of the timestamp.
@@ -117,12 +123,6 @@ func (m *CameraEvent) SetTimestampMs(v uint16) *CameraEvent {
 // SetCameraEventType sets CameraEvent value.
 func (m *CameraEvent) SetCameraEventType(v typedef.CameraEventType) *CameraEvent {
 	m.CameraEventType = v
-	return m
-}
-
-// SetCameraFileUuid sets CameraEvent value.
-func (m *CameraEvent) SetCameraFileUuid(v string) *CameraEvent {
-	m.CameraFileUuid = v
 	return m
 }
 

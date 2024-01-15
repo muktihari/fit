@@ -16,9 +16,9 @@ import (
 
 // Sport is a Sport message.
 type Sport struct {
+	Name     string
 	Sport    typedef.Sport
 	SubSport typedef.SubSport
-	Name     string
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -42,9 +42,9 @@ func NewSport(mesg *proto.Message) *Sport {
 	}
 
 	return &Sport{
+		Name:     typeconv.ToString[string](vals[3]),
 		Sport:    typeconv.ToEnum[typedef.Sport](vals[0]),
 		SubSport: typeconv.ToEnum[typedef.SubSport](vals[1]),
-		Name:     typeconv.ToString[string](vals[3]),
 
 		DeveloperFields: developerFields,
 	}
@@ -58,6 +58,11 @@ func (m *Sport) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSport)
 
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.Name
+		fields = append(fields, field)
+	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = byte(m.Sport)
@@ -66,11 +71,6 @@ func (m *Sport) ToMesg(fac Factory) proto.Message {
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = byte(m.SubSport)
-		fields = append(fields, field)
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Name
 		fields = append(fields, field)
 	}
 
@@ -82,6 +82,12 @@ func (m *Sport) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SetName sets Sport value.
+func (m *Sport) SetName(v string) *Sport {
+	m.Name = v
+	return m
+}
+
 // SetSport sets Sport value.
 func (m *Sport) SetSport(v typedef.Sport) *Sport {
 	m.Sport = v
@@ -91,12 +97,6 @@ func (m *Sport) SetSport(v typedef.Sport) *Sport {
 // SetSubSport sets Sport value.
 func (m *Sport) SetSubSport(v typedef.SubSport) *Sport {
 	m.SubSport = v
-	return m
-}
-
-// SetName sets Sport value.
-func (m *Sport) SetName(v string) *Sport {
-	m.Name = v
 	return m
 }
 

@@ -17,19 +17,19 @@ import (
 
 // SegmentPoint is a SegmentPoint message.
 type SegmentPoint struct {
-	MessageIndex     typedef.MessageIndex
+	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 	PositionLat      int32    // Units: semicircles
 	PositionLong     int32    // Units: semicircles
 	Distance         uint32   // Scale: 100; Units: m; Accumulated distance along the segment at the described point
-	Altitude         uint16   // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
-	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 	EnhancedAltitude uint32   // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+	MessageIndex     typedef.MessageIndex
+	Altitude         uint16 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+
+	IsExpandedFields [7]bool // Used for tracking expanded fields, field.Num as index.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [7]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.
@@ -53,17 +53,17 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	}
 
 	return &SegmentPoint{
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		LeaderTime:       typeconv.ToSliceUint32[uint32](vals[5]),
 		PositionLat:      typeconv.ToSint32[int32](vals[1]),
 		PositionLong:     typeconv.ToSint32[int32](vals[2]),
 		Distance:         typeconv.ToUint32[uint32](vals[3]),
-		Altitude:         typeconv.ToUint16[uint16](vals[4]),
-		LeaderTime:       typeconv.ToSliceUint32[uint32](vals[5]),
 		EnhancedAltitude: typeconv.ToUint32[uint32](vals[6]),
-
-		DeveloperFields: developerFields,
+		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		Altitude:         typeconv.ToUint16[uint16](vals[4]),
 
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -75,9 +75,9 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentPoint)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+	if m.LeaderTime != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.LeaderTime
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -95,20 +95,20 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Distance
 		fields = append(fields, field)
 	}
-	if m.Altitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Altitude
-		fields = append(fields, field)
-	}
-	if m.LeaderTime != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.LeaderTime
-		fields = append(fields, field)
-	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EnhancedAltitude
 		field.IsExpandedField = m.IsExpandedFields[6]
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
+		fields = append(fields, field)
+	}
+	if m.Altitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Altitude
 		fields = append(fields, field)
 	}
 
@@ -118,26 +118,6 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance along the segment at the described point].
-//
-// If Distance value is invalid, float64 invalid value will be returned.
-func (m *SegmentPoint) DistanceScaled() float64 {
-	if m.Distance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.Distance, 100, 0)
-}
-
-// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
-//
-// If Altitude value is invalid, float64 invalid value will be returned.
-func (m *SegmentPoint) AltitudeScaled() float64 {
-	if m.Altitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
 
 // LeaderTimeScaled return LeaderTime in its scaled value [Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.].
@@ -150,6 +130,16 @@ func (m *SegmentPoint) LeaderTimeScaled() []float64 {
 	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
 }
 
+// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance along the segment at the described point].
+//
+// If Distance value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) DistanceScaled() float64 {
+	if m.Distance == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Distance, 100, 0)
+}
+
 // EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
 //
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
@@ -160,9 +150,21 @@ func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
 
-// SetMessageIndex sets SegmentPoint value.
-func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
-	m.MessageIndex = v
+// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
+//
+// If Altitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) AltitudeScaled() float64 {
+	if m.Altitude == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Altitude, 5, 500)
+}
+
+// SetLeaderTime sets SegmentPoint value.
+//
+// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
+func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
+	m.LeaderTime = v
 	return m
 }
 
@@ -190,27 +192,25 @@ func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
 	return m
 }
 
-// SetAltitude sets SegmentPoint value.
-//
-// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
-func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
-	m.Altitude = v
-	return m
-}
-
-// SetLeaderTime sets SegmentPoint value.
-//
-// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
-func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
-	m.LeaderTime = v
-	return m
-}
-
 // SetEnhancedAltitude sets SegmentPoint value.
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
 	m.EnhancedAltitude = v
+	return m
+}
+
+// SetMessageIndex sets SegmentPoint value.
+func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
+	m.MessageIndex = v
+	return m
+}
+
+// SetAltitude sets SegmentPoint value.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
+	m.Altitude = v
 	return m
 }
 

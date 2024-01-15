@@ -19,8 +19,8 @@ import (
 // BeatIntervals is a BeatIntervals message.
 type BeatIntervals struct {
 	Timestamp   time.Time
-	TimestampMs uint16   // Units: ms; Milliseconds past date_time
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
+	TimestampMs uint16   // Units: ms; Milliseconds past date_time
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,8 +45,8 @@ func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 
 	return &BeatIntervals{
 		Timestamp:   datetime.ToTime(vals[253]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		Time:        typeconv.ToSliceUint16[uint16](vals[1]),
+		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,14 +65,14 @@ func (m *BeatIntervals) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
-		fields = append(fields, field)
-	}
 	if m.Time != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Time
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 
@@ -90,19 +90,19 @@ func (m *BeatIntervals) SetTimestamp(v time.Time) *BeatIntervals {
 	return m
 }
 
-// SetTimestampMs sets BeatIntervals value.
-//
-// Units: ms; Milliseconds past date_time
-func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
-	m.TimestampMs = v
-	return m
-}
-
 // SetTime sets BeatIntervals value.
 //
 // Array: [N]; Units: ms; Array of millisecond times between beats
 func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
 	m.Time = v
+	return m
+}
+
+// SetTimestampMs sets BeatIntervals value.
+//
+// Units: ms; Milliseconds past date_time
+func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
+	m.TimestampMs = v
 	return m
 }
 

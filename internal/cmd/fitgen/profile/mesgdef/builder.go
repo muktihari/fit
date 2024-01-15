@@ -16,6 +16,7 @@ import (
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
 	"github.com/muktihari/fit/profile/basetype"
+	"golang.org/x/exp/slices"
 )
 
 type mesgdefBuilder struct {
@@ -128,6 +129,8 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				Num:            field.Num,
 				Name:           strutil.ToTitle(mesg.Fields[i].Name),
 				String:         field.Name,
+				ProfileType:    field.Type,
+				BaseType:       b.baseTypeMapByProfileType[field.Type],
 				Type:           b.transformType(field.Type, field.Array),
 				TypedValue:     b.transformTypedValue(field.Num, field.Type, field.Array),
 				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
@@ -150,14 +153,22 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				f.Comment = fmt.Sprintf("Units: %s; %s", field.Units, field.Comment)
 			}
 
-			f.Offset = offsetOrDefault(field.Offsets, 0)
-			if f.Offset != 0 {
-				f.Comment = fmt.Sprintf("Offset: %g; %s", f.Offset, f.Comment)
+			if len(field.Offsets) > 1 { // Multiple offsets only for components
+				f.Offset = 0
+			} else {
+				f.Offset = offsetOrDefault(field.Offsets, 0)
+				if f.Offset != 0 {
+					f.Comment = fmt.Sprintf("Offset: %g; %s", f.Offset, f.Comment)
+				}
 			}
 
-			f.Scale = scaleOrDefault(field.Scales, 0)
-			if f.Scale != 1 {
-				f.Comment = fmt.Sprintf("Scale: %g; %s", f.Scale, f.Comment)
+			if len(field.Scales) > 1 { // Multiple scales only for components
+				f.Scale = 1
+			} else {
+				f.Scale = scaleOrDefault(field.Scales, 0)
+				if f.Scale != 1 {
+					f.Comment = fmt.Sprintf("Scale: %g; %s", f.Scale, f.Comment)
+				}
 			}
 
 			if !(f.Scale == 1 && f.Offset == 0) {
@@ -180,6 +191,9 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			}
 		}
 
+		// Optimize memory usage by aligning the memory in the struct.
+		b.simpleMemoryAlignment(fields)
+
 		data := Data{
 			SDKVersion:        b.sdkVersion,
 			Package:           "mesgdef",
@@ -199,6 +213,31 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 	}
 
 	return dataBuilders, nil
+}
+
+func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
+	// In 64 bits machine, the layout is per 8 bytes.
+	// If the size is a multply of 8, set 8.
+	for i := range fields {
+		if strings.HasPrefix(fields[i].Type, "[]") { // Slice
+			fields[i].Size = 8 // 24 bytes (pointer to array (8 bytes), len (8 bytes), cap (8 bytes))
+		} else if isTypeTime(fields[i].ProfileType) { // time.Time
+			fields[i].Size = 8 // 24 bytes (wall (8 bytes), ext (8 bytes), *loc (8 bytes))
+		} else if fields[i].BaseType == "string" {
+			fields[i].Size = 8 // 16 bytes (pointer to array (8 bytes) + len (8 bytes))
+		} else { // Everything else, 8 bytes or lower.
+			fields[i].Size = int(basetype.FromString(fields[i].BaseType).Size())
+		}
+	}
+	// Order by the size desc.
+	slices.SortStableFunc(fields, func(a, b Field) int {
+		if a.Size > b.Size {
+			return -1
+		} else if a.Size < b.Size {
+			return 1
+		}
+		return 0
+	})
 }
 
 func (b *mesgdefBuilder) transformType(fieldType, fieldArray string) string {

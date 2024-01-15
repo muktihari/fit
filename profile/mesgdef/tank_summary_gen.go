@@ -21,9 +21,9 @@ import (
 type TankSummary struct {
 	Timestamp     time.Time // Units: s
 	Sensor        typedef.AntChannelId
+	VolumeUsed    uint32 // Scale: 100; Units: L
 	StartPressure uint16 // Scale: 100; Units: bar
 	EndPressure   uint16 // Scale: 100; Units: bar
-	VolumeUsed    uint32 // Scale: 100; Units: L
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -49,9 +49,9 @@ func NewTankSummary(mesg *proto.Message) *TankSummary {
 	return &TankSummary{
 		Timestamp:     datetime.ToTime(vals[253]),
 		Sensor:        typeconv.ToUint32z[typedef.AntChannelId](vals[0]),
+		VolumeUsed:    typeconv.ToUint32[uint32](vals[3]),
 		StartPressure: typeconv.ToUint16[uint16](vals[1]),
 		EndPressure:   typeconv.ToUint16[uint16](vals[2]),
-		VolumeUsed:    typeconv.ToUint32[uint32](vals[3]),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,6 +75,11 @@ func (m *TankSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = uint32(m.Sensor)
 		fields = append(fields, field)
 	}
+	if m.VolumeUsed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.VolumeUsed
+		fields = append(fields, field)
+	}
 	if m.StartPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.StartPressure
@@ -85,11 +90,6 @@ func (m *TankSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = m.EndPressure
 		fields = append(fields, field)
 	}
-	if m.VolumeUsed != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.VolumeUsed
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -97,6 +97,16 @@ func (m *TankSummary) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// VolumeUsedScaled return VolumeUsed in its scaled value [Scale: 100; Units: L].
+//
+// If VolumeUsed value is invalid, float64 invalid value will be returned.
+func (m *TankSummary) VolumeUsedScaled() float64 {
+	if m.VolumeUsed == basetype.Uint32Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
 }
 
 // StartPressureScaled return StartPressure in its scaled value [Scale: 100; Units: bar].
@@ -119,16 +129,6 @@ func (m *TankSummary) EndPressureScaled() float64 {
 	return scaleoffset.Apply(m.EndPressure, 100, 0)
 }
 
-// VolumeUsedScaled return VolumeUsed in its scaled value [Scale: 100; Units: L].
-//
-// If VolumeUsed value is invalid, float64 invalid value will be returned.
-func (m *TankSummary) VolumeUsedScaled() float64 {
-	if m.VolumeUsed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
-}
-
 // SetTimestamp sets TankSummary value.
 //
 // Units: s
@@ -140,6 +140,14 @@ func (m *TankSummary) SetTimestamp(v time.Time) *TankSummary {
 // SetSensor sets TankSummary value.
 func (m *TankSummary) SetSensor(v typedef.AntChannelId) *TankSummary {
 	m.Sensor = v
+	return m
+}
+
+// SetVolumeUsed sets TankSummary value.
+//
+// Scale: 100; Units: L
+func (m *TankSummary) SetVolumeUsed(v uint32) *TankSummary {
+	m.VolumeUsed = v
 	return m
 }
 
@@ -156,14 +164,6 @@ func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
 // Scale: 100; Units: bar
 func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
 	m.EndPressure = v
-	return m
-}
-
-// SetVolumeUsed sets TankSummary value.
-//
-// Scale: 100; Units: L
-func (m *TankSummary) SetVolumeUsed(v uint32) *TankSummary {
-	m.VolumeUsed = v
 	return m
 }
 

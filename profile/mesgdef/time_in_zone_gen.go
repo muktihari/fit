@@ -20,22 +20,22 @@ import (
 // TimeInZone is a TimeInZone message.
 type TimeInZone struct {
 	Timestamp                time.Time // Units: s
+	TimeInHrZone             []uint32  // Array: [N]; Scale: 1000; Units: s
+	TimeInSpeedZone          []uint32  // Array: [N]; Scale: 1000; Units: s
+	TimeInCadenceZone        []uint32  // Array: [N]; Scale: 1000; Units: s
+	TimeInPowerZone          []uint32  // Array: [N]; Scale: 1000; Units: s
+	HrZoneHighBoundary       []uint8   // Array: [N]; Units: bpm
+	SpeedZoneHighBoundary    []uint16  // Array: [N]; Scale: 1000; Units: m/s
+	CadenceZoneHighBondary   []uint8   // Array: [N]; Units: rpm
+	PowerZoneHighBoundary    []uint16  // Array: [N]; Units: watts
 	ReferenceMesg            typedef.MesgNum
 	ReferenceIndex           typedef.MessageIndex
-	TimeInHrZone             []uint32 // Array: [N]; Scale: 1000; Units: s
-	TimeInSpeedZone          []uint32 // Array: [N]; Scale: 1000; Units: s
-	TimeInCadenceZone        []uint32 // Array: [N]; Scale: 1000; Units: s
-	TimeInPowerZone          []uint32 // Array: [N]; Scale: 1000; Units: s
-	HrZoneHighBoundary       []uint8  // Array: [N]; Units: bpm
-	SpeedZoneHighBoundary    []uint16 // Array: [N]; Scale: 1000; Units: m/s
-	CadenceZoneHighBondary   []uint8  // Array: [N]; Units: rpm
-	PowerZoneHighBoundary    []uint16 // Array: [N]; Units: watts
+	FunctionalThresholdPower uint16
 	HrCalcType               typedef.HrZoneCalc
 	MaxHeartRate             uint8
 	RestingHeartRate         uint8
 	ThresholdHeartRate       uint8
 	PwrCalcType              typedef.PwrZoneCalc
-	FunctionalThresholdPower uint16
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -60,8 +60,6 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 
 	return &TimeInZone{
 		Timestamp:                datetime.ToTime(vals[253]),
-		ReferenceMesg:            typeconv.ToUint16[typedef.MesgNum](vals[0]),
-		ReferenceIndex:           typeconv.ToUint16[typedef.MessageIndex](vals[1]),
 		TimeInHrZone:             typeconv.ToSliceUint32[uint32](vals[2]),
 		TimeInSpeedZone:          typeconv.ToSliceUint32[uint32](vals[3]),
 		TimeInCadenceZone:        typeconv.ToSliceUint32[uint32](vals[4]),
@@ -70,12 +68,14 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 		SpeedZoneHighBoundary:    typeconv.ToSliceUint16[uint16](vals[7]),
 		CadenceZoneHighBondary:   typeconv.ToSliceUint8[uint8](vals[8]),
 		PowerZoneHighBoundary:    typeconv.ToSliceUint16[uint16](vals[9]),
+		ReferenceMesg:            typeconv.ToUint16[typedef.MesgNum](vals[0]),
+		ReferenceIndex:           typeconv.ToUint16[typedef.MessageIndex](vals[1]),
+		FunctionalThresholdPower: typeconv.ToUint16[uint16](vals[15]),
 		HrCalcType:               typeconv.ToEnum[typedef.HrZoneCalc](vals[10]),
 		MaxHeartRate:             typeconv.ToUint8[uint8](vals[11]),
 		RestingHeartRate:         typeconv.ToUint8[uint8](vals[12]),
 		ThresholdHeartRate:       typeconv.ToUint8[uint8](vals[13]),
 		PwrCalcType:              typeconv.ToEnum[typedef.PwrZoneCalc](vals[14]),
-		FunctionalThresholdPower: typeconv.ToUint16[uint16](vals[15]),
 
 		DeveloperFields: developerFields,
 	}
@@ -92,16 +92,6 @@ func (m *TimeInZone) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.ReferenceMesg)
-		fields = append(fields, field)
-	}
-	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.ReferenceIndex)
 		fields = append(fields, field)
 	}
 	if m.TimeInHrZone != nil {
@@ -144,6 +134,21 @@ func (m *TimeInZone) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PowerZoneHighBoundary
 		fields = append(fields, field)
 	}
+	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = uint16(m.ReferenceMesg)
+		fields = append(fields, field)
+	}
+	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = uint16(m.ReferenceIndex)
+		fields = append(fields, field)
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.FunctionalThresholdPower
+		fields = append(fields, field)
+	}
 	if byte(m.HrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = byte(m.HrCalcType)
@@ -167,11 +172,6 @@ func (m *TimeInZone) ToMesg(fac Factory) proto.Message {
 	if byte(m.PwrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = byte(m.PwrCalcType)
-		fields = append(fields, field)
-	}
-	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = m.FunctionalThresholdPower
 		fields = append(fields, field)
 	}
 
@@ -241,18 +241,6 @@ func (m *TimeInZone) SetTimestamp(v time.Time) *TimeInZone {
 	return m
 }
 
-// SetReferenceMesg sets TimeInZone value.
-func (m *TimeInZone) SetReferenceMesg(v typedef.MesgNum) *TimeInZone {
-	m.ReferenceMesg = v
-	return m
-}
-
-// SetReferenceIndex sets TimeInZone value.
-func (m *TimeInZone) SetReferenceIndex(v typedef.MessageIndex) *TimeInZone {
-	m.ReferenceIndex = v
-	return m
-}
-
 // SetTimeInHrZone sets TimeInZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
@@ -317,6 +305,24 @@ func (m *TimeInZone) SetPowerZoneHighBoundary(v []uint16) *TimeInZone {
 	return m
 }
 
+// SetReferenceMesg sets TimeInZone value.
+func (m *TimeInZone) SetReferenceMesg(v typedef.MesgNum) *TimeInZone {
+	m.ReferenceMesg = v
+	return m
+}
+
+// SetReferenceIndex sets TimeInZone value.
+func (m *TimeInZone) SetReferenceIndex(v typedef.MessageIndex) *TimeInZone {
+	m.ReferenceIndex = v
+	return m
+}
+
+// SetFunctionalThresholdPower sets TimeInZone value.
+func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
+	m.FunctionalThresholdPower = v
+	return m
+}
+
 // SetHrCalcType sets TimeInZone value.
 func (m *TimeInZone) SetHrCalcType(v typedef.HrZoneCalc) *TimeInZone {
 	m.HrCalcType = v
@@ -344,12 +350,6 @@ func (m *TimeInZone) SetThresholdHeartRate(v uint8) *TimeInZone {
 // SetPwrCalcType sets TimeInZone value.
 func (m *TimeInZone) SetPwrCalcType(v typedef.PwrZoneCalc) *TimeInZone {
 	m.PwrCalcType = v
-	return m
-}
-
-// SetFunctionalThresholdPower sets TimeInZone value.
-func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
-	m.FunctionalThresholdPower = v
 	return m
 }
 

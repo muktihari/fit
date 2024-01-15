@@ -19,8 +19,8 @@ import (
 // NmeaSentence is a NmeaSentence message.
 type NmeaSentence struct {
 	Timestamp   time.Time // Units: s; Timestamp message was output
-	TimestampMs uint16    // Units: ms; Fractional part of timestamp, added to timestamp
 	Sentence    string    // NMEA sentence
+	TimestampMs uint16    // Units: ms; Fractional part of timestamp, added to timestamp
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,8 +45,8 @@ func NewNmeaSentence(mesg *proto.Message) *NmeaSentence {
 
 	return &NmeaSentence{
 		Timestamp:   datetime.ToTime(vals[253]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 		Sentence:    typeconv.ToString[string](vals[1]),
+		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,14 +65,14 @@ func (m *NmeaSentence) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
-		fields = append(fields, field)
-	}
 	if m.Sentence != basetype.StringInvalid && m.Sentence != "" {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.Sentence
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 
@@ -92,19 +92,19 @@ func (m *NmeaSentence) SetTimestamp(v time.Time) *NmeaSentence {
 	return m
 }
 
-// SetTimestampMs sets NmeaSentence value.
-//
-// Units: ms; Fractional part of timestamp, added to timestamp
-func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
-	m.TimestampMs = v
-	return m
-}
-
 // SetSentence sets NmeaSentence value.
 //
 // NMEA sentence
 func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {
 	m.Sentence = v
+	return m
+}
+
+// SetTimestampMs sets NmeaSentence value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
+	m.TimestampMs = v
 	return m
 }
 

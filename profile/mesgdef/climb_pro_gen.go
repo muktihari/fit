@@ -21,10 +21,10 @@ type ClimbPro struct {
 	Timestamp     time.Time // Units: s
 	PositionLat   int32     // Units: semicircles
 	PositionLong  int32     // Units: semicircles
-	ClimbProEvent typedef.ClimbProEvent
+	CurrentDist   float32   // Units: m
 	ClimbNumber   uint16
+	ClimbProEvent typedef.ClimbProEvent
 	ClimbCategory uint8
-	CurrentDist   float32 // Units: m
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -51,10 +51,10 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 		Timestamp:     datetime.ToTime(vals[253]),
 		PositionLat:   typeconv.ToSint32[int32](vals[0]),
 		PositionLong:  typeconv.ToSint32[int32](vals[1]),
-		ClimbProEvent: typeconv.ToEnum[typedef.ClimbProEvent](vals[2]),
-		ClimbNumber:   typeconv.ToUint16[uint16](vals[3]),
-		ClimbCategory: typeconv.ToUint8[uint8](vals[4]),
 		CurrentDist:   typeconv.ToFloat32[float32](vals[5]),
+		ClimbNumber:   typeconv.ToUint16[uint16](vals[3]),
+		ClimbProEvent: typeconv.ToEnum[typedef.ClimbProEvent](vals[2]),
+		ClimbCategory: typeconv.ToUint8[uint8](vals[4]),
 
 		DeveloperFields: developerFields,
 	}
@@ -83,9 +83,9 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PositionLong
 		fields = append(fields, field)
 	}
-	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.ClimbProEvent)
+	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.CurrentDist
 		fields = append(fields, field)
 	}
 	if m.ClimbNumber != basetype.Uint16Invalid {
@@ -93,14 +93,14 @@ func (m *ClimbPro) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ClimbNumber
 		fields = append(fields, field)
 	}
+	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = byte(m.ClimbProEvent)
+		fields = append(fields, field)
+	}
 	if m.ClimbCategory != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.ClimbCategory
-		fields = append(fields, field)
-	}
-	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.CurrentDist
 		fields = append(fields, field)
 	}
 
@@ -136,9 +136,11 @@ func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
 	return m
 }
 
-// SetClimbProEvent sets ClimbPro value.
-func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
-	m.ClimbProEvent = v
+// SetCurrentDist sets ClimbPro value.
+//
+// Units: m
+func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
+	m.CurrentDist = v
 	return m
 }
 
@@ -148,17 +150,15 @@ func (m *ClimbPro) SetClimbNumber(v uint16) *ClimbPro {
 	return m
 }
 
-// SetClimbCategory sets ClimbPro value.
-func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
-	m.ClimbCategory = v
+// SetClimbProEvent sets ClimbPro value.
+func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
+	m.ClimbProEvent = v
 	return m
 }
 
-// SetCurrentDist sets ClimbPro value.
-//
-// Units: m
-func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
-	m.CurrentDist = v
+// SetClimbCategory sets ClimbPro value.
+func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
+	m.ClimbCategory = v
 	return m
 }
 

@@ -16,10 +16,10 @@ import (
 
 // ExerciseTitle is a ExerciseTitle message.
 type ExerciseTitle struct {
+	WktStepName      []string // Array: [N]
 	MessageIndex     typedef.MessageIndex
 	ExerciseCategory typedef.ExerciseCategory
 	ExerciseName     uint16
-	WktStepName      []string // Array: [N]
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -43,10 +43,10 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 	}
 
 	return &ExerciseTitle{
+		WktStepName:      typeconv.ToSliceString[string](vals[2]),
 		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		ExerciseCategory: typeconv.ToUint16[typedef.ExerciseCategory](vals[0]),
 		ExerciseName:     typeconv.ToUint16[uint16](vals[1]),
-		WktStepName:      typeconv.ToSliceString[string](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -60,6 +60,11 @@ func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExerciseTitle)
 
+	if m.WktStepName != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.WktStepName
+		fields = append(fields, field)
+	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = uint16(m.MessageIndex)
@@ -75,11 +80,6 @@ func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ExerciseName
 		fields = append(fields, field)
 	}
-	if m.WktStepName != nil {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.WktStepName
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -87,6 +87,14 @@ func (m *ExerciseTitle) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SetWktStepName sets ExerciseTitle value.
+//
+// Array: [N]
+func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
+	m.WktStepName = v
+	return m
 }
 
 // SetMessageIndex sets ExerciseTitle value.
@@ -104,14 +112,6 @@ func (m *ExerciseTitle) SetExerciseCategory(v typedef.ExerciseCategory) *Exercis
 // SetExerciseName sets ExerciseTitle value.
 func (m *ExerciseTitle) SetExerciseName(v uint16) *ExerciseTitle {
 	m.ExerciseName = v
-	return m
-}
-
-// SetWktStepName sets ExerciseTitle value.
-//
-// Array: [N]
-func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
-	m.WktStepName = v
 	return m
 }
 

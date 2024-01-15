@@ -17,6 +17,7 @@ import (
 
 // SleepAssessment is a SleepAssessment message.
 type SleepAssessment struct {
+	AverageStressDuringSleep uint16 // Scale: 100; Excludes stress during awake periods in the sleep window
 	CombinedAwakeScore       uint8  // Average of awake_time_score and awakenings_count_score. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 	AwakeTimeScore           uint8  // Score that evaluates the total time spent awake between sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 	AwakeningsCountScore     uint8  // Score that evaluates the number of awakenings that interrupt sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
@@ -30,7 +31,6 @@ type SleepAssessment struct {
 	SleepRestlessnessScore   uint8  // Score that evaluates the amount of restlessness during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 	AwakeningsCount          uint8  // The number of awakenings during sleep.
 	InterruptionsScore       uint8  // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
-	AverageStressDuringSleep uint16 // Scale: 100; Excludes stress during awake periods in the sleep window
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -54,6 +54,7 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 	}
 
 	return &SleepAssessment{
+		AverageStressDuringSleep: typeconv.ToUint16[uint16](vals[15]),
 		CombinedAwakeScore:       typeconv.ToUint8[uint8](vals[0]),
 		AwakeTimeScore:           typeconv.ToUint8[uint8](vals[1]),
 		AwakeningsCountScore:     typeconv.ToUint8[uint8](vals[2]),
@@ -67,7 +68,6 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 		SleepRestlessnessScore:   typeconv.ToUint8[uint8](vals[10]),
 		AwakeningsCount:          typeconv.ToUint8[uint8](vals[11]),
 		InterruptionsScore:       typeconv.ToUint8[uint8](vals[14]),
-		AverageStressDuringSleep: typeconv.ToUint16[uint16](vals[15]),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,6 +81,11 @@ func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSleepAssessment)
 
+	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.AverageStressDuringSleep
+		fields = append(fields, field)
+	}
 	if m.CombinedAwakeScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.CombinedAwakeScore
@@ -146,11 +151,6 @@ func (m *SleepAssessment) ToMesg(fac Factory) proto.Message {
 		field.Value = m.InterruptionsScore
 		fields = append(fields, field)
 	}
-	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = m.AverageStressDuringSleep
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -168,6 +168,14 @@ func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 		return basetype.Float64InvalidInFloatForm()
 	}
 	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
+}
+
+// SetAverageStressDuringSleep sets SleepAssessment value.
+//
+// Scale: 100; Excludes stress during awake periods in the sleep window
+func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
+	m.AverageStressDuringSleep = v
+	return m
 }
 
 // SetCombinedAwakeScore sets SleepAssessment value.
@@ -271,14 +279,6 @@ func (m *SleepAssessment) SetAwakeningsCount(v uint8) *SleepAssessment {
 // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetInterruptionsScore(v uint8) *SleepAssessment {
 	m.InterruptionsScore = v
-	return m
-}
-
-// SetAverageStressDuringSleep sets SleepAssessment value.
-//
-// Scale: 100; Excludes stress during awake periods in the sleep window
-func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
-	m.AverageStressDuringSleep = v
 	return m
 }
 

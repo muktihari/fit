@@ -16,9 +16,9 @@ import (
 
 // Course is a Course message.
 type Course struct {
-	Sport        typedef.Sport
 	Name         string
 	Capabilities typedef.CourseCapabilities
+	Sport        typedef.Sport
 	SubSport     typedef.SubSport
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -43,9 +43,9 @@ func NewCourse(mesg *proto.Message) *Course {
 	}
 
 	return &Course{
-		Sport:        typeconv.ToEnum[typedef.Sport](vals[4]),
 		Name:         typeconv.ToString[string](vals[5]),
 		Capabilities: typeconv.ToUint32z[typedef.CourseCapabilities](vals[6]),
+		Sport:        typeconv.ToEnum[typedef.Sport](vals[4]),
 		SubSport:     typeconv.ToEnum[typedef.SubSport](vals[7]),
 
 		DeveloperFields: developerFields,
@@ -60,11 +60,6 @@ func (m *Course) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCourse)
 
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.Sport)
-		fields = append(fields, field)
-	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Name
@@ -73,6 +68,11 @@ func (m *Course) ToMesg(fac Factory) proto.Message {
 	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = uint32(m.Capabilities)
+		fields = append(fields, field)
+	}
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
@@ -89,12 +89,6 @@ func (m *Course) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SetSport sets Course value.
-func (m *Course) SetSport(v typedef.Sport) *Course {
-	m.Sport = v
-	return m
-}
-
 // SetName sets Course value.
 func (m *Course) SetName(v string) *Course {
 	m.Name = v
@@ -104,6 +98,12 @@ func (m *Course) SetName(v string) *Course {
 // SetCapabilities sets Course value.
 func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
 	m.Capabilities = v
+	return m
+}
+
+// SetSport sets Course value.
+func (m *Course) SetSport(v typedef.Sport) *Course {
+	m.Sport = v
 	return m
 }
 

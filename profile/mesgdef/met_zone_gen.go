@@ -18,9 +18,9 @@ import (
 // MetZone is a MetZone message.
 type MetZone struct {
 	MessageIndex typedef.MessageIndex
-	HighBpm      uint8
 	Calories     uint16 // Scale: 10; Units: kcal / min
-	FatCalories  uint8  // Scale: 10; Units: kcal / min
+	HighBpm      uint8
+	FatCalories  uint8 // Scale: 10; Units: kcal / min
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,8 +45,8 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 
 	return &MetZone{
 		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
 		Calories:     typeconv.ToUint16[uint16](vals[2]),
+		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
 		FatCalories:  typeconv.ToUint8[uint8](vals[3]),
 
 		DeveloperFields: developerFields,
@@ -66,14 +66,14 @@ func (m *MetZone) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
-	if m.HighBpm != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.HighBpm
-		fields = append(fields, field)
-	}
 	if m.Calories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Calories
+		fields = append(fields, field)
+	}
+	if m.HighBpm != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.HighBpm
 		fields = append(fields, field)
 	}
 	if m.FatCalories != basetype.Uint8Invalid {
@@ -116,17 +116,17 @@ func (m *MetZone) SetMessageIndex(v typedef.MessageIndex) *MetZone {
 	return m
 }
 
-// SetHighBpm sets MetZone value.
-func (m *MetZone) SetHighBpm(v uint8) *MetZone {
-	m.HighBpm = v
-	return m
-}
-
 // SetCalories sets MetZone value.
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetCalories(v uint16) *MetZone {
 	m.Calories = v
+	return m
+}
+
+// SetHighBpm sets MetZone value.
+func (m *MetZone) SetHighBpm(v uint8) *MetZone {
+	m.HighBpm = v
 	return m
 }
 

@@ -20,7 +20,6 @@ import (
 // AviationAttitude is a AviationAttitude message.
 type AviationAttitude struct {
 	Timestamp             time.Time                  // Units: s; Timestamp message was output
-	TimestampMs           uint16                     // Units: ms; Fractional part of timestamp, added to timestamp
 	SystemTime            []uint32                   // Array: [N]; Units: ms; System time associated with sample expressed in ms.
 	Pitch                 []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
 	Roll                  []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
@@ -31,6 +30,7 @@ type AviationAttitude struct {
 	AttitudeStageComplete []uint8                    // Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
 	Track                 []uint16                   // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 	Validity              []typedef.AttitudeValidity // Array: [N]
+	TimestampMs           uint16                     // Units: ms; Fractional part of timestamp, added to timestamp
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -55,7 +55,6 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 
 	return &AviationAttitude{
 		Timestamp:             datetime.ToTime(vals[253]),
-		TimestampMs:           typeconv.ToUint16[uint16](vals[0]),
 		SystemTime:            typeconv.ToSliceUint32[uint32](vals[1]),
 		Pitch:                 typeconv.ToSliceSint16[int16](vals[2]),
 		Roll:                  typeconv.ToSliceSint16[int16](vals[3]),
@@ -66,6 +65,7 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 		AttitudeStageComplete: typeconv.ToSliceUint8[uint8](vals[8]),
 		Track:                 typeconv.ToSliceUint16[uint16](vals[9]),
 		Validity:              typeconv.ToSliceUint16[typedef.AttitudeValidity](vals[10]),
+		TimestampMs:           typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,11 +82,6 @@ func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
@@ -137,6 +132,11 @@ func (m *AviationAttitude) ToMesg(fac Factory) proto.Message {
 	if typeconv.ToSliceUint16[uint16](m.Validity) != nil {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = typeconv.ToSliceUint16[uint16](m.Validity)
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 
@@ -213,14 +213,6 @@ func (m *AviationAttitude) TrackScaled() []float64 {
 // Units: s; Timestamp message was output
 func (m *AviationAttitude) SetTimestamp(v time.Time) *AviationAttitude {
 	m.Timestamp = v
-	return m
-}
-
-// SetTimestampMs sets AviationAttitude value.
-//
-// Units: ms; Fractional part of timestamp, added to timestamp
-func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
-	m.TimestampMs = v
 	return m
 }
 
@@ -301,6 +293,14 @@ func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
 // Array: [N]
 func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAttitude {
 	m.Validity = v
+	return m
+}
+
+// SetTimestampMs sets AviationAttitude value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
+	m.TimestampMs = v
 	return m
 }
 

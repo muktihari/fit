@@ -16,19 +16,19 @@ import (
 
 // FieldDescription is a FieldDescription message.
 type FieldDescription struct {
-	DeveloperDataIndex    uint8
-	FieldDefinitionNumber uint8
-	FitBaseTypeId         basetype.BaseType
 	FieldName             []string // Array: [N]
-	Array                 uint8
 	Components            string
-	Scale                 uint8
-	Offset                int8
 	Units                 []string // Array: [N]
 	Bits                  string
 	Accumulate            string
 	FitBaseUnitId         typedef.FitBaseUnit
 	NativeMesgNum         typedef.MesgNum
+	DeveloperDataIndex    uint8
+	FieldDefinitionNumber uint8
+	FitBaseTypeId         basetype.BaseType
+	Array                 uint8
+	Scale                 uint8
+	Offset                int8
 	NativeFieldNum        uint8
 }
 
@@ -47,19 +47,19 @@ func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 	}
 
 	return &FieldDescription{
-		DeveloperDataIndex:    typeconv.ToUint8[uint8](vals[0]),
-		FieldDefinitionNumber: typeconv.ToUint8[uint8](vals[1]),
-		FitBaseTypeId:         typeconv.ToUint8[basetype.BaseType](vals[2]),
 		FieldName:             typeconv.ToSliceString[string](vals[3]),
-		Array:                 typeconv.ToUint8[uint8](vals[4]),
 		Components:            typeconv.ToString[string](vals[5]),
-		Scale:                 typeconv.ToUint8[uint8](vals[6]),
-		Offset:                typeconv.ToSint8[int8](vals[7]),
 		Units:                 typeconv.ToSliceString[string](vals[8]),
 		Bits:                  typeconv.ToString[string](vals[9]),
 		Accumulate:            typeconv.ToString[string](vals[10]),
 		FitBaseUnitId:         typeconv.ToUint16[typedef.FitBaseUnit](vals[13]),
 		NativeMesgNum:         typeconv.ToUint16[typedef.MesgNum](vals[14]),
+		DeveloperDataIndex:    typeconv.ToUint8[uint8](vals[0]),
+		FieldDefinitionNumber: typeconv.ToUint8[uint8](vals[1]),
+		FitBaseTypeId:         typeconv.ToUint8[basetype.BaseType](vals[2]),
+		Array:                 typeconv.ToUint8[uint8](vals[4]),
+		Scale:                 typeconv.ToUint8[uint8](vals[6]),
+		Offset:                typeconv.ToSint8[int8](vals[7]),
 		NativeFieldNum:        typeconv.ToUint8[uint8](vals[15]),
 	}
 }
@@ -72,44 +72,14 @@ func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumFieldDescription)
 
-	if m.DeveloperDataIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.DeveloperDataIndex
-		fields = append(fields, field)
-	}
-	if m.FieldDefinitionNumber != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.FieldDefinitionNumber
-		fields = append(fields, field)
-	}
-	if uint8(m.FitBaseTypeId) != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint8(m.FitBaseTypeId)
-		fields = append(fields, field)
-	}
 	if m.FieldName != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.FieldName
 		fields = append(fields, field)
 	}
-	if m.Array != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Array
-		fields = append(fields, field)
-	}
 	if m.Components != basetype.StringInvalid && m.Components != "" {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Components
-		fields = append(fields, field)
-	}
-	if m.Scale != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.Scale
-		fields = append(fields, field)
-	}
-	if m.Offset != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.Offset
 		fields = append(fields, field)
 	}
 	if m.Units != nil {
@@ -137,6 +107,36 @@ func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
 		field.Value = uint16(m.NativeMesgNum)
 		fields = append(fields, field)
 	}
+	if m.DeveloperDataIndex != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.DeveloperDataIndex
+		fields = append(fields, field)
+	}
+	if m.FieldDefinitionNumber != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = m.FieldDefinitionNumber
+		fields = append(fields, field)
+	}
+	if uint8(m.FitBaseTypeId) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = uint8(m.FitBaseTypeId)
+		fields = append(fields, field)
+	}
+	if m.Array != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = m.Array
+		fields = append(fields, field)
+	}
+	if m.Scale != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.Scale
+		fields = append(fields, field)
+	}
+	if m.Offset != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = m.Offset
+		fields = append(fields, field)
+	}
 	if m.NativeFieldNum != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = m.NativeFieldNum
@@ -149,24 +149,6 @@ func (m *FieldDescription) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SetDeveloperDataIndex sets FieldDescription value.
-func (m *FieldDescription) SetDeveloperDataIndex(v uint8) *FieldDescription {
-	m.DeveloperDataIndex = v
-	return m
-}
-
-// SetFieldDefinitionNumber sets FieldDescription value.
-func (m *FieldDescription) SetFieldDefinitionNumber(v uint8) *FieldDescription {
-	m.FieldDefinitionNumber = v
-	return m
-}
-
-// SetFitBaseTypeId sets FieldDescription value.
-func (m *FieldDescription) SetFitBaseTypeId(v basetype.BaseType) *FieldDescription {
-	m.FitBaseTypeId = v
-	return m
-}
-
 // SetFieldName sets FieldDescription value.
 //
 // Array: [N]
@@ -175,27 +157,9 @@ func (m *FieldDescription) SetFieldName(v []string) *FieldDescription {
 	return m
 }
 
-// SetArray sets FieldDescription value.
-func (m *FieldDescription) SetArray(v uint8) *FieldDescription {
-	m.Array = v
-	return m
-}
-
 // SetComponents sets FieldDescription value.
 func (m *FieldDescription) SetComponents(v string) *FieldDescription {
 	m.Components = v
-	return m
-}
-
-// SetScale sets FieldDescription value.
-func (m *FieldDescription) SetScale(v uint8) *FieldDescription {
-	m.Scale = v
-	return m
-}
-
-// SetOffset sets FieldDescription value.
-func (m *FieldDescription) SetOffset(v int8) *FieldDescription {
-	m.Offset = v
 	return m
 }
 
@@ -228,6 +192,42 @@ func (m *FieldDescription) SetFitBaseUnitId(v typedef.FitBaseUnit) *FieldDescrip
 // SetNativeMesgNum sets FieldDescription value.
 func (m *FieldDescription) SetNativeMesgNum(v typedef.MesgNum) *FieldDescription {
 	m.NativeMesgNum = v
+	return m
+}
+
+// SetDeveloperDataIndex sets FieldDescription value.
+func (m *FieldDescription) SetDeveloperDataIndex(v uint8) *FieldDescription {
+	m.DeveloperDataIndex = v
+	return m
+}
+
+// SetFieldDefinitionNumber sets FieldDescription value.
+func (m *FieldDescription) SetFieldDefinitionNumber(v uint8) *FieldDescription {
+	m.FieldDefinitionNumber = v
+	return m
+}
+
+// SetFitBaseTypeId sets FieldDescription value.
+func (m *FieldDescription) SetFitBaseTypeId(v basetype.BaseType) *FieldDescription {
+	m.FitBaseTypeId = v
+	return m
+}
+
+// SetArray sets FieldDescription value.
+func (m *FieldDescription) SetArray(v uint8) *FieldDescription {
+	m.Array = v
+	return m
+}
+
+// SetScale sets FieldDescription value.
+func (m *FieldDescription) SetScale(v uint8) *FieldDescription {
+	m.Scale = v
+	return m
+}
+
+// SetOffset sets FieldDescription value.
+func (m *FieldDescription) SetOffset(v int8) *FieldDescription {
+	m.Offset = v
 	return m
 }
 

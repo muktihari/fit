@@ -16,12 +16,12 @@ import (
 
 // MemoGlob is a MemoGlob message.
 type MemoGlob struct {
-	PartIndex   uint32               // Sequence number of memo blocks
 	Memo        []byte               // Array: [N]; Deprecated. Use data field.
+	Data        []uint8              // Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+	PartIndex   uint32               // Sequence number of memo blocks
 	MesgNum     typedef.MesgNum      // Message Number of the parent message
 	ParentIndex typedef.MessageIndex // Index of mesg that this glob is associated with.
 	FieldNum    uint8                // Field within the parent that this glob is associated with
-	Data        []uint8              // Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,12 +45,12 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 	}
 
 	return &MemoGlob{
-		PartIndex:   typeconv.ToUint32[uint32](vals[250]),
 		Memo:        typeconv.ToSliceByte[byte](vals[0]),
+		Data:        typeconv.ToSliceUint8z[uint8](vals[4]),
+		PartIndex:   typeconv.ToUint32[uint32](vals[250]),
 		MesgNum:     typeconv.ToUint16[typedef.MesgNum](vals[1]),
 		ParentIndex: typeconv.ToUint16[typedef.MessageIndex](vals[2]),
 		FieldNum:    typeconv.ToUint8[uint8](vals[3]),
-		Data:        typeconv.ToSliceUint8z[uint8](vals[4]),
 
 		DeveloperFields: developerFields,
 	}
@@ -64,14 +64,19 @@ func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumMemoGlob)
 
-	if m.PartIndex != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 250)
-		field.Value = m.PartIndex
-		fields = append(fields, field)
-	}
 	if m.Memo != nil {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Memo
+		fields = append(fields, field)
+	}
+	if typeconv.ToSliceUint8z[uint8](m.Data) != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.Data)
+		fields = append(fields, field)
+	}
+	if m.PartIndex != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 250)
+		field.Value = m.PartIndex
 		fields = append(fields, field)
 	}
 	if uint16(m.MesgNum) != basetype.Uint16Invalid {
@@ -89,11 +94,6 @@ func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FieldNum
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint8z[uint8](m.Data) != nil {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.Data)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -103,19 +103,27 @@ func (m *MemoGlob) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SetPartIndex sets MemoGlob value.
-//
-// Sequence number of memo blocks
-func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
-	m.PartIndex = v
-	return m
-}
-
 // SetMemo sets MemoGlob value.
 //
 // Array: [N]; Deprecated. Use data field.
 func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
 	m.Memo = v
+	return m
+}
+
+// SetData sets MemoGlob value.
+//
+// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
+	m.Data = v
+	return m
+}
+
+// SetPartIndex sets MemoGlob value.
+//
+// Sequence number of memo blocks
+func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
+	m.PartIndex = v
 	return m
 }
 
@@ -140,14 +148,6 @@ func (m *MemoGlob) SetParentIndex(v typedef.MessageIndex) *MemoGlob {
 // Field within the parent that this glob is associated with
 func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
 	m.FieldNum = v
-	return m
-}
-
-// SetData sets MemoGlob value.
-//
-// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
-func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
-	m.Data = v
 	return m
 }
 

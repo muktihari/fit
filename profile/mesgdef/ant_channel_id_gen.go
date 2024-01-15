@@ -16,9 +16,9 @@ import (
 
 // AntChannelId is a AntChannelId message.
 type AntChannelId struct {
+	DeviceNumber     uint16
 	ChannelNumber    uint8
 	DeviceType       uint8
-	DeviceNumber     uint16
 	TransmissionType uint8
 	DeviceIndex      typedef.DeviceIndex
 
@@ -44,9 +44,9 @@ func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 	}
 
 	return &AntChannelId{
+		DeviceNumber:     typeconv.ToUint16z[uint16](vals[2]),
 		ChannelNumber:    typeconv.ToUint8[uint8](vals[0]),
 		DeviceType:       typeconv.ToUint8z[uint8](vals[1]),
-		DeviceNumber:     typeconv.ToUint16z[uint16](vals[2]),
 		TransmissionType: typeconv.ToUint8z[uint8](vals[3]),
 		DeviceIndex:      typeconv.ToUint8[typedef.DeviceIndex](vals[4]),
 
@@ -62,6 +62,11 @@ func (m *AntChannelId) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumAntChannelId)
 
+	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = uint16(m.DeviceNumber)
+		fields = append(fields, field)
+	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ChannelNumber
@@ -70,11 +75,6 @@ func (m *AntChannelId) ToMesg(fac Factory) proto.Message {
 	if uint8(m.DeviceType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = uint8(m.DeviceType)
-		fields = append(fields, field)
-	}
-	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint16(m.DeviceNumber)
 		fields = append(fields, field)
 	}
 	if uint8(m.TransmissionType) != basetype.Uint8zInvalid {
@@ -96,6 +96,12 @@ func (m *AntChannelId) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
+// SetDeviceNumber sets AntChannelId value.
+func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
+	m.DeviceNumber = v
+	return m
+}
+
 // SetChannelNumber sets AntChannelId value.
 func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 	m.ChannelNumber = v
@@ -105,12 +111,6 @@ func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 // SetDeviceType sets AntChannelId value.
 func (m *AntChannelId) SetDeviceType(v uint8) *AntChannelId {
 	m.DeviceType = v
-	return m
-}
-
-// SetDeviceNumber sets AntChannelId value.
-func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
-	m.DeviceNumber = v
 	return m
 }
 

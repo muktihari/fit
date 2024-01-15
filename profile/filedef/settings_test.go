@@ -66,6 +66,10 @@ func TestSettingsCorrectness(t *testing.T) {
 
 	fit := settings.ToFit(nil) // use standard factory
 
+	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
+	sortFields(mesgs)
+	sortFields(fit.Messages)
+
 	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {

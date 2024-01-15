@@ -17,20 +17,20 @@ import (
 
 // SplitSummary is a SplitSummary message.
 type SplitSummary struct {
-	MessageIndex    typedef.MessageIndex
-	SplitType       typedef.SplitType
-	NumSplits       uint16
 	TotalTimerTime  uint32 // Scale: 1000; Units: s
 	TotalDistance   uint32 // Scale: 100; Units: m
 	AvgSpeed        uint32 // Scale: 1000; Units: m/s
 	MaxSpeed        uint32 // Scale: 1000; Units: m/s
-	TotalAscent     uint16 // Units: m
-	TotalDescent    uint16 // Units: m
-	AvgHeartRate    uint8  // Units: bpm
-	MaxHeartRate    uint8  // Units: bpm
 	AvgVertSpeed    int32  // Scale: 1000; Units: m/s
 	TotalCalories   uint32 // Units: kcal
 	TotalMovingTime uint32 // Scale: 1000; Units: s
+	MessageIndex    typedef.MessageIndex
+	NumSplits       uint16
+	TotalAscent     uint16 // Units: m
+	TotalDescent    uint16 // Units: m
+	SplitType       typedef.SplitType
+	AvgHeartRate    uint8 // Units: bpm
+	MaxHeartRate    uint8 // Units: bpm
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -54,20 +54,20 @@ func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 	}
 
 	return &SplitSummary{
-		MessageIndex:    typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		SplitType:       typeconv.ToEnum[typedef.SplitType](vals[0]),
-		NumSplits:       typeconv.ToUint16[uint16](vals[3]),
 		TotalTimerTime:  typeconv.ToUint32[uint32](vals[4]),
 		TotalDistance:   typeconv.ToUint32[uint32](vals[5]),
 		AvgSpeed:        typeconv.ToUint32[uint32](vals[6]),
 		MaxSpeed:        typeconv.ToUint32[uint32](vals[7]),
-		TotalAscent:     typeconv.ToUint16[uint16](vals[8]),
-		TotalDescent:    typeconv.ToUint16[uint16](vals[9]),
-		AvgHeartRate:    typeconv.ToUint8[uint8](vals[10]),
-		MaxHeartRate:    typeconv.ToUint8[uint8](vals[11]),
 		AvgVertSpeed:    typeconv.ToSint32[int32](vals[12]),
 		TotalCalories:   typeconv.ToUint32[uint32](vals[13]),
 		TotalMovingTime: typeconv.ToUint32[uint32](vals[77]),
+		MessageIndex:    typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		NumSplits:       typeconv.ToUint16[uint16](vals[3]),
+		TotalAscent:     typeconv.ToUint16[uint16](vals[8]),
+		TotalDescent:    typeconv.ToUint16[uint16](vals[9]),
+		SplitType:       typeconv.ToEnum[typedef.SplitType](vals[0]),
+		AvgHeartRate:    typeconv.ToUint8[uint8](vals[10]),
+		MaxHeartRate:    typeconv.ToUint8[uint8](vals[11]),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,21 +81,6 @@ func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumSplitSummary)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
-	if byte(m.SplitType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SplitType)
-		fields = append(fields, field)
-	}
-	if m.NumSplits != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.NumSplits
-		fields = append(fields, field)
-	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.TotalTimerTime
@@ -116,26 +101,6 @@ func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MaxSpeed
 		fields = append(fields, field)
 	}
-	if m.TotalAscent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.TotalAscent
-		fields = append(fields, field)
-	}
-	if m.TotalDescent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.TotalDescent
-		fields = append(fields, field)
-	}
-	if m.AvgHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.AvgHeartRate
-		fields = append(fields, field)
-	}
-	if m.MaxHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.MaxHeartRate
-		fields = append(fields, field)
-	}
 	if m.AvgVertSpeed != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = m.AvgVertSpeed
@@ -149,6 +114,41 @@ func (m *SplitSummary) ToMesg(fac Factory) proto.Message {
 	if m.TotalMovingTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 77)
 		field.Value = m.TotalMovingTime
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
+		fields = append(fields, field)
+	}
+	if m.NumSplits != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = m.NumSplits
+		fields = append(fields, field)
+	}
+	if m.TotalAscent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.TotalAscent
+		fields = append(fields, field)
+	}
+	if m.TotalDescent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = m.TotalDescent
+		fields = append(fields, field)
+	}
+	if byte(m.SplitType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = byte(m.SplitType)
+		fields = append(fields, field)
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.AvgHeartRate
+		fields = append(fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.MaxHeartRate
 		fields = append(fields, field)
 	}
 
@@ -220,24 +220,6 @@ func (m *SplitSummary) TotalMovingTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
 
-// SetMessageIndex sets SplitSummary value.
-func (m *SplitSummary) SetMessageIndex(v typedef.MessageIndex) *SplitSummary {
-	m.MessageIndex = v
-	return m
-}
-
-// SetSplitType sets SplitSummary value.
-func (m *SplitSummary) SetSplitType(v typedef.SplitType) *SplitSummary {
-	m.SplitType = v
-	return m
-}
-
-// SetNumSplits sets SplitSummary value.
-func (m *SplitSummary) SetNumSplits(v uint16) *SplitSummary {
-	m.NumSplits = v
-	return m
-}
-
 // SetTotalTimerTime sets SplitSummary value.
 //
 // Scale: 1000; Units: s
@@ -270,38 +252,6 @@ func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
 	return m
 }
 
-// SetTotalAscent sets SplitSummary value.
-//
-// Units: m
-func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
-	m.TotalAscent = v
-	return m
-}
-
-// SetTotalDescent sets SplitSummary value.
-//
-// Units: m
-func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
-	m.TotalDescent = v
-	return m
-}
-
-// SetAvgHeartRate sets SplitSummary value.
-//
-// Units: bpm
-func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
-	m.AvgHeartRate = v
-	return m
-}
-
-// SetMaxHeartRate sets SplitSummary value.
-//
-// Units: bpm
-func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
-	m.MaxHeartRate = v
-	return m
-}
-
 // SetAvgVertSpeed sets SplitSummary value.
 //
 // Scale: 1000; Units: m/s
@@ -323,6 +273,56 @@ func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
 // Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalMovingTime(v uint32) *SplitSummary {
 	m.TotalMovingTime = v
+	return m
+}
+
+// SetMessageIndex sets SplitSummary value.
+func (m *SplitSummary) SetMessageIndex(v typedef.MessageIndex) *SplitSummary {
+	m.MessageIndex = v
+	return m
+}
+
+// SetNumSplits sets SplitSummary value.
+func (m *SplitSummary) SetNumSplits(v uint16) *SplitSummary {
+	m.NumSplits = v
+	return m
+}
+
+// SetTotalAscent sets SplitSummary value.
+//
+// Units: m
+func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
+	m.TotalAscent = v
+	return m
+}
+
+// SetTotalDescent sets SplitSummary value.
+//
+// Units: m
+func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
+	m.TotalDescent = v
+	return m
+}
+
+// SetSplitType sets SplitSummary value.
+func (m *SplitSummary) SetSplitType(v typedef.SplitType) *SplitSummary {
+	m.SplitType = v
+	return m
+}
+
+// SetAvgHeartRate sets SplitSummary value.
+//
+// Units: bpm
+func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets SplitSummary value.
+//
+// Units: bpm
+func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
+	m.MaxHeartRate = v
 	return m
 }
 

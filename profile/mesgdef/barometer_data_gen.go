@@ -19,9 +19,9 @@ import (
 // BarometerData is a BarometerData message.
 type BarometerData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -46,9 +46,9 @@ func NewBarometerData(mesg *proto.Message) *BarometerData {
 
 	return &BarometerData{
 		Timestamp:        datetime.ToTime(vals[253]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
 		BaroPres:         typeconv.ToSliceUint32[uint32](vals[2]),
+		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,11 +67,6 @@ func (m *BarometerData) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
-		fields = append(fields, field)
-	}
 	if m.SampleTimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.SampleTimeOffset
@@ -80,6 +75,11 @@ func (m *BarometerData) ToMesg(fac Factory) proto.Message {
 	if m.BaroPres != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.BaroPres
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
 		fields = append(fields, field)
 	}
 
@@ -99,14 +99,6 @@ func (m *BarometerData) SetTimestamp(v time.Time) *BarometerData {
 	return m
 }
 
-// SetTimestampMs sets BarometerData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
-	m.TimestampMs = v
-	return m
-}
-
 // SetSampleTimeOffset sets BarometerData value.
 //
 // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
@@ -120,6 +112,14 @@ func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
 // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
 	m.BaroPres = v
+	return m
+}
+
+// SetTimestampMs sets BarometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
+	m.TimestampMs = v
 	return m
 }
 

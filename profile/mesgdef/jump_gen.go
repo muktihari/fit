@@ -22,19 +22,19 @@ type Jump struct {
 	Timestamp     time.Time // Units: s
 	Distance      float32   // Units: m
 	Height        float32   // Units: m
+	HangTime      float32   // Units: s
+	Score         float32   // A score for a jump calculated based on hang time, rotations, and distance.
+	PositionLat   int32     // Units: semicircles
+	PositionLong  int32     // Units: semicircles
+	EnhancedSpeed uint32    // Scale: 1000; Units: m/s
+	Speed         uint16    // Scale: 1000; Units: m/s
 	Rotations     uint8
-	HangTime      float32 // Units: s
-	Score         float32 // A score for a jump calculated based on hang time, rotations, and distance.
-	PositionLat   int32   // Units: semicircles
-	PositionLong  int32   // Units: semicircles
-	Speed         uint16  // Scale: 1000; Units: m/s
-	EnhancedSpeed uint32  // Scale: 1000; Units: m/s
+
+	IsExpandedFields [9]bool // Used for tracking expanded fields, field.Num as index.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [9]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewJump creates new Jump struct based on given mesg.
@@ -61,17 +61,17 @@ func NewJump(mesg *proto.Message) *Jump {
 		Timestamp:     datetime.ToTime(vals[253]),
 		Distance:      typeconv.ToFloat32[float32](vals[0]),
 		Height:        typeconv.ToFloat32[float32](vals[1]),
-		Rotations:     typeconv.ToUint8[uint8](vals[2]),
 		HangTime:      typeconv.ToFloat32[float32](vals[3]),
 		Score:         typeconv.ToFloat32[float32](vals[4]),
 		PositionLat:   typeconv.ToSint32[int32](vals[5]),
 		PositionLong:  typeconv.ToSint32[int32](vals[6]),
-		Speed:         typeconv.ToUint16[uint16](vals[7]),
 		EnhancedSpeed: typeconv.ToUint32[uint32](vals[8]),
-
-		DeveloperFields: developerFields,
+		Speed:         typeconv.ToUint16[uint16](vals[7]),
+		Rotations:     typeconv.ToUint8[uint8](vals[2]),
 
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -98,11 +98,6 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Height
 		fields = append(fields, field)
 	}
-	if m.Rotations != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Rotations
-		fields = append(fields, field)
-	}
 	if typeconv.ToUint32[uint32](m.HangTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.HangTime
@@ -123,15 +118,20 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PositionLong
 		fields = append(fields, field)
 	}
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.EnhancedSpeed
+		field.IsExpandedField = m.IsExpandedFields[8]
+		fields = append(fields, field)
+	}
 	if m.Speed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.Speed
 		fields = append(fields, field)
 	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.EnhancedSpeed
-		field.IsExpandedField = m.IsExpandedFields[8]
+	if m.Rotations != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Rotations
 		fields = append(fields, field)
 	}
 
@@ -143,16 +143,6 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 	return mesg
 }
 
-// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
-//
-// If Speed value is invalid, float64 invalid value will be returned.
-func (m *Jump) SpeedScaled() float64 {
-	if m.Speed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
-	}
-	return scaleoffset.Apply(m.Speed, 1000, 0)
-}
-
 // EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
 //
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
@@ -161,6 +151,16 @@ func (m *Jump) EnhancedSpeedScaled() float64 {
 		return basetype.Float64InvalidInFloatForm()
 	}
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+}
+
+// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If Speed value is invalid, float64 invalid value will be returned.
+func (m *Jump) SpeedScaled() float64 {
+	if m.Speed == basetype.Uint16Invalid {
+		return basetype.Float64InvalidInFloatForm()
+	}
+	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
 // SetTimestamp sets Jump value.
@@ -184,12 +184,6 @@ func (m *Jump) SetDistance(v float32) *Jump {
 // Units: m
 func (m *Jump) SetHeight(v float32) *Jump {
 	m.Height = v
-	return m
-}
-
-// SetRotations sets Jump value.
-func (m *Jump) SetRotations(v uint8) *Jump {
-	m.Rotations = v
 	return m
 }
 
@@ -225,6 +219,14 @@ func (m *Jump) SetPositionLong(v int32) *Jump {
 	return m
 }
 
+// SetEnhancedSpeed sets Jump value.
+//
+// Scale: 1000; Units: m/s
+func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
+	m.EnhancedSpeed = v
+	return m
+}
+
 // SetSpeed sets Jump value.
 //
 // Scale: 1000; Units: m/s
@@ -233,11 +235,9 @@ func (m *Jump) SetSpeed(v uint16) *Jump {
 	return m
 }
 
-// SetEnhancedSpeed sets Jump value.
-//
-// Scale: 1000; Units: m/s
-func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
-	m.EnhancedSpeed = v
+// SetRotations sets Jump value.
+func (m *Jump) SetRotations(v uint8) *Jump {
+	m.Rotations = v
 	return m
 }
 

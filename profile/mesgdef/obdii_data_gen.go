@@ -19,14 +19,14 @@ import (
 // ObdiiData is a ObdiiData message.
 type ObdiiData struct {
 	Timestamp        time.Time // Units: s; Timestamp message was output
-	TimestampMs      uint16    // Units: ms; Fractional part of timestamp, added to timestamp
 	TimeOffset       []uint16  // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
-	Pid              byte      // Parameter ID
 	RawData          []byte    // Array: [N]; Raw parameter data
 	PidDataSize      []uint8   // Array: [N]; Optional, data size of PID[i]. If not specified refer to SAE J1979.
 	SystemTime       []uint32  // Array: [N]; System time associated with sample expressed in ms, can be used instead of time_offset. There will be a system_time value for each raw_data element. For multibyte pids the system_time is repeated.
 	StartTimestamp   time.Time // Timestamp of first sample recorded in the message. Used with time_offset to generate time of each sample
+	TimestampMs      uint16    // Units: ms; Fractional part of timestamp, added to timestamp
 	StartTimestampMs uint16    // Units: ms; Fractional part of start_timestamp
+	Pid              byte      // Parameter ID
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -51,14 +51,14 @@ func NewObdiiData(mesg *proto.Message) *ObdiiData {
 
 	return &ObdiiData{
 		Timestamp:        datetime.ToTime(vals[253]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		TimeOffset:       typeconv.ToSliceUint16[uint16](vals[1]),
-		Pid:              typeconv.ToByte[byte](vals[2]),
 		RawData:          typeconv.ToSliceByte[byte](vals[3]),
 		PidDataSize:      typeconv.ToSliceUint8[uint8](vals[4]),
 		SystemTime:       typeconv.ToSliceUint32[uint32](vals[5]),
 		StartTimestamp:   datetime.ToTime(vals[6]),
+		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
 		StartTimestampMs: typeconv.ToUint16[uint16](vals[7]),
+		Pid:              typeconv.ToByte[byte](vals[2]),
 
 		DeveloperFields: developerFields,
 	}
@@ -77,19 +77,9 @@ func (m *ObdiiData) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
-		fields = append(fields, field)
-	}
 	if m.TimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = m.TimeOffset
-		fields = append(fields, field)
-	}
-	if m.Pid != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Pid
 		fields = append(fields, field)
 	}
 	if m.RawData != nil {
@@ -112,9 +102,19 @@ func (m *ObdiiData) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.StartTimestamp)
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.TimestampMs
+		fields = append(fields, field)
+	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = m.StartTimestampMs
+		fields = append(fields, field)
+	}
+	if m.Pid != basetype.ByteInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.Pid
 		fields = append(fields, field)
 	}
 
@@ -134,27 +134,11 @@ func (m *ObdiiData) SetTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
-// SetTimestampMs sets ObdiiData value.
-//
-// Units: ms; Fractional part of timestamp, added to timestamp
-func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
-	m.TimestampMs = v
-	return m
-}
-
 // SetTimeOffset sets ObdiiData value.
 //
 // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
 func (m *ObdiiData) SetTimeOffset(v []uint16) *ObdiiData {
 	m.TimeOffset = v
-	return m
-}
-
-// SetPid sets ObdiiData value.
-//
-// Parameter ID
-func (m *ObdiiData) SetPid(v byte) *ObdiiData {
-	m.Pid = v
 	return m
 }
 
@@ -190,11 +174,27 @@ func (m *ObdiiData) SetStartTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
+// SetTimestampMs sets ObdiiData value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
+	m.TimestampMs = v
+	return m
+}
+
 // SetStartTimestampMs sets ObdiiData value.
 //
 // Units: ms; Fractional part of start_timestamp
 func (m *ObdiiData) SetStartTimestampMs(v uint16) *ObdiiData {
 	m.StartTimestampMs = v
+	return m
+}
+
+// SetPid sets ObdiiData value.
+//
+// Parameter ID
+func (m *ObdiiData) SetPid(v byte) *ObdiiData {
+	m.Pid = v
 	return m
 }
 

@@ -17,11 +17,11 @@ import (
 
 // BikeProfile is a BikeProfile message.
 type BikeProfile struct {
-	MessageIndex             typedef.MessageIndex
 	Name                     string
-	Sport                    typedef.Sport
-	SubSport                 typedef.SubSport
-	Odometer                 uint32 // Scale: 100; Units: m
+	FrontGear                []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
+	RearGear                 []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
+	Odometer                 uint32  // Scale: 100; Units: m
+	MessageIndex             typedef.MessageIndex
 	BikeSpdAntId             uint16
 	BikeCadAntId             uint16
 	BikeSpdcadAntId          uint16
@@ -30,24 +30,24 @@ type BikeProfile struct {
 	AutoWheelsize            uint16 // Scale: 1000; Units: m
 	BikeWeight               uint16 // Scale: 10; Units: kg
 	PowerCalFactor           uint16 // Scale: 10; Units: %
-	AutoWheelCal             bool
-	AutoPowerZero            bool
+	Sport                    typedef.Sport
+	SubSport                 typedef.SubSport
 	Id                       uint8
-	SpdEnabled               bool
-	CadEnabled               bool
-	SpdcadEnabled            bool
-	PowerEnabled             bool
 	CrankLength              uint8 // Scale: 2; Offset: -110; Units: mm
-	Enabled                  bool
 	BikeSpdAntIdTransType    uint8
 	BikeCadAntIdTransType    uint8
 	BikeSpdcadAntIdTransType uint8
 	BikePowerAntIdTransType  uint8
-	OdometerRollover         uint8   // Rollover counter that can be used to extend the odometer
-	FrontGearNum             uint8   // Number of front gears
-	FrontGear                []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
-	RearGearNum              uint8   // Number of rear gears
-	RearGear                 []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
+	OdometerRollover         uint8 // Rollover counter that can be used to extend the odometer
+	FrontGearNum             uint8 // Number of front gears
+	RearGearNum              uint8 // Number of rear gears
+	AutoWheelCal             bool
+	AutoPowerZero            bool
+	SpdEnabled               bool
+	CadEnabled               bool
+	SpdcadEnabled            bool
+	PowerEnabled             bool
+	Enabled                  bool
 	ShimanoDi2Enabled        bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -72,11 +72,11 @@ func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 	}
 
 	return &BikeProfile{
-		MessageIndex:             typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Name:                     typeconv.ToString[string](vals[0]),
-		Sport:                    typeconv.ToEnum[typedef.Sport](vals[1]),
-		SubSport:                 typeconv.ToEnum[typedef.SubSport](vals[2]),
+		FrontGear:                typeconv.ToSliceUint8z[uint8](vals[39]),
+		RearGear:                 typeconv.ToSliceUint8z[uint8](vals[41]),
 		Odometer:                 typeconv.ToUint32[uint32](vals[3]),
+		MessageIndex:             typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		BikeSpdAntId:             typeconv.ToUint16z[uint16](vals[4]),
 		BikeCadAntId:             typeconv.ToUint16z[uint16](vals[5]),
 		BikeSpdcadAntId:          typeconv.ToUint16z[uint16](vals[6]),
@@ -85,24 +85,24 @@ func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 		AutoWheelsize:            typeconv.ToUint16[uint16](vals[9]),
 		BikeWeight:               typeconv.ToUint16[uint16](vals[10]),
 		PowerCalFactor:           typeconv.ToUint16[uint16](vals[11]),
-		AutoWheelCal:             typeconv.ToBool[bool](vals[12]),
-		AutoPowerZero:            typeconv.ToBool[bool](vals[13]),
+		Sport:                    typeconv.ToEnum[typedef.Sport](vals[1]),
+		SubSport:                 typeconv.ToEnum[typedef.SubSport](vals[2]),
 		Id:                       typeconv.ToUint8[uint8](vals[14]),
-		SpdEnabled:               typeconv.ToBool[bool](vals[15]),
-		CadEnabled:               typeconv.ToBool[bool](vals[16]),
-		SpdcadEnabled:            typeconv.ToBool[bool](vals[17]),
-		PowerEnabled:             typeconv.ToBool[bool](vals[18]),
 		CrankLength:              typeconv.ToUint8[uint8](vals[19]),
-		Enabled:                  typeconv.ToBool[bool](vals[20]),
 		BikeSpdAntIdTransType:    typeconv.ToUint8z[uint8](vals[21]),
 		BikeCadAntIdTransType:    typeconv.ToUint8z[uint8](vals[22]),
 		BikeSpdcadAntIdTransType: typeconv.ToUint8z[uint8](vals[23]),
 		BikePowerAntIdTransType:  typeconv.ToUint8z[uint8](vals[24]),
 		OdometerRollover:         typeconv.ToUint8[uint8](vals[37]),
 		FrontGearNum:             typeconv.ToUint8z[uint8](vals[38]),
-		FrontGear:                typeconv.ToSliceUint8z[uint8](vals[39]),
 		RearGearNum:              typeconv.ToUint8z[uint8](vals[40]),
-		RearGear:                 typeconv.ToSliceUint8z[uint8](vals[41]),
+		AutoWheelCal:             typeconv.ToBool[bool](vals[12]),
+		AutoPowerZero:            typeconv.ToBool[bool](vals[13]),
+		SpdEnabled:               typeconv.ToBool[bool](vals[15]),
+		CadEnabled:               typeconv.ToBool[bool](vals[16]),
+		SpdcadEnabled:            typeconv.ToBool[bool](vals[17]),
+		PowerEnabled:             typeconv.ToBool[bool](vals[18]),
+		Enabled:                  typeconv.ToBool[bool](vals[20]),
 		ShimanoDi2Enabled:        typeconv.ToBool[bool](vals[44]),
 
 		DeveloperFields: developerFields,
@@ -117,29 +117,29 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumBikeProfile)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.Name
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.Sport)
+	if typeconv.ToSliceUint8z[uint8](m.FrontGear) != nil {
+		field := fac.CreateField(mesg.Num, 39)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.FrontGear)
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.SubSport)
+	if typeconv.ToSliceUint8z[uint8](m.RearGear) != nil {
+		field := fac.CreateField(mesg.Num, 41)
+		field.Value = typeconv.ToSliceUint8z[uint8](m.RearGear)
 		fields = append(fields, field)
 	}
 	if m.Odometer != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Odometer
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if uint16(m.BikeSpdAntId) != basetype.Uint16zInvalid {
@@ -182,14 +182,14 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PowerCalFactor
 		fields = append(fields, field)
 	}
-	if m.AutoWheelCal != false {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = m.AutoWheelCal
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
-	if m.AutoPowerZero != false {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.AutoPowerZero
+	if byte(m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = byte(m.SubSport)
 		fields = append(fields, field)
 	}
 	if m.Id != basetype.Uint8Invalid {
@@ -197,34 +197,9 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Id
 		fields = append(fields, field)
 	}
-	if m.SpdEnabled != false {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = m.SpdEnabled
-		fields = append(fields, field)
-	}
-	if m.CadEnabled != false {
-		field := fac.CreateField(mesg.Num, 16)
-		field.Value = m.CadEnabled
-		fields = append(fields, field)
-	}
-	if m.SpdcadEnabled != false {
-		field := fac.CreateField(mesg.Num, 17)
-		field.Value = m.SpdcadEnabled
-		fields = append(fields, field)
-	}
-	if m.PowerEnabled != false {
-		field := fac.CreateField(mesg.Num, 18)
-		field.Value = m.PowerEnabled
-		fields = append(fields, field)
-	}
 	if m.CrankLength != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.CrankLength
-		fields = append(fields, field)
-	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 20)
-		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
 	if uint8(m.BikeSpdAntIdTransType) != basetype.Uint8zInvalid {
@@ -257,19 +232,44 @@ func (m *BikeProfile) ToMesg(fac Factory) proto.Message {
 		field.Value = uint8(m.FrontGearNum)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint8z[uint8](m.FrontGear) != nil {
-		field := fac.CreateField(mesg.Num, 39)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.FrontGear)
-		fields = append(fields, field)
-	}
 	if uint8(m.RearGearNum) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 40)
 		field.Value = uint8(m.RearGearNum)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint8z[uint8](m.RearGear) != nil {
-		field := fac.CreateField(mesg.Num, 41)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.RearGear)
+	if m.AutoWheelCal != false {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = m.AutoWheelCal
+		fields = append(fields, field)
+	}
+	if m.AutoPowerZero != false {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = m.AutoPowerZero
+		fields = append(fields, field)
+	}
+	if m.SpdEnabled != false {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = m.SpdEnabled
+		fields = append(fields, field)
+	}
+	if m.CadEnabled != false {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = m.CadEnabled
+		fields = append(fields, field)
+	}
+	if m.SpdcadEnabled != false {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = m.SpdcadEnabled
+		fields = append(fields, field)
+	}
+	if m.PowerEnabled != false {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = m.PowerEnabled
+		fields = append(fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = m.Enabled
 		fields = append(fields, field)
 	}
 	if m.ShimanoDi2Enabled != false {
@@ -346,27 +346,25 @@ func (m *BikeProfile) CrankLengthScaled() float64 {
 	return scaleoffset.Apply(m.CrankLength, 2, -110)
 }
 
-// SetMessageIndex sets BikeProfile value.
-func (m *BikeProfile) SetMessageIndex(v typedef.MessageIndex) *BikeProfile {
-	m.MessageIndex = v
-	return m
-}
-
 // SetName sets BikeProfile value.
 func (m *BikeProfile) SetName(v string) *BikeProfile {
 	m.Name = v
 	return m
 }
 
-// SetSport sets BikeProfile value.
-func (m *BikeProfile) SetSport(v typedef.Sport) *BikeProfile {
-	m.Sport = v
+// SetFrontGear sets BikeProfile value.
+//
+// Array: [N]; Number of teeth on each gear 0 is innermost
+func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
+	m.FrontGear = v
 	return m
 }
 
-// SetSubSport sets BikeProfile value.
-func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
-	m.SubSport = v
+// SetRearGear sets BikeProfile value.
+//
+// Array: [N]; Number of teeth on each gear 0 is innermost
+func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
+	m.RearGear = v
 	return m
 }
 
@@ -375,6 +373,12 @@ func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
 // Scale: 100; Units: m
 func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
 	m.Odometer = v
+	return m
+}
+
+// SetMessageIndex sets BikeProfile value.
+func (m *BikeProfile) SetMessageIndex(v typedef.MessageIndex) *BikeProfile {
+	m.MessageIndex = v
 	return m
 }
 
@@ -434,15 +438,15 @@ func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
 	return m
 }
 
-// SetAutoWheelCal sets BikeProfile value.
-func (m *BikeProfile) SetAutoWheelCal(v bool) *BikeProfile {
-	m.AutoWheelCal = v
+// SetSport sets BikeProfile value.
+func (m *BikeProfile) SetSport(v typedef.Sport) *BikeProfile {
+	m.Sport = v
 	return m
 }
 
-// SetAutoPowerZero sets BikeProfile value.
-func (m *BikeProfile) SetAutoPowerZero(v bool) *BikeProfile {
-	m.AutoPowerZero = v
+// SetSubSport sets BikeProfile value.
+func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
+	m.SubSport = v
 	return m
 }
 
@@ -452,41 +456,11 @@ func (m *BikeProfile) SetId(v uint8) *BikeProfile {
 	return m
 }
 
-// SetSpdEnabled sets BikeProfile value.
-func (m *BikeProfile) SetSpdEnabled(v bool) *BikeProfile {
-	m.SpdEnabled = v
-	return m
-}
-
-// SetCadEnabled sets BikeProfile value.
-func (m *BikeProfile) SetCadEnabled(v bool) *BikeProfile {
-	m.CadEnabled = v
-	return m
-}
-
-// SetSpdcadEnabled sets BikeProfile value.
-func (m *BikeProfile) SetSpdcadEnabled(v bool) *BikeProfile {
-	m.SpdcadEnabled = v
-	return m
-}
-
-// SetPowerEnabled sets BikeProfile value.
-func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
-	m.PowerEnabled = v
-	return m
-}
-
 // SetCrankLength sets BikeProfile value.
 //
 // Scale: 2; Offset: -110; Units: mm
 func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
 	m.CrankLength = v
-	return m
-}
-
-// SetEnabled sets BikeProfile value.
-func (m *BikeProfile) SetEnabled(v bool) *BikeProfile {
-	m.Enabled = v
 	return m
 }
 
@@ -530,14 +504,6 @@ func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
 	return m
 }
 
-// SetFrontGear sets BikeProfile value.
-//
-// Array: [N]; Number of teeth on each gear 0 is innermost
-func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
-	m.FrontGear = v
-	return m
-}
-
 // SetRearGearNum sets BikeProfile value.
 //
 // Number of rear gears
@@ -546,11 +512,45 @@ func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
 	return m
 }
 
-// SetRearGear sets BikeProfile value.
-//
-// Array: [N]; Number of teeth on each gear 0 is innermost
-func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
-	m.RearGear = v
+// SetAutoWheelCal sets BikeProfile value.
+func (m *BikeProfile) SetAutoWheelCal(v bool) *BikeProfile {
+	m.AutoWheelCal = v
+	return m
+}
+
+// SetAutoPowerZero sets BikeProfile value.
+func (m *BikeProfile) SetAutoPowerZero(v bool) *BikeProfile {
+	m.AutoPowerZero = v
+	return m
+}
+
+// SetSpdEnabled sets BikeProfile value.
+func (m *BikeProfile) SetSpdEnabled(v bool) *BikeProfile {
+	m.SpdEnabled = v
+	return m
+}
+
+// SetCadEnabled sets BikeProfile value.
+func (m *BikeProfile) SetCadEnabled(v bool) *BikeProfile {
+	m.CadEnabled = v
+	return m
+}
+
+// SetSpdcadEnabled sets BikeProfile value.
+func (m *BikeProfile) SetSpdcadEnabled(v bool) *BikeProfile {
+	m.SpdcadEnabled = v
+	return m
+}
+
+// SetPowerEnabled sets BikeProfile value.
+func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
+	m.PowerEnabled = v
+	return m
+}
+
+// SetEnabled sets BikeProfile value.
+func (m *BikeProfile) SetEnabled(v bool) *BikeProfile {
+	m.Enabled = v
 	return m
 }
 

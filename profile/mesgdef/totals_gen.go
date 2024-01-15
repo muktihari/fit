@@ -18,15 +18,15 @@ import (
 
 // Totals is a Totals message.
 type Totals struct {
-	MessageIndex typedef.MessageIndex
 	Timestamp    time.Time // Units: s
 	TimerTime    uint32    // Units: s; Excludes pauses
 	Distance     uint32    // Units: m
 	Calories     uint32    // Units: kcal
-	Sport        typedef.Sport
-	ElapsedTime  uint32 // Units: s; Includes pauses
+	ElapsedTime  uint32    // Units: s; Includes pauses
+	ActiveTime   uint32    // Units: s
+	MessageIndex typedef.MessageIndex
 	Sessions     uint16
-	ActiveTime   uint32 // Units: s
+	Sport        typedef.Sport
 	SportIndex   uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -51,15 +51,15 @@ func NewTotals(mesg *proto.Message) *Totals {
 	}
 
 	return &Totals{
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
 		Timestamp:    datetime.ToTime(vals[253]),
 		TimerTime:    typeconv.ToUint32[uint32](vals[0]),
 		Distance:     typeconv.ToUint32[uint32](vals[1]),
 		Calories:     typeconv.ToUint32[uint32](vals[2]),
-		Sport:        typeconv.ToEnum[typedef.Sport](vals[3]),
 		ElapsedTime:  typeconv.ToUint32[uint32](vals[4]),
-		Sessions:     typeconv.ToUint16[uint16](vals[5]),
 		ActiveTime:   typeconv.ToUint32[uint32](vals[6]),
+		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
+		Sessions:     typeconv.ToUint16[uint16](vals[5]),
+		Sport:        typeconv.ToEnum[typedef.Sport](vals[3]),
 		SportIndex:   typeconv.ToUint8[uint8](vals[9]),
 
 		DeveloperFields: developerFields,
@@ -74,11 +74,6 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumTotals)
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = datetime.ToUint32(m.Timestamp)
@@ -99,14 +94,19 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Calories
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = byte(m.Sport)
-		fields = append(fields, field)
-	}
 	if m.ElapsedTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.ElapsedTime
+		fields = append(fields, field)
+	}
+	if m.ActiveTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = m.ActiveTime
+		fields = append(fields, field)
+	}
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = uint16(m.MessageIndex)
 		fields = append(fields, field)
 	}
 	if m.Sessions != basetype.Uint16Invalid {
@@ -114,9 +114,9 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Sessions
 		fields = append(fields, field)
 	}
-	if m.ActiveTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.ActiveTime
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = byte(m.Sport)
 		fields = append(fields, field)
 	}
 	if m.SportIndex != basetype.Uint8Invalid {
@@ -131,12 +131,6 @@ func (m *Totals) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetMessageIndex sets Totals value.
-func (m *Totals) SetMessageIndex(v typedef.MessageIndex) *Totals {
-	m.MessageIndex = v
-	return m
 }
 
 // SetTimestamp sets Totals value.
@@ -171,17 +165,25 @@ func (m *Totals) SetCalories(v uint32) *Totals {
 	return m
 }
 
-// SetSport sets Totals value.
-func (m *Totals) SetSport(v typedef.Sport) *Totals {
-	m.Sport = v
-	return m
-}
-
 // SetElapsedTime sets Totals value.
 //
 // Units: s; Includes pauses
 func (m *Totals) SetElapsedTime(v uint32) *Totals {
 	m.ElapsedTime = v
+	return m
+}
+
+// SetActiveTime sets Totals value.
+//
+// Units: s
+func (m *Totals) SetActiveTime(v uint32) *Totals {
+	m.ActiveTime = v
+	return m
+}
+
+// SetMessageIndex sets Totals value.
+func (m *Totals) SetMessageIndex(v typedef.MessageIndex) *Totals {
+	m.MessageIndex = v
 	return m
 }
 
@@ -191,11 +193,9 @@ func (m *Totals) SetSessions(v uint16) *Totals {
 	return m
 }
 
-// SetActiveTime sets Totals value.
-//
-// Units: s
-func (m *Totals) SetActiveTime(v uint32) *Totals {
-	m.ActiveTime = v
+// SetSport sets Totals value.
+func (m *Totals) SetSport(v typedef.Sport) *Totals {
+	m.Sport = v
 	return m
 }
 

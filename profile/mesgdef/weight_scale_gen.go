@@ -19,20 +19,20 @@ import (
 
 // WeightScale is a WeightScale message.
 type WeightScale struct {
-	Timestamp         time.Time      // Units: s
-	Weight            typedef.Weight // Scale: 100; Units: kg
-	PercentFat        uint16         // Scale: 100; Units: %
-	PercentHydration  uint16         // Scale: 100; Units: %
-	VisceralFatMass   uint16         // Scale: 100; Units: kg
-	BoneMass          uint16         // Scale: 100; Units: kg
-	MuscleMass        uint16         // Scale: 100; Units: kg
-	BasalMet          uint16         // Scale: 4; Units: kcal/day
-	PhysiqueRating    uint8
-	ActiveMet         uint16 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
-	MetabolicAge      uint8  // Units: years
-	VisceralFatRating uint8
+	Timestamp         time.Time            // Units: s
+	Weight            typedef.Weight       // Scale: 100; Units: kg
+	PercentFat        uint16               // Scale: 100; Units: %
+	PercentHydration  uint16               // Scale: 100; Units: %
+	VisceralFatMass   uint16               // Scale: 100; Units: kg
+	BoneMass          uint16               // Scale: 100; Units: kg
+	MuscleMass        uint16               // Scale: 100; Units: kg
+	BasalMet          uint16               // Scale: 4; Units: kcal/day
+	ActiveMet         uint16               // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 	UserProfileIndex  typedef.MessageIndex // Associates this weight scale message to a user. This corresponds to the index of the user profile message in the weight scale file.
 	Bmi               uint16               // Scale: 10; Units: kg/m^2
+	PhysiqueRating    uint8
+	MetabolicAge      uint8 // Units: years
+	VisceralFatRating uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -64,12 +64,12 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 		BoneMass:          typeconv.ToUint16[uint16](vals[4]),
 		MuscleMass:        typeconv.ToUint16[uint16](vals[5]),
 		BasalMet:          typeconv.ToUint16[uint16](vals[7]),
-		PhysiqueRating:    typeconv.ToUint8[uint8](vals[8]),
 		ActiveMet:         typeconv.ToUint16[uint16](vals[9]),
-		MetabolicAge:      typeconv.ToUint8[uint8](vals[10]),
-		VisceralFatRating: typeconv.ToUint8[uint8](vals[11]),
 		UserProfileIndex:  typeconv.ToUint16[typedef.MessageIndex](vals[12]),
 		Bmi:               typeconv.ToUint16[uint16](vals[13]),
+		PhysiqueRating:    typeconv.ToUint8[uint8](vals[8]),
+		MetabolicAge:      typeconv.ToUint8[uint8](vals[10]),
+		VisceralFatRating: typeconv.ToUint8[uint8](vals[11]),
 
 		DeveloperFields: developerFields,
 	}
@@ -123,24 +123,9 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 		field.Value = m.BasalMet
 		fields = append(fields, field)
 	}
-	if m.PhysiqueRating != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.PhysiqueRating
-		fields = append(fields, field)
-	}
 	if m.ActiveMet != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.ActiveMet
-		fields = append(fields, field)
-	}
-	if m.MetabolicAge != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.MetabolicAge
-		fields = append(fields, field)
-	}
-	if m.VisceralFatRating != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.VisceralFatRating
 		fields = append(fields, field)
 	}
 	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
@@ -151,6 +136,21 @@ func (m *WeightScale) ToMesg(fac Factory) proto.Message {
 	if m.Bmi != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = m.Bmi
+		fields = append(fields, field)
+	}
+	if m.PhysiqueRating != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = m.PhysiqueRating
+		fields = append(fields, field)
+	}
+	if m.MetabolicAge != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = m.MetabolicAge
+		fields = append(fields, field)
+	}
+	if m.VisceralFatRating != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = m.VisceralFatRating
 		fields = append(fields, field)
 	}
 
@@ -316,31 +316,11 @@ func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
 	return m
 }
 
-// SetPhysiqueRating sets WeightScale value.
-func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
-	m.PhysiqueRating = v
-	return m
-}
-
 // SetActiveMet sets WeightScale value.
 //
 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
 	m.ActiveMet = v
-	return m
-}
-
-// SetMetabolicAge sets WeightScale value.
-//
-// Units: years
-func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
-	m.MetabolicAge = v
-	return m
-}
-
-// SetVisceralFatRating sets WeightScale value.
-func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
-	m.VisceralFatRating = v
 	return m
 }
 
@@ -357,6 +337,26 @@ func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
 // Scale: 10; Units: kg/m^2
 func (m *WeightScale) SetBmi(v uint16) *WeightScale {
 	m.Bmi = v
+	return m
+}
+
+// SetPhysiqueRating sets WeightScale value.
+func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
+	m.PhysiqueRating = v
+	return m
+}
+
+// SetMetabolicAge sets WeightScale value.
+//
+// Units: years
+func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
+	m.MetabolicAge = v
+	return m
+}
+
+// SetVisceralFatRating sets WeightScale value.
+func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
+	m.VisceralFatRating = v
 	return m
 }
 

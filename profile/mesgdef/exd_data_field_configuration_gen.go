@@ -16,18 +16,18 @@ import (
 
 // ExdDataFieldConfiguration is a ExdDataFieldConfiguration message.
 type ExdDataFieldConfiguration struct {
+	Title        []string // Array: [32]
 	ScreenIndex  uint8
 	ConceptField byte
 	FieldId      uint8
 	ConceptCount uint8
 	DisplayType  typedef.ExdDisplayType
-	Title        []string // Array: [32]
+
+	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
 	DeveloperFields []proto.DeveloperField
-
-	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
 }
 
 // NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg.
@@ -51,16 +51,16 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 	}
 
 	return &ExdDataFieldConfiguration{
+		Title:        typeconv.ToSliceString[string](vals[5]),
 		ScreenIndex:  typeconv.ToUint8[uint8](vals[0]),
 		ConceptField: typeconv.ToByte[byte](vals[1]),
 		FieldId:      typeconv.ToUint8[uint8](vals[2]),
 		ConceptCount: typeconv.ToUint8[uint8](vals[3]),
 		DisplayType:  typeconv.ToEnum[typedef.ExdDisplayType](vals[4]),
-		Title:        typeconv.ToSliceString[string](vals[5]),
-
-		DeveloperFields: developerFields,
 
 		IsExpandedFields: isExpandedFields,
+
+		DeveloperFields: developerFields,
 	}
 }
 
@@ -72,6 +72,11 @@ func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumExdDataFieldConfiguration)
 
+	if m.Title != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = m.Title
+		fields = append(fields, field)
+	}
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.ScreenIndex
@@ -99,11 +104,6 @@ func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
 		field.Value = byte(m.DisplayType)
 		fields = append(fields, field)
 	}
-	if m.Title != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.Title
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -111,6 +111,14 @@ func (m *ExdDataFieldConfiguration) ToMesg(fac Factory) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// SetTitle sets ExdDataFieldConfiguration value.
+//
+// Array: [32]
+func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
+	m.Title = v
+	return m
 }
 
 // SetScreenIndex sets ExdDataFieldConfiguration value.
@@ -140,14 +148,6 @@ func (m *ExdDataFieldConfiguration) SetConceptCount(v uint8) *ExdDataFieldConfig
 // SetDisplayType sets ExdDataFieldConfiguration value.
 func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *ExdDataFieldConfiguration {
 	m.DisplayType = v
-	return m
-}
-
-// SetTitle sets ExdDataFieldConfiguration value.
-//
-// Array: [32]
-func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
-	m.Title = v
 	return m
 }
 

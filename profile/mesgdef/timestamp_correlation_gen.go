@@ -20,10 +20,10 @@ import (
 // TimestampCorrelation is a TimestampCorrelation message.
 type TimestampCorrelation struct {
 	Timestamp                 time.Time // Units: s; Whole second part of UTC timestamp at the time the system timestamp was recorded.
-	FractionalTimestamp       uint16    // Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
 	SystemTimestamp           time.Time // Units: s; Whole second part of the system timestamp
-	FractionalSystemTimestamp uint16    // Scale: 32768; Units: s; Fractional part of the system timestamp
 	LocalTimestamp            time.Time // Units: s; timestamp epoch expressed in local time used to convert timestamps to local time
+	FractionalTimestamp       uint16    // Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
+	FractionalSystemTimestamp uint16    // Scale: 32768; Units: s; Fractional part of the system timestamp
 	TimestampMs               uint16    // Units: ms; Millisecond part of the UTC timestamp at the time the system timestamp was recorded.
 	SystemTimestampMs         uint16    // Units: ms; Millisecond part of the system timestamp
 
@@ -50,10 +50,10 @@ func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 
 	return &TimestampCorrelation{
 		Timestamp:                 datetime.ToTime(vals[253]),
-		FractionalTimestamp:       typeconv.ToUint16[uint16](vals[0]),
 		SystemTimestamp:           datetime.ToTime(vals[1]),
-		FractionalSystemTimestamp: typeconv.ToUint16[uint16](vals[2]),
 		LocalTimestamp:            datetime.ToTime(vals[3]),
+		FractionalTimestamp:       typeconv.ToUint16[uint16](vals[0]),
+		FractionalSystemTimestamp: typeconv.ToUint16[uint16](vals[2]),
 		TimestampMs:               typeconv.ToUint16[uint16](vals[4]),
 		SystemTimestampMs:         typeconv.ToUint16[uint16](vals[5]),
 
@@ -74,24 +74,24 @@ func (m *TimestampCorrelation) ToMesg(fac Factory) proto.Message {
 		field.Value = datetime.ToUint32(m.Timestamp)
 		fields = append(fields, field)
 	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FractionalTimestamp
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.SystemTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = datetime.ToUint32(m.SystemTimestamp)
 		fields = append(fields, field)
 	}
-	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.FractionalSystemTimestamp
-		fields = append(fields, field)
-	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = datetime.ToUint32(m.LocalTimestamp)
+		fields = append(fields, field)
+	}
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = m.FractionalTimestamp
+		fields = append(fields, field)
+	}
+	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = m.FractionalSystemTimestamp
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -141,14 +141,6 @@ func (m *TimestampCorrelation) SetTimestamp(v time.Time) *TimestampCorrelation {
 	return m
 }
 
-// SetFractionalTimestamp sets TimestampCorrelation value.
-//
-// Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
-func (m *TimestampCorrelation) SetFractionalTimestamp(v uint16) *TimestampCorrelation {
-	m.FractionalTimestamp = v
-	return m
-}
-
 // SetSystemTimestamp sets TimestampCorrelation value.
 //
 // Units: s; Whole second part of the system timestamp
@@ -157,19 +149,27 @@ func (m *TimestampCorrelation) SetSystemTimestamp(v time.Time) *TimestampCorrela
 	return m
 }
 
-// SetFractionalSystemTimestamp sets TimestampCorrelation value.
-//
-// Scale: 32768; Units: s; Fractional part of the system timestamp
-func (m *TimestampCorrelation) SetFractionalSystemTimestamp(v uint16) *TimestampCorrelation {
-	m.FractionalSystemTimestamp = v
-	return m
-}
-
 // SetLocalTimestamp sets TimestampCorrelation value.
 //
 // Units: s; timestamp epoch expressed in local time used to convert timestamps to local time
 func (m *TimestampCorrelation) SetLocalTimestamp(v time.Time) *TimestampCorrelation {
 	m.LocalTimestamp = v
+	return m
+}
+
+// SetFractionalTimestamp sets TimestampCorrelation value.
+//
+// Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
+func (m *TimestampCorrelation) SetFractionalTimestamp(v uint16) *TimestampCorrelation {
+	m.FractionalTimestamp = v
+	return m
+}
+
+// SetFractionalSystemTimestamp sets TimestampCorrelation value.
+//
+// Scale: 32768; Units: s; Fractional part of the system timestamp
+func (m *TimestampCorrelation) SetFractionalSystemTimestamp(v uint16) *TimestampCorrelation {
+	m.FractionalSystemTimestamp = v
 	return m
 }
 
