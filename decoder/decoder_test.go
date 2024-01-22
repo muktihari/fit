@@ -1862,13 +1862,15 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(typedef.MesgNumRecord)
 	mesgDef := proto.CreateMessageDefinition(&mesg)
-	dec := New(nil, WithIgnoreChecksum(), WithNoComponentExpansion())
-	dec.localMessageDefinitions[0] = &mesgDef
 	mesgb, _ := mesg.MarshalBinary()
+	buf := bytes.NewBuffer(mesgb)
+	dec := New(buf, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
+	dec.localMessageDefinitions[0] = &mesgDef
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		dec.r = bytes.NewBuffer(mesgb)
+		buf.Reset()
+		buf.Write(mesgb)
 		err := dec.decodeMessageData(0)
 		if err != nil {
 			b.Fatal(err)
@@ -1891,11 +1893,43 @@ func BenchmarkDecode(b *testing.B) {
 	if err != nil {
 		panic(err)
 	}
+
+	buf := bytes.NewBuffer(all)
+	dec := New(buf)
 	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.Write(all)
+		_, err = dec.Decode()
+		if err != nil {
+			b.Fatal(err)
+		}
+		dec.reset()
+	}
+}
+
+func BenchmarkDecodeWithFiledef(b *testing.B) {
+	b.StopTimer()
+	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// But since it's big, it's should be good to benchmark.
+	f, err := os.Open("../testdata/big_activity.fit")
+	// f, err := os.Open("../testdata/from_official_sdk/activity_lowbattery.fit")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	all, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
 
 	al := filedef.NewListener()
 	buf := bytes.NewBuffer(all)
 	dec := New(buf, WithMesgListener(al), WithBroadcastOnly())
+	b.StartTimer()
+
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
 		buf.Write(all)
