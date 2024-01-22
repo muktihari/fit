@@ -961,7 +961,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_tracker_enabled",
 					Num:        36,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1006,7 +1006,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "move_alert_enabled",
 					Num:        46,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1111,7 +1111,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "lactate_threshold_autodetect_enabled",
 					Num:        80,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1126,7 +1126,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ble_auto_upload_enabled",
 					Num:        86,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1691,7 +1691,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1721,7 +1721,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "log_hrv",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1771,7 +1771,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1831,7 +1831,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_source",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2076,7 +2076,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_wheel_cal",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2091,7 +2091,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_power_zero",
 					Num:        13,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2121,7 +2121,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "spd_enabled",
 					Num:        15,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2136,7 +2136,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cad_enabled",
 					Num:        16,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2151,7 +2151,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "spdcad_enabled",
 					Num:        17,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2166,7 +2166,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power_enabled",
 					Num:        18,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2196,7 +2196,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        20,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2346,7 +2346,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "shimano_di2_enabled",
 					Num:        44,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2366,7 +2366,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2381,7 +2381,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_le_enabled",
 					Num:        1,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2396,7 +2396,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2426,7 +2426,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "live_tracking_enabled",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2441,7 +2441,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_conditions_enabled",
 					Num:        5,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2456,7 +2456,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_alerts_enabled",
 					Num:        6,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2471,7 +2471,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_activity_upload_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2486,7 +2486,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "course_download_enabled",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2501,7 +2501,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "workout_download_enabled",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2516,7 +2516,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_ephemeris_download_enabled",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2531,7 +2531,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "incident_detection_enabled",
 					Num:        11,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2546,7 +2546,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "grouptrack_enabled",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3484,7 +3484,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "safety_stop_enabled",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3529,7 +3529,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "apnea_countdown_enabled",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3797,7 +3797,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "up_key_enabled",
 					Num:        30,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3907,7 +3907,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3982,7 +3982,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3997,7 +3997,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4012,7 +4012,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4027,7 +4027,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4107,7 +4107,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4182,7 +4182,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4197,7 +4197,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4212,7 +4212,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4227,7 +4227,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4447,7 +4447,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeat",
 					Num:        6,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4507,7 +4507,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14922,7 +14922,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "favorite",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14987,7 +14987,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16777,7 +16777,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17806,7 +17806,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "completed",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19282,7 +19282,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_data",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19797,7 +19797,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20068,7 +20068,7 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "is_signed",
 					Num:        11,
-					Type:       profile.Bool, /* basetype.Bool (size: 0) */
+					Type:       profile.Bool, /* basetype.Enum (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
