@@ -193,9 +193,8 @@ func (m *Message) FieldByNum(num byte) *Field {
 // FieldValueByNum returns the value of the Field in a Messsage, if not found return nil.
 func (m *Message) FieldValueByNum(num byte) any {
 	for i := range m.Fields {
-		field := &m.Fields[i]
-		if field.Num == num {
-			return field.Value
+		if m.Fields[i].Num == num {
+			return m.Fields[i].Value
 		}
 	}
 	return nil
@@ -203,33 +202,22 @@ func (m *Message) FieldValueByNum(num byte) any {
 
 // RemoveFieldByNum removes Field in a Message by num.
 func (m *Message) RemoveFieldByNum(num byte) {
-	var idx *int
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {
-			idx = &i
-			break
+			m.Fields = append(m.Fields[:i], m.Fields[i+1:]...)
+			return
 		}
-	}
-
-	if idx != nil {
-		m.Fields = append(m.Fields[:*idx], m.Fields[*idx+1:]...)
 	}
 }
 
 // Clone clones Message.
 func (m Message) Clone() Message {
-	fields := make([]Field, 0)
 	for i := range m.Fields {
-		fields = append(fields, m.Fields[i].Clone())
+		m.Fields[i] = m.Fields[i].Clone()
 	}
-	m.Fields = fields
-
-	developerFields := make([]DeveloperField, 0)
 	for i := range m.DeveloperFields {
-		developerFields = append(developerFields, m.DeveloperFields[i].Clone())
+		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
 	}
-	m.DeveloperFields = developerFields
-
 	return m
 }
 
@@ -240,10 +228,10 @@ type FieldBase struct {
 	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific number (defined by manufacturer). (255 == invalid)
 	Type       profile.ProfileType // Type is defined type that serves as an abstraction layer above base types (primitive-types), e.g. DateTime is a time representation in uint32.
 	Array      bool                // Flag whether the value of this field is an array
+	Accumulate bool                // Flag to indicate if the value of the field is accumulable.
 	Scale      float64             // A scale or offset specified in the FIT profile for binary fields (sint/uint etc.) only. the binary quantity is divided by the scale factor and then the offset is subtracted. (default: 1)
 	Offset     float64             // A scale or offset specified in the FIT profile for binary fields (sint/uint etc.) only. the binary quantity is divided by the scale factor and then the offset is subtracted. (default: 0)
 	Units      string              // Units of the value, such as m (meter), m/s (meter per second), s (second), etc.
-	Accumulate bool                // Flag to indicate if the value of the field is accumulable.
 	Components []Component         // List of components
 	SubFields  []SubField          // List of sub-fields
 }
@@ -331,8 +319,8 @@ type DeveloperField struct {
 	Size               byte
 	NativeMesgNum      typedef.MesgNum
 	NativeFieldNum     byte
-	Name               string
 	Type               basetype.BaseType
+	Name               string
 	Units              string
 	Value              any
 }
@@ -346,10 +334,10 @@ func (f DeveloperField) Clone() DeveloperField {
 // The component can be expanded as a main Field in a Message or to update the value of the destination main Field.
 type Component struct {
 	FieldNum   byte
-	Scale      float64
-	Offset     float64
 	Accumulate bool
 	Bits       byte // bit value max 32
+	Scale      float64
+	Offset     float64
 }
 
 // SubField is a dynamic interpretation of the main Field in a Message when the SubFieldMap mapping match. See SubFieldMap's docs.

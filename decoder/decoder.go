@@ -686,9 +686,8 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 
 		componentScaled := scaleoffset.Apply(val, component.Scale, component.Offset)
 		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
-		value := valueFromBits(val, componentField.Type.BaseType())
+		componentField.Value = valueFromBits(val, componentField.Type.BaseType())
 
-		componentField.Value = value
 		mesg.Fields = append(mesg.Fields, componentField)
 
 		// The destination field (componentField) can itself contain components requiring expansion.
@@ -795,10 +794,8 @@ func (d *Decoder) read(b []byte) error {
 // readByte is shorthand for read([1]byte).
 func (d *Decoder) readByte() (byte, error) {
 	b := d.bytesArray[:1]
-	if err := d.read(b); err != nil {
-		return 0, err
-	}
-	return b[0], nil
+	err := d.read(b)
+	return b[0], err
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.

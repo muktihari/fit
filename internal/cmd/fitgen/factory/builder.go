@@ -85,7 +85,7 @@ func (b *factoryBuilder) populateLookupData() {
 	}
 
 	// additional profile type which is not defined in basetype.
-	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "bool"})
+	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "enum"})
 
 	for _, _type := range b.types {
 		b.goTypesByProfileTypes[_type.Name] = goTypesByBaseTypes[_type.BaseType]
@@ -281,7 +281,11 @@ func (b *factoryBuilder) transformProfileType(fieldType string) string {
 }
 
 func (b *factoryBuilder) transformBaseType(fieldType string) string {
-	return "basetype." + strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]) // basetype.Uint16z
+	baseType := b.baseTypeMapByProfileType[fieldType]
+	if baseType == "bool" {
+		baseType = "enum"
+	}
+	return "basetype." + strutil.ToTitle(baseType) // basetype.Uint16z
 }
 
 func (b *factoryBuilder) transformMesgnum(s string) string {
