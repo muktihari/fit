@@ -23,8 +23,7 @@ type mesgdefBuilder struct {
 	template     *template.Template
 	templateExec string
 
-	path       string // path to generate the file
-	sdkVersion string // Fit SDK Version
+	path string // path to generate the file
 
 	once sync.Once
 
@@ -38,7 +37,7 @@ type mesgdefBuilder struct {
 	fieldByMesgNameByFieldName map[string]map[string]parser.Field
 }
 
-func NewBuilder(path, version string, message []parser.Message, types []parser.Type) builder.Builder {
+func NewBuilder(path string, message []parser.Message, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &mesgdefBuilder{
@@ -46,7 +45,6 @@ func NewBuilder(path, version string, message []parser.Message, types []parser.T
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
 		templateExec:               "mesgdef",
 		path:                       filepath.Join(path, "profile", "mesgdef"),
-		sdkVersion:                 version,
 		messages:                   message,
 		types:                      types,
 		goTypesByBaseTypes:         make(map[string]string),
@@ -195,7 +193,6 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		b.simpleMemoryAlignment(fields)
 
 		data := Data{
-			SDKVersion:        b.sdkVersion,
 			Package:           "mesgdef",
 			Imports:           []string{},
 			Name:              strutil.ToTitle(mesg.Name),

@@ -26,12 +26,11 @@ type typebuilder struct {
 	template     *template.Template
 	templateExec string
 
-	path       string        // path to generate the file
-	sdkVersion string        // Fit SDK Version
-	types      []parser.Type // type parsed from profile.xlsx
+	path  string        // path to generate the file
+	types []parser.Type // type parsed from profile.xlsx
 }
 
-func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
+func NewBuilder(path string, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &typebuilder{
@@ -42,7 +41,6 @@ func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
 				filepath.Join(cd, "..", "..", "builder", "shared", "constant.tmpl"))),
 		templateExec: "typedef",
 		path:         filepath.Join(path, "profile", "typedef"),
-		sdkVersion:   sdkVersion,
 		types:        types,
 	}
 }
@@ -55,11 +53,10 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 		}
 		var hasMfgRangeMin, hashasMfgRangeMax bool
 		data := shared.ConstantData{
-			Package:    "typedef",
-			SDKVersion: b.sdkVersion,
-			Imports:    []string{"strconv"},
-			Type:       strutil.ToTitle(t.Name),
-			Base:       basetype.FromString(t.BaseType).GoType(),
+			Package: "typedef",
+			Imports: []string{"strconv"},
+			Type:    strutil.ToTitle(t.Name),
+			Base:    basetype.FromString(t.BaseType).GoType(),
 		}
 
 		data.Invalid = shared.Constant{

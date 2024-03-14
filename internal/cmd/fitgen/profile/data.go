@@ -20,7 +20,7 @@ type MappingBaseType struct {
 
 // VersionData is data representative of version.tmpl
 type VersionData struct {
-	SDKVersion     string
-	Package        string
 	ProfileVersion string
+	Package        string
+	Version        uint16
 }

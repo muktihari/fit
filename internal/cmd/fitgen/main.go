@@ -42,8 +42,8 @@ interface (CLI) to generate a customized SDK. When executing the CLI command, sp
 the path to the edited-file such as "Profile-copy.xlsx" using the "--path" option.
 
 Example: 
- - "./fitgen --profile-file Profile-copy.xlsx --path ../../ --builders all -v -y"
- - "./fitgen -f Profile-copy.xlsx -p ../../ -b all -v -y"
+ - "./fitgen --profile-file Profile-copy.xlsx --path ../../../ --builders all --profile-version 21.115 -v -y"
+ - "./fitgen -f Profile-copy.xlsx -p ../../../ -b all --profile-version 21.115 -v -y"
 
 Note: The existing Garmin SDK specifications must not be altered, since it might 
 result in data that does not align with the terms and conditions of the Fit Protocol.
@@ -58,7 +58,7 @@ func main() {
 	flag.StringVar(&profileFilePath, "f", "", profileFilePathHelp)
 	flag.StringVar(&profileFilePath, "profile-file", "", profileFilePathHelp)
 
-	var generatePath, generatePathHelp = "", "Root path to generate files (e.g. \"../../\")"
+	var generatePath, generatePathHelp = "", "Root path to generate files (e.g. \"../../../\")"
 	flag.StringVar(&generatePath, "p", "", generatePathHelp)
 	flag.StringVar(&generatePath, "path", "", generatePathHelp)
 
@@ -67,8 +67,8 @@ func main() {
 	flag.StringVar(&whichBuilder, "b", "", whichBuilderHelp)
 	flag.StringVar(&whichBuilder, "builders", "", whichBuilderHelp)
 
-	var sdkVersion, sdkVersionHelp = "", "Garmin Fit SDK Version (e.g. \"21.115\")"
-	flag.StringVar(&sdkVersion, "sdk-version", "", sdkVersionHelp)
+	var profileVersion, profileVersionHelp = "", "Garmin Fit SDK Profile Version (e.g. \"21.115\")"
+	flag.StringVar(&profileVersion, "profile-version", "", profileVersionHelp)
 
 	var confirm, confirmHelp = false, "Confirm action"
 	flag.BoolVar(&confirm, "y", false, confirmHelp)
@@ -92,8 +92,8 @@ func main() {
 		fatalf("missing flag: --path=root/path/to/generate/files\n")
 	}
 
-	if sdkVersion == "" {
-		fatalf("missing flag: --sdk-version=<version> e.g 21.115\n")
+	if profileVersion == "" {
+		fatalf("missing flag: --profile-version=<version> e.g 21.115\n")
 	}
 
 	generatePath = abspath(generatePath)
@@ -128,12 +128,12 @@ func main() {
 	}
 
 	var (
-		typedefb = typedef.NewBuilder(generatePath, sdkVersion, parsedtypes)
-		profileb = profile.NewBuilder(generatePath, sdkVersion, parsedtypes)
-		factoryb = factory.NewBuilder(generatePath, sdkVersion, parsedtypes, parsedmesgs)
-		mesgnumb = mesgnum.NewBuilder(generatePath, sdkVersion, parsedtypes)
-		fielnumb = fieldnum.NewBuilder(generatePath, sdkVersion, parsedmesgs, parsedtypes)
-		mesgdefb = mesgdef.NewBuilder(generatePath, sdkVersion, parsedmesgs, parsedtypes)
+		typedefb = typedef.NewBuilder(generatePath, parsedtypes)
+		profileb = profile.NewBuilder(generatePath, profileVersion, parsedtypes)
+		factoryb = factory.NewBuilder(generatePath, parsedtypes, parsedmesgs)
+		mesgnumb = mesgnum.NewBuilder(generatePath, parsedtypes)
+		fielnumb = fieldnum.NewBuilder(generatePath, parsedmesgs, parsedtypes)
+		mesgdefb = mesgdef.NewBuilder(generatePath, parsedmesgs, parsedtypes)
 	)
 
 	var builders []builder.Builder
