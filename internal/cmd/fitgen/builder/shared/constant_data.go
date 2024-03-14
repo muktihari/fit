@@ -20,7 +20,6 @@ func FuncMap() template.FuncMap {
 // ConstantData is data representation of constant definitions template.
 // This map one to one with file that will be generated. 1 data == 1 proto.
 type ConstantData struct {
-	SDKVersion    string
 	PackageDoc    string
 	Package       string
 	Imports       []string

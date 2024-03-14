@@ -29,10 +29,9 @@ type fieldnumBuilder struct {
 	template     *template.Template
 	templateExec string
 
-	path       string // path to generate the file
-	sdkVersion string // Fit SDK Version
-	messages   []parser.Message
-	types      []parser.Type
+	path     string // path to generate the file
+	messages []parser.Message
+	types    []parser.Type
 
 	once sync.Once
 
@@ -40,7 +39,7 @@ type fieldnumBuilder struct {
 	constantsMapByProfileType map[ProfileType][]string
 }
 
-func NewBuilder(path, version string, message []parser.Message, types []parser.Type) builder.Builder {
+func NewBuilder(path string, message []parser.Message, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &fieldnumBuilder{
@@ -51,7 +50,6 @@ func NewBuilder(path, version string, message []parser.Message, types []parser.T
 				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
 		templateExec: "fieldnum",
 		path:         filepath.Join(path, "profile", "untyped", "fieldnum"),
-		sdkVersion:   version,
 		messages:     message,
 		types:        types,
 	}
@@ -138,11 +136,10 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 		Path:         b.path,
 		Filename:     "fieldnum_gen.go",
 		Data: shared.ConstantData{
-			Package:    "fieldnum",
-			SDKVersion: b.sdkVersion,
-			Type:       _type,
-			Base:       "byte",
-			Constants:  constants,
+			Package:   "fieldnum",
+			Type:      _type,
+			Base:      "byte",
+			Constants: constants,
 		},
 	}
 

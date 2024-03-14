@@ -38,10 +38,9 @@ type factoryBuilder struct {
 	mesgnumPackageName string
 	profilePackageName string
 
-	path       string           // path to generate the file
-	sdkVersion string           // Fit SDK Version
-	messages   []parser.Message // messages parsed from profile.xlsx
-	types      []parser.Type
+	path     string           // path to generate the file
+	messages []parser.Message // messages parsed from profile.xlsx
+	types    []parser.Type
 
 	once sync.Once
 
@@ -55,7 +54,7 @@ type factoryBuilder struct {
 	fieldMapByMessageNameByFieldName map[MessageName]map[FieldName]parser.Field // e.g. map[file_createor][software_version] -> Field{}
 }
 
-func NewBuilder(path, sdkVersion string, types []parser.Type, messages []parser.Message) builder.Builder {
+func NewBuilder(path string, types []parser.Type, messages []parser.Message) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &factoryBuilder{
@@ -63,7 +62,6 @@ func NewBuilder(path, sdkVersion string, types []parser.Type, messages []parser.
 		path:                             filepath.Join(path, "factory"),
 		mesgnumPackageName:               "typedef",
 		profilePackageName:               "profile",
-		sdkVersion:                       sdkVersion,
 		types:                            types,
 		messages:                         messages,
 		goTypesByProfileTypes:            make(map[ProfileType]string),
@@ -159,10 +157,9 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 			Path:         b.path,
 			Filename:     "factory_gen.go",
 			Data: Data{
-				Package:    "factory",
-				SDKVersion: b.sdkVersion,
-				Messages:   strbuf.String(),
-				Mesgnums:   mesgnums,
+				Package:  "factory",
+				Messages: strbuf.String(),
+				Mesgnums: mesgnums,
 			},
 		},
 		{
@@ -171,8 +168,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 			Path:         b.path,
 			Filename:     "exported_gen.go",
 			Data: Data{
-				Package:    "factory",
-				SDKVersion: b.sdkVersion,
+				Package: "factory",
 			},
 		},
 	}, nil

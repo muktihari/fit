@@ -28,12 +28,12 @@ const (
 type profilebuilder struct {
 	template *template.Template
 
-	path       string        // path to generate the file
-	sdkVersion string        // Fit SDK Version
-	types      []parser.Type // type parsed from profile.xlsx
+	path           string        // path to generate the file
+	profileVersion string        // Fit SDK Profile Version
+	types          []parser.Type // type parsed from profile.xlsx
 }
 
-func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
+func NewBuilder(path, profileVersion string, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &profilebuilder{
@@ -42,9 +42,9 @@ func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
 			ParseFiles(
 				filepath.Join(cd, "profile.tmpl"),
 				filepath.Join(cd, "..", "builder", "shared", "constant.tmpl"))),
-		path:       filepath.Join(path, "profile"),
-		sdkVersion: sdkVersion,
-		types:      types,
+		path:           filepath.Join(path, "profile"),
+		profileVersion: profileVersion,
+		types:          types,
 	}
 }
 
@@ -102,10 +102,9 @@ func (b *profilebuilder) buildProfile() builder.Data {
 			"strconv",
 			"github.com/muktihari/fit/profile/basetype",
 		},
-		SDKVersion: b.sdkVersion,
-		Type:       ProfileType,
-		Base:       "uint16",
-		Constants:  constants,
+		Type:      ProfileType,
+		Base:      "uint16",
+		Constants: constants,
 	}
 
 	data.Invalid = shared.Constant{
@@ -133,9 +132,9 @@ func (b *profilebuilder) buildVersion() builder.Data {
 		Path:         b.path,
 		Filename:     "version_gen.go",
 		Data: VersionData{
-			SDKVersion:     b.sdkVersion,
+			ProfileVersion: b.profileVersion,
 			Package:        "profile",
-			ProfileVersion: toProfileVersion(b.sdkVersion),
+			Version:        toVersion(b.profileVersion),
 		},
 	}
 }
@@ -144,11 +143,11 @@ func transformBaseType(s string) string {
 	return "basetype." + s
 }
 
-func toProfileVersion(s string) string {
+func toVersion(profileVersion string) uint16 {
 	// On error, use panic so we can get stack trace, should not generate when version is invalid.
-	parts := strings.Split(s, ".")
+	parts := strings.Split(profileVersion, ".")
 	if len(parts) < 2 {
-		panic(fmt.Errorf("malformed sdkversion, should in the form of <major>.<minor>, got: %s", s))
+		panic(fmt.Errorf("malformed profile version, should in the form of <major>.<minor>, got: %s", profileVersion))
 	}
 
 	major, err := strconv.ParseUint(parts[0], 10, 64)
@@ -166,5 +165,5 @@ func toProfileVersion(s string) string {
 		panic(fmt.Errorf("version should not exceed max uint16, expected < %d, got: %d", math.MaxUint16, version))
 	}
 
-	return fmt.Sprintf("%s // (Major * 1000) + Minor", strconv.FormatUint(version, 10))
+	return uint16(version)
 }

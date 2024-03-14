@@ -25,12 +25,11 @@ type mesgnumbuilder struct {
 	template     *template.Template
 	templateExec string
 
-	path       string        // path to generate the file
-	sdkVersion string        // Fit SDK Version
-	types      []parser.Type // type parsed from profile.xlsx
+	path  string        // path to generate the file
+	types []parser.Type // type parsed from profile.xlsx
 }
 
-func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
+func NewBuilder(path string, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &mesgnumbuilder{
@@ -41,7 +40,6 @@ func NewBuilder(path, sdkVersion string, types []parser.Type) builder.Builder {
 				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
 		templateExec: "mesgnum",
 		path:         filepath.Join(path, "profile", "untyped", "mesgnum"),
-		sdkVersion:   sdkVersion,
 		types:        types,
 	}
 }
@@ -54,11 +52,10 @@ func (b *mesgnumbuilder) Build() ([]builder.Data, error) {
 		}
 
 		data := shared.ConstantData{
-			Package:    "mesgnum",
-			SDKVersion: b.sdkVersion,
-			Imports:    []string{"strconv"},
-			Type:       strutil.ToTitle(t.Name),
-			Base:       basetype.FromString(t.BaseType).GoType(),
+			Package: "mesgnum",
+			Imports: []string{"strconv"},
+			Type:    strutil.ToTitle(t.Name),
+			Base:    basetype.FromString(t.BaseType).GoType(),
 		}
 
 		data.Constants = make([]shared.Constant, 0, len(t.Values))

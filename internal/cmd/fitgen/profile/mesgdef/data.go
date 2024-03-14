@@ -5,7 +5,6 @@
 package mesgdef
 
 type Data struct {
-	SDKVersion        string
 	Package           string
 	Imports           []string
 	Name              string

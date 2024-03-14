@@ -6,8 +6,7 @@ package factory
 
 // Data represent factory.tmpl
 type Data struct {
-	SDKVersion string // Fit SDK Version
-	Package    string // Package name
-	Messages   string // string formated struct []*proto.Message{...}
-	Mesgnums   []string
+	Package  string // Package name
+	Messages string // string formated struct []*proto.Message{...}
+	Mesgnums []string
 }
