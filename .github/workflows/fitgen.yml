@@ -14,16 +14,16 @@ jobs:
         id: check-comment
         run: |
           echo "trigger=${{ startsWith(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
-          
+
           if [[ "${{ startsWith(github.event.comment.body, 'run fitgen') }}" == "false" ]]; then 
             echo "Aborted: no command found"
             exit 0
           fi
-          
+
           if [[ "${{ github.event.comment.body }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
-            echo "sdkversion=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+            echo "profile_version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
           else 
-            echo "Aborted: not a valid 'run fitgen <sdk.version>' command"
+            echo "Aborted: not a valid 'run fitgen <profile.version>' command"
             exit 0
           fi
 
@@ -51,9 +51,9 @@ jobs:
           export wd=$(pwd)
           echo $wd
           cd internal/cmd/fitgen
-          go run main.go -f Profile.xlsx -p ../../../ -b all --sdk-version ${{ steps.check-comment.outputs.sdkversion }} --verbose -y
+          go run main.go -f Profile.xlsx -p ../../../ -b all --profile-version ${{ steps.check-comment.outputs.profile_version }} --verbose -y
           cd $wd
-          sed -E -i 's/sdkversion\-[0-9]+\.[0-9]+-lightblue.svg/\sdkversion-${{ steps.check-comment.outputs.sdkversion }}-lightblue.svg/' README.md
+          sed -E -i 's/profile\-v[0-9]+\.[0-9]+-lightblue.svg/\profile-v${{ steps.check-comment.outputs.profile_version }}-lightblue.svg/' README.md
 
       - name: Commit and Push
         if: steps.check-comment.outputs.trigger == 'true'
@@ -64,5 +64,5 @@ jobs:
           git config --global user.name "Hikmatulloh Hari Mukti"
 
           git add .
-          git commit -m "gh actions: generate files for v${{ steps.check-comment.outputs.sdkversion }}"
+          git commit -m "gh actions: generate files for v${{ steps.check-comment.outputs.profile_version }}"
           git push
