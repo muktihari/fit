@@ -664,10 +664,14 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		return
 	}
 
+	// PERF: Reuse a single variable 'componentField' instead of declaring it inside the loop to prevent
+	// the Compiler's escape analysis from moving it to the heap, which could occur due to the risk of
+	// stack overflow caused by repeatedly creating the variable.
+	var componentField proto.Field
 	for i := range components {
 		component := &components[i]
 
-		componentField := d.factory.CreateField(mesg.Num, component.FieldNum)
+		componentField = d.factory.CreateField(mesg.Num, component.FieldNum)
 		componentField.IsExpandedField = true
 
 		if component.Accumulate {
