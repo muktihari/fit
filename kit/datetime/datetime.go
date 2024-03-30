@@ -72,7 +72,7 @@ func TzOffsetHours(localDateTime, dateTime time.Time) int {
 	return int(localDateTime.Sub(dateTime).Seconds()) / 3600
 }
 
-// TzOffsetHoursFromUint32 is similiar to TzOffsetHours but it took uint32 as parameters.
+// TzOffsetHoursFromUint32 is similar to TzOffsetHours but it took uint32 as parameters.
 func TzOffsetHoursFromUint32(localDateTime, dateTime uint32) int {
 	return int(localDateTime-dateTime) / 3600
 }

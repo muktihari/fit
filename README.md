@@ -1,4 +1,4 @@
-# Fit SDK for Go
+# FIT SDK for Go
 
 ![GitHub Workflow Status](https://github.com/muktihari/fit/workflows/CI/badge.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)

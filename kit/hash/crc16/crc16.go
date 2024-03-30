@@ -8,7 +8,7 @@ import (
 	"github.com/muktihari/fit/kit/hash"
 )
 
-// Table is [16]uint32
+// Table is [16]uint16
 type Table [16]uint16
 
 const (

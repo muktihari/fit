@@ -531,7 +531,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	e.wrapWriterAndCrc16.writer = w
 }
 
-// EncodeWithContext is similiar to Encode but with respect to context propagation.
+// EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
 	defer e.reset()
 
