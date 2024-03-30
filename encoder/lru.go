@@ -5,7 +5,7 @@
 package encoder
 
 import (
-	"golang.org/x/exp/slices"
+	"bytes"
 )
 
 // lru implements simple lru algorithm. Item search best case: O(1), worst case: O(n), depends how recently used is it.
@@ -58,7 +58,8 @@ func (l *lru) Put(item []byte) (itemIndex byte, isNewItem bool) {
 
 func (l *lru) store(item []byte) (itemIndex byte) {
 	itemIndex = byte(len(l.bucket))
-	l.items[itemIndex] = slices.Clone(item)
+	l.items[itemIndex] = make([]byte, len(item))
+	copy(l.items[itemIndex], item)
 	l.bucket = append(l.bucket, itemIndex)
 	return
 }
@@ -89,7 +90,7 @@ func (l *lru) replaceLeastRecentlyUsed(item []byte) (itemIndex byte) {
 func (l *lru) bucketIndex(item []byte) int {
 	for i := len(l.bucket); i > 0; i-- {
 		cur := l.bucket[i-1]
-		if slices.Equal(l.items[cur], item) {
+		if bytes.Equal(l.items[cur], item) {
 			return i - 1
 		}
 	}
