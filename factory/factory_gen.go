@@ -159,7 +159,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
-					Type:       profile.File, /* basetype.Enum (size: 1) */
+					Type:       profile.File,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -174,7 +175,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        1,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -189,7 +191,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -220,7 +223,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
-					Type:       profile.Uint32z, /* basetype.Uint32z (size: 4) */
+					Type:       profile.Uint32z,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -235,7 +239,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        4,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -250,7 +255,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "number",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -265,7 +271,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product_name",
 					Num:        8,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -285,7 +292,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "software_version",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -300,7 +308,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hardware_version",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -320,7 +329,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -335,7 +345,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      32768,
@@ -350,7 +361,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "system_timestamp",
 					Num:        1,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -365,7 +377,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_system_timestamp",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      32768,
@@ -380,7 +393,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        3,
-					Type:       profile.LocalDateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -395,7 +409,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -410,7 +425,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "system_timestamp_ms",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -430,7 +446,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -445,7 +462,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "version",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -460,7 +478,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "part_number",
 					Num:        5,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -480,7 +499,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        0,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -495,7 +515,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -531,8 +552,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "languages",
 					Num:        0,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -546,8 +568,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sports",
 					Num:        1,
-					Type:       profile.SportBits0, /* basetype.Uint8z (size: 1) */
-					Array:      true,               /* Array Size [N] */
+					Type:       profile.SportBits0,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -561,7 +584,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "workouts_supported",
 					Num:        21,
-					Type:       profile.WorkoutCapabilities, /* basetype.Uint32z (size: 4) */
+					Type:       profile.WorkoutCapabilities,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -576,7 +600,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "connectivity_supported",
 					Num:        23,
-					Type:       profile.ConnectivityCapabilities, /* basetype.Uint32z (size: 4) */
+					Type:       profile.ConnectivityCapabilities,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -596,7 +621,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -611,7 +637,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
-					Type:       profile.File, /* basetype.Enum (size: 1) */
+					Type:       profile.File,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -626,7 +653,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "flags",
 					Num:        1,
-					Type:       profile.FileFlags, /* basetype.Uint8z (size: 1) */
+					Type:       profile.FileFlags,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -641,7 +669,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "directory",
 					Num:        2,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -656,7 +685,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_count",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -671,7 +701,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_size",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -691,7 +722,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -706,7 +738,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "file",
 					Num:        0,
-					Type:       profile.File, /* basetype.Enum (size: 1) */
+					Type:       profile.File,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -721,7 +754,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -736,7 +770,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "count_type",
 					Num:        2,
-					Type:       profile.MesgCount, /* basetype.Enum (size: 1) */
+					Type:       profile.MesgCount,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -751,7 +786,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "count",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -790,7 +826,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -805,7 +842,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "file",
 					Num:        0,
-					Type:       profile.File, /* basetype.Enum (size: 1) */
+					Type:       profile.File,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -820,7 +858,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -835,7 +874,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_num",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -850,7 +890,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "count",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -870,7 +911,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time_zone",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -885,7 +927,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "utc_offset",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -900,8 +943,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_offset",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -915,8 +959,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_mode",
 					Num:        4,
-					Type:       profile.TimeMode, /* basetype.Enum (size: 1) */
-					Array:      true,             /* Array Size [N] */
+					Type:       profile.TimeMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -930,8 +975,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_zone_offset",
 					Num:        5,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      4,
 					Offset:     0,
@@ -945,7 +991,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_mode",
 					Num:        12,
-					Type:       profile.BacklightMode, /* basetype.Enum (size: 1) */
+					Type:       profile.BacklightMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -960,7 +1007,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_tracker_enabled",
 					Num:        36,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -975,7 +1023,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "clock_time",
 					Num:        39,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -990,8 +1039,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pages_enabled",
 					Num:        40,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -1005,7 +1055,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "move_alert_enabled",
 					Num:        46,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1020,7 +1071,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "date_mode",
 					Num:        47,
-					Type:       profile.DateMode, /* basetype.Enum (size: 1) */
+					Type:       profile.DateMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1035,7 +1087,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "display_orientation",
 					Num:        55,
-					Type:       profile.DisplayOrientation, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayOrientation,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1050,7 +1103,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mounting_side",
 					Num:        56,
-					Type:       profile.Side, /* basetype.Enum (size: 1) */
+					Type:       profile.Side,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1065,8 +1119,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_page",
 					Num:        57,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -1080,7 +1135,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "autosync_min_steps",
 					Num:        58,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1095,7 +1151,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "autosync_min_time",
 					Num:        59,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1110,7 +1167,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "lactate_threshold_autodetect_enabled",
 					Num:        80,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1125,7 +1183,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ble_auto_upload_enabled",
 					Num:        86,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1140,7 +1199,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_sync_frequency",
 					Num:        89,
-					Type:       profile.AutoSyncFrequency, /* basetype.Enum (size: 1) */
+					Type:       profile.AutoSyncFrequency,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1155,7 +1215,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_activity_detect",
 					Num:        90,
-					Type:       profile.AutoActivityDetect, /* basetype.Uint32 (size: 4) */
+					Type:       profile.AutoActivityDetect,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1170,7 +1231,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "number_of_screens",
 					Num:        94,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1185,7 +1247,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "smart_notification_display_orientation",
 					Num:        95,
-					Type:       profile.DisplayOrientation, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayOrientation,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1200,7 +1263,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "tap_interface",
 					Num:        134,
-					Type:       profile.Switch, /* basetype.Enum (size: 1) */
+					Type:       profile.Switch,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1215,7 +1279,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "tap_sensitivity",
 					Num:        174,
-					Type:       profile.TapSensitivity, /* basetype.Enum (size: 1) */
+					Type:       profile.TapSensitivity,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1235,7 +1300,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1250,7 +1316,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "friendly_name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1265,7 +1332,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gender",
 					Num:        1,
-					Type:       profile.Gender, /* basetype.Enum (size: 1) */
+					Type:       profile.Gender,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1280,7 +1348,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "age",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1295,7 +1364,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "height",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -1310,7 +1380,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -1325,7 +1396,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "language",
 					Num:        5,
-					Type:       profile.Language, /* basetype.Enum (size: 1) */
+					Type:       profile.Language,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1340,7 +1412,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "elev_setting",
 					Num:        6,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1355,7 +1428,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_setting",
 					Num:        7,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1370,7 +1444,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1385,7 +1460,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_running_heart_rate",
 					Num:        9,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1400,7 +1476,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_biking_heart_rate",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1415,7 +1492,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_heart_rate",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1430,7 +1508,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_setting",
 					Num:        12,
-					Type:       profile.DisplayHeart, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayHeart,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1445,7 +1524,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_setting",
 					Num:        13,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1460,7 +1540,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dist_setting",
 					Num:        14,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1475,7 +1556,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power_setting",
 					Num:        16,
-					Type:       profile.DisplayPower, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayPower,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1490,7 +1572,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_class",
 					Num:        17,
-					Type:       profile.ActivityClass, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivityClass,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1505,7 +1588,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_setting",
 					Num:        18,
-					Type:       profile.DisplayPosition, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayPosition,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1520,7 +1604,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_setting",
 					Num:        21,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1535,7 +1620,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "local_id",
 					Num:        22,
-					Type:       profile.UserLocalId, /* basetype.Uint16 (size: 2) */
+					Type:       profile.UserLocalId,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1550,8 +1636,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "global_id",
 					Num:        23,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [6] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [6] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -1565,7 +1652,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wake_time",
 					Num:        28,
-					Type:       profile.LocaltimeIntoDay, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocaltimeIntoDay,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1580,7 +1668,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_time",
 					Num:        29,
-					Type:       profile.LocaltimeIntoDay, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocaltimeIntoDay,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1595,7 +1684,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "height_setting",
 					Num:        30,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1610,7 +1700,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_running_step_length",
 					Num:        31,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -1625,7 +1716,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_walking_step_length",
 					Num:        32,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -1640,7 +1732,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "depth_setting",
 					Num:        47,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1655,7 +1748,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_count",
 					Num:        49,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1675,7 +1769,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1690,7 +1785,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1705,7 +1801,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hrm_ant_id",
 					Num:        1,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1720,7 +1817,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "log_hrv",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1735,7 +1833,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hrm_ant_id_trans_type",
 					Num:        3,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1755,7 +1854,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1770,7 +1870,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1785,7 +1886,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_ant_id",
 					Num:        1,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1800,7 +1902,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_cal_factor",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -1815,7 +1918,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -1830,7 +1934,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_source",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1845,7 +1950,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_ant_id_trans_type",
 					Num:        5,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1860,7 +1966,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer_rollover",
 					Num:        7,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1880,7 +1987,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1895,7 +2003,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1910,7 +2019,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        1,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1925,7 +2035,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        2,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1940,7 +2051,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -1955,7 +2067,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spd_ant_id",
 					Num:        4,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1970,7 +2083,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_cad_ant_id",
 					Num:        5,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -1985,7 +2099,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spdcad_ant_id",
 					Num:        6,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2000,7 +2115,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_power_ant_id",
 					Num:        7,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2015,7 +2131,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_wheelsize",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -2030,7 +2147,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_wheelsize",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -2045,7 +2163,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_weight",
 					Num:        10,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -2060,7 +2179,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power_cal_factor",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -2075,7 +2195,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_wheel_cal",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2090,7 +2211,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_power_zero",
 					Num:        13,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2105,7 +2227,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        14,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2120,7 +2243,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "spd_enabled",
 					Num:        15,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2135,7 +2259,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cad_enabled",
 					Num:        16,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2150,7 +2275,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "spdcad_enabled",
 					Num:        17,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2165,7 +2291,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power_enabled",
 					Num:        18,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2180,7 +2307,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "crank_length",
 					Num:        19,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -2195,7 +2323,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        20,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2210,7 +2339,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spd_ant_id_trans_type",
 					Num:        21,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2225,7 +2355,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_cad_ant_id_trans_type",
 					Num:        22,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2240,7 +2371,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spdcad_ant_id_trans_type",
 					Num:        23,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2255,7 +2387,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_power_ant_id_trans_type",
 					Num:        24,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2270,7 +2403,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer_rollover",
 					Num:        37,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2285,7 +2419,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_num",
 					Num:        38,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2300,8 +2435,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear",
 					Num:        39,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -2315,7 +2451,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_num",
 					Num:        40,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2330,8 +2467,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear",
 					Num:        41,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -2345,7 +2483,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "shimano_di2_enabled",
 					Num:        44,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2365,7 +2504,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_enabled",
 					Num:        0,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2380,7 +2520,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_le_enabled",
 					Num:        1,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2395,7 +2536,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2410,7 +2552,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        3,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2425,7 +2568,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "live_tracking_enabled",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2440,7 +2584,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_conditions_enabled",
 					Num:        5,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2455,7 +2600,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_alerts_enabled",
 					Num:        6,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2470,7 +2616,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_activity_upload_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2485,7 +2632,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "course_download_enabled",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2500,7 +2648,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "workout_download_enabled",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2515,7 +2664,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_ephemeris_download_enabled",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2530,7 +2680,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "incident_detection_enabled",
 					Num:        11,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2545,7 +2696,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "grouptrack_enabled",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2565,7 +2717,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2580,7 +2733,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        0,
-					Type:       profile.WatchfaceMode, /* basetype.Enum (size: 1) */
+					Type:       profile.WatchfaceMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2595,7 +2749,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "layout",
 					Num:        1,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2628,7 +2783,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2643,7 +2799,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
-					Type:       profile.Switch, /* basetype.Enum (size: 1) */
+					Type:       profile.Switch,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2663,7 +2820,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2678,7 +2836,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_mesg",
 					Num:        0,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2693,7 +2852,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_index",
 					Num:        1,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2708,8 +2868,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -2723,8 +2884,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -2738,8 +2900,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -2753,8 +2916,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -2768,8 +2932,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_zone_high_boundary",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -2783,8 +2948,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_zone_high_boundary",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -2798,8 +2964,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence_zone_high_bondary",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -2813,8 +2980,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power_zone_high_boundary",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -2828,7 +2996,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_calc_type",
 					Num:        10,
-					Type:       profile.HrZoneCalc, /* basetype.Enum (size: 1) */
+					Type:       profile.HrZoneCalc,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2843,7 +3012,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2858,7 +3028,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        12,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2873,7 +3044,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_heart_rate",
 					Num:        13,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2888,7 +3060,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pwr_calc_type",
 					Num:        14,
-					Type:       profile.PwrZoneCalc, /* basetype.Enum (size: 1) */
+					Type:       profile.PwrZoneCalc,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2903,7 +3076,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "functional_threshold_power",
 					Num:        15,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2923,7 +3097,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2938,7 +3113,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_heart_rate",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2953,7 +3129,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "functional_threshold_power",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2968,7 +3145,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_calc_type",
 					Num:        5,
-					Type:       profile.HrZoneCalc, /* basetype.Enum (size: 1) */
+					Type:       profile.HrZoneCalc,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -2983,7 +3161,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pwr_calc_type",
 					Num:        7,
-					Type:       profile.PwrZoneCalc, /* basetype.Enum (size: 1) */
+					Type:       profile.PwrZoneCalc,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3003,7 +3182,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3018,7 +3198,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3033,7 +3214,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        3,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3053,7 +3235,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3068,7 +3251,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_bpm",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3083,7 +3267,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        2,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3103,7 +3288,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3118,7 +3304,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -3133,7 +3320,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3153,7 +3341,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3168,7 +3357,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3183,7 +3373,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3203,7 +3394,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3218,7 +3410,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3233,7 +3426,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        2,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3253,7 +3447,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3268,7 +3463,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_bpm",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3283,7 +3479,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -3298,7 +3495,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fat_calories",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -3318,7 +3516,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3333,7 +3532,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3348,7 +3548,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3363,7 +3564,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "model",
 					Num:        1,
-					Type:       profile.TissueModelType, /* basetype.Enum (size: 1) */
+					Type:       profile.TissueModelType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3378,7 +3580,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gf_low",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3393,7 +3596,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gf_high",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3408,7 +3612,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "water_type",
 					Num:        4,
-					Type:       profile.WaterType, /* basetype.Enum (size: 1) */
+					Type:       profile.WaterType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3423,7 +3628,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "water_density",
 					Num:        5,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3438,7 +3644,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_warn",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -3453,7 +3660,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_critical",
 					Num:        7,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -3468,7 +3676,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_deco",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -3483,7 +3692,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "safety_stop_enabled",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3498,7 +3708,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_depth",
 					Num:        10,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3513,7 +3724,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_time",
 					Num:        11,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3528,7 +3740,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "apnea_countdown_enabled",
 					Num:        12,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3543,7 +3756,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "apnea_countdown_time",
 					Num:        13,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3558,7 +3772,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_mode",
 					Num:        14,
-					Type:       profile.DiveBacklightMode, /* basetype.Enum (size: 1) */
+					Type:       profile.DiveBacklightMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3573,7 +3788,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_brightness",
 					Num:        15,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3588,7 +3804,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_timeout",
 					Num:        16,
-					Type:       profile.BacklightTimeout, /* basetype.Uint8 (size: 1) */
+					Type:       profile.BacklightTimeout,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3603,7 +3820,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeat_dive_interval",
 					Num:        17,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3618,7 +3836,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "safety_stop_time",
 					Num:        18,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3633,7 +3852,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_source_type",
 					Num:        19,
-					Type:       profile.SourceType, /* basetype.Enum (size: 1) */
+					Type:       profile.SourceType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3648,7 +3868,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_source",
 					Num:        20,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3676,7 +3897,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "travel_gas",
 					Num:        21,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3691,7 +3913,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint_switch_mode",
 					Num:        22,
-					Type:       profile.CcrSetpointSwitchMode, /* basetype.Enum (size: 1) */
+					Type:       profile.CcrSetpointSwitchMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3706,7 +3929,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint",
 					Num:        23,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -3721,7 +3945,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint_depth",
 					Num:        24,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -3736,7 +3961,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint_switch_mode",
 					Num:        25,
-					Type:       profile.CcrSetpointSwitchMode, /* basetype.Enum (size: 1) */
+					Type:       profile.CcrSetpointSwitchMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3751,7 +3977,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint",
 					Num:        26,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -3766,7 +3993,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint_depth",
 					Num:        27,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -3781,7 +4009,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gas_consumption_display",
 					Num:        29,
-					Type:       profile.GasConsumptionRateType, /* basetype.Enum (size: 1) */
+					Type:       profile.GasConsumptionRateType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3796,7 +4025,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "up_key_enabled",
 					Num:        30,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3811,7 +4041,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_sounds",
 					Num:        35,
-					Type:       profile.Tone, /* basetype.Enum (size: 1) */
+					Type:       profile.Tone,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3826,7 +4057,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "last_stop_multiple",
 					Num:        36,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -3841,7 +4073,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "no_fly_time_mode",
 					Num:        37,
-					Type:       profile.NoFlyTimeMode, /* basetype.Enum (size: 1) */
+					Type:       profile.NoFlyTimeMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3861,7 +4094,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3876,7 +4110,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -3891,7 +4126,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3906,7 +4142,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3921,7 +4158,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "alarm_type",
 					Num:        3,
-					Type:       profile.DiveAlarmType, /* basetype.Enum (size: 1) */
+					Type:       profile.DiveAlarmType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3936,7 +4174,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sound",
 					Num:        4,
-					Type:       profile.Tone, /* basetype.Enum (size: 1) */
+					Type:       profile.Tone,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3951,8 +4190,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_types",
 					Num:        5,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
-					Array:      true,             /* Array Size [N] */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -3966,7 +4206,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3981,7 +4222,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -3996,7 +4238,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4011,7 +4254,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4026,7 +4270,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4041,7 +4286,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed",
 					Num:        11,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4061,7 +4307,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4076,7 +4323,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4091,7 +4339,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4106,7 +4355,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4121,7 +4371,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "alarm_type",
 					Num:        3,
-					Type:       profile.DiveAlarmType, /* basetype.Enum (size: 1) */
+					Type:       profile.DiveAlarmType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4136,7 +4387,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sound",
 					Num:        4,
-					Type:       profile.Tone, /* basetype.Enum (size: 1) */
+					Type:       profile.Tone,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4151,8 +4403,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_types",
 					Num:        5,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
-					Array:      true,             /* Array Size [N] */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -4166,7 +4419,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4181,7 +4435,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4196,7 +4451,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4211,7 +4467,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4226,7 +4483,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4241,7 +4499,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed",
 					Num:        11,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4261,7 +4520,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4276,7 +4536,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "helium_content",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4291,7 +4552,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "oxygen_content",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4306,7 +4568,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        2,
-					Type:       profile.DiveGasStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.DiveGasStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4321,7 +4584,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        3,
-					Type:       profile.DiveGasMode, /* basetype.Enum (size: 1) */
+					Type:       profile.DiveGasMode,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4341,7 +4605,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4356,7 +4621,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4371,7 +4637,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4386,7 +4653,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_date",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4401,7 +4669,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_date",
 					Num:        3,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4416,7 +4685,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        4,
-					Type:       profile.Goal, /* basetype.Enum (size: 1) */
+					Type:       profile.Goal,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4431,7 +4701,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4446,7 +4717,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repeat",
 					Num:        6,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4461,7 +4733,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "target_value",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4476,7 +4749,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "recurrence",
 					Num:        8,
-					Type:       profile.GoalRecurrence, /* basetype.Enum (size: 1) */
+					Type:       profile.GoalRecurrence,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4491,7 +4765,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "recurrence_value",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4506,7 +4781,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        10,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4521,7 +4797,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "source",
 					Num:        11,
-					Type:       profile.GoalSource, /* basetype.Enum (size: 1) */
+					Type:       profile.GoalSource,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4541,7 +4818,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4556,7 +4834,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4571,7 +4850,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_sessions",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4586,7 +4866,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        2,
-					Type:       profile.Activity, /* basetype.Enum (size: 1) */
+					Type:       profile.Activity,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4601,7 +4882,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        3,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4616,7 +4898,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        4,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4631,7 +4914,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        5,
-					Type:       profile.LocalDateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4646,7 +4930,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4666,7 +4951,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4681,7 +4967,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4696,7 +4983,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4711,7 +4999,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4726,7 +5015,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4741,7 +5031,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4756,7 +5047,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4771,7 +5063,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        5,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4786,7 +5079,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        6,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4801,7 +5095,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4816,7 +5111,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -4831,7 +5127,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -4846,7 +5143,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4878,7 +5176,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4893,7 +5192,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        13,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4906,10 +5206,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_speed",
-					Num:   14,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "avg_speed",
+					Num:      14,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 124 /* enhanced_avg_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -4923,10 +5224,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_speed",
-					Num:   15,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "max_speed",
+					Num:      15,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 125 /* enhanced_max_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -4942,7 +5244,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        16,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4957,7 +5260,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        17,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4972,7 +5276,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        18,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -4994,7 +5299,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        19,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5016,7 +5322,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        20,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5031,7 +5338,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        21,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5046,7 +5354,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        22,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5061,7 +5370,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        23,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5076,7 +5386,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_training_effect",
 					Num:        24,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -5091,7 +5402,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "first_lap_index",
 					Num:        25,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5106,7 +5418,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_laps",
 					Num:        26,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5121,7 +5434,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        27,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5136,7 +5450,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger",
 					Num:        28,
-					Type:       profile.SessionTrigger, /* basetype.Enum (size: 1) */
+					Type:       profile.SessionTrigger,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5151,7 +5466,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_lat",
 					Num:        29,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5166,7 +5482,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_long",
 					Num:        30,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5181,7 +5498,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_lat",
 					Num:        31,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5196,7 +5514,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_long",
 					Num:        32,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5211,7 +5530,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_lengths",
 					Num:        33,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5226,7 +5546,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        34,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5241,7 +5562,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "training_stress_score",
 					Num:        35,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -5256,7 +5578,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity_factor",
 					Num:        36,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5271,7 +5594,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        37,
-					Type:       profile.LeftRightBalance100, /* basetype.Uint16 (size: 2) */
+					Type:       profile.LeftRightBalance100,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5286,7 +5610,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        38,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5301,7 +5626,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        39,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5316,7 +5642,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_count",
 					Num:        41,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -5331,7 +5658,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_distance",
 					Num:        42,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5346,7 +5674,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        43,
-					Type:       profile.SwimStroke, /* basetype.Enum (size: 1) */
+					Type:       profile.SwimStroke,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5361,7 +5690,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        44,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5376,7 +5706,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_power",
 					Num:        45,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5391,7 +5722,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        46,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5406,7 +5738,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_active_lengths",
 					Num:        47,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5421,7 +5754,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        48,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5434,10 +5768,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_altitude",
-					Num:   49,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "avg_altitude",
+					Num:      49,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 126 /* enhanced_avg_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -5451,10 +5786,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_altitude",
-					Num:   50,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "max_altitude",
+					Num:      50,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 128 /* enhanced_max_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -5470,7 +5806,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        51,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5485,7 +5822,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        52,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5500,7 +5838,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        53,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5515,7 +5854,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        54,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5530,7 +5870,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        55,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5545,7 +5886,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        56,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5560,7 +5902,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        57,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5575,7 +5918,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        58,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5590,7 +5934,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        59,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5605,7 +5950,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        60,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5620,7 +5966,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        61,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5635,7 +5982,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        62,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5650,7 +5998,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        63,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5665,7 +6014,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        64,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5680,8 +6030,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        65,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -5695,8 +6046,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        66,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -5710,8 +6062,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        67,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -5725,8 +6078,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        68,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -5740,7 +6094,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lap_time",
 					Num:        69,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -5755,7 +6110,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "best_lap_index",
 					Num:        70,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5768,10 +6124,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "min_altitude",
-					Num:   71,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "min_altitude",
+					Num:      71,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 127 /* enhanced_min_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -5787,7 +6144,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        82,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5802,7 +6160,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        83,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5817,7 +6176,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_name",
 					Num:        84,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -5832,8 +6192,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        85,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -5847,8 +6208,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        86,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -5862,7 +6224,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_ball_speed",
 					Num:        87,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5877,7 +6240,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_ball_speed",
 					Num:        88,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5892,7 +6256,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_oscillation",
 					Num:        89,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -5907,7 +6272,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_percent",
 					Num:        90,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -5922,7 +6288,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time",
 					Num:        91,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -5937,7 +6304,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        92,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -5952,7 +6320,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        93,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -5967,7 +6336,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        94,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -5982,8 +6352,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_total_hemoglobin_conc",
 					Num:        95,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -5997,8 +6368,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_total_hemoglobin_conc",
 					Num:        96,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -6012,8 +6384,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_total_hemoglobin_conc",
 					Num:        97,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -6027,8 +6400,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_saturated_hemoglobin_percent",
 					Num:        98,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -6042,8 +6416,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_saturated_hemoglobin_percent",
 					Num:        99,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -6057,8 +6432,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_saturated_hemoglobin_percent",
 					Num:        100,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -6072,7 +6448,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        101,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6087,7 +6464,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        102,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6102,7 +6480,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        103,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6117,7 +6496,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        104,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6132,7 +6512,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        105,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6147,7 +6528,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_profile_name",
 					Num:        110,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6162,7 +6544,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_index",
 					Num:        111,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6177,7 +6560,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        112,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6192,7 +6576,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        113,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6207,7 +6592,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        114,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6222,7 +6608,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        115,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6237,8 +6624,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        116,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -6252,8 +6640,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        117,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -6267,8 +6656,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        118,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -6282,8 +6672,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        119,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -6297,8 +6688,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        120,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -6312,8 +6704,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        121,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -6327,8 +6720,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        122,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -6342,8 +6736,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        123,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -6357,7 +6752,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_speed",
 					Num:        124,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6372,7 +6768,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_speed",
 					Num:        125,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6387,7 +6784,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        126,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -6402,7 +6800,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        127,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -6417,7 +6816,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        128,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -6432,7 +6832,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lev_motor_power",
 					Num:        129,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6447,7 +6848,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_lev_motor_power",
 					Num:        130,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6462,7 +6864,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "lev_battery_consumption",
 					Num:        131,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -6477,7 +6880,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_ratio",
 					Num:        132,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6492,7 +6896,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_balance",
 					Num:        133,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6507,7 +6912,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_step_length",
 					Num:        134,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -6522,7 +6928,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_anaerobic_training_effect",
 					Num:        137,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -6537,7 +6944,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vam",
 					Num:        139,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6552,7 +6960,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        140,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6567,7 +6976,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        141,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -6582,7 +6992,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "surface_interval",
 					Num:        142,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6597,7 +7008,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_cns",
 					Num:        143,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6612,7 +7024,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_cns",
 					Num:        144,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6627,7 +7040,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_n2",
 					Num:        145,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6642,7 +7056,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_n2",
 					Num:        146,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6655,10 +7070,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_respiration_rate",
-					Num:   147,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "avg_respiration_rate",
+					Num:      147,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 169 /* enhanced_avg_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -6672,10 +7088,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_respiration_rate",
-					Num:   148,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "max_respiration_rate",
+					Num:      148,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 170 /* enhanced_max_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -6689,10 +7106,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "min_respiration_rate",
-					Num:   149,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "min_respiration_rate",
+					Num:      149,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 180 /* enhanced_min_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -6708,7 +7126,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_temperature",
 					Num:        150,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6723,7 +7142,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "o2_toxicity",
 					Num:        155,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6738,7 +7158,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_number",
 					Num:        156,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6753,7 +7174,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "training_load_peak",
 					Num:        168,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      65536,
@@ -6768,7 +7190,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        169,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6783,7 +7206,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        170,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6798,7 +7222,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_respiration_rate",
 					Num:        180,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6813,7 +7238,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        181,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6828,7 +7254,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        182,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6843,7 +7270,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "jump_count",
 					Num:        183,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6858,7 +7286,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        186,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6873,7 +7302,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        187,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6888,7 +7318,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_spo2",
 					Num:        194,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6903,7 +7334,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stress",
 					Num:        195,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6918,7 +7350,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sdrr_hrv",
 					Num:        197,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6933,7 +7366,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rmssd_hrv",
 					Num:        198,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -6948,7 +7382,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        199,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6963,7 +7398,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        200,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6978,7 +7414,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_core_temperature",
 					Num:        208,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -6993,7 +7430,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_core_temperature",
 					Num:        209,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7008,7 +7446,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_core_temperature",
 					Num:        210,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7028,7 +7467,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7043,7 +7483,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7058,7 +7499,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7073,7 +7515,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7088,7 +7531,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7103,7 +7547,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7118,7 +7563,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7133,7 +7579,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        5,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7148,7 +7595,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        6,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7163,7 +7611,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7178,7 +7627,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7193,7 +7643,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7208,7 +7659,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7240,7 +7692,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7255,7 +7708,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        12,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7268,10 +7722,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_speed",
-					Num:   13,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "avg_speed",
+					Num:      13,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 110 /* enhanced_avg_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -7285,10 +7740,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_speed",
-					Num:   14,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "max_speed",
+					Num:      14,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 111 /* enhanced_max_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -7304,7 +7760,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        15,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7319,7 +7776,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        16,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7334,7 +7792,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        17,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7356,7 +7815,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        18,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7378,7 +7838,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        19,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7393,7 +7854,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        20,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7408,7 +7870,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        21,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7423,7 +7886,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        22,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7438,7 +7902,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        23,
-					Type:       profile.Intensity, /* basetype.Enum (size: 1) */
+					Type:       profile.Intensity,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7453,7 +7918,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "lap_trigger",
 					Num:        24,
-					Type:       profile.LapTrigger, /* basetype.Enum (size: 1) */
+					Type:       profile.LapTrigger,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7468,7 +7934,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        25,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7483,7 +7950,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        26,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7498,7 +7966,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_lengths",
 					Num:        32,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7513,7 +7982,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        33,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7528,7 +7998,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        34,
-					Type:       profile.LeftRightBalance100, /* basetype.Uint16 (size: 2) */
+					Type:       profile.LeftRightBalance100,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7543,7 +8014,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "first_length_index",
 					Num:        35,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7558,7 +8030,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_distance",
 					Num:        37,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7573,7 +8046,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        38,
-					Type:       profile.SwimStroke, /* basetype.Enum (size: 1) */
+					Type:       profile.SwimStroke,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7588,7 +8062,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        39,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7603,7 +8078,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_active_lengths",
 					Num:        40,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7618,7 +8094,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        41,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7631,10 +8108,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_altitude",
-					Num:   42,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "avg_altitude",
+					Num:      42,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 112 /* enhanced_avg_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -7648,10 +8126,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_altitude",
-					Num:   43,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "max_altitude",
+					Num:      43,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 114 /* enhanced_max_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -7667,7 +8146,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        44,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7682,7 +8162,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        45,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7697,7 +8178,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        46,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7712,7 +8194,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        47,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7727,7 +8210,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        48,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7742,7 +8226,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        49,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -7757,7 +8242,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        50,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7772,7 +8258,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        51,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7787,7 +8274,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        52,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7802,7 +8290,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        53,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7817,7 +8306,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        54,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7832,7 +8322,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        55,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7847,7 +8338,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        56,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -7862,8 +8354,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        57,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -7877,8 +8370,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        58,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -7892,8 +8386,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        59,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -7907,8 +8402,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        60,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -7922,7 +8418,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repetition_num",
 					Num:        61,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7935,10 +8432,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "min_altitude",
-					Num:   62,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "min_altitude",
+					Num:      62,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 113 /* enhanced_min_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -7954,7 +8452,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        63,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7969,7 +8468,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        71,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7984,7 +8484,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        74,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -7999,8 +8500,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        75,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8014,8 +8516,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        76,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8029,7 +8532,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_oscillation",
 					Num:        77,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -8044,7 +8548,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_percent",
 					Num:        78,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8059,7 +8564,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time",
 					Num:        79,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -8074,7 +8580,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        80,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -8089,7 +8596,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        81,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -8104,7 +8612,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        82,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -8119,7 +8628,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        83,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8134,8 +8644,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_total_hemoglobin_conc",
 					Num:        84,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -8149,8 +8660,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_total_hemoglobin_conc",
 					Num:        85,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -8164,8 +8676,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_total_hemoglobin_conc",
 					Num:        86,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -8179,8 +8692,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_saturated_hemoglobin_percent",
 					Num:        87,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -8194,8 +8708,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_saturated_hemoglobin_percent",
 					Num:        88,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -8209,8 +8724,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_saturated_hemoglobin_percent",
 					Num:        89,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10,
 					Offset:     0,
@@ -8224,7 +8740,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        91,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8239,7 +8756,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        92,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8254,7 +8772,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        93,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8269,7 +8788,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        94,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8284,7 +8804,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        95,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8299,7 +8820,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        98,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8314,7 +8836,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        99,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8329,7 +8852,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        100,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8344,7 +8868,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        101,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8359,8 +8884,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        102,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -8374,8 +8900,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        103,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -8389,8 +8916,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        104,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -8404,8 +8932,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        105,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -8419,8 +8948,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        106,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8434,8 +8964,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        107,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8449,8 +8980,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        108,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8464,8 +8996,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        109,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -8479,7 +9012,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_speed",
 					Num:        110,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8494,7 +9028,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_speed",
 					Num:        111,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8509,7 +9044,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        112,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -8524,7 +9060,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        113,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -8539,7 +9076,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        114,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -8554,7 +9092,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lev_motor_power",
 					Num:        115,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8569,7 +9108,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_lev_motor_power",
 					Num:        116,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8584,7 +9124,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "lev_battery_consumption",
 					Num:        117,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -8599,7 +9140,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_ratio",
 					Num:        118,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8614,7 +9156,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_balance",
 					Num:        119,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8629,7 +9172,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_step_length",
 					Num:        120,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -8644,7 +9188,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vam",
 					Num:        121,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8659,7 +9204,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        122,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8674,7 +9220,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        123,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -8689,7 +9236,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_temperature",
 					Num:        124,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8704,7 +9252,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        136,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8719,7 +9268,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        137,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8732,10 +9282,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_respiration_rate",
-					Num:   147,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "avg_respiration_rate",
+					Num:      147,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 136 /* enhanced_avg_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -8749,10 +9300,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_respiration_rate",
-					Num:   148,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "max_respiration_rate",
+					Num:      148,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 137 /* enhanced_max_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -8768,7 +9320,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        149,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8783,7 +9336,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        150,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8798,7 +9352,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "jump_count",
 					Num:        151,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8813,7 +9368,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        153,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8828,7 +9384,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        154,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8843,7 +9400,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        156,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8858,7 +9416,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        157,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8873,7 +9432,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_core_temperature",
 					Num:        158,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8888,7 +9448,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_core_temperature",
 					Num:        159,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8903,7 +9464,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_core_temperature",
 					Num:        160,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -8923,7 +9485,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8938,7 +9501,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8953,7 +9517,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8968,7 +9533,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8983,7 +9549,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -8998,7 +9565,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -9013,7 +9581,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -9028,7 +9597,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_strokes",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9043,7 +9613,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        6,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -9058,7 +9629,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        7,
-					Type:       profile.SwimStroke, /* basetype.Enum (size: 1) */
+					Type:       profile.SwimStroke,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9073,7 +9645,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_swimming_cadence",
 					Num:        9,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9088,7 +9661,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9103,7 +9677,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9118,7 +9693,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "length_type",
 					Num:        12,
-					Type:       profile.LengthType, /* basetype.Enum (size: 1) */
+					Type:       profile.LengthType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9133,7 +9709,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        18,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9148,7 +9725,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        19,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9163,8 +9741,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        20,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -9178,8 +9757,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        21,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -9193,7 +9773,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        22,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9208,7 +9789,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        23,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9221,10 +9803,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_respiration_rate",
-					Num:   24,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "avg_respiration_rate",
+					Num:      24,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 22 /* enhanced_avg_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -9238,10 +9821,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_respiration_rate",
-					Num:   25,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "max_respiration_rate",
+					Num:      25,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 23 /* enhanced_max_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -9262,7 +9846,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9277,7 +9862,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        0,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9292,7 +9878,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9305,10 +9892,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "altitude",
-					Num:   2,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "altitude",
+					Num:      2,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 78 /* enhanced_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -9324,7 +9912,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9339,7 +9928,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9354,7 +9944,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9367,10 +9958,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "speed",
-					Num:   6,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "speed",
+					Num:      6,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 73 /* enhanced_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -9386,7 +9978,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "power",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9399,10 +9992,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "compressed_speed_distance",
-					Num:   8,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: true,         /* Array Size [3] */
+					Name:     "compressed_speed_distance",
+					Num:      8,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    true,          /* Array Size [3] */
 					Components: []proto.Component{
 						{FieldNum: 6 /* speed */, Scale: 100, Offset: 0, Accumulate: false, Bits: 12},
 						{FieldNum: 5 /* distance */, Scale: 16, Offset: 0, Accumulate: true, Bits: 12},
@@ -9419,7 +10013,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "grade",
 					Num:        9,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9434,7 +10029,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "resistance",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9449,7 +10045,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_from_course",
 					Num:        11,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -9464,7 +10061,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycle_length",
 					Num:        12,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9479,7 +10077,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        13,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9494,8 +10093,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_1s",
 					Num:        17,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      16,
 					Offset:     0,
@@ -9507,10 +10107,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "cycles",
-					Num:   18,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "cycles",
+					Num:      18,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 19 /* total_cycles */, Scale: 1, Offset: 0, Accumulate: true, Bits: 8},
 					},
@@ -9526,7 +10127,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        19,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9539,10 +10141,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "compressed_accumulated_power",
-					Num:   28,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "compressed_accumulated_power",
+					Num:      28,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 29 /* accumulated_power */, Scale: 1, Offset: 0, Accumulate: true, Bits: 16},
 					},
@@ -9558,7 +10161,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accumulated_power",
 					Num:        29,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9573,7 +10177,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        30,
-					Type:       profile.LeftRightBalance, /* basetype.Uint8 (size: 1) */
+					Type:       profile.LeftRightBalance,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9588,7 +10193,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        31,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9603,7 +10209,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_speed",
 					Num:        32,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -9618,7 +10225,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        33,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9633,7 +10241,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_oscillation",
 					Num:        39,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -9648,7 +10257,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time_percent",
 					Num:        40,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9663,7 +10273,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time",
 					Num:        41,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -9678,7 +10289,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        42,
-					Type:       profile.ActivityType, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivityType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9693,7 +10305,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_torque_effectiveness",
 					Num:        43,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -9708,7 +10321,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "right_torque_effectiveness",
 					Num:        44,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -9723,7 +10337,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_pedal_smoothness",
 					Num:        45,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -9738,7 +10353,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "right_pedal_smoothness",
 					Num:        46,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -9753,7 +10369,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "combined_pedal_smoothness",
 					Num:        47,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -9768,7 +10385,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time128",
 					Num:        48,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -9783,7 +10401,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_type",
 					Num:        49,
-					Type:       profile.StrokeType, /* basetype.Enum (size: 1) */
+					Type:       profile.StrokeType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9798,7 +10417,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "zone",
 					Num:        50,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9813,7 +10433,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ball_speed",
 					Num:        51,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9828,7 +10449,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence256",
 					Num:        52,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      256,
@@ -9843,7 +10465,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_cadence",
 					Num:        53,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -9858,7 +10481,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc",
 					Num:        54,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9873,7 +10497,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc_min",
 					Num:        55,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9888,7 +10513,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc_max",
 					Num:        56,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -9903,7 +10529,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent",
 					Num:        57,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -9918,7 +10545,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent_min",
 					Num:        58,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -9933,7 +10561,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent_max",
 					Num:        59,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -9948,7 +10577,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        62,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9963,7 +10593,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_pco",
 					Num:        67,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9978,7 +10609,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "right_pco",
 					Num:        68,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -9993,8 +10625,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_power_phase",
 					Num:        69,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -10008,8 +10641,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_power_phase_peak",
 					Num:        70,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -10023,8 +10657,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "right_power_phase",
 					Num:        71,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -10038,8 +10673,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "right_power_phase_peak",
 					Num:        72,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -10053,7 +10689,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        73,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -10068,7 +10705,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        78,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -10083,7 +10721,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_soc",
 					Num:        81,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -10098,7 +10737,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "motor_power",
 					Num:        82,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10113,7 +10753,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_ratio",
 					Num:        83,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10128,7 +10769,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time_balance",
 					Num:        84,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10143,7 +10785,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "step_length",
 					Num:        85,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -10158,7 +10801,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycle_length16",
 					Num:        87,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10173,7 +10817,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "absolute_pressure",
 					Num:        91,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10188,7 +10833,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        92,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -10203,7 +10849,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "next_stop_depth",
 					Num:        93,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -10218,7 +10865,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "next_stop_time",
 					Num:        94,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10233,7 +10881,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_to_surface",
 					Num:        95,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10248,7 +10897,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ndl_time",
 					Num:        96,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10263,7 +10913,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cns_load",
 					Num:        97,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10278,7 +10929,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "n2_load",
 					Num:        98,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10291,10 +10943,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "respiration_rate",
-					Num:   99,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "respiration_rate",
+					Num:      99,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 108 /* enhanced_respiration_rate */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -10310,7 +10963,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_respiration_rate",
 					Num:        108,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10325,7 +10979,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "grit",
 					Num:        114,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10340,7 +10995,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "flow",
 					Num:        115,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10355,7 +11011,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "current_stress",
 					Num:        116,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10370,7 +11027,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_travel_range",
 					Num:        117,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10385,7 +11043,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_battery_level",
 					Num:        118,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10400,7 +11059,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_assist_mode",
 					Num:        119,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10415,7 +11075,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_assist_level_percent",
 					Num:        120,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10430,7 +11091,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "air_time_remaining",
 					Num:        123,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10445,7 +11107,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pressure_sac",
 					Num:        124,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10460,7 +11123,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "volume_sac",
 					Num:        125,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10475,7 +11139,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rmv",
 					Num:        126,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10490,7 +11155,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent_rate",
 					Num:        127,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -10505,7 +11171,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "po2",
 					Num:        129,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10520,7 +11187,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "core_temperature",
 					Num:        139,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -10540,7 +11208,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10555,7 +11224,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10570,7 +11240,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10583,10 +11254,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "data16",
-					Num:   2,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "data16",
+					Num:      2,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 3 /* data */, Scale: 1, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -10602,7 +11274,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10770,7 +11443,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10785,7 +11459,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "score",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10800,7 +11475,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10815,7 +11491,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_num",
 					Num:        9,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10830,7 +11507,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear",
 					Num:        10,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10845,7 +11523,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_num",
 					Num:        11,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10860,7 +11539,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear",
 					Num:        12,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10875,7 +11555,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        13,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10890,7 +11571,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        14,
-					Type:       profile.ActivityType, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivityType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10905,7 +11587,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        15,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10927,7 +11610,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_level_max",
 					Num:        21,
-					Type:       profile.RadarThreatLevelType, /* basetype.Enum (size: 1) */
+					Type:       profile.RadarThreatLevelType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10942,7 +11626,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_count",
 					Num:        22,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -10957,7 +11642,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_avg_approach_speed",
 					Num:        23,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -10972,7 +11658,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_max_approach_speed",
 					Num:        24,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -10992,7 +11679,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11007,7 +11695,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11022,7 +11711,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_type",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11062,7 +11752,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        2,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11077,7 +11768,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
-					Type:       profile.Uint32z, /* basetype.Uint32z (size: 4) */
+					Type:       profile.Uint32z,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11092,7 +11784,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11123,7 +11816,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "software_version",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -11138,7 +11832,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hardware_version",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11153,7 +11848,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cum_operating_time",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11168,7 +11864,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_voltage",
 					Num:        10,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      256,
@@ -11183,7 +11880,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_status",
 					Num:        11,
-					Type:       profile.BatteryStatus, /* basetype.Uint8 (size: 1) */
+					Type:       profile.BatteryStatus,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11198,7 +11896,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_position",
 					Num:        18,
-					Type:       profile.BodyLocation, /* basetype.Enum (size: 1) */
+					Type:       profile.BodyLocation,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11213,7 +11912,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "descriptor",
 					Num:        19,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11228,7 +11928,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_transmission_type",
 					Num:        20,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11243,7 +11944,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_device_number",
 					Num:        21,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11258,7 +11960,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_network",
 					Num:        22,
-					Type:       profile.AntNetwork, /* basetype.Enum (size: 1) */
+					Type:       profile.AntNetwork,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11273,7 +11976,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "source_type",
 					Num:        25,
-					Type:       profile.SourceType, /* basetype.Enum (size: 1) */
+					Type:       profile.SourceType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11288,7 +11992,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product_name",
 					Num:        27,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11303,7 +12008,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_level",
 					Num:        32,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11323,7 +12029,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11338,7 +12045,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11353,7 +12061,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_voltage",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      256,
@@ -11368,7 +12077,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_status",
 					Num:        2,
-					Type:       profile.BatteryStatus, /* basetype.Uint8 (size: 1) */
+					Type:       profile.BatteryStatus,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11383,7 +12093,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_identifier",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11403,7 +12114,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11418,7 +12130,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
-					Type:       profile.File, /* basetype.Enum (size: 1) */
+					Type:       profile.File,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11433,7 +12146,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        1,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11448,7 +12162,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11479,7 +12194,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
-					Type:       profile.Uint32z, /* basetype.Uint32z (size: 4) */
+					Type:       profile.Uint32z,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11494,7 +12210,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        4,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11514,7 +12231,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11529,7 +12247,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_report",
 					Num:        0,
-					Type:       profile.WeatherReport, /* basetype.Enum (size: 1) */
+					Type:       profile.WeatherReport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11544,7 +12263,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        1,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11559,7 +12279,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "condition",
 					Num:        2,
-					Type:       profile.WeatherStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.WeatherStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11574,7 +12295,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wind_direction",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11589,7 +12311,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wind_speed",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -11604,7 +12327,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "precipitation_probability",
 					Num:        5,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11619,7 +12343,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_feels_like",
 					Num:        6,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11634,7 +12359,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "relative_humidity",
 					Num:        7,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11649,7 +12375,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "location",
 					Num:        8,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11664,7 +12391,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_at_time",
 					Num:        9,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11679,7 +12407,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_location_lat",
 					Num:        10,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11694,7 +12423,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_location_long",
 					Num:        11,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11709,7 +12439,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "day_of_week",
 					Num:        12,
-					Type:       profile.DayOfWeek, /* basetype.Enum (size: 1) */
+					Type:       profile.DayOfWeek,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11724,7 +12455,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "high_temperature",
 					Num:        13,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11739,7 +12471,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "low_temperature",
 					Num:        14,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11759,7 +12492,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11774,7 +12508,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "report_id",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11789,7 +12524,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "issue_time",
 					Num:        1,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11804,7 +12540,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "expire_time",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11819,7 +12556,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "severity",
 					Num:        3,
-					Type:       profile.WeatherSeverity, /* basetype.Enum (size: 1) */
+					Type:       profile.WeatherSeverity,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11834,7 +12572,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        4,
-					Type:       profile.WeatherSevereType, /* basetype.Enum (size: 1) */
+					Type:       profile.WeatherSevereType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11854,7 +12593,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11869,7 +12609,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11884,7 +12625,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11899,7 +12641,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        2,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11914,7 +12657,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -11929,7 +12673,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -11944,7 +12689,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heading",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -11959,7 +12705,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "utc_timestamp",
 					Num:        6,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -11974,8 +12721,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "velocity",
 					Num:        7,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [3] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [3] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -11994,7 +12742,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12009,7 +12758,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12024,7 +12774,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_event_type",
 					Num:        1,
-					Type:       profile.CameraEventType, /* basetype.Enum (size: 1) */
+					Type:       profile.CameraEventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12039,7 +12790,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_file_uuid",
 					Num:        2,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12054,7 +12806,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_orientation",
 					Num:        3,
-					Type:       profile.CameraOrientationType, /* basetype.Enum (size: 1) */
+					Type:       profile.CameraOrientationType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12074,7 +12827,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12089,7 +12843,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12104,8 +12859,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12119,8 +12875,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_x",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12134,8 +12891,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_y",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12149,8 +12907,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_z",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12164,8 +12923,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_x",
 					Num:        5,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12179,8 +12939,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_y",
 					Num:        6,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12194,8 +12955,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_z",
 					Num:        7,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12214,7 +12976,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12229,7 +12992,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12244,8 +13008,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12259,8 +13024,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_x",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12274,8 +13040,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_y",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12289,8 +13056,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_z",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12304,8 +13072,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_x",
 					Num:        5,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12319,8 +13088,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_y",
 					Num:        6,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12334,8 +13104,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_z",
 					Num:        7,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12349,8 +13120,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_x",
 					Num:        8,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12364,8 +13136,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_y",
 					Num:        9,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12379,8 +13152,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_z",
 					Num:        10,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12399,7 +13173,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12414,7 +13189,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12429,8 +13205,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12444,8 +13221,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_x",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12459,8 +13237,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_y",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12474,8 +13253,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_z",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12489,8 +13269,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_x",
 					Num:        5,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12504,8 +13285,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_y",
 					Num:        6,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12519,8 +13301,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_z",
 					Num:        7,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
-					Array:      true,            /* Array Size [N] */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      true,             /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12539,7 +13322,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12554,7 +13338,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12569,8 +13354,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12584,8 +13370,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "baro_pres",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12604,7 +13391,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12619,7 +13407,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_type",
 					Num:        0,
-					Type:       profile.SensorType, /* basetype.Enum (size: 1) */
+					Type:       profile.SensorType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12634,7 +13423,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_factor",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12662,7 +13452,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_divisor",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12677,7 +13468,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "level_shift",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12692,8 +13484,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "offset_cal",
 					Num:        4,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
-					Array:      true,           /* Array Size [3] */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
+					Array:      true,            /* Array Size [3] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12707,8 +13500,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "orientation_matrix",
 					Num:        5,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
-					Array:      true,           /* Array Size [9] */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
+					Array:      true,            /* Array Size [9] */
 					Components: nil,
 					Scale:      65535,
 					Offset:     0,
@@ -12727,7 +13521,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12742,7 +13537,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_type",
 					Num:        0,
-					Type:       profile.SensorType, /* basetype.Enum (size: 1) */
+					Type:       profile.SensorType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12757,7 +13553,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_factor",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12779,7 +13576,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_divisor",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12794,7 +13592,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "level_shift",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12809,7 +13608,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "offset_cal",
 					Num:        4,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12829,7 +13629,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12844,7 +13645,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12859,7 +13661,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "frame_number",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12879,7 +13682,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12894,7 +13698,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12909,8 +13714,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_offset",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12924,7 +13730,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pid",
 					Num:        2,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12939,8 +13746,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "raw_data",
 					Num:        3,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12954,8 +13762,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pid_data_size",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12969,8 +13778,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "system_time",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -12984,7 +13794,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        6,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -12999,7 +13810,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp_ms",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13019,7 +13831,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13034,7 +13847,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13049,7 +13863,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sentence",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13069,7 +13884,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13084,7 +13900,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13099,8 +13916,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "system_time",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13114,8 +13932,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pitch",
 					Num:        2,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10430.38,
 					Offset:     0,
@@ -13129,8 +13948,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "roll",
 					Num:        3,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10430.38,
 					Offset:     0,
@@ -13144,8 +13964,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_lateral",
 					Num:        4,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -13159,8 +13980,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_normal",
 					Num:        5,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -13174,8 +13996,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "turn_rate",
 					Num:        6,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1024,
 					Offset:     0,
@@ -13189,8 +14012,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stage",
 					Num:        7,
-					Type:       profile.AttitudeStage, /* basetype.Enum (size: 1) */
-					Array:      true,                  /* Array Size [N] */
+					Type:       profile.AttitudeStage,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13204,8 +14028,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "attitude_stage_complete",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13219,8 +14044,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "track",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      10430.38,
 					Offset:     0,
@@ -13234,8 +14060,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "validity",
 					Num:        10,
-					Type:       profile.AttitudeValidity, /* basetype.Uint16 (size: 2) */
-					Array:      true,                     /* Array Size [N] */
+					Type:       profile.AttitudeValidity,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13254,7 +14081,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "url",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13269,7 +14097,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hosting_provider",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13284,7 +14113,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13304,7 +14134,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13319,7 +14150,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_count",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13334,7 +14166,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "text",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13354,7 +14187,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13369,7 +14203,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_count",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13384,7 +14219,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "text",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13404,7 +14240,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_number",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13419,7 +14256,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        1,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13434,7 +14272,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp_ms",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13449,7 +14288,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_timestamp",
 					Num:        3,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13464,7 +14304,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_timestamp_ms",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13479,7 +14320,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_start",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13494,7 +14336,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_end",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13514,7 +14357,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        254,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13529,7 +14373,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -13544,7 +14389,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repetitions",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13559,7 +14405,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      16,
@@ -13574,7 +14421,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "set_type",
 					Num:        5,
-					Type:       profile.SetType, /* basetype.Uint8 (size: 1) */
+					Type:       profile.SetType,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13589,7 +14437,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        6,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13604,8 +14453,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "category",
 					Num:        7,
-					Type:       profile.ExerciseCategory, /* basetype.Uint16 (size: 2) */
-					Array:      true,                     /* Array Size [N] */
+					Type:       profile.ExerciseCategory,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13619,8 +14469,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "category_subtype",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -13634,7 +14485,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_display_unit",
 					Num:        9,
-					Type:       profile.FitBaseUnit, /* basetype.Uint16 (size: 2) */
+					Type:       profile.FitBaseUnit,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13649,7 +14501,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        10,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13664,7 +14517,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        11,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13684,7 +14538,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13699,7 +14554,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        0,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13714,7 +14570,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "height",
 					Num:        1,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13729,7 +14586,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rotations",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13744,7 +14602,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hang_time",
 					Num:        3,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13759,7 +14618,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "score",
 					Num:        4,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13774,7 +14634,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        5,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13789,7 +14650,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        6,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13802,10 +14664,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "speed",
-					Num:   7,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "speed",
+					Num:      7,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 8 /* enhanced_speed */, Scale: 1000, Offset: 0, Accumulate: false, Bits: 16},
 					},
@@ -13821,7 +14684,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        8,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -13841,7 +14705,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13856,7 +14721,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "split_type",
 					Num:        0,
-					Type:       profile.SplitType, /* basetype.Enum (size: 1) */
+					Type:       profile.SplitType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13871,7 +14737,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -13886,7 +14753,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -13901,7 +14769,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -13916,7 +14785,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -13931,7 +14801,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        9,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13946,7 +14817,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        13,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13961,7 +14833,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        14,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13976,7 +14849,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        21,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -13991,7 +14865,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        22,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14006,7 +14881,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        23,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14021,7 +14897,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        24,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14036,7 +14913,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        25,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14051,7 +14929,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vert_speed",
 					Num:        26,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14066,7 +14945,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_time",
 					Num:        27,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14081,7 +14961,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        28,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14096,7 +14977,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_elevation",
 					Num:        74,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -14111,7 +14993,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        110,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14131,7 +15014,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14146,7 +15030,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "split_type",
 					Num:        0,
-					Type:       profile.SplitType, /* basetype.Enum (size: 1) */
+					Type:       profile.SplitType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14161,7 +15046,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_splits",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14176,7 +15062,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14191,7 +15078,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -14206,7 +15094,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14221,7 +15110,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14236,7 +15126,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14251,7 +15142,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14266,7 +15158,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14281,7 +15174,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14296,7 +15190,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vert_speed",
 					Num:        12,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14311,7 +15206,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        13,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14326,7 +15222,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        77,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -14346,7 +15243,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14361,7 +15259,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        0,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14376,7 +15275,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14391,7 +15291,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_pro_event",
 					Num:        2,
-					Type:       profile.ClimbProEvent, /* basetype.Enum (size: 1) */
+					Type:       profile.ClimbProEvent,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14406,7 +15307,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_number",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14421,7 +15323,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_category",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14436,7 +15339,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "current_dist",
 					Num:        5,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14456,7 +15360,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_data_index",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14471,7 +15376,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_definition_number",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14486,7 +15392,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fit_base_type_id",
 					Num:        2,
-					Type:       profile.FitBaseType, /* basetype.Uint8 (size: 1) */
+					Type:       profile.FitBaseType,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14501,8 +15408,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_name",
 					Num:        3,
-					Type:       profile.String, /* basetype.String (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -14516,7 +15424,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "array",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14531,7 +15440,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "components",
 					Num:        5,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14546,7 +15456,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "scale",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14561,7 +15472,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "offset",
 					Num:        7,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14576,8 +15488,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "units",
 					Num:        8,
-					Type:       profile.String, /* basetype.String (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -14591,7 +15504,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bits",
 					Num:        9,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14606,7 +15520,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accumulate",
 					Num:        10,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14621,7 +15536,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fit_base_unit_id",
 					Num:        13,
-					Type:       profile.FitBaseUnit, /* basetype.Uint16 (size: 2) */
+					Type:       profile.FitBaseUnit,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14636,7 +15552,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "native_mesg_num",
 					Num:        14,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14651,7 +15568,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "native_field_num",
 					Num:        15,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14671,8 +15589,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_id",
 					Num:        0,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -14686,8 +15605,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "application_id",
 					Num:        1,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -14701,7 +15621,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer_id",
 					Num:        2,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14716,7 +15637,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_data_index",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14731,7 +15653,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "application_version",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14751,7 +15674,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        4,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14766,7 +15690,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        5,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14781,7 +15706,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "capabilities",
 					Num:        6,
-					Type:       profile.CourseCapabilities, /* basetype.Uint32z (size: 4) */
+					Type:       profile.CourseCapabilities,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14796,7 +15722,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        7,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14816,7 +15743,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14831,7 +15759,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        1,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14846,7 +15775,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        2,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14861,7 +15791,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        3,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14876,7 +15807,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -14891,7 +15823,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        5,
-					Type:       profile.CoursePoint, /* basetype.Enum (size: 1) */
+					Type:       profile.CoursePoint,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14906,7 +15839,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        6,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14921,7 +15855,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "favorite",
 					Num:        8,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14941,7 +15876,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14956,7 +15892,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "uuid",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14971,7 +15908,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        2,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -14986,7 +15924,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15001,7 +15940,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_primary_key",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15016,7 +15956,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_id",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15031,7 +15972,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_race_leader",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15046,7 +15988,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "delete_status",
 					Num:        7,
-					Type:       profile.SegmentDeleteStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.SegmentDeleteStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15061,7 +16004,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "selection_type",
 					Num:        8,
-					Type:       profile.SegmentSelectionType, /* basetype.Enum (size: 1) */
+					Type:       profile.SegmentSelectionType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15081,7 +16025,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15096,7 +16041,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15111,7 +16057,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        1,
-					Type:       profile.SegmentLeaderboardType, /* basetype.Enum (size: 1) */
+					Type:       profile.SegmentLeaderboardType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15126,7 +16073,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "group_primary_key",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15141,7 +16089,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_id",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15156,7 +16105,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "segment_time",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -15171,7 +16121,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_id_string",
 					Num:        5,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15191,7 +16142,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15206,7 +16158,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        1,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15221,7 +16174,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        2,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15236,7 +16190,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15249,10 +16204,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "altitude",
-					Num:   4,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "altitude",
+					Num:      4,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 6 /* enhanced_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -15268,8 +16224,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_time",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -15283,7 +16240,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -15303,7 +16261,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15318,7 +16277,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15333,7 +16293,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
-					Type:       profile.Event, /* basetype.Enum (size: 1) */
+					Type:       profile.Event,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15348,7 +16309,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
-					Type:       profile.EventType, /* basetype.Enum (size: 1) */
+					Type:       profile.EventType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15363,7 +16325,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15378,7 +16341,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15393,7 +16357,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15408,7 +16373,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        5,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15423,7 +16389,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        6,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15438,7 +16405,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -15453,7 +16421,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -15468,7 +16437,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15483,7 +16453,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15505,7 +16476,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15520,7 +16492,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        12,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15535,7 +16508,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        13,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -15550,7 +16524,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        14,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -15565,7 +16540,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        15,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15580,7 +16556,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        16,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15595,7 +16572,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        17,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15610,7 +16588,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        18,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15625,7 +16604,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        19,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15640,7 +16620,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        20,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15655,7 +16636,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        21,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15670,7 +16652,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        22,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15685,7 +16668,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        23,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15700,7 +16684,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        24,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15715,7 +16700,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_lat",
 					Num:        25,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15730,7 +16716,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_long",
 					Num:        26,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15745,7 +16732,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_lat",
 					Num:        27,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15760,7 +16748,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_long",
 					Num:        28,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15775,7 +16764,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        29,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15790,7 +16780,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        30,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15805,7 +16796,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        31,
-					Type:       profile.LeftRightBalance100, /* basetype.Uint16 (size: 2) */
+					Type:       profile.LeftRightBalance100,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15820,7 +16812,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        32,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15835,7 +16828,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        33,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15848,10 +16842,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "avg_altitude",
-					Num:   34,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "avg_altitude",
+					Num:      34,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 91 /* enhanced_avg_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -15865,10 +16860,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "max_altitude",
-					Num:   35,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "max_altitude",
+					Num:      35,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 92 /* enhanced_max_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -15884,7 +16880,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        36,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15899,7 +16896,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        37,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15914,7 +16912,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        38,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15929,7 +16928,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        39,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15944,7 +16944,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        40,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15959,7 +16960,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        41,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -15974,7 +16976,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        42,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -15989,7 +16992,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        43,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16004,7 +17008,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        44,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16019,7 +17024,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        45,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16034,7 +17040,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        46,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16049,7 +17056,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        47,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16064,7 +17072,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        48,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16079,8 +17088,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        49,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -16094,8 +17104,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        50,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -16109,8 +17120,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        51,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -16124,8 +17136,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        52,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -16139,7 +17152,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "repetition_num",
 					Num:        53,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16152,10 +17166,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "min_altitude",
-					Num:   54,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: false,
+					Name:     "min_altitude",
+					Num:      54,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 93 /* enhanced_min_altitude */, Scale: 5, Offset: 500, Accumulate: false, Bits: 16},
 					},
@@ -16171,7 +17186,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        55,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16186,7 +17202,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        56,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16201,7 +17218,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        57,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16216,7 +17234,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_event",
 					Num:        58,
-					Type:       profile.SportEvent, /* basetype.Enum (size: 1) */
+					Type:       profile.SportEvent,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16231,7 +17250,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        59,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -16246,7 +17266,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        60,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -16261,7 +17282,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        61,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -16276,7 +17298,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        62,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -16291,7 +17314,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        63,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -16306,7 +17330,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        64,
-					Type:       profile.SegmentLapStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.SegmentLapStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16321,7 +17346,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "uuid",
 					Num:        65,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16336,7 +17362,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        66,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -16351,7 +17378,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        67,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -16366,7 +17394,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        68,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -16381,7 +17410,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_shift_count",
 					Num:        69,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16396,7 +17426,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_shift_count",
 					Num:        70,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16411,7 +17442,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        71,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -16426,7 +17458,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        72,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16441,7 +17474,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        73,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16456,7 +17490,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        74,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16471,8 +17506,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        75,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -16486,8 +17522,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        76,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -16501,8 +17538,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        77,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -16516,8 +17554,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        78,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      0.7111111,
 					Offset:     0,
@@ -16531,8 +17570,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        79,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16546,8 +17586,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        80,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16561,8 +17602,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        81,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16576,8 +17618,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        82,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16591,7 +17634,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        83,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16606,7 +17650,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        84,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16621,7 +17666,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        85,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16636,7 +17682,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        86,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16651,7 +17698,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        87,
-					Type:       profile.Float32, /* basetype.Float32 (size: 4) */
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16666,7 +17714,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        89,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -16681,7 +17730,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        90,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -16696,7 +17746,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        91,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -16711,7 +17762,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        92,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -16726,7 +17778,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        93,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      5,
@@ -16746,7 +17799,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16761,7 +17815,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "file_uuid",
 					Num:        1,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16776,7 +17831,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16791,7 +17847,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_primary_key",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16806,8 +17863,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_type",
 					Num:        7,
-					Type:       profile.SegmentLeaderboardType, /* basetype.Enum (size: 1) */
-					Array:      true,                           /* Array Size [N] */
+					Type:       profile.SegmentLeaderboardType,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16821,8 +17879,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_group_primary_key",
 					Num:        8,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16836,8 +17895,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_activity_id",
 					Num:        9,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16851,8 +17911,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_activity_id_string",
 					Num:        10,
-					Type:       profile.String, /* basetype.String (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -16866,7 +17927,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "default_race_leader",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16886,7 +17948,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16901,7 +17964,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        4,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16916,7 +17980,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "capabilities",
 					Num:        5,
-					Type:       profile.WorkoutCapabilities, /* basetype.Uint32z (size: 4) */
+					Type:       profile.WorkoutCapabilities,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16931,7 +17996,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_valid_steps",
 					Num:        6,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16946,7 +18012,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_name",
 					Num:        8,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16961,7 +18028,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        11,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -16976,7 +18044,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        14,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -16991,7 +18060,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        15,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17011,7 +18081,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17026,7 +18097,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17041,7 +18113,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17056,7 +18129,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "num_valid_steps",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17071,7 +18145,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "first_step_index",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17086,7 +18161,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -17101,7 +18177,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        5,
-					Type:       profile.DisplayMeasure, /* basetype.Enum (size: 1) */
+					Type:       profile.DisplayMeasure,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17121,7 +18198,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17136,7 +18214,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_name",
 					Num:        0,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17151,7 +18230,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_type",
 					Num:        1,
-					Type:       profile.WktStepDuration, /* basetype.Enum (size: 1) */
+					Type:       profile.WktStepDuration,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17166,7 +18246,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_value",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17234,7 +18315,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "target_type",
 					Num:        3,
-					Type:       profile.WktStepTarget, /* basetype.Enum (size: 1) */
+					Type:       profile.WktStepTarget,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17249,7 +18331,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "target_value",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17333,7 +18416,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_target_value_low",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17373,7 +18457,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_target_value_high",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17413,7 +18498,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        7,
-					Type:       profile.Intensity, /* basetype.Enum (size: 1) */
+					Type:       profile.Intensity,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17428,7 +18514,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "notes",
 					Num:        8,
-					Type:       profile.String, /* basetype.String (size: 1) */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17443,7 +18530,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "equipment",
 					Num:        9,
-					Type:       profile.WorkoutEquipment, /* basetype.Enum (size: 1) */
+					Type:       profile.WorkoutEquipment,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17458,7 +18546,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_category",
 					Num:        10,
-					Type:       profile.ExerciseCategory, /* basetype.Uint16 (size: 2) */
+					Type:       profile.ExerciseCategory,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17473,7 +18562,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_name",
 					Num:        11,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17488,7 +18578,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_weight",
 					Num:        12,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -17503,7 +18594,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_display_unit",
 					Num:        13,
-					Type:       profile.FitBaseUnit, /* basetype.Uint16 (size: 2) */
+					Type:       profile.FitBaseUnit,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17518,7 +18610,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_target_type",
 					Num:        19,
-					Type:       profile.WktStepTarget, /* basetype.Enum (size: 1) */
+					Type:       profile.WktStepTarget,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17533,7 +18626,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_target_value",
 					Num:        20,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17579,7 +18673,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_custom_target_value_low",
 					Num:        21,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17619,7 +18714,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_custom_target_value_high",
 					Num:        22,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17664,7 +18760,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17679,7 +18776,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_category",
 					Num:        0,
-					Type:       profile.ExerciseCategory, /* basetype.Uint16 (size: 2) */
+					Type:       profile.ExerciseCategory,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17694,7 +18792,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_name",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17709,8 +18808,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_name",
 					Num:        2,
-					Type:       profile.String, /* basetype.String (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -17729,7 +18829,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        0,
-					Type:       profile.Manufacturer, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Manufacturer,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17744,7 +18845,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17775,7 +18877,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        2,
-					Type:       profile.Uint32z, /* basetype.Uint32z (size: 4) */
+					Type:       profile.Uint32z,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17790,7 +18893,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        3,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17805,7 +18909,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "completed",
 					Num:        4,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17820,7 +18925,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        5,
-					Type:       profile.Schedule, /* basetype.Enum (size: 1) */
+					Type:       profile.Schedule,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17835,7 +18941,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "scheduled_time",
 					Num:        6,
-					Type:       profile.LocalDateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17855,7 +18962,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17870,7 +18978,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17885,7 +18994,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timer_time",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17900,7 +19010,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17915,7 +19026,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17930,7 +19042,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        3,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17945,7 +19058,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "elapsed_time",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17960,7 +19074,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sessions",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17975,7 +19090,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        6,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -17990,7 +19106,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_index",
 					Num:        9,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18010,7 +19127,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18025,7 +19143,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        0,
-					Type:       profile.Weight, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Weight,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18040,7 +19159,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "percent_fat",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18055,7 +19175,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "percent_hydration",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18070,7 +19191,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "visceral_fat_mass",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18085,7 +19207,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bone_mass",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18100,7 +19223,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "muscle_mass",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18115,7 +19239,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "basal_met",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      4,
@@ -18130,7 +19255,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "physique_rating",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18145,7 +19271,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_met",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      4,
@@ -18160,7 +19287,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "metabolic_age",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18175,7 +19303,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "visceral_fat_rating",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18190,7 +19319,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_index",
 					Num:        12,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18205,7 +19335,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bmi",
 					Num:        13,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -18225,7 +19356,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18240,7 +19372,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "systolic_pressure",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18255,7 +19388,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "diastolic_pressure",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18270,7 +19404,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mean_arterial_pressure",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18285,7 +19420,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "map_3_sample_mean",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18300,7 +19436,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "map_morning_values",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18315,7 +19452,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "map_evening_values",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18330,7 +19468,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18345,7 +19484,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_type",
 					Num:        7,
-					Type:       profile.HrType, /* basetype.Enum (size: 1) */
+					Type:       profile.HrType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18360,7 +19500,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        8,
-					Type:       profile.BpStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.BpStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18375,7 +19516,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_index",
 					Num:        9,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18395,7 +19537,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18410,7 +19553,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        0,
-					Type:       profile.LocalDateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18425,8 +19569,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        1,
-					Type:       profile.ActivityType, /* basetype.Enum (size: 1) */
-					Array:      true,                 /* Array Size [N] */
+					Type:       profile.ActivityType,
+					BaseType:   basetype.Enum, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -18440,8 +19585,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_to_distance",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      5000,
 					Offset:     0,
@@ -18455,8 +19601,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_to_calories",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      5000,
 					Offset:     0,
@@ -18470,7 +19617,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_metabolic_rate",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18490,7 +19638,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18505,7 +19654,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18520,7 +19670,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18535,7 +19686,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18550,7 +19702,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      2,
@@ -18580,7 +19733,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -18595,7 +19749,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        5,
-					Type:       profile.ActivityType, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivityType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18610,7 +19765,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_subtype",
 					Num:        6,
-					Type:       profile.ActivitySubtype, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivitySubtype,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18625,7 +19781,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_level",
 					Num:        7,
-					Type:       profile.ActivityLevel, /* basetype.Enum (size: 1) */
+					Type:       profile.ActivityLevel,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18640,7 +19797,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "distance_16",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18655,7 +19813,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_16",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18670,7 +19829,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time_16",
 					Num:        10,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18685,7 +19845,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        11,
-					Type:       profile.LocalDateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18700,7 +19861,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        12,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18715,7 +19877,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_min",
 					Num:        14,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18730,7 +19893,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_max",
 					Num:        15,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -18745,8 +19909,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_time",
 					Num:        16,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [8] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [8] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -18760,7 +19925,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "active_calories",
 					Num:        19,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18773,10 +19939,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "current_activity_type_intensity",
-					Num:   24,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: false,
+					Name:     "current_activity_type_intensity",
+					Num:      24,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 5 /* activity_type */, Scale: 1, Offset: 0, Accumulate: false, Bits: 5},
 						{FieldNum: 28 /* intensity */, Scale: 1, Offset: 0, Accumulate: false, Bits: 3},
@@ -18793,7 +19960,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_min_8",
 					Num:        25,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18808,7 +19976,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_16",
 					Num:        26,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18823,7 +19992,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        27,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18838,7 +20008,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        28,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -18853,7 +20024,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_min",
 					Num:        29,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18868,7 +20040,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        30,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18883,7 +20056,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent",
 					Num:        31,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -18898,7 +20072,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "descent",
 					Num:        32,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -18913,7 +20088,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "moderate_activity_minutes",
 					Num:        33,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18928,7 +20104,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "vigorous_activity_minutes",
 					Num:        34,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18948,7 +20125,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18963,7 +20141,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18978,7 +20157,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "current_day_resting_heart_rate",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -18998,7 +20178,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19013,7 +20194,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_spo2",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19028,7 +20210,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_confidence",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19043,7 +20226,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        2,
-					Type:       profile.Spo2MeasurementType, /* basetype.Enum (size: 1) */
+					Type:       profile.Spo2MeasurementType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19063,7 +20247,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19078,7 +20263,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      32768,
@@ -19091,10 +20277,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "time256",
-					Num:   1,
-					Type:  profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array: false,
+					Name:     "time256",
+					Num:      1,
+					Type:     profile.Uint8,
+					BaseType: basetype.Uint8, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 0 /* fractional_timestamp */, Scale: 256, Offset: 0, Accumulate: false, Bits: 8},
 					},
@@ -19110,8 +20297,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "filtered_bpm",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19125,8 +20313,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_timestamp",
 					Num:        9,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1024,
 					Offset:     0,
@@ -19138,10 +20327,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "event_timestamp_12",
-					Num:   10,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: true,         /* Array Size [N] */
+					Name:     "event_timestamp_12",
+					Num:      10,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    true,          /* Array Size [N] */
 					Components: []proto.Component{
 						{FieldNum: 9 /* event_timestamp */, Scale: 1024, Offset: 0, Accumulate: true, Bits: 12},
 						{FieldNum: 9 /* event_timestamp */, Scale: 1024, Offset: 0, Accumulate: true, Bits: 12},
@@ -19171,7 +20361,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level_value",
 					Num:        0,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19186,7 +20377,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level_time",
 					Num:        1,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19206,7 +20398,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "update_time",
 					Num:        0,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19221,7 +20414,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "vo2_max",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -19236,7 +20430,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        5,
-					Type:       profile.Sport, /* basetype.Enum (size: 1) */
+					Type:       profile.Sport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19251,7 +20446,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        6,
-					Type:       profile.SubSport, /* basetype.Enum (size: 1) */
+					Type:       profile.SubSport,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19266,7 +20462,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_met_category",
 					Num:        8,
-					Type:       profile.MaxMetCategory, /* basetype.Enum (size: 1) */
+					Type:       profile.MaxMetCategory,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19281,7 +20478,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_data",
 					Num:        9,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19296,7 +20494,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_source",
 					Num:        12,
-					Type:       profile.MaxMetHeartRateSource, /* basetype.Enum (size: 1) */
+					Type:       profile.MaxMetHeartRateSource,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19311,7 +20510,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_source",
 					Num:        13,
-					Type:       profile.MaxMetSpeedSource, /* basetype.Enum (size: 1) */
+					Type:       profile.MaxMetSpeedSource,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19331,7 +20531,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19346,7 +20547,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19361,8 +20563,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "level",
 					Num:        1,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19376,8 +20579,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "charged",
 					Num:        2,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19391,8 +20595,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "uncharged",
 					Num:        3,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19411,7 +20616,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19426,7 +20632,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "event_id",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19446,7 +20653,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19461,7 +20669,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19476,7 +20685,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sampling_interval",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19491,8 +20701,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_x",
 					Num:        2,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1.024,
 					Offset:     0,
@@ -19506,8 +20717,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_y",
 					Num:        3,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1.024,
 					Offset:     0,
@@ -19521,8 +20733,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_z",
 					Num:        4,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1.024,
 					Offset:     0,
@@ -19536,7 +20749,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_32k",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19556,7 +20770,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19571,7 +20786,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19586,7 +20802,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sampling_interval",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19601,8 +20818,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_x",
 					Num:        2,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      28.57143,
 					Offset:     0,
@@ -19616,8 +20834,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_y",
 					Num:        3,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      28.57143,
 					Offset:     0,
@@ -19631,8 +20850,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_z",
 					Num:        4,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      28.57143,
 					Offset:     0,
@@ -19646,7 +20866,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_32k",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19666,7 +20887,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19681,7 +20903,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19696,8 +20919,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "steps",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19716,7 +20940,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19731,7 +20956,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19746,8 +20972,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_spo2",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19761,8 +20988,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "confidence",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19781,7 +21009,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19796,7 +21025,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19811,8 +21041,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level",
 					Num:        1,
-					Type:       profile.Sint8, /* basetype.Sint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Sint8,
+					BaseType:   basetype.Sint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19831,7 +21062,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19846,7 +21078,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19861,8 +21094,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "respiration_rate",
 					Num:        1,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      100,
 					Offset:     0,
@@ -19881,7 +21115,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19896,7 +21131,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19911,7 +21147,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19926,8 +21163,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19946,7 +21184,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19961,8 +21200,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        0,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -19976,7 +21216,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data_size",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -19996,7 +21237,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20011,7 +21253,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20026,8 +21269,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -20046,7 +21290,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "part_index",
 					Num:        250,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20061,8 +21306,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "memo",
 					Num:        0,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -20076,7 +21322,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20091,7 +21338,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "parent_index",
 					Num:        2,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20106,7 +21354,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_num",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20121,8 +21370,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -20141,7 +21391,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20156,7 +21407,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_level",
 					Num:        0,
-					Type:       profile.SleepLevel, /* basetype.Enum (size: 1) */
+					Type:       profile.SleepLevel,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20176,7 +21428,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20191,7 +21444,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_type",
 					Num:        1,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20206,7 +21460,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_number",
 					Num:        2,
-					Type:       profile.Uint16z, /* basetype.Uint16z (size: 2) */
+					Type:       profile.Uint16z,
+					BaseType:   basetype.Uint16z, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20221,7 +21476,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "transmission_type",
 					Num:        3,
-					Type:       profile.Uint8z, /* basetype.Uint8z (size: 1) */
+					Type:       profile.Uint8z,
+					BaseType:   basetype.Uint8z, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20236,7 +21492,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        4,
-					Type:       profile.DeviceIndex, /* basetype.Uint8 (size: 1) */
+					Type:       profile.DeviceIndex,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20256,7 +21513,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20271,7 +21529,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      32768,
@@ -20286,7 +21545,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_id",
 					Num:        1,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20299,10 +21559,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "mesg_data",
-					Num:   2,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: true,         /* Array Size [N] */
+					Name:     "mesg_data",
+					Num:      2,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    true,          /* Array Size [N] */
 					Components: []proto.Component{
 						{FieldNum: 3 /* channel_number */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 						{FieldNum: 4 /* data */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
@@ -20326,7 +21587,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20341,8 +21603,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -20361,7 +21624,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20376,7 +21640,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      32768,
@@ -20391,7 +21656,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_id",
 					Num:        1,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20404,10 +21670,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "mesg_data",
-					Num:   2,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: true,         /* Array Size [N] */
+					Name:     "mesg_data",
+					Num:      2,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    true,          /* Array Size [N] */
 					Components: []proto.Component{
 						{FieldNum: 3 /* channel_number */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 						{FieldNum: 4 /* data */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
@@ -20431,7 +21698,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20446,8 +21714,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
-					Type:       profile.Byte, /* basetype.Byte (size: 1) */
-					Array:      true,         /* Array Size [N] */
+					Type:       profile.Byte,
+					BaseType:   basetype.Byte, /* (size: 1) */
+					Array:      true,          /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -20466,7 +21735,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20481,7 +21751,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_count",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20496,7 +21767,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "layout",
 					Num:        2,
-					Type:       profile.ExdLayout, /* basetype.Enum (size: 1) */
+					Type:       profile.ExdLayout,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20511,7 +21783,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_enabled",
 					Num:        3,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20531,7 +21804,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20544,10 +21818,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "concept_field",
-					Num:   1,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: false,
+					Name:     "concept_field",
+					Num:      1,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 2 /* field_id */, Scale: 1, Offset: 0, Accumulate: false, Bits: 4},
 						{FieldNum: 3 /* concept_count */, Scale: 1, Offset: 0, Accumulate: false, Bits: 4},
@@ -20564,7 +21839,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_id",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20579,7 +21855,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_count",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20594,7 +21871,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "display_type",
 					Num:        4,
-					Type:       profile.ExdDisplayType, /* basetype.Enum (size: 1) */
+					Type:       profile.ExdDisplayType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20609,8 +21887,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "title",
 					Num:        5,
-					Type:       profile.String, /* basetype.String (size: 1) */
-					Array:      true,           /* Array Size [32] */
+					Type:       profile.String,
+					BaseType:   basetype.String, /* (size: 1) */
+					Array:      true,            /* Array Size [32] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -20629,7 +21908,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20642,10 +21922,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "concept_field",
-					Num:   1,
-					Type:  profile.Byte, /* basetype.Byte (size: 1) */
-					Array: false,
+					Name:     "concept_field",
+					Num:      1,
+					Type:     profile.Byte,
+					BaseType: basetype.Byte, /* (size: 1) */
+					Array:    false,
 					Components: []proto.Component{
 						{FieldNum: 2 /* field_id */, Scale: 1, Offset: 0, Accumulate: false, Bits: 4},
 						{FieldNum: 3 /* concept_index */, Scale: 1, Offset: 0, Accumulate: false, Bits: 4},
@@ -20662,7 +21943,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "field_id",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20677,7 +21959,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_index",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20692,7 +21975,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data_page",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20707,7 +21991,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_key",
 					Num:        5,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20722,7 +22007,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "scaling",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20737,7 +22023,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "data_units",
 					Num:        8,
-					Type:       profile.ExdDataUnits, /* basetype.Enum (size: 1) */
+					Type:       profile.ExdDataUnits,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20752,7 +22039,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "qualifier",
 					Num:        9,
-					Type:       profile.ExdQualifiers, /* basetype.Enum (size: 1) */
+					Type:       profile.ExdQualifiers,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20767,7 +22055,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "descriptor",
 					Num:        10,
-					Type:       profile.ExdDescriptors, /* basetype.Enum (size: 1) */
+					Type:       profile.ExdDescriptors,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20782,7 +22071,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "is_signed",
 					Num:        11,
-					Type:       profile.Bool, /* basetype.Enum (size: 1) */
+					Type:       profile.Bool,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20802,7 +22092,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20817,7 +22108,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_mesg",
 					Num:        0,
-					Type:       profile.MesgNum, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MesgNum,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20832,7 +22124,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_index",
 					Num:        1,
-					Type:       profile.MessageIndex, /* basetype.Uint16 (size: 2) */
+					Type:       profile.MessageIndex,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20847,7 +22140,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -20862,7 +22156,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -20877,7 +22172,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "surface_interval",
 					Num:        4,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20892,7 +22188,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_cns",
 					Num:        5,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20907,7 +22204,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_cns",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20922,7 +22220,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_n2",
 					Num:        7,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20937,7 +22236,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_n2",
 					Num:        8,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20952,7 +22252,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "o2_toxicity",
 					Num:        9,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20967,7 +22268,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_number",
 					Num:        10,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -20982,7 +22284,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_time",
 					Num:        11,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -20997,7 +22300,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pressure_sac",
 					Num:        12,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21012,7 +22316,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_volume_sac",
 					Num:        13,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21027,7 +22332,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_rmv",
 					Num:        14,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21042,7 +22348,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "descent_time",
 					Num:        15,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21057,7 +22364,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent_time",
 					Num:        16,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21072,7 +22380,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_ascent_rate",
 					Num:        17,
-					Type:       profile.Sint32, /* basetype.Sint32 (size: 4) */
+					Type:       profile.Sint32,
+					BaseType:   basetype.Sint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21087,7 +22396,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_descent_rate",
 					Num:        22,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21102,7 +22412,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_ascent_rate",
 					Num:        23,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21117,7 +22428,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_descent_rate",
 					Num:        24,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21132,7 +22444,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "hang_time",
 					Num:        25,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21152,7 +22465,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21167,7 +22481,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21182,7 +22497,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "energy_total",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21197,7 +22513,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "zero_cross_cnt",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21212,7 +22529,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "instance",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21227,7 +22545,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time_above_threshold",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      25,
@@ -21247,8 +22566,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1000,
 					Offset:     0,
@@ -21267,7 +22587,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21282,7 +22603,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21297,8 +22619,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -21317,7 +22640,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21332,7 +22656,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "weekly_average",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21347,7 +22672,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "last_night_average",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21362,7 +22688,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "last_night_5_min_high",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21377,7 +22704,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_low_upper",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21392,7 +22720,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_balanced_lower",
 					Num:        4,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21407,7 +22736,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_balanced_upper",
 					Num:        5,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21422,7 +22752,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        6,
-					Type:       profile.HrvStatus, /* basetype.Enum (size: 1) */
+					Type:       profile.HrvStatus,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21442,7 +22773,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21457,7 +22789,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      128,
@@ -21477,7 +22810,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21492,7 +22826,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21505,10 +22840,11 @@ var mesgs = [...]proto.Message{
 			},
 			{
 				FieldBase: &proto.FieldBase{
-					Name:  "data",
-					Num:   1,
-					Type:  profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array: true,           /* Array Size [N] */
+					Name:     "data",
+					Num:      1,
+					Type:     profile.Uint16,
+					BaseType: basetype.Uint16, /* (size: 2) */
+					Array:    true,            /* Array Size [N] */
 					Components: []proto.Component{
 						{FieldNum: 2 /* time */, Scale: 1, Offset: 0, Accumulate: false, Bits: 14},
 						{FieldNum: 3 /* quality */, Scale: 1, Offset: 0, Accumulate: false, Bits: 1},
@@ -21568,8 +22904,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
-					Array:      true,           /* Array Size [N] */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
+					Array:      true,            /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -21583,8 +22920,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "quality",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -21598,8 +22936,9 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "gap",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
-					Array:      true,          /* Array Size [N] */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      true,           /* Array Size [N] */
 					Components: nil,
 					Scale:      1,
 					Offset:     0,
@@ -21618,7 +22957,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21633,7 +22973,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "respiration_rate",
 					Num:        0,
-					Type:       profile.Sint16, /* basetype.Sint16 (size: 2) */
+					Type:       profile.Sint16,
+					BaseType:   basetype.Sint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21653,7 +22994,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21668,7 +23010,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "min_speed",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21683,7 +23026,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        1,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21698,7 +23042,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        2,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21713,7 +23058,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_count",
 					Num:        3,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21728,7 +23074,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "projectile_type",
 					Num:        4,
-					Type:       profile.ProjectileType, /* basetype.Enum (size: 1) */
+					Type:       profile.ProjectileType,
+					BaseType:   basetype.Enum, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21743,7 +23090,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "grain_weight",
 					Num:        5,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      10,
@@ -21763,7 +23111,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21778,7 +23127,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_speed",
 					Num:        0,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1000,
@@ -21793,7 +23143,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_num",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21813,7 +23164,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21828,7 +23180,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor",
 					Num:        0,
-					Type:       profile.AntChannelId, /* basetype.Uint32z (size: 4) */
+					Type:       profile.AntChannelId,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21843,7 +23196,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "pressure",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21863,7 +23217,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
-					Type:       profile.DateTime, /* basetype.Uint32 (size: 4) */
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21878,7 +23233,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor",
 					Num:        0,
-					Type:       profile.AntChannelId, /* basetype.Uint32z (size: 4) */
+					Type:       profile.AntChannelId,
+					BaseType:   basetype.Uint32z, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21893,7 +23249,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "start_pressure",
 					Num:        1,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21908,7 +23265,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "end_pressure",
 					Num:        2,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21923,7 +23281,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "volume_used",
 					Num:        3,
-					Type:       profile.Uint32, /* basetype.Uint32 (size: 4) */
+					Type:       profile.Uint32,
+					BaseType:   basetype.Uint32, /* (size: 4) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,
@@ -21943,7 +23302,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "combined_awake_score",
 					Num:        0,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21958,7 +23318,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "awake_time_score",
 					Num:        1,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21973,7 +23334,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "awakenings_count_score",
 					Num:        2,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -21988,7 +23350,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "deep_sleep_score",
 					Num:        3,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22003,7 +23366,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_duration_score",
 					Num:        4,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22018,7 +23382,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "light_sleep_score",
 					Num:        5,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22033,7 +23398,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "overall_sleep_score",
 					Num:        6,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22048,7 +23414,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_quality_score",
 					Num:        7,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22063,7 +23430,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_recovery_score",
 					Num:        8,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22078,7 +23446,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "rem_sleep_score",
 					Num:        9,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22093,7 +23462,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_restlessness_score",
 					Num:        10,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22108,7 +23478,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "awakenings_count",
 					Num:        11,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22123,7 +23494,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "interruptions_score",
 					Num:        14,
-					Type:       profile.Uint8, /* basetype.Uint8 (size: 1) */
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
 					Array:      false,
 					Components: nil,
 					Scale:      1,
@@ -22138,7 +23510,8 @@ var mesgs = [...]proto.Message{
 				FieldBase: &proto.FieldBase{
 					Name:       "average_stress_during_sleep",
 					Num:        15,
-					Type:       profile.Uint16, /* basetype.Uint16 (size: 2) */
+					Type:       profile.Uint16,
+					BaseType:   basetype.Uint16, /* (size: 2) */
 					Array:      false,
 					Components: nil,
 					Scale:      100,

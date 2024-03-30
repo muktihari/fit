@@ -620,8 +620,9 @@ func TestEncodeMessage(t *testing.T) {
 			mesg: proto.Message{Fields: []proto.Field{
 				{
 					FieldBase: &proto.FieldBase{
-						Name: factory.NameUnknown,
-						Type: profile.Sint64, // int64 type is ilegal for protocol v1.0
+						Name:     factory.NameUnknown,
+						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
+						BaseType: profile.Sint64.BaseType(),
 					},
 					Value: int64(1234),
 				},
@@ -638,8 +639,9 @@ func TestEncodeMessage(t *testing.T) {
 			mesg: proto.Message{Fields: []proto.Field{
 				{
 					FieldBase: &proto.FieldBase{
-						Name: factory.NameUnknown,
-						Type: profile.Sint64, // int64 type is ilegal for protocol v1.0
+						Name:     factory.NameUnknown,
+						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
+						BaseType: profile.Sint64.BaseType(),
 					},
 					Value: int64(1234),
 				},

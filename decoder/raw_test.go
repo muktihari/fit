@@ -235,7 +235,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						Name:               "Heart Rate",
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
-						Type:               basetype.Uint8,
+						BaseType:           basetype.Uint8,
 						Value:              uint8(100),
 					},
 				)
@@ -270,7 +270,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						Name:               "Heart Rate",
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
-						Type:               basetype.Uint8,
+						BaseType:           basetype.Uint8,
 						Value:              uint8(100),
 					},
 				)
@@ -305,7 +305,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						Name:               "Heart Rate",
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
-						Type:               basetype.Uint8,
+						BaseType:           basetype.Uint8,
 						Value:              uint8(100),
 					},
 				)

@@ -511,7 +511,7 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 }
 
 func isValueValid(field *proto.Field) bool {
-	switch field.Type.BaseType() {
+	switch field.BaseType {
 	case basetype.Float32:
 		f32 := typeconv.ToFloat32[float32](field.Value)
 		if math.Float32bits(f32) == basetype.Float32Invalid {
@@ -523,7 +523,7 @@ func isValueValid(field *proto.Field) bool {
 			return false
 		}
 	default:
-		if field.Value == field.Type.BaseType().Invalid() {
+		if field.Value == field.BaseType.Invalid() {
 			return false
 		}
 	}

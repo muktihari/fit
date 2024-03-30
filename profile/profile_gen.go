@@ -1221,6 +1221,46 @@ func ListProfileType() []ProfileType {
 	}
 }
 
+func ProfileTypeFromBaseType(baseType basetype.BaseType) ProfileType {
+	switch baseType {
+	case basetype.Enum:
+		return Enum
+	case basetype.Sint8:
+		return Sint8
+	case basetype.Uint8:
+		return Uint8
+	case basetype.Sint16:
+		return Sint16
+	case basetype.Uint16:
+		return Uint16
+	case basetype.Sint32:
+		return Sint32
+	case basetype.Uint32:
+		return Uint32
+	case basetype.String:
+		return String
+	case basetype.Float32:
+		return Float32
+	case basetype.Float64:
+		return Float64
+	case basetype.Uint8z:
+		return Uint8z
+	case basetype.Uint16z:
+		return Uint16z
+	case basetype.Uint32z:
+		return Uint32z
+	case basetype.Byte:
+		return Byte
+	case basetype.Sint64:
+		return Sint64
+	case basetype.Uint64:
+		return Uint64
+	case basetype.Uint64z:
+		return Uint64z
+	}
+	return Invalid
+}
+
 func (p ProfileType) BaseType() basetype.BaseType {
 	switch p {
 	case Enum:

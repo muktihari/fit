@@ -10,10 +10,20 @@
 {{ define "profile" }}
 {{ template "constant" .ConstantData -}}
 
+func ProfileTypeFromBaseType(baseType basetype.BaseType) ProfileType {
+    switch baseType {
+    {{ range .MappingBaseTypeToProfileTypes -}}
+    case {{ .BaseType }}:
+        return {{ .ProfileType }}
+    {{ end -}}
+    }
+    return Invalid
+}
+
 func (p ProfileType) BaseType() basetype.BaseType {
 	switch p {
-	{{ range .MappingBaseTypes -}}
-	case {{ .ConstantName }}:
+	{{ range .MappingProfileTypeToBaseTypes -}}
+	case {{ .ProfileType }}:
 		return {{ .BaseType }}
 	{{ end -}}
 	}
