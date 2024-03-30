@@ -25,7 +25,6 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 var (
@@ -212,6 +211,9 @@ func (d *Decoder) initDecodeHeaderOnce() {
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
 func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
+	if d.err != nil {
+		return nil, d.err
+	}
 	defer func() { d.err = err }()
 	if err = d.decodeHeaderOnce(); err != nil {
 		return
@@ -235,6 +237,10 @@ func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 // After invoking this method, the underlying reader should be reset afterward as the reader has been fully read.
 // If the underlying reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
 func (d *Decoder) CheckIntegrity() (seq int, err error) {
+	if d.err != nil {
+		return 0, d.err
+	}
+
 	shouldChecksum := d.options.shouldChecksum
 	d.options.shouldChecksum = true // Must checksum
 
@@ -280,10 +286,68 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 	// Reset used variables so that the decoder can be reused by the same reader.
 	d.reset()
 	d.n = 0 // Must reset bytes counter
-	d.err = nil
+	d.err = err
 	d.options.shouldChecksum = shouldChecksum
 
 	return seq, err
+}
+
+// discardMessages efficiently discards bytes used by messages.
+func (d *Decoder) discardMessages() (err error) {
+	arraySize := uint32(len(d.bytesArray))
+	for d.cur < d.fileHeader.DataSize {
+		size := d.fileHeader.DataSize - d.cur
+		if size > arraySize {
+			size = arraySize
+		}
+		if err = d.read(d.bytesArray[:size]); err != nil { // Discard bytes
+			return err
+		}
+	}
+	return nil
+}
+
+// Discard discards a single FIT file sequence and returns any error encountered. This method directs the Decoder to
+// point to the byte sequence of the next valid FIT file sequence, discarding the current FIT file sequence.
+//
+// Example: - A chained FIT file consist of Activity, Course, Workout and Settings. And we only want to decode Course.
+//
+//		for dec.Next() {
+//			fileId, err := dec.PeekFileId()
+//			if err != nil {
+//				return err
+//			}
+//			if fileId.Type != typedef.FileCourse {
+//				if err := dec.Discard(); err != nil {
+//			    	return err
+//			    }
+//				continue
+//			}
+//			fit, err := dec.Decode()
+//			if err != nil {
+//				return err
+//	     	}
+//		 }
+func (d *Decoder) Discard() error {
+	if d.err != nil {
+		return d.err
+	}
+
+	optionsShouldChecksum := d.options.shouldChecksum
+	d.options.shouldChecksum = false
+	defer func() { d.options.shouldChecksum = optionsShouldChecksum }()
+
+	if d.err = d.decodeHeaderOnce(); d.err != nil {
+		return d.err
+	}
+	if d.err = d.discardMessages(); d.err != nil {
+		return d.err
+	}
+	if d.err = d.read(d.bytesArray[:2]); d.err != nil { // Discard File CRC
+		return d.err
+	}
+	d.sequenceCompleted = true
+	return d.err
 }
 
 // Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
@@ -356,6 +420,9 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 //	     }
 //	}
 func (d *Decoder) Decode() (fit *proto.Fit, err error) {
+	if d.err != nil {
+		return nil, d.err
+	}
 	defer func() { d.err = err }()
 	if err = d.decodeHeaderOnce(); err != nil {
 		return nil, err
@@ -367,8 +434,8 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 		return nil, err
 	}
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		return nil, fmt.Errorf("expected crc %d, got: %d: %w",
-			d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+		return nil, err
 	}
 	d.sequenceCompleted = true
 	return &proto.Fit{
@@ -403,12 +470,13 @@ func (d *Decoder) decodeHeader() error {
 		ProtocolVersion: b[0],
 		ProfileVersion:  binary.LittleEndian.Uint16(b[1:3]),
 		DataSize:        binary.LittleEndian.Uint32(b[3:7]),
-		DataType:        string(b[7:11]),
 	}
 
-	if d.fileHeader.DataType != proto.DataTypeFIT {
+	// PERF: Neither string(b[7:11]) nor assigning proto.DataTypeFIT constant to a variable escape to the heap.
+	if string(b[7:11]) != proto.DataTypeFIT {
 		return ErrNotAFitFile
 	}
+	d.fileHeader.DataType = proto.DataTypeFIT
 
 	if err := proto.Validate(d.fileHeader.ProtocolVersion); err != nil {
 		return err
@@ -560,7 +628,8 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		return err
 	}
 
-	mesg.Fields = slices.Clone(mesg.Fields)
+	mesg.Fields = make([]proto.Field, len(mesg.Fields))
+	copy(mesg.Fields, d.fieldsArray[:])
 
 	// FileId Message
 	if d.fileId == nil && mesg.Num == mesgnum.FileId {
@@ -820,6 +889,9 @@ func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool,
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.
 func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
+	if d.err != nil {
+		return nil, d.err
+	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -840,8 +912,8 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 		return nil, err
 	}
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		return nil, fmt.Errorf("expected crc %d, got: %d: %w",
-			d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+		return nil, err
 	}
 	d.sequenceCompleted = true
 	return &proto.Fit{

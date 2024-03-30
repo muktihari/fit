@@ -253,6 +253,27 @@ func TestDecodeHeaderOnce(t *testing.T) {
 	}
 }
 
+func TestReinvocationOfExportedMethodsWhenDecoderHasExistingError(t *testing.T) {
+	dec := New(nil)
+	dec.err = errors.New("intentional error")
+
+	if _, err := dec.CheckIntegrity(); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+	if _, err := dec.PeekFileId(); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+	if err := dec.Discard(); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+	if _, err := dec.Decode(); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+	if _, err := dec.DecodeWithContext(context.Background()); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+}
+
 func TestPeekFileId(t *testing.T) {
 	fit, buf := createFitForTest()
 
@@ -556,6 +577,130 @@ func createFitForTest() (proto.Fit, []byte) {
 	copy(b[12:14], fileHeaderCRC) // update FileHeader CRC
 
 	return fit, b
+}
+
+func TestDiscard(t *testing.T) {
+	_, buf := createFitForTest()
+
+	tt := []struct {
+		name string
+		r    io.Reader
+		err  error
+	}{
+		{
+			name: "discard happy flow",
+			r: func() io.Reader {
+				var buf, cur = slices.Clone(buf), 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(buf) {
+						return 0, io.EOF
+					}
+					cur += copy(b, buf[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: nil,
+		},
+		{
+			name: "discard error on decode header",
+			r: func() io.Reader {
+				return fnReaderErr
+			}(),
+			err: io.EOF,
+		},
+		{
+			name: "discard error when reading data",
+			r: func() io.Reader {
+				var buf, cur = slices.Clone(buf), 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur > 14 {
+						return 0, io.EOF
+					}
+					cur += copy(b, buf[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: io.EOF,
+		},
+		{
+			name: "discard error when reading crc",
+			r: func() io.Reader {
+				var buf, cur = slices.Clone(buf), 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(buf)-2 {
+						return 0, io.EOF
+					}
+					cur += copy(b, buf[cur:cur+len(b)])
+					return len(b), nil
+				})
+			}(),
+			err: io.EOF,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			dec := New(tc.r)
+			err := dec.Discard()
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				if dec.sequenceCompleted {
+					t.Fatalf("sequenceCompleted should be false")
+				}
+				return
+			}
+			if !dec.sequenceCompleted {
+				t.Fatalf("sequenceCompleted should be true")
+			}
+		})
+	}
+}
+
+func TestDiscardChained(t *testing.T) {
+	activityFile, err := os.ReadFile(filepath.Join(fromOfficialSDK, "Activity.fit"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	monitoringFile, err := os.ReadFile(filepath.Join(fromOfficialSDK, "MonitoringFile.fit"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// make chained files
+	b := make([]byte, 0, len(activityFile)+len(monitoringFile)+len(activityFile))
+	b = append(b, activityFile...)
+	b = append(b, monitoringFile...)
+	b = append(b, activityFile...)
+
+	r := bytes.NewBuffer(b)
+
+	fits := make([]*proto.Fit, 0, 2)
+	dec := New(r)
+	for dec.Next() {
+		fileId, err := dec.PeekFileId()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if fileId.Type != typedef.FileActivity {
+			if err := dec.Discard(); err != nil {
+				t.Fatal(err)
+			}
+			continue
+		}
+
+		fit, err := dec.Decode()
+		if err != nil {
+			t.Fatal(err)
+		}
+		fits = append(fits, fit)
+	}
+
+	if len(fits) != 2 {
+		t.Fatalf("expected activities is 2, got: %d", len(fits))
+	}
 }
 
 func TestNext(t *testing.T) {
