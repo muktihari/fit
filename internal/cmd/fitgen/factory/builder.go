@@ -186,8 +186,8 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
 		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))
-		strbuf.WriteString(fmt.Sprintf("Type: %s, /* %s (size: %d) */\n",
-			b.transformProfileType(field.Type),
+		strbuf.WriteString(fmt.Sprintf("Type: %s,\n", b.transformProfileType(field.Type)))
+		strbuf.WriteString(fmt.Sprintf("BaseType: %s, /* (size: %d) */\n",
 			b.transformBaseType(field.Type),
 			basetype.FromString(b.baseTypeMapByProfileType[field.Type]).Size(),
 		))

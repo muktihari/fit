@@ -99,22 +99,21 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			i--
 			continue
 		}
-
 		// Restore any scaled float64 value back into its corresponding integer representation.
 		if field.Scale != 1 && field.Offset != 0 {
 			field.Value = scaleoffset.DiscardAny(
 				field.Value,
-				field.Type.BaseType(),
+				field.BaseType,
 				field.Scale,
 				field.Offset,
 			)
 		}
 
 		// Now that the value is sanitized, we can check whether the type and value are aligned.
-		if !isValueTypeAligned(field.Value, field.Type.BaseType()) {
+		if !isValueTypeAligned(field.Value, field.BaseType) {
 			return fmt.Errorf(
-				"type '%T' is not align with the expected type '%s' for fieldIndex: %d, fieldNum: %d, fieldName: %q, fieldValue: '%v': %w",
-				field.Value, field.Type, i, field.Num, field.Name, field.Value, ErrValueTypeMismatch)
+				"type '%T' is not align with the expected type '%s (%s)' for fieldIndex: %d, fieldNum: %d, fieldName: %q, fieldValue: '%v': %w",
+				field.Value, field.Type, field.BaseType, i, field.Num, field.Name, field.Value, ErrValueTypeMismatch)
 		}
 
 		// UTF-8 String Validation
@@ -134,7 +133,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// Size of value should not exceed 255 bytes since proto.FieldDefinition's Size is a type of byte.
-		valBytes := typedef.Sizeof(field.Value, field.Type.BaseType())
+		valBytes := typedef.Sizeof(field.Value, field.BaseType)
 		if valBytes > 255 {
 			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
 		}
@@ -188,9 +187,9 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// Size of value should not exceed 255 bytes since proto.DeveloperFieldDefinition's Size is a type of byte.
-		valBytes := typedef.Sizeof(devField.Value, devField.Type)
+		valBytes := typedef.Sizeof(devField.Value, devField.BaseType)
 		if valBytes > 255 {
-			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
+			return fmt.Errorf("developer field max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
 		}
 	}
 

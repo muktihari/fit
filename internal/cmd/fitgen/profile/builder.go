@@ -57,10 +57,12 @@ func (b *profilebuilder) Build() ([]builder.Data, error) {
 
 func (b *profilebuilder) buildProfile() builder.Data {
 	constants := make([]shared.Constant, 0, len(b.types))
-	mappingToBaseTypes := make([]MappingBaseType, 0, len(b.types))
+	mappingProfileTypeToBaseTypes := make([]ProfileTypeBaseType, 0, len(b.types))
+	var mappingBaseTypeToProfileTypes []ProfileTypeBaseType
 
 	for _, t := range b.types {
 		if t.Name == FitBaseType { // special types to be included, mapping to itself (profile.Uint8 == basetype.Uint8)
+			mappingBaseTypeToProfileTypes = make([]ProfileTypeBaseType, 0, len(t.Values))
 			for _, v := range t.Values {
 				constantName := strutil.ToTitle(v.Name)
 				baseType := transformBaseType(strutil.ToTitle(v.Name))
@@ -68,14 +70,18 @@ func (b *profilebuilder) buildProfile() builder.Data {
 					Name:   constantName,
 					String: v.Name,
 				})
-				mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{
-					ConstantName: constantName,
-					BaseType:     baseType,
+				mappingProfileTypeToBaseTypes = append(mappingProfileTypeToBaseTypes, ProfileTypeBaseType{
+					ProfileType: constantName,
+					BaseType:    baseType,
+				})
+				mappingBaseTypeToProfileTypes = append(mappingBaseTypeToProfileTypes, ProfileTypeBaseType{
+					BaseType:    baseType,
+					ProfileType: constantName,
 				})
 			}
 
 			constants = append(constants, shared.Constant{Name: "Bool", String: "bool"})
-			mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{ConstantName: "Bool", BaseType: transformBaseType("Enum")})
+			mappingProfileTypeToBaseTypes = append(mappingProfileTypeToBaseTypes, ProfileTypeBaseType{ProfileType: "Bool", BaseType: transformBaseType("Enum")})
 		}
 	}
 
@@ -84,9 +90,9 @@ func (b *profilebuilder) buildProfile() builder.Data {
 			Name:   strutil.ToTitle(t.Name),
 			String: t.Name,
 		})
-		mappingToBaseTypes = append(mappingToBaseTypes, MappingBaseType{
-			ConstantName: strutil.ToTitle(t.Name),
-			BaseType:     transformBaseType(strutil.ToTitle(t.BaseType)),
+		mappingProfileTypeToBaseTypes = append(mappingProfileTypeToBaseTypes, ProfileTypeBaseType{
+			ProfileType: strutil.ToTitle(t.Name),
+			BaseType:    transformBaseType(strutil.ToTitle(t.BaseType)),
 		})
 	}
 
@@ -119,8 +125,9 @@ func (b *profilebuilder) buildProfile() builder.Data {
 		Path:         b.path,
 		Filename:     "profile_gen.go",
 		Data: ProfileData{
-			ConstantData:     data,
-			MappingBaseTypes: mappingToBaseTypes,
+			ConstantData:                  data,
+			MappingProfileTypeToBaseTypes: mappingProfileTypeToBaseTypes,
+			MappingBaseTypeToProfileTypes: mappingBaseTypeToProfileTypes,
 		},
 	}
 }

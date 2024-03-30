@@ -8,14 +8,15 @@ import "github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
 
 // ProfileData is data representative of profile.tmpl
 type ProfileData struct {
-	ConstantData     shared.ConstantData
-	MappingBaseTypes []MappingBaseType
+	ConstantData                  shared.ConstantData
+	MappingProfileTypeToBaseTypes []ProfileTypeBaseType
+	MappingBaseTypeToProfileTypes []ProfileTypeBaseType
 }
 
-// MappingBaseType is mapping struct from ProfileType to its BaseType
-type MappingBaseType struct {
-	ConstantName string
-	BaseType     string
+// ProfileTypeBaseType is mapping struct from ProfileType to its BaseType or vise versa.
+type ProfileTypeBaseType struct {
+	ProfileType string
+	BaseType    string
 }
 
 // VersionData is data representative of version.tmpl

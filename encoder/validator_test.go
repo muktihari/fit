@@ -114,7 +114,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 							Name:               "Heart Rate",
 							NativeMesgNum:      mesgnum.Record,
 							NativeFieldNum:     fieldnum.RecordHeartRate,
-							Type:               basetype.Uint8,
+							BaseType:           basetype.Uint8,
 						},
 					},
 				},
@@ -218,11 +218,12 @@ func TestMessageValidatorValidate(t *testing.T) {
 						for i := range fields {
 							fields[i] = factory.CreateField(mesgnum.Record, 255)
 							fields[i].FieldBase = &proto.FieldBase{
-								Num:    255,
-								Name:   factory.NameUnknown,
-								Type:   profile.Byte,
-								Scale:  1,
-								Offset: 0,
+								Num:      255,
+								Name:     factory.NameUnknown,
+								Type:     profile.Byte,
+								BaseType: profile.Byte.BaseType(),
+								Scale:    1,
+								Offset:   0,
 							}
 							fields[i].Value = byte(1)
 						}
@@ -316,7 +317,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                1,
-						Type:               basetype.String,
+						BaseType:           basetype.String,
 						Value:              strings.Repeat("a", 256),
 					},
 				),

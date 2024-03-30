@@ -601,7 +601,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field := d.factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 		if field.Name == factory.NameUnknown {
 			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
-			field.Type = profile.ProfileTypeFromString(fieldDef.BaseType.String())
+			field.Type = profile.ProfileTypeFromBaseType(fieldDef.BaseType)
+			field.BaseType = fieldDef.BaseType
 			// Check if the size corresponds to an array.
 			field.Array = fieldDef.Size > fieldDef.BaseType.Size() && fieldDef.Size%fieldDef.BaseType.Size() == 0
 		}
@@ -690,7 +691,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 
 		componentScaled := scaleoffset.Apply(val, component.Scale, component.Offset)
 		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
-		componentField.Value = valueFromBits(val, componentField.Type.BaseType())
+		componentField.Value = valueFromBits(val, componentField.BaseType)
 
 		mesg.Fields = append(mesg.Fields, componentField)
 
@@ -738,7 +739,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 			Size:               devFieldDef.Size,
 			NativeMesgNum:      fieldDescription.NativeMesgNum,
 			NativeFieldNum:     fieldDescription.NativeFieldNum,
-			Type:               fieldDescription.FitBaseTypeId,
+			BaseType:           fieldDescription.FitBaseTypeId,
 		}
 
 		developerField.Name = strings.Join(fieldDescription.FieldName, "|")
@@ -755,11 +756,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		// Until we discover a better implementation, let's determine it by using multiplication of the size.
 		// Consequently, all strings will be treated as arrays since its size is 1.
 		var isArray bool
-		if devFieldDef.Size > developerField.Type.Size() && devFieldDef.Size%developerField.Type.Size() == 0 {
+		if devFieldDef.Size > developerField.BaseType.Size() && devFieldDef.Size%developerField.BaseType.Size() == 0 {
 			isArray = true
 		}
 
-		val, err := d.readValue(developerField.Size, developerField.Type, isArray, mesgDef.Architecture)
+		val, err := d.readValue(developerField.Size, developerField.BaseType, isArray, mesgDef.Architecture)
 		if err != nil {
 			return err
 		}

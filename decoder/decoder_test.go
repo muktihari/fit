@@ -491,7 +491,7 @@ func createFitForTest() (proto.Fit, []byte) {
 						Name:               "Heart Rate",
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
-						Type:               basetype.Uint8,
+						BaseType:           basetype.Uint8,
 						Value:              uint8(100),
 					},
 				),
@@ -1413,6 +1413,7 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 						Num:        0,
 						Name:       "event",
 						Type:       profile.Event, /* basetype.Enum (size: 1) */
+						BaseType:   profile.Event.BaseType(),
 						Components: nil,
 						Scale:      1, Offset: 0,
 					},
@@ -1420,10 +1421,11 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 				},
 				{
 					FieldBase: &proto.FieldBase{
-						Num:   1,
-						Name:  "data",
-						Type:  profile.Uint32,
-						Scale: 1, Offset: 0,
+						Num:      1,
+						Name:     "data",
+						Type:     profile.Uint32,
+						BaseType: basetype.Uint32,
+						Scale:    1, Offset: 0,
 						SubFields: []proto.SubField{
 							{Name: "timer_trigger", Type: profile.TimerTrigger /* basetype.Enum */, Scale: 1, Offset: 0,
 								Components: nil,
@@ -1442,9 +1444,10 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 				},
 				{
 					FieldBase: &proto.FieldBase{
-						Num:  2,
-						Name: "compressed_data",
-						Type: profile.Uint32,
+						Num:      2,
+						Name:     "compressed_data",
+						Type:     profile.Uint32,
+						BaseType: profile.Uint32.BaseType(),
 						Components: []proto.Component{
 							{FieldNum: 1 /* data */, Scale: 1, Offset: 0, Accumulate: false, Bits: 8},
 						},

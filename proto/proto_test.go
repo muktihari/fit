@@ -246,7 +246,7 @@ func TestMessageClone(t *testing.T) {
 			Num:                0,
 			DeveloperDataIndex: 0,
 			Size:               1,
-			Type:               basetype.Uint8,
+			BaseType:           basetype.Uint8,
 			Value:              uint8(1),
 		},
 		proto.DeveloperField{},
@@ -417,7 +417,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]any{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "Fit SDK Go", Type: basetype.Byte, DeveloperDataIndex: 0, Value: byte(1),
+						Num: 0, Name: "Fit SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: byte(1),
 					},
 				),
 			mesgDef: proto.MessageDefinition{

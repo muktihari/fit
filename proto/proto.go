@@ -62,8 +62,8 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.Fields {
 		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
 			Num:      mesg.Fields[i].Num,
-			Size:     byte(typedef.Sizeof(mesg.Fields[i].Value, mesg.Fields[i].Type.BaseType())),
-			BaseType: mesg.Fields[i].Type.BaseType(),
+			Size:     byte(typedef.Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
+			BaseType: mesg.Fields[i].BaseType,
 		})
 	}
 
@@ -80,7 +80,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.DeveloperFields {
 		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
 			Num:                mesg.DeveloperFields[i].Num,
-			Size:               mesg.DeveloperFields[i].Type.Size(),
+			Size:               mesg.DeveloperFields[i].BaseType.Size(),
 			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
 		})
 	}
@@ -227,6 +227,7 @@ type FieldBase struct {
 	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
 	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific number (defined by manufacturer). (255 == invalid)
 	Type       profile.ProfileType // Type is defined type that serves as an abstraction layer above base types (primitive-types), e.g. DateTime is a time representation in uint32.
+	BaseType   basetype.BaseType   // BaseType is the base of the ProfileType. E.g. profile.DateTime -> basetype.Uint32.
 	Array      bool                // Flag whether the value of this field is an array
 	Accumulate bool                // Flag to indicate if the value of the field is accumulable.
 	Scale      float64             // A scale or offset specified in the FIT profile for binary fields (sint/uint etc.) only. the binary quantity is divided by the scale factor and then the offset is subtracted. (default: 1)
@@ -319,7 +320,7 @@ type DeveloperField struct {
 	Size               byte
 	NativeMesgNum      typedef.MesgNum
 	NativeFieldNum     byte
-	Type               basetype.BaseType
+	BaseType           basetype.BaseType
 	Name               string
 	Units              string
 	Value              any
