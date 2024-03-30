@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -30,6 +29,7 @@ type Settings struct {
 
 var _ File = &Settings{}
 
+// NewSettings creates new Settings File.
 func NewSettings(mesgs ...proto.Message) *Settings {
 	f := &Settings{}
 	for i := range mesgs {
@@ -39,6 +39,7 @@ func NewSettings(mesgs ...proto.Message) *Settings {
 	return f
 }
 
+// Add adds mesg to the Settings.
 func (f *Settings) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -62,11 +63,8 @@ func (f *Settings) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Settings) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Settings to proto.Fit. If options is nil, default options will be used.
+func (f *Settings) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 1 // non slice fields
 
 	size += len(f.UserProfiles) + len(f.HrmProfiles) + len(f.SdmProfiles) +
@@ -78,16 +76,16 @@ func (f *Settings) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	ToMesgs(&fit.Messages, fac, mesgnum.UserProfile, f.UserProfiles)
-	ToMesgs(&fit.Messages, fac, mesgnum.HrmProfile, f.HrmProfiles)
-	ToMesgs(&fit.Messages, fac, mesgnum.SdmProfile, f.SdmProfiles)
-	ToMesgs(&fit.Messages, fac, mesgnum.BikeProfile, f.BikeProfiles)
-	ToMesgs(&fit.Messages, fac, mesgnum.DeviceSettings, f.DeviceSettings)
+	ToMesgs(&fit.Messages, options, mesgnum.UserProfile, f.UserProfiles)
+	ToMesgs(&fit.Messages, options, mesgnum.HrmProfile, f.HrmProfiles)
+	ToMesgs(&fit.Messages, options, mesgnum.SdmProfile, f.SdmProfiles)
+	ToMesgs(&fit.Messages, options, mesgnum.BikeProfile, f.BikeProfiles)
+	ToMesgs(&fit.Messages, options, mesgnum.DeviceSettings, f.DeviceSettings)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

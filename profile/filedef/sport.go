@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -32,6 +31,7 @@ type Sport struct {
 
 var _ File = &Sport{}
 
+// NewSport creates new Sport File.
 func NewSport(mesgs ...proto.Message) *Sport {
 	f := &Sport{}
 	for i := range mesgs {
@@ -41,6 +41,7 @@ func NewSport(mesgs ...proto.Message) *Sport {
 	return f
 }
 
+// Add adds mesg to the Sport.
 func (f *Sport) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -68,11 +69,8 @@ func (f *Sport) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Sport) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Sport to proto.Fit. If options is nil, default options will be used.
+func (f *Sport) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 2 // non slice fields
 
 	size += len(f.ZonesTargets) + len(f.HrZones) + len(f.PowerZones) +
@@ -84,22 +82,22 @@ func (f *Sport) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	ToMesgs(&fit.Messages, fac, mesgnum.ZonesTarget, f.ZonesTargets)
+	ToMesgs(&fit.Messages, options, mesgnum.ZonesTarget, f.ZonesTargets)
 
 	if f.Sport != nil {
-		fit.Messages = append(fit.Messages, f.Sport.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Sport.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.HrZone, f.HrZones)
-	ToMesgs(&fit.Messages, fac, mesgnum.PowerZone, f.PowerZones)
-	ToMesgs(&fit.Messages, fac, mesgnum.MetZone, f.MetZones)
-	ToMesgs(&fit.Messages, fac, mesgnum.SpeedZone, f.SpeedZones)
-	ToMesgs(&fit.Messages, fac, mesgnum.CadenceZone, f.CadenceZones)
+	ToMesgs(&fit.Messages, options, mesgnum.HrZone, f.HrZones)
+	ToMesgs(&fit.Messages, options, mesgnum.PowerZone, f.PowerZones)
+	ToMesgs(&fit.Messages, options, mesgnum.MetZone, f.MetZones)
+	ToMesgs(&fit.Messages, options, mesgnum.SpeedZone, f.SpeedZones)
+	ToMesgs(&fit.Messages, options, mesgnum.CadenceZone, f.CadenceZones)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

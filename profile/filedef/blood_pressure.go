@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -28,6 +27,7 @@ type BloodPressure struct {
 
 var _ File = &BloodPressure{}
 
+// NewBloodPressure creates new BloodPressure File.
 func NewBloodPressure(mesgs ...proto.Message) *BloodPressure {
 	f := &BloodPressure{}
 	for i := range mesgs {
@@ -37,6 +37,7 @@ func NewBloodPressure(mesgs ...proto.Message) *BloodPressure {
 	return f
 }
 
+// Add adds mesg to the BloodPressure.
 func (f *BloodPressure) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -56,11 +57,8 @@ func (f *BloodPressure) Add(mesg proto.Message) {
 	}
 }
 
-func (f *BloodPressure) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts BloodPressure to proto.Fit. If options is nil, default options will be used.
+func (f *BloodPressure) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 2 // non slice fields
 
 	size += len(f.BloodPressures) + len(f.DeviceInfos) +
@@ -71,17 +69,17 @@ func (f *BloodPressure) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.UserProfile != nil {
-		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.BloodPressure, f.BloodPressures)
-	ToMesgs(&fit.Messages, fac, mesgnum.DeviceInfo, f.DeviceInfos)
+	ToMesgs(&fit.Messages, options, mesgnum.BloodPressure, f.BloodPressures)
+	ToMesgs(&fit.Messages, options, mesgnum.DeviceInfo, f.DeviceInfos)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

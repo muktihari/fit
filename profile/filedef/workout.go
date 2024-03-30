@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -31,6 +30,7 @@ type Workout struct {
 
 var _ File = &Workout{}
 
+// NewWorkout creates new Workout File.
 func NewWorkout(mesgs ...proto.Message) *Workout {
 	f := &Workout{}
 	for i := range mesgs {
@@ -40,6 +40,7 @@ func NewWorkout(mesgs ...proto.Message) *Workout {
 	return f
 }
 
+// Add adds mesg to the Workout.
 func (f *Workout) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -57,11 +58,8 @@ func (f *Workout) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Workout) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Workout to proto.Fit. If options is nil, default options will be used.
+func (f *Workout) ToFit(options *mesgdef.Options) proto.Fit {
 	size := 2 /* non slice fields */
 
 	size += len(f.WorkoutSteps) + len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
@@ -71,16 +69,16 @@ func (f *Workout) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.Workout != nil {
-		fit.Messages = append(fit.Messages, f.Workout.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Workout.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.WorkoutStep, f.WorkoutSteps)
+	ToMesgs(&fit.Messages, options, mesgnum.WorkoutStep, f.WorkoutSteps)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

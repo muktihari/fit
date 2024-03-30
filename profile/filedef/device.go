@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -30,6 +29,7 @@ type Device struct {
 
 var _ File = &Device{}
 
+// NewDevice creates new Device File.
 func NewDevice(mesgs ...proto.Message) *Device {
 	f := &Device{}
 	for i := range mesgs {
@@ -39,6 +39,7 @@ func NewDevice(mesgs ...proto.Message) *Device {
 	return f
 }
 
+// Add adds mesg to the Device.
 func (f *Device) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -62,11 +63,8 @@ func (f *Device) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Device) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Device to proto.Fit. If options is nil, default options will be used.
+func (f *Device) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 1 // non slice fields
 
 	size += len(f.Softwares) + len(f.Capabilities) + len(f.FileCapabilities) +
@@ -78,16 +76,16 @@ func (f *Device) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Software, f.Softwares)
-	ToMesgs(&fit.Messages, fac, mesgnum.Capabilities, f.Capabilities)
-	ToMesgs(&fit.Messages, fac, mesgnum.FileCapabilities, f.FileCapabilities)
-	ToMesgs(&fit.Messages, fac, mesgnum.MesgCapabilities, f.MesgCapabilities)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldCapabilities, f.FieldCapabilities)
+	ToMesgs(&fit.Messages, options, mesgnum.Software, f.Softwares)
+	ToMesgs(&fit.Messages, options, mesgnum.Capabilities, f.Capabilities)
+	ToMesgs(&fit.Messages, options, mesgnum.FileCapabilities, f.FileCapabilities)
+	ToMesgs(&fit.Messages, options, mesgnum.MesgCapabilities, f.MesgCapabilities)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldCapabilities, f.FieldCapabilities)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
