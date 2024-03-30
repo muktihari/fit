@@ -85,20 +85,18 @@ type messageValidator struct {
 func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
+	var valid byte
 	for i := 0; i < len(mesg.Fields); i++ {
 		field := &mesg.Fields[i]
 
 		if field.FieldBase == nil || field.IsExpandedField {
-			mesg.Fields = append(mesg.Fields[:i], mesg.Fields[i+1:]...)
-			i--
 			continue
 		}
 
 		if v.options.omitInvalidValues && !hasValidValue(field.Value) {
-			mesg.Fields = append(mesg.Fields[:i], mesg.Fields[i+1:]...)
-			i--
 			continue
 		}
+
 		// Restore any scaled float64 value back into its corresponding integer representation.
 		if field.Scale != 1 && field.Offset != 0 {
 			field.Value = scaleoffset.DiscardAny(
@@ -137,14 +135,17 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		if valBytes > 255 {
 			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
 		}
+
+		mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
+		if valid == 255 {
+			return fmt.Errorf("max n fields is 255: %w", ErrExceedMaxAllowed)
+		}
+		valid++
 	}
 
+	mesg.Fields = mesg.Fields[:valid]
 	if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
 		return ErrNoFields
-	}
-
-	if len(mesg.Fields) > 255 {
-		return fmt.Errorf("max n fields is 255, got: %d: %w", len(mesg.Fields), ErrExceedMaxAllowed)
 	}
 
 	switch mesg.Num {
