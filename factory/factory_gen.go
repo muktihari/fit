@@ -68,12 +68,7 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 
 func (f *Factory) createMesg(num typedef.MesgNum) proto.Message {
 	if num < typedef.MesgNum(len(mesgs)) && mesgs[num].Num == num {
-		mesg := mesgs[num]
-		return mesg
-	}
-
-	if f.registeredMesgs == nil {
-		return createUnknownMesg(num)
+		return mesgs[num]
 	}
 
 	if mesg, ok := f.registeredMesgs[num]; ok {
@@ -94,16 +89,13 @@ func createUnknownMesg(num typedef.MesgNum) proto.Message {
 // create it by calling field.Clone().
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
-		for i := range mesgs[mesgNum].Fields {
-			if mesgs[mesgNum].Fields[i].Num == num {
-				return mesgs[mesgNum].Fields[i]
+		mesg := mesgs[mesgNum]
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num == num {
+				return mesg.Fields[i]
 			}
 		}
-		return createUnknownField(mesgNum, num)
-	}
-
-	if f.registeredMesgs == nil {
-		return createUnknownField(mesgNum, num)
+		return createUnknownField(num)
 	}
 
 	if mesg, ok := f.registeredMesgs[mesgNum]; ok {
@@ -114,10 +106,10 @@ func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 		}
 	}
 
-	return createUnknownField(mesgNum, num)
+	return createUnknownField(num)
 }
 
-func createUnknownField(mesgNum typedef.MesgNum, num byte) proto.Field {
+func createUnknownField(num byte) proto.Field {
 	return proto.Field{FieldBase: &proto.FieldBase{Name: NameUnknown, Num: num, Scale: 1, Offset: 0}}
 }
 
@@ -138,11 +130,6 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 
 	if mesg.Num < typedef.MesgNum(len(mesgs)) && mesgs[mesg.Num].Num == mesg.Num {
 		return fmt.Errorf("could not register on reserved predefined message, mesg.Num %d is already exist", mesg.Num)
-	}
-
-	if _, ok := f.registeredMesgs[mesg.Num]; ok {
-		f.registeredMesgs[mesg.Num] = mesg // replace
-		return nil
 	}
 
 	f.registeredMesgs[mesg.Num] = mesg
