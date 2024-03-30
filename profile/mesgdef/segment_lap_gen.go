@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -244,8 +245,16 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 	}
 }
 
-// ToMesg converts SegmentLap into proto.Message.
-func (m *SegmentLap) ToMesg(fac Factory) proto.Message {
+// ToMesg converts SegmentLap into proto.Message. If options is nil, default options will be used.
+func (m *SegmentLap) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -432,19 +441,19 @@ func (m *SegmentLap) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgFlow
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgAltitude != basetype.Uint32Invalid {
+	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[91] && options.IncludeExpandedFields) || !m.IsExpandedFields[91]) {
 		field := fac.CreateField(mesg.Num, 91)
 		field.Value = m.EnhancedAvgAltitude
 		field.IsExpandedField = m.IsExpandedFields[91]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMaxAltitude != basetype.Uint32Invalid {
+	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[92] && options.IncludeExpandedFields) || !m.IsExpandedFields[92]) {
 		field := fac.CreateField(mesg.Num, 92)
 		field.Value = m.EnhancedMaxAltitude
 		field.IsExpandedField = m.IsExpandedFields[92]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMinAltitude != basetype.Uint32Invalid {
+	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[93] && options.IncludeExpandedFields) || !m.IsExpandedFields[93]) {
 		field := fac.CreateField(mesg.Num, 93)
 		field.Value = m.EnhancedMinAltitude
 		field.IsExpandedField = m.IsExpandedFields[93]

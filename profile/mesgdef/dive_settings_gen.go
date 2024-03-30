@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -116,8 +117,16 @@ func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 	}
 }
 
-// ToMesg converts DiveSettings into proto.Message.
-func (m *DiveSettings) ToMesg(fac Factory) proto.Message {
+// ToMesg converts DiveSettings into proto.Message. If options is nil, default options will be used.
+func (m *DiveSettings) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -53,8 +54,16 @@ func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 	}
 }
 
-// ToMesg converts FieldCapabilities into proto.Message.
-func (m *FieldCapabilities) ToMesg(fac Factory) proto.Message {
+// ToMesg converts FieldCapabilities into proto.Message. If options is nil, default options will be used.
+func (m *FieldCapabilities) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

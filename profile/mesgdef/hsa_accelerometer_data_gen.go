@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -60,8 +61,16 @@ func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 	}
 }
 
-// ToMesg converts HsaAccelerometerData into proto.Message.
-func (m *HsaAccelerometerData) ToMesg(fac Factory) proto.Message {
+// ToMesg converts HsaAccelerometerData into proto.Message. If options is nil, default options will be used.
+func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
@@ -66,8 +67,16 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	}
 }
 
-// ToMesg converts SegmentPoint into proto.Message.
-func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
+// ToMesg converts SegmentPoint into proto.Message. If options is nil, default options will be used.
+func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -94,7 +103,7 @@ func (m *SegmentPoint) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Distance
 		fields = append(fields, field)
 	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid {
+	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.EnhancedAltitude
 		field.IsExpandedField = m.IsExpandedFields[6]

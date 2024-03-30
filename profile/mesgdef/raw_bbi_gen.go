@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
@@ -65,8 +66,16 @@ func NewRawBbi(mesg *proto.Message) *RawBbi {
 	}
 }
 
-// ToMesg converts RawBbi into proto.Message.
-func (m *RawBbi) ToMesg(fac Factory) proto.Message {
+// ToMesg converts RawBbi into proto.Message. If options is nil, default options will be used.
+func (m *RawBbi) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -83,19 +92,19 @@ func (m *RawBbi) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Data
 		fields = append(fields, field)
 	}
-	if m.Time != nil {
+	if m.Time != nil && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.Time
 		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
-	if m.Quality != nil {
+	if m.Quality != nil && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.Quality
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
-	if m.Gap != nil {
+	if m.Gap != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Gap
 		field.IsExpandedField = m.IsExpandedFields[4]

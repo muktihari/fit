@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -98,8 +99,16 @@ func NewLength(mesg *proto.Message) *Length {
 	}
 }
 
-// ToMesg converts Length into proto.Message.
-func (m *Length) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Length into proto.Message. If options is nil, default options will be used.
+func (m *Length) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -166,13 +175,13 @@ func (m *Length) ToMesg(fac Factory) proto.Message {
 		field.Value = m.OpponentScore
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
+	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[22] && options.IncludeExpandedFields) || !m.IsExpandedFields[22]) {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = m.EnhancedAvgRespirationRate
 		field.IsExpandedField = m.IsExpandedFields[22]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
+	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[23] && options.IncludeExpandedFields) || !m.IsExpandedFields[23]) {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = m.EnhancedMaxRespirationRate
 		field.IsExpandedField = m.IsExpandedFields[23]

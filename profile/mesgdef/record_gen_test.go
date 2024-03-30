@@ -22,6 +22,6 @@ func BenchmarkRecordToMesg(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_ = record.ToMesg(factory.StandardFactory())
+		_ = record.ToMesg(nil)
 	}
 }

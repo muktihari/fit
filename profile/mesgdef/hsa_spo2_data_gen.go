@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
@@ -53,8 +54,16 @@ func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 	}
 }
 
-// ToMesg converts HsaSpo2Data into proto.Message.
-func (m *HsaSpo2Data) ToMesg(fac Factory) proto.Message {
+// ToMesg converts HsaSpo2Data into proto.Message. If options is nil, default options will be used.
+func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

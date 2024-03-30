@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -66,8 +67,16 @@ func NewHr(mesg *proto.Message) *Hr {
 	}
 }
 
-// ToMesg converts Hr into proto.Message.
-func (m *Hr) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Hr into proto.Message. If options is nil, default options will be used.
+func (m *Hr) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -84,7 +93,7 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 		field.Value = m.FilteredBpm
 		fields = append(fields, field)
 	}
-	if m.EventTimestamp != nil {
+	if m.EventTimestamp != nil && ((m.IsExpandedFields[9] && options.IncludeExpandedFields) || !m.IsExpandedFields[9]) {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = m.EventTimestamp
 		field.IsExpandedField = m.IsExpandedFields[9]
@@ -95,7 +104,7 @@ func (m *Hr) ToMesg(fac Factory) proto.Message {
 		field.Value = m.EventTimestamp12
 		fields = append(fields, field)
 	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid {
+	if m.FractionalTimestamp != basetype.Uint16Invalid && ((m.IsExpandedFields[0] && options.IncludeExpandedFields) || !m.IsExpandedFields[0]) {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = m.FractionalTimestamp
 		field.IsExpandedField = m.IsExpandedFields[0]
