@@ -6,6 +6,7 @@ Table of Contents:
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
    - [Decode to Common File Types](#Decode-to-Common-File-Types)
    - [Peek FileId](#Peek-FileId)
+   - [Discard FIT File Sequences](#Discard-FIT-File-Sequences)
    - [Check Integrity](#Check-Integrity)
    - [Available Decode Options](#Available-Decode-Options)
    - [RawDecoder (Low-Level Abstraction)](#RawDecoder-Low-Level-Abstraction)
@@ -280,6 +281,33 @@ func main() {
 }
 ```
 
+### Discard FIT File Sequences
+
+When handling a chained fit file, sometimes we only want to decode a certain file type, let's say a Course File, while discarding other file types. Instead of unecessarily decode all the file types but we don't use all of them, we can just discard it. Discard directs the Decoder to efficiently just discard the bytes without doing unnecessary work.
+
+```go
+    ...
+
+    for dec.Next() {
+        fileId, err := dec.PeekFileId()
+        if err != nil {
+            return err
+        }
+        if fileId.Type != typedef.FileCourse {
+            if err := dec.Discard(); err != nil { // not a Course File, discard this sequence!
+                return err
+            }
+            continue
+        }
+        fit, err := dec.Decode()
+        if err != nil {
+            return err
+            }
+        // do something with fit variable
+    }
+    ...
+```
+
 ### Check Integrity
 
 Check integrity checks whether FIT File is not corrupted or contains missing data that can invalidates the entire file. Example of when we need to check the integrity is when dealing with **Course File** that contains turn-by-turn navigation, we don't want to guide a person halfway to their destination or guide them to unintended route, do we? The same applies for other file types where it is critical that the contents of the file should be valid, such as Workout, User Profile, Device Settings, etc. For Activity File, most cases, we don't need to check the integrity.
@@ -342,7 +370,6 @@ func main() {
    fac := factory.New()
    fac.RegisterMesg(proto.Message{
        Num:  65281,
-       Name: "Manufacturer specific message",
        Fields: []proto.Field{
            {
                FieldBase: &proto.FieldBase{
@@ -588,7 +615,7 @@ func main() {
             }),
             // We can use WithFields as well, see `proto` for details.
             // When using WithFields, it's recommended to use CreateMesgOnly to create a mesg with empty fields
-            // to reduce unecessary alloc since the fields will be replaced anyway, see `factory` for details.
+            // to reduce unnecessary alloc since the fields will be replaced anyway, see `factory` for details.
             factory.CreateMesgOnly(mesgnum.Record).WithFields(
                 factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
                 factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
@@ -784,7 +811,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
    ```
 
 1. **WithNormalHeader**: directs the Encoder to use NormalHeader for encoding the message using
-   specified multiple local message typedef. By default, the Encoder uses local message type 0.
+   specified multiple local message type. By default, the Encoder uses local message type 0.
    This option allows users to specify values between 0-15 (while entering zero is equivalent to using
    the default option, nothing is changed). Using multiple local message types optimizes file size by
    avoiding the need to interleave different message definition.
