@@ -8,6 +8,7 @@
 package {{ .Package }}
 
 import (
+    "github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -77,8 +78,16 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 	}
 }
 
-// ToMesg converts {{ .Name }} into proto.Message.
-func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
+// ToMesg converts {{ .Name }} into proto.Message. If options is nil, default options will be used.
+func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+        options.Factory = factory.StandardFactory()
+    }
+
+    fac := options.Factory
+
     fieldsArray := fieldsPool.Get().(*[256]proto.Field)
     defer fieldsPool.Put(fieldsArray)
     
@@ -86,7 +95,7 @@ func (m *{{ .Name }}) ToMesg(fac Factory) proto.Message {
     mesg := fac.CreateMesgOnly(typedef.MesgNum{{ .Name }})
 	
     {{ range .Fields -}}
-        if {{ .ComparableValue }} != {{ .InvalidValue }} {
+        if {{ .ComparableValue }} != {{ .InvalidValue }} {{ if eq .CanExpand true -}} && ((m.IsExpandedFields[{{ .Num }}] && options.IncludeExpandedFields) || !m.IsExpandedFields[{{ .Num }}]) {{ end }} {
 			field := fac.CreateField(mesg.Num, {{ .Num }})
 			field.Value = {{ .PrimitiveValue }}
 			{{ if eq .CanExpand true -}}

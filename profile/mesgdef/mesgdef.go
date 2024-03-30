@@ -3,6 +3,7 @@ package mesgdef
 import (
 	"sync"
 
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -17,4 +18,18 @@ var fieldsPool = sync.Pool{
 		fields := [256]proto.Field{}
 		return &fields
 	},
+}
+
+type Options struct {
+	Factory               Factory // If not specified, factory.StandardFactory() will be used.
+	IncludeExpandedFields bool
+}
+
+var defaultOptions = DefaultOptions()
+
+func DefaultOptions() *Options {
+	return &Options{
+		Factory:               factory.StandardFactory(),
+		IncludeExpandedFields: false,
+	}
 }
