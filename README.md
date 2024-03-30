@@ -7,7 +7,7 @@
 [![Profile Version](https://img.shields.io/badge/profile-v21.133-lightblue.svg?style=flat)](https://developer.garmin.com/fit/download)
 
 The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices.
-When recording an activity using devices such as cycling computer, smartwatch, and similiar devices, chances are the resulting file is often in FIT file format (\*.fit).
+When recording an activity using devices such as cycling computer, smartwatch, and similar devices, chances are the resulting file is often in FIT file format (\*.fit).
 The FIT file is a binary file format known for its compact size, making it the preferred choice for manufacturers to use in their embedded devices.
 However, despite having gained widespread adoption, Garmin has not yet released an official SDK for Go, this is where this SDK comes in to bridge the gap, enabling Go developers to be able to interact with FIT file format.
 
@@ -287,7 +287,7 @@ Here is the sample of what **Developer Fields** would look like in a **.fit** th
 
 ## CLIs
 
-We provides some CLI programs to interact with FIT files that can be found in `cmd` folder.
+We provide some CLI programs to interact with FIT files that can be found in `cmd` folder.
 
 1. `fitactivity`: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
 2. `fitconv`: Converts FIT file to a CSV file, allowing us to read the FIT file in a human-readable format. [README.md](/cmd/fitconv/README.md)
