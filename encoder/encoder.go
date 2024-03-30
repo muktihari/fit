@@ -56,32 +56,33 @@ const (
 
 // Encoder is Fit file encoder. See New() for details.
 type Encoder struct {
-	w             io.Writer // A writer to write the bytes encoded fit.
-	n             int64     // Total bytes written to w, will keep counting for every Encode invocation.
-	lastHeaderPos int64     // The byte position of the last header.
-	options       *options  // Encoder's options.
-
-	messageValidator  MessageValidator // Validates all messages before encoding, ensuring the resulting Fit file is correct.
-	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
-
-	defaultFileHeader proto.FileHeader // Default header to encode when not specified.
-
-	dataSize uint32      // Data size of messages in bytes for a single Fit file.
-	crc16    hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
-
-	localMesgNumLRU *lru // LRU cache for writing local message definition
-
-	// This timestamp reference is retrieved from the first message containing a valid timestamp field.
-	// It is initialized only if the 'compressedTimestamp' option is applied and reset when decoding is completed.
-	// This reference only serves as a flag and might be helpful for debugging purposes.
-	timestampReference uint32
-
-	mesgDef    *proto.MessageDefinition // Temporary message definition to reduce alloc.
-	mesgDefBuf *bytes.Buffer            // Temporary message definition bytes buffer to reduce alloc (Only used for LRU).
+	w             io.Writer   // A writer to write the bytes encoded fit.
+	n             int64       // Total bytes written to w, will keep counting for every Encode invocation.
+	lastHeaderPos int64       // The byte position of the last header.
+	crc16         hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
 
 	// A wrapper that act as a multi writer for writing message definitions and messages to w and crc16 simultaneously.
 	// We don't use io.MultiWriter since we need to change w on every encode message.
 	wrapWriterAndCrc16 *wrapWriterAndCrc16
+
+	options           *options         // Encoder's options.
+	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
+
+	dataSize uint32 // Data size of messages in bytes for a single Fit file.
+
+	// This timestamp reference serves as current active timestamp when 'headerOptionCompressedTimestamp' is specified.
+	// The first timestamp value is retrieved from the first message containing a valid timestamp field,
+	// and will change every RolloverEvent occurrence.
+	timestampReference uint32
+
+	localMesgNumLRU *lru // LRU cache for writing local message definition
+
+	mesgDef *proto.MessageDefinition // Temporary message definition to reduce alloc.
+	buf     *bytes.Buffer            // Temporary bytes buffer to reduce alloc.
+
+	bytesArray [proto.MaxBytesPerMessageDefinition]byte // Underlying array for buf as well as general purpose array for encoding process.
+
+	defaultFileHeader proto.FileHeader // Default header to encode when not specified.
 }
 
 type options struct {
@@ -191,12 +192,11 @@ func New(w io.Writer, opts ...Option) *Encoder {
 	}
 
 	crc16 := crc16.New(crc16.MakeFitTable())
-	return &Encoder{
+	e := &Encoder{
 		w:                 w,
 		options:           options,
 		crc16:             crc16,
 		protocolValidator: proto.NewValidator(options.protocolVersion),
-		messageValidator:  options.messageValidator,
 		localMesgNumLRU:   newLRU(lruCapacity),
 		defaultFileHeader: proto.FileHeader{
 			Size:            proto.DefaultFileHeaderSize,
@@ -207,9 +207,11 @@ func New(w io.Writer, opts ...Option) *Encoder {
 			CRC:             0, // calculated during encoding
 		},
 		mesgDef:            &proto.MessageDefinition{},
-		mesgDefBuf:         bytes.NewBuffer(make([]byte, proto.MaxBytesPerMessageDefinition)),
 		wrapWriterAndCrc16: &wrapWriterAndCrc16{writer: w, crc16: crc16},
 	}
+	e.buf = bytes.NewBuffer(e.bytesArray[:])
+
+	return e
 }
 
 // Encode encodes fit into the dest writer. Encoder will do the following validations:
@@ -283,7 +285,9 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 
 	header.DataSize = e.dataSize
 
-	b, _ := header.MarshalBinary()
+	e.buf.Reset()
+	_, _ = header.WriteTo(e.buf)
+	b := e.buf.Bytes()
 
 	if header.Size >= 14 {
 		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since header is changed.
@@ -342,7 +346,9 @@ func (e *Encoder) encodeHeader(header *proto.FileHeader) error {
 	}
 	header.ProtocolVersion = byte(e.options.protocolVersion)
 
-	b, _ := header.MarshalBinary()
+	e.buf.Reset()
+	_, _ = header.WriteTo(e.buf)
+	b := e.buf.Bytes()
 
 	if header.Size < 14 {
 		n, err := e.w.Write(b[:header.Size])
@@ -387,50 +393,37 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask
 	mesg.Architecture = e.options.endianness
 
-	if err := e.messageValidator.Validate(mesg); err != nil {
+	if err := e.options.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
 	}
 
-	var isNewMesgDef bool
-	e.mesgDefBuf.Reset()
-
-	// Writing strategy based on the selected header option:
-	switch e.options.headerOption {
-	case headerOptionNormal:
-		proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
-		if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
-			return err
-		}
-
-		var localMesgNum byte
-		_, _ = e.mesgDef.WriteTo(e.mesgDefBuf)
-		localMesgNum, isNewMesgDef = e.localMesgNumLRU.Put(e.mesgDefBuf.Bytes())
-		e.mesgDef.Header = (e.mesgDef.Header &^ proto.LocalMesgNumMask) | localMesgNum // update the message definition header.
-
-		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
-	case headerOptionCompressedTimestamp:
+	if e.options.headerOption == headerOptionCompressedTimestamp {
 		e.compressTimestampIntoHeader(mesg)
-
-		proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
-		if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
-			return err
-		}
-
-		_, _ = e.mesgDef.WriteTo(e.mesgDefBuf)
-		_, isNewMesgDef = e.localMesgNumLRU.Put(e.mesgDefBuf.Bytes())
 	}
 
+	proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
+	if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
+		return err
+	}
+
+	e.buf.Reset()
+	_, _ = e.mesgDef.WriteTo(e.buf)
+	mesgDefBytes := e.buf.Bytes()
+	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(mesgDefBytes)            // This might alloc memory since we need to copy the item.
+	mesgDefBytes[0] = (mesgDefBytes[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
+	mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
+
+	e.wrapWriterAndCrc16.writer = w // Change writer
+
 	if isNewMesgDef {
-		e.wrapWriterAndCrc16.writer = w // Change writer
-		n, err := e.mesgDef.WriteTo(e.wrapWriterAndCrc16)
+		n, err := e.wrapWriterAndCrc16.Write(mesgDefBytes)
 		e.dataSize += uint32(n)
 		e.n += int64(n)
 		if err != nil {
-			return fmt.Errorf("write message failed: %w", err)
+			return fmt.Errorf("write message definition failed: %w", err)
 		}
 	}
 
-	e.wrapWriterAndCrc16.writer = w // Change writer
 	n, err := mesg.WriteTo(e.wrapWriterAndCrc16)
 	e.dataSize += uint32(n)
 	e.n += int64(n)
@@ -491,15 +484,14 @@ func (w *wrapWriterAndCrc16) Write(p []byte) (n int, err error) {
 }
 
 func (e *Encoder) encodeCRC() error {
-	b := make([]byte, 2)
+	b := e.bytesArray[:2]
 	binary.LittleEndian.PutUint16(b, e.crc16.Sum16())
 
 	n, err := e.w.Write(b)
+	e.n += int64(n)
 	if err != nil {
 		return fmt.Errorf("could not write crc: %w", err)
 	}
-
-	e.n += int64(n)
 
 	e.crc16.Reset()
 
@@ -511,7 +503,7 @@ func (e *Encoder) reset() {
 	e.dataSize = 0
 	e.crc16.Reset()
 	e.localMesgNumLRU.Reset()
-	e.messageValidator.Reset()
+	e.options.messageValidator.Reset()
 	e.timestampReference = 0
 }
 
@@ -536,7 +528,6 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 
 	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 	e.defaultFileHeader.ProtocolVersion = byte(e.options.protocolVersion)
-	e.messageValidator = e.options.messageValidator
 	e.wrapWriterAndCrc16.writer = w
 }
 
@@ -572,8 +563,25 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 	return nil
 }
 
+func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.Fit) error {
+	n := e.n
+
+	if err := e.encodeMessagesWithContext(ctx, io.Discard, fit.Messages); err != nil {
+		return fmt.Errorf("calculate data size: %w", err)
+	}
+
+	if fit.FileHeader.Size == 0 {
+		fit.FileHeader = e.defaultFileHeader
+	}
+	fit.FileHeader.DataSize = e.dataSize // update Header's DataSize of the actual messages size
+	e.reset()
+	e.n = n
+
+	return nil
+}
+
 func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
-	if err := e.calculateDataSize(fit); err != nil {
+	if err := e.calculateDataSizeWithContext(ctx, fit); err != nil {
 		return err
 	}
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {

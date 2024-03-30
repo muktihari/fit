@@ -39,8 +39,7 @@ var bufPool = sync.Pool{
 
 var (
 	// Zero alloc marshaler for efficient marshaling.
-	// We don't need to implement io.WriterTo for FileHeader, as writing FileHeader is much less frequently
-	// compared to writing MessageDefinition or Message.
+	_ io.WriterTo = &FileHeader{}
 	_ io.WriterTo = &Message{}
 	_ io.WriterTo = &MessageDefinition{}
 
@@ -50,7 +49,23 @@ var (
 )
 
 func (h *FileHeader) MarshalBinary() ([]byte, error) {
-	b := make([]byte, h.Size)
+	buf := bufPool.Get().(*bytes.Buffer)
+	defer bufPool.Put(buf)
+	buf.Reset()
+
+	_, _ = h.WriteTo(buf)
+
+	b := make([]byte, buf.Len())
+	copy(b, buf.Bytes())
+
+	return b, nil
+}
+
+func (h *FileHeader) WriteTo(w io.Writer) (n int64, err error) {
+	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
+	defer arrayPool.Put(arr)
+
+	b := (*arr)[:h.Size]
 
 	b[0] = h.Size
 	b[1] = h.ProtocolVersion
@@ -60,13 +75,12 @@ func (h *FileHeader) MarshalBinary() ([]byte, error) {
 
 	copy(b[8:12], h.DataType)
 
-	if h.Size < 14 {
-		return b, nil
+	if h.Size >= 14 {
+		binary.LittleEndian.PutUint16(b[12:14], h.CRC)
 	}
 
-	binary.LittleEndian.PutUint16(b[12:14], h.CRC)
-
-	return b, nil
+	nn, err := w.Write(b)
+	return int64(nn), err
 }
 
 func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
