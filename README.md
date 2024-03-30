@@ -13,18 +13,11 @@ However, despite having gained widespread adoption, Garmin has not yet released 
 
 More about FIT: [developer.garmin.com/fit](https://developer.garmin.com/fit)
 
-This SDK is designed with efficiency in mind, but it places a higher priority on clarity, simplicity and extensibility. There might be some Go implementations out there for decoding or encoding FIT, but we offer greater completeness and similar semantics to the Official SDK.
+This SDK is designed with efficiency in mind, but it places a higher priority on clarity, simplicity and extensibility. While other Go implementations for decoding or encoding FIT files may exist, we offer greater correctness, completeness, and similar semantics to the Official SDK.
 
 ## Usage
 
 Please see [Usage](/docs/usage.md).
-
-## Key distinct features
-
-1. You have full control over the data since by default it uses FIT protocol messages semantic instead of direct mapping to user-defined struct. However, we still offer the user-defined struct mapping for someone who prefer to interact with FIT that way. See [Usage](/docs/usage.md) for details.
-1. Receive the message as soon as it is decoded by registering listeners to the decoder. The decoder will broadcast every message to all registered listeners.
-1. Decoding and Encoding **Developer Fields** since [Protocol Version 2.0 is supported](#Protocol-Version-20-is-supported)
-1. Encoding **multiple local message type** and **compressed message** are supported, it means, you can create the smallest binary size as possible than just using localMesgNum 0.
 
 ## Protocol Version 2.0 is supported
 
@@ -303,7 +296,7 @@ The programs are automatically built during release; for Linux, Windows, and mac
 
 ## Custom FIT SDK
 
-A FIT file may contain manufacturer specific messages that are not defined in `Global Profile (Profile.xlsx)` since it's specific to a manufacturer (other manufacturers may have different meaning for that messages)
+A FIT file may contain manufacturer specific messages (`Product Profile`) that are not defined in `Global Profile (Profile.xlsx)` since it's specific to a manufacturer (other manufacturers may have different meaning for that messages)
 
 To be able to decode or create the manufacturer specific messages, we provide options to pick based on your need:
 
