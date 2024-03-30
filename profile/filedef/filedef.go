@@ -18,19 +18,19 @@ type File interface {
 	// Add adds message into file structure.
 	Add(mesg proto.Message)
 	// ToFit converts file back to proto.Fit structure.
-	ToFit(fac mesgdef.Factory) proto.Fit
+	ToFit(options *mesgdef.Options) proto.Fit
 }
 
 // ToMesgs bulks convert mesgdef into proto.Message and append it to messages
-func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, fac mesgdef.Factory, mesgNum typedef.MesgNum, s S) {
+func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, options *mesgdef.Options, mesgNum typedef.MesgNum, s S) {
 	for i := range s {
-		*messages = append(*messages, s[i].ToMesg(fac))
+		*messages = append(*messages, s[i].ToMesg(options))
 	}
 }
 
 // ToMesg is a type constraint to retrieve all mesgdef structures which implement ToMesg method.
 type ToMesg interface {
-	ToMesg(fac mesgdef.Factory) proto.Message
+	ToMesg(options *mesgdef.Options) proto.Message
 }
 
 // SortMessagesByTimestamp sorts messages by timestamp only if the message has timestamp field.

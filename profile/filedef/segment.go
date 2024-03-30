@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -29,6 +28,7 @@ type Segment struct {
 
 var _ File = &Segment{}
 
+// NewSegment creates new Segment File.
 func NewSegment(mesgs ...proto.Message) *Segment {
 	f := &Segment{}
 	for i := range mesgs {
@@ -38,6 +38,7 @@ func NewSegment(mesgs ...proto.Message) *Segment {
 	return f
 }
 
+// Add adds mesg to the Segment.
 func (f *Segment) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -59,11 +60,8 @@ func (f *Segment) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Segment) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Segment to proto.Fit. If options is nil, default options will be used.
+func (f *Segment) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 4 // non slice fields
 
 	size += len(f.SegmentPoints) + len(f.DeveloperDataIds) +
@@ -74,24 +72,24 @@ func (f *Segment) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.SegmentId != nil {
-		fit.Messages = append(fit.Messages, f.SegmentId.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.SegmentId.ToMesg(options))
 	}
 
 	if f.SegmentLeaderboardEntry != nil {
-		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry.ToMesg(options))
 	}
 
 	if f.SegmentLap != nil {
-		fit.Messages = append(fit.Messages, f.SegmentLap.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.SegmentLap.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.SegmentPoint, f.SegmentPoints)
+	ToMesgs(&fit.Messages, options, mesgnum.SegmentPoint, f.SegmentPoints)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

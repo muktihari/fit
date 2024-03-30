@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -40,6 +39,7 @@ type Course struct {
 
 var _ File = &Course{}
 
+// NewCourse creates new Course File.
 func NewCourse(mesgs ...proto.Message) *Course {
 	f := &Course{}
 	for i := range mesgs {
@@ -49,6 +49,7 @@ func NewCourse(mesgs ...proto.Message) *Course {
 	return f
 }
 
+// Add adds mesg to the Course.
 func (f *Course) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -72,11 +73,8 @@ func (f *Course) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Course) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Course to proto.Fit. If options is nil, default options will be used.
+func (f *Course) ToFit(options *mesgdef.Options) proto.Fit {
 	size := 3 /* non slice fields */
 
 	size += len(f.Records) + len(f.Events) + len(f.CoursePoints) +
@@ -87,22 +85,22 @@ func (f *Course) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.Course != nil {
-		fit.Messages = append(fit.Messages, f.Course.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Course.ToMesg(options))
 	}
 
 	if f.Lap != nil {
-		fit.Messages = append(fit.Messages, f.Lap.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Lap.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Record, f.Records)
-	ToMesgs(&fit.Messages, fac, mesgnum.Event, f.Events)
-	ToMesgs(&fit.Messages, fac, mesgnum.CoursePoint, f.CoursePoints)
+	ToMesgs(&fit.Messages, options, mesgnum.Record, f.Records)
+	ToMesgs(&fit.Messages, options, mesgnum.Event, f.Events)
+	ToMesgs(&fit.Messages, options, mesgnum.CoursePoint, f.CoursePoints)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

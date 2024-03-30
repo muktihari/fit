@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -27,6 +26,7 @@ type SegmentList struct {
 
 var _ File = &SegmentList{}
 
+// NewSegmentList creates new SegmentList File.
 func NewSegmentList(mesgs ...proto.Message) *SegmentList {
 	f := &SegmentList{}
 	for i := range mesgs {
@@ -36,6 +36,7 @@ func NewSegmentList(mesgs ...proto.Message) *SegmentList {
 	return f
 }
 
+// Add adds mesg to the SegmentList.
 func (f *SegmentList) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -53,11 +54,8 @@ func (f *SegmentList) Add(mesg proto.Message) {
 	}
 }
 
-func (f *SegmentList) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts SegmentList to proto.Fit. If options is nil, default options will be used.
+func (f *SegmentList) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 2 // non slice fields
 
 	size += len(f.SegmentFiles) + len(f.DeveloperDataIds) +
@@ -68,16 +66,16 @@ func (f *SegmentList) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.FileCreator != nil {
-		fit.Messages = append(fit.Messages, f.FileCreator.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.FileCreator.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.SegmentFile, f.SegmentFiles)
+	ToMesgs(&fit.Messages, options, mesgnum.SegmentFile, f.SegmentFiles)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

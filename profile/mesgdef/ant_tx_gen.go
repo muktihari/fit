@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -66,8 +67,16 @@ func NewAntTx(mesg *proto.Message) *AntTx {
 	}
 }
 
-// ToMesg converts AntTx into proto.Message.
-func (m *AntTx) ToMesg(fac Factory) proto.Message {
+// ToMesg converts AntTx into proto.Message. If options is nil, default options will be used.
+func (m *AntTx) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -84,7 +93,7 @@ func (m *AntTx) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MesgData
 		fields = append(fields, field)
 	}
-	if m.Data != nil {
+	if m.Data != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = m.Data
 		field.IsExpandedField = m.IsExpandedFields[4]
@@ -100,7 +109,7 @@ func (m *AntTx) ToMesg(fac Factory) proto.Message {
 		field.Value = m.MesgId
 		fields = append(fields, field)
 	}
-	if m.ChannelNumber != basetype.Uint8Invalid {
+	if m.ChannelNumber != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ChannelNumber
 		field.IsExpandedField = m.IsExpandedFields[3]

@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -300,8 +301,16 @@ func NewLap(mesg *proto.Message) *Lap {
 	}
 }
 
-// ToMesg converts Lap into proto.Message.
-func (m *Lap) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Lap into proto.Message. If options is nil, default options will be used.
+func (m *Lap) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -473,31 +482,31 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TimeStanding
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgSpeed != basetype.Uint32Invalid {
+	if m.EnhancedAvgSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[110] && options.IncludeExpandedFields) || !m.IsExpandedFields[110]) {
 		field := fac.CreateField(mesg.Num, 110)
 		field.Value = m.EnhancedAvgSpeed
 		field.IsExpandedField = m.IsExpandedFields[110]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMaxSpeed != basetype.Uint32Invalid {
+	if m.EnhancedMaxSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[111] && options.IncludeExpandedFields) || !m.IsExpandedFields[111]) {
 		field := fac.CreateField(mesg.Num, 111)
 		field.Value = m.EnhancedMaxSpeed
 		field.IsExpandedField = m.IsExpandedFields[111]
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgAltitude != basetype.Uint32Invalid {
+	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[112] && options.IncludeExpandedFields) || !m.IsExpandedFields[112]) {
 		field := fac.CreateField(mesg.Num, 112)
 		field.Value = m.EnhancedAvgAltitude
 		field.IsExpandedField = m.IsExpandedFields[112]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMinAltitude != basetype.Uint32Invalid {
+	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[113] && options.IncludeExpandedFields) || !m.IsExpandedFields[113]) {
 		field := fac.CreateField(mesg.Num, 113)
 		field.Value = m.EnhancedMinAltitude
 		field.IsExpandedField = m.IsExpandedFields[113]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMaxAltitude != basetype.Uint32Invalid {
+	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[114] && options.IncludeExpandedFields) || !m.IsExpandedFields[114]) {
 		field := fac.CreateField(mesg.Num, 114)
 		field.Value = m.EnhancedMaxAltitude
 		field.IsExpandedField = m.IsExpandedFields[114]
@@ -738,13 +747,13 @@ func (m *Lap) ToMesg(fac Factory) proto.Message {
 		field.Value = m.AvgVam
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
+	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[136] && options.IncludeExpandedFields) || !m.IsExpandedFields[136]) {
 		field := fac.CreateField(mesg.Num, 136)
 		field.Value = m.EnhancedAvgRespirationRate
 		field.IsExpandedField = m.IsExpandedFields[136]
 		fields = append(fields, field)
 	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
+	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[137] && options.IncludeExpandedFields) || !m.IsExpandedFields[137]) {
 		field := fac.CreateField(mesg.Num, 137)
 		field.Value = m.EnhancedMaxRespirationRate
 		field.IsExpandedField = m.IsExpandedFields[137]

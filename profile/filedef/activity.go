@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -48,6 +47,7 @@ type Activity struct {
 
 var _ File = &Activity{}
 
+// NewActivity creates new Activity File.
 func NewActivity(mesgs ...proto.Message) *Activity {
 	f := &Activity{}
 	for i := range mesgs {
@@ -57,6 +57,7 @@ func NewActivity(mesgs ...proto.Message) *Activity {
 	return f
 }
 
+// Add adds mesg to the Activity.
 func (f *Activity) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -98,11 +99,8 @@ func (f *Activity) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Activity) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Activity to proto.Fit. If options is nil, default options will be used.
+func (f *Activity) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 3 // non slice fields
 
 	size += len(f.Sessions) + len(f.Laps) + len(f.Records) + len(f.DeviceInfos) +
@@ -115,32 +113,32 @@ func (f *Activity) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeviceInfo, f.DeviceInfos)
+	ToMesgs(&fit.Messages, options, mesgnum.DeviceInfo, f.DeviceInfos)
 
 	if f.UserProfile != nil {
-		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
 
 	if f.Activity != nil {
-		fit.Messages = append(fit.Messages, f.Activity.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Activity.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Session, f.Sessions)
-	ToMesgs(&fit.Messages, fac, mesgnum.Lap, f.Laps)
-	ToMesgs(&fit.Messages, fac, mesgnum.Record, f.Records)
-	ToMesgs(&fit.Messages, fac, mesgnum.Event, f.Events)
-	ToMesgs(&fit.Messages, fac, mesgnum.Length, f.Lengths)
-	ToMesgs(&fit.Messages, fac, mesgnum.SegmentLap, f.SegmentLap)
-	ToMesgs(&fit.Messages, fac, mesgnum.ZonesTarget, f.ZonesTargets)
-	ToMesgs(&fit.Messages, fac, mesgnum.Workout, f.Workouts)
-	ToMesgs(&fit.Messages, fac, mesgnum.WorkoutStep, f.WorkoutSteps)
-	ToMesgs(&fit.Messages, fac, mesgnum.Hr, f.HRs)
-	ToMesgs(&fit.Messages, fac, mesgnum.Hrv, f.HRVs)
+	ToMesgs(&fit.Messages, options, mesgnum.Session, f.Sessions)
+	ToMesgs(&fit.Messages, options, mesgnum.Lap, f.Laps)
+	ToMesgs(&fit.Messages, options, mesgnum.Record, f.Records)
+	ToMesgs(&fit.Messages, options, mesgnum.Event, f.Events)
+	ToMesgs(&fit.Messages, options, mesgnum.Length, f.Lengths)
+	ToMesgs(&fit.Messages, options, mesgnum.SegmentLap, f.SegmentLap)
+	ToMesgs(&fit.Messages, options, mesgnum.ZonesTarget, f.ZonesTargets)
+	ToMesgs(&fit.Messages, options, mesgnum.Workout, f.Workouts)
+	ToMesgs(&fit.Messages, options, mesgnum.WorkoutStep, f.WorkoutSteps)
+	ToMesgs(&fit.Messages, options, mesgnum.Hr, f.HRs)
+	ToMesgs(&fit.Messages, options, mesgnum.Hrv, f.HRVs)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

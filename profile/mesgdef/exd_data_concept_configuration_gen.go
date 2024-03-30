@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -73,8 +74,16 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 	}
 }
 
-// ToMesg converts ExdDataConceptConfiguration into proto.Message.
-func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
+// ToMesg converts ExdDataConceptConfiguration into proto.Message. If options is nil, default options will be used.
+func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -91,13 +100,13 @@ func (m *ExdDataConceptConfiguration) ToMesg(fac Factory) proto.Message {
 		field.Value = m.ConceptField
 		fields = append(fields, field)
 	}
-	if m.FieldId != basetype.Uint8Invalid {
+	if m.FieldId != basetype.Uint8Invalid && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = m.FieldId
 		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
-	if m.ConceptIndex != basetype.Uint8Invalid {
+	if m.ConceptIndex != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = m.ConceptIndex
 		field.IsExpandedField = m.IsExpandedFields[3]

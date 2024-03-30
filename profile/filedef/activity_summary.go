@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -28,6 +27,7 @@ type ActivitySummary struct {
 
 var _ File = &ActivitySummary{}
 
+// NewActivitySummary creates new ActivitySummary File.
 func NewActivitySummary(mesgs ...proto.Message) *ActivitySummary {
 	f := &ActivitySummary{}
 	for i := range mesgs {
@@ -37,6 +37,7 @@ func NewActivitySummary(mesgs ...proto.Message) *ActivitySummary {
 	return f
 }
 
+// Add adds mesg to the ActivitySummary.
 func (f *ActivitySummary) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -56,11 +57,8 @@ func (f *ActivitySummary) Add(mesg proto.Message) {
 	}
 }
 
-func (f *ActivitySummary) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts ActivitySummary to proto.Fit. If options is nil, default options will be used.
+func (f *ActivitySummary) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 2 // non slice fields
 
 	size += len(f.Sessions) + len(f.Laps) + len(f.DeveloperDataIds) +
@@ -71,17 +69,17 @@ func (f *ActivitySummary) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.Activity != nil {
-		fit.Messages = append(fit.Messages, f.Activity.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.Activity.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Session, f.Sessions)
-	ToMesgs(&fit.Messages, fac, mesgnum.Lap, f.Laps)
+	ToMesgs(&fit.Messages, options, mesgnum.Session, f.Sessions)
+	ToMesgs(&fit.Messages, options, mesgnum.Lap, f.Laps)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

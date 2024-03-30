@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -222,8 +223,16 @@ func NewRecord(mesg *proto.Message) *Record {
 	}
 }
 
-// ToMesg converts Record into proto.Message.
-func (m *Record) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Record into proto.Message. If options is nil, default options will be used.
+func (m *Record) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -275,7 +284,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PositionLong
 		fields = append(fields, field)
 	}
-	if m.Distance != basetype.Uint32Invalid {
+	if m.Distance != basetype.Uint32Invalid && ((m.IsExpandedFields[5] && options.IncludeExpandedFields) || !m.IsExpandedFields[5]) {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = m.Distance
 		field.IsExpandedField = m.IsExpandedFields[5]
@@ -286,25 +295,25 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.TimeFromCourse
 		fields = append(fields, field)
 	}
-	if m.TotalCycles != basetype.Uint32Invalid {
+	if m.TotalCycles != basetype.Uint32Invalid && ((m.IsExpandedFields[19] && options.IncludeExpandedFields) || !m.IsExpandedFields[19]) {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = m.TotalCycles
 		field.IsExpandedField = m.IsExpandedFields[19]
 		fields = append(fields, field)
 	}
-	if m.AccumulatedPower != basetype.Uint32Invalid {
+	if m.AccumulatedPower != basetype.Uint32Invalid && ((m.IsExpandedFields[29] && options.IncludeExpandedFields) || !m.IsExpandedFields[29]) {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = m.AccumulatedPower
 		field.IsExpandedField = m.IsExpandedFields[29]
 		fields = append(fields, field)
 	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid {
+	if m.EnhancedSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[73] && options.IncludeExpandedFields) || !m.IsExpandedFields[73]) {
 		field := fac.CreateField(mesg.Num, 73)
 		field.Value = m.EnhancedSpeed
 		field.IsExpandedField = m.IsExpandedFields[73]
 		fields = append(fields, field)
 	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid {
+	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[78] && options.IncludeExpandedFields) || !m.IsExpandedFields[78]) {
 		field := fac.CreateField(mesg.Num, 78)
 		field.Value = m.EnhancedAltitude
 		field.IsExpandedField = m.IsExpandedFields[78]
@@ -365,7 +374,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.Altitude
 		fields = append(fields, field)
 	}
-	if m.Speed != basetype.Uint16Invalid {
+	if m.Speed != basetype.Uint16Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = m.Speed
 		field.IsExpandedField = m.IsExpandedFields[6]
@@ -481,7 +490,7 @@ func (m *Record) ToMesg(fac Factory) proto.Message {
 		field.Value = m.N2Load
 		fields = append(fields, field)
 	}
-	if m.EnhancedRespirationRate != basetype.Uint16Invalid {
+	if m.EnhancedRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[108] && options.IncludeExpandedFields) || !m.IsExpandedFields[108]) {
 		field := fac.CreateField(mesg.Num, 108)
 		field.Value = m.EnhancedRespirationRate
 		field.IsExpandedField = m.IsExpandedFields[108]

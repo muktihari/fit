@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -62,8 +63,16 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 	}
 }
 
-// ToMesg converts CoursePoint into proto.Message.
-func (m *CoursePoint) ToMesg(fac Factory) proto.Message {
+// ToMesg converts CoursePoint into proto.Message. If options is nil, default options will be used.
+func (m *CoursePoint) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

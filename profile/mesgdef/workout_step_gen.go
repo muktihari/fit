@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
@@ -82,8 +83,16 @@ func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 	}
 }
 
-// ToMesg converts WorkoutStep into proto.Message.
-func (m *WorkoutStep) ToMesg(fac Factory) proto.Message {
+// ToMesg converts WorkoutStep into proto.Message. If options is nil, default options will be used.
+func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

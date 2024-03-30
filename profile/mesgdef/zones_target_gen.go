@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -53,8 +54,16 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 	}
 }
 
-// ToMesg converts ZonesTarget into proto.Message.
-func (m *ZonesTarget) ToMesg(fac Factory) proto.Message {
+// ToMesg converts ZonesTarget into proto.Message. If options is nil, default options will be used.
+func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

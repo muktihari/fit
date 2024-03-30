@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -112,8 +113,16 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 	}
 }
 
-// ToMesg converts Monitoring into proto.Message.
-func (m *Monitoring) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Monitoring into proto.Message. If options is nil, default options will be used.
+func (m *Monitoring) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -230,7 +239,7 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 		field.Value = uint8(m.DeviceIndex)
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityType) != basetype.EnumInvalid {
+	if byte(m.ActivityType) != basetype.EnumInvalid && ((m.IsExpandedFields[5] && options.IncludeExpandedFields) || !m.IsExpandedFields[5]) {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = byte(m.ActivityType)
 		field.IsExpandedField = m.IsExpandedFields[5]
@@ -261,7 +270,7 @@ func (m *Monitoring) ToMesg(fac Factory) proto.Message {
 		field.Value = m.HeartRate
 		fields = append(fields, field)
 	}
-	if m.Intensity != basetype.Uint8Invalid {
+	if m.Intensity != basetype.Uint8Invalid && ((m.IsExpandedFields[28] && options.IncludeExpandedFields) || !m.IsExpandedFields[28]) {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = m.Intensity
 		field.IsExpandedField = m.IsExpandedFields[28]

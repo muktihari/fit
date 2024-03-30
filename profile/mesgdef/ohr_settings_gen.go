@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
@@ -49,8 +50,16 @@ func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 	}
 }
 
-// ToMesg converts OhrSettings into proto.Message.
-func (m *OhrSettings) ToMesg(fac Factory) proto.Message {
+// ToMesg converts OhrSettings into proto.Message. If options is nil, default options will be used.
+func (m *OhrSettings) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

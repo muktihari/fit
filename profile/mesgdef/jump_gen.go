@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -74,8 +75,16 @@ func NewJump(mesg *proto.Message) *Jump {
 	}
 }
 
-// ToMesg converts Jump into proto.Message.
-func (m *Jump) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Jump into proto.Message. If options is nil, default options will be used.
+func (m *Jump) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 
@@ -117,7 +126,7 @@ func (m *Jump) ToMesg(fac Factory) proto.Message {
 		field.Value = m.PositionLong
 		fields = append(fields, field)
 	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid {
+	if m.EnhancedSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[8] && options.IncludeExpandedFields) || !m.IsExpandedFields[8]) {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = m.EnhancedSpeed
 		field.IsExpandedField = m.IsExpandedFields[8]

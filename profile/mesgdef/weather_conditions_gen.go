@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/typeconv"
@@ -78,8 +79,16 @@ func NewWeatherConditions(mesg *proto.Message) *WeatherConditions {
 	}
 }
 
-// ToMesg converts WeatherConditions into proto.Message.
-func (m *WeatherConditions) ToMesg(fac Factory) proto.Message {
+// ToMesg converts WeatherConditions into proto.Message. If options is nil, default options will be used.
+func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

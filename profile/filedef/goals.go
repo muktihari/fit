@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -26,6 +25,7 @@ type Goals struct {
 
 var _ File = &Goals{}
 
+// NewGoals creates new Goals File.
 func NewGoals(mesgs ...proto.Message) *Goals {
 	f := &Goals{}
 	for i := range mesgs {
@@ -35,6 +35,7 @@ func NewGoals(mesgs ...proto.Message) *Goals {
 	return f
 }
 
+// Add adds mesg to the Goals.
 func (f *Goals) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -50,11 +51,8 @@ func (f *Goals) Add(mesg proto.Message) {
 	}
 }
 
-func (f *Goals) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts Goals to proto.Fit. If options is nil, default options will be used.
+func (f *Goals) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 1 // non slice fields
 
 	size += len(f.Goals) + len(f.DeveloperDataIds) +
@@ -65,12 +63,12 @@ func (f *Goals) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Goal, f.Goals)
+	ToMesgs(&fit.Messages, options, mesgnum.Goal, f.Goals)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

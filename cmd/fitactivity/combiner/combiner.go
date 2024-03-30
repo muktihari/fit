@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/muktihari/fit/cmd/fitactivity/finder"
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -96,7 +95,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		}
 
 		combineSession(session, nextSession)
-		sessionMesg = session.ToMesg(factory.StandardFactory())
+		sessionMesg = session.ToMesg(nil)
 
 		// Let's make "summary last sequence" order by updating session's timestamp with last lastRecord's timestamp
 		lastRecord := fits[i].Messages[nextSessionInfo.RecordLastIndex]

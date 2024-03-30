@@ -7,6 +7,7 @@
 package mesgdef
 
 import (
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -49,8 +50,16 @@ func NewVideo(mesg *proto.Message) *Video {
 	}
 }
 
-// ToMesg converts Video into proto.Message.
-func (m *Video) ToMesg(fac Factory) proto.Message {
+// ToMesg converts Video into proto.Message. If options is nil, default options will be used.
+func (m *Video) ToMesg(options *Options) proto.Message {
+	if options == nil {
+		options = defaultOptions
+	} else if options.Factory == nil {
+		options.Factory = factory.StandardFactory()
+	}
+
+	fac := options.Factory
+
 	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
 	defer fieldsPool.Put(fieldsArray)
 

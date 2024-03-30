@@ -5,7 +5,6 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -32,6 +31,7 @@ type MonitoringAB struct {
 
 var _ File = &MonitoringAB{}
 
+// NewMonitoringAB creates new MonitoringAB File.
 func NewMonitoringAB(mesgs ...proto.Message) *MonitoringAB {
 	f := &MonitoringAB{}
 	for i := range mesgs {
@@ -41,6 +41,7 @@ func NewMonitoringAB(mesgs ...proto.Message) *MonitoringAB {
 	return f
 }
 
+// Add adds mesg to the MonitoringAB.
 func (f *MonitoringAB) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
@@ -60,11 +61,8 @@ func (f *MonitoringAB) Add(mesg proto.Message) {
 	}
 }
 
-func (f *MonitoringAB) ToFit(fac mesgdef.Factory) proto.Fit {
-	if fac == nil {
-		fac = factory.StandardFactory()
-	}
-
+// ToFit converts MonitoringAB to proto.Fit. If options is nil, default options will be used.
+func (f *MonitoringAB) ToFit(options *mesgdef.Options) proto.Fit {
 	var size = 2 // non slice fields
 
 	size += len(f.Monitorings) + len(f.DeviceInfos) +
@@ -75,17 +73,17 @@ func (f *MonitoringAB) ToFit(fac mesgdef.Factory) proto.Fit {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
-	fit.Messages = append(fit.Messages, f.FileId.ToMesg(fac))
+	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, fac, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, fac, mesgnum.FieldDescription, f.FieldDescriptions)
+	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
+	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
 
 	if f.MonitoringInfo != nil {
-		fit.Messages = append(fit.Messages, f.MonitoringInfo.ToMesg(fac))
+		fit.Messages = append(fit.Messages, f.MonitoringInfo.ToMesg(options))
 	}
 
-	ToMesgs(&fit.Messages, fac, mesgnum.Monitoring, f.Monitorings)
-	ToMesgs(&fit.Messages, fac, mesgnum.DeviceInfo, f.DeviceInfos)
+	ToMesgs(&fit.Messages, options, mesgnum.Monitoring, f.Monitorings)
+	ToMesgs(&fit.Messages, options, mesgnum.DeviceInfo, f.DeviceInfos)
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
