@@ -135,7 +135,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
 
 	strbuf := new(strings.Builder)
-	strbuf.WriteString("[...]proto.Message{\n")
+	strbuf.WriteString("[...]message{\n")
 	for _, message := range b.messages {
 		strbuf.WriteString(b.transformMesgnum(message.Name) + ": {\n") // indexed to create fixed-size slice.
 		strbuf.WriteString(fmt.Sprintf("Num: %s, /* %s */\n", b.transformMesgnum(message.Name), message.Name))
@@ -180,9 +180,10 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 	}
 
 	strbuf := new(strings.Builder)
-	strbuf.WriteString("[]proto.Field{\n")
+	strbuf.WriteString("[256]proto.Field{\n")
 	for _, field := range message.Fields {
-		strbuf.WriteString("{\n")
+		// strbuf.WriteString("{\n")
+		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
 		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
 		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))

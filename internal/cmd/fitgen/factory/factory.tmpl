@@ -17,6 +17,7 @@ package {{ .Package }}
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/muktihari/fit/proto"
 	"github.com/muktihari/fit/profile"
@@ -47,53 +48,65 @@ type Factory struct {
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
 func New() *Factory { return &Factory{} }
 
+var ( // cache for CreateMesg func
+	once sync.Once
+	cache map[typedef.MesgNum]proto.Message
+)
+
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	mesg := f.createMesg(num)
+	once.Do(func() { // populate data fields in the cache.
+		cache = make(map[typedef.MesgNum]proto.Message)
+		for i := range mesgs {
+			rawmesg := &mesgs[i]
+			if _, ok := cache[rawmesg.Num]; ok {
+				continue
+			}
+			var n byte
+			for j := range rawmesg.Fields {
+				field := rawmesg.Fields[j]
+				if field.FieldBase != nil {
+					n++
+				}
+			}
+            fields := make([]proto.Field, 0, n)
+			for j := range rawmesg.Fields {
+				field := rawmesg.Fields[j]
+				if field.FieldBase != nil {
+					fields = append(fields, field)
+				}
+			}
+			cache[rawmesg.Num] = proto.Message{Num: rawmesg.Num, Fields: fields}
+		}
+	})
 
-	if mesg.Fields == nil { // Unknown message
-		return mesg
+	mesg, ok := cache[num]
+	if !ok {
+		mesg = f.registeredMesgs[num]
 	}
 
-	mesg.Fields = make([]proto.Field, len(mesg.Fields))
-	copy(mesg.Fields, mesgs[num].Fields) // shallow copy
+	mesg.Num = num // In case of unknown field
+
+	if len(mesg.Fields) != 0 {
+		fields := make([]proto.Field, len(mesg.Fields))
+		copy(fields, mesg.Fields)
+		mesg.Fields = fields
+	}
 
 	return mesg
 }
 
 {{ template "create_mesg_only_doc" -}}
 func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
-	mesg := f.createMesg(num)
-
-	mesg.Fields = nil
-
-	return mesg
-}
-
-func (f *Factory) createMesg(num typedef.MesgNum) proto.Message {
-	if num < typedef.MesgNum(len(mesgs)) && mesgs[num].Num == num {
-        return mesgs[num]
-	}
-
-	if mesg, ok := f.registeredMesgs[num]; ok {
-        return mesg
-	}
-	
-	return createUnknownMesg(num)
-}
-
-func createUnknownMesg(num typedef.MesgNum) proto.Message {
 	return proto.Message{Num: num}
 }
 
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
-        mesg := mesgs[mesgNum]
-		for i := range mesg.Fields {
-			if mesg.Fields[i].Num == num {
-				return mesg.Fields[i]
-			}
+		field := mesgs[mesgNum].Fields[num]
+		if field.FieldBase != nil {
+			return field
 		}
 		return createUnknownField(num)
 	}
@@ -130,6 +143,11 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 	f.registeredMesgs[mesg.Num] = mesg
 
 	return nil
+}
+
+type message struct {
+	Num    typedef.MesgNum
+	Fields [256]proto.Field // Use array to ensure O(1) lookup
 }
 
 // Use array to ensure O(1) lookup
@@ -177,15 +195,17 @@ func RegisterMesg(mesg proto.Message) error {
 
 // Funcs & Methods Shared Documentations:
 {{ define "create_mesg_doc" }}
-// CreateMesg creates new message based on defined messages in the factory. If not found, it returns new message with "unknown" name.
+// CreateMesg creates new message based on defined messages in the factory. If not found, it returns new unknown message.
 //
-// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except fot the unknown field).
-// If you want a deep copy of the mesg, create it by calling mesg.Clone().
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
+// If you want a deep copy of the mesg, clone it by calling mesg.Clone().
+//
+// NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
 {{ end }}
 
 {{ define "create_mesg_only_doc" }}
-// CreateMesgOnly is similar to CreateMesg, but it sets Fields to nil. This is useful when we plan to fill these values ourselves
-// to avoid unnecessary malloc when cloning them, as they will be removed anyway. For example, the decoding process will populate them with decoded data.
+// CreateMesgOnly creates new message without predefined fields. This is useful when we plan to fill these values ourselves 
+// e.g the decoding process will populate them with decoded data.
 {{ end }}
 
 {{ define "create_field_doc" }}
