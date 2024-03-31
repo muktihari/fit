@@ -858,7 +858,7 @@ func main() {
 
     // f (*os.File) is implementing both io.WriterAt and io.WriteSeeker so it can be used directly.
     // But to reduce syscall, let's wrap it using buffered writer instead.
-    bw := bufferedwriter.New(fout)
+    bw := bufferedwriter.New(f)
     defer bw.Flush()
 
     streamEnc, err := encoder.New(bw).StreamEncoder()
