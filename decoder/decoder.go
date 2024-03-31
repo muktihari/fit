@@ -256,14 +256,8 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 			break
 		}
 		// Read bytes acquired by messages to calculate crc checksum of its contents
-		for d.cur < d.fileHeader.DataSize {
-			size := d.fileHeader.DataSize - d.cur
-			if arraySize := uint32(len(d.bytesArray)); size > arraySize {
-				size = arraySize
-			}
-			if err = d.read(d.bytesArray[:size]); err != nil { // Discard bytes
-				break
-			}
+		if err = d.discardMessages(); err != nil {
+			break
 		}
 		if err = d.decodeCRC(); err != nil {
 			break
