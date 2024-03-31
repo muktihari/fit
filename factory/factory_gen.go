@@ -40,9 +40,9 @@ type Factory struct {
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
 func New() *Factory { return &Factory{} }
 
-var ( // cache for CreateMesg func
-	once  sync.Once
-	cache map[typedef.MesgNum]proto.Message
+var ( // cache for CreateMesg method
+	once       sync.Once
+	protoMesgs [len(mesgs)]proto.Message // data is populated on CreateMesg first invocation.
 )
 
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns new unknown message.
@@ -53,32 +53,34 @@ var ( // cache for CreateMesg func
 // NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	once.Do(func() { // populate data fields in the cache.
-		cache = make(map[typedef.MesgNum]proto.Message)
 		for i := range mesgs {
 			rawmesg := &mesgs[i]
-			if _, ok := cache[rawmesg.Num]; ok {
-				continue
+			if rawmesg.Num != typedef.MesgNum(i) {
+				continue // skip unknown message
 			}
 			var n byte
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
+				if field != nil {
 					n++
 				}
 			}
 			fields := make([]proto.Field, 0, n)
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
-					fields = append(fields, field)
+				if field != nil {
+					fields = append(fields, *field)
 				}
 			}
-			cache[rawmesg.Num] = proto.Message{Num: rawmesg.Num, Fields: fields}
+			protoMesgs[rawmesg.Num] = proto.Message{
+				Num:    rawmesg.Num,
+				Fields: fields,
+			}
 		}
 	})
 
-	mesg, ok := cache[num]
-	if !ok {
+	mesg := protoMesgs[num]
+	if mesg.Num != num {
 		mesg = f.registeredMesgs[num]
 	}
 
@@ -107,8 +109,8 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
 		field := mesgs[mesgNum].Fields[num]
-		if field.FieldBase != nil {
-			return field
+		if field != nil {
+			return *field
 		}
 		return createUnknownField(num)
 	}
@@ -154,14 +156,14 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 
 type message struct {
 	Num    typedef.MesgNum
-	Fields [256]proto.Field // Use array to ensure O(1) lookup
+	Fields [256]*proto.Field // Use array to ensure O(1) lookup, use pointer to reduce memory usage.
 }
 
 // Use array to ensure O(1) lookup
 var mesgs = [...]message{
 	typedef.MesgNumFileId: {
 		Num: typedef.MesgNumFileId, /* file_id */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
@@ -294,7 +296,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumFileCreator: {
 		Num: typedef.MesgNumFileCreator, /* file_creator */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "software_version",
@@ -331,7 +333,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTimestampCorrelation: {
 		Num: typedef.MesgNumTimestampCorrelation, /* timestamp_correlation */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -448,7 +450,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSoftware: {
 		Num: typedef.MesgNumSoftware, /* software */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -501,7 +503,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSlaveDevice: {
 		Num: typedef.MesgNumSlaveDevice, /* slave_device */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
@@ -554,7 +556,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumCapabilities: {
 		Num: typedef.MesgNumCapabilities, /* capabilities */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "languages",
@@ -623,7 +625,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumFileCapabilities: {
 		Num: typedef.MesgNumFileCapabilities, /* file_capabilities */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -724,7 +726,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMesgCapabilities: {
 		Num: typedef.MesgNumMesgCapabilities, /* mesg_capabilities */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -828,7 +830,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumFieldCapabilities: {
 		Num: typedef.MesgNumFieldCapabilities, /* field_capabilities */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -913,7 +915,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDeviceSettings: {
 		Num: typedef.MesgNumDeviceSettings, /* device_settings */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time_zone",
@@ -1302,7 +1304,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumUserProfile: {
 		Num: typedef.MesgNumUserProfile, /* user_profile */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -1771,7 +1773,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHrmProfile: {
 		Num: typedef.MesgNumHrmProfile, /* hrm_profile */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -1856,7 +1858,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSdmProfile: {
 		Num: typedef.MesgNumSdmProfile, /* sdm_profile */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -1989,7 +1991,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumBikeProfile: {
 		Num: typedef.MesgNumBikeProfile, /* bike_profile */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -2506,7 +2508,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumConnectivity: {
 		Num: typedef.MesgNumConnectivity, /* connectivity */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_enabled",
@@ -2719,7 +2721,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWatchfaceSettings: {
 		Num: typedef.MesgNumWatchfaceSettings, /* watchface_settings */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -2785,7 +2787,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumOhrSettings: {
 		Num: typedef.MesgNumOhrSettings, /* ohr_settings */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -2822,7 +2824,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTimeInZone: {
 		Num: typedef.MesgNumTimeInZone, /* time_in_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -3099,7 +3101,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumZonesTarget: {
 		Num: typedef.MesgNumZonesTarget, /* zones_target */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
@@ -3184,7 +3186,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSport: {
 		Num: typedef.MesgNumSport, /* sport */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
@@ -3237,7 +3239,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHrZone: {
 		Num: typedef.MesgNumHrZone, /* hr_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -3290,7 +3292,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSpeedZone: {
 		Num: typedef.MesgNumSpeedZone, /* speed_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -3343,7 +3345,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumCadenceZone: {
 		Num: typedef.MesgNumCadenceZone, /* cadence_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -3396,7 +3398,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumPowerZone: {
 		Num: typedef.MesgNumPowerZone, /* power_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -3449,7 +3451,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMetZone: {
 		Num: typedef.MesgNumMetZone, /* met_zone */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -3518,7 +3520,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDiveSettings: {
 		Num: typedef.MesgNumDiveSettings, /* dive_settings */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -4096,7 +4098,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDiveAlarm: {
 		Num: typedef.MesgNumDiveAlarm, /* dive_alarm */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -4309,7 +4311,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDiveApneaAlarm: {
 		Num: typedef.MesgNumDiveApneaAlarm, /* dive_apnea_alarm */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -4522,7 +4524,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDiveGas: {
 		Num: typedef.MesgNumDiveGas, /* dive_gas */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -4607,7 +4609,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumGoal: {
 		Num: typedef.MesgNumGoal, /* goal */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -4820,7 +4822,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumActivity: {
 		Num: typedef.MesgNumActivity, /* activity */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -4953,7 +4955,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSession: {
 		Num: typedef.MesgNumSession, /* session */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -7469,7 +7471,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumLap: {
 		Num: typedef.MesgNumLap, /* lap */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -9487,7 +9489,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumLength: {
 		Num: typedef.MesgNumLength, /* length */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -9848,7 +9850,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumRecord: {
 		Num: typedef.MesgNumRecord, /* record */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -11210,7 +11212,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumEvent: {
 		Num: typedef.MesgNumEvent, /* event */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -11681,7 +11683,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDeviceInfo: {
 		Num: typedef.MesgNumDeviceInfo, /* device_info */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12031,7 +12033,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDeviceAuxBatteryInfo: {
 		Num: typedef.MesgNumDeviceAuxBatteryInfo, /* device_aux_battery_info */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12116,7 +12118,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTrainingFile: {
 		Num: typedef.MesgNumTrainingFile, /* training_file */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12233,7 +12235,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWeatherConditions: {
 		Num: typedef.MesgNumWeatherConditions, /* weather_conditions */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12494,7 +12496,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWeatherAlert: {
 		Num: typedef.MesgNumWeatherAlert, /* weather_alert */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12595,7 +12597,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumGpsMetadata: {
 		Num: typedef.MesgNumGpsMetadata, /* gps_metadata */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12744,7 +12746,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumCameraEvent: {
 		Num: typedef.MesgNumCameraEvent, /* camera_event */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12829,7 +12831,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumGyroscopeData: {
 		Num: typedef.MesgNumGyroscopeData, /* gyroscope_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -12978,7 +12980,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAccelerometerData: {
 		Num: typedef.MesgNumAccelerometerData, /* accelerometer_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13175,7 +13177,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMagnetometerData: {
 		Num: typedef.MesgNumMagnetometerData, /* magnetometer_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13324,7 +13326,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumBarometerData: {
 		Num: typedef.MesgNumBarometerData, /* barometer_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13393,7 +13395,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumThreeDSensorCalibration: {
 		Num: typedef.MesgNumThreeDSensorCalibration, /* three_d_sensor_calibration */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13523,7 +13525,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumOneDSensorCalibration: {
 		Num: typedef.MesgNumOneDSensorCalibration, /* one_d_sensor_calibration */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13631,7 +13633,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumVideoFrame: {
 		Num: typedef.MesgNumVideoFrame, /* video_frame */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13684,7 +13686,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumObdiiData: {
 		Num: typedef.MesgNumObdiiData, /* obdii_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13833,7 +13835,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumNmeaSentence: {
 		Num: typedef.MesgNumNmeaSentence, /* nmea_sentence */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -13886,7 +13888,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAviationAttitude: {
 		Num: typedef.MesgNumAviationAttitude, /* aviation_attitude */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -14083,7 +14085,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumVideo: {
 		Num: typedef.MesgNumVideo, /* video */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "url",
@@ -14136,7 +14138,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumVideoTitle: {
 		Num: typedef.MesgNumVideoTitle, /* video_title */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -14189,7 +14191,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumVideoDescription: {
 		Num: typedef.MesgNumVideoDescription, /* video_description */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -14242,7 +14244,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumVideoClip: {
 		Num: typedef.MesgNumVideoClip, /* video_clip */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_number",
@@ -14359,7 +14361,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSet: {
 		Num: typedef.MesgNumSet, /* set */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -14540,7 +14542,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumJump: {
 		Num: typedef.MesgNumJump, /* jump */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -14707,7 +14709,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSplit: {
 		Num: typedef.MesgNumSplit, /* split */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -15016,7 +15018,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSplitSummary: {
 		Num: typedef.MesgNumSplitSummary, /* split_summary */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -15245,7 +15247,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumClimbPro: {
 		Num: typedef.MesgNumClimbPro, /* climb_pro */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -15362,7 +15364,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumFieldDescription: {
 		Num: typedef.MesgNumFieldDescription, /* field_description */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_data_index",
@@ -15591,7 +15593,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDeveloperDataId: {
 		Num: typedef.MesgNumDeveloperDataId, /* developer_data_id */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_id",
@@ -15676,7 +15678,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumCourse: {
 		Num: typedef.MesgNumCourse, /* course */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
@@ -15745,7 +15747,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumCoursePoint: {
 		Num: typedef.MesgNumCoursePoint, /* course_point */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -15878,7 +15880,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSegmentId: {
 		Num: typedef.MesgNumSegmentId, /* segment_id */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
@@ -16027,7 +16029,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSegmentLeaderboardEntry: {
 		Num: typedef.MesgNumSegmentLeaderboardEntry, /* segment_leaderboard_entry */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -16144,7 +16146,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSegmentPoint: {
 		Num: typedef.MesgNumSegmentPoint, /* segment_point */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -16263,7 +16265,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSegmentLap: {
 		Num: typedef.MesgNumSegmentLap, /* segment_lap */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -17801,7 +17803,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSegmentFile: {
 		Num: typedef.MesgNumSegmentFile, /* segment_file */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -17950,7 +17952,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWorkout: {
 		Num: typedef.MesgNumWorkout, /* workout */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -18083,7 +18085,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWorkoutSession: {
 		Num: typedef.MesgNumWorkoutSession, /* workout_session */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -18200,7 +18202,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWorkoutStep: {
 		Num: typedef.MesgNumWorkoutStep, /* workout_step */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -18762,7 +18764,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumExerciseTitle: {
 		Num: typedef.MesgNumExerciseTitle, /* exercise_title */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -18831,7 +18833,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSchedule: {
 		Num: typedef.MesgNumSchedule, /* schedule */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
@@ -18964,7 +18966,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTotals: {
 		Num: typedef.MesgNumTotals, /* totals */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
@@ -19129,7 +19131,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumWeightScale: {
 		Num: typedef.MesgNumWeightScale, /* weight_scale */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -19358,7 +19360,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumBloodPressure: {
 		Num: typedef.MesgNumBloodPressure, /* blood_pressure */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -19539,7 +19541,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMonitoringInfo: {
 		Num: typedef.MesgNumMonitoringInfo, /* monitoring_info */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -19640,7 +19642,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMonitoring: {
 		Num: typedef.MesgNumMonitoring, /* monitoring */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20127,7 +20129,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMonitoringHrData: {
 		Num: typedef.MesgNumMonitoringHrData, /* monitoring_hr_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20180,7 +20182,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSpo2Data: {
 		Num: typedef.MesgNumSpo2Data, /* spo2_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20249,7 +20251,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHr: {
 		Num: typedef.MesgNumHr, /* hr */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20363,7 +20365,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumStressLevel: {
 		Num: typedef.MesgNumStressLevel, /* stress_level */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level_value",
@@ -20400,7 +20402,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMaxMetData: {
 		Num: typedef.MesgNumMaxMetData, /* max_met_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "update_time",
@@ -20533,7 +20535,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaBodyBatteryData: {
 		Num: typedef.MesgNumHsaBodyBatteryData, /* hsa_body_battery_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20618,7 +20620,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaEvent: {
 		Num: typedef.MesgNumHsaEvent, /* hsa_event */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20655,7 +20657,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaAccelerometerData: {
 		Num: typedef.MesgNumHsaAccelerometerData, /* hsa_accelerometer_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20772,7 +20774,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaGyroscopeData: {
 		Num: typedef.MesgNumHsaGyroscopeData, /* hsa_gyroscope_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20889,7 +20891,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaStepData: {
 		Num: typedef.MesgNumHsaStepData, /* hsa_step_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -20942,7 +20944,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaSpo2Data: {
 		Num: typedef.MesgNumHsaSpo2Data, /* hsa_spo2_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21011,7 +21013,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaStressData: {
 		Num: typedef.MesgNumHsaStressData, /* hsa_stress_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21064,7 +21066,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaRespirationData: {
 		Num: typedef.MesgNumHsaRespirationData, /* hsa_respiration_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21117,7 +21119,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaHeartRateData: {
 		Num: typedef.MesgNumHsaHeartRateData, /* hsa_heart_rate_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21186,7 +21188,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaConfigurationData: {
 		Num: typedef.MesgNumHsaConfigurationData, /* hsa_configuration_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21239,7 +21241,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHsaWristTemperatureData: {
 		Num: typedef.MesgNumHsaWristTemperatureData, /* hsa_wrist_temperature_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21292,7 +21294,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumMemoGlob: {
 		Num: typedef.MesgNumMemoGlob, /* memo_glob */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			250: {
 				FieldBase: &proto.FieldBase{
 					Name:       "part_index",
@@ -21393,7 +21395,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSleepLevel: {
 		Num: typedef.MesgNumSleepLevel, /* sleep_level */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21430,7 +21432,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAntChannelId: {
 		Num: typedef.MesgNumAntChannelId, /* ant_channel_id */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
@@ -21515,7 +21517,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAntRx: {
 		Num: typedef.MesgNumAntRx, /* ant_rx */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21626,7 +21628,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAntTx: {
 		Num: typedef.MesgNumAntTx, /* ant_tx */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -21737,7 +21739,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumExdScreenConfiguration: {
 		Num: typedef.MesgNumExdScreenConfiguration, /* exd_screen_configuration */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
@@ -21806,7 +21808,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumExdDataFieldConfiguration: {
 		Num: typedef.MesgNumExdDataFieldConfiguration, /* exd_data_field_configuration */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
@@ -21910,7 +21912,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumExdDataConceptConfiguration: {
 		Num: typedef.MesgNumExdDataConceptConfiguration, /* exd_data_concept_configuration */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
@@ -22094,7 +22096,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumDiveSummary: {
 		Num: typedef.MesgNumDiveSummary, /* dive_summary */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22467,7 +22469,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumAadAccelFeatures: {
 		Num: typedef.MesgNumAadAccelFeatures, /* aad_accel_features */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22568,7 +22570,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHrv: {
 		Num: typedef.MesgNumHrv, /* hrv */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
@@ -22589,7 +22591,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumBeatIntervals: {
 		Num: typedef.MesgNumBeatIntervals, /* beat_intervals */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22642,7 +22644,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHrvStatusSummary: {
 		Num: typedef.MesgNumHrvStatusSummary, /* hrv_status_summary */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22775,7 +22777,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumHrvValue: {
 		Num: typedef.MesgNumHrvValue, /* hrv_value */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22812,7 +22814,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumRawBbi: {
 		Num: typedef.MesgNumRawBbi, /* raw_bbi */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22959,7 +22961,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumRespirationRate: {
 		Num: typedef.MesgNumRespirationRate, /* respiration_rate */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -22996,7 +22998,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumChronoShotSession: {
 		Num: typedef.MesgNumChronoShotSession, /* chrono_shot_session */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -23113,7 +23115,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumChronoShotData: {
 		Num: typedef.MesgNumChronoShotData, /* chrono_shot_data */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -23166,7 +23168,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTankUpdate: {
 		Num: typedef.MesgNumTankUpdate, /* tank_update */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -23219,7 +23221,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumTankSummary: {
 		Num: typedef.MesgNumTankSummary, /* tank_summary */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
@@ -23304,7 +23306,7 @@ var mesgs = [...]message{
 	},
 	typedef.MesgNumSleepAssessment: {
 		Num: typedef.MesgNumSleepAssessment, /* sleep_assessment */
-		Fields: [256]proto.Field{
+		Fields: [256]*proto.Field{
 			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "combined_awake_score",
