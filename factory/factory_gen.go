@@ -9,6 +9,7 @@ package factory
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
@@ -39,46 +40,62 @@ type Factory struct {
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
 func New() *Factory { return &Factory{} }
 
-// CreateMesg creates new message based on defined messages in the factory. If not found, it returns new message with "unknown" name.
+var ( // cache for CreateMesg func
+	once  sync.Once
+	cache map[typedef.MesgNum]proto.Message
+)
+
+// CreateMesg creates new message based on defined messages in the factory. If not found, it returns new unknown message.
 //
-// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except fot the unknown field).
-// If you want a deep copy of the mesg, create it by calling mesg.Clone().
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
+// If you want a deep copy of the mesg, clone it by calling mesg.Clone().
+//
+// NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	mesg := f.createMesg(num)
+	once.Do(func() { // populate data fields in the cache.
+		cache = make(map[typedef.MesgNum]proto.Message)
+		for i := range mesgs {
+			rawmesg := &mesgs[i]
+			if _, ok := cache[rawmesg.Num]; ok {
+				continue
+			}
+			var n byte
+			for j := range rawmesg.Fields {
+				field := rawmesg.Fields[j]
+				if field.FieldBase != nil {
+					n++
+				}
+			}
+			fields := make([]proto.Field, 0, n)
+			for j := range rawmesg.Fields {
+				field := rawmesg.Fields[j]
+				if field.FieldBase != nil {
+					fields = append(fields, field)
+				}
+			}
+			cache[rawmesg.Num] = proto.Message{Num: rawmesg.Num, Fields: fields}
+		}
+	})
 
-	if mesg.Fields == nil { // Unknown message
-		return mesg
+	mesg, ok := cache[num]
+	if !ok {
+		mesg = f.registeredMesgs[num]
 	}
 
-	mesg.Fields = make([]proto.Field, len(mesg.Fields))
-	copy(mesg.Fields, mesgs[num].Fields) // shallow copy
+	mesg.Num = num // In case of unknown field
+
+	if len(mesg.Fields) != 0 {
+		fields := make([]proto.Field, len(mesg.Fields))
+		copy(fields, mesg.Fields)
+		mesg.Fields = fields
+	}
 
 	return mesg
 }
 
-// CreateMesgOnly is similar to CreateMesg, but it sets Fields to nil. This is useful when we plan to fill these values ourselves
-// to avoid unnecessary malloc when cloning them, as they will be removed anyway. For example, the decoding process will populate them with decoded data.
+// CreateMesgOnly creates new message without predefined fields. This is useful when we plan to fill these values ourselves
+// e.g the decoding process will populate them with decoded data.
 func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
-	mesg := f.createMesg(num)
-
-	mesg.Fields = nil
-
-	return mesg
-}
-
-func (f *Factory) createMesg(num typedef.MesgNum) proto.Message {
-	if num < typedef.MesgNum(len(mesgs)) && mesgs[num].Num == num {
-		return mesgs[num]
-	}
-
-	if mesg, ok := f.registeredMesgs[num]; ok {
-		return mesg
-	}
-
-	return createUnknownMesg(num)
-}
-
-func createUnknownMesg(num typedef.MesgNum) proto.Message {
 	return proto.Message{Num: num}
 }
 
@@ -89,11 +106,9 @@ func createUnknownMesg(num typedef.MesgNum) proto.Message {
 // create it by calling field.Clone().
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
-		mesg := mesgs[mesgNum]
-		for i := range mesg.Fields {
-			if mesg.Fields[i].Num == num {
-				return mesg.Fields[i]
-			}
+		field := mesgs[mesgNum].Fields[num]
+		if field.FieldBase != nil {
+			return field
 		}
 		return createUnknownField(num)
 	}
@@ -137,12 +152,17 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 	return nil
 }
 
+type message struct {
+	Num    typedef.MesgNum
+	Fields [256]proto.Field // Use array to ensure O(1) lookup
+}
+
 // Use array to ensure O(1) lookup
-var mesgs = [...]proto.Message{
+var mesgs = [...]message{
 	typedef.MesgNumFileId: {
 		Num: typedef.MesgNumFileId, /* file_id */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
@@ -158,7 +178,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        1,
@@ -174,7 +194,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        2,
@@ -206,7 +226,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
@@ -222,7 +242,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        4,
@@ -238,7 +258,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "number",
 					Num:        5,
@@ -254,7 +274,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product_name",
 					Num:        8,
@@ -274,8 +294,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumFileCreator: {
 		Num: typedef.MesgNumFileCreator, /* file_creator */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "software_version",
 					Num:        0,
@@ -291,7 +311,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hardware_version",
 					Num:        1,
@@ -311,8 +331,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTimestampCorrelation: {
 		Num: typedef.MesgNumTimestampCorrelation, /* timestamp_correlation */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -328,7 +348,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
@@ -344,7 +364,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "system_timestamp",
 					Num:        1,
@@ -360,7 +380,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_system_timestamp",
 					Num:        2,
@@ -376,7 +396,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        3,
@@ -392,7 +412,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        4,
@@ -408,7 +428,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "system_timestamp_ms",
 					Num:        5,
@@ -428,8 +448,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSoftware: {
 		Num: typedef.MesgNumSoftware, /* software */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -445,7 +465,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "version",
 					Num:        3,
@@ -461,7 +481,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "part_number",
 					Num:        5,
@@ -481,8 +501,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSlaveDevice: {
 		Num: typedef.MesgNumSlaveDevice, /* slave_device */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        0,
@@ -498,7 +518,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        1,
@@ -534,8 +554,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumCapabilities: {
 		Num: typedef.MesgNumCapabilities, /* capabilities */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "languages",
 					Num:        0,
@@ -551,7 +571,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sports",
 					Num:        1,
@@ -567,7 +587,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "workouts_supported",
 					Num:        21,
@@ -583,7 +603,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "connectivity_supported",
 					Num:        23,
@@ -603,8 +623,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumFileCapabilities: {
 		Num: typedef.MesgNumFileCapabilities, /* file_capabilities */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -620,7 +640,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
@@ -636,7 +656,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "flags",
 					Num:        1,
@@ -652,7 +672,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "directory",
 					Num:        2,
@@ -668,7 +688,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_count",
 					Num:        3,
@@ -684,7 +704,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_size",
 					Num:        4,
@@ -704,8 +724,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMesgCapabilities: {
 		Num: typedef.MesgNumMesgCapabilities, /* mesg_capabilities */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -721,7 +741,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "file",
 					Num:        0,
@@ -737,7 +757,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
@@ -753,7 +773,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "count_type",
 					Num:        2,
@@ -769,7 +789,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "count",
 					Num:        3,
@@ -808,8 +828,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumFieldCapabilities: {
 		Num: typedef.MesgNumFieldCapabilities, /* field_capabilities */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -825,7 +845,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "file",
 					Num:        0,
@@ -841,7 +861,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
@@ -857,7 +877,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_num",
 					Num:        2,
@@ -873,7 +893,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "count",
 					Num:        3,
@@ -893,8 +913,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDeviceSettings: {
 		Num: typedef.MesgNumDeviceSettings, /* device_settings */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time_zone",
 					Num:        0,
@@ -910,7 +930,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "utc_offset",
 					Num:        1,
@@ -926,7 +946,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_offset",
 					Num:        2,
@@ -942,7 +962,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_mode",
 					Num:        4,
@@ -958,7 +978,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_zone_offset",
 					Num:        5,
@@ -974,7 +994,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int8(nil), /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_mode",
 					Num:        12,
@@ -990,7 +1010,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			36: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_tracker_enabled",
 					Num:        36,
@@ -1006,7 +1026,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "clock_time",
 					Num:        39,
@@ -1022,7 +1042,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			40: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pages_enabled",
 					Num:        40,
@@ -1038,7 +1058,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			46: {
 				FieldBase: &proto.FieldBase{
 					Name:       "move_alert_enabled",
 					Num:        46,
@@ -1054,7 +1074,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "date_mode",
 					Num:        47,
@@ -1070,7 +1090,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			55: {
 				FieldBase: &proto.FieldBase{
 					Name:       "display_orientation",
 					Num:        55,
@@ -1086,7 +1106,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			56: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mounting_side",
 					Num:        56,
@@ -1102,7 +1122,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			57: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_page",
 					Num:        57,
@@ -1118,7 +1138,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			58: {
 				FieldBase: &proto.FieldBase{
 					Name:       "autosync_min_steps",
 					Num:        58,
@@ -1134,7 +1154,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			59: {
 				FieldBase: &proto.FieldBase{
 					Name:       "autosync_min_time",
 					Num:        59,
@@ -1150,7 +1170,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			80: {
 				FieldBase: &proto.FieldBase{
 					Name:       "lactate_threshold_autodetect_enabled",
 					Num:        80,
@@ -1166,7 +1186,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			86: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ble_auto_upload_enabled",
 					Num:        86,
@@ -1182,7 +1202,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			89: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_sync_frequency",
 					Num:        89,
@@ -1198,7 +1218,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			90: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_activity_detect",
 					Num:        90,
@@ -1214,7 +1234,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			94: {
 				FieldBase: &proto.FieldBase{
 					Name:       "number_of_screens",
 					Num:        94,
@@ -1230,7 +1250,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			95: {
 				FieldBase: &proto.FieldBase{
 					Name:       "smart_notification_display_orientation",
 					Num:        95,
@@ -1246,7 +1266,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			134: {
 				FieldBase: &proto.FieldBase{
 					Name:       "tap_interface",
 					Num:        134,
@@ -1262,7 +1282,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			174: {
 				FieldBase: &proto.FieldBase{
 					Name:       "tap_sensitivity",
 					Num:        174,
@@ -1282,8 +1302,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumUserProfile: {
 		Num: typedef.MesgNumUserProfile, /* user_profile */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -1299,7 +1319,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "friendly_name",
 					Num:        0,
@@ -1315,7 +1335,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gender",
 					Num:        1,
@@ -1331,7 +1351,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "age",
 					Num:        2,
@@ -1347,7 +1367,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "height",
 					Num:        3,
@@ -1363,7 +1383,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        4,
@@ -1379,7 +1399,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "language",
 					Num:        5,
@@ -1395,7 +1415,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "elev_setting",
 					Num:        6,
@@ -1411,7 +1431,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_setting",
 					Num:        7,
@@ -1427,7 +1447,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        8,
@@ -1443,7 +1463,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_running_heart_rate",
 					Num:        9,
@@ -1459,7 +1479,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_biking_heart_rate",
 					Num:        10,
@@ -1475,7 +1495,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_max_heart_rate",
 					Num:        11,
@@ -1491,7 +1511,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_setting",
 					Num:        12,
@@ -1507,7 +1527,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_setting",
 					Num:        13,
@@ -1523,7 +1543,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dist_setting",
 					Num:        14,
@@ -1539,7 +1559,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "power_setting",
 					Num:        16,
@@ -1555,7 +1575,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_class",
 					Num:        17,
@@ -1571,7 +1591,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_setting",
 					Num:        18,
@@ -1587,7 +1607,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_setting",
 					Num:        21,
@@ -1603,7 +1623,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "local_id",
 					Num:        22,
@@ -1619,7 +1639,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "global_id",
 					Num:        23,
@@ -1635,7 +1655,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wake_time",
 					Num:        28,
@@ -1651,7 +1671,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_time",
 					Num:        29,
@@ -1667,7 +1687,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "height_setting",
 					Num:        30,
@@ -1683,7 +1703,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			31: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_running_step_length",
 					Num:        31,
@@ -1699,7 +1719,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_walking_step_length",
 					Num:        32,
@@ -1715,7 +1735,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "depth_setting",
 					Num:        47,
@@ -1731,7 +1751,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			49: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_count",
 					Num:        49,
@@ -1751,8 +1771,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHrmProfile: {
 		Num: typedef.MesgNumHrmProfile, /* hrm_profile */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -1768,7 +1788,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
@@ -1784,7 +1804,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hrm_ant_id",
 					Num:        1,
@@ -1800,7 +1820,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "log_hrv",
 					Num:        2,
@@ -1816,7 +1836,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hrm_ant_id_trans_type",
 					Num:        3,
@@ -1836,8 +1856,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSdmProfile: {
 		Num: typedef.MesgNumSdmProfile, /* sdm_profile */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -1853,7 +1873,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
@@ -1869,7 +1889,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_ant_id",
 					Num:        1,
@@ -1885,7 +1905,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_cal_factor",
 					Num:        2,
@@ -1901,7 +1921,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer",
 					Num:        3,
@@ -1917,7 +1937,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_source",
 					Num:        4,
@@ -1933,7 +1953,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sdm_ant_id_trans_type",
 					Num:        5,
@@ -1949,7 +1969,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer_rollover",
 					Num:        7,
@@ -1969,8 +1989,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumBikeProfile: {
 		Num: typedef.MesgNumBikeProfile, /* bike_profile */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -1986,7 +2006,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
@@ -2002,7 +2022,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        1,
@@ -2018,7 +2038,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        2,
@@ -2034,7 +2054,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer",
 					Num:        3,
@@ -2050,7 +2070,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spd_ant_id",
 					Num:        4,
@@ -2066,7 +2086,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_cad_ant_id",
 					Num:        5,
@@ -2082,7 +2102,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spdcad_ant_id",
 					Num:        6,
@@ -2098,7 +2118,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_power_ant_id",
 					Num:        7,
@@ -2114,7 +2134,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_wheelsize",
 					Num:        8,
@@ -2130,7 +2150,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_wheelsize",
 					Num:        9,
@@ -2146,7 +2166,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_weight",
 					Num:        10,
@@ -2162,7 +2182,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "power_cal_factor",
 					Num:        11,
@@ -2178,7 +2198,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_wheel_cal",
 					Num:        12,
@@ -2194,7 +2214,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_power_zero",
 					Num:        13,
@@ -2210,7 +2230,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        14,
@@ -2226,7 +2246,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "spd_enabled",
 					Num:        15,
@@ -2242,7 +2262,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cad_enabled",
 					Num:        16,
@@ -2258,7 +2278,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "spdcad_enabled",
 					Num:        17,
@@ -2274,7 +2294,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "power_enabled",
 					Num:        18,
@@ -2290,7 +2310,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "crank_length",
 					Num:        19,
@@ -2306,7 +2326,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        20,
@@ -2322,7 +2342,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spd_ant_id_trans_type",
 					Num:        21,
@@ -2338,7 +2358,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_cad_ant_id_trans_type",
 					Num:        22,
@@ -2354,7 +2374,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_spdcad_ant_id_trans_type",
 					Num:        23,
@@ -2370,7 +2390,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bike_power_ant_id_trans_type",
 					Num:        24,
@@ -2386,7 +2406,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			37: {
 				FieldBase: &proto.FieldBase{
 					Name:       "odometer_rollover",
 					Num:        37,
@@ -2402,7 +2422,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			38: {
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_num",
 					Num:        38,
@@ -2418,7 +2438,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear",
 					Num:        39,
@@ -2434,7 +2454,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			40: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_num",
 					Num:        40,
@@ -2450,7 +2470,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			41: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear",
 					Num:        41,
@@ -2466,7 +2486,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			44: {
 				FieldBase: &proto.FieldBase{
 					Name:       "shimano_di2_enabled",
 					Num:        44,
@@ -2486,8 +2506,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumConnectivity: {
 		Num: typedef.MesgNumConnectivity, /* connectivity */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_enabled",
 					Num:        0,
@@ -2503,7 +2523,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bluetooth_le_enabled",
 					Num:        1,
@@ -2519,7 +2539,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_enabled",
 					Num:        2,
@@ -2535,7 +2555,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        3,
@@ -2551,7 +2571,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "live_tracking_enabled",
 					Num:        4,
@@ -2567,7 +2587,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_conditions_enabled",
 					Num:        5,
@@ -2583,7 +2603,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_alerts_enabled",
 					Num:        6,
@@ -2599,7 +2619,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "auto_activity_upload_enabled",
 					Num:        7,
@@ -2615,7 +2635,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "course_download_enabled",
 					Num:        8,
@@ -2631,7 +2651,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "workout_download_enabled",
 					Num:        9,
@@ -2647,7 +2667,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_ephemeris_download_enabled",
 					Num:        10,
@@ -2663,7 +2683,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "incident_detection_enabled",
 					Num:        11,
@@ -2679,7 +2699,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "grouptrack_enabled",
 					Num:        12,
@@ -2699,8 +2719,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWatchfaceSettings: {
 		Num: typedef.MesgNumWatchfaceSettings, /* watchface_settings */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -2716,7 +2736,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        0,
@@ -2732,7 +2752,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "layout",
 					Num:        1,
@@ -2765,8 +2785,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumOhrSettings: {
 		Num: typedef.MesgNumOhrSettings, /* ohr_settings */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -2782,7 +2802,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        0,
@@ -2802,8 +2822,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTimeInZone: {
 		Num: typedef.MesgNumTimeInZone, /* time_in_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -2819,7 +2839,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_mesg",
 					Num:        0,
@@ -2835,7 +2855,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_index",
 					Num:        1,
@@ -2851,7 +2871,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        2,
@@ -2867,7 +2887,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        3,
@@ -2883,7 +2903,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        4,
@@ -2899,7 +2919,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        5,
@@ -2915,7 +2935,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_zone_high_boundary",
 					Num:        6,
@@ -2931,7 +2951,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_zone_high_boundary",
 					Num:        7,
@@ -2947,7 +2967,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence_zone_high_bondary",
 					Num:        8,
@@ -2963,7 +2983,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "power_zone_high_boundary",
 					Num:        9,
@@ -2979,7 +2999,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_calc_type",
 					Num:        10,
@@ -2995,7 +3015,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        11,
@@ -3011,7 +3031,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        12,
@@ -3027,7 +3047,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_heart_rate",
 					Num:        13,
@@ -3043,7 +3063,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pwr_calc_type",
 					Num:        14,
@@ -3059,7 +3079,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "functional_threshold_power",
 					Num:        15,
@@ -3079,8 +3099,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumZonesTarget: {
 		Num: typedef.MesgNumZonesTarget, /* zones_target */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        1,
@@ -3096,7 +3116,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_heart_rate",
 					Num:        2,
@@ -3112,7 +3132,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "functional_threshold_power",
 					Num:        3,
@@ -3128,7 +3148,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_calc_type",
 					Num:        5,
@@ -3144,7 +3164,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pwr_calc_type",
 					Num:        7,
@@ -3164,8 +3184,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSport: {
 		Num: typedef.MesgNumSport, /* sport */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
@@ -3181,7 +3201,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
@@ -3197,7 +3217,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        3,
@@ -3217,8 +3237,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHrZone: {
 		Num: typedef.MesgNumHrZone, /* hr_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3234,7 +3254,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_bpm",
 					Num:        1,
@@ -3250,7 +3270,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        2,
@@ -3270,8 +3290,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSpeedZone: {
 		Num: typedef.MesgNumSpeedZone, /* speed_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3287,7 +3307,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        0,
@@ -3303,7 +3323,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        1,
@@ -3323,8 +3343,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumCadenceZone: {
 		Num: typedef.MesgNumCadenceZone, /* cadence_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3340,7 +3360,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        0,
@@ -3356,7 +3376,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        1,
@@ -3376,8 +3396,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumPowerZone: {
 		Num: typedef.MesgNumPowerZone, /* power_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3393,7 +3413,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_value",
 					Num:        1,
@@ -3409,7 +3429,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        2,
@@ -3429,8 +3449,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMetZone: {
 		Num: typedef.MesgNumMetZone, /* met_zone */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3446,7 +3466,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_bpm",
 					Num:        1,
@@ -3462,7 +3482,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        2,
@@ -3478,7 +3498,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fat_calories",
 					Num:        3,
@@ -3498,8 +3518,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDiveSettings: {
 		Num: typedef.MesgNumDiveSettings, /* dive_settings */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -3515,7 +3535,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -3531,7 +3551,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
@@ -3547,7 +3567,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "model",
 					Num:        1,
@@ -3563,7 +3583,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gf_low",
 					Num:        2,
@@ -3579,7 +3599,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gf_high",
 					Num:        3,
@@ -3595,7 +3615,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "water_type",
 					Num:        4,
@@ -3611,7 +3631,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "water_density",
 					Num:        5,
@@ -3627,7 +3647,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_warn",
 					Num:        6,
@@ -3643,7 +3663,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_critical",
 					Num:        7,
@@ -3659,7 +3679,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "po2_deco",
 					Num:        8,
@@ -3675,7 +3695,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "safety_stop_enabled",
 					Num:        9,
@@ -3691,7 +3711,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_depth",
 					Num:        10,
@@ -3707,7 +3727,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_time",
 					Num:        11,
@@ -3723,7 +3743,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "apnea_countdown_enabled",
 					Num:        12,
@@ -3739,7 +3759,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "apnea_countdown_time",
 					Num:        13,
@@ -3755,7 +3775,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_mode",
 					Num:        14,
@@ -3771,7 +3791,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_brightness",
 					Num:        15,
@@ -3787,7 +3807,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "backlight_timeout",
 					Num:        16,
@@ -3803,7 +3823,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repeat_dive_interval",
 					Num:        17,
@@ -3819,7 +3839,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "safety_stop_time",
 					Num:        18,
@@ -3835,7 +3855,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_source_type",
 					Num:        19,
@@ -3851,7 +3871,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_source",
 					Num:        20,
@@ -3880,7 +3900,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "travel_gas",
 					Num:        21,
@@ -3896,7 +3916,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint_switch_mode",
 					Num:        22,
@@ -3912,7 +3932,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint",
 					Num:        23,
@@ -3928,7 +3948,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_low_setpoint_depth",
 					Num:        24,
@@ -3944,7 +3964,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint_switch_mode",
 					Num:        25,
@@ -3960,7 +3980,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint",
 					Num:        26,
@@ -3976,7 +3996,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ccr_high_setpoint_depth",
 					Num:        27,
@@ -3992,7 +4012,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gas_consumption_display",
 					Num:        29,
@@ -4008,7 +4028,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "up_key_enabled",
 					Num:        30,
@@ -4024,7 +4044,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			35: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_sounds",
 					Num:        35,
@@ -4040,7 +4060,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			36: {
 				FieldBase: &proto.FieldBase{
 					Name:       "last_stop_multiple",
 					Num:        36,
@@ -4056,7 +4076,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			37: {
 				FieldBase: &proto.FieldBase{
 					Name:       "no_fly_time_mode",
 					Num:        37,
@@ -4076,8 +4096,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDiveAlarm: {
 		Num: typedef.MesgNumDiveAlarm, /* dive_alarm */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -4093,7 +4113,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        0,
@@ -4109,7 +4129,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
@@ -4125,7 +4145,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
@@ -4141,7 +4161,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "alarm_type",
 					Num:        3,
@@ -4157,7 +4177,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sound",
 					Num:        4,
@@ -4173,7 +4193,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_types",
 					Num:        5,
@@ -4189,7 +4209,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        6,
@@ -4205,7 +4225,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
@@ -4221,7 +4241,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
@@ -4237,7 +4257,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
@@ -4253,7 +4273,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
@@ -4269,7 +4289,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed",
 					Num:        11,
@@ -4289,8 +4309,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDiveApneaAlarm: {
 		Num: typedef.MesgNumDiveApneaAlarm, /* dive_apnea_alarm */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -4306,7 +4326,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        0,
@@ -4322,7 +4342,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
@@ -4338,7 +4358,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        2,
@@ -4354,7 +4374,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "alarm_type",
 					Num:        3,
@@ -4370,7 +4390,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sound",
 					Num:        4,
@@ -4386,7 +4406,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_types",
 					Num:        5,
@@ -4402,7 +4422,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "id",
 					Num:        6,
@@ -4418,7 +4438,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "popup_enabled",
 					Num:        7,
@@ -4434,7 +4454,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_descent",
 					Num:        8,
@@ -4450,7 +4470,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger_on_ascent",
 					Num:        9,
@@ -4466,7 +4486,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repeating",
 					Num:        10,
@@ -4482,7 +4502,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed",
 					Num:        11,
@@ -4502,8 +4522,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDiveGas: {
 		Num: typedef.MesgNumDiveGas, /* dive_gas */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -4519,7 +4539,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "helium_content",
 					Num:        0,
@@ -4535,7 +4555,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "oxygen_content",
 					Num:        1,
@@ -4551,7 +4571,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        2,
@@ -4567,7 +4587,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        3,
@@ -4587,8 +4607,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumGoal: {
 		Num: typedef.MesgNumGoal, /* goal */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -4604,7 +4624,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
@@ -4620,7 +4640,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
@@ -4636,7 +4656,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_date",
 					Num:        2,
@@ -4652,7 +4672,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_date",
 					Num:        3,
@@ -4668,7 +4688,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        4,
@@ -4684,7 +4704,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        5,
@@ -4700,7 +4720,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repeat",
 					Num:        6,
@@ -4716,7 +4736,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "target_value",
 					Num:        7,
@@ -4732,7 +4752,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "recurrence",
 					Num:        8,
@@ -4748,7 +4768,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "recurrence_value",
 					Num:        9,
@@ -4764,7 +4784,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        10,
@@ -4780,7 +4800,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "source",
 					Num:        11,
@@ -4800,8 +4820,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumActivity: {
 		Num: typedef.MesgNumActivity, /* activity */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -4817,7 +4837,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        0,
@@ -4833,7 +4853,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_sessions",
 					Num:        1,
@@ -4849,7 +4869,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        2,
@@ -4865,7 +4885,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        3,
@@ -4881,7 +4901,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        4,
@@ -4897,7 +4917,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        5,
@@ -4913,7 +4933,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        6,
@@ -4933,8 +4953,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSession: {
 		Num: typedef.MesgNumSession, /* session */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -4950,7 +4970,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -4966,7 +4986,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
@@ -4982,7 +5002,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
@@ -4998,7 +5018,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
@@ -5014,7 +5034,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
@@ -5030,7 +5050,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
@@ -5046,7 +5066,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        5,
@@ -5062,7 +5082,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        6,
@@ -5078,7 +5098,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
@@ -5094,7 +5114,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
@@ -5110,7 +5130,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
@@ -5126,7 +5146,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
@@ -5159,7 +5179,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
@@ -5175,7 +5195,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        13,
@@ -5191,7 +5211,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_speed",
 					Num:      14,
@@ -5209,7 +5229,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_speed",
 					Num:      15,
@@ -5227,7 +5247,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        16,
@@ -5243,7 +5263,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        17,
@@ -5259,7 +5279,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        18,
@@ -5282,7 +5302,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        19,
@@ -5305,7 +5325,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        20,
@@ -5321,7 +5341,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        21,
@@ -5337,7 +5357,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        22,
@@ -5353,7 +5373,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        23,
@@ -5369,7 +5389,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_training_effect",
 					Num:        24,
@@ -5385,7 +5405,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "first_lap_index",
 					Num:        25,
@@ -5401,7 +5421,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_laps",
 					Num:        26,
@@ -5417,7 +5437,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        27,
@@ -5433,7 +5453,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:       "trigger",
 					Num:        28,
@@ -5449,7 +5469,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_lat",
 					Num:        29,
@@ -5465,7 +5485,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_long",
 					Num:        30,
@@ -5481,7 +5501,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			31: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_lat",
 					Num:        31,
@@ -5497,7 +5517,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_long",
 					Num:        32,
@@ -5513,7 +5533,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			33: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_lengths",
 					Num:        33,
@@ -5529,7 +5549,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			34: {
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        34,
@@ -5545,7 +5565,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			35: {
 				FieldBase: &proto.FieldBase{
 					Name:       "training_stress_score",
 					Num:        35,
@@ -5561,7 +5581,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			36: {
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity_factor",
 					Num:        36,
@@ -5577,7 +5597,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			37: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        37,
@@ -5593,7 +5613,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			38: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        38,
@@ -5609,7 +5629,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        39,
@@ -5625,7 +5645,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			41: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_count",
 					Num:        41,
@@ -5641,7 +5661,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			42: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_distance",
 					Num:        42,
@@ -5657,7 +5677,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			43: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        43,
@@ -5673,7 +5693,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			44: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        44,
@@ -5689,7 +5709,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			45: {
 				FieldBase: &proto.FieldBase{
 					Name:       "threshold_power",
 					Num:        45,
@@ -5705,7 +5725,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			46: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        46,
@@ -5721,7 +5741,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_active_lengths",
 					Num:        47,
@@ -5737,7 +5757,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			48: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        48,
@@ -5753,7 +5773,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			49: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_altitude",
 					Num:      49,
@@ -5771,7 +5791,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			50: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_altitude",
 					Num:      50,
@@ -5789,7 +5809,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			51: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        51,
@@ -5805,7 +5825,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			52: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        52,
@@ -5821,7 +5841,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			53: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        53,
@@ -5837,7 +5857,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			54: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        54,
@@ -5853,7 +5873,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			55: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        55,
@@ -5869,7 +5889,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			56: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        56,
@@ -5885,7 +5905,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			57: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        57,
@@ -5901,7 +5921,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			58: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        58,
@@ -5917,7 +5937,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			59: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        59,
@@ -5933,7 +5953,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			60: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        60,
@@ -5949,7 +5969,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			61: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        61,
@@ -5965,7 +5985,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			62: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        62,
@@ -5981,7 +6001,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			63: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        63,
@@ -5997,7 +6017,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			64: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        64,
@@ -6013,7 +6033,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			65: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        65,
@@ -6029,7 +6049,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			66: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        66,
@@ -6045,7 +6065,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			67: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        67,
@@ -6061,7 +6081,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			68: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        68,
@@ -6077,7 +6097,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			69: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lap_time",
 					Num:        69,
@@ -6093,7 +6113,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			70: {
 				FieldBase: &proto.FieldBase{
 					Name:       "best_lap_index",
 					Num:        70,
@@ -6109,7 +6129,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			71: {
 				FieldBase: &proto.FieldBase{
 					Name:     "min_altitude",
 					Num:      71,
@@ -6127,7 +6147,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			82: {
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        82,
@@ -6143,7 +6163,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			83: {
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        83,
@@ -6159,7 +6179,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			84: {
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_name",
 					Num:        84,
@@ -6175,7 +6195,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			85: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        85,
@@ -6191,7 +6211,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			86: {
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        86,
@@ -6207,7 +6227,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			87: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_ball_speed",
 					Num:        87,
@@ -6223,7 +6243,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			88: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_ball_speed",
 					Num:        88,
@@ -6239,7 +6259,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			89: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_oscillation",
 					Num:        89,
@@ -6255,7 +6275,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			90: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_percent",
 					Num:        90,
@@ -6271,7 +6291,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			91: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time",
 					Num:        91,
@@ -6287,7 +6307,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			92: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        92,
@@ -6303,7 +6323,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			93: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        93,
@@ -6319,7 +6339,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			94: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        94,
@@ -6335,7 +6355,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			95: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_total_hemoglobin_conc",
 					Num:        95,
@@ -6351,7 +6371,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			96: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_total_hemoglobin_conc",
 					Num:        96,
@@ -6367,7 +6387,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			97: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_total_hemoglobin_conc",
 					Num:        97,
@@ -6383,7 +6403,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			98: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_saturated_hemoglobin_percent",
 					Num:        98,
@@ -6399,7 +6419,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			99: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_saturated_hemoglobin_percent",
 					Num:        99,
@@ -6415,7 +6435,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			100: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_saturated_hemoglobin_percent",
 					Num:        100,
@@ -6431,7 +6451,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			101: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        101,
@@ -6447,7 +6467,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			102: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        102,
@@ -6463,7 +6483,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			103: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        103,
@@ -6479,7 +6499,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			104: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        104,
@@ -6495,7 +6515,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			105: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        105,
@@ -6511,7 +6531,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			110: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_profile_name",
 					Num:        110,
@@ -6527,7 +6547,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			111: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_index",
 					Num:        111,
@@ -6543,7 +6563,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			112: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        112,
@@ -6559,7 +6579,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			113: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        113,
@@ -6575,7 +6595,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			114: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        114,
@@ -6591,7 +6611,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			115: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        115,
@@ -6607,7 +6627,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			116: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        116,
@@ -6623,7 +6643,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			117: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        117,
@@ -6639,7 +6659,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			118: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        118,
@@ -6655,7 +6675,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			119: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        119,
@@ -6671,7 +6691,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			120: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        120,
@@ -6687,7 +6707,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			121: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        121,
@@ -6703,7 +6723,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			122: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        122,
@@ -6719,7 +6739,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			123: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        123,
@@ -6735,7 +6755,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			124: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_speed",
 					Num:        124,
@@ -6751,7 +6771,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			125: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_speed",
 					Num:        125,
@@ -6767,7 +6787,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			126: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        126,
@@ -6783,7 +6803,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			127: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        127,
@@ -6799,7 +6819,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			128: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        128,
@@ -6815,7 +6835,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			129: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lev_motor_power",
 					Num:        129,
@@ -6831,7 +6851,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			130: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_lev_motor_power",
 					Num:        130,
@@ -6847,7 +6867,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			131: {
 				FieldBase: &proto.FieldBase{
 					Name:       "lev_battery_consumption",
 					Num:        131,
@@ -6863,7 +6883,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			132: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_ratio",
 					Num:        132,
@@ -6879,7 +6899,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			133: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_balance",
 					Num:        133,
@@ -6895,7 +6915,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			134: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_step_length",
 					Num:        134,
@@ -6911,7 +6931,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			137: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_anaerobic_training_effect",
 					Num:        137,
@@ -6927,7 +6947,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			139: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vam",
 					Num:        139,
@@ -6943,7 +6963,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			140: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        140,
@@ -6959,7 +6979,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			141: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        141,
@@ -6975,7 +6995,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			142: {
 				FieldBase: &proto.FieldBase{
 					Name:       "surface_interval",
 					Num:        142,
@@ -6991,7 +7011,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			143: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_cns",
 					Num:        143,
@@ -7007,7 +7027,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			144: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_cns",
 					Num:        144,
@@ -7023,7 +7043,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			145: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_n2",
 					Num:        145,
@@ -7039,7 +7059,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			146: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_n2",
 					Num:        146,
@@ -7055,7 +7075,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			147: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_respiration_rate",
 					Num:      147,
@@ -7073,7 +7093,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			148: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_respiration_rate",
 					Num:      148,
@@ -7091,7 +7111,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			149: {
 				FieldBase: &proto.FieldBase{
 					Name:     "min_respiration_rate",
 					Num:      149,
@@ -7109,7 +7129,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			150: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_temperature",
 					Num:        150,
@@ -7125,7 +7145,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			155: {
 				FieldBase: &proto.FieldBase{
 					Name:       "o2_toxicity",
 					Num:        155,
@@ -7141,7 +7161,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			156: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_number",
 					Num:        156,
@@ -7157,7 +7177,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			168: {
 				FieldBase: &proto.FieldBase{
 					Name:       "training_load_peak",
 					Num:        168,
@@ -7173,7 +7193,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			169: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        169,
@@ -7189,7 +7209,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			170: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        170,
@@ -7205,7 +7225,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			180: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_respiration_rate",
 					Num:        180,
@@ -7221,7 +7241,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			181: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        181,
@@ -7237,7 +7257,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			182: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        182,
@@ -7253,7 +7273,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			183: {
 				FieldBase: &proto.FieldBase{
 					Name:       "jump_count",
 					Num:        183,
@@ -7269,7 +7289,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			186: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        186,
@@ -7285,7 +7305,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			187: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        187,
@@ -7301,7 +7321,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			194: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_spo2",
 					Num:        194,
@@ -7317,7 +7337,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			195: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stress",
 					Num:        195,
@@ -7333,7 +7353,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			197: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sdrr_hrv",
 					Num:        197,
@@ -7349,7 +7369,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			198: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rmssd_hrv",
 					Num:        198,
@@ -7365,7 +7385,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			199: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        199,
@@ -7381,7 +7401,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			200: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        200,
@@ -7397,7 +7417,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			208: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_core_temperature",
 					Num:        208,
@@ -7413,7 +7433,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			209: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_core_temperature",
 					Num:        209,
@@ -7429,7 +7449,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			210: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_core_temperature",
 					Num:        210,
@@ -7449,8 +7469,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumLap: {
 		Num: typedef.MesgNumLap, /* lap */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -7466,7 +7486,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -7482,7 +7502,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
@@ -7498,7 +7518,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
@@ -7514,7 +7534,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
@@ -7530,7 +7550,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
@@ -7546,7 +7566,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
@@ -7562,7 +7582,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        5,
@@ -7578,7 +7598,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        6,
@@ -7594,7 +7614,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
@@ -7610,7 +7630,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
@@ -7626,7 +7646,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
@@ -7642,7 +7662,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
@@ -7675,7 +7695,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
@@ -7691,7 +7711,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        12,
@@ -7707,7 +7727,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_speed",
 					Num:      13,
@@ -7725,7 +7745,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_speed",
 					Num:      14,
@@ -7743,7 +7763,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        15,
@@ -7759,7 +7779,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        16,
@@ -7775,7 +7795,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        17,
@@ -7798,7 +7818,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        18,
@@ -7821,7 +7841,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        19,
@@ -7837,7 +7857,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        20,
@@ -7853,7 +7873,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        21,
@@ -7869,7 +7889,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        22,
@@ -7885,7 +7905,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        23,
@@ -7901,7 +7921,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "lap_trigger",
 					Num:        24,
@@ -7917,7 +7937,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        25,
@@ -7933,7 +7953,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        26,
@@ -7949,7 +7969,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_lengths",
 					Num:        32,
@@ -7965,7 +7985,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			33: {
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        33,
@@ -7981,7 +8001,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			34: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        34,
@@ -7997,7 +8017,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			35: {
 				FieldBase: &proto.FieldBase{
 					Name:       "first_length_index",
 					Num:        35,
@@ -8013,7 +8033,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			37: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stroke_distance",
 					Num:        37,
@@ -8029,7 +8049,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			38: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        38,
@@ -8045,7 +8065,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        39,
@@ -8061,7 +8081,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			40: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_active_lengths",
 					Num:        40,
@@ -8077,7 +8097,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			41: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        41,
@@ -8093,7 +8113,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			42: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_altitude",
 					Num:      42,
@@ -8111,7 +8131,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			43: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_altitude",
 					Num:      43,
@@ -8129,7 +8149,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			44: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        44,
@@ -8145,7 +8165,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			45: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        45,
@@ -8161,7 +8181,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			46: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        46,
@@ -8177,7 +8197,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        47,
@@ -8193,7 +8213,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			48: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        48,
@@ -8209,7 +8229,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			49: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        49,
@@ -8225,7 +8245,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			50: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        50,
@@ -8241,7 +8261,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			51: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        51,
@@ -8257,7 +8277,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			52: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        52,
@@ -8273,7 +8293,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			53: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        53,
@@ -8289,7 +8309,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			54: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        54,
@@ -8305,7 +8325,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			55: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        55,
@@ -8321,7 +8341,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			56: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        56,
@@ -8337,7 +8357,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			57: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        57,
@@ -8353,7 +8373,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			58: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        58,
@@ -8369,7 +8389,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			59: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        59,
@@ -8385,7 +8405,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			60: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        60,
@@ -8401,7 +8421,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			61: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repetition_num",
 					Num:        61,
@@ -8417,7 +8437,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			62: {
 				FieldBase: &proto.FieldBase{
 					Name:     "min_altitude",
 					Num:      62,
@@ -8435,7 +8455,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			63: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        63,
@@ -8451,7 +8471,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			71: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        71,
@@ -8467,7 +8487,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			74: {
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        74,
@@ -8483,7 +8503,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			75: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        75,
@@ -8499,7 +8519,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			76: {
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        76,
@@ -8515,7 +8535,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			77: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_oscillation",
 					Num:        77,
@@ -8531,7 +8551,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			78: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_percent",
 					Num:        78,
@@ -8547,7 +8567,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			79: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time",
 					Num:        79,
@@ -8563,7 +8583,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			80: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        80,
@@ -8579,7 +8599,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			81: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        81,
@@ -8595,7 +8615,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			82: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        82,
@@ -8611,7 +8631,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			83: {
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        83,
@@ -8627,7 +8647,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			84: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_total_hemoglobin_conc",
 					Num:        84,
@@ -8643,7 +8663,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			85: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_total_hemoglobin_conc",
 					Num:        85,
@@ -8659,7 +8679,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			86: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_total_hemoglobin_conc",
 					Num:        86,
@@ -8675,7 +8695,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			87: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_saturated_hemoglobin_percent",
 					Num:        87,
@@ -8691,7 +8711,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			88: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_saturated_hemoglobin_percent",
 					Num:        88,
@@ -8707,7 +8727,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			89: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_saturated_hemoglobin_percent",
 					Num:        89,
@@ -8723,7 +8743,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			91: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        91,
@@ -8739,7 +8759,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			92: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        92,
@@ -8755,7 +8775,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			93: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        93,
@@ -8771,7 +8791,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			94: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        94,
@@ -8787,7 +8807,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			95: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        95,
@@ -8803,7 +8823,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			98: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        98,
@@ -8819,7 +8839,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			99: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        99,
@@ -8835,7 +8855,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			100: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        100,
@@ -8851,7 +8871,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			101: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        101,
@@ -8867,7 +8887,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			102: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        102,
@@ -8883,7 +8903,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			103: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        103,
@@ -8899,7 +8919,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			104: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        104,
@@ -8915,7 +8935,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			105: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        105,
@@ -8931,7 +8951,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			106: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        106,
@@ -8947,7 +8967,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			107: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        107,
@@ -8963,7 +8983,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			108: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        108,
@@ -8979,7 +8999,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			109: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        109,
@@ -8995,7 +9015,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			110: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_speed",
 					Num:        110,
@@ -9011,7 +9031,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			111: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_speed",
 					Num:        111,
@@ -9027,7 +9047,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			112: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        112,
@@ -9043,7 +9063,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			113: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        113,
@@ -9059,7 +9079,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			114: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        114,
@@ -9075,7 +9095,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			115: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_lev_motor_power",
 					Num:        115,
@@ -9091,7 +9111,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			116: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_lev_motor_power",
 					Num:        116,
@@ -9107,7 +9127,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			117: {
 				FieldBase: &proto.FieldBase{
 					Name:       "lev_battery_consumption",
 					Num:        117,
@@ -9123,7 +9143,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			118: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vertical_ratio",
 					Num:        118,
@@ -9139,7 +9159,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			119: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_stance_time_balance",
 					Num:        119,
@@ -9155,7 +9175,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			120: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_step_length",
 					Num:        120,
@@ -9171,7 +9191,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			121: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vam",
 					Num:        121,
@@ -9187,7 +9207,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			122: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        122,
@@ -9203,7 +9223,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			123: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        123,
@@ -9219,7 +9239,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			124: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_temperature",
 					Num:        124,
@@ -9235,7 +9255,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			136: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        136,
@@ -9251,7 +9271,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			137: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        137,
@@ -9267,7 +9287,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			147: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_respiration_rate",
 					Num:      147,
@@ -9285,7 +9305,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			148: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_respiration_rate",
 					Num:      148,
@@ -9303,7 +9323,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			149: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        149,
@@ -9319,7 +9339,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			150: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        150,
@@ -9335,7 +9355,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			151: {
 				FieldBase: &proto.FieldBase{
 					Name:       "jump_count",
 					Num:        151,
@@ -9351,7 +9371,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			153: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        153,
@@ -9367,7 +9387,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			154: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        154,
@@ -9383,7 +9403,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			156: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        156,
@@ -9399,7 +9419,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			157: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        157,
@@ -9415,7 +9435,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			158: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_core_temperature",
 					Num:        158,
@@ -9431,7 +9451,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			159: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_core_temperature",
 					Num:        159,
@@ -9447,7 +9467,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			160: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_core_temperature",
 					Num:        160,
@@ -9467,8 +9487,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumLength: {
 		Num: typedef.MesgNumLength, /* length */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -9484,7 +9504,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -9500,7 +9520,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
@@ -9516,7 +9536,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
@@ -9532,7 +9552,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
@@ -9548,7 +9568,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        3,
@@ -9564,7 +9584,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        4,
@@ -9580,7 +9600,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_strokes",
 					Num:        5,
@@ -9596,7 +9616,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        6,
@@ -9612,7 +9632,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swim_stroke",
 					Num:        7,
@@ -9628,7 +9648,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_swimming_cadence",
 					Num:        9,
@@ -9644,7 +9664,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        10,
@@ -9660,7 +9680,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
@@ -9676,7 +9696,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "length_type",
 					Num:        12,
@@ -9692,7 +9712,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "player_score",
 					Num:        18,
@@ -9708,7 +9728,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        19,
@@ -9724,7 +9744,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_count",
 					Num:        20,
@@ -9740,7 +9760,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "zone_count",
 					Num:        21,
@@ -9756,7 +9776,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_respiration_rate",
 					Num:        22,
@@ -9772,7 +9792,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_respiration_rate",
 					Num:        23,
@@ -9788,7 +9808,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_respiration_rate",
 					Num:      24,
@@ -9806,7 +9826,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_respiration_rate",
 					Num:      25,
@@ -9828,8 +9848,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumRecord: {
 		Num: typedef.MesgNumRecord, /* record */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -9845,7 +9865,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        0,
@@ -9861,7 +9881,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        1,
@@ -9877,7 +9897,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:     "altitude",
 					Num:      2,
@@ -9895,7 +9915,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        3,
@@ -9911,7 +9931,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence",
 					Num:        4,
@@ -9927,7 +9947,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        5,
@@ -9943,7 +9963,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:     "speed",
 					Num:      6,
@@ -9961,7 +9981,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "power",
 					Num:        7,
@@ -9977,7 +9997,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:     "compressed_speed_distance",
 					Num:      8,
@@ -9996,7 +10016,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "grade",
 					Num:        9,
@@ -10012,7 +10032,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "resistance",
 					Num:        10,
@@ -10028,7 +10048,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_from_course",
 					Num:        11,
@@ -10044,7 +10064,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycle_length",
 					Num:        12,
@@ -10060,7 +10080,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        13,
@@ -10076,7 +10096,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_1s",
 					Num:        17,
@@ -10092,7 +10112,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:     "cycles",
 					Num:      18,
@@ -10110,7 +10130,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        19,
@@ -10126,7 +10146,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:     "compressed_accumulated_power",
 					Num:      28,
@@ -10144,7 +10164,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accumulated_power",
 					Num:        29,
@@ -10160,7 +10180,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        30,
@@ -10176,7 +10196,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			31: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        31,
@@ -10192,7 +10212,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_speed",
 					Num:        32,
@@ -10208,7 +10228,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			33: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        33,
@@ -10224,7 +10244,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_oscillation",
 					Num:        39,
@@ -10240,7 +10260,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			40: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time_percent",
 					Num:        40,
@@ -10256,7 +10276,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			41: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time",
 					Num:        41,
@@ -10272,7 +10292,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			42: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        42,
@@ -10288,7 +10308,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			43: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_torque_effectiveness",
 					Num:        43,
@@ -10304,7 +10324,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			44: {
 				FieldBase: &proto.FieldBase{
 					Name:       "right_torque_effectiveness",
 					Num:        44,
@@ -10320,7 +10340,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			45: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_pedal_smoothness",
 					Num:        45,
@@ -10336,7 +10356,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			46: {
 				FieldBase: &proto.FieldBase{
 					Name:       "right_pedal_smoothness",
 					Num:        46,
@@ -10352,7 +10372,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "combined_pedal_smoothness",
 					Num:        47,
@@ -10368,7 +10388,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			48: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time128",
 					Num:        48,
@@ -10384,7 +10404,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			49: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stroke_type",
 					Num:        49,
@@ -10400,7 +10420,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			50: {
 				FieldBase: &proto.FieldBase{
 					Name:       "zone",
 					Num:        50,
@@ -10416,7 +10436,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			51: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ball_speed",
 					Num:        51,
@@ -10432,7 +10452,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			52: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cadence256",
 					Num:        52,
@@ -10448,7 +10468,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			53: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_cadence",
 					Num:        53,
@@ -10464,7 +10484,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			54: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc",
 					Num:        54,
@@ -10480,7 +10500,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			55: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc_min",
 					Num:        55,
@@ -10496,7 +10516,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			56: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_hemoglobin_conc_max",
 					Num:        56,
@@ -10512,7 +10532,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			57: {
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent",
 					Num:        57,
@@ -10528,7 +10548,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			58: {
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent_min",
 					Num:        58,
@@ -10544,7 +10564,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			59: {
 				FieldBase: &proto.FieldBase{
 					Name:       "saturated_hemoglobin_percent_max",
 					Num:        59,
@@ -10560,7 +10580,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			62: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        62,
@@ -10576,7 +10596,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			67: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_pco",
 					Num:        67,
@@ -10592,7 +10612,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			68: {
 				FieldBase: &proto.FieldBase{
 					Name:       "right_pco",
 					Num:        68,
@@ -10608,7 +10628,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			69: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_power_phase",
 					Num:        69,
@@ -10624,7 +10644,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			70: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_power_phase_peak",
 					Num:        70,
@@ -10640,7 +10660,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			71: {
 				FieldBase: &proto.FieldBase{
 					Name:       "right_power_phase",
 					Num:        71,
@@ -10656,7 +10676,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			72: {
 				FieldBase: &proto.FieldBase{
 					Name:       "right_power_phase_peak",
 					Num:        72,
@@ -10672,7 +10692,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			73: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        73,
@@ -10688,7 +10708,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			78: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        78,
@@ -10704,7 +10724,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			81: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_soc",
 					Num:        81,
@@ -10720,7 +10740,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			82: {
 				FieldBase: &proto.FieldBase{
 					Name:       "motor_power",
 					Num:        82,
@@ -10736,7 +10756,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			83: {
 				FieldBase: &proto.FieldBase{
 					Name:       "vertical_ratio",
 					Num:        83,
@@ -10752,7 +10772,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			84: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stance_time_balance",
 					Num:        84,
@@ -10768,7 +10788,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			85: {
 				FieldBase: &proto.FieldBase{
 					Name:       "step_length",
 					Num:        85,
@@ -10784,7 +10804,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			87: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycle_length16",
 					Num:        87,
@@ -10800,7 +10820,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			91: {
 				FieldBase: &proto.FieldBase{
 					Name:       "absolute_pressure",
 					Num:        91,
@@ -10816,7 +10836,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			92: {
 				FieldBase: &proto.FieldBase{
 					Name:       "depth",
 					Num:        92,
@@ -10832,7 +10852,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			93: {
 				FieldBase: &proto.FieldBase{
 					Name:       "next_stop_depth",
 					Num:        93,
@@ -10848,7 +10868,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			94: {
 				FieldBase: &proto.FieldBase{
 					Name:       "next_stop_time",
 					Num:        94,
@@ -10864,7 +10884,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			95: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_to_surface",
 					Num:        95,
@@ -10880,7 +10900,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			96: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ndl_time",
 					Num:        96,
@@ -10896,7 +10916,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			97: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cns_load",
 					Num:        97,
@@ -10912,7 +10932,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			98: {
 				FieldBase: &proto.FieldBase{
 					Name:       "n2_load",
 					Num:        98,
@@ -10928,7 +10948,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			99: {
 				FieldBase: &proto.FieldBase{
 					Name:     "respiration_rate",
 					Num:      99,
@@ -10946,7 +10966,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			108: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_respiration_rate",
 					Num:        108,
@@ -10962,7 +10982,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			114: {
 				FieldBase: &proto.FieldBase{
 					Name:       "grit",
 					Num:        114,
@@ -10978,7 +10998,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			115: {
 				FieldBase: &proto.FieldBase{
 					Name:       "flow",
 					Num:        115,
@@ -10994,7 +11014,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			116: {
 				FieldBase: &proto.FieldBase{
 					Name:       "current_stress",
 					Num:        116,
@@ -11010,7 +11030,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			117: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_travel_range",
 					Num:        117,
@@ -11026,7 +11046,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			118: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_battery_level",
 					Num:        118,
@@ -11042,7 +11062,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			119: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_assist_mode",
 					Num:        119,
@@ -11058,7 +11078,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			120: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ebike_assist_level_percent",
 					Num:        120,
@@ -11074,7 +11094,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			123: {
 				FieldBase: &proto.FieldBase{
 					Name:       "air_time_remaining",
 					Num:        123,
@@ -11090,7 +11110,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			124: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pressure_sac",
 					Num:        124,
@@ -11106,7 +11126,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			125: {
 				FieldBase: &proto.FieldBase{
 					Name:       "volume_sac",
 					Num:        125,
@@ -11122,7 +11142,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			126: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rmv",
 					Num:        126,
@@ -11138,7 +11158,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			127: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent_rate",
 					Num:        127,
@@ -11154,7 +11174,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			129: {
 				FieldBase: &proto.FieldBase{
 					Name:       "po2",
 					Num:        129,
@@ -11170,7 +11190,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			139: {
 				FieldBase: &proto.FieldBase{
 					Name:       "core_temperature",
 					Num:        139,
@@ -11190,8 +11210,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumEvent: {
 		Num: typedef.MesgNumEvent, /* event */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -11207,7 +11227,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
@@ -11223,7 +11243,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
@@ -11239,7 +11259,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:     "data16",
 					Num:      2,
@@ -11257,7 +11277,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        3,
@@ -11426,7 +11446,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        4,
@@ -11442,7 +11462,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "score",
 					Num:        7,
@@ -11458,7 +11478,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "opponent_score",
 					Num:        8,
@@ -11474,7 +11494,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_num",
 					Num:        9,
@@ -11490,7 +11510,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear",
 					Num:        10,
@@ -11506,7 +11526,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_num",
 					Num:        11,
@@ -11522,7 +11542,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear",
 					Num:        12,
@@ -11538,7 +11558,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        13,
@@ -11554,7 +11574,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        14,
@@ -11570,7 +11590,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        15,
@@ -11593,7 +11613,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_level_max",
 					Num:        21,
@@ -11609,7 +11629,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_count",
 					Num:        22,
@@ -11625,7 +11645,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_avg_approach_speed",
 					Num:        23,
@@ -11641,7 +11661,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "radar_threat_max_approach_speed",
 					Num:        24,
@@ -11661,8 +11681,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDeviceInfo: {
 		Num: typedef.MesgNumDeviceInfo, /* device_info */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -11678,7 +11698,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
@@ -11694,7 +11714,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_type",
 					Num:        1,
@@ -11735,7 +11755,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        2,
@@ -11751,7 +11771,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
@@ -11767,7 +11787,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        4,
@@ -11799,7 +11819,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "software_version",
 					Num:        5,
@@ -11815,7 +11835,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hardware_version",
 					Num:        6,
@@ -11831,7 +11851,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cum_operating_time",
 					Num:        7,
@@ -11847,7 +11867,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_voltage",
 					Num:        10,
@@ -11863,7 +11883,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_status",
 					Num:        11,
@@ -11879,7 +11899,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_position",
 					Num:        18,
@@ -11895,7 +11915,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "descriptor",
 					Num:        19,
@@ -11911,7 +11931,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_transmission_type",
 					Num:        20,
@@ -11927,7 +11947,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_device_number",
 					Num:        21,
@@ -11943,7 +11963,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ant_network",
 					Num:        22,
@@ -11959,7 +11979,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "source_type",
 					Num:        25,
@@ -11975,7 +11995,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product_name",
 					Num:        27,
@@ -11991,7 +12011,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_level",
 					Num:        32,
@@ -12011,8 +12031,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDeviceAuxBatteryInfo: {
 		Num: typedef.MesgNumDeviceAuxBatteryInfo, /* device_aux_battery_info */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12028,7 +12048,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
@@ -12044,7 +12064,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_voltage",
 					Num:        1,
@@ -12060,7 +12080,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_status",
 					Num:        2,
@@ -12076,7 +12096,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "battery_identifier",
 					Num:        3,
@@ -12096,8 +12116,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTrainingFile: {
 		Num: typedef.MesgNumTrainingFile, /* training_file */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12113,7 +12133,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        0,
@@ -12129,7 +12149,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        1,
@@ -12145,7 +12165,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        2,
@@ -12177,7 +12197,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        3,
@@ -12193,7 +12213,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        4,
@@ -12213,8 +12233,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWeatherConditions: {
 		Num: typedef.MesgNumWeatherConditions, /* weather_conditions */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12230,7 +12250,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weather_report",
 					Num:        0,
@@ -12246,7 +12266,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        1,
@@ -12262,7 +12282,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "condition",
 					Num:        2,
@@ -12278,7 +12298,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wind_direction",
 					Num:        3,
@@ -12294,7 +12314,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wind_speed",
 					Num:        4,
@@ -12310,7 +12330,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "precipitation_probability",
 					Num:        5,
@@ -12326,7 +12346,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_feels_like",
 					Num:        6,
@@ -12342,7 +12362,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "relative_humidity",
 					Num:        7,
@@ -12358,7 +12378,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "location",
 					Num:        8,
@@ -12374,7 +12394,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_at_time",
 					Num:        9,
@@ -12390,7 +12410,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_location_lat",
 					Num:        10,
@@ -12406,7 +12426,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "observed_location_long",
 					Num:        11,
@@ -12422,7 +12442,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "day_of_week",
 					Num:        12,
@@ -12438,7 +12458,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "high_temperature",
 					Num:        13,
@@ -12454,7 +12474,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "low_temperature",
 					Num:        14,
@@ -12474,8 +12494,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWeatherAlert: {
 		Num: typedef.MesgNumWeatherAlert, /* weather_alert */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12491,7 +12511,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "report_id",
 					Num:        0,
@@ -12507,7 +12527,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "issue_time",
 					Num:        1,
@@ -12523,7 +12543,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "expire_time",
 					Num:        2,
@@ -12539,7 +12559,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "severity",
 					Num:        3,
@@ -12555,7 +12575,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        4,
@@ -12575,8 +12595,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumGpsMetadata: {
 		Num: typedef.MesgNumGpsMetadata, /* gps_metadata */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12592,7 +12612,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -12608,7 +12628,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        1,
@@ -12624,7 +12644,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        2,
@@ -12640,7 +12660,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        3,
@@ -12656,7 +12676,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        4,
@@ -12672,7 +12692,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heading",
 					Num:        5,
@@ -12688,7 +12708,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "utc_timestamp",
 					Num:        6,
@@ -12704,7 +12724,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "velocity",
 					Num:        7,
@@ -12724,8 +12744,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumCameraEvent: {
 		Num: typedef.MesgNumCameraEvent, /* camera_event */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12741,7 +12761,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -12757,7 +12777,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_event_type",
 					Num:        1,
@@ -12773,7 +12793,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_file_uuid",
 					Num:        2,
@@ -12789,7 +12809,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "camera_orientation",
 					Num:        3,
@@ -12809,8 +12829,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumGyroscopeData: {
 		Num: typedef.MesgNumGyroscopeData, /* gyroscope_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12826,7 +12846,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -12842,7 +12862,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
@@ -12858,7 +12878,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_x",
 					Num:        2,
@@ -12874,7 +12894,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_y",
 					Num:        3,
@@ -12890,7 +12910,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_z",
 					Num:        4,
@@ -12906,7 +12926,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_x",
 					Num:        5,
@@ -12922,7 +12942,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_y",
 					Num:        6,
@@ -12938,7 +12958,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_gyro_z",
 					Num:        7,
@@ -12958,8 +12978,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAccelerometerData: {
 		Num: typedef.MesgNumAccelerometerData, /* accelerometer_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -12975,7 +12995,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -12991,7 +13011,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
@@ -13007,7 +13027,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_x",
 					Num:        2,
@@ -13023,7 +13043,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_y",
 					Num:        3,
@@ -13039,7 +13059,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_z",
 					Num:        4,
@@ -13055,7 +13075,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_x",
 					Num:        5,
@@ -13071,7 +13091,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_y",
 					Num:        6,
@@ -13087,7 +13107,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_accel_z",
 					Num:        7,
@@ -13103,7 +13123,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_x",
 					Num:        8,
@@ -13119,7 +13139,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_y",
 					Num:        9,
@@ -13135,7 +13155,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "compressed_calibrated_accel_z",
 					Num:        10,
@@ -13155,8 +13175,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMagnetometerData: {
 		Num: typedef.MesgNumMagnetometerData, /* magnetometer_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13172,7 +13192,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13188,7 +13208,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
@@ -13204,7 +13224,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_x",
 					Num:        2,
@@ -13220,7 +13240,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_y",
 					Num:        3,
@@ -13236,7 +13256,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mag_z",
 					Num:        4,
@@ -13252,7 +13272,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_x",
 					Num:        5,
@@ -13268,7 +13288,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_y",
 					Num:        6,
@@ -13284,7 +13304,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []float32(nil), /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_mag_z",
 					Num:        7,
@@ -13304,8 +13324,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumBarometerData: {
 		Num: typedef.MesgNumBarometerData, /* barometer_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13321,7 +13341,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13337,7 +13357,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sample_time_offset",
 					Num:        1,
@@ -13353,7 +13373,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "baro_pres",
 					Num:        2,
@@ -13373,8 +13393,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumThreeDSensorCalibration: {
 		Num: typedef.MesgNumThreeDSensorCalibration, /* three_d_sensor_calibration */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13390,7 +13410,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_type",
 					Num:        0,
@@ -13406,7 +13426,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_factor",
 					Num:        1,
@@ -13435,7 +13455,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_divisor",
 					Num:        2,
@@ -13451,7 +13471,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "level_shift",
 					Num:        3,
@@ -13467,7 +13487,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "offset_cal",
 					Num:        4,
@@ -13483,7 +13503,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int32(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "orientation_matrix",
 					Num:        5,
@@ -13503,8 +13523,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumOneDSensorCalibration: {
 		Num: typedef.MesgNumOneDSensorCalibration, /* one_d_sensor_calibration */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13520,7 +13540,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor_type",
 					Num:        0,
@@ -13536,7 +13556,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_factor",
 					Num:        1,
@@ -13559,7 +13579,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibration_divisor",
 					Num:        2,
@@ -13575,7 +13595,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "level_shift",
 					Num:        3,
@@ -13591,7 +13611,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "offset_cal",
 					Num:        4,
@@ -13611,8 +13631,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumVideoFrame: {
 		Num: typedef.MesgNumVideoFrame, /* video_frame */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13628,7 +13648,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13644,7 +13664,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "frame_number",
 					Num:        1,
@@ -13664,8 +13684,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumObdiiData: {
 		Num: typedef.MesgNumObdiiData, /* obdii_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13681,7 +13701,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13697,7 +13717,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_offset",
 					Num:        1,
@@ -13713,7 +13733,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pid",
 					Num:        2,
@@ -13729,7 +13749,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "raw_data",
 					Num:        3,
@@ -13745,7 +13765,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pid_data_size",
 					Num:        4,
@@ -13761,7 +13781,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "system_time",
 					Num:        5,
@@ -13777,7 +13797,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        6,
@@ -13793,7 +13813,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp_ms",
 					Num:        7,
@@ -13813,8 +13833,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumNmeaSentence: {
 		Num: typedef.MesgNumNmeaSentence, /* nmea_sentence */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13830,7 +13850,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13846,7 +13866,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sentence",
 					Num:        1,
@@ -13866,8 +13886,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAviationAttitude: {
 		Num: typedef.MesgNumAviationAttitude, /* aviation_attitude */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -13883,7 +13903,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -13899,7 +13919,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "system_time",
 					Num:        1,
@@ -13915,7 +13935,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pitch",
 					Num:        2,
@@ -13931,7 +13951,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "roll",
 					Num:        3,
@@ -13947,7 +13967,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_lateral",
 					Num:        4,
@@ -13963,7 +13983,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_normal",
 					Num:        5,
@@ -13979,7 +13999,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "turn_rate",
 					Num:        6,
@@ -13995,7 +14015,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stage",
 					Num:        7,
@@ -14011,7 +14031,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "attitude_stage_complete",
 					Num:        8,
@@ -14027,7 +14047,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "track",
 					Num:        9,
@@ -14043,7 +14063,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "validity",
 					Num:        10,
@@ -14063,8 +14083,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumVideo: {
 		Num: typedef.MesgNumVideo, /* video */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "url",
 					Num:        0,
@@ -14080,7 +14100,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hosting_provider",
 					Num:        1,
@@ -14096,7 +14116,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        2,
@@ -14116,8 +14136,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumVideoTitle: {
 		Num: typedef.MesgNumVideoTitle, /* video_title */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -14133,7 +14153,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_count",
 					Num:        0,
@@ -14149,7 +14169,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "text",
 					Num:        1,
@@ -14169,8 +14189,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumVideoDescription: {
 		Num: typedef.MesgNumVideoDescription, /* video_description */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -14186,7 +14206,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_count",
 					Num:        0,
@@ -14202,7 +14222,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "text",
 					Num:        1,
@@ -14222,8 +14242,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumVideoClip: {
 		Num: typedef.MesgNumVideoClip, /* video_clip */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_number",
 					Num:        0,
@@ -14239,7 +14259,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp",
 					Num:        1,
@@ -14255,7 +14275,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_timestamp_ms",
 					Num:        2,
@@ -14271,7 +14291,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_timestamp",
 					Num:        3,
@@ -14287,7 +14307,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_timestamp_ms",
 					Num:        4,
@@ -14303,7 +14323,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_start",
 					Num:        6,
@@ -14319,7 +14339,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "clip_end",
 					Num:        7,
@@ -14339,8 +14359,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSet: {
 		Num: typedef.MesgNumSet, /* set */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        254,
@@ -14356,7 +14376,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        0,
@@ -14372,7 +14392,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repetitions",
 					Num:        3,
@@ -14388,7 +14408,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        4,
@@ -14404,7 +14424,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "set_type",
 					Num:        5,
@@ -14420,7 +14440,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        6,
@@ -14436,7 +14456,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "category",
 					Num:        7,
@@ -14452,7 +14472,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "category_subtype",
 					Num:        8,
@@ -14468,7 +14488,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_display_unit",
 					Num:        9,
@@ -14484,7 +14504,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        10,
@@ -14500,7 +14520,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        11,
@@ -14520,8 +14540,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumJump: {
 		Num: typedef.MesgNumJump, /* jump */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -14537,7 +14557,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        0,
@@ -14553,7 +14573,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "height",
 					Num:        1,
@@ -14569,7 +14589,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rotations",
 					Num:        2,
@@ -14585,7 +14605,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hang_time",
 					Num:        3,
@@ -14601,7 +14621,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "score",
 					Num:        4,
@@ -14617,7 +14637,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        5,
@@ -14633,7 +14653,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        6,
@@ -14649,7 +14669,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:     "speed",
 					Num:      7,
@@ -14667,7 +14687,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_speed",
 					Num:        8,
@@ -14687,8 +14707,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSplit: {
 		Num: typedef.MesgNumSplit, /* split */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -14704,7 +14724,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "split_type",
 					Num:        0,
@@ -14720,7 +14740,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        1,
@@ -14736,7 +14756,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        2,
@@ -14752,7 +14772,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        3,
@@ -14768,7 +14788,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        4,
@@ -14784,7 +14804,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        9,
@@ -14800,7 +14820,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        13,
@@ -14816,7 +14836,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        14,
@@ -14832,7 +14852,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        21,
@@ -14848,7 +14868,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        22,
@@ -14864,7 +14884,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        23,
@@ -14880,7 +14900,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        24,
@@ -14896,7 +14916,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        25,
@@ -14912,7 +14932,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vert_speed",
 					Num:        26,
@@ -14928,7 +14948,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_time",
 					Num:        27,
@@ -14944,7 +14964,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        28,
@@ -14960,7 +14980,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			74: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_elevation",
 					Num:        74,
@@ -14976,7 +14996,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			110: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        110,
@@ -14996,8 +15016,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSplitSummary: {
 		Num: typedef.MesgNumSplitSummary, /* split_summary */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -15013,7 +15033,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "split_type",
 					Num:        0,
@@ -15029,7 +15049,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_splits",
 					Num:        3,
@@ -15045,7 +15065,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        4,
@@ -15061,7 +15081,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        5,
@@ -15077,7 +15097,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        6,
@@ -15093,7 +15113,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        7,
@@ -15109,7 +15129,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        8,
@@ -15125,7 +15145,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        9,
@@ -15141,7 +15161,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        10,
@@ -15157,7 +15177,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        11,
@@ -15173,7 +15193,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_vert_speed",
 					Num:        12,
@@ -15189,7 +15209,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        13,
@@ -15205,7 +15225,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			77: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        77,
@@ -15225,8 +15245,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumClimbPro: {
 		Num: typedef.MesgNumClimbPro, /* climb_pro */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -15242,7 +15262,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        0,
@@ -15258,7 +15278,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        1,
@@ -15274,7 +15294,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_pro_event",
 					Num:        2,
@@ -15290,7 +15310,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_number",
 					Num:        3,
@@ -15306,7 +15326,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "climb_category",
 					Num:        4,
@@ -15322,7 +15342,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "current_dist",
 					Num:        5,
@@ -15342,8 +15362,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumFieldDescription: {
 		Num: typedef.MesgNumFieldDescription, /* field_description */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_data_index",
 					Num:        0,
@@ -15359,7 +15379,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_definition_number",
 					Num:        1,
@@ -15375,7 +15395,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fit_base_type_id",
 					Num:        2,
@@ -15391,7 +15411,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_name",
 					Num:        3,
@@ -15407,7 +15427,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []string(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "array",
 					Num:        4,
@@ -15423,7 +15443,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "components",
 					Num:        5,
@@ -15439,7 +15459,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "scale",
 					Num:        6,
@@ -15455,7 +15475,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "offset",
 					Num:        7,
@@ -15471,7 +15491,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "units",
 					Num:        8,
@@ -15487,7 +15507,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []string(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bits",
 					Num:        9,
@@ -15503,7 +15523,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accumulate",
 					Num:        10,
@@ -15519,7 +15539,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fit_base_unit_id",
 					Num:        13,
@@ -15535,7 +15555,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "native_mesg_num",
 					Num:        14,
@@ -15551,7 +15571,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "native_field_num",
 					Num:        15,
@@ -15571,8 +15591,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDeveloperDataId: {
 		Num: typedef.MesgNumDeveloperDataId, /* developer_data_id */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_id",
 					Num:        0,
@@ -15588,7 +15608,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "application_id",
 					Num:        1,
@@ -15604,7 +15624,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer_id",
 					Num:        2,
@@ -15620,7 +15640,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "developer_data_index",
 					Num:        3,
@@ -15636,7 +15656,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "application_version",
 					Num:        4,
@@ -15656,8 +15676,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumCourse: {
 		Num: typedef.MesgNumCourse, /* course */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        4,
@@ -15673,7 +15693,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        5,
@@ -15689,7 +15709,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "capabilities",
 					Num:        6,
@@ -15705,7 +15725,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        7,
@@ -15725,8 +15745,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumCoursePoint: {
 		Num: typedef.MesgNumCoursePoint, /* course_point */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -15742,7 +15762,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        1,
@@ -15758,7 +15778,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        2,
@@ -15774,7 +15794,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        3,
@@ -15790,7 +15810,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        4,
@@ -15806,7 +15826,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        5,
@@ -15822,7 +15842,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        6,
@@ -15838,7 +15858,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "favorite",
 					Num:        8,
@@ -15858,8 +15878,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSegmentId: {
 		Num: typedef.MesgNumSegmentId, /* segment_id */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
@@ -15875,7 +15895,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "uuid",
 					Num:        1,
@@ -15891,7 +15911,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        2,
@@ -15907,7 +15927,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
@@ -15923,7 +15943,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_primary_key",
 					Num:        4,
@@ -15939,7 +15959,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_id",
 					Num:        5,
@@ -15955,7 +15975,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_race_leader",
 					Num:        6,
@@ -15971,7 +15991,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "delete_status",
 					Num:        7,
@@ -15987,7 +16007,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "selection_type",
 					Num:        8,
@@ -16007,8 +16027,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSegmentLeaderboardEntry: {
 		Num: typedef.MesgNumSegmentLeaderboardEntry, /* segment_leaderboard_entry */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -16024,7 +16044,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        0,
@@ -16040,7 +16060,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        1,
@@ -16056,7 +16076,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "group_primary_key",
 					Num:        2,
@@ -16072,7 +16092,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_id",
 					Num:        3,
@@ -16088,7 +16108,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "segment_time",
 					Num:        4,
@@ -16104,7 +16124,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_id_string",
 					Num:        5,
@@ -16124,8 +16144,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSegmentPoint: {
 		Num: typedef.MesgNumSegmentPoint, /* segment_point */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -16141,7 +16161,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_lat",
 					Num:        1,
@@ -16157,7 +16177,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "position_long",
 					Num:        2,
@@ -16173,7 +16193,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        3,
@@ -16189,7 +16209,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:     "altitude",
 					Num:      4,
@@ -16207,7 +16227,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_time",
 					Num:        5,
@@ -16223,7 +16243,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_altitude",
 					Num:        6,
@@ -16243,8 +16263,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSegmentLap: {
 		Num: typedef.MesgNumSegmentLap, /* segment_lap */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -16260,7 +16280,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -16276,7 +16296,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event",
 					Num:        0,
@@ -16292,7 +16312,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_type",
 					Num:        1,
@@ -16308,7 +16328,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_time",
 					Num:        2,
@@ -16324,7 +16344,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_lat",
 					Num:        3,
@@ -16340,7 +16360,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_position_long",
 					Num:        4,
@@ -16356,7 +16376,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_lat",
 					Num:        5,
@@ -16372,7 +16392,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_position_long",
 					Num:        6,
@@ -16388,7 +16408,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_elapsed_time",
 					Num:        7,
@@ -16404,7 +16424,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_timer_time",
 					Num:        8,
@@ -16420,7 +16440,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_distance",
 					Num:        9,
@@ -16436,7 +16456,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_cycles",
 					Num:        10,
@@ -16459,7 +16479,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_calories",
 					Num:        11,
@@ -16475,7 +16495,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fat_calories",
 					Num:        12,
@@ -16491,7 +16511,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        13,
@@ -16507,7 +16527,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        14,
@@ -16523,7 +16543,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_heart_rate",
 					Num:        15,
@@ -16539,7 +16559,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_heart_rate",
 					Num:        16,
@@ -16555,7 +16575,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence",
 					Num:        17,
@@ -16571,7 +16591,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			18: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence",
 					Num:        18,
@@ -16587,7 +16607,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power",
 					Num:        19,
@@ -16603,7 +16623,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power",
 					Num:        20,
@@ -16619,7 +16639,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_ascent",
 					Num:        21,
@@ -16635,7 +16655,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_descent",
 					Num:        22,
@@ -16651,7 +16671,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        23,
@@ -16667,7 +16687,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_group",
 					Num:        24,
@@ -16683,7 +16703,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_lat",
 					Num:        25,
@@ -16699,7 +16719,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "nec_long",
 					Num:        26,
@@ -16715,7 +16735,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_lat",
 					Num:        27,
@@ -16731,7 +16751,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:       "swc_long",
 					Num:        28,
@@ -16747,7 +16767,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "name",
 					Num:        29,
@@ -16763,7 +16783,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "normalized_power",
 					Num:        30,
@@ -16779,7 +16799,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			31: {
 				FieldBase: &proto.FieldBase{
 					Name:       "left_right_balance",
 					Num:        31,
@@ -16795,7 +16815,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        32,
@@ -16811,7 +16831,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			33: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_work",
 					Num:        33,
@@ -16827,7 +16847,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			34: {
 				FieldBase: &proto.FieldBase{
 					Name:     "avg_altitude",
 					Num:      34,
@@ -16845,7 +16865,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			35: {
 				FieldBase: &proto.FieldBase{
 					Name:     "max_altitude",
 					Num:      35,
@@ -16863,7 +16883,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			36: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gps_accuracy",
 					Num:        36,
@@ -16879,7 +16899,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			37: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grade",
 					Num:        37,
@@ -16895,7 +16915,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			38: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_grade",
 					Num:        38,
@@ -16911,7 +16931,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			39: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_grade",
 					Num:        39,
@@ -16927,7 +16947,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			40: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_grade",
 					Num:        40,
@@ -16943,7 +16963,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			41: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_grade",
 					Num:        41,
@@ -16959,7 +16979,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			42: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_temperature",
 					Num:        42,
@@ -16975,7 +16995,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			43: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_temperature",
 					Num:        43,
@@ -16991,7 +17011,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			44: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_moving_time",
 					Num:        44,
@@ -17007,7 +17027,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			45: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pos_vertical_speed",
 					Num:        45,
@@ -17023,7 +17043,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			46: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_neg_vertical_speed",
 					Num:        46,
@@ -17039,7 +17059,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			47: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_pos_vertical_speed",
 					Num:        47,
@@ -17055,7 +17075,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			48: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_neg_vertical_speed",
 					Num:        48,
@@ -17071,7 +17091,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			49: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_hr_zone",
 					Num:        49,
@@ -17087,7 +17107,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			50: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_speed_zone",
 					Num:        50,
@@ -17103,7 +17123,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			51: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_cadence_zone",
 					Num:        51,
@@ -17119,7 +17139,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			52: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_in_power_zone",
 					Num:        52,
@@ -17135,7 +17155,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			53: {
 				FieldBase: &proto.FieldBase{
 					Name:       "repetition_num",
 					Num:        53,
@@ -17151,7 +17171,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			54: {
 				FieldBase: &proto.FieldBase{
 					Name:     "min_altitude",
 					Num:      54,
@@ -17169,7 +17189,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			55: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_heart_rate",
 					Num:        55,
@@ -17185,7 +17205,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			56: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        56,
@@ -17201,7 +17221,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			57: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_index",
 					Num:        57,
@@ -17217,7 +17237,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			58: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_event",
 					Num:        58,
@@ -17233,7 +17253,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			59: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_torque_effectiveness",
 					Num:        59,
@@ -17249,7 +17269,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			60: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_torque_effectiveness",
 					Num:        60,
@@ -17265,7 +17285,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			61: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pedal_smoothness",
 					Num:        61,
@@ -17281,7 +17301,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			62: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pedal_smoothness",
 					Num:        62,
@@ -17297,7 +17317,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			63: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_combined_pedal_smoothness",
 					Num:        63,
@@ -17313,7 +17333,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			64: {
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        64,
@@ -17329,7 +17349,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			65: {
 				FieldBase: &proto.FieldBase{
 					Name:       "uuid",
 					Num:        65,
@@ -17345,7 +17365,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			66: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_fractional_cadence",
 					Num:        66,
@@ -17361,7 +17381,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			67: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_fractional_cadence",
 					Num:        67,
@@ -17377,7 +17397,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			68: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_cycles",
 					Num:        68,
@@ -17393,7 +17413,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			69: {
 				FieldBase: &proto.FieldBase{
 					Name:       "front_gear_shift_count",
 					Num:        69,
@@ -17409,7 +17429,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			70: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rear_gear_shift_count",
 					Num:        70,
@@ -17425,7 +17445,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			71: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_standing",
 					Num:        71,
@@ -17441,7 +17461,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			72: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stand_count",
 					Num:        72,
@@ -17457,7 +17477,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			73: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_pco",
 					Num:        73,
@@ -17473,7 +17493,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			74: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_pco",
 					Num:        74,
@@ -17489,7 +17509,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			75: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase",
 					Num:        75,
@@ -17505,7 +17525,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			76: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_left_power_phase_peak",
 					Num:        76,
@@ -17521,7 +17541,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			77: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase",
 					Num:        77,
@@ -17537,7 +17557,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			78: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_right_power_phase_peak",
 					Num:        78,
@@ -17553,7 +17573,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			79: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_power_position",
 					Num:        79,
@@ -17569,7 +17589,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			80: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_power_position",
 					Num:        80,
@@ -17585,7 +17605,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			81: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_cadence_position",
 					Num:        81,
@@ -17601,7 +17621,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			82: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_cadence_position",
 					Num:        82,
@@ -17617,7 +17637,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			83: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        83,
@@ -17633,7 +17653,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			84: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_grit",
 					Num:        84,
@@ -17649,7 +17669,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			85: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_flow",
 					Num:        85,
@@ -17665,7 +17685,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			86: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_grit",
 					Num:        86,
@@ -17681,7 +17701,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			87: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_flow",
 					Num:        87,
@@ -17697,7 +17717,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Float32.Invalid(), /* Default Value: Invalid */
 			},
-			{
+			89: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_ascent",
 					Num:        89,
@@ -17713,7 +17733,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			90: {
 				FieldBase: &proto.FieldBase{
 					Name:       "total_fractional_descent",
 					Num:        90,
@@ -17729,7 +17749,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			91: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_avg_altitude",
 					Num:        91,
@@ -17745,7 +17765,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			92: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_max_altitude",
 					Num:        92,
@@ -17761,7 +17781,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			93: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enhanced_min_altitude",
 					Num:        93,
@@ -17781,8 +17801,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSegmentFile: {
 		Num: typedef.MesgNumSegmentFile, /* segment_file */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -17798,7 +17818,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "file_uuid",
 					Num:        1,
@@ -17814,7 +17834,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "enabled",
 					Num:        3,
@@ -17830,7 +17850,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_primary_key",
 					Num:        4,
@@ -17846,7 +17866,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_type",
 					Num:        7,
@@ -17862,7 +17882,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_group_primary_key",
 					Num:        8,
@@ -17878,7 +17898,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_activity_id",
 					Num:        9,
@@ -17894,7 +17914,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "leader_activity_id_string",
 					Num:        10,
@@ -17910,7 +17930,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []string(nil), /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "default_race_leader",
 					Num:        11,
@@ -17930,8 +17950,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWorkout: {
 		Num: typedef.MesgNumWorkout, /* workout */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -17947,7 +17967,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        4,
@@ -17963,7 +17983,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "capabilities",
 					Num:        5,
@@ -17979,7 +17999,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_valid_steps",
 					Num:        6,
@@ -17995,7 +18015,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_name",
 					Num:        8,
@@ -18011,7 +18031,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        11,
@@ -18027,7 +18047,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        14,
@@ -18043,7 +18063,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        15,
@@ -18063,8 +18083,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWorkoutSession: {
 		Num: typedef.MesgNumWorkoutSession, /* workout_session */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -18080,7 +18100,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        0,
@@ -18096,7 +18116,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        1,
@@ -18112,7 +18132,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "num_valid_steps",
 					Num:        2,
@@ -18128,7 +18148,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "first_step_index",
 					Num:        3,
@@ -18144,7 +18164,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length",
 					Num:        4,
@@ -18160,7 +18180,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pool_length_unit",
 					Num:        5,
@@ -18180,8 +18200,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWorkoutStep: {
 		Num: typedef.MesgNumWorkoutStep, /* workout_step */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -18197,7 +18217,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_name",
 					Num:        0,
@@ -18213,7 +18233,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_type",
 					Num:        1,
@@ -18229,7 +18249,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_value",
 					Num:        2,
@@ -18298,7 +18318,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "target_type",
 					Num:        3,
@@ -18314,7 +18334,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "target_value",
 					Num:        4,
@@ -18399,7 +18419,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_target_value_low",
 					Num:        5,
@@ -18440,7 +18460,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "custom_target_value_high",
 					Num:        6,
@@ -18481,7 +18501,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        7,
@@ -18497,7 +18517,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "notes",
 					Num:        8,
@@ -18513,7 +18533,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.StringInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "equipment",
 					Num:        9,
@@ -18529,7 +18549,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_category",
 					Num:        10,
@@ -18545,7 +18565,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_name",
 					Num:        11,
@@ -18561,7 +18581,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_weight",
 					Num:        12,
@@ -18577,7 +18597,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight_display_unit",
 					Num:        13,
@@ -18593,7 +18613,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_target_type",
 					Num:        19,
@@ -18609,7 +18629,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			20: {
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_target_value",
 					Num:        20,
@@ -18656,7 +18676,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			21: {
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_custom_target_value_low",
 					Num:        21,
@@ -18697,7 +18717,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "secondary_custom_target_value_high",
 					Num:        22,
@@ -18742,8 +18762,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumExerciseTitle: {
 		Num: typedef.MesgNumExerciseTitle, /* exercise_title */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -18759,7 +18779,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_category",
 					Num:        0,
@@ -18775,7 +18795,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "exercise_name",
 					Num:        1,
@@ -18791,7 +18811,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "wkt_step_name",
 					Num:        2,
@@ -18811,8 +18831,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSchedule: {
 		Num: typedef.MesgNumSchedule, /* schedule */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "manufacturer",
 					Num:        0,
@@ -18828,7 +18848,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "product",
 					Num:        1,
@@ -18860,7 +18880,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "serial_number",
 					Num:        2,
@@ -18876,7 +18896,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_created",
 					Num:        3,
@@ -18892,7 +18912,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "completed",
 					Num:        4,
@@ -18908,7 +18928,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "type",
 					Num:        5,
@@ -18924,7 +18944,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "scheduled_time",
 					Num:        6,
@@ -18944,8 +18964,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTotals: {
 		Num: typedef.MesgNumTotals, /* totals */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			254: {
 				FieldBase: &proto.FieldBase{
 					Name:       "message_index",
 					Num:        254,
@@ -18961,7 +18981,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -18977,7 +18997,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timer_time",
 					Num:        0,
@@ -18993,7 +19013,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        1,
@@ -19009,7 +19029,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        2,
@@ -19025,7 +19045,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        3,
@@ -19041,7 +19061,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "elapsed_time",
 					Num:        4,
@@ -19057,7 +19077,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sessions",
 					Num:        5,
@@ -19073,7 +19093,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        6,
@@ -19089,7 +19109,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport_index",
 					Num:        9,
@@ -19109,8 +19129,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumWeightScale: {
 		Num: typedef.MesgNumWeightScale, /* weight_scale */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -19126,7 +19146,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weight",
 					Num:        0,
@@ -19142,7 +19162,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "percent_fat",
 					Num:        1,
@@ -19158,7 +19178,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "percent_hydration",
 					Num:        2,
@@ -19174,7 +19194,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "visceral_fat_mass",
 					Num:        3,
@@ -19190,7 +19210,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bone_mass",
 					Num:        4,
@@ -19206,7 +19226,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "muscle_mass",
 					Num:        5,
@@ -19222,7 +19242,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "basal_met",
 					Num:        7,
@@ -19238,7 +19258,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "physique_rating",
 					Num:        8,
@@ -19254,7 +19274,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_met",
 					Num:        9,
@@ -19270,7 +19290,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "metabolic_age",
 					Num:        10,
@@ -19286,7 +19306,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "visceral_fat_rating",
 					Num:        11,
@@ -19302,7 +19322,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_index",
 					Num:        12,
@@ -19318,7 +19338,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bmi",
 					Num:        13,
@@ -19338,8 +19358,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumBloodPressure: {
 		Num: typedef.MesgNumBloodPressure, /* blood_pressure */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -19355,7 +19375,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "systolic_pressure",
 					Num:        0,
@@ -19371,7 +19391,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "diastolic_pressure",
 					Num:        1,
@@ -19387,7 +19407,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mean_arterial_pressure",
 					Num:        2,
@@ -19403,7 +19423,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "map_3_sample_mean",
 					Num:        3,
@@ -19419,7 +19439,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "map_morning_values",
 					Num:        4,
@@ -19435,7 +19455,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "map_evening_values",
 					Num:        5,
@@ -19451,7 +19471,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        6,
@@ -19467,7 +19487,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate_type",
 					Num:        7,
@@ -19483,7 +19503,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        8,
@@ -19499,7 +19519,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "user_profile_index",
 					Num:        9,
@@ -19519,8 +19539,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMonitoringInfo: {
 		Num: typedef.MesgNumMonitoringInfo, /* monitoring_info */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -19536,7 +19556,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        0,
@@ -19552,7 +19572,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        1,
@@ -19568,7 +19588,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_to_distance",
 					Num:        3,
@@ -19584,7 +19604,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_to_calories",
 					Num:        4,
@@ -19600,7 +19620,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_metabolic_rate",
 					Num:        5,
@@ -19620,8 +19640,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMonitoring: {
 		Num: typedef.MesgNumMonitoring, /* monitoring */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -19637,7 +19657,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        0,
@@ -19653,7 +19673,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calories",
 					Num:        1,
@@ -19669,7 +19689,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance",
 					Num:        2,
@@ -19685,7 +19705,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles",
 					Num:        3,
@@ -19716,7 +19736,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time",
 					Num:        4,
@@ -19732,7 +19752,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_type",
 					Num:        5,
@@ -19748,7 +19768,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_subtype",
 					Num:        6,
@@ -19764,7 +19784,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_level",
 					Num:        7,
@@ -19780,7 +19800,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "distance_16",
 					Num:        8,
@@ -19796,7 +19816,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "cycles_16",
 					Num:        9,
@@ -19812,7 +19832,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_time_16",
 					Num:        10,
@@ -19828,7 +19848,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "local_timestamp",
 					Num:        11,
@@ -19844,7 +19864,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature",
 					Num:        12,
@@ -19860,7 +19880,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_min",
 					Num:        14,
@@ -19876,7 +19896,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "temperature_max",
 					Num:        15,
@@ -19892,7 +19912,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "activity_time",
 					Num:        16,
@@ -19908,7 +19928,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			19: {
 				FieldBase: &proto.FieldBase{
 					Name:       "active_calories",
 					Num:        19,
@@ -19924,7 +19944,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:     "current_activity_type_intensity",
 					Num:      24,
@@ -19943,7 +19963,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_min_8",
 					Num:        25,
@@ -19959,7 +19979,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			26: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_16",
 					Num:        26,
@@ -19975,7 +19995,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			27: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        27,
@@ -19991,7 +20011,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			28: {
 				FieldBase: &proto.FieldBase{
 					Name:       "intensity",
 					Num:        28,
@@ -20007,7 +20027,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			29: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration_min",
 					Num:        29,
@@ -20023,7 +20043,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			30: {
 				FieldBase: &proto.FieldBase{
 					Name:       "duration",
 					Num:        30,
@@ -20039,7 +20059,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			31: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent",
 					Num:        31,
@@ -20055,7 +20075,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			32: {
 				FieldBase: &proto.FieldBase{
 					Name:       "descent",
 					Num:        32,
@@ -20071,7 +20091,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			33: {
 				FieldBase: &proto.FieldBase{
 					Name:       "moderate_activity_minutes",
 					Num:        33,
@@ -20087,7 +20107,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			34: {
 				FieldBase: &proto.FieldBase{
 					Name:       "vigorous_activity_minutes",
 					Num:        34,
@@ -20107,8 +20127,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMonitoringHrData: {
 		Num: typedef.MesgNumMonitoringHrData, /* monitoring_hr_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20124,7 +20144,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "resting_heart_rate",
 					Num:        0,
@@ -20140,7 +20160,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "current_day_resting_heart_rate",
 					Num:        1,
@@ -20160,8 +20180,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSpo2Data: {
 		Num: typedef.MesgNumSpo2Data, /* spo2_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20177,7 +20197,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_spo2",
 					Num:        0,
@@ -20193,7 +20213,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_confidence",
 					Num:        1,
@@ -20209,7 +20229,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mode",
 					Num:        2,
@@ -20229,8 +20249,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHr: {
 		Num: typedef.MesgNumHr, /* hr */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20246,7 +20266,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
@@ -20262,7 +20282,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:     "time256",
 					Num:      1,
@@ -20280,7 +20300,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "filtered_bpm",
 					Num:        6,
@@ -20296,7 +20316,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_timestamp",
 					Num:        9,
@@ -20312,7 +20332,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint32(nil), /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:     "event_timestamp_12",
 					Num:      10,
@@ -20343,8 +20363,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumStressLevel: {
 		Num: typedef.MesgNumStressLevel, /* stress_level */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level_value",
 					Num:        0,
@@ -20360,7 +20380,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level_time",
 					Num:        1,
@@ -20380,8 +20400,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMaxMetData: {
 		Num: typedef.MesgNumMaxMetData, /* max_met_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "update_time",
 					Num:        0,
@@ -20397,7 +20417,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "vo2_max",
 					Num:        2,
@@ -20413,7 +20433,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sport",
 					Num:        5,
@@ -20429,7 +20449,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sub_sport",
 					Num:        6,
@@ -20445,7 +20465,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_met_category",
 					Num:        8,
@@ -20461,7 +20481,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "calibrated_data",
 					Num:        9,
@@ -20477,7 +20497,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: false, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hr_source",
 					Num:        12,
@@ -20493,7 +20513,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "speed_source",
 					Num:        13,
@@ -20513,8 +20533,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaBodyBatteryData: {
 		Num: typedef.MesgNumHsaBodyBatteryData, /* hsa_body_battery_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20530,7 +20550,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -20546,7 +20566,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "level",
 					Num:        1,
@@ -20562,7 +20582,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int8(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "charged",
 					Num:        2,
@@ -20578,7 +20598,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "uncharged",
 					Num:        3,
@@ -20598,8 +20618,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaEvent: {
 		Num: typedef.MesgNumHsaEvent, /* hsa_event */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20615,7 +20635,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "event_id",
 					Num:        0,
@@ -20635,8 +20655,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaAccelerometerData: {
 		Num: typedef.MesgNumHsaAccelerometerData, /* hsa_accelerometer_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20652,7 +20672,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -20668,7 +20688,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sampling_interval",
 					Num:        1,
@@ -20684,7 +20704,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_x",
 					Num:        2,
@@ -20700,7 +20720,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_y",
 					Num:        3,
@@ -20716,7 +20736,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "accel_z",
 					Num:        4,
@@ -20732,7 +20752,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_32k",
 					Num:        5,
@@ -20752,8 +20772,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaGyroscopeData: {
 		Num: typedef.MesgNumHsaGyroscopeData, /* hsa_gyroscope_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20769,7 +20789,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -20785,7 +20805,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sampling_interval",
 					Num:        1,
@@ -20801,7 +20821,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_x",
 					Num:        2,
@@ -20817,7 +20837,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_y",
 					Num:        3,
@@ -20833,7 +20853,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gyro_z",
 					Num:        4,
@@ -20849,7 +20869,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []int16(nil), /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_32k",
 					Num:        5,
@@ -20869,8 +20889,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaStepData: {
 		Num: typedef.MesgNumHsaStepData, /* hsa_step_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20886,7 +20906,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -20902,7 +20922,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "steps",
 					Num:        1,
@@ -20922,8 +20942,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaSpo2Data: {
 		Num: typedef.MesgNumHsaSpo2Data, /* hsa_spo2_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -20939,7 +20959,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -20955,7 +20975,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reading_spo2",
 					Num:        1,
@@ -20971,7 +20991,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "confidence",
 					Num:        2,
@@ -20991,8 +21011,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaStressData: {
 		Num: typedef.MesgNumHsaStressData, /* hsa_stress_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21008,7 +21028,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -21024,7 +21044,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "stress_level",
 					Num:        1,
@@ -21044,8 +21064,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaRespirationData: {
 		Num: typedef.MesgNumHsaRespirationData, /* hsa_respiration_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21061,7 +21081,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -21077,7 +21097,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "respiration_rate",
 					Num:        1,
@@ -21097,8 +21117,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaHeartRateData: {
 		Num: typedef.MesgNumHsaHeartRateData, /* hsa_heart_rate_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21114,7 +21134,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -21130,7 +21150,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        1,
@@ -21146,7 +21166,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "heart_rate",
 					Num:        2,
@@ -21166,8 +21186,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaConfigurationData: {
 		Num: typedef.MesgNumHsaConfigurationData, /* hsa_configuration_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21183,7 +21203,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        0,
@@ -21199,7 +21219,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data_size",
 					Num:        1,
@@ -21219,8 +21239,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHsaWristTemperatureData: {
 		Num: typedef.MesgNumHsaWristTemperatureData, /* hsa_wrist_temperature_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21236,7 +21256,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "processing_interval",
 					Num:        0,
@@ -21252,7 +21272,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        1,
@@ -21272,8 +21292,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumMemoGlob: {
 		Num: typedef.MesgNumMemoGlob, /* memo_glob */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			250: {
 				FieldBase: &proto.FieldBase{
 					Name:       "part_index",
 					Num:        250,
@@ -21289,7 +21309,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "memo",
 					Num:        0,
@@ -21305,7 +21325,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_num",
 					Num:        1,
@@ -21321,7 +21341,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "parent_index",
 					Num:        2,
@@ -21337,7 +21357,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_num",
 					Num:        3,
@@ -21353,7 +21373,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
@@ -21373,8 +21393,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSleepLevel: {
 		Num: typedef.MesgNumSleepLevel, /* sleep_level */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21390,7 +21410,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_level",
 					Num:        0,
@@ -21410,8 +21430,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAntChannelId: {
 		Num: typedef.MesgNumAntChannelId, /* ant_channel_id */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        0,
@@ -21427,7 +21447,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_type",
 					Num:        1,
@@ -21443,7 +21463,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_number",
 					Num:        2,
@@ -21459,7 +21479,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16zInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "transmission_type",
 					Num:        3,
@@ -21475,7 +21495,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8zInvalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "device_index",
 					Num:        4,
@@ -21495,8 +21515,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAntRx: {
 		Num: typedef.MesgNumAntRx, /* ant_rx */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21512,7 +21532,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
@@ -21528,7 +21548,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_id",
 					Num:        1,
@@ -21544,7 +21564,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:     "mesg_data",
 					Num:      2,
@@ -21570,7 +21590,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        3,
@@ -21586,7 +21606,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
@@ -21606,8 +21626,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAntTx: {
 		Num: typedef.MesgNumAntTx, /* ant_tx */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -21623,7 +21643,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "fractional_timestamp",
 					Num:        0,
@@ -21639,7 +21659,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "mesg_id",
 					Num:        1,
@@ -21655,7 +21675,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:     "mesg_data",
 					Num:      2,
@@ -21681,7 +21701,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []byte(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "channel_number",
 					Num:        3,
@@ -21697,7 +21717,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data",
 					Num:        4,
@@ -21717,8 +21737,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumExdScreenConfiguration: {
 		Num: typedef.MesgNumExdScreenConfiguration, /* exd_screen_configuration */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
@@ -21734,7 +21754,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_count",
 					Num:        1,
@@ -21750,7 +21770,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "layout",
 					Num:        2,
@@ -21766,7 +21786,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_enabled",
 					Num:        3,
@@ -21786,8 +21806,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumExdDataFieldConfiguration: {
 		Num: typedef.MesgNumExdDataFieldConfiguration, /* exd_data_field_configuration */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
@@ -21803,7 +21823,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:     "concept_field",
 					Num:      1,
@@ -21822,7 +21842,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_id",
 					Num:        2,
@@ -21838,7 +21858,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_count",
 					Num:        3,
@@ -21854,7 +21874,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "display_type",
 					Num:        4,
@@ -21870,7 +21890,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "title",
 					Num:        5,
@@ -21890,8 +21910,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumExdDataConceptConfiguration: {
 		Num: typedef.MesgNumExdDataConceptConfiguration, /* exd_data_concept_configuration */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "screen_index",
 					Num:        0,
@@ -21907,7 +21927,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:     "concept_field",
 					Num:      1,
@@ -21926,7 +21946,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.ByteInvalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "field_id",
 					Num:        2,
@@ -21942,7 +21962,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_index",
 					Num:        3,
@@ -21958,7 +21978,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data_page",
 					Num:        4,
@@ -21974,7 +21994,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "concept_key",
 					Num:        5,
@@ -21990,7 +22010,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "scaling",
 					Num:        6,
@@ -22006,7 +22026,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "data_units",
 					Num:        8,
@@ -22022,7 +22042,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "qualifier",
 					Num:        9,
@@ -22038,7 +22058,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "descriptor",
 					Num:        10,
@@ -22054,7 +22074,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "is_signed",
 					Num:        11,
@@ -22074,8 +22094,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumDiveSummary: {
 		Num: typedef.MesgNumDiveSummary, /* dive_summary */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22091,7 +22111,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_mesg",
 					Num:        0,
@@ -22107,7 +22127,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "reference_index",
 					Num:        1,
@@ -22123,7 +22143,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_depth",
 					Num:        2,
@@ -22139,7 +22159,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_depth",
 					Num:        3,
@@ -22155,7 +22175,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "surface_interval",
 					Num:        4,
@@ -22171,7 +22191,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_cns",
 					Num:        5,
@@ -22187,7 +22207,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_cns",
 					Num:        6,
@@ -22203,7 +22223,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_n2",
 					Num:        7,
@@ -22219,7 +22239,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_n2",
 					Num:        8,
@@ -22235,7 +22255,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "o2_toxicity",
 					Num:        9,
@@ -22251,7 +22271,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "dive_number",
 					Num:        10,
@@ -22267,7 +22287,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "bottom_time",
 					Num:        11,
@@ -22283,7 +22303,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			12: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_pressure_sac",
 					Num:        12,
@@ -22299,7 +22319,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			13: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_volume_sac",
 					Num:        13,
@@ -22315,7 +22335,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_rmv",
 					Num:        14,
@@ -22331,7 +22351,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "descent_time",
 					Num:        15,
@@ -22347,7 +22367,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			16: {
 				FieldBase: &proto.FieldBase{
 					Name:       "ascent_time",
 					Num:        16,
@@ -22363,7 +22383,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			17: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_ascent_rate",
 					Num:        17,
@@ -22379,7 +22399,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Sint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			22: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_descent_rate",
 					Num:        22,
@@ -22395,7 +22415,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			23: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_ascent_rate",
 					Num:        23,
@@ -22411,7 +22431,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			24: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_descent_rate",
 					Num:        24,
@@ -22427,7 +22447,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			25: {
 				FieldBase: &proto.FieldBase{
 					Name:       "hang_time",
 					Num:        25,
@@ -22447,8 +22467,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumAadAccelFeatures: {
 		Num: typedef.MesgNumAadAccelFeatures, /* aad_accel_features */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22464,7 +22484,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        0,
@@ -22480,7 +22500,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "energy_total",
 					Num:        1,
@@ -22496,7 +22516,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "zero_cross_cnt",
 					Num:        2,
@@ -22512,7 +22532,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "instance",
 					Num:        3,
@@ -22528,7 +22548,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time_above_threshold",
 					Num:        4,
@@ -22548,8 +22568,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHrv: {
 		Num: typedef.MesgNumHrv, /* hrv */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        0,
@@ -22569,8 +22589,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumBeatIntervals: {
 		Num: typedef.MesgNumBeatIntervals, /* beat_intervals */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22586,7 +22606,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -22602,7 +22622,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        1,
@@ -22622,8 +22642,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHrvStatusSummary: {
 		Num: typedef.MesgNumHrvStatusSummary, /* hrv_status_summary */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22639,7 +22659,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "weekly_average",
 					Num:        0,
@@ -22655,7 +22675,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "last_night_average",
 					Num:        1,
@@ -22671,7 +22691,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "last_night_5_min_high",
 					Num:        2,
@@ -22687,7 +22707,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_low_upper",
 					Num:        3,
@@ -22703,7 +22723,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_balanced_lower",
 					Num:        4,
@@ -22719,7 +22739,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "baseline_balanced_upper",
 					Num:        5,
@@ -22735,7 +22755,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "status",
 					Num:        6,
@@ -22755,8 +22775,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumHrvValue: {
 		Num: typedef.MesgNumHrvValue, /* hrv_value */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22772,7 +22792,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "value",
 					Num:        0,
@@ -22792,8 +22812,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumRawBbi: {
 		Num: typedef.MesgNumRawBbi, /* raw_bbi */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22809,7 +22829,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp_ms",
 					Num:        0,
@@ -22825,7 +22845,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:     "data",
 					Num:      1,
@@ -22887,7 +22907,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "time",
 					Num:        2,
@@ -22903,7 +22923,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint16(nil), /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "quality",
 					Num:        3,
@@ -22919,7 +22939,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: []uint8(nil), /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "gap",
 					Num:        4,
@@ -22939,8 +22959,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumRespirationRate: {
 		Num: typedef.MesgNumRespirationRate, /* respiration_rate */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22956,7 +22976,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "respiration_rate",
 					Num:        0,
@@ -22976,8 +22996,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumChronoShotSession: {
 		Num: typedef.MesgNumChronoShotSession, /* chrono_shot_session */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -22993,7 +23013,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "min_speed",
 					Num:        0,
@@ -23009,7 +23029,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "max_speed",
 					Num:        1,
@@ -23025,7 +23045,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_speed",
 					Num:        2,
@@ -23041,7 +23061,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_count",
 					Num:        3,
@@ -23057,7 +23077,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "projectile_type",
 					Num:        4,
@@ -23073,7 +23093,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.EnumInvalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "grain_weight",
 					Num:        5,
@@ -23093,8 +23113,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumChronoShotData: {
 		Num: typedef.MesgNumChronoShotData, /* chrono_shot_data */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -23110,7 +23130,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_speed",
 					Num:        0,
@@ -23126,7 +23146,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "shot_num",
 					Num:        1,
@@ -23146,8 +23166,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTankUpdate: {
 		Num: typedef.MesgNumTankUpdate, /* tank_update */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -23163,7 +23183,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor",
 					Num:        0,
@@ -23179,7 +23199,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "pressure",
 					Num:        1,
@@ -23199,8 +23219,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumTankSummary: {
 		Num: typedef.MesgNumTankSummary, /* tank_summary */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			253: {
 				FieldBase: &proto.FieldBase{
 					Name:       "timestamp",
 					Num:        253,
@@ -23216,7 +23236,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32Invalid, /* Default Value: Invalid */
 			},
-			{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sensor",
 					Num:        0,
@@ -23232,7 +23252,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint32zInvalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "start_pressure",
 					Num:        1,
@@ -23248,7 +23268,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "end_pressure",
 					Num:        2,
@@ -23264,7 +23284,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint16Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "volume_used",
 					Num:        3,
@@ -23284,8 +23304,8 @@ var mesgs = [...]proto.Message{
 	},
 	typedef.MesgNumSleepAssessment: {
 		Num: typedef.MesgNumSleepAssessment, /* sleep_assessment */
-		Fields: []proto.Field{
-			{
+		Fields: [256]proto.Field{
+			0: {
 				FieldBase: &proto.FieldBase{
 					Name:       "combined_awake_score",
 					Num:        0,
@@ -23301,7 +23321,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			1: {
 				FieldBase: &proto.FieldBase{
 					Name:       "awake_time_score",
 					Num:        1,
@@ -23317,7 +23337,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			2: {
 				FieldBase: &proto.FieldBase{
 					Name:       "awakenings_count_score",
 					Num:        2,
@@ -23333,7 +23353,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			3: {
 				FieldBase: &proto.FieldBase{
 					Name:       "deep_sleep_score",
 					Num:        3,
@@ -23349,7 +23369,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			4: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_duration_score",
 					Num:        4,
@@ -23365,7 +23385,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			5: {
 				FieldBase: &proto.FieldBase{
 					Name:       "light_sleep_score",
 					Num:        5,
@@ -23381,7 +23401,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			6: {
 				FieldBase: &proto.FieldBase{
 					Name:       "overall_sleep_score",
 					Num:        6,
@@ -23397,7 +23417,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			7: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_quality_score",
 					Num:        7,
@@ -23413,7 +23433,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			8: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_recovery_score",
 					Num:        8,
@@ -23429,7 +23449,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			9: {
 				FieldBase: &proto.FieldBase{
 					Name:       "rem_sleep_score",
 					Num:        9,
@@ -23445,7 +23465,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			10: {
 				FieldBase: &proto.FieldBase{
 					Name:       "sleep_restlessness_score",
 					Num:        10,
@@ -23461,7 +23481,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			11: {
 				FieldBase: &proto.FieldBase{
 					Name:       "awakenings_count",
 					Num:        11,
@@ -23477,7 +23497,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			14: {
 				FieldBase: &proto.FieldBase{
 					Name:       "interruptions_score",
 					Num:        14,
@@ -23493,7 +23513,7 @@ var mesgs = [...]proto.Message{
 				},
 				Value: basetype.Uint8Invalid, /* Default Value: Invalid */
 			},
-			{
+			15: {
 				FieldBase: &proto.FieldBase{
 					Name:       "average_stress_during_sleep",
 					Num:        15,
