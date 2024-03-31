@@ -302,7 +302,7 @@ When handling a chained fit file, sometimes we only want to decode a certain fil
         fit, err := dec.Decode()
         if err != nil {
             return err
-            }
+        }
         // do something with fit variable
     }
     ...
@@ -760,6 +760,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     if err != nil {
         panic(err)
     }
+    defer fout.Close()
 
     bw := bufferedwriter.New(fout)
     defer bw.Flush()
@@ -842,6 +843,7 @@ import (
 
     "github.com/muktihari/fit/encoder"
     "github.com/muktihari/fit/factory"
+    "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/kit/datetime"
     "github.com/muktihari/fit/profile/untyped/fieldnum"
     "github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -854,8 +856,12 @@ func main() {
     }
     defer f.Close()
 
-    // f (*os.File) is even implementing both io.WriterAt and io.WriteSeeker
-    streamEnc, err := encoder.New(f).StreamEncoder()
+    // f (*os.File) is implementing both io.WriterAt and io.WriteSeeker so it can be used directly.
+    // But to reduce syscall, let's wrap it using buffered writer instead.
+    bw := bufferedwriter.New(fout)
+    defer bw.Flush()
+
+    streamEnc, err := encoder.New(bw).StreamEncoder()
     if err != nil {
         panic(err)
     }

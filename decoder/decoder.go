@@ -306,22 +306,22 @@ func (d *Decoder) discardMessages() (err error) {
 //
 // Example: - A chained FIT file consist of Activity, Course, Workout and Settings. And we only want to decode Course.
 //
-//		for dec.Next() {
-//			fileId, err := dec.PeekFileId()
-//			if err != nil {
-//				return err
-//			}
-//			if fileId.Type != typedef.FileCourse {
-//				if err := dec.Discard(); err != nil {
-//			    	return err
-//			    }
-//				continue
-//			}
-//			fit, err := dec.Decode()
-//			if err != nil {
-//				return err
-//	     	}
-//		 }
+//	for dec.Next() {
+//		fileId, err := dec.PeekFileId()
+//		if err != nil {
+//			return err
+//		}
+//		if fileId.Type != typedef.FileCourse {
+//		    if err := dec.Discard(); err != nil {
+//		    	return err
+//		    }
+//		    continue
+//		}
+//		fit, err := dec.Decode()
+//		if err != nil {
+//			return err
+//		}
+//	 }
 func (d *Decoder) Discard() error {
 	if d.err != nil {
 		return d.err
@@ -729,8 +729,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 	}
 
 	// PERF: Reuse a single variable 'componentField' instead of declaring it inside the loop to prevent
-	// the Compiler's escape analysis from moving it to the heap, which could occur due to the risk of
-	// stack overflow caused by repeatedly creating the variable.
+	// the Compiler's escape analysis from moving it to the heap.
 	var componentField proto.Field
 	for i := range components {
 		component := &components[i]
