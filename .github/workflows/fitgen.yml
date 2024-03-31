@@ -12,15 +12,17 @@ jobs:
     steps:
       - name: Check PR comment
         id: check-comment
+        env:
+          COMMENT: ${{ github.event.comment.body }} # Sanitize input using env to prevent script injection attack
         run: |
-          echo "trigger=${{ startsWith(github.event.comment.body, 'run fitgen') }}" >> $GITHUB_OUTPUT
+          echo "trigger=${{ startsWith($COMMENT, 'run fitgen') }}" >> $GITHUB_OUTPUT
 
-          if [[ "${{ startsWith(github.event.comment.body, 'run fitgen') }}" == "false" ]]; then 
+          if [[ "${{ startsWith($COMMENT, 'run fitgen') }}" == "false" ]]; then 
             echo "Aborted: no command found"
             exit 0
           fi
 
-          if [[ "${{ github.event.comment.body }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
+          if [[ "${{ $COMMENT }}" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
             echo "profile_version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
           else 
             echo "Aborted: not a valid 'run fitgen <profile.version>' command"
