@@ -180,7 +180,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 	}
 
 	strbuf := new(strings.Builder)
-	strbuf.WriteString("[256]proto.Field{\n")
+	strbuf.WriteString("[256]*proto.Field{\n")
 	for _, field := range message.Fields {
 		// strbuf.WriteString("{\n")
 		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))

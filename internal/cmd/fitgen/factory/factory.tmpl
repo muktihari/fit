@@ -48,40 +48,42 @@ type Factory struct {
 // Receiving messages through here means we need to validate all of it, while RegisterMesg is already exist for that purpose.
 func New() *Factory { return &Factory{} }
 
-var ( // cache for CreateMesg func
-	once sync.Once
-	cache map[typedef.MesgNum]proto.Message
+var ( // cache for CreateMesg method
+	once	   sync.Once
+	protoMesgs [len(mesgs)]proto.Message // data is populated on CreateMesg first invocation.
 )
 
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	once.Do(func() { // populate data fields in the cache.
-		cache = make(map[typedef.MesgNum]proto.Message)
 		for i := range mesgs {
 			rawmesg := &mesgs[i]
-			if _, ok := cache[rawmesg.Num]; ok {
-				continue
+			if rawmesg.Num != typedef.MesgNum(i) {
+				continue // skip unknown message
 			}
 			var n byte
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
+				if field != nil {
 					n++
 				}
 			}
-            fields := make([]proto.Field, 0, n)
+			fields := make([]proto.Field, 0, n)
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
-					fields = append(fields, field)
+				if field != nil {
+					fields = append(fields, *field)
 				}
 			}
-			cache[rawmesg.Num] = proto.Message{Num: rawmesg.Num, Fields: fields}
+			protoMesgs[rawmesg.Num] = proto.Message{
+				Num:    rawmesg.Num, 
+				Fields: fields,
+			}
 		}
 	})
 
-	mesg, ok := cache[num]
-	if !ok {
+	mesg := protoMesgs[num]
+	if mesg.Num != num {
 		mesg = f.registeredMesgs[num]
 	}
 
@@ -105,18 +107,18 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
 		field := mesgs[mesgNum].Fields[num]
-		if field.FieldBase != nil {
-			return field
+		if field != nil {
+			return *field
 		}
 		return createUnknownField(num)
 	}
 
-    if mesg, ok := f.registeredMesgs[mesgNum]; ok {
-        for i := range mesg.Fields {
-            if mesg.Fields[i].Num == num {
-                return mesg.Fields[i]
-            }
-        }
+	if mesg, ok := f.registeredMesgs[mesgNum]; ok {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num == num {
+				return mesg.Fields[i]
+			}
+		}
 	}
 
 	return createUnknownField(num)
@@ -128,11 +130,11 @@ func createUnknownField(num byte) proto.Field {
 
 {{ template "register_mesg_doc" -}}
 func (f *Factory) RegisterMesg(mesg proto.Message) error {
-    if f.registeredMesgs == nil {
-        f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
-    }
+	if f.registeredMesgs == nil {
+		f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
+	}
 
-    if mesg.Num > typedef.MesgNumMfgRangeMax {
+	if mesg.Num > typedef.MesgNumMfgRangeMax {
 		return fmt.Errorf("could not register outside max range: %d", typedef.MesgNumMfgRangeMax)
 	}
 
@@ -147,7 +149,7 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 
 type message struct {
 	Num    typedef.MesgNum
-	Fields [256]proto.Field // Use array to ensure O(1) lookup
+	Fields [256]*proto.Field // Use array to ensure O(1) lookup, use pointer to reduce memory usage.
 }
 
 // Use array to ensure O(1) lookup
