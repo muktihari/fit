@@ -140,7 +140,7 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 		}
 
 		// only field has fieldNum, sub-field doesn't.
-		fieldNum, err := strconv.Atoi(row.Cell("B"))
+		fieldNum, err := strconv.ParseUint(row.Cell("B"), 0, 8)
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +213,7 @@ func splitBytesOrNil(s string) ([]byte, error) {
 	strVals := strings.Split(s, ",")
 	bs := make([]byte, 0, len(strVals))
 	for _, s := range strVals {
-		b, err := strconv.Atoi(s)
+		b, err := strconv.ParseUint(s, 0, 8)
 		if err != nil {
 			return nil, err
 		}
