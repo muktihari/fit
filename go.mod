@@ -3,7 +3,7 @@ module github.com/muktihari/fit
 go 1.20
 
 require (
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.6.0
 	github.com/pkg/profile v1.7.0
 	github.com/thedatashed/xlsxreader v1.2.5
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
