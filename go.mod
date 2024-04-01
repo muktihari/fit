@@ -7,7 +7,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/thedatashed/xlsxreader v1.2.5
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
-	golang.org/x/text v0.12.0
+	golang.org/x/text v0.14.0
 )
 
 require (
