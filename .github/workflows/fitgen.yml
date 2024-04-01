@@ -5,9 +5,14 @@ on:
     types:
       - created
 
+permissions: {}
+
 jobs:
   run-fitgen:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # allow push commit
 
     steps:
       - name: Check PR comment
