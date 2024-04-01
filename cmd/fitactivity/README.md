@@ -1,6 +1,8 @@
 # FIT Activity CLI
 
-A program to combine and conceal position (Lat & Long at specified distance) of FIT Activity Files.
+A program to combine multiple FIT activity files (\*.fit) and conceal its position (Lat & Long at specified distance). Available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
+
+TLDR: [Usage](#Usage)
 
 ## Background
 
@@ -26,7 +28,7 @@ The first file will be the base for the resulting file and we will combine these
 
   Why lap positions must be removed? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
 
-Other messages from the next FIT files will not be combined.
+Other messages from the next FIT files will be appended as it is except **FileId** and **FileCreator**.
 
 ### Calculated Session Fields:
 
@@ -100,7 +102,7 @@ _Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/i
 2. Windows
 
    ```sh
-   GOOS=windows GOARCH=amd64 go build -o fitactivity main.go
+   GOOS=windows GOARCH=amd64 go build -o fitactivity.exe main.go
    ```
 
 3. Linux
@@ -120,11 +122,11 @@ go install .
 
 **Alternatively, now you can just download the the binary from [Release's Assets](https://github.com/muktihari/fit/releases)**
 
-## Usage Examples
+## Usage
 
-After the program has been built or installed, you can call the fitactivity executable.
+After the program has been built or installed, you can call the fitactivity executable in terminal (_or command prompt, if you are using windows, use fitactivity.exe instead_)
 
-### Combine Multiple FIT files
+### Combine Multiple FIT Activity files
 
 1. Using -o argument
    ```sh
@@ -175,4 +177,43 @@ fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fi
 
 # ls output
 # part1.fit part2.fit result.fit
+```
+
+### Available Options
+
+NOTE: We can only use either `interleave` or `compress` at a time.
+
+<table class="table table-bordered table-hover table-condensed">
+<thead>
+<tr>
+    <th style="width: 80px">Option</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>-interleave</td>
+    <td>uint</td>
+    <th>15</th>
+    <td>Max interleave allowed to reduce writing the same message definition on encoding process. Valid value: 0-15. <strong>NOTE: If your target is an embedded device, consider using smaller value or just use 0, since its RAM is relatively small.</strong></td>
+</tr>
+<tr>
+    <td>-compress</td>
+    <td>boolean</td>
+    <th>false</th>
+    <td>Compress timestamp in message header. Save 7 bytes per message for every message written in 31s interval.</td>
+</tr>
+</tbody>
+</table>
+
+Example using options:
+
+```sh
+fitactivity --combine -o result.fit --interleave 7 part1.fit part2.fit
+```
+
+```sh
+fitactivity --combine -o result.fit --compress part1.fit part2.fit
 ```
