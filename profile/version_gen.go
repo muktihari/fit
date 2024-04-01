@@ -6,9 +6,9 @@
 
 package profile
 
-const version = 21133
+const version = 21132
 
-// Version returns the current profile version, v21.133, in its uint16 form: (Major * 1000) + Minor = 21133.
+// Version returns the current profile version, v21.132, in its uint16 form: (Major * 1000) + Minor = 21132.
 func Version() uint16 {
 	return version
 }
