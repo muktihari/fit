@@ -72,7 +72,9 @@ func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.Wa
 		}
 
 		if fileId.Type != typedef.FileActivity {
-			// Chained file may be composed of activity files and other file types, skip the non-activity file.
+			if err := dec.Discard(); err != nil {
+				resultc <- result{err: err}
+			}
 			continue
 		}
 

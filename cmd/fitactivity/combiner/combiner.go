@@ -7,7 +7,6 @@ package combiner
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/muktihari/fit/cmd/fitactivity/finder"
 	"github.com/muktihari/fit/profile/basetype"
@@ -48,11 +47,14 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 	result := &fits[0]
 
 	for i := 1; i < len(fits); i++ {
-		sessionInfo := finder.FindLastSessionInfo(&fits[i-1])
+		currentFIT := &fits[i-1]
+		nextFIT := &fits[i]
+
+		sessionInfo := finder.FindLastSessionInfo(currentFIT)
 		if sessionInfo.SessionIndex == -1 {
-			return nil, fmt.Errorf("could not find last session index, fit index: %d: %w", i-1, ErrNoSessionFound)
+			return nil, fmt.Errorf("could not find current last session message, fit index: %d: %w", i-1, ErrNoSessionFound)
 		}
-		sessionMesg := fits[i-1].Messages[sessionInfo.SessionIndex]
+		sessionMesg := currentFIT.Messages[sessionInfo.SessionIndex]
 		session := mesgdef.NewSession(&sessionMesg)
 
 		if i-1 == 0 {
@@ -60,45 +62,45 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 			result.Messages = append(result.Messages[:sessionInfo.SessionIndex], result.Messages[sessionInfo.SessionIndex+1:]...)
 		}
 
-		nextSessionInfo := finder.FindFirstSessionInfo(&fits[i])
+		nextSessionInfo := finder.FindFirstSessionInfo(nextFIT)
 		if nextSessionInfo.SessionIndex == -1 {
-			return nil, fmt.Errorf("could not find next first session index, fit index: %d: %w", i, ErrNoSessionFound)
+			return nil, fmt.Errorf("could not find next first session message, fit index: %d: %w", i, ErrNoSessionFound)
 		}
-		nextSession := mesgdef.NewSession(&fits[i].Messages[nextSessionInfo.SessionIndex])
+		nextSession := mesgdef.NewSession(&nextFIT.Messages[nextSessionInfo.SessionIndex])
 
 		if session.Sport != nextSession.Sport {
 			return nil, fmt.Errorf("last session's sport: %s, next first session's sport %s, fit index: %d: %w",
 				session.Sport, nextSession.Sport, i, ErrSportMismatch)
 		}
 
+	loop:
 		for j := nextSessionInfo.RecordFirstIndex; j <= nextSessionInfo.RecordLastIndex; j++ {
-			mesg := fits[i].Messages[j]
+			mesg := nextFIT.Messages[j]
 			switch mesg.Num {
+			case mesgnum.FileId, mesgnum.FileCreator:
+				continue loop // skip these messages
 			case mesgnum.Record:
 				fieldDistance := mesg.FieldByNum(fieldnum.RecordDistance)
 				if fieldDistance == nil {
-					continue
+					continue loop
 				}
 				distance, ok := fieldDistance.Value.(uint32)
 				if !ok {
-					continue
+					continue loop
 				}
 				distance += session.TotalDistance
 				fieldDistance.Value = distance
-
-				result.Messages = append(result.Messages, mesg)
-			case mesgnum.Event:
-				result.Messages = append(result.Messages, mesg)
-			case mesgnum.Lap:
-				result.Messages = append(result.Messages, mesg)
 			}
+			result.Messages = append(result.Messages, mesg)
 		}
 
 		combineSession(session, nextSession)
+		session.TotalElapsedTime = calculateSessionTotalElapsedTime(currentFIT, nextFIT, &sessionInfo, &nextSessionInfo)
+
 		sessionMesg = session.ToMesg(nil)
 
 		// Let's make "summary last sequence" order by updating session's timestamp with last lastRecord's timestamp
-		lastRecord := fits[i].Messages[nextSessionInfo.RecordLastIndex]
+		lastRecord := nextFIT.Messages[nextSessionInfo.RecordLastIndex]
 		newSessionTimestamp, ok := lastRecord.FieldValueByNum(fieldnum.RecordTimestamp).(uint32)
 		if !ok {
 			return nil, fmt.Errorf("timestamp is a required field but not present in record")
@@ -132,15 +134,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 	return result, nil
 }
 
-// combineSession combines s2 into s1.
+// combineSession combines s2 into s1. // s1.TotalElapsedTime will be calculated separately.
 func combineSession(s1, s2 *mesgdef.Session) {
-	s1EndTime := s1.StartTime.Add(time.Duration(s1.TotalElapsedTime/1000) * time.Second)
-	elapsedTimeGap := s2.StartTime.Sub(s1EndTime)
-	if elapsedTimeGap >= 0 {
-		s1.TotalElapsedTime += uint32(elapsedTimeGap.Seconds())
-	}
-
-	s1.TotalElapsedTime += s2.TotalElapsedTime
 	s1.TotalTimerTime += s2.TotalTimerTime
 	s1.TotalDistance += s2.TotalDistance
 	s1.EndPositionLat = s2.EndPositionLat
@@ -253,4 +248,32 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	} else if s1.MaxAltitude == basetype.Uint16Invalid {
 		s1.MaxAltitude = s2.MaxAltitude
 	}
+}
+
+func calculateSessionTotalElapsedTime(currentFIT, nextFIT *proto.Fit,
+	sessionInfo, nextSessionInfo *finder.SessionInfo) (totalElapsed uint32) {
+	var firstSessionRecordTimestamp uint32
+	var ok bool
+
+	// Find first record of the current session that has timestamp
+	for i := sessionInfo.RecordFirstIndex; i <= sessionInfo.RecordLastIndex; i++ {
+		firstSessionRecordTimestamp, ok = currentFIT.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
+		if ok {
+			break
+		}
+	}
+
+	// Find last record of the next session that has timestamp
+	var nextSessionLastRecordTimestamp uint32
+	for i := nextSessionInfo.RecordLastIndex; i >= nextSessionInfo.RecordFirstIndex; i-- {
+		nextSessionLastRecordTimestamp, ok = nextFIT.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
+		if ok {
+			break
+		}
+	}
+
+	const sessionTotalElapedTimeScale = 1000 // & session.TotalElapedTime's offset is 0
+	totalElapsed = (nextSessionLastRecordTimestamp - firstSessionRecordTimestamp) * sessionTotalElapedTimeScale
+
+	return totalElapsed
 }
