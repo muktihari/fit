@@ -8,7 +8,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/muktihari/fit/cmd/fitactivity/finder"
+	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -21,10 +22,6 @@ var (
 	ErrMinimalCombine = errors.New("minimal combine")
 	ErrNoSessionFound = errors.New("no session found")
 	ErrSportMismatch  = errors.New("sport mismatch")
-)
-
-const (
-	fieldNumTimestamp = 253 // all message have the same field number for timestamp.
 )
 
 func Combine(fits ...proto.Fit) (*proto.Fit, error) {
@@ -44,84 +41,151 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		return 1
 	})
 
-	result := &fits[0]
+	var sessionMesgs []proto.Message
+	var activityMesg proto.Message
 
-	for i := 1; i < len(fits); i++ {
-		currentFIT := &fits[i-1]
-		nextFIT := &fits[i]
-
-		sessionInfo := finder.FindLastSessionInfo(currentFIT)
-		if sessionInfo.SessionIndex == -1 {
-			return nil, fmt.Errorf("could not find current last session message, fit index: %d: %w", i-1, ErrNoSessionFound)
-		}
-		sessionMesg := currentFIT.Messages[sessionInfo.SessionIndex]
-		session := mesgdef.NewSession(&sessionMesg)
-
-		if i-1 == 0 {
-			// remove target session from result, session will be added later depend on sequence order.
-			result.Messages = append(result.Messages[:sessionInfo.SessionIndex], result.Messages[sessionInfo.SessionIndex+1:]...)
-		}
-
-		nextSessionInfo := finder.FindFirstSessionInfo(nextFIT)
-		if nextSessionInfo.SessionIndex == -1 {
-			return nil, fmt.Errorf("could not find next first session message, fit index: %d: %w", i, ErrNoSessionFound)
-		}
-		nextSession := mesgdef.NewSession(&nextFIT.Messages[nextSessionInfo.SessionIndex])
-
-		if session.Sport != nextSession.Sport {
-			return nil, fmt.Errorf("last session's sport: %s, next first session's sport %s, fit index: %d: %w",
-				session.Sport, nextSession.Sport, i, ErrSportMismatch)
-		}
-
-	loop:
-		for j := nextSessionInfo.RecordFirstIndex; j <= nextSessionInfo.RecordLastIndex; j++ {
-			mesg := nextFIT.Messages[j]
+	sessionsByFIT := make([][]proto.Message, len(fits))
+	for i := range fits {
+		fit := &fits[i]
+		for j := 0; j < len(fit.Messages); j++ {
+			mesg := fit.Messages[j]
 			switch mesg.Num {
-			case mesgnum.FileId, mesgnum.FileCreator:
-				continue loop // skip these messages
-			case mesgnum.Record:
-				fieldDistance := mesg.FieldByNum(fieldnum.RecordDistance)
-				if fieldDistance == nil {
-					continue loop
+			case mesgnum.Session:
+				if i == 0 { // First FIT as base
+					sessionMesgs = append(sessionMesgs, mesg)
+					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all sessions from result
 				}
-				distance, ok := fieldDistance.Value.(uint32)
-				if !ok {
-					continue loop
+				sessionsByFIT[i] = append(sessionsByFIT[i], mesg)
+			case mesgnum.Activity:
+				if activityMesg.Num != mesgnum.Activity {
+					activityMesg = mesg
+					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove activity from result
 				}
-				distance += session.TotalDistance
-				fieldDistance.Value = distance
 			}
-			result.Messages = append(result.Messages, mesg)
 		}
-
-		combineSession(session, nextSession)
-		session.TotalElapsedTime = calculateSessionTotalElapsedTime(currentFIT, nextFIT, &sessionInfo, &nextSessionInfo)
-
-		sessionMesg = session.ToMesg(nil)
-
-		// Let's make "summary last sequence" order by updating session's timestamp with last lastRecord's timestamp
-		lastRecord := nextFIT.Messages[nextSessionInfo.RecordLastIndex]
-		newSessionTimestamp, ok := lastRecord.FieldValueByNum(fieldnum.RecordTimestamp).(uint32)
-		if !ok {
-			return nil, fmt.Errorf("timestamp is a required field but not present in record")
-		}
-
-		fieldTimestamp := sessionMesg.FieldByNum(fieldnum.SessionTimestamp)
-		if fieldTimestamp == nil {
-			return nil, fmt.Errorf("timestamp is a required field but not present in session")
-		}
-
-		fieldTimestamp.Value = newSessionTimestamp
-
-		result.Messages = append(result.Messages, sessionMesg)
 	}
 
-	slices.SortStableFunc(result.Messages, func(mesg1, mesg2 proto.Message) int {
-		timestamp1, ok := mesg1.FieldValueByNum(fieldNumTimestamp).(uint32)
+	fitResult := &fits[0]
+
+	for i := range sessionsByFIT {
+		if len(sessionsByFIT[i]) == 0 {
+			return nil, fmt.Errorf("fits[i]: %w", ErrNoSessionFound)
+		}
+	}
+
+	for i := 1; i < len(fits); i++ {
+		var (
+			nextFitSessions = sessionsByFIT[i]
+			curSes          = mesgdef.NewSession(&sessionMesgs[len(sessionMesgs)-1])
+			nextSes         = mesgdef.NewSession(&nextFitSessions[0])
+		)
+		if curSes.Sport != nextSes.Sport {
+			return nil, fmt.Errorf("fits[%d] %q != %q: %w",
+				i, curSes.Sport, nextSes.Sport, ErrSportMismatch)
+		}
+
+		nextSesEndTime := datetime.ToUint32(nextSes.StartTime) + uint32(float64(nextSes.TotalElapsedTime)/1000)
+
+		var lastTimestampPerFit uint32
+		for _, mesg := range fits[i].Messages {
+			switch mesg.Num {
+			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
+				continue // skip
+			}
+			timestamp, ok := mesg.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
+			if ok && timestamp <= nextSesEndTime {
+				lastTimestampPerFit = timestamp
+			}
+			fitResult.Messages = append(fitResult.Messages, mesg)
+		}
+
+		combineSession(curSes, nextSes)
+		curSes.TotalElapsedTime = lastTimestampPerFit - datetime.ToUint32(curSes.StartTime)
+		sessionMesgs[len(sessionMesgs)-1] = curSes.ToMesg(nil) // Update Session
+
+		if len(nextFitSessions) > 1 { // append the rest of the sessions
+			sessionMesgs = append(sessionMesgs, nextFitSessions[1:]...)
+		}
+	}
+
+	// Now that all messages has been appended, let's update the session messages and
+	// activity message and place it at the end of the resulting FIT (Sessions Last Summary).
+
+	firstTimestamp := basetype.Uint32Invalid
+	for _, mesg := range fitResult.Messages {
+		if firstTimestamp == basetype.Uint32Invalid {
+			timestamp, ok := mesg.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
+			if ok {
+				firstTimestamp = timestamp
+				break
+			}
+		}
+	}
+
+	lastTimestamp := basetype.Uint32Invalid
+	for i := len(fitResult.Messages) - 1; i > 0; i-- {
+		timestamp, ok := fitResult.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
+		if ok {
+			lastTimestamp = timestamp
+			break
+		}
+	}
+
+	for _, sesMesg := range sessionMesgs {
+		field := sesMesg.FieldByNum(proto.FieldNumTimestamp)
+		if field == nil {
+			sesMesg.Fields = append(sesMesg.Fields, factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp))
+			field = &sesMesg.Fields[len(sesMesg.Fields)-1]
+		}
+		field.Value = lastTimestamp // Update session timestamp
+		fitResult.Messages = append(fitResult.Messages, sesMesg)
+	}
+
+	// Update activity.Timestamp & activity.LocalTimestamp
+	timestampField := activityMesg.FieldByNum(proto.FieldNumTimestamp)
+	if timestampField == nil {
+		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, proto.FieldNumTimestamp))
+		timestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	}
+
+	localTimestampField := activityMesg.FieldByNum(fieldnum.ActivityLocalTimestamp)
+	if localTimestampField == nil {
+		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp))
+		localTimestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	}
+
+	tzOffsetHour := datetime.TzOffsetHours(
+		datetime.ToTime(localTimestampField.Value),
+		datetime.ToTime(timestampField.Value),
+	)
+
+	timestampField.Value = lastTimestamp
+	localTimestampField.Value = uint32(int64(lastTimestamp) + int64(tzOffsetHour*3600))
+
+	// Update activity.TotalTimerTime
+	timestampField = activityMesg.FieldByNum(fieldnum.ActivityTotalTimerTime)
+	if timestampField == nil {
+		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime))
+		timestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	}
+	timestampField.Value = (lastTimestamp - firstTimestamp) * 1000 // Scale: 1000, Offset: 0
+
+	// Update activity.NumSessions
+	numSessions := activityMesg.FieldByNum(fieldnum.ActivityNumSessions)
+	if numSessions == nil {
+		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions))
+		numSessions = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	}
+	numSessions.Value = uint16(len(sessionMesgs))
+
+	fitResult.Messages = append(fitResult.Messages, activityMesg)
+
+	slices.SortStableFunc(fitResult.Messages, func(mesg1, mesg2 proto.Message) int {
+		timestamp1, ok := mesg1.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
 		if !ok {
 			return 0
 		}
-		timestamp2, ok := mesg2.FieldValueByNum(fieldNumTimestamp).(uint32)
+		timestamp2, ok := mesg2.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
 		if !ok {
 			return 0
 		}
@@ -131,7 +195,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		return 1
 	})
 
-	return result, nil
+	return fitResult, nil
 }
 
 // combineSession combines s2 into s1. // s1.TotalElapsedTime will be calculated separately.
@@ -248,32 +312,4 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	} else if s1.MaxAltitude == basetype.Uint16Invalid {
 		s1.MaxAltitude = s2.MaxAltitude
 	}
-}
-
-func calculateSessionTotalElapsedTime(currentFIT, nextFIT *proto.Fit,
-	sessionInfo, nextSessionInfo *finder.SessionInfo) (totalElapsed uint32) {
-	var firstSessionRecordTimestamp uint32
-	var ok bool
-
-	// Find first record of the current session that has timestamp
-	for i := sessionInfo.RecordFirstIndex; i <= sessionInfo.RecordLastIndex; i++ {
-		firstSessionRecordTimestamp, ok = currentFIT.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-		if ok {
-			break
-		}
-	}
-
-	// Find last record of the next session that has timestamp
-	var nextSessionLastRecordTimestamp uint32
-	for i := nextSessionInfo.RecordLastIndex; i >= nextSessionInfo.RecordFirstIndex; i-- {
-		nextSessionLastRecordTimestamp, ok = nextFIT.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-		if ok {
-			break
-		}
-	}
-
-	const sessionTotalElapedTimeScale = 1000 // & session.TotalElapedTime's offset is 0
-	totalElapsed = (nextSessionLastRecordTimestamp - firstSessionRecordTimestamp) * sessionTotalElapedTimeScale
-
-	return totalElapsed
 }
