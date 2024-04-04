@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -37,7 +36,7 @@ type GpsMetadata struct {
 // NewGpsMetadata creates new GpsMetadata struct based on given mesg.
 // If mesg is nil, it will return GpsMetadata with all fields being set to its corresponding invalid value.
 func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -51,15 +50,15 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 	}
 
 	return &GpsMetadata{
-		Timestamp:        datetime.ToTime(vals[253]),
-		UtcTimestamp:     datetime.ToTime(vals[6]),
-		Velocity:         typeconv.ToSliceSint16[int16](vals[7]),
-		PositionLat:      typeconv.ToSint32[int32](vals[1]),
-		PositionLong:     typeconv.ToSint32[int32](vals[2]),
-		EnhancedAltitude: typeconv.ToUint32[uint32](vals[3]),
-		EnhancedSpeed:    typeconv.ToUint32[uint32](vals[4]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
-		Heading:          typeconv.ToUint16[uint16](vals[5]),
+		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		UtcTimestamp:     datetime.ToTime(vals[6].Uint32()),
+		Velocity:         vals[7].SliceInt16(),
+		PositionLat:      vals[1].Int32(),
+		PositionLong:     vals[2].Int32(),
+		EnhancedAltitude: vals[3].Uint32(),
+		EnhancedSpeed:    vals[4].Uint32(),
+		TimestampMs:      vals[0].Uint16(),
+		Heading:          vals[5].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -83,47 +82,47 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = datetime.ToUint32(m.UtcTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.UtcTimestamp))
 		fields = append(fields, field)
 	}
 	if m.Velocity != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.Velocity
+		field.Value = proto.SliceInt16(m.Velocity)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.PositionLat
+		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.PositionLong
+		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.EnhancedAltitude
+		field.Value = proto.Uint32(m.EnhancedAltitude)
 		fields = append(fields, field)
 	}
 	if m.EnhancedSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.EnhancedSpeed
+		field.Value = proto.Uint32(m.EnhancedSpeed)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.Heading != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.Heading
+		field.Value = proto.Uint16(m.Heading)
 		fields = append(fields, field)
 	}
 

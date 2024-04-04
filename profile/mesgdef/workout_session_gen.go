@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type WorkoutSession struct {
 // NewWorkoutSession creates new WorkoutSession struct based on given mesg.
 // If mesg is nil, it will return WorkoutSession with all fields being set to its corresponding invalid value.
 func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,13 +46,13 @@ func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 	}
 
 	return &WorkoutSession{
-		MessageIndex:   typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		NumValidSteps:  typeconv.ToUint16[uint16](vals[2]),
-		FirstStepIndex: typeconv.ToUint16[uint16](vals[3]),
-		PoolLength:     typeconv.ToUint16[uint16](vals[4]),
-		Sport:          typeconv.ToEnum[typedef.Sport](vals[0]),
-		SubSport:       typeconv.ToEnum[typedef.SubSport](vals[1]),
-		PoolLengthUnit: typeconv.ToEnum[typedef.DisplayMeasure](vals[5]),
+		MessageIndex:   typedef.MessageIndex(vals[254].Uint16()),
+		NumValidSteps:  vals[2].Uint16(),
+		FirstStepIndex: vals[3].Uint16(),
+		PoolLength:     vals[4].Uint16(),
+		Sport:          typedef.Sport(vals[0].Uint8()),
+		SubSport:       typedef.SubSport(vals[1].Uint8()),
+		PoolLengthUnit: typedef.DisplayMeasure(vals[5].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -77,37 +76,37 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.NumValidSteps
+		field.Value = proto.Uint16(m.NumValidSteps)
 		fields = append(fields, field)
 	}
 	if m.FirstStepIndex != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.FirstStepIndex
+		field.Value = proto.Uint16(m.FirstStepIndex)
 		fields = append(fields, field)
 	}
 	if m.PoolLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.PoolLength
+		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.SubSport)
+		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = byte(m.PoolLengthUnit)
+		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
 		fields = append(fields, field)
 	}
 

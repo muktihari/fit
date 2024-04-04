@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -42,7 +41,7 @@ type WeightScale struct {
 // NewWeightScale creates new WeightScale struct based on given mesg.
 // If mesg is nil, it will return WeightScale with all fields being set to its corresponding invalid value.
 func NewWeightScale(mesg *proto.Message) *WeightScale {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -56,20 +55,20 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 	}
 
 	return &WeightScale{
-		Timestamp:         datetime.ToTime(vals[253]),
-		Weight:            typeconv.ToUint16[typedef.Weight](vals[0]),
-		PercentFat:        typeconv.ToUint16[uint16](vals[1]),
-		PercentHydration:  typeconv.ToUint16[uint16](vals[2]),
-		VisceralFatMass:   typeconv.ToUint16[uint16](vals[3]),
-		BoneMass:          typeconv.ToUint16[uint16](vals[4]),
-		MuscleMass:        typeconv.ToUint16[uint16](vals[5]),
-		BasalMet:          typeconv.ToUint16[uint16](vals[7]),
-		ActiveMet:         typeconv.ToUint16[uint16](vals[9]),
-		UserProfileIndex:  typeconv.ToUint16[typedef.MessageIndex](vals[12]),
-		Bmi:               typeconv.ToUint16[uint16](vals[13]),
-		PhysiqueRating:    typeconv.ToUint8[uint8](vals[8]),
-		MetabolicAge:      typeconv.ToUint8[uint8](vals[10]),
-		VisceralFatRating: typeconv.ToUint8[uint8](vals[11]),
+		Timestamp:         datetime.ToTime(vals[253].Uint32()),
+		Weight:            typedef.Weight(vals[0].Uint16()),
+		PercentFat:        vals[1].Uint16(),
+		PercentHydration:  vals[2].Uint16(),
+		VisceralFatMass:   vals[3].Uint16(),
+		BoneMass:          vals[4].Uint16(),
+		MuscleMass:        vals[5].Uint16(),
+		BasalMet:          vals[7].Uint16(),
+		ActiveMet:         vals[9].Uint16(),
+		UserProfileIndex:  typedef.MessageIndex(vals[12].Uint16()),
+		Bmi:               vals[13].Uint16(),
+		PhysiqueRating:    vals[8].Uint8(),
+		MetabolicAge:      vals[10].Uint8(),
+		VisceralFatRating: vals[11].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -93,72 +92,72 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if uint16(m.Weight) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.Weight)
+		field.Value = proto.Uint16(uint16(m.Weight))
 		fields = append(fields, field)
 	}
 	if m.PercentFat != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.PercentFat
+		field.Value = proto.Uint16(m.PercentFat)
 		fields = append(fields, field)
 	}
 	if m.PercentHydration != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.PercentHydration
+		field.Value = proto.Uint16(m.PercentHydration)
 		fields = append(fields, field)
 	}
 	if m.VisceralFatMass != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.VisceralFatMass
+		field.Value = proto.Uint16(m.VisceralFatMass)
 		fields = append(fields, field)
 	}
 	if m.BoneMass != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.BoneMass
+		field.Value = proto.Uint16(m.BoneMass)
 		fields = append(fields, field)
 	}
 	if m.MuscleMass != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.MuscleMass
+		field.Value = proto.Uint16(m.MuscleMass)
 		fields = append(fields, field)
 	}
 	if m.BasalMet != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.BasalMet
+		field.Value = proto.Uint16(m.BasalMet)
 		fields = append(fields, field)
 	}
 	if m.ActiveMet != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.ActiveMet
+		field.Value = proto.Uint16(m.ActiveMet)
 		fields = append(fields, field)
 	}
 	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = uint16(m.UserProfileIndex)
+		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
 		fields = append(fields, field)
 	}
 	if m.Bmi != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.Bmi
+		field.Value = proto.Uint16(m.Bmi)
 		fields = append(fields, field)
 	}
 	if m.PhysiqueRating != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.PhysiqueRating
+		field.Value = proto.Uint8(m.PhysiqueRating)
 		fields = append(fields, field)
 	}
 	if m.MetabolicAge != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.MetabolicAge
+		field.Value = proto.Uint8(m.MetabolicAge)
 		fields = append(fields, field)
 	}
 	if m.VisceralFatRating != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.VisceralFatRating
+		field.Value = proto.Uint8(m.VisceralFatRating)
 		fields = append(fields, field)
 	}
 

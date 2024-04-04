@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type Activity struct {
 // NewActivity creates new Activity struct based on given mesg.
 // If mesg is nil, it will return Activity with all fields being set to its corresponding invalid value.
 func NewActivity(mesg *proto.Message) *Activity {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,14 +49,14 @@ func NewActivity(mesg *proto.Message) *Activity {
 	}
 
 	return &Activity{
-		Timestamp:      datetime.ToTime(vals[253]),
-		LocalTimestamp: datetime.ToTime(vals[5]),
-		TotalTimerTime: typeconv.ToUint32[uint32](vals[0]),
-		NumSessions:    typeconv.ToUint16[uint16](vals[1]),
-		Type:           typeconv.ToEnum[typedef.Activity](vals[2]),
-		Event:          typeconv.ToEnum[typedef.Event](vals[3]),
-		EventType:      typeconv.ToEnum[typedef.EventType](vals[4]),
-		EventGroup:     typeconv.ToUint8[uint8](vals[6]),
+		Timestamp:      datetime.ToTime(vals[253].Uint32()),
+		LocalTimestamp: datetime.ToTime(vals[5].Uint32()),
+		TotalTimerTime: vals[0].Uint32(),
+		NumSessions:    vals[1].Uint16(),
+		Type:           typedef.Activity(vals[2].Uint8()),
+		Event:          typedef.Event(vals[3].Uint8()),
+		EventType:      typedef.EventType(vals[4].Uint8()),
+		EventGroup:     vals[6].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,42 +80,42 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = datetime.ToUint32(m.LocalTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
 		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TotalTimerTime
+		field.Value = proto.Uint32(m.TotalTimerTime)
 		fields = append(fields, field)
 	}
 	if m.NumSessions != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.NumSessions
+		field.Value = proto.Uint16(m.NumSessions)
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if byte(m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = byte(m.Event)
+		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
 	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.EventType)
+		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.EventGroup
+		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
 

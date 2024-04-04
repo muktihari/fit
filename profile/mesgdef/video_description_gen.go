@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -28,7 +27,7 @@ type VideoDescription struct {
 // NewVideoDescription creates new VideoDescription struct based on given mesg.
 // If mesg is nil, it will return VideoDescription with all fields being set to its corresponding invalid value.
 func NewVideoDescription(mesg *proto.Message) *VideoDescription {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -42,9 +41,9 @@ func NewVideoDescription(mesg *proto.Message) *VideoDescription {
 	}
 
 	return &VideoDescription{
-		Text:         typeconv.ToString[string](vals[1]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		MessageCount: typeconv.ToUint16[uint16](vals[0]),
+		Text:         vals[1].String(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		MessageCount: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,17 +67,17 @@ func (m *VideoDescription) ToMesg(options *Options) proto.Message {
 
 	if m.Text != basetype.StringInvalid && m.Text != "" {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Text
+		field.Value = proto.String(m.Text)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.MessageCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.MessageCount
+		field.Value = proto.Uint16(m.MessageCount)
 		fields = append(fields, field)
 	}
 

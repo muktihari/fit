@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type HsaStressData struct {
 // NewHsaStressData creates new HsaStressData struct based on given mesg.
 // If mesg is nil, it will return HsaStressData with all fields being set to its corresponding invalid value.
 func NewHsaStressData(mesg *proto.Message) *HsaStressData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,9 +43,9 @@ func NewHsaStressData(mesg *proto.Message) *HsaStressData {
 	}
 
 	return &HsaStressData{
-		Timestamp:          datetime.ToTime(vals[253]),
-		StressLevel:        typeconv.ToSliceSint8[int8](vals[1]),
-		ProcessingInterval: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		StressLevel:        vals[1].SliceInt8(),
+		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,17 +69,17 @@ func (m *HsaStressData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.StressLevel != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.StressLevel
+		field.Value = proto.SliceInt8(m.StressLevel)
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ProcessingInterval
+		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 

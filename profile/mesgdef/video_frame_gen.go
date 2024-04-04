@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type VideoFrame struct {
 // NewVideoFrame creates new VideoFrame struct based on given mesg.
 // If mesg is nil, it will return VideoFrame with all fields being set to its corresponding invalid value.
 func NewVideoFrame(mesg *proto.Message) *VideoFrame {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,9 +43,9 @@ func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 	}
 
 	return &VideoFrame{
-		Timestamp:   datetime.ToTime(vals[253]),
-		FrameNumber: typeconv.ToUint32[uint32](vals[1]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:   datetime.ToTime(vals[253].Uint32()),
+		FrameNumber: vals[1].Uint32(),
+		TimestampMs: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,17 +69,17 @@ func (m *VideoFrame) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.FrameNumber != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.FrameNumber
+		field.Value = proto.Uint32(m.FrameNumber)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 

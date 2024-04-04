@@ -8,13 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"reflect"
 	"unicode/utf8"
 
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
-	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -99,7 +97,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 
 		// Restore any scaled float64 value back into its corresponding integer representation.
 		if field.Scale != 1 && field.Offset != 0 {
-			field.Value = scaleoffset.DiscardAny(
+			field.Value = scaleoffset.DiscardValue(
 				field.Value,
 				field.BaseType,
 				field.Scale,
@@ -115,13 +113,15 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// UTF-8 String Validation
-		switch val := field.Value.(type) {
-		case string:
+		switch field.Value.Type() {
+		case proto.TypeString:
+			val := field.Value.String()
 			if !utf8.ValidString(val) {
 				return fmt.Errorf("%q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
 					val, i, field.Num, field.Name, ErrInvalidUTF8String)
 			}
-		case []string:
+		case proto.TypeSliceString:
+			val := field.Value.SliceString()
 			for j := range val {
 				if !utf8.ValidString(val[j]) {
 					return fmt.Errorf("[valueIndex: %d] %q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
@@ -131,7 +131,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// Size of value should not exceed 255 bytes since proto.FieldDefinition's Size is a type of byte.
-		valBytes := typedef.Sizeof(field.Value, field.BaseType)
+		valBytes := proto.Sizeof(field.Value, field.BaseType)
 		if valBytes > 255 {
 			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
 		}
@@ -188,7 +188,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// Size of value should not exceed 255 bytes since proto.DeveloperFieldDefinition's Size is a type of byte.
-		valBytes := typedef.Sizeof(devField.Value, devField.BaseType)
+		valBytes := proto.Sizeof(devField.Value, devField.BaseType)
 		if valBytes > 255 {
 			return fmt.Errorf("developer field max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
 		}
@@ -207,254 +207,166 @@ func (v *messageValidator) Reset() {
 }
 
 // isValueTypeAligned checks whether the value is aligned with type. The value should be a concrete type not pointer to a value.
-func isValueTypeAligned(value any, baseType basetype.BaseType) bool {
-	if value == nil {
-		return false
-	}
-
-	switch value.(type) { // Fast path
-	case bool, []bool:
+func isValueTypeAligned(value proto.Value, baseType basetype.BaseType) bool {
+	switch value.Type() {
+	case proto.TypeBool, proto.TypeSliceBool:
 		return baseType == basetype.Enum
-	case int8, []int8:
+	case proto.TypeInt8, proto.TypeSliceInt8:
 		return baseType == basetype.Sint8
-	case uint8, []uint8: // == byte
+	case proto.TypeUint8, proto.TypeSliceUint8: // == byte
 		return baseType == basetype.Enum ||
 			baseType == basetype.Byte ||
 			baseType == basetype.Uint8 ||
 			baseType == basetype.Uint8z
-	case int16, []int16:
+	case proto.TypeInt16, proto.TypeSliceInt16:
 		return baseType == basetype.Sint16
-	case uint16, []uint16:
+	case proto.TypeUint16, proto.TypeSliceUint16:
 		return baseType == basetype.Uint16 || baseType == basetype.Uint16z
-	case int32, []int32:
+	case proto.TypeInt32, proto.TypeSliceInt32:
 		return baseType == basetype.Sint32
-	case uint32, []uint32:
+	case proto.TypeUint32, proto.TypeSliceUint32:
 		return baseType == basetype.Uint32 || baseType == basetype.Uint32z
-	case float32, []float32:
+	case proto.TypeFloat32, proto.TypeSliceFloat32:
 		return baseType == basetype.Float32
-	case float64, []float64:
+	case proto.TypeFloat64, proto.TypeSliceFloat64:
 		return baseType == basetype.Float64
-	case int64, []int64:
+	case proto.TypeInt64, proto.TypeSliceInt64:
 		return baseType == basetype.Sint64
-	case uint64, []uint64:
+	case proto.TypeUint64, proto.TypeSliceUint64:
 		return baseType == basetype.Uint64 || baseType == basetype.Uint64z
-	case string, []string:
+	case proto.TypeString, proto.TypeSliceString:
 		return baseType == basetype.String
-	case []any: // type is not supported. ref: profile/typedef/marshal.go
-		return false
 	}
-
-	// Fallback to reflection, reflect.TypeOf is fast enough and manageable. In this case, it's preferrable than asserting every possible types.
-	rt := reflect.TypeOf(value)
-	switch rt.Kind() {
-	case reflect.Pointer, reflect.Slice:
-		return rt.Elem().Kind() == baseType.Kind()
-	}
-
-	return rt.Kind() == baseType.Kind()
+	return false
 }
 
 // hasValidValue checks whether given val has any valid value.
 // If val is a slice, even though only one value is valid, it will be counted a valid value.
-func hasValidValue(val any) bool {
-	if val == nil {
-		return false
+func hasValidValue(val proto.Value) bool {
+	switch val.Type() { // Fast Path
+	case proto.TypeInt8:
+		return val.Int8() != basetype.Sint8Invalid
+	case proto.TypeUint8:
+		return val.Uint8() != basetype.Uint8Invalid
+	case proto.TypeInt16:
+		return val.Int16() != basetype.Sint16Invalid
+	case proto.TypeUint16:
+		return val.Uint16() != basetype.Uint16Invalid
+	case proto.TypeInt32:
+		return val.Int32() != basetype.Sint32Invalid
+	case proto.TypeUint32:
+		return val.Uint32() != basetype.Uint32Invalid
+	case proto.TypeString:
+		s := val.String()
+		return s != basetype.StringInvalid && s != ""
+	case proto.TypeFloat32:
+		return math.Float32bits(val.Float32()) != basetype.Float32Invalid
+	case proto.TypeFloat64:
+		return math.Float64bits(val.Float64()) != basetype.Float64Invalid
+	case proto.TypeInt64:
+		return val.Int64() != basetype.Sint64Invalid
+	case proto.TypeUint64:
+		return val.Uint64() != basetype.Uint64Invalid
+	case proto.TypeSliceInt8:
+		invalidcounter := 0
+		vals := val.SliceInt8()
+		for i := range vals {
+			if vals[i] == basetype.Sint8Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceUint8:
+		vals := val.SliceUint8()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Uint8Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceInt16:
+		vals := val.SliceInt16()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Sint16Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceUint16:
+		vals := val.SliceUint16()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Uint16Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceInt32:
+		vals := val.SliceInt32()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Sint32Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceUint32:
+		vals := val.SliceUint32()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Uint32Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceString:
+		vals := val.SliceString()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.StringInvalid || vals[i] == "" {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceFloat32:
+		vals := val.SliceFloat32()
+		invalidcounter := 0
+		for i := range vals {
+			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceFloat64:
+		vals := val.SliceFloat64()
+		invalidcounter := 0
+		for i := range vals {
+			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceInt64:
+		vals := val.SliceInt64()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Sint64Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
+	case proto.TypeSliceUint64:
+		vals := val.SliceUint64()
+		invalidcounter := 0
+		for i := range vals {
+			if vals[i] == basetype.Uint64Invalid {
+				invalidcounter++
+			}
+		}
+		return invalidcounter != len(vals)
 	}
 
-	switch v := val.(type) { // Fast Path
-	case int8:
-		return v != basetype.Sint8Invalid
-	case uint8:
-		return v != basetype.Uint8Invalid
-	case int16:
-		return v != basetype.Sint16Invalid
-	case uint16:
-		return v != basetype.Uint16Invalid
-	case int32:
-		return v != basetype.Sint32Invalid
-	case uint32:
-		return v != basetype.Uint32Invalid
-	case string:
-		return v != basetype.StringInvalid && v != ""
-	case float32:
-		return math.Float32bits(v) != basetype.Float32Invalid
-	case float64:
-		return math.Float64bits(v) != basetype.Float64Invalid
-	case int64:
-		return v != basetype.Sint64Invalid
-	case uint64:
-		return v != basetype.Uint64Invalid
-	case []int8:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Sint8Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []uint8:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Uint8Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []int16:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Sint16Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []uint16:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Uint16Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []int32:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Sint32Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []uint32:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Uint32Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []string:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.StringInvalid || v[i] == "" {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []float32:
-		invalidcounter := 0
-		for i := range v {
-			if math.Float32bits(v[i]) == basetype.Float32Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []float64:
-		invalidcounter := 0
-		for i := range v {
-			if math.Float64bits(v[i]) == basetype.Float64Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []int64:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Sint64Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	case []uint64:
-		invalidcounter := 0
-		for i := range v {
-			if v[i] == basetype.Uint64Invalid {
-				invalidcounter++
-			}
-		}
-		return invalidcounter != len(v)
-	}
-
-	// Fallback to reflection
-	rv := reflect.ValueOf(val)
-	switch rv.Kind() {
-	case reflect.Int8:
-		return int8(rv.Int()) != basetype.Sint8Invalid
-	case reflect.Uint8:
-		return uint8(rv.Uint()) != basetype.Uint8Invalid
-	case reflect.Int16:
-		return int16(rv.Int()) != basetype.Sint16Invalid
-	case reflect.Uint16:
-		return uint16(rv.Uint()) != basetype.Uint16Invalid
-	case reflect.Int32:
-		return int32(rv.Int()) != basetype.Sint32Invalid
-	case reflect.Uint32:
-		return uint32(rv.Uint()) != basetype.Uint32Invalid
-	case reflect.String:
-		return rv.String() != basetype.StringInvalid
-	case reflect.Float32:
-		return math.Float32bits(float32(rv.Float())) != basetype.Float32Invalid
-	case reflect.Float64:
-		return math.Float64bits(rv.Float()) != basetype.Float64Invalid
-	case reflect.Int64:
-		return int64(rv.Int()) != basetype.Sint64Invalid
-	case reflect.Uint64:
-		return uint64(rv.Uint()) != basetype.Uint64Invalid
-	case reflect.Slice:
-		invalidcounter := 0
-		for i := 0; i < rv.Len(); i++ {
-			rve := rv.Index(i)
-
-			switch rve.Kind() {
-			case reflect.Int8:
-				if int8(rve.Int()) == basetype.Sint8Invalid {
-					invalidcounter++
-				}
-			case reflect.Uint8:
-				if uint8(rve.Uint()) == basetype.Uint8Invalid {
-					invalidcounter++
-				}
-			case reflect.Int16:
-				if int16(rve.Int()) == basetype.Sint16Invalid {
-					invalidcounter++
-				}
-			case reflect.Uint16:
-				if uint16(rve.Uint()) == basetype.Uint16Invalid {
-					invalidcounter++
-				}
-			case reflect.Int32:
-				if int32(rve.Int()) == basetype.Sint32Invalid {
-					invalidcounter++
-				}
-			case reflect.Uint32:
-				if uint32(rve.Uint()) == basetype.Uint32Invalid {
-					invalidcounter++
-				}
-			case reflect.String:
-				if str := rve.String(); str == basetype.StringInvalid || str == "" {
-					invalidcounter++
-				}
-			case reflect.Float32:
-				if math.Float32bits(float32(rve.Float())) == basetype.Float32Invalid {
-					invalidcounter++
-				}
-			case reflect.Float64:
-				if math.Float64bits(rve.Float()) == basetype.Float64Invalid {
-					invalidcounter++
-				}
-			case reflect.Int64:
-				if int64(rve.Int()) == basetype.Sint64Invalid {
-					invalidcounter++
-				}
-			case reflect.Uint64:
-				if uint64(rve.Uint()) == basetype.Uint64Invalid {
-					invalidcounter++
-				}
-			default: // not supported
-				return true // unknown type, let it be swept by isValueTypeAligned
-			}
-		}
-		return invalidcounter != rv.Len()
-	default: // not supported
-		return true // unknown type, let it be swept by isValueTypeAligned
-	}
+	return false
 }

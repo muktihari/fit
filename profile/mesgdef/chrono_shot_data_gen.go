@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type ChronoShotData struct {
 // NewChronoShotData creates new ChronoShotData struct based on given mesg.
 // If mesg is nil, it will return ChronoShotData with all fields being set to its corresponding invalid value.
 func NewChronoShotData(mesg *proto.Message) *ChronoShotData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,9 +44,9 @@ func NewChronoShotData(mesg *proto.Message) *ChronoShotData {
 	}
 
 	return &ChronoShotData{
-		Timestamp: datetime.ToTime(vals[253]),
-		ShotSpeed: typeconv.ToUint32[uint32](vals[0]),
-		ShotNum:   typeconv.ToUint16[uint16](vals[1]),
+		Timestamp: datetime.ToTime(vals[253].Uint32()),
+		ShotSpeed: vals[0].Uint32(),
+		ShotNum:   vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,17 +70,17 @@ func (m *ChronoShotData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.ShotSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ShotSpeed
+		field.Value = proto.Uint32(m.ShotSpeed)
 		fields = append(fields, field)
 	}
 	if m.ShotNum != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ShotNum
+		field.Value = proto.Uint16(m.ShotNum)
 		fields = append(fields, field)
 	}
 

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type MetZone struct {
 // NewMetZone creates new MetZone struct based on given mesg.
 // If mesg is nil, it will return MetZone with all fields being set to its corresponding invalid value.
 func NewMetZone(mesg *proto.Message) *MetZone {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,10 +43,10 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 	}
 
 	return &MetZone{
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Calories:     typeconv.ToUint16[uint16](vals[2]),
-		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
-		FatCalories:  typeconv.ToUint8[uint8](vals[3]),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		Calories:     vals[2].Uint16(),
+		HighBpm:      vals[1].Uint8(),
+		FatCalories:  vals[3].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,22 +70,22 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Calories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Calories
+		field.Value = proto.Uint16(m.Calories)
 		fields = append(fields, field)
 	}
 	if m.HighBpm != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.HighBpm
+		field.Value = proto.Uint8(m.HighBpm)
 		fields = append(fields, field)
 	}
 	if m.FatCalories != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.FatCalories
+		field.Value = proto.Uint8(m.FatCalories)
 		fields = append(fields, field)
 	}
 

@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/muktihari/fit/cmd/fitactivity/combiner"
 	"github.com/muktihari/fit/cmd/fitactivity/concealer"
@@ -37,9 +36,6 @@ type options struct {
 }
 
 func main() {
-	defer func(begin time.Time) {
-		fmt.Printf("took: %s\n", time.Since(begin))
-	}(time.Now())
 	var opts options
 	outputPathHelpText := "[option] Output of combined files: result.fit"
 	flag.StringVar(&opts.combineOutputPath, "o", "", outputPathHelpText)

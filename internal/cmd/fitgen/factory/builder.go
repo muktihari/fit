@@ -180,7 +180,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 	}
 
 	strbuf := new(strings.Builder)
-	strbuf.WriteString("[256]*proto.Field{\n")
+	strbuf.WriteString("[256]proto.Field{\n")
 	for _, field := range message.Fields {
 		// strbuf.WriteString("{\n")
 		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
@@ -289,28 +289,39 @@ func (b *factoryBuilder) transformMesgnum(s string) string {
 	return b.mesgnumPackageName + ".MesgNum" + strutil.ToTitle(s) // types.MesgNumFileId
 }
 
+var baseTypeReplacer = strings.NewReplacer(
+	"Enum", "Uint8",
+	"Sint", "Int",
+	"Byte", "Uint8",
+)
+
 func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
 	if fieldType == "bool" {
-		return "false"
+		return "proto.Bool(false)"
 	}
 
+	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
+	baseType = baseTypeReplacer.Replace(baseType)
+
+	protoFuncName := strings.TrimSuffix(baseType, "z")
+
+	goType := b.goTypesByProfileTypes[fieldType]
 	if array != "" {
-		goType := b.goTypesByProfileTypes[fieldType]
-		return fmt.Sprintf("[]%s(nil)", goType)
+		return fmt.Sprintf("proto.Slice%s([]%s(nil))", protoFuncName, goType)
 	}
 
 	// Float is a special case since NaN is not comparable, so for example, basetype.Float32Invalid, is not a float,
 	// but its representation in integer form. This way we can compare it in its integer form later.
 	if b.baseTypeMapByProfileType[fieldType] == "float32" {
-		return "basetype.Float32.Invalid()" // same as `math.Float32frombits(basetype.Float32Invalid)`
+		return "proto.Float32(basetype.Float32InvalidInFloatForm())" // same as `math.Float32frombits(basetype.Float32Invalid)`
 	}
 
 	if b.baseTypeMapByProfileType[fieldType] == "float64" {
-		return "basetype.Float64.Invalid()" // same as `math.Float64frombits(basetype.Float64Invalid)`
+		return "proto.Float64(basetype.Float64InvalidInFloatForm())" // same as `math.Float64frombits(basetype.Float64Invalid)`
 	}
 
-	bt := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).String()
-	return fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(bt))
+	return fmt.Sprintf("proto.%s(basetype.%sInvalid)", protoFuncName, strings.Replace(baseType, "Int", "Sint", 1))
+
 }
 
 func bitsOrDefault(bits []byte, index int) byte {

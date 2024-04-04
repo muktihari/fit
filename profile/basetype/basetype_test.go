@@ -6,7 +6,6 @@ package basetype_test
 
 import (
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -165,40 +164,6 @@ func TestGoType(t *testing.T) {
 			size := tc.baseType.GoType()
 			if size != tc.goType {
 				t.Fatalf("expected: %s, got: %s", tc.goType, size)
-			}
-		})
-	}
-}
-
-func TestKind(t *testing.T) {
-	tt := []struct {
-		baseType basetype.BaseType
-		kind     reflect.Kind
-	}{
-		{baseType: basetype.Sint8, kind: reflect.Int8},
-		{baseType: basetype.Enum, kind: reflect.Uint8},
-		{baseType: basetype.Byte, kind: reflect.Uint8},
-		{baseType: basetype.Uint8, kind: reflect.Uint8},
-		{baseType: basetype.Uint8z, kind: reflect.Uint8},
-		{baseType: basetype.String, kind: reflect.String},
-		{baseType: basetype.Sint16, kind: reflect.Int16},
-		{baseType: basetype.Uint16, kind: reflect.Uint16},
-		{baseType: basetype.Uint16z, kind: reflect.Uint16},
-		{baseType: basetype.Sint32, kind: reflect.Int32},
-		{baseType: basetype.Uint32, kind: reflect.Uint32},
-		{baseType: basetype.Uint32z, kind: reflect.Uint32},
-		{baseType: basetype.Float32, kind: reflect.Float32},
-		{baseType: basetype.Sint64, kind: reflect.Int64},
-		{baseType: basetype.Uint64, kind: reflect.Uint64},
-		{baseType: basetype.Uint64z, kind: reflect.Uint64},
-		{baseType: basetype.Float64, kind: reflect.Float64},
-		{baseType: 255, kind: reflect.Invalid},
-	}
-	for _, tc := range tt {
-		t.Run(tc.baseType.String(), func(t *testing.T) {
-			kind := tc.baseType.Kind()
-			if kind != tc.kind {
-				t.Fatalf("expected: %s, got: %s", tc.kind, kind)
 			}
 		})
 	}

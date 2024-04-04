@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type MonitoringHrData struct {
 // NewMonitoringHrData creates new MonitoringHrData struct based on given mesg.
 // If mesg is nil, it will return MonitoringHrData with all fields being set to its corresponding invalid value.
 func NewMonitoringHrData(mesg *proto.Message) *MonitoringHrData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,9 +43,9 @@ func NewMonitoringHrData(mesg *proto.Message) *MonitoringHrData {
 	}
 
 	return &MonitoringHrData{
-		Timestamp:                  datetime.ToTime(vals[253]),
-		RestingHeartRate:           typeconv.ToUint8[uint8](vals[0]),
-		CurrentDayRestingHeartRate: typeconv.ToUint8[uint8](vals[1]),
+		Timestamp:                  datetime.ToTime(vals[253].Uint32()),
+		RestingHeartRate:           vals[0].Uint8(),
+		CurrentDayRestingHeartRate: vals[1].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,17 +69,17 @@ func (m *MonitoringHrData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.RestingHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.RestingHeartRate
+		field.Value = proto.Uint8(m.RestingHeartRate)
 		fields = append(fields, field)
 	}
 	if m.CurrentDayRestingHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.CurrentDayRestingHeartRate
+		field.Value = proto.Uint8(m.CurrentDayRestingHeartRate)
 		fields = append(fields, field)
 	}
 

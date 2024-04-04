@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type AadAccelFeatures struct {
 // NewAadAccelFeatures creates new AadAccelFeatures struct based on given mesg.
 // If mesg is nil, it will return AadAccelFeatures with all fields being set to its corresponding invalid value.
 func NewAadAccelFeatures(mesg *proto.Message) *AadAccelFeatures {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,12 +47,12 @@ func NewAadAccelFeatures(mesg *proto.Message) *AadAccelFeatures {
 	}
 
 	return &AadAccelFeatures{
-		Timestamp:          datetime.ToTime(vals[253]),
-		EnergyTotal:        typeconv.ToUint32[uint32](vals[1]),
-		Time:               typeconv.ToUint16[uint16](vals[0]),
-		ZeroCrossCnt:       typeconv.ToUint16[uint16](vals[2]),
-		TimeAboveThreshold: typeconv.ToUint16[uint16](vals[4]),
-		Instance:           typeconv.ToUint8[uint8](vals[3]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		EnergyTotal:        vals[1].Uint32(),
+		Time:               vals[0].Uint16(),
+		ZeroCrossCnt:       vals[2].Uint16(),
+		TimeAboveThreshold: vals[4].Uint16(),
+		Instance:           vals[3].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -77,32 +76,32 @@ func (m *AadAccelFeatures) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.EnergyTotal != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.EnergyTotal
+		field.Value = proto.Uint32(m.EnergyTotal)
 		fields = append(fields, field)
 	}
 	if m.Time != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Time
+		field.Value = proto.Uint16(m.Time)
 		fields = append(fields, field)
 	}
 	if m.ZeroCrossCnt != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.ZeroCrossCnt
+		field.Value = proto.Uint16(m.ZeroCrossCnt)
 		fields = append(fields, field)
 	}
 	if m.TimeAboveThreshold != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.TimeAboveThreshold
+		field.Value = proto.Uint16(m.TimeAboveThreshold)
 		fields = append(fields, field)
 	}
 	if m.Instance != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Instance
+		field.Value = proto.Uint8(m.Instance)
 		fields = append(fields, field)
 	}
 

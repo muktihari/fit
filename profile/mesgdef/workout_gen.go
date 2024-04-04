@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type Workout struct {
 // NewWorkout creates new Workout struct based on given mesg.
 // If mesg is nil, it will return Workout with all fields being set to its corresponding invalid value.
 func NewWorkout(mesg *proto.Message) *Workout {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,14 +47,14 @@ func NewWorkout(mesg *proto.Message) *Workout {
 	}
 
 	return &Workout{
-		WktName:        typeconv.ToString[string](vals[8]),
-		Capabilities:   typeconv.ToUint32z[typedef.WorkoutCapabilities](vals[5]),
-		MessageIndex:   typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		NumValidSteps:  typeconv.ToUint16[uint16](vals[6]),
-		PoolLength:     typeconv.ToUint16[uint16](vals[14]),
-		Sport:          typeconv.ToEnum[typedef.Sport](vals[4]),
-		SubSport:       typeconv.ToEnum[typedef.SubSport](vals[11]),
-		PoolLengthUnit: typeconv.ToEnum[typedef.DisplayMeasure](vals[15]),
+		WktName:        vals[8].String(),
+		Capabilities:   typedef.WorkoutCapabilities(vals[5].Uint32z()),
+		MessageIndex:   typedef.MessageIndex(vals[254].Uint16()),
+		NumValidSteps:  vals[6].Uint16(),
+		PoolLength:     vals[14].Uint16(),
+		Sport:          typedef.Sport(vals[4].Uint8()),
+		SubSport:       typedef.SubSport(vals[11].Uint8()),
+		PoolLengthUnit: typedef.DisplayMeasure(vals[15].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -79,42 +78,42 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 
 	if m.WktName != basetype.StringInvalid && m.WktName != "" {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.WktName
+		field.Value = proto.String(m.WktName)
 		fields = append(fields, field)
 	}
 	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = uint32(m.Capabilities)
+		field.Value = proto.Uint32(uint32(m.Capabilities))
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.NumValidSteps
+		field.Value = proto.Uint16(m.NumValidSteps)
 		fields = append(fields, field)
 	}
 	if m.PoolLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = m.PoolLength
+		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = byte(m.SubSport)
+		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 15)
-		field.Value = byte(m.PoolLengthUnit)
+		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
 		fields = append(fields, field)
 	}
 

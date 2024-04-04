@@ -5,7 +5,7 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -37,23 +37,17 @@ type ToMesg interface {
 // When a message has no timestamp field, its order will not be changed.
 func SortMessagesByTimestamp(messages []proto.Message) {
 	slices.SortStableFunc(messages, func(m1, m2 proto.Message) int {
-		value1 := m1.FieldValueByNum(proto.FieldNumTimestamp)
-		if value1 == nil {
+		timestamp1 := m1.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp1 == basetype.Uint32Invalid {
 			return 0
 		}
-
-		value2 := m2.FieldValueByNum(proto.FieldNumTimestamp)
-		if value2 == nil {
+		timestamp2 := m2.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp2 == basetype.Uint32Invalid {
 			return 0
 		}
-
-		timestamp1 := typeconv.ToUint32[uint32](value1)
-		timestamp2 := typeconv.ToUint32[uint32](value2)
-
 		if timestamp1 <= timestamp2 {
 			return -1
 		}
-
 		return 1
 	})
 }

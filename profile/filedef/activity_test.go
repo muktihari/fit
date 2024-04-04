@@ -5,7 +5,6 @@
 package filedef_test
 
 import (
-	"fmt"
 	"math"
 	"testing"
 	"time"
@@ -35,24 +34,15 @@ func sortFields(mesgs []proto.Message) {
 	}
 }
 
-func createFieldComparer() cmp.Option {
-	return cmp.Comparer(func(field1, field2 proto.Field) bool {
-		// Compare float in integer form. since when f is NaN, f != f.
-		switch f1 := field1.Value.(type) {
-		case float32:
-			f2, ok := field2.Value.(float32)
-			if !ok {
-				break
-			}
-			return math.Float32bits(f1) == math.Float32bits(f2)
-		case float64:
-			f2, ok := field2.Value.(float64)
-			if !ok {
-				break
-			}
-			return math.Float64bits(f1) == math.Float64bits(f2)
+func valueTransformer() cmp.Option {
+	return cmp.Transformer("Value", func(v proto.Value) any {
+		switch v.Type() {
+		case proto.TypeFloat32:
+			return math.Float32bits(v.Float32())
+		case proto.TypeFloat64:
+			return math.Float64bits(v.Float64())
 		}
-		return cmp.Diff(field1, field2) == ""
+		return v.Any()
 	})
 }
 
@@ -156,13 +146,11 @@ func TestActivityCorrectness(t *testing.T) {
 	sortFields(mesgs)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
-		fmt.Println("messages order:")
-		for i := range fit.Messages {
-			mesg := fit.Messages[i]
-			fmt.Printf("%d: %s\n", mesg.Num, mesg.Num)
-		}
-		fmt.Println("")
+	if !isMessageOrdered(mesgs, fit.Messages, t) {
+		t.Fatalf("messages order mismatch")
+	}
+
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		t.Fatal(diff)
 	}
 }

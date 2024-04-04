@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type HsaHeartRateData struct {
 // NewHsaHeartRateData creates new HsaHeartRateData struct based on given mesg.
 // If mesg is nil, it will return HsaHeartRateData with all fields being set to its corresponding invalid value.
 func NewHsaHeartRateData(mesg *proto.Message) *HsaHeartRateData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,10 +44,10 @@ func NewHsaHeartRateData(mesg *proto.Message) *HsaHeartRateData {
 	}
 
 	return &HsaHeartRateData{
-		Timestamp:          datetime.ToTime(vals[253]),
-		HeartRate:          typeconv.ToSliceUint8[uint8](vals[2]),
-		ProcessingInterval: typeconv.ToUint16[uint16](vals[0]),
-		Status:             typeconv.ToUint8[uint8](vals[1]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		HeartRate:          vals[2].SliceUint8(),
+		ProcessingInterval: vals[0].Uint16(),
+		Status:             vals[1].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,22 +71,22 @@ func (m *HsaHeartRateData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.HeartRate != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.HeartRate
+		field.Value = proto.SliceUint8(m.HeartRate)
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ProcessingInterval
+		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 	if m.Status != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Status
+		field.Value = proto.Uint8(m.Status)
 		fields = append(fields, field)
 	}
 

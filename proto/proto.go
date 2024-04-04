@@ -5,7 +5,6 @@
 package proto
 
 import (
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -62,7 +61,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.Fields {
 		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
 			Num:      mesg.Fields[i].Num,
-			Size:     byte(typedef.Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
+			Size:     byte(Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
 			BaseType: mesg.Fields[i].BaseType,
 		})
 	}
@@ -166,8 +165,8 @@ func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
 		if !ok {
 			continue
 		}
-		if value != nil { // message created from factory should be non-nil, extra check for user-defined message.
-			m.Fields[i].Value = value
+		if value != TypeInvalid { // message created from factory should be non-nil, extra check for user-defined message.
+			m.Fields[i].Value = Any(value)
 		}
 	}
 	return m
@@ -191,13 +190,13 @@ func (m *Message) FieldByNum(num byte) *Field {
 }
 
 // FieldValueByNum returns the value of the Field in a Messsage, if not found return nil.
-func (m *Message) FieldValueByNum(num byte) any {
+func (m *Message) FieldValueByNum(num byte) Value {
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {
 			return m.Fields[i].Value
 		}
 	}
-	return nil
+	return Value{}
 }
 
 // RemoveFieldByNum removes Field in a Message by num.
@@ -212,9 +211,11 @@ func (m *Message) RemoveFieldByNum(num byte) {
 
 // Clone clones Message.
 func (m Message) Clone() Message {
+	m.Fields = slices.Clone(m.Fields)
 	for i := range m.Fields {
 		m.Fields[i] = m.Fields[i].Clone()
 	}
+	m.DeveloperFields = slices.Clone(m.DeveloperFields)
 	for i := range m.DeveloperFields {
 		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
 	}
@@ -242,15 +243,9 @@ type Field struct {
 	// PERF: Embedding the struct as a pointer to avoid runtime duffcopy when creating a field since FieldBase should not be altered.
 	*FieldBase
 
-	// The decoded value, composed by decoder, will always in a form of a primitive-type (or a slice of primitive types):
-	// - int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64 and string.
-	// - []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []float32, []float64 and []string.
-	//
-	// When the field is manually composed, you may use type-defined value as long as it refer to any of primitive-types
-	// (e.g. typedef.FileActivity). However, please note that marshaling type-defined value requires reflection.
-	//
-	// NOTE: You can not use distinct types such as int and uint.
-	Value any
+	// Value holds any primitive-type single value (or slice value) in a form of proto.Value.
+	// We use proto.Value instead of interface{} since interface{} is (mostly) heap alloc and proto.Value does not.
+	Value Value
 
 	// A flag to detect whether this field is generated through component expansion.
 	IsExpandedField bool
@@ -258,7 +253,7 @@ type Field struct {
 
 // WithValue returns a Field containing v value.
 func (f Field) WithValue(v any) Field {
-	f.Value = v
+	f.Value = Any(v)
 	return f
 }
 
@@ -283,11 +278,34 @@ func (f *Field) SubFieldSubtitution(mesgRef *Message) *SubField {
 // isValueEqualTo compare if Value == SubField's Map RefFieldValue.
 // fit documentation on dynamic fields says: reference fields must be of integer type, floating point reference values are not supported.
 func (f *Field) isValueEqualTo(refFieldValue int64) bool {
-	v, ok := typeconv.IntegerToInt64(f.Value)
+	fieldValue, ok := convertToInt64(f.Value)
 	if !ok {
 		return ok
 	}
-	return v == refFieldValue
+	return fieldValue == refFieldValue
+}
+
+// convertToInt64 converts any integer value of val to int64, if val is non-integer value return false.
+func convertToInt64(val Value) (int64, bool) {
+	switch val.Type() {
+	case TypeInt8:
+		return int64(val.Int8()), true
+	case TypeUint8:
+		return int64(val.Uint8()), true
+	case TypeInt16:
+		return int64(val.Int16()), true
+	case TypeUint16:
+		return int64(val.Uint16()), true
+	case TypeInt32:
+		return int64(val.Int32()), true
+	case TypeUint32:
+		return int64(val.Uint32()), true
+	case TypeInt64:
+		return val.Int64(), true
+	case TypeUint64:
+		return int64(val.Uint64()), true
+	}
+	return 0, false
 }
 
 // Clone clones Field
@@ -323,7 +341,7 @@ type DeveloperField struct {
 	BaseType           basetype.BaseType
 	Name               string
 	Units              string
-	Value              any
+	Value              Value
 }
 
 // Clone clones DeveloperField

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -26,7 +25,7 @@ type DeveloperDataId struct {
 // NewDeveloperDataId creates new DeveloperDataId struct based on given mesg.
 // If mesg is nil, it will return DeveloperDataId with all fields being set to its corresponding invalid value.
 func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
-	vals := [5]any{}
+	vals := [5]proto.Value{}
 
 	if mesg != nil {
 		for i := range mesg.Fields {
@@ -38,11 +37,11 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 	}
 
 	return &DeveloperDataId{
-		DeveloperId:        typeconv.ToSliceByte[byte](vals[0]),
-		ApplicationId:      typeconv.ToSliceByte[byte](vals[1]),
-		ApplicationVersion: typeconv.ToUint32[uint32](vals[4]),
-		ManufacturerId:     typeconv.ToUint16[typedef.Manufacturer](vals[2]),
-		DeveloperDataIndex: typeconv.ToUint8[uint8](vals[3]),
+		DeveloperId:        vals[0].SliceUint8(),
+		ApplicationId:      vals[1].SliceUint8(),
+		ApplicationVersion: vals[4].Uint32(),
+		ManufacturerId:     typedef.Manufacturer(vals[2].Uint16()),
+		DeveloperDataIndex: vals[3].Uint8(),
 	}
 }
 
@@ -64,27 +63,27 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 
 	if m.DeveloperId != nil {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.DeveloperId
+		field.Value = proto.SliceUint8(m.DeveloperId)
 		fields = append(fields, field)
 	}
 	if m.ApplicationId != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ApplicationId
+		field.Value = proto.SliceUint8(m.ApplicationId)
 		fields = append(fields, field)
 	}
 	if m.ApplicationVersion != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.ApplicationVersion
+		field.Value = proto.Uint32(m.ApplicationVersion)
 		fields = append(fields, field)
 	}
 	if uint16(m.ManufacturerId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint16(m.ManufacturerId)
+		field.Value = proto.Uint16(uint16(m.ManufacturerId))
 		fields = append(fields, field)
 	}
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.DeveloperDataIndex
+		field.Value = proto.Uint8(m.DeveloperDataIndex)
 		fields = append(fields, field)
 	}
 

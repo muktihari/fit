@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type Spo2Data struct {
 // NewSpo2Data creates new Spo2Data struct based on given mesg.
 // If mesg is nil, it will return Spo2Data with all fields being set to its corresponding invalid value.
 func NewSpo2Data(mesg *proto.Message) *Spo2Data {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,10 +44,10 @@ func NewSpo2Data(mesg *proto.Message) *Spo2Data {
 	}
 
 	return &Spo2Data{
-		Timestamp:         datetime.ToTime(vals[253]),
-		ReadingSpo2:       typeconv.ToUint8[uint8](vals[0]),
-		ReadingConfidence: typeconv.ToUint8[uint8](vals[1]),
-		Mode:              typeconv.ToEnum[typedef.Spo2MeasurementType](vals[2]),
+		Timestamp:         datetime.ToTime(vals[253].Uint32()),
+		ReadingSpo2:       vals[0].Uint8(),
+		ReadingConfidence: vals[1].Uint8(),
+		Mode:              typedef.Spo2MeasurementType(vals[2].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,22 +71,22 @@ func (m *Spo2Data) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.ReadingSpo2 != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ReadingSpo2
+		field.Value = proto.Uint8(m.ReadingSpo2)
 		fields = append(fields, field)
 	}
 	if m.ReadingConfidence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ReadingConfidence
+		field.Value = proto.Uint8(m.ReadingConfidence)
 		fields = append(fields, field)
 	}
 	if byte(m.Mode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.Mode)
+		field.Value = proto.Uint8(byte(m.Mode))
 		fields = append(fields, field)
 	}
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -27,7 +26,7 @@ type SlaveDevice struct {
 // NewSlaveDevice creates new SlaveDevice struct based on given mesg.
 // If mesg is nil, it will return SlaveDevice with all fields being set to its corresponding invalid value.
 func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
-	vals := [2]any{}
+	vals := [2]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -41,8 +40,8 @@ func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
 	}
 
 	return &SlaveDevice{
-		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[0]),
-		Product:      typeconv.ToUint16[uint16](vals[1]),
+		Manufacturer: typedef.Manufacturer(vals[0].Uint16()),
+		Product:      vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -66,12 +65,12 @@ func (m *SlaveDevice) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.Manufacturer)
+		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Product
+		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
 

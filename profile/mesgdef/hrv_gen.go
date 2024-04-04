@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
@@ -26,7 +25,7 @@ type Hrv struct {
 // NewHrv creates new Hrv struct based on given mesg.
 // If mesg is nil, it will return Hrv with all fields being set to its corresponding invalid value.
 func NewHrv(mesg *proto.Message) *Hrv {
-	vals := [1]any{}
+	vals := [1]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -40,7 +39,7 @@ func NewHrv(mesg *proto.Message) *Hrv {
 	}
 
 	return &Hrv{
-		Time: typeconv.ToSliceUint16[uint16](vals[0]),
+		Time: vals[0].SliceUint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -64,7 +63,7 @@ func (m *Hrv) ToMesg(options *Options) proto.Message {
 
 	if m.Time != nil {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Time
+		field.Value = proto.SliceUint16(m.Time)
 		fields = append(fields, field)
 	}
 

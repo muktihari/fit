@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type SegmentId struct {
 // NewSegmentId creates new SegmentId struct based on given mesg.
 // If mesg is nil, it will return SegmentId with all fields being set to its corresponding invalid value.
 func NewSegmentId(mesg *proto.Message) *SegmentId {
-	vals := [9]any{}
+	vals := [9]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,15 +47,15 @@ func NewSegmentId(mesg *proto.Message) *SegmentId {
 	}
 
 	return &SegmentId{
-		Name:                  typeconv.ToString[string](vals[0]),
-		Uuid:                  typeconv.ToString[string](vals[1]),
-		UserProfilePrimaryKey: typeconv.ToUint32[uint32](vals[4]),
-		DeviceId:              typeconv.ToUint32[uint32](vals[5]),
-		Sport:                 typeconv.ToEnum[typedef.Sport](vals[2]),
-		DefaultRaceLeader:     typeconv.ToUint8[uint8](vals[6]),
-		DeleteStatus:          typeconv.ToEnum[typedef.SegmentDeleteStatus](vals[7]),
-		SelectionType:         typeconv.ToEnum[typedef.SegmentSelectionType](vals[8]),
-		Enabled:               typeconv.ToBool[bool](vals[3]),
+		Name:                  vals[0].String(),
+		Uuid:                  vals[1].String(),
+		UserProfilePrimaryKey: vals[4].Uint32(),
+		DeviceId:              vals[5].Uint32(),
+		Sport:                 typedef.Sport(vals[2].Uint8()),
+		DefaultRaceLeader:     vals[6].Uint8(),
+		DeleteStatus:          typedef.SegmentDeleteStatus(vals[7].Uint8()),
+		SelectionType:         typedef.SegmentSelectionType(vals[8].Uint8()),
+		Enabled:               vals[3].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -80,47 +79,47 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Uuid
+		field.Value = proto.String(m.Uuid)
 		fields = append(fields, field)
 	}
 	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.UserProfilePrimaryKey
+		field.Value = proto.Uint32(m.UserProfilePrimaryKey)
 		fields = append(fields, field)
 	}
 	if m.DeviceId != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.DeviceId
+		field.Value = proto.Uint32(m.DeviceId)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.DefaultRaceLeader
+		field.Value = proto.Uint8(m.DefaultRaceLeader)
 		fields = append(fields, field)
 	}
 	if byte(m.DeleteStatus) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = byte(m.DeleteStatus)
+		field.Value = proto.Uint8(byte(m.DeleteStatus))
 		fields = append(fields, field)
 	}
 	if byte(m.SelectionType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = byte(m.SelectionType)
+		field.Value = proto.Uint8(byte(m.SelectionType))
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Enabled
+		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 

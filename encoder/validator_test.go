@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
@@ -128,7 +129,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					func() proto.Field {
 						field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
 						field.IsExpandedField = true
-						field.Value = uint32(1000)
+						field.Value = proto.Uint32(1000)
 						return field
 					}(),
 				),
@@ -225,7 +226,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 								Scale:    1,
 								Offset:   0,
 							}
-							fields[i].Value = byte(1)
+							fields[i].Value = proto.Uint8(1)
 						}
 						return fields
 					}(),
@@ -318,7 +319,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 						DeveloperDataIndex: 0,
 						Num:                1,
 						BaseType:           basetype.String,
-						Value:              strings.Repeat("a", 256),
+						Value:              proto.String(strings.Repeat("a", 256)),
 					},
 				),
 			},
@@ -351,54 +352,46 @@ func TestMessageValidatorValidate(t *testing.T) {
 }
 
 func TestIsValueTypeAligned(t *testing.T) {
-	var i8 int8 = 10
-
 	tt := []struct {
-		value    any
+		value    proto.Value
 		baseType basetype.BaseType
 		expected bool
 	}{
-		{value: nil, baseType: basetype.Sint8, expected: false},
-		{value: true, baseType: basetype.Enum, expected: true},
-		{value: []bool{true, false}, baseType: basetype.Enum, expected: true},
-		{value: &i8, baseType: basetype.Sint8, expected: true},
-		{value: int8(1), baseType: basetype.Sint8, expected: true},
-		{value: uint8(1), baseType: basetype.Uint8, expected: true},
-		{value: uint8(1), baseType: basetype.Uint8z, expected: true},
-		{value: int16(1), baseType: basetype.Sint16, expected: true},
-		{value: uint16(1), baseType: basetype.Uint16, expected: true},
-		{value: uint16(1), baseType: basetype.Uint16z, expected: true},
-		{value: int32(1), baseType: basetype.Sint32, expected: true},
-		{value: uint32(1), baseType: basetype.Uint32, expected: true},
-		{value: uint32(1), baseType: basetype.Uint32z, expected: true},
-		{value: float32(1.0), baseType: basetype.Float32, expected: true},
-		{value: float64(1.0), baseType: basetype.Float64, expected: true},
-		{value: int64(1.0), baseType: basetype.Sint64, expected: true},
-		{value: uint64(1), baseType: basetype.Uint64, expected: true},
-		{value: uint64(1), baseType: basetype.Uint64z, expected: true},
-		{value: string("Fit SDK"), baseType: basetype.String, expected: true},
-		{value: test_uint8(1), baseType: basetype.Byte, expected: true},
-		{value: test_uint8(1), baseType: basetype.Sint16, expected: false},
-		{value: []int8{1}, baseType: basetype.Sint8, expected: true},
-		{value: []uint8{1}, baseType: basetype.Uint8, expected: true},
-		{value: []uint8{1}, baseType: basetype.Uint8z, expected: true},
-		{value: []int16{1}, baseType: basetype.Sint16, expected: true},
-		{value: []uint16{1}, baseType: basetype.Uint16, expected: true},
-		{value: []uint16{1}, baseType: basetype.Uint16z, expected: true},
-		{value: []int32{1}, baseType: basetype.Sint32, expected: true},
-		{value: []uint32{1}, baseType: basetype.Uint32, expected: true},
-		{value: []uint32{1}, baseType: basetype.Uint32z, expected: true},
-		{value: []float32{1.0}, baseType: basetype.Float32, expected: true},
-		{value: []float64{1.0}, baseType: basetype.Float64, expected: true},
-		{value: []int64{1}, baseType: basetype.Sint64, expected: true},
-		{value: []uint64{1}, baseType: basetype.Uint64, expected: true},
-		{value: []uint64{1}, baseType: basetype.Uint64z, expected: true},
-		{value: []string{"Fit SDK"}, baseType: basetype.String, expected: true},
-		{value: []byte("Fit SDK"), baseType: basetype.Byte, expected: true},
-		{value: []any{byte(1), byte(2)}, baseType: basetype.Byte, expected: false}, // []any is not supported
-		{value: []*int8{&i8}, baseType: basetype.Sint8, expected: false},
-		{value: []int8{1, 2, 3}, baseType: basetype.Sint8, expected: true},
-		{value: []test_string{"Fit SDK"}, baseType: basetype.String, expected: true},
+		{value: proto.Value{}, baseType: basetype.Sint8, expected: false},
+		{value: proto.Bool(true), baseType: basetype.Enum, expected: true},
+		{value: proto.SliceBool([]bool{true, false}), baseType: basetype.Enum, expected: true},
+		{value: proto.Int8(1), baseType: basetype.Sint8, expected: true},
+		{value: proto.Uint8(1), baseType: basetype.Uint8, expected: true},
+		{value: proto.Uint8(1), baseType: basetype.Uint8z, expected: true},
+		{value: proto.Int16(1), baseType: basetype.Sint16, expected: true},
+		{value: proto.Uint16(1), baseType: basetype.Uint16, expected: true},
+		{value: proto.Uint16(1), baseType: basetype.Uint16z, expected: true},
+		{value: proto.Int32(1), baseType: basetype.Sint32, expected: true},
+		{value: proto.Uint32(1), baseType: basetype.Uint32, expected: true},
+		{value: proto.Uint32(1), baseType: basetype.Uint32z, expected: true},
+		{value: proto.Float32(1.0), baseType: basetype.Float32, expected: true},
+		{value: proto.Float64(1.0), baseType: basetype.Float64, expected: true},
+		{value: proto.Int64(1.0), baseType: basetype.Sint64, expected: true},
+		{value: proto.Uint64(1), baseType: basetype.Uint64, expected: true},
+		{value: proto.Uint64(1), baseType: basetype.Uint64z, expected: true},
+		{value: proto.String("Fit SDK"), baseType: basetype.String, expected: true},
+		{value: proto.SliceInt8([]int8{1}), baseType: basetype.Sint8, expected: true},
+		{value: proto.SliceUint8([]uint8{1}), baseType: basetype.Uint8, expected: true},
+		{value: proto.SliceUint8([]uint8{1}), baseType: basetype.Uint8z, expected: true},
+		{value: proto.SliceInt16([]int16{1}), baseType: basetype.Sint16, expected: true},
+		{value: proto.SliceUint16([]uint16{1}), baseType: basetype.Uint16, expected: true},
+		{value: proto.SliceUint16([]uint16{1}), baseType: basetype.Uint16z, expected: true},
+		{value: proto.SliceInt32([]int32{1}), baseType: basetype.Sint32, expected: true},
+		{value: proto.SliceUint32([]uint32{1}), baseType: basetype.Uint32, expected: true},
+		{value: proto.SliceUint32([]uint32{1}), baseType: basetype.Uint32z, expected: true},
+		{value: proto.SliceFloat32([]float32{1.0}), baseType: basetype.Float32, expected: true},
+		{value: proto.SliceFloat64([]float64{1.0}), baseType: basetype.Float64, expected: true},
+		{value: proto.SliceInt64([]int64{1}), baseType: basetype.Sint64, expected: true},
+		{value: proto.SliceUint64([]uint64{1}), baseType: basetype.Uint64, expected: true},
+		{value: proto.SliceUint64([]uint64{1}), baseType: basetype.Uint64z, expected: true},
+		{value: proto.SliceString([]string{"Fit SDK"}), baseType: basetype.String, expected: true},
+		{value: proto.SliceUint8([]byte("Fit SDK")), baseType: basetype.Byte, expected: true},
+		{value: proto.SliceInt8([]int8{1, 2, 3}), baseType: basetype.Sint8, expected: true},
 	}
 
 	for _, tc := range tt {
@@ -412,71 +405,43 @@ func TestIsValueTypeAligned(t *testing.T) {
 
 func TestHasValidValue(t *testing.T) {
 	tt := []struct {
-		value    any
+		value    proto.Value
 		expected bool
 	}{
-		{value: nil, expected: false},
-		{value: int(0), expected: true},  // mark as valid since its invalid value is unknown
-		{value: uint(0), expected: true}, // mark as valid since its invalid value is unknown
-		{value: int8(0), expected: true},
-		{value: uint8(0), expected: true},
-		{value: int16(0), expected: true},
-		{value: uint16(0), expected: true},
-		{value: int32(0), expected: true},
-		{value: uint32(0), expected: true},
-		{value: string("Fit SDK Go"), expected: true},
-		{value: string(""), expected: false},
-		{value: string("\x00"), expected: false},
-		{value: float32(0.2), expected: true},
-		{value: float32(math.Float32frombits(basetype.Float32Invalid)), expected: false},
-		{value: float32(math.Float32frombits(basetype.Float32Invalid - 1)), expected: true},
-		{value: float64(0.5), expected: true},
-		{value: float64(math.Float64frombits(basetype.Float64Invalid)), expected: false},
-		{value: float64(math.Float64frombits(basetype.Float64Invalid - 1)), expected: true},
-		{value: int64(0), expected: true},
-		{value: uint64(0), expected: true},
-		{value: struct{}{}, expected: true}, // mark as valid since its invalid value is unknown
-		{value: []int8{0, basetype.Sint8Invalid}, expected: true},
-		{value: []uint8{0, basetype.Uint8Invalid}, expected: true},
-		{value: []int16{0, basetype.Sint16Invalid}, expected: true},
-		{value: []uint16{0, basetype.Uint16Invalid}, expected: true},
-		{value: []int32{0, basetype.Sint32Invalid}, expected: true},
-		{value: []string{"Fit SDK Go"}, expected: true},
-		{value: []string{""}, expected: false},
-		{value: []string{"\x00"}, expected: false},
-		{value: []uint32{0, basetype.Uint32Invalid}, expected: true},
-		{value: []float32{0.2, math.Float32frombits(basetype.Float32Invalid)}, expected: true},
-		{value: []float64{0.5, math.Float64frombits(basetype.Float64Invalid)}, expected: true},
-		{value: []int64{0, basetype.Sint64Invalid}, expected: true},
-		{value: []uint64{0, basetype.Uint64Invalid}, expected: true},
-		{value: test_int8(0), expected: true},
-		{value: test_uint8(0), expected: true},
-		{value: test_int16(0), expected: true},
-		{value: test_uint16(0), expected: true},
-		{value: test_int32(0), expected: true},
-		{value: test_uint32(0), expected: true},
-		{value: test_string("Fit SDK Go"), expected: true},
-		{value: test_float32(0.2), expected: true},
-		{value: test_float64(0.5), expected: true},
-		{value: test_int64(0), expected: true},
-		{value: test_uint64(0), expected: true},
-		{value: []test_int8{0, test_int8(basetype.Sint8Invalid)}, expected: true},
-		{value: []test_uint8{0, test_uint8(basetype.Uint8Invalid)}, expected: true},
-		{value: []test_int16{0, test_int16(basetype.Sint16Invalid)}, expected: true},
-		{value: []test_uint16{0, test_uint16(basetype.Uint16Invalid)}, expected: true},
-		{value: []test_int32{0, test_int32(basetype.Sint32Invalid)}, expected: true},
-		{value: []test_uint32{0, test_uint32(basetype.Uint32Invalid)}, expected: true},
-		{value: []test_string{"Fit SDK Go"}, expected: true},
-		{value: []test_string{""}, expected: false},
-		{value: []test_string{"\x00"}, expected: false},
-		{value: []test_float32{0.2, test_float32(math.Float32frombits(basetype.Float32Invalid))}, expected: true},
-		{value: []test_float64{0.5, test_float64(math.Float64frombits(basetype.Float64Invalid))}, expected: true},
-		{value: []test_int64{0, test_int64(basetype.Sint64Invalid)}, expected: true},
-		{value: []test_uint64{0, test_uint64(basetype.Uint64Invalid)}, expected: true},
-		{value: []struct{}{{}}, expected: true}, // mark as valid since its invalid value is unknown
+		{value: proto.Value{}, expected: false},
+		{value: proto.Int8(0), expected: true},
+		{value: proto.Uint8(0), expected: true},
+		{value: proto.Int16(0), expected: true},
+		{value: proto.Uint16(0), expected: true},
+		{value: proto.Int32(0), expected: true},
+		{value: proto.Uint32(0), expected: true},
+		{value: proto.String("Fit SDK Go"), expected: true},
+		{value: proto.String(""), expected: false},
+		{value: proto.String("\x00"), expected: false},
+		{value: proto.Float32(0.2), expected: true},
+		{value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), expected: false},
+		{value: proto.Float32(math.Float32frombits(basetype.Float32Invalid - 1)), expected: true},
+		{value: proto.Float64(0.5), expected: true},
+		{value: proto.Float64(math.Float64frombits(basetype.Float64Invalid)), expected: false},
+		{value: proto.Float64(math.Float64frombits(basetype.Float64Invalid - 1)), expected: true},
+		{value: proto.Int64(0), expected: true},
+		{value: proto.Uint64(0), expected: true},
+		{value: proto.SliceInt8([]int8{0, basetype.Sint8Invalid}), expected: true},
+		{value: proto.SliceUint8([]uint8{0, basetype.Uint8Invalid}), expected: true},
+		{value: proto.SliceInt16([]int16{0, basetype.Sint16Invalid}), expected: true},
+		{value: proto.SliceUint16([]uint16{0, basetype.Uint16Invalid}), expected: true},
+		{value: proto.SliceInt32([]int32{0, basetype.Sint32Invalid}), expected: true},
+		{value: proto.SliceString([]string{"Fit SDK Go"}), expected: true},
+		{value: proto.SliceString([]string{""}), expected: false},
+		{value: proto.SliceString([]string{"\x00"}), expected: false},
+		{value: proto.SliceUint32([]uint32{0, basetype.Uint32Invalid}), expected: true},
+		{value: proto.SliceFloat32([]float32{0.2, math.Float32frombits(basetype.Float32Invalid)}), expected: true},
+		{value: proto.SliceFloat64([]float64{0.5, math.Float64frombits(basetype.Float64Invalid)}), expected: true},
+		{value: proto.SliceInt64([]int64{0, basetype.Sint64Invalid}), expected: true},
+		{value: proto.SliceUint64([]uint64{0, basetype.Uint64Invalid}), expected: true},
 	}
-	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%v (%T)", tc.value, tc.value), func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v (%T)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
 			result := hasValidValue(tc.value)
 			if result != tc.expected {
 				t.Fatalf("expected: %t, got: %t", tc.expected, result)
@@ -487,7 +452,7 @@ func TestHasValidValue(t *testing.T) {
 
 func BenchmarkIsValueTypeAligned(b *testing.B) {
 	b.Run("benchmark primitive-values byte", func(b *testing.B) {
-		var value byte = 10
+		var value = proto.Uint8(10)
 		for i := 0; i < b.N; i++ {
 			ok := isValueTypeAligned(value, basetype.Byte)
 			if !ok {
@@ -497,7 +462,7 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 	})
 
 	b.Run("benchmark primitive-values float64", func(b *testing.B) {
-		var value float64 = 10.5
+		var value = proto.Float64(10.5)
 		for i := 0; i < b.N; i++ {
 			ok := isValueTypeAligned(value, basetype.Float64)
 			if !ok {
@@ -507,7 +472,7 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 	})
 
 	b.Run("benchmark types", func(b *testing.B) {
-		var value typedef.File = typedef.FileActivity
+		var value = proto.Any(typedef.FileActivity)
 		for i := 0; i < b.N; i++ {
 			ok := isValueTypeAligned(value, basetype.Byte)
 			if !ok {
@@ -517,7 +482,7 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 	})
 
 	b.Run("benchmark []byte", func(b *testing.B) {
-		var value = []byte{1, 2, 3, 4, 5}
+		var value = proto.SliceUint8([]byte{1, 2, 3, 4, 5})
 
 		for i := 0; i < b.N; i++ {
 			ok := isValueTypeAligned(value, basetype.Byte)
@@ -528,13 +493,13 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 	})
 
 	b.Run("benchmark []float64", func(b *testing.B) {
-		var value = []float64{
+		var value = proto.SliceFloat64([]float64{
 			1.9123455,
 			2.9123455,
 			3.9123455,
 			4.9123455,
 			5.9123455,
-		}
+		})
 
 		for i := 0; i < b.N; i++ {
 			ok := isValueTypeAligned(value, basetype.Float64)
@@ -552,9 +517,10 @@ func BenchmarkIsValueTypeAligned(b *testing.B) {
 			typedef.FileBloodPressure,
 			typedef.FileDevice,
 		}
+		val := *(*[]byte)(unsafe.Pointer(&value))
 
 		for i := 0; i < b.N; i++ {
-			ok := isValueTypeAligned(value, basetype.Byte)
+			ok := isValueTypeAligned(proto.SliceUint8(val), basetype.Byte)
 			if !ok {
 				b.Fail()
 			}
@@ -571,19 +537,19 @@ func BenchmarkValidate(b *testing.B) {
 		func() proto.Field {
 			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
 			field.IsExpandedField = true
-			field.Value = uint32(1000)
+			field.Value = proto.Uint32(1000)
 			return field
 		}(),
 		func() proto.Field {
 			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
 			field.IsExpandedField = true
-			field.Value = uint32(1000)
+			field.Value = proto.Uint32(1000)
 			return field
 		}(),
 		func() proto.Field {
 			field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
 			field.IsExpandedField = true
-			field.Value = uint32(1000)
+			field.Value = proto.Uint32(1000)
 			return field
 		}(),
 	)

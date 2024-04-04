@@ -11,6 +11,7 @@ import (
 
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/proto"
 )
 
 var epoch = time.Date(1989, time.December, 31, 0, 0, 0, 0, time.UTC)
@@ -27,6 +28,8 @@ func ToTime(value any) time.Time {
 	var val uint32 = basetype.Uint32Invalid
 
 	switch v := value.(type) {
+	case proto.Value:
+		val = v.Uint32()
 	case uint32:
 		val = v
 	case typedef.DateTime:

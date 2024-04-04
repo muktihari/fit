@@ -440,16 +440,11 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 		return
 	}
 
-	var timestamp uint32
-	switch val := field.Value.(type) {
-	case uint32:
-		timestamp = val
-	case typedef.DateTime:
-		timestamp = uint32(val)
-	default:
+	if field.Value.Type() != proto.TypeUint32 {
 		return // not supported
 	}
 
+	timestamp := field.Value.Uint32()
 	if timestamp < uint32(typedef.DateTimeMin) {
 		return
 	}

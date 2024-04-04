@@ -8,10 +8,10 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"unsafe"
 )
 
 // Capabilities is a Capabilities message.
@@ -29,7 +29,7 @@ type Capabilities struct {
 // NewCapabilities creates new Capabilities struct based on given mesg.
 // If mesg is nil, it will return Capabilities with all fields being set to its corresponding invalid value.
 func NewCapabilities(mesg *proto.Message) *Capabilities {
-	vals := [24]any{}
+	vals := [24]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,10 +43,14 @@ func NewCapabilities(mesg *proto.Message) *Capabilities {
 	}
 
 	return &Capabilities{
-		Languages:             typeconv.ToSliceUint8z[uint8](vals[0]),
-		Sports:                typeconv.ToSliceUint8z[typedef.SportBits0](vals[1]),
-		WorkoutsSupported:     typeconv.ToUint32z[typedef.WorkoutCapabilities](vals[21]),
-		ConnectivitySupported: typeconv.ToUint32z[typedef.ConnectivityCapabilities](vals[23]),
+		Languages: vals[0].SliceUint8(),
+		Sports: func() []typedef.SportBits0 {
+			sliceValue := vals[1].SliceUint8()
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*typedef.SportBits0)(ptr), len(sliceValue))
+		}(),
+		WorkoutsSupported:     typedef.WorkoutCapabilities(vals[21].Uint32z()),
+		ConnectivitySupported: typedef.ConnectivityCapabilities(vals[23].Uint32z()),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,24 +72,24 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumCapabilities)
 
-	if typeconv.ToSliceUint8z[uint8](m.Languages) != nil {
+	if m.Languages != nil {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.Languages)
+		field.Value = proto.SliceUint8(m.Languages)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint8z[uint8](m.Sports) != nil {
+	if m.Sports != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.Sports)
+		field.Value = proto.SliceUint8(unsafe.Slice((*uint8)(unsafe.SliceData(m.Sports)), len(m.Sports)))
 		fields = append(fields, field)
 	}
 	if uint32(m.WorkoutsSupported) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = uint32(m.WorkoutsSupported)
+		field.Value = proto.Uint32(uint32(m.WorkoutsSupported))
 		fields = append(fields, field)
 	}
 	if uint32(m.ConnectivitySupported) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = uint32(m.ConnectivitySupported)
+		field.Value = proto.Uint32(uint32(m.ConnectivitySupported))
 		fields = append(fields, field)
 	}
 

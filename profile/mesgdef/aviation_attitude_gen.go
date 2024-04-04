@@ -10,11 +10,11 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"time"
+	"unsafe"
 )
 
 // AviationAttitude is a AviationAttitude message.
@@ -40,7 +40,7 @@ type AviationAttitude struct {
 // NewAviationAttitude creates new AviationAttitude struct based on given mesg.
 // If mesg is nil, it will return AviationAttitude with all fields being set to its corresponding invalid value.
 func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -54,18 +54,26 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 	}
 
 	return &AviationAttitude{
-		Timestamp:             datetime.ToTime(vals[253]),
-		SystemTime:            typeconv.ToSliceUint32[uint32](vals[1]),
-		Pitch:                 typeconv.ToSliceSint16[int16](vals[2]),
-		Roll:                  typeconv.ToSliceSint16[int16](vals[3]),
-		AccelLateral:          typeconv.ToSliceSint16[int16](vals[4]),
-		AccelNormal:           typeconv.ToSliceSint16[int16](vals[5]),
-		TurnRate:              typeconv.ToSliceSint16[int16](vals[6]),
-		Stage:                 typeconv.ToSliceEnum[typedef.AttitudeStage](vals[7]),
-		AttitudeStageComplete: typeconv.ToSliceUint8[uint8](vals[8]),
-		Track:                 typeconv.ToSliceUint16[uint16](vals[9]),
-		Validity:              typeconv.ToSliceUint16[typedef.AttitudeValidity](vals[10]),
-		TimestampMs:           typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:    datetime.ToTime(vals[253].Uint32()),
+		SystemTime:   vals[1].SliceUint32(),
+		Pitch:        vals[2].SliceInt16(),
+		Roll:         vals[3].SliceInt16(),
+		AccelLateral: vals[4].SliceInt16(),
+		AccelNormal:  vals[5].SliceInt16(),
+		TurnRate:     vals[6].SliceInt16(),
+		Stage: func() []typedef.AttitudeStage {
+			sliceValue := vals[7].SliceUint8()
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*typedef.AttitudeStage)(ptr), len(sliceValue))
+		}(),
+		AttitudeStageComplete: vals[8].SliceUint8(),
+		Track:                 vals[9].SliceUint16(),
+		Validity: func() []typedef.AttitudeValidity {
+			sliceValue := vals[10].SliceUint16()
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*typedef.AttitudeValidity)(ptr), len(sliceValue))
+		}(),
+		TimestampMs: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -89,62 +97,62 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.SystemTime
+		field.Value = proto.SliceUint32(m.SystemTime)
 		fields = append(fields, field)
 	}
 	if m.Pitch != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Pitch
+		field.Value = proto.SliceInt16(m.Pitch)
 		fields = append(fields, field)
 	}
 	if m.Roll != nil {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Roll
+		field.Value = proto.SliceInt16(m.Roll)
 		fields = append(fields, field)
 	}
 	if m.AccelLateral != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.AccelLateral
+		field.Value = proto.SliceInt16(m.AccelLateral)
 		fields = append(fields, field)
 	}
 	if m.AccelNormal != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.AccelNormal
+		field.Value = proto.SliceInt16(m.AccelNormal)
 		fields = append(fields, field)
 	}
 	if m.TurnRate != nil {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.TurnRate
+		field.Value = proto.SliceInt16(m.TurnRate)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceEnum[byte](m.Stage) != nil {
+	if m.Stage != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToSliceEnum[byte](m.Stage)
+		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.Stage)), len(m.Stage)))
 		fields = append(fields, field)
 	}
 	if m.AttitudeStageComplete != nil {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.AttitudeStageComplete
+		field.Value = proto.SliceUint8(m.AttitudeStageComplete)
 		fields = append(fields, field)
 	}
 	if m.Track != nil {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.Track
+		field.Value = proto.SliceUint16(m.Track)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint16[uint16](m.Validity) != nil {
+	if m.Validity != nil {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = typeconv.ToSliceUint16[uint16](m.Validity)
+		field.Value = proto.SliceUint16(unsafe.Slice((*uint16)(unsafe.SliceData(m.Validity)), len(m.Validity)))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 

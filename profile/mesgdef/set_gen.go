@@ -10,11 +10,11 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"time"
+	"unsafe"
 )
 
 // Set is a Set message.
@@ -39,7 +39,7 @@ type Set struct {
 // NewSet creates new Set struct based on given mesg.
 // If mesg is nil, it will return Set with all fields being set to its corresponding invalid value.
 func NewSet(mesg *proto.Message) *Set {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -53,17 +53,21 @@ func NewSet(mesg *proto.Message) *Set {
 	}
 
 	return &Set{
-		Timestamp:         datetime.ToTime(vals[254]),
-		StartTime:         datetime.ToTime(vals[6]),
-		Category:          typeconv.ToSliceUint16[typedef.ExerciseCategory](vals[7]),
-		CategorySubtype:   typeconv.ToSliceUint16[uint16](vals[8]),
-		Duration:          typeconv.ToUint32[uint32](vals[0]),
-		Repetitions:       typeconv.ToUint16[uint16](vals[3]),
-		Weight:            typeconv.ToUint16[uint16](vals[4]),
-		WeightDisplayUnit: typeconv.ToUint16[typedef.FitBaseUnit](vals[9]),
-		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[10]),
-		WktStepIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[11]),
-		SetType:           typeconv.ToUint8[typedef.SetType](vals[5]),
+		Timestamp: datetime.ToTime(vals[254].Uint32()),
+		StartTime: datetime.ToTime(vals[6].Uint32()),
+		Category: func() []typedef.ExerciseCategory {
+			sliceValue := vals[7].SliceUint16()
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*typedef.ExerciseCategory)(ptr), len(sliceValue))
+		}(),
+		CategorySubtype:   vals[8].SliceUint16(),
+		Duration:          vals[0].Uint32(),
+		Repetitions:       vals[3].Uint16(),
+		Weight:            vals[4].Uint16(),
+		WeightDisplayUnit: typedef.FitBaseUnit(vals[9].Uint16()),
+		MessageIndex:      typedef.MessageIndex(vals[10].Uint16()),
+		WktStepIndex:      typedef.MessageIndex(vals[11].Uint16()),
+		SetType:           typedef.SetType(vals[5].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -87,57 +91,57 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = datetime.ToUint32(m.StartTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint16[uint16](m.Category) != nil {
+	if m.Category != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = typeconv.ToSliceUint16[uint16](m.Category)
+		field.Value = proto.SliceUint16(unsafe.Slice((*uint16)(unsafe.SliceData(m.Category)), len(m.Category)))
 		fields = append(fields, field)
 	}
 	if m.CategorySubtype != nil {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.CategorySubtype
+		field.Value = proto.SliceUint16(m.CategorySubtype)
 		fields = append(fields, field)
 	}
 	if m.Duration != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Duration
+		field.Value = proto.Uint32(m.Duration)
 		fields = append(fields, field)
 	}
 	if m.Repetitions != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Repetitions
+		field.Value = proto.Uint16(m.Repetitions)
 		fields = append(fields, field)
 	}
 	if m.Weight != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Weight
+		field.Value = proto.Uint16(m.Weight)
 		fields = append(fields, field)
 	}
 	if uint16(m.WeightDisplayUnit) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = uint16(m.WeightDisplayUnit)
+		field.Value = proto.Uint16(uint16(m.WeightDisplayUnit))
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = uint16(m.WktStepIndex)
+		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)
 	}
 	if uint8(m.SetType) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = uint8(m.SetType)
+		field.Value = proto.Uint8(uint8(m.SetType))
 		fields = append(fields, field)
 	}
 

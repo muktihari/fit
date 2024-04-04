@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type WeatherAlert struct {
 // NewWeatherAlert creates new WeatherAlert struct based on given mesg.
 // If mesg is nil, it will return WeatherAlert with all fields being set to its corresponding invalid value.
 func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,12 +46,12 @@ func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 	}
 
 	return &WeatherAlert{
-		Timestamp:  datetime.ToTime(vals[253]),
-		ReportId:   typeconv.ToString[string](vals[0]),
-		IssueTime:  datetime.ToTime(vals[1]),
-		ExpireTime: datetime.ToTime(vals[2]),
-		Severity:   typeconv.ToEnum[typedef.WeatherSeverity](vals[3]),
-		Type:       typeconv.ToEnum[typedef.WeatherSevereType](vals[4]),
+		Timestamp:  datetime.ToTime(vals[253].Uint32()),
+		ReportId:   vals[0].String(),
+		IssueTime:  datetime.ToTime(vals[1].Uint32()),
+		ExpireTime: datetime.ToTime(vals[2].Uint32()),
+		Severity:   typedef.WeatherSeverity(vals[3].Uint8()),
+		Type:       typedef.WeatherSevereType(vals[4].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -76,32 +75,32 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ReportId
+		field.Value = proto.String(m.ReportId)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = datetime.ToUint32(m.IssueTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.IssueTime))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = datetime.ToUint32(m.ExpireTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.ExpireTime))
 		fields = append(fields, field)
 	}
 	if byte(m.Severity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = byte(m.Severity)
+		field.Value = proto.Uint8(byte(m.Severity))
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -27,7 +26,7 @@ type FileCreator struct {
 // NewFileCreator creates new FileCreator struct based on given mesg.
 // If mesg is nil, it will return FileCreator with all fields being set to its corresponding invalid value.
 func NewFileCreator(mesg *proto.Message) *FileCreator {
-	vals := [2]any{}
+	vals := [2]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -41,8 +40,8 @@ func NewFileCreator(mesg *proto.Message) *FileCreator {
 	}
 
 	return &FileCreator{
-		SoftwareVersion: typeconv.ToUint16[uint16](vals[0]),
-		HardwareVersion: typeconv.ToUint8[uint8](vals[1]),
+		SoftwareVersion: vals[0].Uint16(),
+		HardwareVersion: vals[1].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -66,12 +65,12 @@ func (m *FileCreator) ToMesg(options *Options) proto.Message {
 
 	if m.SoftwareVersion != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.SoftwareVersion
+		field.Value = proto.Uint16(m.SoftwareVersion)
 		fields = append(fields, field)
 	}
 	if m.HardwareVersion != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.HardwareVersion
+		field.Value = proto.Uint8(m.HardwareVersion)
 		fields = append(fields, field)
 	}
 

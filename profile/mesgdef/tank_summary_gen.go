@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type TankSummary struct {
 // NewTankSummary creates new TankSummary struct based on given mesg.
 // If mesg is nil, it will return TankSummary with all fields being set to its corresponding invalid value.
 func NewTankSummary(mesg *proto.Message) *TankSummary {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,11 +46,11 @@ func NewTankSummary(mesg *proto.Message) *TankSummary {
 	}
 
 	return &TankSummary{
-		Timestamp:     datetime.ToTime(vals[253]),
-		Sensor:        typeconv.ToUint32z[typedef.AntChannelId](vals[0]),
-		VolumeUsed:    typeconv.ToUint32[uint32](vals[3]),
-		StartPressure: typeconv.ToUint16[uint16](vals[1]),
-		EndPressure:   typeconv.ToUint16[uint16](vals[2]),
+		Timestamp:     datetime.ToTime(vals[253].Uint32()),
+		Sensor:        typedef.AntChannelId(vals[0].Uint32z()),
+		VolumeUsed:    vals[3].Uint32(),
+		StartPressure: vals[1].Uint16(),
+		EndPressure:   vals[2].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,27 +74,27 @@ func (m *TankSummary) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if uint32(m.Sensor) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint32(m.Sensor)
+		field.Value = proto.Uint32(uint32(m.Sensor))
 		fields = append(fields, field)
 	}
 	if m.VolumeUsed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.VolumeUsed
+		field.Value = proto.Uint32(m.VolumeUsed)
 		fields = append(fields, field)
 	}
 	if m.StartPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.StartPressure
+		field.Value = proto.Uint16(m.StartPressure)
 		fields = append(fields, field)
 	}
 	if m.EndPressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.EndPressure
+		field.Value = proto.Uint16(m.EndPressure)
 		fields = append(fields, field)
 	}
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type FileCapabilities struct {
 // NewFileCapabilities creates new FileCapabilities struct based on given mesg.
 // If mesg is nil, it will return FileCapabilities with all fields being set to its corresponding invalid value.
 func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,12 +44,12 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 	}
 
 	return &FileCapabilities{
-		Directory:    typeconv.ToString[string](vals[2]),
-		MaxSize:      typeconv.ToUint32[uint32](vals[4]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		MaxCount:     typeconv.ToUint16[uint16](vals[3]),
-		Type:         typeconv.ToEnum[typedef.File](vals[0]),
-		Flags:        typeconv.ToUint8z[typedef.FileFlags](vals[1]),
+		Directory:    vals[2].String(),
+		MaxSize:      vals[4].Uint32(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		MaxCount:     vals[3].Uint16(),
+		Type:         typedef.File(vals[0].Uint8()),
+		Flags:        typedef.FileFlags(vals[1].Uint8z()),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,32 +73,32 @@ func (m *FileCapabilities) ToMesg(options *Options) proto.Message {
 
 	if m.Directory != basetype.StringInvalid && m.Directory != "" {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Directory
+		field.Value = proto.String(m.Directory)
 		fields = append(fields, field)
 	}
 	if m.MaxSize != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.MaxSize
+		field.Value = proto.Uint32(m.MaxSize)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.MaxCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.MaxCount
+		field.Value = proto.Uint16(m.MaxCount)
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if uint8(m.Flags) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint8(m.Flags)
+		field.Value = proto.Uint8(uint8(m.Flags))
 		fields = append(fields, field)
 	}
 

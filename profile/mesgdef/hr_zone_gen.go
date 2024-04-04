@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -28,7 +27,7 @@ type HrZone struct {
 // NewHrZone creates new HrZone struct based on given mesg.
 // If mesg is nil, it will return HrZone with all fields being set to its corresponding invalid value.
 func NewHrZone(mesg *proto.Message) *HrZone {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -42,9 +41,9 @@ func NewHrZone(mesg *proto.Message) *HrZone {
 	}
 
 	return &HrZone{
-		Name:         typeconv.ToString[string](vals[2]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		HighBpm:      typeconv.ToUint8[uint8](vals[1]),
+		Name:         vals[2].String(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		HighBpm:      vals[1].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,17 +67,17 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.HighBpm != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.HighBpm
+		field.Value = proto.Uint8(m.HighBpm)
 		fields = append(fields, field)
 	}
 

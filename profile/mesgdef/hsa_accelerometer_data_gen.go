@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -35,7 +34,7 @@ type HsaAccelerometerData struct {
 // NewHsaAccelerometerData creates new HsaAccelerometerData struct based on given mesg.
 // If mesg is nil, it will return HsaAccelerometerData with all fields being set to its corresponding invalid value.
 func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -49,13 +48,13 @@ func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 	}
 
 	return &HsaAccelerometerData{
-		Timestamp:        datetime.ToTime(vals[253]),
-		AccelX:           typeconv.ToSliceSint16[int16](vals[2]),
-		AccelY:           typeconv.ToSliceSint16[int16](vals[3]),
-		AccelZ:           typeconv.ToSliceSint16[int16](vals[4]),
-		Timestamp32K:     typeconv.ToUint32[uint32](vals[5]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
-		SamplingInterval: typeconv.ToUint16[uint16](vals[1]),
+		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		AccelX:           vals[2].SliceInt16(),
+		AccelY:           vals[3].SliceInt16(),
+		AccelZ:           vals[4].SliceInt16(),
+		Timestamp32K:     vals[5].Uint32(),
+		TimestampMs:      vals[0].Uint16(),
+		SamplingInterval: vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -79,37 +78,37 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.AccelX != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.AccelX
+		field.Value = proto.SliceInt16(m.AccelX)
 		fields = append(fields, field)
 	}
 	if m.AccelY != nil {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.AccelY
+		field.Value = proto.SliceInt16(m.AccelY)
 		fields = append(fields, field)
 	}
 	if m.AccelZ != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.AccelZ
+		field.Value = proto.SliceInt16(m.AccelZ)
 		fields = append(fields, field)
 	}
 	if m.Timestamp32K != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.Timestamp32K
+		field.Value = proto.Uint32(m.Timestamp32K)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SamplingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.SamplingInterval
+		field.Value = proto.Uint16(m.SamplingInterval)
 		fields = append(fields, field)
 	}
 

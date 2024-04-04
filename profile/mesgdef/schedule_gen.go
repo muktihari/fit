@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type Schedule struct {
 // NewSchedule creates new Schedule struct based on given mesg.
 // If mesg is nil, it will return Schedule with all fields being set to its corresponding invalid value.
 func NewSchedule(mesg *proto.Message) *Schedule {
-	vals := [7]any{}
+	vals := [7]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,13 +47,13 @@ func NewSchedule(mesg *proto.Message) *Schedule {
 	}
 
 	return &Schedule{
-		TimeCreated:   datetime.ToTime(vals[3]),
-		ScheduledTime: datetime.ToTime(vals[6]),
-		SerialNumber:  typeconv.ToUint32z[uint32](vals[2]),
-		Manufacturer:  typeconv.ToUint16[typedef.Manufacturer](vals[0]),
-		Product:       typeconv.ToUint16[uint16](vals[1]),
-		Type:          typeconv.ToEnum[typedef.Schedule](vals[5]),
-		Completed:     typeconv.ToBool[bool](vals[4]),
+		TimeCreated:   datetime.ToTime(vals[3].Uint32()),
+		ScheduledTime: datetime.ToTime(vals[6].Uint32()),
+		SerialNumber:  vals[2].Uint32z(),
+		Manufacturer:  typedef.Manufacturer(vals[0].Uint16()),
+		Product:       vals[1].Uint16(),
+		Type:          typedef.Schedule(vals[5].Uint8()),
+		Completed:     vals[4].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -78,37 +77,37 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = datetime.ToUint32(m.TimeCreated)
+		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = datetime.ToUint32(m.ScheduledTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.ScheduledTime))
 		fields = append(fields, field)
 	}
 	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint32(m.SerialNumber)
+		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.Manufacturer)
+		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Product
+		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if m.Completed != false {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Completed
+		field.Value = proto.Bool(m.Completed)
 		fields = append(fields, field)
 	}
 

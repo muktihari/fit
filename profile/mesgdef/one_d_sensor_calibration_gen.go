@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type OneDSensorCalibration struct {
 // NewOneDSensorCalibration creates new OneDSensorCalibration struct based on given mesg.
 // If mesg is nil, it will return OneDSensorCalibration with all fields being set to its corresponding invalid value.
 func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,12 +46,12 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 	}
 
 	return &OneDSensorCalibration{
-		Timestamp:          datetime.ToTime(vals[253]),
-		CalibrationFactor:  typeconv.ToUint32[uint32](vals[1]),
-		CalibrationDivisor: typeconv.ToUint32[uint32](vals[2]),
-		LevelShift:         typeconv.ToUint32[uint32](vals[3]),
-		OffsetCal:          typeconv.ToSint32[int32](vals[4]),
-		SensorType:         typeconv.ToEnum[typedef.SensorType](vals[0]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		CalibrationFactor:  vals[1].Uint32(),
+		CalibrationDivisor: vals[2].Uint32(),
+		LevelShift:         vals[3].Uint32(),
+		OffsetCal:          vals[4].Int32(),
+		SensorType:         typedef.SensorType(vals[0].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -76,32 +75,32 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.CalibrationFactor
+		field.Value = proto.Uint32(m.CalibrationFactor)
 		fields = append(fields, field)
 	}
 	if m.CalibrationDivisor != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.CalibrationDivisor
+		field.Value = proto.Uint32(m.CalibrationDivisor)
 		fields = append(fields, field)
 	}
 	if m.LevelShift != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.LevelShift
+		field.Value = proto.Uint32(m.LevelShift)
 		fields = append(fields, field)
 	}
 	if m.OffsetCal != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.OffsetCal
+		field.Value = proto.Int32(m.OffsetCal)
 		fields = append(fields, field)
 	}
 	if byte(m.SensorType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SensorType)
+		field.Value = proto.Uint8(byte(m.SensorType))
 		fields = append(fields, field)
 	}
 

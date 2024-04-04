@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type DeviceAuxBatteryInfo struct {
 // NewDeviceAuxBatteryInfo creates new DeviceAuxBatteryInfo struct based on given mesg.
 // If mesg is nil, it will return DeviceAuxBatteryInfo with all fields being set to its corresponding invalid value.
 func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,11 +46,11 @@ func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
 	}
 
 	return &DeviceAuxBatteryInfo{
-		Timestamp:         datetime.ToTime(vals[253]),
-		BatteryVoltage:    typeconv.ToUint16[uint16](vals[1]),
-		DeviceIndex:       typeconv.ToUint8[typedef.DeviceIndex](vals[0]),
-		BatteryStatus:     typeconv.ToUint8[typedef.BatteryStatus](vals[2]),
-		BatteryIdentifier: typeconv.ToUint8[uint8](vals[3]),
+		Timestamp:         datetime.ToTime(vals[253].Uint32()),
+		BatteryVoltage:    vals[1].Uint16(),
+		DeviceIndex:       typedef.DeviceIndex(vals[0].Uint8()),
+		BatteryStatus:     typedef.BatteryStatus(vals[2].Uint8()),
+		BatteryIdentifier: vals[3].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,27 +74,27 @@ func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.BatteryVoltage != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.BatteryVoltage
+		field.Value = proto.Uint16(m.BatteryVoltage)
 		fields = append(fields, field)
 	}
 	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint8(m.DeviceIndex)
+		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint8(m.BatteryStatus)
+		field.Value = proto.Uint8(uint8(m.BatteryStatus))
 		fields = append(fields, field)
 	}
 	if m.BatteryIdentifier != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.BatteryIdentifier
+		field.Value = proto.Uint8(m.BatteryIdentifier)
 		fields = append(fields, field)
 	}
 

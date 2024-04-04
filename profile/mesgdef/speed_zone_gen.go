@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type SpeedZone struct {
 // NewSpeedZone creates new SpeedZone struct based on given mesg.
 // If mesg is nil, it will return SpeedZone with all fields being set to its corresponding invalid value.
 func NewSpeedZone(mesg *proto.Message) *SpeedZone {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,9 +42,9 @@ func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 	}
 
 	return &SpeedZone{
-		Name:         typeconv.ToString[string](vals[1]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		HighValue:    typeconv.ToUint16[uint16](vals[0]),
+		Name:         vals[1].String(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		HighValue:    vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,17 +68,17 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.HighValue != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.HighValue
+		field.Value = proto.Uint16(m.HighValue)
 		fields = append(fields, field)
 	}
 

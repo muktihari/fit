@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type MemoGlob struct {
 // NewMemoGlob creates new MemoGlob struct based on given mesg.
 // If mesg is nil, it will return MemoGlob with all fields being set to its corresponding invalid value.
 func NewMemoGlob(mesg *proto.Message) *MemoGlob {
-	vals := [251]any{}
+	vals := [251]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,12 +44,12 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 	}
 
 	return &MemoGlob{
-		Memo:        typeconv.ToSliceByte[byte](vals[0]),
-		Data:        typeconv.ToSliceUint8z[uint8](vals[4]),
-		PartIndex:   typeconv.ToUint32[uint32](vals[250]),
-		MesgNum:     typeconv.ToUint16[typedef.MesgNum](vals[1]),
-		ParentIndex: typeconv.ToUint16[typedef.MessageIndex](vals[2]),
-		FieldNum:    typeconv.ToUint8[uint8](vals[3]),
+		Memo:        vals[0].SliceUint8(),
+		Data:        vals[4].SliceUint8(),
+		PartIndex:   vals[250].Uint32(),
+		MesgNum:     typedef.MesgNum(vals[1].Uint16()),
+		ParentIndex: typedef.MessageIndex(vals[2].Uint16()),
+		FieldNum:    vals[3].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,32 +73,32 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 
 	if m.Memo != nil {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Memo
+		field.Value = proto.SliceUint8(m.Memo)
 		fields = append(fields, field)
 	}
-	if typeconv.ToSliceUint8z[uint8](m.Data) != nil {
+	if m.Data != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = typeconv.ToSliceUint8z[uint8](m.Data)
+		field.Value = proto.SliceUint8(m.Data)
 		fields = append(fields, field)
 	}
 	if m.PartIndex != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 250)
-		field.Value = m.PartIndex
+		field.Value = proto.Uint32(m.PartIndex)
 		fields = append(fields, field)
 	}
 	if uint16(m.MesgNum) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.MesgNum)
+		field.Value = proto.Uint16(uint16(m.MesgNum))
 		fields = append(fields, field)
 	}
 	if uint16(m.ParentIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint16(m.ParentIndex)
+		field.Value = proto.Uint16(uint16(m.ParentIndex))
 		fields = append(fields, field)
 	}
 	if m.FieldNum != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.FieldNum
+		field.Value = proto.Uint8(m.FieldNum)
 		fields = append(fields, field)
 	}
 

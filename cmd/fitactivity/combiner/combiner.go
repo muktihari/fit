@@ -33,8 +33,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		if len(f1.Messages) == 0 || len(f2.Messages) == 0 {
 			return 0
 		}
-		timeCreated1, _ := f1.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).(uint32)
-		timeCreated2, _ := f2.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).(uint32)
+		timeCreated1 := f1.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).Uint32()
+		timeCreated2 := f2.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).Uint32()
 		if timeCreated1 < timeCreated2 {
 			return -1
 		}
@@ -92,8 +92,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
 				continue // skip
 			}
-			timestamp, ok := mesg.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-			if ok && timestamp <= nextSesEndTime {
+			timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+			if timestamp != basetype.Uint32Invalid && timestamp <= nextSesEndTime {
 				lastTimestampPerFit = timestamp
 			}
 			fitResult.Messages = append(fitResult.Messages, mesg)
@@ -114,8 +114,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 	firstTimestamp := basetype.Uint32Invalid
 	for _, mesg := range fitResult.Messages {
 		if firstTimestamp == basetype.Uint32Invalid {
-			timestamp, ok := mesg.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-			if ok {
+			timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+			if timestamp != basetype.Uint32Invalid {
 				firstTimestamp = timestamp
 				break
 			}
@@ -124,8 +124,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 
 	lastTimestamp := basetype.Uint32Invalid
 	for i := len(fitResult.Messages) - 1; i > 0; i-- {
-		timestamp, ok := fitResult.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-		if ok {
+		timestamp := fitResult.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp != basetype.Uint32Invalid {
 			lastTimestamp = timestamp
 			break
 		}
@@ -137,7 +137,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 			sesMesg.Fields = append(sesMesg.Fields, factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp))
 			field = &sesMesg.Fields[len(sesMesg.Fields)-1]
 		}
-		field.Value = lastTimestamp // Update session timestamp
+		field.Value = proto.Uint32(lastTimestamp) // Update session timestamp
 		fitResult.Messages = append(fitResult.Messages, sesMesg)
 	}
 
@@ -159,8 +159,8 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		datetime.ToTime(timestampField.Value),
 	)
 
-	timestampField.Value = lastTimestamp
-	localTimestampField.Value = uint32(int64(lastTimestamp) + int64(tzOffsetHour*3600))
+	timestampField.Value = proto.Uint32(lastTimestamp)
+	localTimestampField.Value = proto.Uint32(uint32(int64(lastTimestamp) + int64(tzOffsetHour*3600)))
 
 	// Update activity.TotalTimerTime
 	timestampField = activityMesg.FieldByNum(fieldnum.ActivityTotalTimerTime)
@@ -168,7 +168,7 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime))
 		timestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
 	}
-	timestampField.Value = (lastTimestamp - firstTimestamp) * 1000 // Scale: 1000, Offset: 0
+	timestampField.Value = proto.Uint32((lastTimestamp - firstTimestamp) * 1000) // Scale: 1000, Offset: 0
 
 	// Update activity.NumSessions
 	numSessions := activityMesg.FieldByNum(fieldnum.ActivityNumSessions)
@@ -176,17 +176,17 @@ func Combine(fits ...proto.Fit) (*proto.Fit, error) {
 		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions))
 		numSessions = &activityMesg.Fields[len(activityMesg.Fields)-1]
 	}
-	numSessions.Value = uint16(len(sessionMesgs))
+	numSessions.Value = proto.Uint16(uint16(len(sessionMesgs)))
 
 	fitResult.Messages = append(fitResult.Messages, activityMesg)
 
 	slices.SortStableFunc(fitResult.Messages, func(mesg1, mesg2 proto.Message) int {
-		timestamp1, ok := mesg1.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-		if !ok {
+		timestamp1 := mesg1.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp1 != basetype.Uint32Invalid {
 			return 0
 		}
-		timestamp2, ok := mesg2.FieldValueByNum(proto.FieldNumTimestamp).(uint32)
-		if !ok {
+		timestamp2 := mesg2.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp2 != basetype.Uint32Invalid {
 			return 0
 		}
 		if timestamp1 < timestamp2 {

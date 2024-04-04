@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type MaxMetData struct {
 // NewMaxMetData creates new MaxMetData struct based on given mesg.
 // If mesg is nil, it will return MaxMetData with all fields being set to its corresponding invalid value.
 func NewMaxMetData(mesg *proto.Message) *MaxMetData {
-	vals := [14]any{}
+	vals := [14]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,14 +49,14 @@ func NewMaxMetData(mesg *proto.Message) *MaxMetData {
 	}
 
 	return &MaxMetData{
-		UpdateTime:     datetime.ToTime(vals[0]),
-		Vo2Max:         typeconv.ToUint16[uint16](vals[2]),
-		Sport:          typeconv.ToEnum[typedef.Sport](vals[5]),
-		SubSport:       typeconv.ToEnum[typedef.SubSport](vals[6]),
-		MaxMetCategory: typeconv.ToEnum[typedef.MaxMetCategory](vals[8]),
-		HrSource:       typeconv.ToEnum[typedef.MaxMetHeartRateSource](vals[12]),
-		SpeedSource:    typeconv.ToEnum[typedef.MaxMetSpeedSource](vals[13]),
-		CalibratedData: typeconv.ToBool[bool](vals[9]),
+		UpdateTime:     datetime.ToTime(vals[0].Uint32()),
+		Vo2Max:         vals[2].Uint16(),
+		Sport:          typedef.Sport(vals[5].Uint8()),
+		SubSport:       typedef.SubSport(vals[6].Uint8()),
+		MaxMetCategory: typedef.MaxMetCategory(vals[8].Uint8()),
+		HrSource:       typedef.MaxMetHeartRateSource(vals[12].Uint8()),
+		SpeedSource:    typedef.MaxMetSpeedSource(vals[13].Uint8()),
+		CalibratedData: vals[9].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,42 +80,42 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = datetime.ToUint32(m.UpdateTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.UpdateTime))
 		fields = append(fields, field)
 	}
 	if m.Vo2Max != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Vo2Max
+		field.Value = proto.Uint16(m.Vo2Max)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = byte(m.SubSport)
+		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if byte(m.MaxMetCategory) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = byte(m.MaxMetCategory)
+		field.Value = proto.Uint8(byte(m.MaxMetCategory))
 		fields = append(fields, field)
 	}
 	if byte(m.HrSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = byte(m.HrSource)
+		field.Value = proto.Uint8(byte(m.HrSource))
 		fields = append(fields, field)
 	}
 	if byte(m.SpeedSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = byte(m.SpeedSource)
+		field.Value = proto.Uint8(byte(m.SpeedSource))
 		fields = append(fields, field)
 	}
 	if m.CalibratedData != false {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.CalibratedData
+		field.Value = proto.Bool(m.CalibratedData)
 		fields = append(fields, field)
 	}
 

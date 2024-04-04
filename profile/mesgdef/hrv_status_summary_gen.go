@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type HrvStatusSummary struct {
 // NewHrvStatusSummary creates new HrvStatusSummary struct based on given mesg.
 // If mesg is nil, it will return HrvStatusSummary with all fields being set to its corresponding invalid value.
 func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,14 +49,14 @@ func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
 	}
 
 	return &HrvStatusSummary{
-		Timestamp:             datetime.ToTime(vals[253]),
-		WeeklyAverage:         typeconv.ToUint16[uint16](vals[0]),
-		LastNightAverage:      typeconv.ToUint16[uint16](vals[1]),
-		LastNight5MinHigh:     typeconv.ToUint16[uint16](vals[2]),
-		BaselineLowUpper:      typeconv.ToUint16[uint16](vals[3]),
-		BaselineBalancedLower: typeconv.ToUint16[uint16](vals[4]),
-		BaselineBalancedUpper: typeconv.ToUint16[uint16](vals[5]),
-		Status:                typeconv.ToEnum[typedef.HrvStatus](vals[6]),
+		Timestamp:             datetime.ToTime(vals[253].Uint32()),
+		WeeklyAverage:         vals[0].Uint16(),
+		LastNightAverage:      vals[1].Uint16(),
+		LastNight5MinHigh:     vals[2].Uint16(),
+		BaselineLowUpper:      vals[3].Uint16(),
+		BaselineBalancedLower: vals[4].Uint16(),
+		BaselineBalancedUpper: vals[5].Uint16(),
+		Status:                typedef.HrvStatus(vals[6].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,42 +80,42 @@ func (m *HrvStatusSummary) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.WeeklyAverage != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.WeeklyAverage
+		field.Value = proto.Uint16(m.WeeklyAverage)
 		fields = append(fields, field)
 	}
 	if m.LastNightAverage != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.LastNightAverage
+		field.Value = proto.Uint16(m.LastNightAverage)
 		fields = append(fields, field)
 	}
 	if m.LastNight5MinHigh != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.LastNight5MinHigh
+		field.Value = proto.Uint16(m.LastNight5MinHigh)
 		fields = append(fields, field)
 	}
 	if m.BaselineLowUpper != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.BaselineLowUpper
+		field.Value = proto.Uint16(m.BaselineLowUpper)
 		fields = append(fields, field)
 	}
 	if m.BaselineBalancedLower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.BaselineBalancedLower
+		field.Value = proto.Uint16(m.BaselineBalancedLower)
 		fields = append(fields, field)
 	}
 	if m.BaselineBalancedUpper != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.BaselineBalancedUpper
+		field.Value = proto.Uint16(m.BaselineBalancedUpper)
 		fields = append(fields, field)
 	}
 	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = byte(m.Status)
+		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
 	}
 

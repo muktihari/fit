@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -47,7 +46,7 @@ type Split struct {
 // NewSplit creates new Split struct based on given mesg.
 // If mesg is nil, it will return Split with all fields being set to its corresponding invalid value.
 func NewSplit(mesg *proto.Message) *Split {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -61,25 +60,25 @@ func NewSplit(mesg *proto.Message) *Split {
 	}
 
 	return &Split{
-		StartTime:         datetime.ToTime(vals[9]),
-		EndTime:           datetime.ToTime(vals[27]),
-		TotalElapsedTime:  typeconv.ToUint32[uint32](vals[1]),
-		TotalTimerTime:    typeconv.ToUint32[uint32](vals[2]),
-		TotalDistance:     typeconv.ToUint32[uint32](vals[3]),
-		AvgSpeed:          typeconv.ToUint32[uint32](vals[4]),
-		StartPositionLat:  typeconv.ToSint32[int32](vals[21]),
-		StartPositionLong: typeconv.ToSint32[int32](vals[22]),
-		EndPositionLat:    typeconv.ToSint32[int32](vals[23]),
-		EndPositionLong:   typeconv.ToSint32[int32](vals[24]),
-		MaxSpeed:          typeconv.ToUint32[uint32](vals[25]),
-		AvgVertSpeed:      typeconv.ToSint32[int32](vals[26]),
-		TotalCalories:     typeconv.ToUint32[uint32](vals[28]),
-		StartElevation:    typeconv.ToUint32[uint32](vals[74]),
-		TotalMovingTime:   typeconv.ToUint32[uint32](vals[110]),
-		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		TotalAscent:       typeconv.ToUint16[uint16](vals[13]),
-		TotalDescent:      typeconv.ToUint16[uint16](vals[14]),
-		SplitType:         typeconv.ToEnum[typedef.SplitType](vals[0]),
+		StartTime:         datetime.ToTime(vals[9].Uint32()),
+		EndTime:           datetime.ToTime(vals[27].Uint32()),
+		TotalElapsedTime:  vals[1].Uint32(),
+		TotalTimerTime:    vals[2].Uint32(),
+		TotalDistance:     vals[3].Uint32(),
+		AvgSpeed:          vals[4].Uint32(),
+		StartPositionLat:  vals[21].Int32(),
+		StartPositionLong: vals[22].Int32(),
+		EndPositionLat:    vals[23].Int32(),
+		EndPositionLong:   vals[24].Int32(),
+		MaxSpeed:          vals[25].Uint32(),
+		AvgVertSpeed:      vals[26].Int32(),
+		TotalCalories:     vals[28].Uint32(),
+		StartElevation:    vals[74].Uint32(),
+		TotalMovingTime:   vals[110].Uint32(),
+		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
+		TotalAscent:       vals[13].Uint16(),
+		TotalDescent:      vals[14].Uint16(),
+		SplitType:         typedef.SplitType(vals[0].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -103,97 +102,97 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = datetime.ToUint32(m.StartTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 27)
-		field.Value = datetime.ToUint32(m.EndTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.EndTime))
 		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.TotalElapsedTime
+		field.Value = proto.Uint32(m.TotalElapsedTime)
 		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.TotalTimerTime
+		field.Value = proto.Uint32(m.TotalTimerTime)
 		fields = append(fields, field)
 	}
 	if m.TotalDistance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.TotalDistance
+		field.Value = proto.Uint32(m.TotalDistance)
 		fields = append(fields, field)
 	}
 	if m.AvgSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.AvgSpeed
+		field.Value = proto.Uint32(m.AvgSpeed)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = m.StartPositionLat
+		field.Value = proto.Int32(m.StartPositionLat)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = m.StartPositionLong
+		field.Value = proto.Int32(m.StartPositionLong)
 		fields = append(fields, field)
 	}
 	if m.EndPositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = m.EndPositionLat
+		field.Value = proto.Int32(m.EndPositionLat)
 		fields = append(fields, field)
 	}
 	if m.EndPositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 24)
-		field.Value = m.EndPositionLong
+		field.Value = proto.Int32(m.EndPositionLong)
 		fields = append(fields, field)
 	}
 	if m.MaxSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 25)
-		field.Value = m.MaxSpeed
+		field.Value = proto.Uint32(m.MaxSpeed)
 		fields = append(fields, field)
 	}
 	if m.AvgVertSpeed != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 26)
-		field.Value = m.AvgVertSpeed
+		field.Value = proto.Int32(m.AvgVertSpeed)
 		fields = append(fields, field)
 	}
 	if m.TotalCalories != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 28)
-		field.Value = m.TotalCalories
+		field.Value = proto.Uint32(m.TotalCalories)
 		fields = append(fields, field)
 	}
 	if m.StartElevation != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 74)
-		field.Value = m.StartElevation
+		field.Value = proto.Uint32(m.StartElevation)
 		fields = append(fields, field)
 	}
 	if m.TotalMovingTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 110)
-		field.Value = m.TotalMovingTime
+		field.Value = proto.Uint32(m.TotalMovingTime)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.TotalAscent != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.TotalAscent
+		field.Value = proto.Uint16(m.TotalAscent)
 		fields = append(fields, field)
 	}
 	if m.TotalDescent != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = m.TotalDescent
+		field.Value = proto.Uint16(m.TotalDescent)
 		fields = append(fields, field)
 	}
 	if byte(m.SplitType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.SplitType)
+		field.Value = proto.Uint8(byte(m.SplitType))
 		fields = append(fields, field)
 	}
 

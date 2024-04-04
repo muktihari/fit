@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -35,7 +34,7 @@ type SegmentPoint struct {
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.
 // If mesg is nil, it will return SegmentPoint with all fields being set to its corresponding invalid value.
 func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 	isExpandedFields := [7]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -53,13 +52,13 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	}
 
 	return &SegmentPoint{
-		LeaderTime:       typeconv.ToSliceUint32[uint32](vals[5]),
-		PositionLat:      typeconv.ToSint32[int32](vals[1]),
-		PositionLong:     typeconv.ToSint32[int32](vals[2]),
-		Distance:         typeconv.ToUint32[uint32](vals[3]),
-		EnhancedAltitude: typeconv.ToUint32[uint32](vals[6]),
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Altitude:         typeconv.ToUint16[uint16](vals[4]),
+		LeaderTime:       vals[5].SliceUint32(),
+		PositionLat:      vals[1].Int32(),
+		PositionLong:     vals[2].Int32(),
+		Distance:         vals[3].Uint32(),
+		EnhancedAltitude: vals[6].Uint32(),
+		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
+		Altitude:         vals[4].Uint16(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -85,38 +84,38 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 
 	if m.LeaderTime != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.LeaderTime
+		field.Value = proto.SliceUint32(m.LeaderTime)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.PositionLat
+		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.PositionLong
+		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Distance
+		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.EnhancedAltitude
+		field.Value = proto.Uint32(m.EnhancedAltitude)
 		field.IsExpandedField = m.IsExpandedFields[6]
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Altitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Altitude
+		field.Value = proto.Uint16(m.Altitude)
 		fields = append(fields, field)
 	}
 

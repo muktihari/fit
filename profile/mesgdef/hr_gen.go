@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type Hr struct {
 // NewHr creates new Hr struct based on given mesg.
 // If mesg is nil, it will return Hr with all fields being set to its corresponding invalid value.
 func NewHr(mesg *proto.Message) *Hr {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 	isExpandedFields := [10]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -54,12 +53,12 @@ func NewHr(mesg *proto.Message) *Hr {
 	}
 
 	return &Hr{
-		Timestamp:           datetime.ToTime(vals[253]),
-		FilteredBpm:         typeconv.ToSliceUint8[uint8](vals[6]),
-		EventTimestamp:      typeconv.ToSliceUint32[uint32](vals[9]),
-		EventTimestamp12:    typeconv.ToSliceByte[byte](vals[10]),
-		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
-		Time256:             typeconv.ToUint8[uint8](vals[1]),
+		Timestamp:           datetime.ToTime(vals[253].Uint32()),
+		FilteredBpm:         vals[6].SliceUint8(),
+		EventTimestamp:      vals[9].SliceUint32(),
+		EventTimestamp12:    vals[10].SliceUint8(),
+		FractionalTimestamp: vals[0].Uint16(),
+		Time256:             vals[1].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -85,34 +84,34 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.FilteredBpm != nil {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.FilteredBpm
+		field.Value = proto.SliceUint8(m.FilteredBpm)
 		fields = append(fields, field)
 	}
 	if m.EventTimestamp != nil && ((m.IsExpandedFields[9] && options.IncludeExpandedFields) || !m.IsExpandedFields[9]) {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.EventTimestamp
+		field.Value = proto.SliceUint32(m.EventTimestamp)
 		field.IsExpandedField = m.IsExpandedFields[9]
 		fields = append(fields, field)
 	}
 	if m.EventTimestamp12 != nil {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.EventTimestamp12
+		field.Value = proto.SliceUint8(m.EventTimestamp12)
 		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid && ((m.IsExpandedFields[0] && options.IncludeExpandedFields) || !m.IsExpandedFields[0]) {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FractionalTimestamp
+		field.Value = proto.Uint16(m.FractionalTimestamp)
 		field.IsExpandedField = m.IsExpandedFields[0]
 		fields = append(fields, field)
 	}
 	if m.Time256 != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Time256
+		field.Value = proto.Uint8(m.Time256)
 		fields = append(fields, field)
 	}
 

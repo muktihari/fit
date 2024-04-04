@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type GyroscopeData struct {
 // NewGyroscopeData creates new GyroscopeData struct based on given mesg.
 // If mesg is nil, it will return GyroscopeData with all fields being set to its corresponding invalid value.
 func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,15 +49,15 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 	}
 
 	return &GyroscopeData{
-		Timestamp:        datetime.ToTime(vals[253]),
-		SampleTimeOffset: typeconv.ToSliceUint16[uint16](vals[1]),
-		GyroX:            typeconv.ToSliceUint16[uint16](vals[2]),
-		GyroY:            typeconv.ToSliceUint16[uint16](vals[3]),
-		GyroZ:            typeconv.ToSliceUint16[uint16](vals[4]),
-		CalibratedGyroX:  typeconv.ToSliceFloat32[float32](vals[5]),
-		CalibratedGyroY:  typeconv.ToSliceFloat32[float32](vals[6]),
-		CalibratedGyroZ:  typeconv.ToSliceFloat32[float32](vals[7]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		SampleTimeOffset: vals[1].SliceUint16(),
+		GyroX:            vals[2].SliceUint16(),
+		GyroY:            vals[3].SliceUint16(),
+		GyroZ:            vals[4].SliceUint16(),
+		CalibratedGyroX:  vals[5].SliceFloat32(),
+		CalibratedGyroY:  vals[6].SliceFloat32(),
+		CalibratedGyroZ:  vals[7].SliceFloat32(),
+		TimestampMs:      vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,47 +81,47 @@ func (m *GyroscopeData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.SampleTimeOffset
+		field.Value = proto.SliceUint16(m.SampleTimeOffset)
 		fields = append(fields, field)
 	}
 	if m.GyroX != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.GyroX
+		field.Value = proto.SliceUint16(m.GyroX)
 		fields = append(fields, field)
 	}
 	if m.GyroY != nil {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.GyroY
+		field.Value = proto.SliceUint16(m.GyroY)
 		fields = append(fields, field)
 	}
 	if m.GyroZ != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.GyroZ
+		field.Value = proto.SliceUint16(m.GyroZ)
 		fields = append(fields, field)
 	}
 	if m.CalibratedGyroX != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.CalibratedGyroX
+		field.Value = proto.SliceFloat32(m.CalibratedGyroX)
 		fields = append(fields, field)
 	}
 	if m.CalibratedGyroY != nil {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.CalibratedGyroY
+		field.Value = proto.SliceFloat32(m.CalibratedGyroY)
 		fields = append(fields, field)
 	}
 	if m.CalibratedGyroZ != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.CalibratedGyroZ
+		field.Value = proto.SliceFloat32(m.CalibratedGyroZ)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 

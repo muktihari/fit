@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -28,7 +27,7 @@ type Sport struct {
 // NewSport creates new Sport struct based on given mesg.
 // If mesg is nil, it will return Sport with all fields being set to its corresponding invalid value.
 func NewSport(mesg *proto.Message) *Sport {
-	vals := [4]any{}
+	vals := [4]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -42,9 +41,9 @@ func NewSport(mesg *proto.Message) *Sport {
 	}
 
 	return &Sport{
-		Name:     typeconv.ToString[string](vals[3]),
-		Sport:    typeconv.ToEnum[typedef.Sport](vals[0]),
-		SubSport: typeconv.ToEnum[typedef.SubSport](vals[1]),
+		Name:     vals[3].String(),
+		Sport:    typedef.Sport(vals[0].Uint8()),
+		SubSport: typedef.SubSport(vals[1].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,17 +67,17 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.SubSport)
+		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 

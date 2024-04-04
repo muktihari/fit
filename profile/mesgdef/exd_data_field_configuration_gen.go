@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type ExdDataFieldConfiguration struct {
 // NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdDataFieldConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguration {
-	vals := [6]any{}
+	vals := [6]proto.Value{}
 	isExpandedFields := [4]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -51,12 +50,12 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 	}
 
 	return &ExdDataFieldConfiguration{
-		Title:        typeconv.ToSliceString[string](vals[5]),
-		ScreenIndex:  typeconv.ToUint8[uint8](vals[0]),
-		ConceptField: typeconv.ToByte[byte](vals[1]),
-		FieldId:      typeconv.ToUint8[uint8](vals[2]),
-		ConceptCount: typeconv.ToUint8[uint8](vals[3]),
-		DisplayType:  typeconv.ToEnum[typedef.ExdDisplayType](vals[4]),
+		Title:        vals[5].SliceString(),
+		ScreenIndex:  vals[0].Uint8(),
+		ConceptField: vals[1].Uint8(),
+		FieldId:      vals[2].Uint8(),
+		ConceptCount: vals[3].Uint8(),
+		DisplayType:  typedef.ExdDisplayType(vals[4].Uint8()),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -82,34 +81,34 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 
 	if m.Title != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.Title
+		field.Value = proto.SliceString(m.Title)
 		fields = append(fields, field)
 	}
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ScreenIndex
+		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.ConceptField != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ConceptField
+		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
 	if m.FieldId != basetype.Uint8Invalid && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.FieldId
+		field.Value = proto.Uint8(m.FieldId)
 		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
 	if m.ConceptCount != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ConceptCount
+		field.Value = proto.Uint8(m.ConceptCount)
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if byte(m.DisplayType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.DisplayType)
+		field.Value = proto.Uint8(byte(m.DisplayType))
 		fields = append(fields, field)
 	}
 

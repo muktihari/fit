@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -35,7 +34,7 @@ type TimestampCorrelation struct {
 // NewTimestampCorrelation creates new TimestampCorrelation struct based on given mesg.
 // If mesg is nil, it will return TimestampCorrelation with all fields being set to its corresponding invalid value.
 func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -49,13 +48,13 @@ func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 	}
 
 	return &TimestampCorrelation{
-		Timestamp:                 datetime.ToTime(vals[253]),
-		SystemTimestamp:           datetime.ToTime(vals[1]),
-		LocalTimestamp:            datetime.ToTime(vals[3]),
-		FractionalTimestamp:       typeconv.ToUint16[uint16](vals[0]),
-		FractionalSystemTimestamp: typeconv.ToUint16[uint16](vals[2]),
-		TimestampMs:               typeconv.ToUint16[uint16](vals[4]),
-		SystemTimestampMs:         typeconv.ToUint16[uint16](vals[5]),
+		Timestamp:                 datetime.ToTime(vals[253].Uint32()),
+		SystemTimestamp:           datetime.ToTime(vals[1].Uint32()),
+		LocalTimestamp:            datetime.ToTime(vals[3].Uint32()),
+		FractionalTimestamp:       vals[0].Uint16(),
+		FractionalSystemTimestamp: vals[2].Uint16(),
+		TimestampMs:               vals[4].Uint16(),
+		SystemTimestampMs:         vals[5].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -79,37 +78,37 @@ func (m *TimestampCorrelation) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.SystemTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = datetime.ToUint32(m.SystemTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.SystemTimestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = datetime.ToUint32(m.LocalTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
 		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FractionalTimestamp
+		field.Value = proto.Uint16(m.FractionalTimestamp)
 		fields = append(fields, field)
 	}
 	if m.FractionalSystemTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.FractionalSystemTimestamp
+		field.Value = proto.Uint16(m.FractionalSystemTimestamp)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SystemTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.SystemTimestampMs
+		field.Value = proto.Uint16(m.SystemTimestampMs)
 		fields = append(fields, field)
 	}
 

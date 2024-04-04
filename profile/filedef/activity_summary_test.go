@@ -5,7 +5,6 @@
 package filedef_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -50,6 +49,26 @@ func newActivitySummaryMessageForTest(now time.Time) []proto.Message {
 	}
 }
 
+func isMessageOrdered(in, out []proto.Message, t *testing.T) bool {
+	var ordered = true
+	for i := range in {
+		if in[i].Num != out[i].Num {
+			ordered = false
+			t.Logf("mesg order[%d]: expected: %s, got: %s", i, out[i].Num, in[i].Num)
+			continue
+		}
+		for j := range in[i].Fields {
+			num1 := in[i].Fields[j].Num
+			num2 := out[i].Fields[j].Num
+			if num1 != num2 {
+				ordered = false
+				t.Logf("field order[%d][%d]: expected: %d, got: %d", i, j, num1, num2)
+			}
+		}
+	}
+	return ordered
+}
+
 func TestActivitySummaryCorrectness(t *testing.T) {
 	mesgs := newActivitySummaryMessageForTest(time.Now())
 
@@ -64,13 +83,11 @@ func TestActivitySummaryCorrectness(t *testing.T) {
 	sortFields(mesgs)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
-		fmt.Println("messages order:")
-		for i := range fit.Messages {
-			mesg := fit.Messages[i]
-			fmt.Printf("%d: %s\n", mesg.Num, mesg.Num)
-		}
-		fmt.Println("")
+	if !isMessageOrdered(mesgs, fit.Messages, t) {
+		t.Fatalf("messages order mismatch")
+	}
+
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		t.Fatal(diff)
 	}
 }

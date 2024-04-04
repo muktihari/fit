@@ -64,15 +64,15 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 			var n byte
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field != nil {
+				if field.FieldBase != nil {
 					n++
 				}
 			}
 			fields := make([]proto.Field, 0, n)
 			for j := range rawmesg.Fields {
 				field := rawmesg.Fields[j]
-				if field != nil {
-					fields = append(fields, *field)
+				if field.FieldBase != nil {
+					fields = append(fields, field)
 				}
 			}
 			protoMesgs[rawmesg.Num] = proto.Message{
@@ -107,8 +107,8 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
 		field := mesgs[mesgNum].Fields[num]
-		if field != nil {
-			return *field
+		if field.FieldBase != nil {
+			return field
 		}
 		return createUnknownField(num)
 	}
@@ -149,7 +149,7 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 
 type message struct {
 	Num    typedef.MesgNum
-	Fields [256]*proto.Field // Use array to ensure O(1) lookup, use pointer to reduce memory usage.
+	Fields [256]proto.Field // Use array to ensure O(1) lookup, use pointer to reduce memory usage.
 }
 
 // Use array to ensure O(1) lookup

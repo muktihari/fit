@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type OhrSettings struct {
 // NewOhrSettings creates new OhrSettings struct based on given mesg.
 // If mesg is nil, it will return OhrSettings with all fields being set to its corresponding invalid value.
 func NewOhrSettings(mesg *proto.Message) *OhrSettings {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,8 +42,8 @@ func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 	}
 
 	return &OhrSettings{
-		Timestamp: datetime.ToTime(vals[253]),
-		Enabled:   typeconv.ToEnum[typedef.Switch](vals[0]),
+		Timestamp: datetime.ToTime(vals[253].Uint32()),
+		Enabled:   typedef.Switch(vals[0].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,12 +67,12 @@ func (m *OhrSettings) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if byte(m.Enabled) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Enabled)
+		field.Value = proto.Uint8(byte(m.Enabled))
 		fields = append(fields, field)
 	}
 

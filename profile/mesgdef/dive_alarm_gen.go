@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"unsafe"
 )
 
 // DiveAlarm is a DiveAlarm message.
@@ -39,7 +39,7 @@ type DiveAlarm struct {
 // NewDiveAlarm creates new DiveAlarm struct based on given mesg.
 // If mesg is nil, it will return DiveAlarm with all fields being set to its corresponding invalid value.
 func NewDiveAlarm(mesg *proto.Message) *DiveAlarm {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -53,19 +53,23 @@ func NewDiveAlarm(mesg *proto.Message) *DiveAlarm {
 	}
 
 	return &DiveAlarm{
-		DiveTypes:        typeconv.ToSliceEnum[typedef.SubSport](vals[5]),
-		Depth:            typeconv.ToUint32[uint32](vals[0]),
-		Time:             typeconv.ToSint32[int32](vals[1]),
-		Id:               typeconv.ToUint32[uint32](vals[6]),
-		Speed:            typeconv.ToSint32[int32](vals[11]),
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		AlarmType:        typeconv.ToEnum[typedef.DiveAlarmType](vals[3]),
-		Sound:            typeconv.ToEnum[typedef.Tone](vals[4]),
-		Enabled:          typeconv.ToBool[bool](vals[2]),
-		PopupEnabled:     typeconv.ToBool[bool](vals[7]),
-		TriggerOnDescent: typeconv.ToBool[bool](vals[8]),
-		TriggerOnAscent:  typeconv.ToBool[bool](vals[9]),
-		Repeating:        typeconv.ToBool[bool](vals[10]),
+		DiveTypes: func() []typedef.SubSport {
+			sliceValue := vals[5].SliceUint8()
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*typedef.SubSport)(ptr), len(sliceValue))
+		}(),
+		Depth:            vals[0].Uint32(),
+		Time:             vals[1].Int32(),
+		Id:               vals[6].Uint32(),
+		Speed:            vals[11].Int32(),
+		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
+		AlarmType:        typedef.DiveAlarmType(vals[3].Uint8()),
+		Sound:            typedef.Tone(vals[4].Uint8()),
+		Enabled:          vals[2].Bool(),
+		PopupEnabled:     vals[7].Bool(),
+		TriggerOnDescent: vals[8].Bool(),
+		TriggerOnAscent:  vals[9].Bool(),
+		Repeating:        vals[10].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -87,69 +91,69 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
 	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveAlarm)
 
-	if typeconv.ToSliceEnum[byte](m.DiveTypes) != nil {
+	if m.DiveTypes != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = typeconv.ToSliceEnum[byte](m.DiveTypes)
+		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.DiveTypes)), len(m.DiveTypes)))
 		fields = append(fields, field)
 	}
 	if m.Depth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Depth
+		field.Value = proto.Uint32(m.Depth)
 		fields = append(fields, field)
 	}
 	if m.Time != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Time
+		field.Value = proto.Int32(m.Time)
 		fields = append(fields, field)
 	}
 	if m.Id != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.Id
+		field.Value = proto.Uint32(m.Id)
 		fields = append(fields, field)
 	}
 	if m.Speed != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.Speed
+		field.Value = proto.Int32(m.Speed)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.AlarmType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = byte(m.AlarmType)
+		field.Value = proto.Uint8(byte(m.AlarmType))
 		fields = append(fields, field)
 	}
 	if byte(m.Sound) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.Sound)
+		field.Value = proto.Uint8(byte(m.Sound))
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Enabled
+		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if m.PopupEnabled != false {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.PopupEnabled
+		field.Value = proto.Bool(m.PopupEnabled)
 		fields = append(fields, field)
 	}
 	if m.TriggerOnDescent != false {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.TriggerOnDescent
+		field.Value = proto.Bool(m.TriggerOnDescent)
 		fields = append(fields, field)
 	}
 	if m.TriggerOnAscent != false {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.TriggerOnAscent
+		field.Value = proto.Bool(m.TriggerOnAscent)
 		fields = append(fields, field)
 	}
 	if m.Repeating != false {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.Repeating
+		field.Value = proto.Bool(m.Repeating)
 		fields = append(fields, field)
 	}
 

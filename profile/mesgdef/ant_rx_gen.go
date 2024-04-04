@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type AntRx struct {
 // NewAntRx creates new AntRx struct based on given mesg.
 // If mesg is nil, it will return AntRx with all fields being set to its corresponding invalid value.
 func NewAntRx(mesg *proto.Message) *AntRx {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 	isExpandedFields := [5]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -54,12 +53,12 @@ func NewAntRx(mesg *proto.Message) *AntRx {
 	}
 
 	return &AntRx{
-		Timestamp:           datetime.ToTime(vals[253]),
-		MesgData:            typeconv.ToSliceByte[byte](vals[2]),
-		Data:                typeconv.ToSliceByte[byte](vals[4]),
-		FractionalTimestamp: typeconv.ToUint16[uint16](vals[0]),
-		MesgId:              typeconv.ToByte[byte](vals[1]),
-		ChannelNumber:       typeconv.ToUint8[uint8](vals[3]),
+		Timestamp:           datetime.ToTime(vals[253].Uint32()),
+		MesgData:            vals[2].SliceUint8(),
+		Data:                vals[4].SliceUint8(),
+		FractionalTimestamp: vals[0].Uint16(),
+		MesgId:              vals[1].Uint8(),
+		ChannelNumber:       vals[3].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -85,33 +84,33 @@ func (m *AntRx) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.MesgData != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.MesgData
+		field.Value = proto.SliceUint8(m.MesgData)
 		fields = append(fields, field)
 	}
 	if m.Data != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Data
+		field.Value = proto.SliceUint8(m.Data)
 		field.IsExpandedField = m.IsExpandedFields[4]
 		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.FractionalTimestamp
+		field.Value = proto.Uint16(m.FractionalTimestamp)
 		fields = append(fields, field)
 	}
 	if m.MesgId != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.MesgId
+		field.Value = proto.Uint8(m.MesgId)
 		fields = append(fields, field)
 	}
 	if m.ChannelNumber != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ChannelNumber
+		field.Value = proto.Uint8(m.ChannelNumber)
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}

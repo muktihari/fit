@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -49,7 +48,7 @@ type Event struct {
 // NewEvent creates new Event struct based on given mesg.
 // If mesg is nil, it will return Event with all fields being set to its corresponding invalid value.
 func NewEvent(mesg *proto.Message) *Event {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 	isExpandedFields := [25]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -67,25 +66,25 @@ func NewEvent(mesg *proto.Message) *Event {
 	}
 
 	return &Event{
-		Timestamp:                   datetime.ToTime(vals[253]),
-		StartTimestamp:              datetime.ToTime(vals[15]),
-		Data:                        typeconv.ToUint32[uint32](vals[3]),
-		Data16:                      typeconv.ToUint16[uint16](vals[2]),
-		Score:                       typeconv.ToUint16[uint16](vals[7]),
-		OpponentScore:               typeconv.ToUint16[uint16](vals[8]),
-		Event:                       typeconv.ToEnum[typedef.Event](vals[0]),
-		EventType:                   typeconv.ToEnum[typedef.EventType](vals[1]),
-		EventGroup:                  typeconv.ToUint8[uint8](vals[4]),
-		FrontGearNum:                typeconv.ToUint8z[uint8](vals[9]),
-		FrontGear:                   typeconv.ToUint8z[uint8](vals[10]),
-		RearGearNum:                 typeconv.ToUint8z[uint8](vals[11]),
-		RearGear:                    typeconv.ToUint8z[uint8](vals[12]),
-		DeviceIndex:                 typeconv.ToUint8[typedef.DeviceIndex](vals[13]),
-		ActivityType:                typeconv.ToEnum[typedef.ActivityType](vals[14]),
-		RadarThreatLevelMax:         typeconv.ToEnum[typedef.RadarThreatLevelType](vals[21]),
-		RadarThreatCount:            typeconv.ToUint8[uint8](vals[22]),
-		RadarThreatAvgApproachSpeed: typeconv.ToUint8[uint8](vals[23]),
-		RadarThreatMaxApproachSpeed: typeconv.ToUint8[uint8](vals[24]),
+		Timestamp:                   datetime.ToTime(vals[253].Uint32()),
+		StartTimestamp:              datetime.ToTime(vals[15].Uint32()),
+		Data:                        vals[3].Uint32(),
+		Data16:                      vals[2].Uint16(),
+		Score:                       vals[7].Uint16(),
+		OpponentScore:               vals[8].Uint16(),
+		Event:                       typedef.Event(vals[0].Uint8()),
+		EventType:                   typedef.EventType(vals[1].Uint8()),
+		EventGroup:                  vals[4].Uint8(),
+		FrontGearNum:                vals[9].Uint8z(),
+		FrontGear:                   vals[10].Uint8z(),
+		RearGearNum:                 vals[11].Uint8z(),
+		RearGear:                    vals[12].Uint8z(),
+		DeviceIndex:                 typedef.DeviceIndex(vals[13].Uint8()),
+		ActivityType:                typedef.ActivityType(vals[14].Uint8()),
+		RadarThreatLevelMax:         typedef.RadarThreatLevelType(vals[21].Uint8()),
+		RadarThreatCount:            vals[22].Uint8(),
+		RadarThreatAvgApproachSpeed: vals[23].Uint8(),
+		RadarThreatMaxApproachSpeed: vals[24].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -111,107 +110,107 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 15)
-		field.Value = datetime.ToUint32(m.StartTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
 		fields = append(fields, field)
 	}
 	if m.Data != basetype.Uint32Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Data
+		field.Value = proto.Uint32(m.Data)
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.Data16 != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Data16
+		field.Value = proto.Uint16(m.Data16)
 		fields = append(fields, field)
 	}
 	if m.Score != basetype.Uint16Invalid && ((m.IsExpandedFields[7] && options.IncludeExpandedFields) || !m.IsExpandedFields[7]) {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.Score
+		field.Value = proto.Uint16(m.Score)
 		field.IsExpandedField = m.IsExpandedFields[7]
 		fields = append(fields, field)
 	}
 	if m.OpponentScore != basetype.Uint16Invalid && ((m.IsExpandedFields[8] && options.IncludeExpandedFields) || !m.IsExpandedFields[8]) {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.OpponentScore
+		field.Value = proto.Uint16(m.OpponentScore)
 		field.IsExpandedField = m.IsExpandedFields[8]
 		fields = append(fields, field)
 	}
 	if byte(m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Event)
+		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
 	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.EventType)
+		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.EventGroup
+		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
 	if uint8(m.FrontGearNum) != basetype.Uint8zInvalid && ((m.IsExpandedFields[9] && options.IncludeExpandedFields) || !m.IsExpandedFields[9]) {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = uint8(m.FrontGearNum)
+		field.Value = proto.Uint8(m.FrontGearNum)
 		field.IsExpandedField = m.IsExpandedFields[9]
 		fields = append(fields, field)
 	}
 	if uint8(m.FrontGear) != basetype.Uint8zInvalid && ((m.IsExpandedFields[10] && options.IncludeExpandedFields) || !m.IsExpandedFields[10]) {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = uint8(m.FrontGear)
+		field.Value = proto.Uint8(m.FrontGear)
 		field.IsExpandedField = m.IsExpandedFields[10]
 		fields = append(fields, field)
 	}
 	if uint8(m.RearGearNum) != basetype.Uint8zInvalid && ((m.IsExpandedFields[11] && options.IncludeExpandedFields) || !m.IsExpandedFields[11]) {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = uint8(m.RearGearNum)
+		field.Value = proto.Uint8(m.RearGearNum)
 		field.IsExpandedField = m.IsExpandedFields[11]
 		fields = append(fields, field)
 	}
 	if uint8(m.RearGear) != basetype.Uint8zInvalid && ((m.IsExpandedFields[12] && options.IncludeExpandedFields) || !m.IsExpandedFields[12]) {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = uint8(m.RearGear)
+		field.Value = proto.Uint8(m.RearGear)
 		field.IsExpandedField = m.IsExpandedFields[12]
 		fields = append(fields, field)
 	}
 	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = uint8(m.DeviceIndex)
+		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = byte(m.ActivityType)
+		field.Value = proto.Uint8(byte(m.ActivityType))
 		fields = append(fields, field)
 	}
 	if byte(m.RadarThreatLevelMax) != basetype.EnumInvalid && ((m.IsExpandedFields[21] && options.IncludeExpandedFields) || !m.IsExpandedFields[21]) {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = byte(m.RadarThreatLevelMax)
+		field.Value = proto.Uint8(byte(m.RadarThreatLevelMax))
 		field.IsExpandedField = m.IsExpandedFields[21]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatCount != basetype.Uint8Invalid && ((m.IsExpandedFields[22] && options.IncludeExpandedFields) || !m.IsExpandedFields[22]) {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = m.RadarThreatCount
+		field.Value = proto.Uint8(m.RadarThreatCount)
 		field.IsExpandedField = m.IsExpandedFields[22]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatAvgApproachSpeed != basetype.Uint8Invalid && ((m.IsExpandedFields[23] && options.IncludeExpandedFields) || !m.IsExpandedFields[23]) {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = m.RadarThreatAvgApproachSpeed
+		field.Value = proto.Uint8(m.RadarThreatAvgApproachSpeed)
 		field.IsExpandedField = m.IsExpandedFields[23]
 		fields = append(fields, field)
 	}
 	if m.RadarThreatMaxApproachSpeed != basetype.Uint8Invalid && ((m.IsExpandedFields[24] && options.IncludeExpandedFields) || !m.IsExpandedFields[24]) {
 		field := fac.CreateField(mesg.Num, 24)
-		field.Value = m.RadarThreatMaxApproachSpeed
+		field.Value = proto.Uint8(m.RadarThreatMaxApproachSpeed)
 		field.IsExpandedField = m.IsExpandedFields[24]
 		fields = append(fields, field)
 	}

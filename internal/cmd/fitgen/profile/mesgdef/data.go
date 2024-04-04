@@ -23,6 +23,7 @@ type Field struct {
 	Type            string
 	TypedValue      string
 	PrimitiveValue  string
+	ProtoValue      string
 	ComparableValue string
 	InvalidValue    string
 	Comment         string

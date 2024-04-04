@@ -6,7 +6,6 @@ package concealer
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -40,13 +39,13 @@ loop:
 				sessionIndex = i
 			}
 		case mesgnum.Record:
-			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
-				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
+			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32() == basetype.Sint32Invalid ||
+				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32() == basetype.Sint32Invalid {
 				continue loop
 			}
 
-			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
-			if !ok {
+			distance := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).Uint32()
+			if distance != basetype.Uint32Invalid {
 				continue loop
 			}
 			if distance > concealDistance {
@@ -76,12 +75,10 @@ loop:
 		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
 	} else {
 		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
-		for i := newStartRecordIndex; i < len(fit.Messages); i++ { // find new start record that has lat and long
-			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
-			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
-			if lat != nil && long != nil {
-				newLat = typeconv.ToSint32[int32](lat)
-				newLong = typeconv.ToSint32[int32](lat)
+		for i := newStartRecordIndex; i < len(fit.Messages); i++ { // find new start record that has newLat and long
+			newLat = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32()
+			newLong = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32()
+			if newLat != basetype.Sint32Invalid && newLong != basetype.Sint32Invalid {
 				break
 			}
 		}
@@ -94,7 +91,7 @@ loop:
 			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
 			fieldStartPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
-		fieldStartPositionLat.Value = newLat
+		fieldStartPositionLat.Value = proto.Int32(newLat)
 
 		fieldStartPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionStartPositionLong)
 		if fieldStartPositionLong == nil {
@@ -104,7 +101,7 @@ loop:
 			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
 			fieldStartPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
-		fieldStartPositionLong.Value = newLong
+		fieldStartPositionLong.Value = proto.Int32(newLong)
 	}
 
 	return nil
@@ -129,12 +126,12 @@ loop:
 				sessionIndex = i
 			}
 		case mesgnum.Record:
-			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat) == nil ||
-				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong) == nil {
+			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32() == basetype.Sint32Invalid ||
+				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32() == basetype.Sint32Invalid {
 				continue loop
 			}
-			distance, ok := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).(uint32)
-			if !ok {
+			distance := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).Uint32()
+			if distance != basetype.Uint32Invalid {
 				continue loop
 			}
 
@@ -169,12 +166,10 @@ loop:
 		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
 	} else {
 		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
-		for i := newEndRecordIndex; i > 0; i++ { // find new end record that has lat and long
-			lat := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat)
-			long := fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong)
-			if lat != nil && long != nil {
-				newLat = typeconv.ToSint32[int32](lat)
-				newLong = typeconv.ToSint32[int32](lat)
+		for i := newEndRecordIndex; i > 0; i++ { // find new end record that has newLat and long
+			newLat = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32()
+			newLong = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32()
+			if newLat != basetype.Sint32Invalid && newLong != basetype.Sint32Invalid {
 				break
 			}
 		}
@@ -187,7 +182,7 @@ loop:
 			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
 			fieldEndPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
-		fieldEndPositionLat.Value = newLat
+		fieldEndPositionLat.Value = proto.Int32(newLat)
 
 		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
 		if fieldEndPositionLong == nil {
@@ -197,7 +192,7 @@ loop:
 			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
 			fieldEndPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
 		}
-		fieldEndPositionLong.Value = newLong
+		fieldEndPositionLong.Value = proto.Int32(newLong)
 	}
 
 	return nil

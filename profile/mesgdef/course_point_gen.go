@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type CoursePoint struct {
 // NewCoursePoint creates new CoursePoint struct based on given mesg.
 // If mesg is nil, it will return CoursePoint with all fields being set to its corresponding invalid value.
 func NewCoursePoint(mesg *proto.Message) *CoursePoint {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,14 +49,14 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 	}
 
 	return &CoursePoint{
-		Timestamp:    datetime.ToTime(vals[1]),
-		Name:         typeconv.ToString[string](vals[6]),
-		PositionLat:  typeconv.ToSint32[int32](vals[2]),
-		PositionLong: typeconv.ToSint32[int32](vals[3]),
-		Distance:     typeconv.ToUint32[uint32](vals[4]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Type:         typeconv.ToEnum[typedef.CoursePoint](vals[5]),
-		Favorite:     typeconv.ToBool[bool](vals[8]),
+		Timestamp:    datetime.ToTime(vals[1].Uint32()),
+		Name:         vals[6].String(),
+		PositionLat:  vals[2].Int32(),
+		PositionLong: vals[3].Int32(),
+		Distance:     vals[4].Uint32(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		Type:         typedef.CoursePoint(vals[5].Uint8()),
+		Favorite:     vals[8].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,42 +80,42 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.PositionLat
+		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.PositionLong
+		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Distance
+		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if m.Favorite != false {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.Favorite
+		field.Value = proto.Bool(m.Favorite)
 		fields = append(fields, field)
 	}
 

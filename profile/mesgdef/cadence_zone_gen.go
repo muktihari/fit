@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -28,7 +27,7 @@ type CadenceZone struct {
 // NewCadenceZone creates new CadenceZone struct based on given mesg.
 // If mesg is nil, it will return CadenceZone with all fields being set to its corresponding invalid value.
 func NewCadenceZone(mesg *proto.Message) *CadenceZone {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -42,9 +41,9 @@ func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 	}
 
 	return &CadenceZone{
-		Name:         typeconv.ToString[string](vals[1]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		HighValue:    typeconv.ToUint8[uint8](vals[0]),
+		Name:         vals[1].String(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		HighValue:    vals[0].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,17 +67,17 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.HighValue != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.HighValue
+		field.Value = proto.Uint8(m.HighValue)
 		fields = append(fields, field)
 	}
 

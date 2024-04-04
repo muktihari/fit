@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -32,7 +31,7 @@ type HsaBodyBatteryData struct {
 // NewHsaBodyBatteryData creates new HsaBodyBatteryData struct based on given mesg.
 // If mesg is nil, it will return HsaBodyBatteryData with all fields being set to its corresponding invalid value.
 func NewHsaBodyBatteryData(mesg *proto.Message) *HsaBodyBatteryData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -46,11 +45,11 @@ func NewHsaBodyBatteryData(mesg *proto.Message) *HsaBodyBatteryData {
 	}
 
 	return &HsaBodyBatteryData{
-		Timestamp:          datetime.ToTime(vals[253]),
-		Level:              typeconv.ToSliceSint8[int8](vals[1]),
-		Charged:            typeconv.ToSliceSint16[int16](vals[2]),
-		Uncharged:          typeconv.ToSliceSint16[int16](vals[3]),
-		ProcessingInterval: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		Level:              vals[1].SliceInt8(),
+		Charged:            vals[2].SliceInt16(),
+		Uncharged:          vals[3].SliceInt16(),
+		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,27 +73,27 @@ func (m *HsaBodyBatteryData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Level != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Level
+		field.Value = proto.SliceInt8(m.Level)
 		fields = append(fields, field)
 	}
 	if m.Charged != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Charged
+		field.Value = proto.SliceInt16(m.Charged)
 		fields = append(fields, field)
 	}
 	if m.Uncharged != nil {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Uncharged
+		field.Value = proto.SliceInt16(m.Uncharged)
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ProcessingInterval
+		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 

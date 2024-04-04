@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type RespirationRate struct {
 // NewRespirationRate creates new RespirationRate struct based on given mesg.
 // If mesg is nil, it will return RespirationRate with all fields being set to its corresponding invalid value.
 func NewRespirationRate(mesg *proto.Message) *RespirationRate {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,8 +43,8 @@ func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 	}
 
 	return &RespirationRate{
-		Timestamp:       datetime.ToTime(vals[253]),
-		RespirationRate: typeconv.ToSint16[int16](vals[0]),
+		Timestamp:       datetime.ToTime(vals[253].Uint32()),
+		RespirationRate: vals[0].Int16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,12 +68,12 @@ func (m *RespirationRate) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.RespirationRate != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.RespirationRate
+		field.Value = proto.Int16(m.RespirationRate)
 		fields = append(fields, field)
 	}
 

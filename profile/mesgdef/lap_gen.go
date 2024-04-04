@@ -10,10 +10,10 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -153,7 +153,7 @@ type Lap struct {
 // NewLap creates new Lap struct based on given mesg.
 // If mesg is nil, it will return Lap with all fields being set to its corresponding invalid value.
 func NewLap(mesg *proto.Message) *Lap {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 	isExpandedFields := [138]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -171,129 +171,129 @@ func NewLap(mesg *proto.Message) *Lap {
 	}
 
 	return &Lap{
-		Timestamp:                     datetime.ToTime(vals[253]),
-		StartTime:                     datetime.ToTime(vals[2]),
-		TimeInHrZone:                  typeconv.ToSliceUint32[uint32](vals[57]),
-		TimeInSpeedZone:               typeconv.ToSliceUint32[uint32](vals[58]),
-		TimeInCadenceZone:             typeconv.ToSliceUint32[uint32](vals[59]),
-		TimeInPowerZone:               typeconv.ToSliceUint32[uint32](vals[60]),
-		StrokeCount:                   typeconv.ToSliceUint16[uint16](vals[75]),
-		ZoneCount:                     typeconv.ToSliceUint16[uint16](vals[76]),
-		AvgTotalHemoglobinConc:        typeconv.ToSliceUint16[uint16](vals[84]),
-		MinTotalHemoglobinConc:        typeconv.ToSliceUint16[uint16](vals[85]),
-		MaxTotalHemoglobinConc:        typeconv.ToSliceUint16[uint16](vals[86]),
-		AvgSaturatedHemoglobinPercent: typeconv.ToSliceUint16[uint16](vals[87]),
-		MinSaturatedHemoglobinPercent: typeconv.ToSliceUint16[uint16](vals[88]),
-		MaxSaturatedHemoglobinPercent: typeconv.ToSliceUint16[uint16](vals[89]),
-		AvgLeftPowerPhase:             typeconv.ToSliceUint8[uint8](vals[102]),
-		AvgLeftPowerPhasePeak:         typeconv.ToSliceUint8[uint8](vals[103]),
-		AvgRightPowerPhase:            typeconv.ToSliceUint8[uint8](vals[104]),
-		AvgRightPowerPhasePeak:        typeconv.ToSliceUint8[uint8](vals[105]),
-		AvgPowerPosition:              typeconv.ToSliceUint16[uint16](vals[106]),
-		MaxPowerPosition:              typeconv.ToSliceUint16[uint16](vals[107]),
-		AvgCadencePosition:            typeconv.ToSliceUint8[uint8](vals[108]),
-		MaxCadencePosition:            typeconv.ToSliceUint8[uint8](vals[109]),
-		StartPositionLat:              typeconv.ToSint32[int32](vals[3]),
-		StartPositionLong:             typeconv.ToSint32[int32](vals[4]),
-		EndPositionLat:                typeconv.ToSint32[int32](vals[5]),
-		EndPositionLong:               typeconv.ToSint32[int32](vals[6]),
-		TotalElapsedTime:              typeconv.ToUint32[uint32](vals[7]),
-		TotalTimerTime:                typeconv.ToUint32[uint32](vals[8]),
-		TotalDistance:                 typeconv.ToUint32[uint32](vals[9]),
-		TotalCycles:                   typeconv.ToUint32[uint32](vals[10]),
-		TotalWork:                     typeconv.ToUint32[uint32](vals[41]),
-		TotalMovingTime:               typeconv.ToUint32[uint32](vals[52]),
-		TimeStanding:                  typeconv.ToUint32[uint32](vals[98]),
-		EnhancedAvgSpeed:              typeconv.ToUint32[uint32](vals[110]),
-		EnhancedMaxSpeed:              typeconv.ToUint32[uint32](vals[111]),
-		EnhancedAvgAltitude:           typeconv.ToUint32[uint32](vals[112]),
-		EnhancedMinAltitude:           typeconv.ToUint32[uint32](vals[113]),
-		EnhancedMaxAltitude:           typeconv.ToUint32[uint32](vals[114]),
-		AvgDepth:                      typeconv.ToUint32[uint32](vals[122]),
-		MaxDepth:                      typeconv.ToUint32[uint32](vals[123]),
-		TotalGrit:                     typeconv.ToFloat32[float32](vals[149]),
-		TotalFlow:                     typeconv.ToFloat32[float32](vals[150]),
-		AvgGrit:                       typeconv.ToFloat32[float32](vals[153]),
-		AvgFlow:                       typeconv.ToFloat32[float32](vals[154]),
-		MessageIndex:                  typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		TotalCalories:                 typeconv.ToUint16[uint16](vals[11]),
-		TotalFatCalories:              typeconv.ToUint16[uint16](vals[12]),
-		AvgSpeed:                      typeconv.ToUint16[uint16](vals[13]),
-		MaxSpeed:                      typeconv.ToUint16[uint16](vals[14]),
-		AvgPower:                      typeconv.ToUint16[uint16](vals[19]),
-		MaxPower:                      typeconv.ToUint16[uint16](vals[20]),
-		TotalAscent:                   typeconv.ToUint16[uint16](vals[21]),
-		TotalDescent:                  typeconv.ToUint16[uint16](vals[22]),
-		NumLengths:                    typeconv.ToUint16[uint16](vals[32]),
-		NormalizedPower:               typeconv.ToUint16[uint16](vals[33]),
-		LeftRightBalance:              typeconv.ToUint16[typedef.LeftRightBalance100](vals[34]),
-		FirstLengthIndex:              typeconv.ToUint16[uint16](vals[35]),
-		AvgStrokeDistance:             typeconv.ToUint16[uint16](vals[37]),
-		NumActiveLengths:              typeconv.ToUint16[uint16](vals[40]),
-		AvgAltitude:                   typeconv.ToUint16[uint16](vals[42]),
-		MaxAltitude:                   typeconv.ToUint16[uint16](vals[43]),
-		AvgGrade:                      typeconv.ToSint16[int16](vals[45]),
-		AvgPosGrade:                   typeconv.ToSint16[int16](vals[46]),
-		AvgNegGrade:                   typeconv.ToSint16[int16](vals[47]),
-		MaxPosGrade:                   typeconv.ToSint16[int16](vals[48]),
-		MaxNegGrade:                   typeconv.ToSint16[int16](vals[49]),
-		AvgPosVerticalSpeed:           typeconv.ToSint16[int16](vals[53]),
-		AvgNegVerticalSpeed:           typeconv.ToSint16[int16](vals[54]),
-		MaxPosVerticalSpeed:           typeconv.ToSint16[int16](vals[55]),
-		MaxNegVerticalSpeed:           typeconv.ToSint16[int16](vals[56]),
-		RepetitionNum:                 typeconv.ToUint16[uint16](vals[61]),
-		MinAltitude:                   typeconv.ToUint16[uint16](vals[62]),
-		WktStepIndex:                  typeconv.ToUint16[typedef.MessageIndex](vals[71]),
-		OpponentScore:                 typeconv.ToUint16[uint16](vals[74]),
-		AvgVerticalOscillation:        typeconv.ToUint16[uint16](vals[77]),
-		AvgStanceTimePercent:          typeconv.ToUint16[uint16](vals[78]),
-		AvgStanceTime:                 typeconv.ToUint16[uint16](vals[79]),
-		PlayerScore:                   typeconv.ToUint16[uint16](vals[83]),
-		StandCount:                    typeconv.ToUint16[uint16](vals[99]),
-		AvgLevMotorPower:              typeconv.ToUint16[uint16](vals[115]),
-		MaxLevMotorPower:              typeconv.ToUint16[uint16](vals[116]),
-		AvgVerticalRatio:              typeconv.ToUint16[uint16](vals[118]),
-		AvgStanceTimeBalance:          typeconv.ToUint16[uint16](vals[119]),
-		AvgStepLength:                 typeconv.ToUint16[uint16](vals[120]),
-		AvgVam:                        typeconv.ToUint16[uint16](vals[121]),
-		EnhancedAvgRespirationRate:    typeconv.ToUint16[uint16](vals[136]),
-		EnhancedMaxRespirationRate:    typeconv.ToUint16[uint16](vals[137]),
-		JumpCount:                     typeconv.ToUint16[uint16](vals[151]),
-		AvgCoreTemperature:            typeconv.ToUint16[uint16](vals[158]),
-		MinCoreTemperature:            typeconv.ToUint16[uint16](vals[159]),
-		MaxCoreTemperature:            typeconv.ToUint16[uint16](vals[160]),
-		Event:                         typeconv.ToEnum[typedef.Event](vals[0]),
-		EventType:                     typeconv.ToEnum[typedef.EventType](vals[1]),
-		AvgHeartRate:                  typeconv.ToUint8[uint8](vals[15]),
-		MaxHeartRate:                  typeconv.ToUint8[uint8](vals[16]),
-		AvgCadence:                    typeconv.ToUint8[uint8](vals[17]),
-		MaxCadence:                    typeconv.ToUint8[uint8](vals[18]),
-		Intensity:                     typeconv.ToEnum[typedef.Intensity](vals[23]),
-		LapTrigger:                    typeconv.ToEnum[typedef.LapTrigger](vals[24]),
-		Sport:                         typeconv.ToEnum[typedef.Sport](vals[25]),
-		EventGroup:                    typeconv.ToUint8[uint8](vals[26]),
-		SwimStroke:                    typeconv.ToEnum[typedef.SwimStroke](vals[38]),
-		SubSport:                      typeconv.ToEnum[typedef.SubSport](vals[39]),
-		GpsAccuracy:                   typeconv.ToUint8[uint8](vals[44]),
-		AvgTemperature:                typeconv.ToSint8[int8](vals[50]),
-		MaxTemperature:                typeconv.ToSint8[int8](vals[51]),
-		MinHeartRate:                  typeconv.ToUint8[uint8](vals[63]),
-		AvgFractionalCadence:          typeconv.ToUint8[uint8](vals[80]),
-		MaxFractionalCadence:          typeconv.ToUint8[uint8](vals[81]),
-		TotalFractionalCycles:         typeconv.ToUint8[uint8](vals[82]),
-		AvgLeftTorqueEffectiveness:    typeconv.ToUint8[uint8](vals[91]),
-		AvgRightTorqueEffectiveness:   typeconv.ToUint8[uint8](vals[92]),
-		AvgLeftPedalSmoothness:        typeconv.ToUint8[uint8](vals[93]),
-		AvgRightPedalSmoothness:       typeconv.ToUint8[uint8](vals[94]),
-		AvgCombinedPedalSmoothness:    typeconv.ToUint8[uint8](vals[95]),
-		AvgLeftPco:                    typeconv.ToSint8[int8](vals[100]),
-		AvgRightPco:                   typeconv.ToSint8[int8](vals[101]),
-		LevBatteryConsumption:         typeconv.ToUint8[uint8](vals[117]),
-		MinTemperature:                typeconv.ToSint8[int8](vals[124]),
-		AvgRespirationRate:            typeconv.ToUint8[uint8](vals[147]),
-		MaxRespirationRate:            typeconv.ToUint8[uint8](vals[148]),
-		TotalFractionalAscent:         typeconv.ToUint8[uint8](vals[156]),
-		TotalFractionalDescent:        typeconv.ToUint8[uint8](vals[157]),
+		Timestamp:                     datetime.ToTime(vals[253].Uint32()),
+		StartTime:                     datetime.ToTime(vals[2].Uint32()),
+		TimeInHrZone:                  vals[57].SliceUint32(),
+		TimeInSpeedZone:               vals[58].SliceUint32(),
+		TimeInCadenceZone:             vals[59].SliceUint32(),
+		TimeInPowerZone:               vals[60].SliceUint32(),
+		StrokeCount:                   vals[75].SliceUint16(),
+		ZoneCount:                     vals[76].SliceUint16(),
+		AvgTotalHemoglobinConc:        vals[84].SliceUint16(),
+		MinTotalHemoglobinConc:        vals[85].SliceUint16(),
+		MaxTotalHemoglobinConc:        vals[86].SliceUint16(),
+		AvgSaturatedHemoglobinPercent: vals[87].SliceUint16(),
+		MinSaturatedHemoglobinPercent: vals[88].SliceUint16(),
+		MaxSaturatedHemoglobinPercent: vals[89].SliceUint16(),
+		AvgLeftPowerPhase:             vals[102].SliceUint8(),
+		AvgLeftPowerPhasePeak:         vals[103].SliceUint8(),
+		AvgRightPowerPhase:            vals[104].SliceUint8(),
+		AvgRightPowerPhasePeak:        vals[105].SliceUint8(),
+		AvgPowerPosition:              vals[106].SliceUint16(),
+		MaxPowerPosition:              vals[107].SliceUint16(),
+		AvgCadencePosition:            vals[108].SliceUint8(),
+		MaxCadencePosition:            vals[109].SliceUint8(),
+		StartPositionLat:              vals[3].Int32(),
+		StartPositionLong:             vals[4].Int32(),
+		EndPositionLat:                vals[5].Int32(),
+		EndPositionLong:               vals[6].Int32(),
+		TotalElapsedTime:              vals[7].Uint32(),
+		TotalTimerTime:                vals[8].Uint32(),
+		TotalDistance:                 vals[9].Uint32(),
+		TotalCycles:                   vals[10].Uint32(),
+		TotalWork:                     vals[41].Uint32(),
+		TotalMovingTime:               vals[52].Uint32(),
+		TimeStanding:                  vals[98].Uint32(),
+		EnhancedAvgSpeed:              vals[110].Uint32(),
+		EnhancedMaxSpeed:              vals[111].Uint32(),
+		EnhancedAvgAltitude:           vals[112].Uint32(),
+		EnhancedMinAltitude:           vals[113].Uint32(),
+		EnhancedMaxAltitude:           vals[114].Uint32(),
+		AvgDepth:                      vals[122].Uint32(),
+		MaxDepth:                      vals[123].Uint32(),
+		TotalGrit:                     vals[149].Float32(),
+		TotalFlow:                     vals[150].Float32(),
+		AvgGrit:                       vals[153].Float32(),
+		AvgFlow:                       vals[154].Float32(),
+		MessageIndex:                  typedef.MessageIndex(vals[254].Uint16()),
+		TotalCalories:                 vals[11].Uint16(),
+		TotalFatCalories:              vals[12].Uint16(),
+		AvgSpeed:                      vals[13].Uint16(),
+		MaxSpeed:                      vals[14].Uint16(),
+		AvgPower:                      vals[19].Uint16(),
+		MaxPower:                      vals[20].Uint16(),
+		TotalAscent:                   vals[21].Uint16(),
+		TotalDescent:                  vals[22].Uint16(),
+		NumLengths:                    vals[32].Uint16(),
+		NormalizedPower:               vals[33].Uint16(),
+		LeftRightBalance:              typedef.LeftRightBalance100(vals[34].Uint16()),
+		FirstLengthIndex:              vals[35].Uint16(),
+		AvgStrokeDistance:             vals[37].Uint16(),
+		NumActiveLengths:              vals[40].Uint16(),
+		AvgAltitude:                   vals[42].Uint16(),
+		MaxAltitude:                   vals[43].Uint16(),
+		AvgGrade:                      vals[45].Int16(),
+		AvgPosGrade:                   vals[46].Int16(),
+		AvgNegGrade:                   vals[47].Int16(),
+		MaxPosGrade:                   vals[48].Int16(),
+		MaxNegGrade:                   vals[49].Int16(),
+		AvgPosVerticalSpeed:           vals[53].Int16(),
+		AvgNegVerticalSpeed:           vals[54].Int16(),
+		MaxPosVerticalSpeed:           vals[55].Int16(),
+		MaxNegVerticalSpeed:           vals[56].Int16(),
+		RepetitionNum:                 vals[61].Uint16(),
+		MinAltitude:                   vals[62].Uint16(),
+		WktStepIndex:                  typedef.MessageIndex(vals[71].Uint16()),
+		OpponentScore:                 vals[74].Uint16(),
+		AvgVerticalOscillation:        vals[77].Uint16(),
+		AvgStanceTimePercent:          vals[78].Uint16(),
+		AvgStanceTime:                 vals[79].Uint16(),
+		PlayerScore:                   vals[83].Uint16(),
+		StandCount:                    vals[99].Uint16(),
+		AvgLevMotorPower:              vals[115].Uint16(),
+		MaxLevMotorPower:              vals[116].Uint16(),
+		AvgVerticalRatio:              vals[118].Uint16(),
+		AvgStanceTimeBalance:          vals[119].Uint16(),
+		AvgStepLength:                 vals[120].Uint16(),
+		AvgVam:                        vals[121].Uint16(),
+		EnhancedAvgRespirationRate:    vals[136].Uint16(),
+		EnhancedMaxRespirationRate:    vals[137].Uint16(),
+		JumpCount:                     vals[151].Uint16(),
+		AvgCoreTemperature:            vals[158].Uint16(),
+		MinCoreTemperature:            vals[159].Uint16(),
+		MaxCoreTemperature:            vals[160].Uint16(),
+		Event:                         typedef.Event(vals[0].Uint8()),
+		EventType:                     typedef.EventType(vals[1].Uint8()),
+		AvgHeartRate:                  vals[15].Uint8(),
+		MaxHeartRate:                  vals[16].Uint8(),
+		AvgCadence:                    vals[17].Uint8(),
+		MaxCadence:                    vals[18].Uint8(),
+		Intensity:                     typedef.Intensity(vals[23].Uint8()),
+		LapTrigger:                    typedef.LapTrigger(vals[24].Uint8()),
+		Sport:                         typedef.Sport(vals[25].Uint8()),
+		EventGroup:                    vals[26].Uint8(),
+		SwimStroke:                    typedef.SwimStroke(vals[38].Uint8()),
+		SubSport:                      typedef.SubSport(vals[39].Uint8()),
+		GpsAccuracy:                   vals[44].Uint8(),
+		AvgTemperature:                vals[50].Int8(),
+		MaxTemperature:                vals[51].Int8(),
+		MinHeartRate:                  vals[63].Uint8(),
+		AvgFractionalCadence:          vals[80].Uint8(),
+		MaxFractionalCadence:          vals[81].Uint8(),
+		TotalFractionalCycles:         vals[82].Uint8(),
+		AvgLeftTorqueEffectiveness:    vals[91].Uint8(),
+		AvgRightTorqueEffectiveness:   vals[92].Uint8(),
+		AvgLeftPedalSmoothness:        vals[93].Uint8(),
+		AvgRightPedalSmoothness:       vals[94].Uint8(),
+		AvgCombinedPedalSmoothness:    vals[95].Uint8(),
+		AvgLeftPco:                    vals[100].Int8(),
+		AvgRightPco:                   vals[101].Int8(),
+		LevBatteryConsumption:         vals[117].Uint8(),
+		MinTemperature:                vals[124].Int8(),
+		AvgRespirationRate:            vals[147].Uint8(),
+		MaxRespirationRate:            vals[148].Uint8(),
+		TotalFractionalAscent:         vals[156].Uint8(),
+		TotalFractionalDescent:        vals[157].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -319,624 +319,624 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = datetime.ToUint32(m.StartTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
 		fields = append(fields, field)
 	}
 	if m.TimeInHrZone != nil {
 		field := fac.CreateField(mesg.Num, 57)
-		field.Value = m.TimeInHrZone
+		field.Value = proto.SliceUint32(m.TimeInHrZone)
 		fields = append(fields, field)
 	}
 	if m.TimeInSpeedZone != nil {
 		field := fac.CreateField(mesg.Num, 58)
-		field.Value = m.TimeInSpeedZone
+		field.Value = proto.SliceUint32(m.TimeInSpeedZone)
 		fields = append(fields, field)
 	}
 	if m.TimeInCadenceZone != nil {
 		field := fac.CreateField(mesg.Num, 59)
-		field.Value = m.TimeInCadenceZone
+		field.Value = proto.SliceUint32(m.TimeInCadenceZone)
 		fields = append(fields, field)
 	}
 	if m.TimeInPowerZone != nil {
 		field := fac.CreateField(mesg.Num, 60)
-		field.Value = m.TimeInPowerZone
+		field.Value = proto.SliceUint32(m.TimeInPowerZone)
 		fields = append(fields, field)
 	}
 	if m.StrokeCount != nil {
 		field := fac.CreateField(mesg.Num, 75)
-		field.Value = m.StrokeCount
+		field.Value = proto.SliceUint16(m.StrokeCount)
 		fields = append(fields, field)
 	}
 	if m.ZoneCount != nil {
 		field := fac.CreateField(mesg.Num, 76)
-		field.Value = m.ZoneCount
+		field.Value = proto.SliceUint16(m.ZoneCount)
 		fields = append(fields, field)
 	}
 	if m.AvgTotalHemoglobinConc != nil {
 		field := fac.CreateField(mesg.Num, 84)
-		field.Value = m.AvgTotalHemoglobinConc
+		field.Value = proto.SliceUint16(m.AvgTotalHemoglobinConc)
 		fields = append(fields, field)
 	}
 	if m.MinTotalHemoglobinConc != nil {
 		field := fac.CreateField(mesg.Num, 85)
-		field.Value = m.MinTotalHemoglobinConc
+		field.Value = proto.SliceUint16(m.MinTotalHemoglobinConc)
 		fields = append(fields, field)
 	}
 	if m.MaxTotalHemoglobinConc != nil {
 		field := fac.CreateField(mesg.Num, 86)
-		field.Value = m.MaxTotalHemoglobinConc
+		field.Value = proto.SliceUint16(m.MaxTotalHemoglobinConc)
 		fields = append(fields, field)
 	}
 	if m.AvgSaturatedHemoglobinPercent != nil {
 		field := fac.CreateField(mesg.Num, 87)
-		field.Value = m.AvgSaturatedHemoglobinPercent
+		field.Value = proto.SliceUint16(m.AvgSaturatedHemoglobinPercent)
 		fields = append(fields, field)
 	}
 	if m.MinSaturatedHemoglobinPercent != nil {
 		field := fac.CreateField(mesg.Num, 88)
-		field.Value = m.MinSaturatedHemoglobinPercent
+		field.Value = proto.SliceUint16(m.MinSaturatedHemoglobinPercent)
 		fields = append(fields, field)
 	}
 	if m.MaxSaturatedHemoglobinPercent != nil {
 		field := fac.CreateField(mesg.Num, 89)
-		field.Value = m.MaxSaturatedHemoglobinPercent
+		field.Value = proto.SliceUint16(m.MaxSaturatedHemoglobinPercent)
 		fields = append(fields, field)
 	}
 	if m.AvgLeftPowerPhase != nil {
 		field := fac.CreateField(mesg.Num, 102)
-		field.Value = m.AvgLeftPowerPhase
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
 		fields = append(fields, field)
 	}
 	if m.AvgLeftPowerPhasePeak != nil {
 		field := fac.CreateField(mesg.Num, 103)
-		field.Value = m.AvgLeftPowerPhasePeak
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
 		fields = append(fields, field)
 	}
 	if m.AvgRightPowerPhase != nil {
 		field := fac.CreateField(mesg.Num, 104)
-		field.Value = m.AvgRightPowerPhase
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
 		fields = append(fields, field)
 	}
 	if m.AvgRightPowerPhasePeak != nil {
 		field := fac.CreateField(mesg.Num, 105)
-		field.Value = m.AvgRightPowerPhasePeak
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
 		fields = append(fields, field)
 	}
 	if m.AvgPowerPosition != nil {
 		field := fac.CreateField(mesg.Num, 106)
-		field.Value = m.AvgPowerPosition
+		field.Value = proto.SliceUint16(m.AvgPowerPosition)
 		fields = append(fields, field)
 	}
 	if m.MaxPowerPosition != nil {
 		field := fac.CreateField(mesg.Num, 107)
-		field.Value = m.MaxPowerPosition
+		field.Value = proto.SliceUint16(m.MaxPowerPosition)
 		fields = append(fields, field)
 	}
 	if m.AvgCadencePosition != nil {
 		field := fac.CreateField(mesg.Num, 108)
-		field.Value = m.AvgCadencePosition
+		field.Value = proto.SliceUint8(m.AvgCadencePosition)
 		fields = append(fields, field)
 	}
 	if m.MaxCadencePosition != nil {
 		field := fac.CreateField(mesg.Num, 109)
-		field.Value = m.MaxCadencePosition
+		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.StartPositionLat
+		field.Value = proto.Int32(m.StartPositionLat)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.StartPositionLong
+		field.Value = proto.Int32(m.StartPositionLong)
 		fields = append(fields, field)
 	}
 	if m.EndPositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.EndPositionLat
+		field.Value = proto.Int32(m.EndPositionLat)
 		fields = append(fields, field)
 	}
 	if m.EndPositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.EndPositionLong
+		field.Value = proto.Int32(m.EndPositionLong)
 		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.TotalElapsedTime
+		field.Value = proto.Uint32(m.TotalElapsedTime)
 		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.TotalTimerTime
+		field.Value = proto.Uint32(m.TotalTimerTime)
 		fields = append(fields, field)
 	}
 	if m.TotalDistance != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.TotalDistance
+		field.Value = proto.Uint32(m.TotalDistance)
 		fields = append(fields, field)
 	}
 	if m.TotalCycles != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.TotalCycles
+		field.Value = proto.Uint32(m.TotalCycles)
 		fields = append(fields, field)
 	}
 	if m.TotalWork != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 41)
-		field.Value = m.TotalWork
+		field.Value = proto.Uint32(m.TotalWork)
 		fields = append(fields, field)
 	}
 	if m.TotalMovingTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 52)
-		field.Value = m.TotalMovingTime
+		field.Value = proto.Uint32(m.TotalMovingTime)
 		fields = append(fields, field)
 	}
 	if m.TimeStanding != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 98)
-		field.Value = m.TimeStanding
+		field.Value = proto.Uint32(m.TimeStanding)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAvgSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[110] && options.IncludeExpandedFields) || !m.IsExpandedFields[110]) {
 		field := fac.CreateField(mesg.Num, 110)
-		field.Value = m.EnhancedAvgSpeed
+		field.Value = proto.Uint32(m.EnhancedAvgSpeed)
 		field.IsExpandedField = m.IsExpandedFields[110]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[111] && options.IncludeExpandedFields) || !m.IsExpandedFields[111]) {
 		field := fac.CreateField(mesg.Num, 111)
-		field.Value = m.EnhancedMaxSpeed
+		field.Value = proto.Uint32(m.EnhancedMaxSpeed)
 		field.IsExpandedField = m.IsExpandedFields[111]
 		fields = append(fields, field)
 	}
 	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[112] && options.IncludeExpandedFields) || !m.IsExpandedFields[112]) {
 		field := fac.CreateField(mesg.Num, 112)
-		field.Value = m.EnhancedAvgAltitude
+		field.Value = proto.Uint32(m.EnhancedAvgAltitude)
 		field.IsExpandedField = m.IsExpandedFields[112]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[113] && options.IncludeExpandedFields) || !m.IsExpandedFields[113]) {
 		field := fac.CreateField(mesg.Num, 113)
-		field.Value = m.EnhancedMinAltitude
+		field.Value = proto.Uint32(m.EnhancedMinAltitude)
 		field.IsExpandedField = m.IsExpandedFields[113]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[114] && options.IncludeExpandedFields) || !m.IsExpandedFields[114]) {
 		field := fac.CreateField(mesg.Num, 114)
-		field.Value = m.EnhancedMaxAltitude
+		field.Value = proto.Uint32(m.EnhancedMaxAltitude)
 		field.IsExpandedField = m.IsExpandedFields[114]
 		fields = append(fields, field)
 	}
 	if m.AvgDepth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 122)
-		field.Value = m.AvgDepth
+		field.Value = proto.Uint32(m.AvgDepth)
 		fields = append(fields, field)
 	}
 	if m.MaxDepth != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 123)
-		field.Value = m.MaxDepth
+		field.Value = proto.Uint32(m.MaxDepth)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.TotalGrit) != basetype.Uint32Invalid {
+	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 149)
-		field.Value = m.TotalGrit
+		field.Value = proto.Float32(m.TotalGrit)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.TotalFlow) != basetype.Uint32Invalid {
+	if math.Float32bits(m.TotalFlow) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 150)
-		field.Value = m.TotalFlow
+		field.Value = proto.Float32(m.TotalFlow)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.AvgGrit) != basetype.Uint32Invalid {
+	if math.Float32bits(m.AvgGrit) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 153)
-		field.Value = m.AvgGrit
+		field.Value = proto.Float32(m.AvgGrit)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.AvgFlow) != basetype.Uint32Invalid {
+	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 154)
-		field.Value = m.AvgFlow
+		field.Value = proto.Float32(m.AvgFlow)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.TotalCalories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.TotalCalories
+		field.Value = proto.Uint16(m.TotalCalories)
 		fields = append(fields, field)
 	}
 	if m.TotalFatCalories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = m.TotalFatCalories
+		field.Value = proto.Uint16(m.TotalFatCalories)
 		fields = append(fields, field)
 	}
 	if m.AvgSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 13)
-		field.Value = m.AvgSpeed
+		field.Value = proto.Uint16(m.AvgSpeed)
 		fields = append(fields, field)
 	}
 	if m.MaxSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
-		field.Value = m.MaxSpeed
+		field.Value = proto.Uint16(m.MaxSpeed)
 		fields = append(fields, field)
 	}
 	if m.AvgPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 19)
-		field.Value = m.AvgPower
+		field.Value = proto.Uint16(m.AvgPower)
 		fields = append(fields, field)
 	}
 	if m.MaxPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 20)
-		field.Value = m.MaxPower
+		field.Value = proto.Uint16(m.MaxPower)
 		fields = append(fields, field)
 	}
 	if m.TotalAscent != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 21)
-		field.Value = m.TotalAscent
+		field.Value = proto.Uint16(m.TotalAscent)
 		fields = append(fields, field)
 	}
 	if m.TotalDescent != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 22)
-		field.Value = m.TotalDescent
+		field.Value = proto.Uint16(m.TotalDescent)
 		fields = append(fields, field)
 	}
 	if m.NumLengths != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 32)
-		field.Value = m.NumLengths
+		field.Value = proto.Uint16(m.NumLengths)
 		fields = append(fields, field)
 	}
 	if m.NormalizedPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 33)
-		field.Value = m.NormalizedPower
+		field.Value = proto.Uint16(m.NormalizedPower)
 		fields = append(fields, field)
 	}
 	if uint16(m.LeftRightBalance) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 34)
-		field.Value = uint16(m.LeftRightBalance)
+		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
 		fields = append(fields, field)
 	}
 	if m.FirstLengthIndex != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 35)
-		field.Value = m.FirstLengthIndex
+		field.Value = proto.Uint16(m.FirstLengthIndex)
 		fields = append(fields, field)
 	}
 	if m.AvgStrokeDistance != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 37)
-		field.Value = m.AvgStrokeDistance
+		field.Value = proto.Uint16(m.AvgStrokeDistance)
 		fields = append(fields, field)
 	}
 	if m.NumActiveLengths != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 40)
-		field.Value = m.NumActiveLengths
+		field.Value = proto.Uint16(m.NumActiveLengths)
 		fields = append(fields, field)
 	}
 	if m.AvgAltitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 42)
-		field.Value = m.AvgAltitude
+		field.Value = proto.Uint16(m.AvgAltitude)
 		fields = append(fields, field)
 	}
 	if m.MaxAltitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 43)
-		field.Value = m.MaxAltitude
+		field.Value = proto.Uint16(m.MaxAltitude)
 		fields = append(fields, field)
 	}
 	if m.AvgGrade != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 45)
-		field.Value = m.AvgGrade
+		field.Value = proto.Int16(m.AvgGrade)
 		fields = append(fields, field)
 	}
 	if m.AvgPosGrade != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 46)
-		field.Value = m.AvgPosGrade
+		field.Value = proto.Int16(m.AvgPosGrade)
 		fields = append(fields, field)
 	}
 	if m.AvgNegGrade != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 47)
-		field.Value = m.AvgNegGrade
+		field.Value = proto.Int16(m.AvgNegGrade)
 		fields = append(fields, field)
 	}
 	if m.MaxPosGrade != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 48)
-		field.Value = m.MaxPosGrade
+		field.Value = proto.Int16(m.MaxPosGrade)
 		fields = append(fields, field)
 	}
 	if m.MaxNegGrade != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 49)
-		field.Value = m.MaxNegGrade
+		field.Value = proto.Int16(m.MaxNegGrade)
 		fields = append(fields, field)
 	}
 	if m.AvgPosVerticalSpeed != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 53)
-		field.Value = m.AvgPosVerticalSpeed
+		field.Value = proto.Int16(m.AvgPosVerticalSpeed)
 		fields = append(fields, field)
 	}
 	if m.AvgNegVerticalSpeed != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 54)
-		field.Value = m.AvgNegVerticalSpeed
+		field.Value = proto.Int16(m.AvgNegVerticalSpeed)
 		fields = append(fields, field)
 	}
 	if m.MaxPosVerticalSpeed != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 55)
-		field.Value = m.MaxPosVerticalSpeed
+		field.Value = proto.Int16(m.MaxPosVerticalSpeed)
 		fields = append(fields, field)
 	}
 	if m.MaxNegVerticalSpeed != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 56)
-		field.Value = m.MaxNegVerticalSpeed
+		field.Value = proto.Int16(m.MaxNegVerticalSpeed)
 		fields = append(fields, field)
 	}
 	if m.RepetitionNum != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 61)
-		field.Value = m.RepetitionNum
+		field.Value = proto.Uint16(m.RepetitionNum)
 		fields = append(fields, field)
 	}
 	if m.MinAltitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 62)
-		field.Value = m.MinAltitude
+		field.Value = proto.Uint16(m.MinAltitude)
 		fields = append(fields, field)
 	}
 	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 71)
-		field.Value = uint16(m.WktStepIndex)
+		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)
 	}
 	if m.OpponentScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 74)
-		field.Value = m.OpponentScore
+		field.Value = proto.Uint16(m.OpponentScore)
 		fields = append(fields, field)
 	}
 	if m.AvgVerticalOscillation != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 77)
-		field.Value = m.AvgVerticalOscillation
+		field.Value = proto.Uint16(m.AvgVerticalOscillation)
 		fields = append(fields, field)
 	}
 	if m.AvgStanceTimePercent != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 78)
-		field.Value = m.AvgStanceTimePercent
+		field.Value = proto.Uint16(m.AvgStanceTimePercent)
 		fields = append(fields, field)
 	}
 	if m.AvgStanceTime != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 79)
-		field.Value = m.AvgStanceTime
+		field.Value = proto.Uint16(m.AvgStanceTime)
 		fields = append(fields, field)
 	}
 	if m.PlayerScore != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 83)
-		field.Value = m.PlayerScore
+		field.Value = proto.Uint16(m.PlayerScore)
 		fields = append(fields, field)
 	}
 	if m.StandCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 99)
-		field.Value = m.StandCount
+		field.Value = proto.Uint16(m.StandCount)
 		fields = append(fields, field)
 	}
 	if m.AvgLevMotorPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 115)
-		field.Value = m.AvgLevMotorPower
+		field.Value = proto.Uint16(m.AvgLevMotorPower)
 		fields = append(fields, field)
 	}
 	if m.MaxLevMotorPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 116)
-		field.Value = m.MaxLevMotorPower
+		field.Value = proto.Uint16(m.MaxLevMotorPower)
 		fields = append(fields, field)
 	}
 	if m.AvgVerticalRatio != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 118)
-		field.Value = m.AvgVerticalRatio
+		field.Value = proto.Uint16(m.AvgVerticalRatio)
 		fields = append(fields, field)
 	}
 	if m.AvgStanceTimeBalance != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 119)
-		field.Value = m.AvgStanceTimeBalance
+		field.Value = proto.Uint16(m.AvgStanceTimeBalance)
 		fields = append(fields, field)
 	}
 	if m.AvgStepLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 120)
-		field.Value = m.AvgStepLength
+		field.Value = proto.Uint16(m.AvgStepLength)
 		fields = append(fields, field)
 	}
 	if m.AvgVam != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 121)
-		field.Value = m.AvgVam
+		field.Value = proto.Uint16(m.AvgVam)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[136] && options.IncludeExpandedFields) || !m.IsExpandedFields[136]) {
 		field := fac.CreateField(mesg.Num, 136)
-		field.Value = m.EnhancedAvgRespirationRate
+		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
 		field.IsExpandedField = m.IsExpandedFields[136]
 		fields = append(fields, field)
 	}
 	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[137] && options.IncludeExpandedFields) || !m.IsExpandedFields[137]) {
 		field := fac.CreateField(mesg.Num, 137)
-		field.Value = m.EnhancedMaxRespirationRate
+		field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
 		field.IsExpandedField = m.IsExpandedFields[137]
 		fields = append(fields, field)
 	}
 	if m.JumpCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 151)
-		field.Value = m.JumpCount
+		field.Value = proto.Uint16(m.JumpCount)
 		fields = append(fields, field)
 	}
 	if m.AvgCoreTemperature != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 158)
-		field.Value = m.AvgCoreTemperature
+		field.Value = proto.Uint16(m.AvgCoreTemperature)
 		fields = append(fields, field)
 	}
 	if m.MinCoreTemperature != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 159)
-		field.Value = m.MinCoreTemperature
+		field.Value = proto.Uint16(m.MinCoreTemperature)
 		fields = append(fields, field)
 	}
 	if m.MaxCoreTemperature != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 160)
-		field.Value = m.MaxCoreTemperature
+		field.Value = proto.Uint16(m.MaxCoreTemperature)
 		fields = append(fields, field)
 	}
 	if byte(m.Event) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Event)
+		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
 	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.EventType)
+		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
 	}
 	if m.AvgHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 15)
-		field.Value = m.AvgHeartRate
+		field.Value = proto.Uint8(m.AvgHeartRate)
 		fields = append(fields, field)
 	}
 	if m.MaxHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 16)
-		field.Value = m.MaxHeartRate
+		field.Value = proto.Uint8(m.MaxHeartRate)
 		fields = append(fields, field)
 	}
 	if m.AvgCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 17)
-		field.Value = m.AvgCadence
+		field.Value = proto.Uint8(m.AvgCadence)
 		fields = append(fields, field)
 	}
 	if m.MaxCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 18)
-		field.Value = m.MaxCadence
+		field.Value = proto.Uint8(m.MaxCadence)
 		fields = append(fields, field)
 	}
 	if byte(m.Intensity) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = byte(m.Intensity)
+		field.Value = proto.Uint8(byte(m.Intensity))
 		fields = append(fields, field)
 	}
 	if byte(m.LapTrigger) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 24)
-		field.Value = byte(m.LapTrigger)
+		field.Value = proto.Uint8(byte(m.LapTrigger))
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 25)
-		field.Value = byte(m.Sport)
+		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 26)
-		field.Value = m.EventGroup
+		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
 	if byte(m.SwimStroke) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 38)
-		field.Value = byte(m.SwimStroke)
+		field.Value = proto.Uint8(byte(m.SwimStroke))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 39)
-		field.Value = byte(m.SubSport)
+		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if m.GpsAccuracy != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 44)
-		field.Value = m.GpsAccuracy
+		field.Value = proto.Uint8(m.GpsAccuracy)
 		fields = append(fields, field)
 	}
 	if m.AvgTemperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 50)
-		field.Value = m.AvgTemperature
+		field.Value = proto.Int8(m.AvgTemperature)
 		fields = append(fields, field)
 	}
 	if m.MaxTemperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 51)
-		field.Value = m.MaxTemperature
+		field.Value = proto.Int8(m.MaxTemperature)
 		fields = append(fields, field)
 	}
 	if m.MinHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 63)
-		field.Value = m.MinHeartRate
+		field.Value = proto.Uint8(m.MinHeartRate)
 		fields = append(fields, field)
 	}
 	if m.AvgFractionalCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 80)
-		field.Value = m.AvgFractionalCadence
+		field.Value = proto.Uint8(m.AvgFractionalCadence)
 		fields = append(fields, field)
 	}
 	if m.MaxFractionalCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 81)
-		field.Value = m.MaxFractionalCadence
+		field.Value = proto.Uint8(m.MaxFractionalCadence)
 		fields = append(fields, field)
 	}
 	if m.TotalFractionalCycles != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 82)
-		field.Value = m.TotalFractionalCycles
+		field.Value = proto.Uint8(m.TotalFractionalCycles)
 		fields = append(fields, field)
 	}
 	if m.AvgLeftTorqueEffectiveness != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 91)
-		field.Value = m.AvgLeftTorqueEffectiveness
+		field.Value = proto.Uint8(m.AvgLeftTorqueEffectiveness)
 		fields = append(fields, field)
 	}
 	if m.AvgRightTorqueEffectiveness != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 92)
-		field.Value = m.AvgRightTorqueEffectiveness
+		field.Value = proto.Uint8(m.AvgRightTorqueEffectiveness)
 		fields = append(fields, field)
 	}
 	if m.AvgLeftPedalSmoothness != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 93)
-		field.Value = m.AvgLeftPedalSmoothness
+		field.Value = proto.Uint8(m.AvgLeftPedalSmoothness)
 		fields = append(fields, field)
 	}
 	if m.AvgRightPedalSmoothness != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 94)
-		field.Value = m.AvgRightPedalSmoothness
+		field.Value = proto.Uint8(m.AvgRightPedalSmoothness)
 		fields = append(fields, field)
 	}
 	if m.AvgCombinedPedalSmoothness != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 95)
-		field.Value = m.AvgCombinedPedalSmoothness
+		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
 		fields = append(fields, field)
 	}
 	if m.AvgLeftPco != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 100)
-		field.Value = m.AvgLeftPco
+		field.Value = proto.Int8(m.AvgLeftPco)
 		fields = append(fields, field)
 	}
 	if m.AvgRightPco != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 101)
-		field.Value = m.AvgRightPco
+		field.Value = proto.Int8(m.AvgRightPco)
 		fields = append(fields, field)
 	}
 	if m.LevBatteryConsumption != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 117)
-		field.Value = m.LevBatteryConsumption
+		field.Value = proto.Uint8(m.LevBatteryConsumption)
 		fields = append(fields, field)
 	}
 	if m.MinTemperature != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 124)
-		field.Value = m.MinTemperature
+		field.Value = proto.Int8(m.MinTemperature)
 		fields = append(fields, field)
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 147)
-		field.Value = m.AvgRespirationRate
+		field.Value = proto.Uint8(m.AvgRespirationRate)
 		fields = append(fields, field)
 	}
 	if m.MaxRespirationRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 148)
-		field.Value = m.MaxRespirationRate
+		field.Value = proto.Uint8(m.MaxRespirationRate)
 		fields = append(fields, field)
 	}
 	if m.TotalFractionalAscent != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 156)
-		field.Value = m.TotalFractionalAscent
+		field.Value = proto.Uint8(m.TotalFractionalAscent)
 		fields = append(fields, field)
 	}
 	if m.TotalFractionalDescent != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 157)
-		field.Value = m.TotalFractionalDescent
+		field.Value = proto.Uint8(m.TotalFractionalDescent)
 		fields = append(fields, field)
 	}
 

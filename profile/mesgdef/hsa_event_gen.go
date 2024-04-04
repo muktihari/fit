@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type HsaEvent struct {
 // NewHsaEvent creates new HsaEvent struct based on given mesg.
 // If mesg is nil, it will return HsaEvent with all fields being set to its corresponding invalid value.
 func NewHsaEvent(mesg *proto.Message) *HsaEvent {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,8 +42,8 @@ func NewHsaEvent(mesg *proto.Message) *HsaEvent {
 	}
 
 	return &HsaEvent{
-		Timestamp: datetime.ToTime(vals[253]),
-		EventId:   typeconv.ToUint8[uint8](vals[0]),
+		Timestamp: datetime.ToTime(vals[253].Uint32()),
+		EventId:   vals[0].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,12 +67,12 @@ func (m *HsaEvent) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.EventId != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.EventId
+		field.Value = proto.Uint8(m.EventId)
 		fields = append(fields, field)
 	}
 

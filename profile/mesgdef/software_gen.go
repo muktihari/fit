@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type Software struct {
 // NewSoftware creates new Software struct based on given mesg.
 // If mesg is nil, it will return Software with all fields being set to its corresponding invalid value.
 func NewSoftware(mesg *proto.Message) *Software {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,9 +42,9 @@ func NewSoftware(mesg *proto.Message) *Software {
 	}
 
 	return &Software{
-		PartNumber:   typeconv.ToString[string](vals[5]),
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Version:      typeconv.ToUint16[uint16](vals[3]),
+		PartNumber:   vals[5].String(),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		Version:      vals[3].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,17 +68,17 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 
 	if m.PartNumber != basetype.StringInvalid && m.PartNumber != "" {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.PartNumber
+		field.Value = proto.String(m.PartNumber)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Version != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Version
+		field.Value = proto.Uint16(m.Version)
 		fields = append(fields, field)
 	}
 

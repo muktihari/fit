@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type VideoClip struct {
 // NewVideoClip creates new VideoClip struct based on given mesg.
 // If mesg is nil, it will return VideoClip with all fields being set to its corresponding invalid value.
 func NewVideoClip(mesg *proto.Message) *VideoClip {
-	vals := [8]any{}
+	vals := [8]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,13 +47,13 @@ func NewVideoClip(mesg *proto.Message) *VideoClip {
 	}
 
 	return &VideoClip{
-		StartTimestamp:   datetime.ToTime(vals[1]),
-		EndTimestamp:     datetime.ToTime(vals[3]),
-		ClipStart:        typeconv.ToUint32[uint32](vals[6]),
-		ClipEnd:          typeconv.ToUint32[uint32](vals[7]),
-		ClipNumber:       typeconv.ToUint16[uint16](vals[0]),
-		StartTimestampMs: typeconv.ToUint16[uint16](vals[2]),
-		EndTimestampMs:   typeconv.ToUint16[uint16](vals[4]),
+		StartTimestamp:   datetime.ToTime(vals[1].Uint32()),
+		EndTimestamp:     datetime.ToTime(vals[3].Uint32()),
+		ClipStart:        vals[6].Uint32(),
+		ClipEnd:          vals[7].Uint32(),
+		ClipNumber:       vals[0].Uint16(),
+		StartTimestampMs: vals[2].Uint16(),
+		EndTimestampMs:   vals[4].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -78,37 +77,37 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = datetime.ToUint32(m.StartTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = datetime.ToUint32(m.EndTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.EndTimestamp))
 		fields = append(fields, field)
 	}
 	if m.ClipStart != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.ClipStart
+		field.Value = proto.Uint32(m.ClipStart)
 		fields = append(fields, field)
 	}
 	if m.ClipEnd != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.ClipEnd
+		field.Value = proto.Uint32(m.ClipEnd)
 		fields = append(fields, field)
 	}
 	if m.ClipNumber != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ClipNumber
+		field.Value = proto.Uint16(m.ClipNumber)
 		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.StartTimestampMs
+		field.Value = proto.Uint16(m.StartTimestampMs)
 		fields = append(fields, field)
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.EndTimestampMs
+		field.Value = proto.Uint16(m.EndTimestampMs)
 		fields = append(fields, field)
 	}
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -38,7 +37,7 @@ type Connectivity struct {
 // NewConnectivity creates new Connectivity struct based on given mesg.
 // If mesg is nil, it will return Connectivity with all fields being set to its corresponding invalid value.
 func NewConnectivity(mesg *proto.Message) *Connectivity {
-	vals := [13]any{}
+	vals := [13]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -52,19 +51,19 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 	}
 
 	return &Connectivity{
-		Name:                        typeconv.ToString[string](vals[3]),
-		BluetoothEnabled:            typeconv.ToBool[bool](vals[0]),
-		BluetoothLeEnabled:          typeconv.ToBool[bool](vals[1]),
-		AntEnabled:                  typeconv.ToBool[bool](vals[2]),
-		LiveTrackingEnabled:         typeconv.ToBool[bool](vals[4]),
-		WeatherConditionsEnabled:    typeconv.ToBool[bool](vals[5]),
-		WeatherAlertsEnabled:        typeconv.ToBool[bool](vals[6]),
-		AutoActivityUploadEnabled:   typeconv.ToBool[bool](vals[7]),
-		CourseDownloadEnabled:       typeconv.ToBool[bool](vals[8]),
-		WorkoutDownloadEnabled:      typeconv.ToBool[bool](vals[9]),
-		GpsEphemerisDownloadEnabled: typeconv.ToBool[bool](vals[10]),
-		IncidentDetectionEnabled:    typeconv.ToBool[bool](vals[11]),
-		GrouptrackEnabled:           typeconv.ToBool[bool](vals[12]),
+		Name:                        vals[3].String(),
+		BluetoothEnabled:            vals[0].Bool(),
+		BluetoothLeEnabled:          vals[1].Bool(),
+		AntEnabled:                  vals[2].Bool(),
+		LiveTrackingEnabled:         vals[4].Bool(),
+		WeatherConditionsEnabled:    vals[5].Bool(),
+		WeatherAlertsEnabled:        vals[6].Bool(),
+		AutoActivityUploadEnabled:   vals[7].Bool(),
+		CourseDownloadEnabled:       vals[8].Bool(),
+		WorkoutDownloadEnabled:      vals[9].Bool(),
+		GpsEphemerisDownloadEnabled: vals[10].Bool(),
+		IncidentDetectionEnabled:    vals[11].Bool(),
+		GrouptrackEnabled:           vals[12].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -88,67 +87,67 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.BluetoothEnabled != false {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.BluetoothEnabled
+		field.Value = proto.Bool(m.BluetoothEnabled)
 		fields = append(fields, field)
 	}
 	if m.BluetoothLeEnabled != false {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.BluetoothLeEnabled
+		field.Value = proto.Bool(m.BluetoothLeEnabled)
 		fields = append(fields, field)
 	}
 	if m.AntEnabled != false {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.AntEnabled
+		field.Value = proto.Bool(m.AntEnabled)
 		fields = append(fields, field)
 	}
 	if m.LiveTrackingEnabled != false {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.LiveTrackingEnabled
+		field.Value = proto.Bool(m.LiveTrackingEnabled)
 		fields = append(fields, field)
 	}
 	if m.WeatherConditionsEnabled != false {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.WeatherConditionsEnabled
+		field.Value = proto.Bool(m.WeatherConditionsEnabled)
 		fields = append(fields, field)
 	}
 	if m.WeatherAlertsEnabled != false {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.WeatherAlertsEnabled
+		field.Value = proto.Bool(m.WeatherAlertsEnabled)
 		fields = append(fields, field)
 	}
 	if m.AutoActivityUploadEnabled != false {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.AutoActivityUploadEnabled
+		field.Value = proto.Bool(m.AutoActivityUploadEnabled)
 		fields = append(fields, field)
 	}
 	if m.CourseDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.CourseDownloadEnabled
+		field.Value = proto.Bool(m.CourseDownloadEnabled)
 		fields = append(fields, field)
 	}
 	if m.WorkoutDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = m.WorkoutDownloadEnabled
+		field.Value = proto.Bool(m.WorkoutDownloadEnabled)
 		fields = append(fields, field)
 	}
 	if m.GpsEphemerisDownloadEnabled != false {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = m.GpsEphemerisDownloadEnabled
+		field.Value = proto.Bool(m.GpsEphemerisDownloadEnabled)
 		fields = append(fields, field)
 	}
 	if m.IncidentDetectionEnabled != false {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.IncidentDetectionEnabled
+		field.Value = proto.Bool(m.IncidentDetectionEnabled)
 		fields = append(fields, field)
 	}
 	if m.GrouptrackEnabled != false {
 		field := fac.CreateField(mesg.Num, 12)
-		field.Value = m.GrouptrackEnabled
+		field.Value = proto.Bool(m.GrouptrackEnabled)
 		fields = append(fields, field)
 	}
 

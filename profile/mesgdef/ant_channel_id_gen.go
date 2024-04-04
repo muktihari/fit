@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type AntChannelId struct {
 // NewAntChannelId creates new AntChannelId struct based on given mesg.
 // If mesg is nil, it will return AntChannelId with all fields being set to its corresponding invalid value.
 func NewAntChannelId(mesg *proto.Message) *AntChannelId {
-	vals := [5]any{}
+	vals := [5]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,11 +43,11 @@ func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 	}
 
 	return &AntChannelId{
-		DeviceNumber:     typeconv.ToUint16z[uint16](vals[2]),
-		ChannelNumber:    typeconv.ToUint8[uint8](vals[0]),
-		DeviceType:       typeconv.ToUint8z[uint8](vals[1]),
-		TransmissionType: typeconv.ToUint8z[uint8](vals[3]),
-		DeviceIndex:      typeconv.ToUint8[typedef.DeviceIndex](vals[4]),
+		DeviceNumber:     vals[2].Uint16z(),
+		ChannelNumber:    vals[0].Uint8(),
+		DeviceType:       vals[1].Uint8z(),
+		TransmissionType: vals[3].Uint8z(),
+		DeviceIndex:      typedef.DeviceIndex(vals[4].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,27 +71,27 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = uint16(m.DeviceNumber)
+		field.Value = proto.Uint16(m.DeviceNumber)
 		fields = append(fields, field)
 	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ChannelNumber
+		field.Value = proto.Uint8(m.ChannelNumber)
 		fields = append(fields, field)
 	}
 	if uint8(m.DeviceType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint8(m.DeviceType)
+		field.Value = proto.Uint8(m.DeviceType)
 		fields = append(fields, field)
 	}
 	if uint8(m.TransmissionType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = uint8(m.TransmissionType)
+		field.Value = proto.Uint8(m.TransmissionType)
 		fields = append(fields, field)
 	}
 	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = uint8(m.DeviceIndex)
+		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 

@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type HsaWristTemperatureData struct {
 // NewHsaWristTemperatureData creates new HsaWristTemperatureData struct based on given mesg.
 // If mesg is nil, it will return HsaWristTemperatureData with all fields being set to its corresponding invalid value.
 func NewHsaWristTemperatureData(mesg *proto.Message) *HsaWristTemperatureData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,9 +44,9 @@ func NewHsaWristTemperatureData(mesg *proto.Message) *HsaWristTemperatureData {
 	}
 
 	return &HsaWristTemperatureData{
-		Timestamp:          datetime.ToTime(vals[253]),
-		Value:              typeconv.ToSliceUint16[uint16](vals[1]),
-		ProcessingInterval: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		Value:              vals[1].SliceUint16(),
+		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,17 +70,17 @@ func (m *HsaWristTemperatureData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Value != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Value
+		field.Value = proto.SliceUint16(m.Value)
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ProcessingInterval
+		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 

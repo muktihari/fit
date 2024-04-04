@@ -613,7 +613,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		d.lastTimeOffset = timeOffset
 
 		timestampField := d.factory.CreateField(mesgDef.MesgNum, proto.FieldNumTimestamp)
-		timestampField.Value = d.timestamp
+		timestampField.Value = proto.Uint32(d.timestamp)
 
 		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
 	}
@@ -622,6 +622,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		return err
 	}
 
+	// mesg.Fields = append([]proto.Field{}, mesg.Fields...)
 	mesg.Fields = make([]proto.Field, len(mesg.Fields))
 	copy(mesg.Fields, d.fieldsArray[:])
 
@@ -676,13 +677,13 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		if field.Num == proto.FieldNumTimestamp {
-			timestamp, ok := val.(uint32)
-			if !ok {
+			if val.Type() != proto.TypeUint32 {
 				// This can only happen when:
 				// 1. Profile.xlsx contain typo from official release or user add manufacturer specific message but specifying wrong type.
 				// 2. User register the message in the factory but using different type.
-				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val, ErrFieldValueTypeMismatch)
+				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val.Any(), ErrFieldValueTypeMismatch)
 			}
+			timestamp := val.Uint32()
 			d.timestamp = timestamp
 			d.lastTimeOffset = byte(timestamp & proto.CompressedTimeMask)
 		}
@@ -866,18 +867,12 @@ func (d *Decoder) readByte() (byte, error) {
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
-func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (any, error) {
+func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (val proto.Value, err error) {
 	b := d.bytesArray[:size]
 	if err := d.read(b); err != nil {
-		return nil, err
+		return val, err
 	}
-
-	val, err := typedef.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
-	if err != nil {
-		return nil, err
-	}
-
-	return val, nil
+	return proto.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
 }
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type TrainingFile struct {
 // NewTrainingFile creates new TrainingFile struct based on given mesg.
 // If mesg is nil, it will return TrainingFile with all fields being set to its corresponding invalid value.
 func NewTrainingFile(mesg *proto.Message) *TrainingFile {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,12 +46,12 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 	}
 
 	return &TrainingFile{
-		Timestamp:    datetime.ToTime(vals[253]),
-		TimeCreated:  datetime.ToTime(vals[4]),
-		SerialNumber: typeconv.ToUint32z[uint32](vals[3]),
-		Manufacturer: typeconv.ToUint16[typedef.Manufacturer](vals[1]),
-		Product:      typeconv.ToUint16[uint16](vals[2]),
-		Type:         typeconv.ToEnum[typedef.File](vals[0]),
+		Timestamp:    datetime.ToTime(vals[253].Uint32()),
+		TimeCreated:  datetime.ToTime(vals[4].Uint32()),
+		SerialNumber: vals[3].Uint32z(),
+		Manufacturer: typedef.Manufacturer(vals[1].Uint16()),
+		Product:      vals[2].Uint16(),
+		Type:         typedef.File(vals[0].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -76,32 +75,32 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = datetime.ToUint32(m.TimeCreated)
+		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
 		fields = append(fields, field)
 	}
 	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = uint32(m.SerialNumber)
+		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.Manufacturer)
+		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
 	}
 	if m.Product != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Product
+		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 

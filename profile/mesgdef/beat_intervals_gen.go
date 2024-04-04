@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type BeatIntervals struct {
 // NewBeatIntervals creates new BeatIntervals struct based on given mesg.
 // If mesg is nil, it will return BeatIntervals with all fields being set to its corresponding invalid value.
 func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,9 +43,9 @@ func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 	}
 
 	return &BeatIntervals{
-		Timestamp:   datetime.ToTime(vals[253]),
-		Time:        typeconv.ToSliceUint16[uint16](vals[1]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:   datetime.ToTime(vals[253].Uint32()),
+		Time:        vals[1].SliceUint16(),
+		TimestampMs: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,17 +69,17 @@ func (m *BeatIntervals) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Time != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Time
+		field.Value = proto.SliceUint16(m.Time)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 

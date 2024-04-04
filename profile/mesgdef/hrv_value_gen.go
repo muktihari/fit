@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type HrvValue struct {
 // NewHrvValue creates new HrvValue struct based on given mesg.
 // If mesg is nil, it will return HrvValue with all fields being set to its corresponding invalid value.
 func NewHrvValue(mesg *proto.Message) *HrvValue {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,8 +43,8 @@ func NewHrvValue(mesg *proto.Message) *HrvValue {
 	}
 
 	return &HrvValue{
-		Timestamp: datetime.ToTime(vals[253]),
-		Value:     typeconv.ToUint16[uint16](vals[0]),
+		Timestamp: datetime.ToTime(vals[253].Uint32()),
+		Value:     vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -69,12 +68,12 @@ func (m *HrvValue) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Value != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Value
+		field.Value = proto.Uint16(m.Value)
 		fields = append(fields, field)
 	}
 

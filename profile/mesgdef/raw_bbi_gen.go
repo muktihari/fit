@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -35,7 +34,7 @@ type RawBbi struct {
 // NewRawBbi creates new RawBbi struct based on given mesg.
 // If mesg is nil, it will return RawBbi with all fields being set to its corresponding invalid value.
 func NewRawBbi(mesg *proto.Message) *RawBbi {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 	isExpandedFields := [5]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -53,12 +52,12 @@ func NewRawBbi(mesg *proto.Message) *RawBbi {
 	}
 
 	return &RawBbi{
-		Timestamp:   datetime.ToTime(vals[253]),
-		Data:        typeconv.ToSliceUint16[uint16](vals[1]),
-		Time:        typeconv.ToSliceUint16[uint16](vals[2]),
-		Quality:     typeconv.ToSliceUint8[uint8](vals[3]),
-		Gap:         typeconv.ToSliceUint8[uint8](vals[4]),
-		TimestampMs: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:   datetime.ToTime(vals[253].Uint32()),
+		Data:        vals[1].SliceUint16(),
+		Time:        vals[2].SliceUint16(),
+		Quality:     vals[3].SliceUint8(),
+		Gap:         vals[4].SliceUint8(),
+		TimestampMs: vals[0].Uint16(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -84,35 +83,35 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.Data != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Data
+		field.Value = proto.SliceUint16(m.Data)
 		fields = append(fields, field)
 	}
 	if m.Time != nil && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Time
+		field.Value = proto.SliceUint16(m.Time)
 		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
 	if m.Quality != nil && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Quality
+		field.Value = proto.SliceUint8(m.Quality)
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.Gap != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Gap
+		field.Value = proto.SliceUint8(m.Gap)
 		field.IsExpandedField = m.IsExpandedFields[4]
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 

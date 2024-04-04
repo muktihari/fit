@@ -61,7 +61,7 @@ func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 func newMonitoringBMessageForTest(now time.Time) []proto.Message {
 	mesgsB := slices.Clone(newMonitoringAMessageForTest(time.Now()))
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = uint8(typedef.FileMonitoringB)
+	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 	return mesgsB
 }
 
@@ -79,7 +79,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 	sortFields(mesgsA)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgsA, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgsA, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]
@@ -91,7 +91,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 
 	mesgsB := newMonitoringBMessageForTest(time.Now())
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = uint8(typedef.FileMonitoringB)
+	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 
 	monitoringB := filedef.NewMonitoringAB(mesgsB...)
 	if monitoringB.FileId.Type != typedef.FileMonitoringB {
@@ -104,7 +104,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 	sortFields(mesgsB)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgsB, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgsB, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]

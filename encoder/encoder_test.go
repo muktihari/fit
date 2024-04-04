@@ -624,7 +624,7 @@ func TestEncodeMessage(t *testing.T) {
 						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
 						BaseType: profile.Sint64.BaseType(),
 					},
-					Value: int64(1234),
+					Value: proto.Int64(1234),
 				},
 			}},
 			w:   nil,
@@ -643,7 +643,7 @@ func TestEncodeMessage(t *testing.T) {
 						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
 						BaseType: profile.Sint64.BaseType(),
 					},
-					Value: int64(1234),
+					Value: proto.Int64(1234),
 				},
 			}},
 			w:   nil,
@@ -667,7 +667,7 @@ func TestEncodeMessage(t *testing.T) {
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(nil),
 			}},
 			w:   fnWriteOK,
-			err: typedef.ErrNilValue,
+			err: proto.ErrTypeNotSupported,
 		},
 		{
 			name: "write message return error",

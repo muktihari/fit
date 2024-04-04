@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type ExerciseTitle struct {
 // NewExerciseTitle creates new ExerciseTitle struct based on given mesg.
 // If mesg is nil, it will return ExerciseTitle with all fields being set to its corresponding invalid value.
 func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,10 +42,10 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 	}
 
 	return &ExerciseTitle{
-		WktStepName:      typeconv.ToSliceString[string](vals[2]),
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		ExerciseCategory: typeconv.ToUint16[typedef.ExerciseCategory](vals[0]),
-		ExerciseName:     typeconv.ToUint16[uint16](vals[1]),
+		WktStepName:      vals[2].SliceString(),
+		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
+		ExerciseCategory: typedef.ExerciseCategory(vals[0].Uint16()),
+		ExerciseName:     vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,22 +69,22 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 
 	if m.WktStepName != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.WktStepName
+		field.Value = proto.SliceString(m.WktStepName)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint16(m.ExerciseCategory)
+		field.Value = proto.Uint16(uint16(m.ExerciseCategory))
 		fields = append(fields, field)
 	}
 	if m.ExerciseName != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ExerciseName
+		field.Value = proto.Uint16(m.ExerciseName)
 		fields = append(fields, field)
 	}
 

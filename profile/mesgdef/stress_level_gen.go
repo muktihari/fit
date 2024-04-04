@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type StressLevel struct {
 // NewStressLevel creates new StressLevel struct based on given mesg.
 // If mesg is nil, it will return StressLevel with all fields being set to its corresponding invalid value.
 func NewStressLevel(mesg *proto.Message) *StressLevel {
-	vals := [2]any{}
+	vals := [2]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,8 +42,8 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 	}
 
 	return &StressLevel{
-		StressLevelTime:  datetime.ToTime(vals[1]),
-		StressLevelValue: typeconv.ToSint16[int16](vals[0]),
+		StressLevelTime:  datetime.ToTime(vals[1].Uint32()),
+		StressLevelValue: vals[0].Int16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,12 +67,12 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = datetime.ToUint32(m.StressLevelTime)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StressLevelTime))
 		fields = append(fields, field)
 	}
 	if m.StressLevelValue != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.StressLevelValue
+		field.Value = proto.Int16(m.StressLevelValue)
 		fields = append(fields, field)
 	}
 

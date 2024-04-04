@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -28,7 +27,7 @@ type WatchfaceSettings struct {
 // NewWatchfaceSettings creates new WatchfaceSettings struct based on given mesg.
 // If mesg is nil, it will return WatchfaceSettings with all fields being set to its corresponding invalid value.
 func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -42,9 +41,9 @@ func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 	}
 
 	return &WatchfaceSettings{
-		MessageIndex: typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Mode:         typeconv.ToEnum[typedef.WatchfaceMode](vals[0]),
-		Layout:       typeconv.ToByte[byte](vals[1]),
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		Mode:         typedef.WatchfaceMode(vals[0].Uint8()),
+		Layout:       vals[1].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -68,17 +67,17 @@ func (m *WatchfaceSettings) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.Mode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = byte(m.Mode)
+		field.Value = proto.Uint8(byte(m.Mode))
 		fields = append(fields, field)
 	}
 	if m.Layout != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Layout
+		field.Value = proto.Uint8(m.Layout)
 		fields = append(fields, field)
 	}
 

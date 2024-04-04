@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -36,7 +35,7 @@ type ObdiiData struct {
 // NewObdiiData creates new ObdiiData struct based on given mesg.
 // If mesg is nil, it will return ObdiiData with all fields being set to its corresponding invalid value.
 func NewObdiiData(mesg *proto.Message) *ObdiiData {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -50,15 +49,15 @@ func NewObdiiData(mesg *proto.Message) *ObdiiData {
 	}
 
 	return &ObdiiData{
-		Timestamp:        datetime.ToTime(vals[253]),
-		TimeOffset:       typeconv.ToSliceUint16[uint16](vals[1]),
-		RawData:          typeconv.ToSliceByte[byte](vals[3]),
-		PidDataSize:      typeconv.ToSliceUint8[uint8](vals[4]),
-		SystemTime:       typeconv.ToSliceUint32[uint32](vals[5]),
-		StartTimestamp:   datetime.ToTime(vals[6]),
-		TimestampMs:      typeconv.ToUint16[uint16](vals[0]),
-		StartTimestampMs: typeconv.ToUint16[uint16](vals[7]),
-		Pid:              typeconv.ToByte[byte](vals[2]),
+		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimeOffset:       vals[1].SliceUint16(),
+		RawData:          vals[3].SliceUint8(),
+		PidDataSize:      vals[4].SliceUint8(),
+		SystemTime:       vals[5].SliceUint32(),
+		StartTimestamp:   datetime.ToTime(vals[6].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
+		StartTimestampMs: vals[7].Uint16(),
+		Pid:              vals[2].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,47 +81,47 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.TimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.TimeOffset
+		field.Value = proto.SliceUint16(m.TimeOffset)
 		fields = append(fields, field)
 	}
 	if m.RawData != nil {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.RawData
+		field.Value = proto.SliceUint8(m.RawData)
 		fields = append(fields, field)
 	}
 	if m.PidDataSize != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.PidDataSize
+		field.Value = proto.SliceUint8(m.PidDataSize)
 		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.SystemTime
+		field.Value = proto.SliceUint32(m.SystemTime)
 		fields = append(fields, field)
 	}
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = datetime.ToUint32(m.StartTimestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.TimestampMs
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.StartTimestampMs
+		field.Value = proto.Uint16(m.StartTimestampMs)
 		fields = append(fields, field)
 	}
 	if m.Pid != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Pid
+		field.Value = proto.Uint8(m.Pid)
 		fields = append(fields, field)
 	}
 

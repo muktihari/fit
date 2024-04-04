@@ -67,7 +67,11 @@ func TestFitWithMessages(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			fit := new(proto.Fit).WithMessages(tc.messages...)
-			if diff := cmp.Diff(fit.Messages, tc.messages); diff != "" {
+			if diff := cmp.Diff(fit.Messages, tc.messages,
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -114,7 +118,7 @@ func TestMessageWithFieldValues(t *testing.T) {
 			mesg.WithFieldValues(tc.fieldValues)
 			for i := range mesg.Fields {
 				if value, ok := tc.fieldValues[mesg.Fields[i].Num]; ok {
-					if mesg.Fields[i].Value != value {
+					if mesg.Fields[i].Value.Any() != value {
 						t.Errorf("expected %T(%v), got: %T(%v)", value, value, mesg.Fields[i].Value, mesg.Fields[i].Value)
 					}
 				}
@@ -153,7 +157,11 @@ func TestMessageFieldByNum(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			field := tc.mesg.FieldByNum(tc.fieldNum)
-			if diff := cmp.Diff(tc.field, field); diff != "" {
+			if diff := cmp.Diff(tc.field, field,
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -165,7 +173,7 @@ func TestMessageFieldValueByNum(t *testing.T) {
 		name     string
 		mesg     proto.Message
 		fieldNum byte
-		value    any
+		value    proto.Value
 	}{
 		{
 			name: "FieldValueByNum found",
@@ -173,7 +181,7 @@ func TestMessageFieldValueByNum(t *testing.T) {
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventEventType,
-			value:    typedef.EventTypeStart,
+			value:    proto.Uint8(uint8(typedef.EventTypeStart)),
 		},
 		{
 			name: "FieldValueByNum not found",
@@ -181,14 +189,14 @@ func TestMessageFieldValueByNum(t *testing.T) {
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventData,
-			value:    nil,
+			value:    proto.Value{},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			value := tc.mesg.FieldValueByNum(tc.fieldNum)
-			if value != tc.value {
+			if value.Any() != tc.value.Any() {
 				t.Fatalf("expected value: %T(%v), got: %T(%v)", tc.value, tc.value, value, value)
 			}
 		})
@@ -239,15 +247,15 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 
 func TestMessageClone(t *testing.T) {
 	mesg := factory.CreateMesg(mesgnum.Session).WithFieldValues(map[byte]any{
-		fieldnum.SessionAvgAltitude: uint16(1000),
-		fieldnum.SessionAvgSpeed:    uint16(1000),
+		fieldnum.SessionAvgAltitude: proto.Uint16(1000),
+		fieldnum.SessionAvgSpeed:    proto.Uint16(1000),
 	}).WithDeveloperFields(
 		proto.DeveloperField{
 			Num:                0,
 			DeveloperDataIndex: 0,
 			Size:               1,
 			BaseType:           basetype.Uint8,
-			Value:              uint8(1),
+			Value:              proto.Uint8(1),
 		},
 		proto.DeveloperField{},
 	)
@@ -256,7 +264,11 @@ func TestMessageClone(t *testing.T) {
 	cloned.Fields[0].Num = 100
 	cloned.DeveloperFields[0].Num = 100
 
-	if diff := cmp.Diff(mesg, cloned); diff == "" {
+	if diff := cmp.Diff(mesg, cloned,
+		cmp.Transformer("Value", func(v proto.Value) any {
+			return v.Any()
+		}),
+	); diff == "" {
 		t.Fatalf("expected deep cloned, but some data still being referenced.")
 	}
 }
@@ -318,14 +330,22 @@ func TestFieldClone(t *testing.T) {
 	cloned := field.Clone()
 	cloned.Components[0].Scale = 777
 
-	if diff := cmp.Diff(field, cloned); diff == "" {
+	if diff := cmp.Diff(field, cloned,
+		cmp.Transformer("Value", func(v proto.Value) any {
+			return v.Any()
+		}),
+	); diff == "" {
 		t.Fatalf("expected deep cloned, but some data still being referenced.")
 	}
 
 	field = proto.Field{}
 	cloned = field.Clone()
 
-	if diff := cmp.Diff(field, cloned); diff != "" {
+	if diff := cmp.Diff(field, cloned,
+		cmp.Transformer("Value", func(v proto.Value) any {
+			return v.Any()
+		}),
+	); diff != "" {
 		t.Fatalf("should not changed")
 	}
 }
@@ -414,10 +434,10 @@ func TestCreateMessageDefinition(t *testing.T) {
 			name: "developer fields",
 			mesg: factory.CreateMesgOnly(mesgnum.UserProfile).
 				WithFields(
-					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]any{byte(2), byte(9)})).
+					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "Fit SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: byte(1),
+						Num: 0, Name: "Fit SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: proto.Uint8(1),
 					},
 				),
 			mesgDef: proto.MessageDefinition{
@@ -439,11 +459,11 @@ func TestCreateMessageDefinition(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
+	for i, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			mesgDef := proto.CreateMessageDefinition(&tc.mesg)
 			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
-				t.Fatal(diff)
+				t.Fatal(i, diff)
 			}
 		})
 	}

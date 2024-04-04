@@ -6,7 +6,6 @@ package basetype
 
 import (
 	"math"
-	"reflect"
 )
 
 // BaseTypeNumMask used to get the index/order of the constants (start from 0, Enum).
@@ -224,34 +223,6 @@ func (t BaseType) GoType() string {
 		return "uint64"
 	}
 	return "invalid"
-}
-
-func (t BaseType) Kind() reflect.Kind {
-	switch t {
-	case Enum, Byte, Uint8, Uint8z:
-		return reflect.Uint8
-	case Sint8:
-		return reflect.Int8
-	case Sint16:
-		return reflect.Int16
-	case Uint16, Uint16z:
-		return reflect.Uint16
-	case Sint32:
-		return reflect.Int32
-	case Uint32, Uint32z:
-		return reflect.Uint32
-	case String:
-		return reflect.String
-	case Float32:
-		return reflect.Float32
-	case Float64:
-		return reflect.Float64
-	case Sint64:
-		return reflect.Int64
-	case Uint64, Uint64z:
-		return reflect.Uint64
-	}
-	return reflect.Invalid
 }
 
 // EndianAbility return whether t have endianness.

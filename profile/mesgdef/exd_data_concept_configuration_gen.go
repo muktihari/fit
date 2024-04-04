@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -38,7 +37,7 @@ type ExdDataConceptConfiguration struct {
 // NewExdDataConceptConfiguration creates new ExdDataConceptConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdDataConceptConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfiguration {
-	vals := [12]any{}
+	vals := [12]proto.Value{}
 	isExpandedFields := [4]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -56,17 +55,17 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 	}
 
 	return &ExdDataConceptConfiguration{
-		ScreenIndex:  typeconv.ToUint8[uint8](vals[0]),
-		ConceptField: typeconv.ToByte[byte](vals[1]),
-		FieldId:      typeconv.ToUint8[uint8](vals[2]),
-		ConceptIndex: typeconv.ToUint8[uint8](vals[3]),
-		DataPage:     typeconv.ToUint8[uint8](vals[4]),
-		ConceptKey:   typeconv.ToUint8[uint8](vals[5]),
-		Scaling:      typeconv.ToUint8[uint8](vals[6]),
-		DataUnits:    typeconv.ToEnum[typedef.ExdDataUnits](vals[8]),
-		Qualifier:    typeconv.ToEnum[typedef.ExdQualifiers](vals[9]),
-		Descriptor:   typeconv.ToEnum[typedef.ExdDescriptors](vals[10]),
-		IsSigned:     typeconv.ToBool[bool](vals[11]),
+		ScreenIndex:  vals[0].Uint8(),
+		ConceptField: vals[1].Uint8(),
+		FieldId:      vals[2].Uint8(),
+		ConceptIndex: vals[3].Uint8(),
+		DataPage:     vals[4].Uint8(),
+		ConceptKey:   vals[5].Uint8(),
+		Scaling:      vals[6].Uint8(),
+		DataUnits:    typedef.ExdDataUnits(vals[8].Uint8()),
+		Qualifier:    typedef.ExdQualifiers(vals[9].Uint8()),
+		Descriptor:   typedef.ExdDescriptors(vals[10].Uint8()),
+		IsSigned:     vals[11].Bool(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -92,59 +91,59 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ScreenIndex
+		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.ConceptField != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ConceptField
+		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
 	if m.FieldId != basetype.Uint8Invalid && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.FieldId
+		field.Value = proto.Uint8(m.FieldId)
 		field.IsExpandedField = m.IsExpandedFields[2]
 		fields = append(fields, field)
 	}
 	if m.ConceptIndex != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ConceptIndex
+		field.Value = proto.Uint8(m.ConceptIndex)
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
 	if m.DataPage != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.DataPage
+		field.Value = proto.Uint8(m.DataPage)
 		fields = append(fields, field)
 	}
 	if m.ConceptKey != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.ConceptKey
+		field.Value = proto.Uint8(m.ConceptKey)
 		fields = append(fields, field)
 	}
 	if m.Scaling != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.Scaling
+		field.Value = proto.Uint8(m.Scaling)
 		fields = append(fields, field)
 	}
 	if byte(m.DataUnits) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = byte(m.DataUnits)
+		field.Value = proto.Uint8(byte(m.DataUnits))
 		fields = append(fields, field)
 	}
 	if byte(m.Qualifier) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = byte(m.Qualifier)
+		field.Value = proto.Uint8(byte(m.Qualifier))
 		fields = append(fields, field)
 	}
 	if byte(m.Descriptor) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = byte(m.Descriptor)
+		field.Value = proto.Uint8(byte(m.Descriptor))
 		fields = append(fields, field)
 	}
 	if m.IsSigned != false {
 		field := fac.CreateField(mesg.Num, 11)
-		field.Value = m.IsSigned
+		field.Value = proto.Bool(m.IsSigned)
 		fields = append(fields, field)
 	}
 

@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -35,7 +34,7 @@ type ChronoShotSession struct {
 // NewChronoShotSession creates new ChronoShotSession struct based on given mesg.
 // If mesg is nil, it will return ChronoShotSession with all fields being set to its corresponding invalid value.
 func NewChronoShotSession(mesg *proto.Message) *ChronoShotSession {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -49,13 +48,13 @@ func NewChronoShotSession(mesg *proto.Message) *ChronoShotSession {
 	}
 
 	return &ChronoShotSession{
-		Timestamp:      datetime.ToTime(vals[253]),
-		MinSpeed:       typeconv.ToUint32[uint32](vals[0]),
-		MaxSpeed:       typeconv.ToUint32[uint32](vals[1]),
-		AvgSpeed:       typeconv.ToUint32[uint32](vals[2]),
-		GrainWeight:    typeconv.ToUint32[uint32](vals[5]),
-		ShotCount:      typeconv.ToUint16[uint16](vals[3]),
-		ProjectileType: typeconv.ToEnum[typedef.ProjectileType](vals[4]),
+		Timestamp:      datetime.ToTime(vals[253].Uint32()),
+		MinSpeed:       vals[0].Uint32(),
+		MaxSpeed:       vals[1].Uint32(),
+		AvgSpeed:       vals[2].Uint32(),
+		GrainWeight:    vals[5].Uint32(),
+		ShotCount:      vals[3].Uint16(),
+		ProjectileType: typedef.ProjectileType(vals[4].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -79,37 +78,37 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.MinSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.MinSpeed
+		field.Value = proto.Uint32(m.MinSpeed)
 		fields = append(fields, field)
 	}
 	if m.MaxSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.MaxSpeed
+		field.Value = proto.Uint32(m.MaxSpeed)
 		fields = append(fields, field)
 	}
 	if m.AvgSpeed != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.AvgSpeed
+		field.Value = proto.Uint32(m.AvgSpeed)
 		fields = append(fields, field)
 	}
 	if m.GrainWeight != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.GrainWeight
+		field.Value = proto.Uint32(m.GrainWeight)
 		fields = append(fields, field)
 	}
 	if m.ShotCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ShotCount
+		field.Value = proto.Uint16(m.ShotCount)
 		fields = append(fields, field)
 	}
 	if byte(m.ProjectileType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = byte(m.ProjectileType)
+		field.Value = proto.Uint8(byte(m.ProjectileType))
 		fields = append(fields, field)
 	}
 

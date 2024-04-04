@@ -9,7 +9,6 @@ package {{ .Package }}
 
 import (
     "github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	{{- if .Imports -}}
@@ -39,7 +38,7 @@ type {{ .Name }} struct {
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
-    vals := [{{ .MaxFieldNum }}]any{}
+    vals := [{{ .MaxFieldNum }}]proto.Value{}
 	{{ if gt .MaxFieldExpandNum 1 -}}
 	isExpandedFields := [{{ .MaxFieldExpandNum }}]bool{}
 	{{ end }}
@@ -97,7 +96,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
     {{ range .Fields -}}
         if {{ .ComparableValue }} != {{ .InvalidValue }} {{ if eq .CanExpand true -}} && ((m.IsExpandedFields[{{ .Num }}] && options.IncludeExpandedFields) || !m.IsExpandedFields[{{ .Num }}]) {{ end }} {
 			field := fac.CreateField(mesg.Num, {{ .Num }})
-			field.Value = {{ .PrimitiveValue }}
+			field.Value = {{ .ProtoValue }}
 			{{ if eq .CanExpand true -}}
 				field.IsExpandedField = m.IsExpandedFields[{{ .Num }}]
 			{{ end -}}

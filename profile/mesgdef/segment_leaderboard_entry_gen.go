@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -33,7 +32,7 @@ type SegmentLeaderboardEntry struct {
 // NewSegmentLeaderboardEntry creates new SegmentLeaderboardEntry struct based on given mesg.
 // If mesg is nil, it will return SegmentLeaderboardEntry with all fields being set to its corresponding invalid value.
 func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -47,13 +46,13 @@ func NewSegmentLeaderboardEntry(mesg *proto.Message) *SegmentLeaderboardEntry {
 	}
 
 	return &SegmentLeaderboardEntry{
-		Name:             typeconv.ToString[string](vals[0]),
-		ActivityIdString: typeconv.ToString[string](vals[5]),
-		GroupPrimaryKey:  typeconv.ToUint32[uint32](vals[2]),
-		ActivityId:       typeconv.ToUint32[uint32](vals[3]),
-		SegmentTime:      typeconv.ToUint32[uint32](vals[4]),
-		MessageIndex:     typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		Type:             typeconv.ToEnum[typedef.SegmentLeaderboardType](vals[1]),
+		Name:             vals[0].String(),
+		ActivityIdString: vals[5].String(),
+		GroupPrimaryKey:  vals[2].Uint32(),
+		ActivityId:       vals[3].Uint32(),
+		SegmentTime:      vals[4].Uint32(),
+		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
+		Type:             typedef.SegmentLeaderboardType(vals[1].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -77,37 +76,37 @@ func (m *SegmentLeaderboardEntry) ToMesg(options *Options) proto.Message {
 
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Name
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.ActivityIdString != basetype.StringInvalid && m.ActivityIdString != "" {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.ActivityIdString
+		field.Value = proto.String(m.ActivityIdString)
 		fields = append(fields, field)
 	}
 	if m.GroupPrimaryKey != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.GroupPrimaryKey
+		field.Value = proto.Uint32(m.GroupPrimaryKey)
 		fields = append(fields, field)
 	}
 	if m.ActivityId != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ActivityId
+		field.Value = proto.Uint32(m.ActivityId)
 		fields = append(fields, field)
 	}
 	if m.SegmentTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.SegmentTime
+		field.Value = proto.Uint32(m.SegmentTime)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = byte(m.Type)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 

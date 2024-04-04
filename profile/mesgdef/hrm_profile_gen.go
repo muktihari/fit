@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -30,7 +29,7 @@ type HrmProfile struct {
 // NewHrmProfile creates new HrmProfile struct based on given mesg.
 // If mesg is nil, it will return HrmProfile with all fields being set to its corresponding invalid value.
 func NewHrmProfile(mesg *proto.Message) *HrmProfile {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -44,11 +43,11 @@ func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 	}
 
 	return &HrmProfile{
-		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		HrmAntId:          typeconv.ToUint16z[uint16](vals[1]),
-		HrmAntIdTransType: typeconv.ToUint8z[uint8](vals[3]),
-		Enabled:           typeconv.ToBool[bool](vals[0]),
-		LogHrv:            typeconv.ToBool[bool](vals[2]),
+		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
+		HrmAntId:          vals[1].Uint16z(),
+		HrmAntIdTransType: vals[3].Uint8z(),
+		Enabled:           vals[0].Bool(),
+		LogHrv:            vals[2].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,27 +71,27 @@ func (m *HrmProfile) ToMesg(options *Options) proto.Message {
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if uint16(m.HrmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.HrmAntId)
+		field.Value = proto.Uint16(m.HrmAntId)
 		fields = append(fields, field)
 	}
 	if uint8(m.HrmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = uint8(m.HrmAntIdTransType)
+		field.Value = proto.Uint8(m.HrmAntIdTransType)
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Enabled
+		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if m.LogHrv != false {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.LogHrv
+		field.Value = proto.Bool(m.LogHrv)
 		fields = append(fields, field)
 	}
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type ExdScreenConfiguration struct {
 // NewExdScreenConfiguration creates new ExdScreenConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdScreenConfiguration with all fields being set to its corresponding invalid value.
 func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
-	vals := [4]any{}
+	vals := [4]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -43,10 +42,10 @@ func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 	}
 
 	return &ExdScreenConfiguration{
-		ScreenIndex:   typeconv.ToUint8[uint8](vals[0]),
-		FieldCount:    typeconv.ToUint8[uint8](vals[1]),
-		Layout:        typeconv.ToEnum[typedef.ExdLayout](vals[2]),
-		ScreenEnabled: typeconv.ToBool[bool](vals[3]),
+		ScreenIndex:   vals[0].Uint8(),
+		FieldCount:    vals[1].Uint8(),
+		Layout:        typedef.ExdLayout(vals[2].Uint8()),
+		ScreenEnabled: vals[3].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -70,22 +69,22 @@ func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ScreenIndex
+		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.FieldCount != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.FieldCount
+		field.Value = proto.Uint8(m.FieldCount)
 		fields = append(fields, field)
 	}
 	if byte(m.Layout) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.Layout)
+		field.Value = proto.Uint8(byte(m.Layout))
 		fields = append(fields, field)
 	}
 	if m.ScreenEnabled != false {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ScreenEnabled
+		field.Value = proto.Bool(m.ScreenEnabled)
 		fields = append(fields, field)
 	}
 

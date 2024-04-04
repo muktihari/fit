@@ -144,6 +144,7 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			if diff := cmp.Diff(tc.result, result,
 				createFloat32Comparer(),
 				createFloat64Comparer(),
+				valueTransformer(),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -188,6 +189,7 @@ func TestListenerForChainedFitFile(t *testing.T) {
 	if diff := cmp.Diff(expectedResult, result,
 		createFloat32Comparer(),
 		createFloat64Comparer(),
+		valueTransformer(),
 	); diff != "" {
 		t.Fatal(diff)
 	}

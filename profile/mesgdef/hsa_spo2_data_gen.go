@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type HsaSpo2Data struct {
 // NewHsaSpo2Data creates new HsaSpo2Data struct based on given mesg.
 // If mesg is nil, it will return HsaSpo2Data with all fields being set to its corresponding invalid value.
 func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,10 +44,10 @@ func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 	}
 
 	return &HsaSpo2Data{
-		Timestamp:          datetime.ToTime(vals[253]),
-		ReadingSpo2:        typeconv.ToSliceUint8[uint8](vals[1]),
-		Confidence:         typeconv.ToSliceUint8[uint8](vals[2]),
-		ProcessingInterval: typeconv.ToUint16[uint16](vals[0]),
+		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		ReadingSpo2:        vals[1].SliceUint8(),
+		Confidence:         vals[2].SliceUint8(),
+		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,22 +71,22 @@ func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.ReadingSpo2 != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.ReadingSpo2
+		field.Value = proto.SliceUint8(m.ReadingSpo2)
 		fields = append(fields, field)
 	}
 	if m.Confidence != nil {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Confidence
+		field.Value = proto.SliceUint8(m.Confidence)
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.ProcessingInterval
+		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 

@@ -82,7 +82,7 @@ func TestCourseCorrectness(t *testing.T) {
 	sortFields(mesgs)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]

@@ -10,10 +10,10 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -40,7 +40,7 @@ type Jump struct {
 // NewJump creates new Jump struct based on given mesg.
 // If mesg is nil, it will return Jump with all fields being set to its corresponding invalid value.
 func NewJump(mesg *proto.Message) *Jump {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 	isExpandedFields := [9]bool{}
 
 	var developerFields []proto.DeveloperField
@@ -58,16 +58,16 @@ func NewJump(mesg *proto.Message) *Jump {
 	}
 
 	return &Jump{
-		Timestamp:     datetime.ToTime(vals[253]),
-		Distance:      typeconv.ToFloat32[float32](vals[0]),
-		Height:        typeconv.ToFloat32[float32](vals[1]),
-		HangTime:      typeconv.ToFloat32[float32](vals[3]),
-		Score:         typeconv.ToFloat32[float32](vals[4]),
-		PositionLat:   typeconv.ToSint32[int32](vals[5]),
-		PositionLong:  typeconv.ToSint32[int32](vals[6]),
-		EnhancedSpeed: typeconv.ToUint32[uint32](vals[8]),
-		Speed:         typeconv.ToUint16[uint16](vals[7]),
-		Rotations:     typeconv.ToUint8[uint8](vals[2]),
+		Timestamp:     datetime.ToTime(vals[253].Uint32()),
+		Distance:      vals[0].Float32(),
+		Height:        vals[1].Float32(),
+		HangTime:      vals[3].Float32(),
+		Score:         vals[4].Float32(),
+		PositionLat:   vals[5].Int32(),
+		PositionLong:  vals[6].Int32(),
+		EnhancedSpeed: vals[8].Uint32(),
+		Speed:         vals[7].Uint16(),
+		Rotations:     vals[2].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -93,53 +93,53 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Distance) != basetype.Uint32Invalid {
+	if math.Float32bits(m.Distance) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Distance
+		field.Value = proto.Float32(m.Distance)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Height) != basetype.Uint32Invalid {
+	if math.Float32bits(m.Height) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Height
+		field.Value = proto.Float32(m.Height)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.HangTime) != basetype.Uint32Invalid {
+	if math.Float32bits(m.HangTime) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.HangTime
+		field.Value = proto.Float32(m.HangTime)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.Score) != basetype.Uint32Invalid {
+	if math.Float32bits(m.Score) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.Score
+		field.Value = proto.Float32(m.Score)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.PositionLat
+		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = m.PositionLong
+		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.EnhancedSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[8] && options.IncludeExpandedFields) || !m.IsExpandedFields[8]) {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = m.EnhancedSpeed
+		field.Value = proto.Uint32(m.EnhancedSpeed)
 		field.IsExpandedField = m.IsExpandedFields[8]
 		fields = append(fields, field)
 	}
 	if m.Speed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.Speed
+		field.Value = proto.Uint16(m.Speed)
 		fields = append(fields, field)
 	}
 	if m.Rotations != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.Rotations
+		field.Value = proto.Uint8(m.Rotations)
 		fields = append(fields, field)
 	}
 

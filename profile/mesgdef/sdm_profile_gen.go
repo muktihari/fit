@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -34,7 +33,7 @@ type SdmProfile struct {
 // NewSdmProfile creates new SdmProfile struct based on given mesg.
 // If mesg is nil, it will return SdmProfile with all fields being set to its corresponding invalid value.
 func NewSdmProfile(mesg *proto.Message) *SdmProfile {
-	vals := [255]any{}
+	vals := [255]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,14 +47,14 @@ func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 	}
 
 	return &SdmProfile{
-		Odometer:          typeconv.ToUint32[uint32](vals[3]),
-		MessageIndex:      typeconv.ToUint16[typedef.MessageIndex](vals[254]),
-		SdmAntId:          typeconv.ToUint16z[uint16](vals[1]),
-		SdmCalFactor:      typeconv.ToUint16[uint16](vals[2]),
-		SdmAntIdTransType: typeconv.ToUint8z[uint8](vals[5]),
-		OdometerRollover:  typeconv.ToUint8[uint8](vals[7]),
-		Enabled:           typeconv.ToBool[bool](vals[0]),
-		SpeedSource:       typeconv.ToBool[bool](vals[4]),
+		Odometer:          vals[3].Uint32(),
+		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
+		SdmAntId:          vals[1].Uint16z(),
+		SdmCalFactor:      vals[2].Uint16(),
+		SdmAntIdTransType: vals[5].Uint8z(),
+		OdometerRollover:  vals[7].Uint8(),
+		Enabled:           vals[0].Bool(),
+		SpeedSource:       vals[4].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -79,42 +78,42 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 
 	if m.Odometer != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.Odometer
+		field.Value = proto.Uint32(m.Odometer)
 		fields = append(fields, field)
 	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
-		field.Value = uint16(m.MessageIndex)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if uint16(m.SdmAntId) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = uint16(m.SdmAntId)
+		field.Value = proto.Uint16(m.SdmAntId)
 		fields = append(fields, field)
 	}
 	if m.SdmCalFactor != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = m.SdmCalFactor
+		field.Value = proto.Uint16(m.SdmCalFactor)
 		fields = append(fields, field)
 	}
 	if uint8(m.SdmAntIdTransType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = uint8(m.SdmAntIdTransType)
+		field.Value = proto.Uint8(m.SdmAntIdTransType)
 		fields = append(fields, field)
 	}
 	if m.OdometerRollover != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = m.OdometerRollover
+		field.Value = proto.Uint8(m.OdometerRollover)
 		fields = append(fields, field)
 	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.Enabled
+		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if m.SpeedSource != false {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.SpeedSource
+		field.Value = proto.Bool(m.SpeedSource)
 		fields = append(fields, field)
 	}
 

@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -31,7 +30,7 @@ type TankUpdate struct {
 // NewTankUpdate creates new TankUpdate struct based on given mesg.
 // If mesg is nil, it will return TankUpdate with all fields being set to its corresponding invalid value.
 func NewTankUpdate(mesg *proto.Message) *TankUpdate {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -45,9 +44,9 @@ func NewTankUpdate(mesg *proto.Message) *TankUpdate {
 	}
 
 	return &TankUpdate{
-		Timestamp: datetime.ToTime(vals[253]),
-		Sensor:    typeconv.ToUint32z[typedef.AntChannelId](vals[0]),
-		Pressure:  typeconv.ToUint16[uint16](vals[1]),
+		Timestamp: datetime.ToTime(vals[253].Uint32()),
+		Sensor:    typedef.AntChannelId(vals[0].Uint32z()),
+		Pressure:  vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,17 +70,17 @@ func (m *TankUpdate) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if uint32(m.Sensor) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = uint32(m.Sensor)
+		field.Value = proto.Uint32(uint32(m.Sensor))
 		fields = append(fields, field)
 	}
 	if m.Pressure != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.Pressure
+		field.Value = proto.Uint16(m.Pressure)
 		fields = append(fields, field)
 	}
 

@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -34,7 +34,7 @@ type ClimbPro struct {
 // NewClimbPro creates new ClimbPro struct based on given mesg.
 // If mesg is nil, it will return ClimbPro with all fields being set to its corresponding invalid value.
 func NewClimbPro(mesg *proto.Message) *ClimbPro {
-	vals := [254]any{}
+	vals := [254]proto.Value{}
 
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
@@ -48,13 +48,13 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 	}
 
 	return &ClimbPro{
-		Timestamp:     datetime.ToTime(vals[253]),
-		PositionLat:   typeconv.ToSint32[int32](vals[0]),
-		PositionLong:  typeconv.ToSint32[int32](vals[1]),
-		CurrentDist:   typeconv.ToFloat32[float32](vals[5]),
-		ClimbNumber:   typeconv.ToUint16[uint16](vals[3]),
-		ClimbProEvent: typeconv.ToEnum[typedef.ClimbProEvent](vals[2]),
-		ClimbCategory: typeconv.ToUint8[uint8](vals[4]),
+		Timestamp:     datetime.ToTime(vals[253].Uint32()),
+		PositionLat:   vals[0].Int32(),
+		PositionLong:  vals[1].Int32(),
+		CurrentDist:   vals[5].Float32(),
+		ClimbNumber:   vals[3].Uint16(),
+		ClimbProEvent: typedef.ClimbProEvent(vals[2].Uint8()),
+		ClimbCategory: vals[4].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -78,37 +78,37 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = datetime.ToUint32(m.Timestamp)
+		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
-		field.Value = m.PositionLat
+		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = m.PositionLong
+		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
-	if typeconv.ToUint32[uint32](m.CurrentDist) != basetype.Uint32Invalid {
+	if math.Float32bits(m.CurrentDist) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = m.CurrentDist
+		field.Value = proto.Float32(m.CurrentDist)
 		fields = append(fields, field)
 	}
 	if m.ClimbNumber != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = m.ClimbNumber
+		field.Value = proto.Uint16(m.ClimbNumber)
 		fields = append(fields, field)
 	}
 	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = byte(m.ClimbProEvent)
+		field.Value = proto.Uint8(byte(m.ClimbProEvent))
 		fields = append(fields, field)
 	}
 	if m.ClimbCategory != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = m.ClimbCategory
+		field.Value = proto.Uint8(m.ClimbCategory)
 		fields = append(fields, field)
 	}
 
