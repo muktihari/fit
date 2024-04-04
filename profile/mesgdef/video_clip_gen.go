@@ -73,7 +73,7 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoClip)
+	mesg := proto.Message{Num: typedef.MesgNumVideoClip}
 
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)

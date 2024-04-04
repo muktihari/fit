@@ -80,7 +80,7 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumSegmentPoint)
+	mesg := proto.Message{Num: typedef.MesgNumSegmentPoint}
 
 	if m.LeaderTime != nil {
 		field := fac.CreateField(mesg.Num, 5)

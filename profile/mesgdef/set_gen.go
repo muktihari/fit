@@ -87,7 +87,7 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumSet)
+	mesg := proto.Message{Num: typedef.MesgNumSet}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 254)
@@ -101,7 +101,7 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 	}
 	if m.Category != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.SliceUint16(unsafe.Slice((*uint16)(unsafe.SliceData(m.Category)), len(m.Category)))
+		field.Value = proto.SliceUint16(m.Category)
 		fields = append(fields, field)
 	}
 	if m.CategorySubtype != nil {

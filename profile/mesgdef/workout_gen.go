@@ -74,7 +74,7 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumWorkout)
+	mesg := proto.Message{Num: typedef.MesgNumWorkout}
 
 	if m.WktName != basetype.StringInvalid && m.WktName != "" {
 		field := fac.CreateField(mesg.Num, 8)

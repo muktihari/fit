@@ -289,10 +289,7 @@ func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array strin
 
 	val := fmt.Sprintf("m.%s", fieldName)
 	if b.baseTypeMapByProfileType[fieldType] != fieldType {
-		if array != "" {
-			val = fmt.Sprintf(`unsafe.Slice((*%s)(unsafe.SliceData(%s)), len(%s))`, goType, val, val)
-			// val = fmt.Sprintf("*(*[]%s)(unsafe.Pointer(&%s))", goType, val)
-		} else {
+		if array == "" {
 			val = fmt.Sprintf("%s(%s)", goType, val)
 		}
 	}

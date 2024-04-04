@@ -67,7 +67,7 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumAntChannelId)
+	mesg := proto.Message{Num: typedef.MesgNumAntChannelId}
 
 	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 2)

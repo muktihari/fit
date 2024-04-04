@@ -89,11 +89,11 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumDiveAlarm)
+	mesg := proto.Message{Num: typedef.MesgNumDiveAlarm}
 
 	if m.DiveTypes != nil {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.DiveTypes)), len(m.DiveTypes)))
+		field.Value = proto.SliceUint8(m.DiveTypes)
 		fields = append(fields, field)
 	}
 	if m.Depth != basetype.Uint32Invalid {

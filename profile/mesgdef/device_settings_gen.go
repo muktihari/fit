@@ -113,7 +113,7 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumDeviceSettings)
+	mesg := proto.Message{Num: typedef.MesgNumDeviceSettings}
 
 	if m.TimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 2)
@@ -122,7 +122,7 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 	}
 	if m.TimeMode != nil {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.TimeMode)), len(m.TimeMode)))
+		field.Value = proto.SliceUint8(m.TimeMode)
 		fields = append(fields, field)
 	}
 	if m.TimeZoneOffset != nil {

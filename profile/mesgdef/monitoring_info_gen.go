@@ -77,7 +77,7 @@ func (m *MonitoringInfo) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumMonitoringInfo)
+	mesg := proto.Message{Num: typedef.MesgNumMonitoringInfo}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
@@ -91,7 +91,7 @@ func (m *MonitoringInfo) ToMesg(options *Options) proto.Message {
 	}
 	if m.ActivityType != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.ActivityType)), len(m.ActivityType)))
+		field.Value = proto.SliceUint8(m.ActivityType)
 		fields = append(fields, field)
 	}
 	if m.CyclesToDistance != nil {

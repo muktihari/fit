@@ -74,7 +74,7 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumSdmProfile)
+	mesg := proto.Message{Num: typedef.MesgNumSdmProfile}
 
 	if m.Odometer != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 3)

@@ -70,7 +70,7 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumCapabilities)
+	mesg := proto.Message{Num: typedef.MesgNumCapabilities}
 
 	if m.Languages != nil {
 		field := fac.CreateField(mesg.Num, 0)
@@ -79,7 +79,7 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 	}
 	if m.Sports != nil {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceUint8(unsafe.Slice((*uint8)(unsafe.SliceData(m.Sports)), len(m.Sports)))
+		field.Value = proto.SliceUint8(m.Sports)
 		fields = append(fields, field)
 	}
 	if uint32(m.WorkoutsSupported) != basetype.Uint32zInvalid {

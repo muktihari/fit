@@ -63,7 +63,7 @@ func (m *VideoDescription) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumVideoDescription)
+	mesg := proto.Message{Num: typedef.MesgNumVideoDescription}
 
 	if m.Text != basetype.StringInvalid && m.Text != "" {
 		field := fac.CreateField(mesg.Num, 1)

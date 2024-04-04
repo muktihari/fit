@@ -76,7 +76,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumCoursePoint)
+	mesg := proto.Message{Num: typedef.MesgNumCoursePoint}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)

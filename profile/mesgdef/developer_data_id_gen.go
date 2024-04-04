@@ -59,7 +59,7 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumDeveloperDataId)
+	mesg := proto.Message{Num: typedef.MesgNumDeveloperDataId}
 
 	if m.DeveloperId != nil {
 		field := fac.CreateField(mesg.Num, 0)

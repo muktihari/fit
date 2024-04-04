@@ -64,7 +64,7 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumSoftware)
+	mesg := proto.Message{Num: typedef.MesgNumSoftware}
 
 	if m.PartNumber != basetype.StringInvalid && m.PartNumber != "" {
 		field := fac.CreateField(mesg.Num, 5)

@@ -76,7 +76,7 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumMaxMetData)
+	mesg := proto.Message{Num: typedef.MesgNumMaxMetData}
 
 	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)

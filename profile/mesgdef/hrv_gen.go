@@ -59,7 +59,7 @@ func (m *Hrv) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumHrv)
+	mesg := proto.Message{Num: typedef.MesgNumHrv}
 
 	if m.Time != nil {
 		field := fac.CreateField(mesg.Num, 0)

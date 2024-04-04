@@ -93,7 +93,7 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumAviationAttitude)
+	mesg := proto.Message{Num: typedef.MesgNumAviationAttitude}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
@@ -132,7 +132,7 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 	}
 	if m.Stage != nil {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.SliceUint8(unsafe.Slice((*byte)(unsafe.SliceData(m.Stage)), len(m.Stage)))
+		field.Value = proto.SliceUint8(m.Stage)
 		fields = append(fields, field)
 	}
 	if m.AttitudeStageComplete != nil {
@@ -147,7 +147,7 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 	}
 	if m.Validity != nil {
 		field := fac.CreateField(mesg.Num, 10)
-		field.Value = proto.SliceUint16(unsafe.Slice((*uint16)(unsafe.SliceData(m.Validity)), len(m.Validity)))
+		field.Value = proto.SliceUint16(m.Validity)
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {

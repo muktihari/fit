@@ -67,7 +67,7 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	defer fieldsPool.Put(fieldsArray)
 
 	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
-	mesg := fac.CreateMesgOnly(typedef.MesgNumZonesTarget)
+	mesg := proto.Message{Num: typedef.MesgNumZonesTarget}
 
 	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
