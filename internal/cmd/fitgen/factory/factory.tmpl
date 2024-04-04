@@ -98,11 +98,6 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	return mesg
 }
 
-{{ template "create_mesg_only_doc" -}}
-func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
-	return proto.Message{Num: num}
-}
-
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
@@ -178,11 +173,6 @@ func CreateMesg(num typedef.MesgNum) proto.Message {
 	return std.CreateMesg(num)
 }
 
-{{- template "create_mesg_only_doc" -}}
-func CreateMesgOnly(num typedef.MesgNum) proto.Message{
-	return std.CreateMesgOnly(num)
-}
-
 {{ template "create_field_doc" -}}
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return std.CreateField(mesgNum, num)
@@ -203,11 +193,6 @@ func RegisterMesg(mesg proto.Message) error {
 // If you want a deep copy of the mesg, clone it by calling mesg.Clone().
 //
 // NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
-{{ end }}
-
-{{ define "create_mesg_only_doc" }}
-// CreateMesgOnly creates new message without predefined fields. This is useful when we plan to fill these values ourselves 
-// e.g the decoding process will populate them with decoded data.
 {{ end }}
 
 {{ define "create_field_doc" }}
