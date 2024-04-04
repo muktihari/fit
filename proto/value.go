@@ -495,64 +495,68 @@ func String(v string) Value {
 	return Value{num: uint64(len(v)), any: stringptr(unsafe.StringData(v))}
 }
 
+// HACK: The use of *(*[]ArbitraryType)(unsafe.Pointer(&slice) below should be safe (in unsafe world) since we only use it to
+// temporarily cast the type to make unsafe.SliceData return the pointer as *ArbitraryType. The actual slice is handled by
+// unsafe.SliceData so we don't lose the data.
+
 // SliceBool converts []bool as Value.
-func SliceBool(vs []bool) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceBool[S []E, E ~bool](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]bool)(unsafe.Pointer(&s)))}
 }
 
 // SliceInt8 converts []int8 as Value.
-func SliceInt8(vs []int8) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceInt8[S []E, E ~int8](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]int8)(unsafe.Pointer(&s)))}
 }
 
 // SliceUint8 converts []uint8 as Value.
-func SliceUint8(vs []uint8) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceUint8[S []E, E ~uint8](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]uint8)(unsafe.Pointer(&s)))}
 }
 
 // SliceInt16 converts []int16 as Value.
-func SliceInt16(vs []int16) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceInt16[S []E, E ~int16](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]int16)(unsafe.Pointer(&s)))}
 }
 
 // SliceUint16 converts []uint16 as Value.
-func SliceUint16(vs []uint16) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceUint16[S []E, E ~uint16](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]uint16)(unsafe.Pointer(&s)))}
 }
 
 // SliceInt32 converts []int32 as Value.
-func SliceInt32(vs []int32) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceInt32[S []E, E ~int32](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]int32)(unsafe.Pointer(&s)))}
 }
 
 // SliceUint32 converts []uint32 as Value.
-func SliceUint32(vs []uint32) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceUint32[S []E, E ~uint32](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]uint32)(unsafe.Pointer(&s)))}
 }
 
 // SliceInt64 converts []int64 as Value.
-func SliceInt64(vs []int64) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceInt64[S []E, E ~int64](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]int64)(unsafe.Pointer(&s)))}
 }
 
 // SliceUint64 converts []uint64 as Value.
-func SliceUint64(vs []uint64) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceUint64[S []E, E ~uint64](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]uint64)(unsafe.Pointer(&s)))}
 }
 
 // SliceFloat32 converts []float32 as Value.
-func SliceFloat32(vs []float32) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceFloat32[S []E, E ~float32](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]float32)(unsafe.Pointer(&s)))}
 }
 
 // SliceFloat64 converts []float64 as Value.
-func SliceFloat64(vs []float64) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceFloat64[S []E, E ~float64](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]float64)(unsafe.Pointer(&s)))}
 }
 
 // SliceString converts []string as Value.
-func SliceString(vs []string) Value {
-	return Value{num: uint64(len(vs)), any: unsafe.SliceData(vs)}
+func SliceString[S []E, E ~string](s S) Value {
+	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]string)(unsafe.Pointer(&s)))}
 }
 
 // Any converts any value into Value. If the given v is not a primitive-type value (or a slice of primitive-type)
@@ -722,13 +726,15 @@ func Any(v any) Value {
 	return Value{any: TypeInvalid}
 }
 
-// Sizeof returns the size of val in bytes.
+// Sizeof returns the size of val in bytes. For every string in Value, if the last index of the string is not '\x00', size += 1.
 func Sizeof(val Value, baseType basetype.BaseType) int {
 	return lenof(val) * int(baseType.Size())
 }
 
 func lenof(val Value) int {
 	switch val.Type() { // Fast Path
+	case TypeInvalid:
+		return 0
 	case TypeBool,
 		TypeInt8,
 		TypeUint8,
@@ -768,27 +774,7 @@ func lenof(val Value) int {
 			return 1 // utf-8 null terminated string
 		}
 		return size
-	case TypeSliceInt8:
-		return len(val.SliceInt8())
-	case TypeSliceUint8:
-		return len(val.SliceUint8())
-	case TypeSliceInt16:
-		return len(val.SliceInt16())
-	case TypeSliceUint16:
-		return len(val.SliceUint16())
-	case TypeSliceInt32:
-		return len(val.SliceInt32())
-	case TypeSliceUint32:
-		return len(val.SliceUint32())
-	case TypeSliceFloat32:
-		return len(val.SliceFloat32())
-	case TypeSliceFloat64:
-		return len(val.SliceFloat64())
-	case TypeSliceInt64:
-		return len(val.SliceInt64())
-	case TypeSliceUint64:
-		return len(val.SliceUint64())
 	}
 
-	return 0
+	return int(val.num) // other slices
 }

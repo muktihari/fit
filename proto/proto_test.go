@@ -138,7 +138,7 @@ func TestMessageFieldByNum(t *testing.T) {
 	}{
 		{
 			name: "FieldByNum found",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				sharedField,
 			),
 			fieldNum: fieldnum.EventEventType,
@@ -146,7 +146,7 @@ func TestMessageFieldByNum(t *testing.T) {
 		},
 		{
 			name: "FieldByNum not found",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				sharedField,
 			),
 			fieldNum: fieldnum.EventData,
@@ -177,7 +177,7 @@ func TestMessageFieldValueByNum(t *testing.T) {
 	}{
 		{
 			name: "FieldValueByNum found",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventEventType,
@@ -185,7 +185,7 @@ func TestMessageFieldValueByNum(t *testing.T) {
 		},
 		{
 			name: "FieldValueByNum not found",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventData,
@@ -213,7 +213,7 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 	}{
 		{
 			name: "remove existing field",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventEventType,
@@ -222,7 +222,7 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 		},
 		{
 			name: "remove field that is not exist",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
 			),
 			fieldNum: fieldnum.EventData,
@@ -358,7 +358,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 	}{
 		{
 			name: "fields only with non-array values",
-			mesg: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			mesg: proto.Message{Num: mesgnum.FileId}.WithFields(
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			),
 			mesgDef: proto.MessageDefinition{
@@ -376,7 +376,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 		{
 			name: "fields only with mesg architecture big-endian",
 			mesg: func() proto.Message {
-				mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+				mesg := proto.Message{Num: mesgnum.FileId}.WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 				)
 				mesg.Architecture = 1 // big-endian
@@ -397,7 +397,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 		},
 		{
 			name: "fields only with string value",
-			mesg: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			mesg: proto.Message{Num: mesgnum.FileId}.WithFields(
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("Fit SDK Go"),
 			),
 			mesgDef: proto.MessageDefinition{
@@ -414,7 +414,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 		},
 		{
 			name: "fields only with array of byte",
-			mesg: factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+			mesg: proto.Message{Num: mesgnum.UserProfile}.WithFields(
 				factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{2, 9}),
 			),
 			mesgDef: proto.MessageDefinition{
@@ -432,7 +432,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 
 		{
 			name: "developer fields",
-			mesg: factory.CreateMesgOnly(mesgnum.UserProfile).
+			mesg: proto.Message{Num: mesgnum.UserProfile}.
 				WithFields(
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(

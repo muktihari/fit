@@ -244,7 +244,7 @@ type Field struct {
 	*FieldBase
 
 	// Value holds any primitive-type single value (or slice value) in a form of proto.Value.
-	// We use proto.Value instead of interface{} since interface{} is (mostly) heap alloc and proto.Value does not.
+	// We use proto.Value instead of interface{} since interface{} is heap alloc while proto.Value is not.
 	Value Value
 
 	// A flag to detect whether this field is generated through component expansion.

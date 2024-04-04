@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"testing"
+	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/profile/basetype"
@@ -292,6 +293,18 @@ func TestSliceBool(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []test_bool{true, false}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]bool)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceBool(slice)
+		result := value.SliceBool()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceBool()
@@ -307,6 +320,18 @@ func TestSliceInt8(t *testing.T) {
 		value := SliceInt8(slice)
 		result := value.SliceInt8()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []int8{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]int8)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceInt8(slice)
+		result := value.SliceInt8()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
@@ -328,6 +353,18 @@ func TestSliceUint8(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []uint8{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]uint8)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceUint8(slice)
+		result := value.SliceUint8()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceUint8()
@@ -343,6 +380,18 @@ func TestSliceInt16(t *testing.T) {
 		value := SliceInt16(slice)
 		result := value.SliceInt16()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []int16{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]int16)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceInt16(slice)
+		result := value.SliceInt16()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
@@ -364,6 +413,18 @@ func TestSliceUint16(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []uint16{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]uint16)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceUint16(slice)
+		result := value.SliceUint16()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceUint16()
@@ -379,6 +440,18 @@ func TestSliceInt32(t *testing.T) {
 		value := SliceInt32(slice)
 		result := value.SliceInt32()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []int32{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]int32)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceInt32(slice)
+		result := value.SliceInt32()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
@@ -400,6 +473,18 @@ func TestSliceUint32(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []uint32{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]uint32)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceUint32(slice)
+		result := value.SliceUint32()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceUint32()
@@ -415,6 +500,18 @@ func TestSliceInt64(t *testing.T) {
 		value := SliceInt64(slice)
 		result := value.SliceInt64()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []int64{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]int64)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceInt64(slice)
+		result := value.SliceInt64()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
@@ -436,6 +533,18 @@ func TestSliceUint64(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []uint64{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]uint64)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceUint64(slice)
+		result := value.SliceUint64()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceUint64()
@@ -451,6 +560,18 @@ func TestSliceFloat32(t *testing.T) {
 		value := SliceFloat32(slice)
 		result := value.SliceFloat32()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []float32{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]float32)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceFloat32(slice)
+		result := value.SliceFloat32()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
@@ -472,6 +593,18 @@ func TestSliceFloat64(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []float64{1, 2}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]float64)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceFloat64(slice)
+		result := value.SliceFloat64()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceFloat64()
@@ -487,6 +620,18 @@ func TestSliceString(t *testing.T) {
 		value := SliceString(slice)
 		result := value.SliceString()
 		if diff := cmp.Diff(slice, result); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+	t.Run("correct custom type", func(t *testing.T) {
+		slice := []test_string{"fit", "sdk"}
+		expected := unsafe.Slice(unsafe.SliceData(*(*[]string)(unsafe.Pointer(&slice))), len(slice))
+		value := SliceString(slice)
+		result := value.SliceString()
+		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
+			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
+		}
+		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
