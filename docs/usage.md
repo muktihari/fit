@@ -52,7 +52,7 @@ func main() {
 
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
-    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType)) // FileId is always the first message; 4 = activity
+    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any()) // FileId is always the first message; 4 = activity
 
     // Output:
     // FileHeader DataSize: 94080
@@ -751,7 +751,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
     /* Do something with the Activity File, for example changing manufacturer and product like this */
     activity.FileId.Manufacturer = typedef.ManufacturerGarmin
-    activity.FileId.Product = uint16(typedef.GarminProductEdge530)
+    activity.FileId.Product = typedef.GarminProductEdge530.Uint16()
 
     // Convert back to RAW Protocol Messages
     fit := activity.ToFit(nil)

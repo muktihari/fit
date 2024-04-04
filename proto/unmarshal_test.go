@@ -99,8 +99,7 @@ func TestUnmarshal(t *testing.T) {
 			}
 			if diff := cmp.Diff(v, tc.expected,
 				cmp.Transformer("Value", func(val proto.Value) any {
-					x := val.Any()
-					return x
+					return val.Any()
 				}),
 			); diff != "" {
 				t.Fatal(diff)

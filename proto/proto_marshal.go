@@ -169,7 +169,7 @@ func (m *Message) WriteTo(w io.Writer) (n int64, err error) {
 		developerField := &m.DeveloperFields[i]
 		err = MarshalTo(&b, developerField.Value, byteorder.Select(m.Architecture))
 		if err != nil {
-			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value, err)
+			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value.Any(), err)
 		}
 	}
 

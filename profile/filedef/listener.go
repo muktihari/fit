@@ -116,21 +116,7 @@ func (l *Listener) loop() {
 	close(l.done)
 }
 
-func (l *Listener) OnMesg(mesg proto.Message) {
-	l.mesgc <- mesg
-	// if mesg.Num == mesgnum.FileId {
-	// 	fileType := typedef.File(mesg.FieldValueByNum(fieldnum.FileIdType).Uint8())
-	// 	newFile, ok := l.options.fileSets[fileType]
-	// 	if !ok {
-	// 		return
-	// 	}
-	// 	l.activeFile = newFile()
-	// }
-	// if l.activeFile == nil {
-	// 	return
-	// }
-	// l.activeFile.Add(mesg)
-}
+func (l *Listener) OnMesg(mesg proto.Message) { l.mesgc <- mesg }
 
 // Close closes channel and wait until all messages is consumed.
 func (l *Listener) Close() {

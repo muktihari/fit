@@ -286,7 +286,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 
 // discardMessages efficiently discards bytes used by messages.
 func (d *Decoder) discardMessages() (err error) {
-	arraySize := uint32(len(d.bytesArray))
+	const arraySize = uint32(len(d.bytesArray))
 	for d.cur < d.fileHeader.DataSize {
 		size := d.fileHeader.DataSize - d.cur
 		if size > arraySize {
@@ -366,9 +366,7 @@ func (d *Decoder) reset() {
 	d.accumulator.Reset()
 	d.crc16.Reset()
 	d.fileHeader = proto.FileHeader{}
-	if !d.options.broadcastOnly {
-		d.messages = nil // Must create new.
-	}
+	d.messages = nil
 	d.fileId = nil
 	d.developerDataIds = d.developerDataIds[:0]
 	d.fieldDescriptions = d.fieldDescriptions[:0]
@@ -620,7 +618,6 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		return err
 	}
 
-	// mesg.Fields = append([]proto.Field{}, mesg.Fields...)
 	mesg.Fields = make([]proto.Field, len(mesg.Fields))
 	copy(mesg.Fields, d.fieldsArray[:])
 

@@ -16,13 +16,6 @@ import (
 // The caller should ensure that the length of the given b matches its corresponding base type's size, otherwise it might panic.
 func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray bool) (Value, error) {
 	switch ref {
-	case basetype.Enum, basetype.Byte:
-		if isArray {
-			vals := make([]byte, len(b))
-			copy(vals, b)
-			return SliceUint8(vals), nil
-		}
-		return Uint8(b[0]), nil
 	case basetype.Sint8:
 		if isArray {
 			vs := make([]int8, 0, len(b))
@@ -32,7 +25,8 @@ func Unmarshal(b []byte, bo binary.ByteOrder, ref basetype.BaseType, isArray boo
 			return SliceInt8(vs), nil
 		}
 		return Int8(int8(b[0])), nil
-	case basetype.Uint8, basetype.Uint8z:
+	case basetype.Enum, basetype.Byte,
+		basetype.Uint8, basetype.Uint8z:
 		if isArray {
 			vals := make([]byte, len(b))
 			copy(vals, b)

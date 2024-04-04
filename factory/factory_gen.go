@@ -45,7 +45,7 @@ var ( // cache for CreateMesg method
 	protoMesgs [len(mesgs)]proto.Message // data is populated on CreateMesg first invocation.
 )
 
-// CreateMesg creates new message based on defined messages in the factory. If not found, it returns new unknown message.
+// CreateMesg creates new message based on defined messages in the factory. If not found, it returns proto.Message{Num: num}.
 //
 // This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
 // If you want a deep copy of the mesg, clone it by calling mesg.Clone().
@@ -95,8 +95,7 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	return mesg
 }
 
-// CreateMesgOnly creates new message without predefined fields. This is useful when we plan to fill these values ourselves
-// e.g the decoding process will populate them with decoded data.
+// CreateMesgOnly is a syntax sugar for creating proto.Message{Num: num}.
 func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 	return proto.Message{Num: num}
 }
