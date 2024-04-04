@@ -19,6 +19,8 @@ const (
 	MesgCountInvalid        MesgCount = 0xFF
 )
 
+func (m MesgCount) Byte() byte { return byte(m) }
+
 func (m MesgCount) String() string {
 	switch m {
 	case MesgCountNumPerFile:

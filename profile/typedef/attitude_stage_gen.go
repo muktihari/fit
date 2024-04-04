@@ -20,6 +20,8 @@ const (
 	AttitudeStageInvalid  AttitudeStage = 0xFF
 )
 
+func (a AttitudeStage) Byte() byte { return byte(a) }
+
 func (a AttitudeStage) String() string {
 	switch a {
 	case AttitudeStageFailed:

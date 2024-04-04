@@ -19,6 +19,8 @@ const (
 	AnalogWatchfaceLayoutInvalid     AnalogWatchfaceLayout = 0xFF
 )
 
+func (a AnalogWatchfaceLayout) Byte() byte { return byte(a) }
+
 func (a AnalogWatchfaceLayout) String() string {
 	switch a {
 	case AnalogWatchfaceLayoutMinimal:

@@ -20,6 +20,8 @@ const (
 	AntNetworkInvalid AntNetwork = 0xFF
 )
 
+func (a AntNetwork) Byte() byte { return byte(a) }
+
 func (a AntNetwork) String() string {
 	switch a {
 	case AntNetworkPublic:

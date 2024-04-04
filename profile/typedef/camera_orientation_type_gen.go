@@ -20,6 +20,8 @@ const (
 	CameraOrientationTypeInvalid              CameraOrientationType = 0xFF
 )
 
+func (c CameraOrientationType) Byte() byte { return byte(c) }
+
 func (c CameraOrientationType) String() string {
 	switch c {
 	case CameraOrientationTypeCameraOrientation0:

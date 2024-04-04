@@ -25,6 +25,8 @@ const (
 	LapTriggerInvalid          LapTrigger = 0xFF
 )
 
+func (l LapTrigger) Byte() byte { return byte(l) }
+
 func (l LapTrigger) String() string {
 	switch l {
 	case LapTriggerManual:

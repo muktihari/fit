@@ -55,6 +55,8 @@ const (
 	PullUpExerciseNameInvalid                          PullUpExerciseName = 0xFFFF
 )
 
+func (p PullUpExerciseName) Uint16() uint16 { return uint16(p) }
+
 func (p PullUpExerciseName) String() string {
 	switch p {
 	case PullUpExerciseNameBandedPullUps:

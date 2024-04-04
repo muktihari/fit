@@ -25,6 +25,8 @@ const (
 	ExdLayoutInvalid                   ExdLayout = 0xFF
 )
 
+func (e ExdLayout) Byte() byte { return byte(e) }
+
 func (e ExdLayout) String() string {
 	switch e {
 	case ExdLayoutFullScreen:

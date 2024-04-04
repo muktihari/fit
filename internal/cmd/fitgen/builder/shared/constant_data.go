@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
 )
 
 func FuncMap() template.FuncMap {
 	return template.FuncMap{
+		"ToTitle": strutil.ToTitle,
 		"ToLower": strings.ToLower,
 		"sprintf": fmt.Sprintf,
 	}

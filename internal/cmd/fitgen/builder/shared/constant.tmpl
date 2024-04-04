@@ -27,6 +27,10 @@ const (
     {{ .Invalid.Name }} {{ .Invalid.Type }} {{ .Invalid.Op }} {{ .Invalid.Value }}
 )
 
+{{ $r := printf "%.1s" $.Type | ToLower }}
+{{ $vals := print $.Type "ToString" | ToLower }}
+func ({{ $r }} {{ $.Type }}) {{ .Base | ToTitle }}() {{ .Base }} { return {{ .Base }}({{ $r }}) }
+
 {{ if .AllowRegister }}
 var {{ .Type | ToLower }}ToString = map[{{ .Type }}]string{}
 var stringTo{{ .Type }} = map[string]{{ .Type }}{}

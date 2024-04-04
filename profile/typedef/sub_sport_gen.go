@@ -105,6 +105,8 @@ const (
 	SubSportInvalid              SubSport = 0xFF
 )
 
+func (s SubSport) Byte() byte { return byte(s) }
+
 func (s SubSport) String() string {
 	switch s {
 	case SubSportGeneric:

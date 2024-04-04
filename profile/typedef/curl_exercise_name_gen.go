@@ -60,6 +60,8 @@ const (
 	CurlExerciseNameInvalid                                   CurlExerciseName = 0xFFFF
 )
 
+func (c CurlExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CurlExerciseName) String() string {
 	switch c {
 	case CurlExerciseNameAlternatingDumbbellBicepsCurl:

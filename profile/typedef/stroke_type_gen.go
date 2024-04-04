@@ -22,6 +22,8 @@ const (
 	StrokeTypeInvalid  StrokeType = 0xFF
 )
 
+func (s StrokeType) Byte() byte { return byte(s) }
+
 func (s StrokeType) String() string {
 	switch s {
 	case StrokeTypeNoEvent:

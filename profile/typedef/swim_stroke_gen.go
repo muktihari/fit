@@ -23,6 +23,8 @@ const (
 	SwimStrokeInvalid      SwimStroke = 0xFF
 )
 
+func (s SwimStroke) Byte() byte { return byte(s) }
+
 func (s SwimStroke) String() string {
 	switch s {
 	case SwimStrokeFreestyle:

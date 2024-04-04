@@ -23,6 +23,8 @@ const (
 	IntensityInvalid  Intensity = 0xFF
 )
 
+func (i Intensity) Byte() byte { return byte(i) }
+
 func (i Intensity) String() string {
 	switch i {
 	case IntensityActive:

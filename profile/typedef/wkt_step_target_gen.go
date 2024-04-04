@@ -30,6 +30,8 @@ const (
 	WktStepTargetInvalid      WktStepTarget = 0xFF
 )
 
+func (w WktStepTarget) Byte() byte { return byte(w) }
+
 func (w WktStepTarget) String() string {
 	switch w {
 	case WktStepTargetSpeed:

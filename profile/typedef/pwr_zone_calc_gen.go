@@ -18,6 +18,8 @@ const (
 	PwrZoneCalcInvalid    PwrZoneCalc = 0xFF
 )
 
+func (p PwrZoneCalc) Byte() byte { return byte(p) }
+
 func (p PwrZoneCalc) String() string {
 	switch p {
 	case PwrZoneCalcCustom:

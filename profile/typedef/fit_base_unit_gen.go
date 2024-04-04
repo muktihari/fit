@@ -19,6 +19,8 @@ const (
 	FitBaseUnitInvalid  FitBaseUnit = 0xFFFF
 )
 
+func (f FitBaseUnit) Uint16() uint16 { return uint16(f) }
+
 func (f FitBaseUnit) String() string {
 	switch f {
 	case FitBaseUnitOther:

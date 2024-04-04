@@ -20,6 +20,8 @@ const (
 	RiderPositionTypeInvalid              RiderPositionType = 0xFF
 )
 
+func (r RiderPositionType) Byte() byte { return byte(r) }
+
 func (r RiderPositionType) String() string {
 	switch r {
 	case RiderPositionTypeSeated:

@@ -19,6 +19,8 @@ const (
 	GasConsumptionRateTypeInvalid     GasConsumptionRateType = 0xFF
 )
 
+func (g GasConsumptionRateType) Byte() byte { return byte(g) }
+
 func (g GasConsumptionRateType) String() string {
 	switch g {
 	case GasConsumptionRateTypePressureSac:

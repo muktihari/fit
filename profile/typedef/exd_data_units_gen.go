@@ -66,6 +66,8 @@ const (
 	ExdDataUnitsInvalid                        ExdDataUnits = 0xFF
 )
 
+func (e ExdDataUnits) Byte() byte { return byte(e) }
+
 func (e ExdDataUnits) String() string {
 	switch e {
 	case ExdDataUnitsNoUnits:

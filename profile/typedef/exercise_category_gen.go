@@ -50,6 +50,8 @@ const (
 	ExerciseCategoryInvalid           ExerciseCategory = 0xFFFF
 )
 
+func (e ExerciseCategory) Uint16() uint16 { return uint16(e) }
+
 func (e ExerciseCategory) String() string {
 	switch e {
 	case ExerciseCategoryBenchPress:

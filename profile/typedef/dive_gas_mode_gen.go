@@ -18,6 +18,8 @@ const (
 	DiveGasModeInvalid              DiveGasMode = 0xFF
 )
 
+func (d DiveGasMode) Byte() byte { return byte(d) }
+
 func (d DiveGasMode) String() string {
 	switch d {
 	case DiveGasModeOpenCircuit:

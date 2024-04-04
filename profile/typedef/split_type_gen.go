@@ -37,6 +37,8 @@ const (
 	SplitTypeInvalid          SplitType = 0xFF
 )
 
+func (s SplitType) Byte() byte { return byte(s) }
+
 func (s SplitType) String() string {
 	switch s {
 	case SplitTypeAscentSplit:

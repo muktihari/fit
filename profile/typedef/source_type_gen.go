@@ -22,6 +22,8 @@ const (
 	SourceTypeInvalid            SourceType = 0xFF
 )
 
+func (s SourceType) Byte() byte { return byte(s) }
+
 func (s SourceType) String() string {
 	switch s {
 	case SourceTypeAnt:

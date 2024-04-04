@@ -27,6 +27,8 @@ const (
 	SegmentLeaderboardTypeInvalid      SegmentLeaderboardType = 0xFF
 )
 
+func (s SegmentLeaderboardType) Byte() byte { return byte(s) }
+
 func (s SegmentLeaderboardType) String() string {
 	switch s {
 	case SegmentLeaderboardTypeOverall:

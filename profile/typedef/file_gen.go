@@ -37,6 +37,8 @@ const (
 	FileInvalid          File = 0xFF
 )
 
+func (f File) Byte() byte { return byte(f) }
+
 var fileToString = map[File]string{}
 var stringToFile = map[string]File{}
 

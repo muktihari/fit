@@ -17,6 +17,8 @@ const (
 	BacklightTimeoutInvalid  BacklightTimeout = 0xFF
 )
 
+func (b BacklightTimeout) Uint8() uint8 { return uint8(b) }
+
 func (b BacklightTimeout) String() string {
 	switch b {
 	case BacklightTimeoutInfinite:

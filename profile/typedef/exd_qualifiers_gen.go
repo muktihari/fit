@@ -60,6 +60,8 @@ const (
 	ExdQualifiersInvalid                  ExdQualifiers = 0xFF
 )
 
+func (e ExdQualifiers) Byte() byte { return byte(e) }
+
 func (e ExdQualifiers) String() string {
 	switch e {
 	case ExdQualifiersNoQualifier:

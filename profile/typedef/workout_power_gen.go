@@ -17,6 +17,8 @@ const (
 	WorkoutPowerInvalid     WorkoutPower = 0xFFFFFFFF
 )
 
+func (w WorkoutPower) Uint32() uint32 { return uint32(w) }
+
 func (w WorkoutPower) String() string {
 	switch w {
 	case WorkoutPowerWattsOffset:

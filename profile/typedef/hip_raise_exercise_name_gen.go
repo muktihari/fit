@@ -66,6 +66,8 @@ const (
 	HipRaiseExerciseNameInvalid                                         HipRaiseExerciseName = 0xFFFF
 )
 
+func (h HipRaiseExerciseName) Uint16() uint16 { return uint16(h) }
+
 func (h HipRaiseExerciseName) String() string {
 	switch h {
 	case HipRaiseExerciseNameBarbellHipThrustOnFloor:

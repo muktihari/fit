@@ -20,6 +20,8 @@ const (
 	AntChannelIdInvalid                            AntChannelId = 0x0
 )
 
+func (a AntChannelId) Uint32() uint32 { return uint32(a) }
+
 func (a AntChannelId) String() string {
 	switch a {
 	case AntChannelIdAntExtendedDeviceNumberUpperNibble:

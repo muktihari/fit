@@ -21,6 +21,8 @@ const (
 	DisplayOrientationInvalid          DisplayOrientation = 0xFF
 )
 
+func (d DisplayOrientation) Byte() byte { return byte(d) }
+
 func (d DisplayOrientation) String() string {
 	switch d {
 	case DisplayOrientationAuto:

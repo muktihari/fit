@@ -21,6 +21,8 @@ const (
 	BpStatusInvalid                 BpStatus = 0xFF
 )
 
+func (b BpStatus) Byte() byte { return byte(b) }
+
 func (b BpStatus) String() string {
 	switch b {
 	case BpStatusNoError:

@@ -18,6 +18,8 @@ const (
 	BikeLightBeamAngleModeInvalid BikeLightBeamAngleMode = 0xFF
 )
 
+func (b BikeLightBeamAngleMode) Uint8() uint8 { return uint8(b) }
+
 func (b BikeLightBeamAngleMode) String() string {
 	switch b {
 	case BikeLightBeamAngleModeManual:

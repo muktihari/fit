@@ -19,6 +19,8 @@ const (
 	DisplayHeartInvalid DisplayHeart = 0xFF
 )
 
+func (d DisplayHeart) Byte() byte { return byte(d) }
+
 func (d DisplayHeart) String() string {
 	switch d {
 	case DisplayHeartBpm:

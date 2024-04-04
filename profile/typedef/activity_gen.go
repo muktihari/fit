@@ -18,6 +18,8 @@ const (
 	ActivityInvalid        Activity = 0xFF
 )
 
+func (a Activity) Byte() byte { return byte(a) }
+
 func (a Activity) String() string {
 	switch a {
 	case ActivityManual:

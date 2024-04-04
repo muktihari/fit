@@ -17,6 +17,8 @@ const (
 	WeightInvalid     Weight = 0xFFFF
 )
 
+func (w Weight) Uint16() uint16 { return uint16(w) }
+
 func (w Weight) String() string {
 	switch w {
 	case WeightCalculating:

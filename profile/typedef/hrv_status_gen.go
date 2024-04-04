@@ -21,6 +21,8 @@ const (
 	HrvStatusInvalid    HrvStatus = 0xFF
 )
 
+func (h HrvStatus) Byte() byte { return byte(h) }
+
 func (h HrvStatus) String() string {
 	switch h {
 	case HrvStatusNone:

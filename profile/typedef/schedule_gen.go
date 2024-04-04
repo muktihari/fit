@@ -18,6 +18,8 @@ const (
 	ScheduleInvalid Schedule = 0xFF
 )
 
+func (s Schedule) Byte() byte { return byte(s) }
+
 func (s Schedule) String() string {
 	switch s {
 	case ScheduleWorkout:

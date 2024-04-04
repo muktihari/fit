@@ -24,6 +24,8 @@ const (
 	LanguageBits3Invalid   LanguageBits3 = 0x0
 )
 
+func (l LanguageBits3) Uint8() uint8 { return uint8(l) }
+
 func (l LanguageBits3) String() string {
 	switch l {
 	case LanguageBits3Bulgarian:

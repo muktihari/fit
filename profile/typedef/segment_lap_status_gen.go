@@ -18,6 +18,8 @@ const (
 	SegmentLapStatusInvalid SegmentLapStatus = 0xFF
 )
 
+func (s SegmentLapStatus) Byte() byte { return byte(s) }
+
 func (s SegmentLapStatus) String() string {
 	switch s {
 	case SegmentLapStatusEnd:

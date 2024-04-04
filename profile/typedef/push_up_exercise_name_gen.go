@@ -95,6 +95,8 @@ const (
 	PushUpExerciseNameInvalid                                    PushUpExerciseName = 0xFFFF
 )
 
+func (p PushUpExerciseName) Uint16() uint16 { return uint16(p) }
+
 func (p PushUpExerciseName) String() string {
 	switch p {
 	case PushUpExerciseNameChestPressWithBand:

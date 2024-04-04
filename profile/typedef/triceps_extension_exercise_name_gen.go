@@ -57,6 +57,8 @@ const (
 	TricepsExtensionExerciseNameInvalid                                      TricepsExtensionExerciseName = 0xFFFF
 )
 
+func (t TricepsExtensionExerciseName) Uint16() uint16 { return uint16(t) }
+
 func (t TricepsExtensionExerciseName) String() string {
 	switch t {
 	case TricepsExtensionExerciseNameBenchDip:

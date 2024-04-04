@@ -24,6 +24,8 @@ const (
 	LocalDeviceTypeInvalid       LocalDeviceType = 0xFF
 )
 
+func (l LocalDeviceType) Uint8() uint8 { return uint8(l) }
+
 func (l LocalDeviceType) String() string {
 	switch l {
 	case LocalDeviceTypeGps:

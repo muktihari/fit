@@ -19,6 +19,8 @@ const (
 	DigitalWatchfaceLayoutInvalid     DigitalWatchfaceLayout = 0xFF
 )
 
+func (d DigitalWatchfaceLayout) Byte() byte { return byte(d) }
+
 func (d DigitalWatchfaceLayout) String() string {
 	switch d {
 	case DigitalWatchfaceLayoutTraditional:

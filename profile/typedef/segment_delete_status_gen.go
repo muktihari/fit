@@ -19,6 +19,8 @@ const (
 	SegmentDeleteStatusInvalid     SegmentDeleteStatus = 0xFF
 )
 
+func (s SegmentDeleteStatus) Byte() byte { return byte(s) }
+
 func (s SegmentDeleteStatus) String() string {
 	switch s {
 	case SegmentDeleteStatusDoNotDelete:

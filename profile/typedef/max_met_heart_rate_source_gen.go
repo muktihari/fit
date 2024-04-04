@@ -18,6 +18,8 @@ const (
 	MaxMetHeartRateSourceInvalid MaxMetHeartRateSource = 0xFF
 )
 
+func (m MaxMetHeartRateSource) Byte() byte { return byte(m) }
+
 func (m MaxMetHeartRateSource) String() string {
 	switch m {
 	case MaxMetHeartRateSourceWhr:

@@ -19,6 +19,8 @@ const (
 	SwitchInvalid Switch = 0xFF
 )
 
+func (s Switch) Byte() byte { return byte(s) }
+
 func (s Switch) String() string {
 	switch s {
 	case SwitchOff:

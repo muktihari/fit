@@ -19,6 +19,8 @@ const (
 	DisplayMeasureInvalid  DisplayMeasure = 0xFF
 )
 
+func (d DisplayMeasure) Byte() byte { return byte(d) }
+
 func (d DisplayMeasure) String() string {
 	switch d {
 	case DisplayMeasureMetric:

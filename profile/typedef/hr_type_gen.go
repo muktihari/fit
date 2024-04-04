@@ -18,6 +18,8 @@ const (
 	HrTypeInvalid   HrType = 0xFF
 )
 
+func (h HrType) Byte() byte { return byte(h) }
+
 func (h HrType) String() string {
 	switch h {
 	case HrTypeNormal:

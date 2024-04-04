@@ -89,6 +89,8 @@ const (
 	CoreExerciseNameInvalid                          CoreExerciseName = 0xFFFF
 )
 
+func (c CoreExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CoreExerciseName) String() string {
 	switch c {
 	case CoreExerciseNameAbsJabs:

@@ -17,6 +17,8 @@ const (
 	DeviceIndexInvalid DeviceIndex = 0xFF
 )
 
+func (d DeviceIndex) Uint8() uint8 { return uint8(d) }
+
 func (d DeviceIndex) String() string {
 	switch d {
 	case DeviceIndexCreator:

@@ -18,6 +18,8 @@ const (
 	SideInvalid Side = 0xFF
 )
 
+func (s Side) Byte() byte { return byte(s) }
+
 func (s Side) String() string {
 	switch s {
 	case SideRight:

@@ -56,6 +56,8 @@ const (
 	HyperextensionExerciseNameInvalid                                         HyperextensionExerciseName = 0xFFFF
 )
 
+func (h HyperextensionExerciseName) Uint16() uint16 { return uint16(h) }
+
 func (h HyperextensionExerciseName) String() string {
 	switch h {
 	case HyperextensionExerciseNameBackExtensionWithOppositeArmAndLegReach:

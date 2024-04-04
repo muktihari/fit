@@ -27,6 +27,8 @@ const (
 	ExdDisplayTypeInvalid           ExdDisplayType = 0xFF
 )
 
+func (e ExdDisplayType) Byte() byte { return byte(e) }
+
 func (e ExdDisplayType) String() string {
 	switch e {
 	case ExdDisplayTypeNumerical:

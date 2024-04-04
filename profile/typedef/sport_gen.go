@@ -85,6 +85,8 @@ const (
 	SportInvalid               Sport = 0xFF
 )
 
+func (s Sport) Byte() byte { return byte(s) }
+
 func (s Sport) String() string {
 	switch s {
 	case SportGeneric:

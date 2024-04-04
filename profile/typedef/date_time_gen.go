@@ -17,6 +17,8 @@ const (
 	DateTimeInvalid DateTime = 0xFFFFFFFF
 )
 
+func (d DateTime) Uint32() uint32 { return uint32(d) }
+
 func (d DateTime) String() string {
 	switch d {
 	case DateTimeMin:

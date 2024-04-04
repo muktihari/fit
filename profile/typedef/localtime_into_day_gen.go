@@ -16,6 +16,8 @@ const (
 	LocaltimeIntoDayInvalid LocaltimeIntoDay = 0xFFFFFFFF
 )
 
+func (l LocaltimeIntoDay) Uint32() uint32 { return uint32(l) }
+
 func (l LocaltimeIntoDay) String() string {
 	switch l {
 	default:

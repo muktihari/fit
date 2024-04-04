@@ -448,6 +448,8 @@ const (
 	GarminProductInvalid                    GarminProduct = 0xFFFF
 )
 
+func (g GarminProduct) Uint16() uint16 { return uint16(g) }
+
 func (g GarminProduct) String() string {
 	switch g {
 	case GarminProductHrm1:

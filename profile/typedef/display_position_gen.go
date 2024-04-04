@@ -58,6 +58,8 @@ const (
 	DisplayPositionInvalid              DisplayPosition = 0xFF
 )
 
+func (d DisplayPosition) Byte() byte { return byte(d) }
+
 func (d DisplayPosition) String() string {
 	switch d {
 	case DisplayPositionDegree:

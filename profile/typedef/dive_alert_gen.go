@@ -55,6 +55,8 @@ const (
 	DiveAlertInvalid                   DiveAlert = 0xFF
 )
 
+func (d DiveAlert) Byte() byte { return byte(d) }
+
 func (d DiveAlert) String() string {
 	switch d {
 	case DiveAlertNdlReached:

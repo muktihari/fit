@@ -20,6 +20,8 @@ const (
 	Spo2MeasurementTypeInvalid         Spo2MeasurementType = 0xFF
 )
 
+func (s Spo2MeasurementType) Byte() byte { return byte(s) }
+
 func (s Spo2MeasurementType) String() string {
 	switch s {
 	case Spo2MeasurementTypeOffWrist:

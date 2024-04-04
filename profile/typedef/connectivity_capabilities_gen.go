@@ -48,6 +48,8 @@ const (
 	ConnectivityCapabilitiesInvalid                         ConnectivityCapabilities = 0x0
 )
 
+func (c ConnectivityCapabilities) Uint32() uint32 { return uint32(c) }
+
 func (c ConnectivityCapabilities) String() string {
 	switch c {
 	case ConnectivityCapabilitiesBluetooth:

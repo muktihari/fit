@@ -25,6 +25,8 @@ const (
 	SportEventInvalid        SportEvent = 0xFF
 )
 
+func (s SportEvent) Byte() byte { return byte(s) }
+
 func (s SportEvent) String() string {
 	switch s {
 	case SportEventUncategorized:

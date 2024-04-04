@@ -38,6 +38,8 @@ const (
 	LegRaiseExerciseNameInvalid                            LegRaiseExerciseName = 0xFFFF
 )
 
+func (l LegRaiseExerciseName) Uint16() uint16 { return uint16(l) }
+
 func (l LegRaiseExerciseName) String() string {
 	switch l {
 	case LegRaiseExerciseNameHangingKneeRaise:

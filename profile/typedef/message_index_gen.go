@@ -19,6 +19,8 @@ const (
 	MessageIndexInvalid  MessageIndex = 0xFFFF
 )
 
+func (m MessageIndex) Uint16() uint16 { return uint16(m) }
+
 func (m MessageIndex) String() string {
 	switch m {
 	case MessageIndexSelected:

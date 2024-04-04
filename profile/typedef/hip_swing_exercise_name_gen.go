@@ -19,6 +19,8 @@ const (
 	HipSwingExerciseNameInvalid                  HipSwingExerciseName = 0xFFFF
 )
 
+func (h HipSwingExerciseName) Uint16() uint16 { return uint16(h) }
+
 func (h HipSwingExerciseName) String() string {
 	switch h {
 	case HipSwingExerciseNameSingleArmKettlebellSwing:

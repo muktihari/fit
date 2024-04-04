@@ -113,6 +113,8 @@ const (
 	ExdDescriptorsInvalid                          ExdDescriptors = 0xFF
 )
 
+func (e ExdDescriptors) Byte() byte { return byte(e) }
+
 func (e ExdDescriptors) String() string {
 	switch e {
 	case ExdDescriptorsBikeLightBatteryStatus:

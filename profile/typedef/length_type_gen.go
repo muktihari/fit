@@ -18,6 +18,8 @@ const (
 	LengthTypeInvalid LengthType = 0xFF
 )
 
+func (l LengthType) Byte() byte { return byte(l) }
+
 func (l LengthType) String() string {
 	switch l {
 	case LengthTypeIdle:

@@ -19,6 +19,8 @@ const (
 	FileFlagsInvalid FileFlags = 0x0
 )
 
+func (f FileFlags) Uint8() uint8 { return uint8(f) }
+
 func (f FileFlags) String() string {
 	switch f {
 	case FileFlagsRead:

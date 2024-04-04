@@ -20,6 +20,8 @@ const (
 	ToneInvalid        Tone = 0xFF
 )
 
+func (t Tone) Byte() byte { return byte(t) }
+
 func (t Tone) String() string {
 	switch t {
 	case ToneOff:

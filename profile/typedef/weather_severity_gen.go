@@ -21,6 +21,8 @@ const (
 	WeatherSeverityInvalid   WeatherSeverity = 0xFF
 )
 
+func (w WeatherSeverity) Byte() byte { return byte(w) }
+
 func (w WeatherSeverity) String() string {
 	switch w {
 	case WeatherSeverityUnknown:

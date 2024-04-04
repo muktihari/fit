@@ -41,6 +41,8 @@ const (
 	AntplusDeviceTypeInvalid                 AntplusDeviceType = 0xFF
 )
 
+func (a AntplusDeviceType) Uint8() uint8 { return uint8(a) }
+
 func (a AntplusDeviceType) String() string {
 	switch a {
 	case AntplusDeviceTypeAntfs:

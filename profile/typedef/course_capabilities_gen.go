@@ -28,6 +28,8 @@ const (
 	CourseCapabilitiesInvalid    CourseCapabilities = 0x0
 )
 
+func (c CourseCapabilities) Uint32() uint32 { return uint32(c) }
+
 func (c CourseCapabilities) String() string {
 	switch c {
 	case CourseCapabilitiesProcessed:

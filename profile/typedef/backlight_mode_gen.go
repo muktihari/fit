@@ -23,6 +23,8 @@ const (
 	BacklightModeInvalid                             BacklightMode = 0xFF
 )
 
+func (b BacklightMode) Byte() byte { return byte(b) }
+
 func (b BacklightMode) String() string {
 	switch b {
 	case BacklightModeOff:

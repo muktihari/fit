@@ -50,6 +50,8 @@ const (
 	RowExerciseNameInvalid                                    RowExerciseName = 0xFFFF
 )
 
+func (r RowExerciseName) Uint16() uint16 { return uint16(r) }
+
 func (r RowExerciseName) String() string {
 	switch r {
 	case RowExerciseNameBarbellStraightLegDeadliftToRow:

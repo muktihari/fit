@@ -21,6 +21,8 @@ const (
 	CarryExerciseNameInvalid           CarryExerciseName = 0xFFFF
 )
 
+func (c CarryExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CarryExerciseName) String() string {
 	switch c {
 	case CarryExerciseNameBarHolds:

@@ -20,6 +20,8 @@ const (
 	RunExerciseNameInvalid RunExerciseName = 0xFFFF
 )
 
+func (r RunExerciseName) Uint16() uint16 { return uint16(r) }
+
 func (r RunExerciseName) String() string {
 	switch r {
 	case RunExerciseNameRun:

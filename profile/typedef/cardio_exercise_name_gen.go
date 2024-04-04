@@ -38,6 +38,8 @@ const (
 	CardioExerciseNameInvalid                   CardioExerciseName = 0xFFFF
 )
 
+func (c CardioExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CardioExerciseName) String() string {
 	switch c {
 	case CardioExerciseNameBobAndWeaveCircle:

@@ -36,6 +36,8 @@ const (
 	ActivitySubtypeInvalid       ActivitySubtype = 0xFF
 )
 
+func (a ActivitySubtype) Byte() byte { return byte(a) }
+
 func (a ActivitySubtype) String() string {
 	switch a {
 	case ActivitySubtypeGeneric:

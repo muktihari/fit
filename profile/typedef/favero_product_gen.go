@@ -18,6 +18,8 @@ const (
 	FaveroProductInvalid    FaveroProduct = 0xFFFF
 )
 
+func (f FaveroProduct) Uint16() uint16 { return uint16(f) }
+
 func (f FaveroProduct) String() string {
 	switch f {
 	case FaveroProductAssiomaUno:

@@ -22,6 +22,8 @@ const (
 	GoalRecurrenceInvalid GoalRecurrence = 0xFF
 )
 
+func (g GoalRecurrence) Byte() byte { return byte(g) }
+
 func (g GoalRecurrence) String() string {
 	switch g {
 	case GoalRecurrenceOff:

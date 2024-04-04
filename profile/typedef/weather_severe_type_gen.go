@@ -101,6 +101,8 @@ const (
 	WeatherSevereTypeInvalid                 WeatherSevereType = 0xFF
 )
 
+func (w WeatherSevereType) Byte() byte { return byte(w) }
+
 func (w WeatherSevereType) String() string {
 	switch w {
 	case WeatherSevereTypeUnspecified:

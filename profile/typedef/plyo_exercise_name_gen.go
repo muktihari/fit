@@ -49,6 +49,8 @@ const (
 	PlyoExerciseNameInvalid                               PlyoExerciseName = 0xFFFF
 )
 
+func (p PlyoExerciseName) Uint16() uint16 { return uint16(p) }
+
 func (p PlyoExerciseName) String() string {
 	switch p {
 	case PlyoExerciseNameAlternatingJumpLunge:

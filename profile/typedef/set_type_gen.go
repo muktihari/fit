@@ -18,6 +18,8 @@ const (
 	SetTypeInvalid SetType = 0xFF
 )
 
+func (s SetType) Uint8() uint8 { return uint8(s) }
+
 func (s SetType) String() string {
 	switch s {
 	case SetTypeRest:

@@ -22,6 +22,8 @@ const (
 	TimeModeInvalid           TimeMode = 0xFF
 )
 
+func (t TimeMode) Byte() byte { return byte(t) }
+
 func (t TimeMode) String() string {
 	switch t {
 	case TimeModeHour12:

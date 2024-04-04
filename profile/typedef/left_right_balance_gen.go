@@ -18,6 +18,8 @@ const (
 	LeftRightBalanceInvalid LeftRightBalance = 0xFF
 )
 
+func (l LeftRightBalance) Uint8() uint8 { return uint8(l) }
+
 func (l LeftRightBalance) String() string {
 	switch l {
 	case LeftRightBalanceMask:

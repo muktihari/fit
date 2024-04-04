@@ -20,6 +20,8 @@ const (
 	HrZoneCalcInvalid      HrZoneCalc = 0xFF
 )
 
+func (h HrZoneCalc) Byte() byte { return byte(h) }
+
 func (h HrZoneCalc) String() string {
 	switch h {
 	case HrZoneCalcCustom:

@@ -17,6 +17,8 @@ const (
 	TissueModelTypeInvalid TissueModelType = 0xFF
 )
 
+func (t TissueModelType) Byte() byte { return byte(t) }
+
 func (t TissueModelType) String() string {
 	switch t {
 	case TissueModelTypeZhl16C:

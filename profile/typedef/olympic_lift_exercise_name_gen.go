@@ -37,6 +37,8 @@ const (
 	OlympicLiftExerciseNameInvalid                    OlympicLiftExerciseName = 0xFFFF
 )
 
+func (o OlympicLiftExerciseName) Uint16() uint16 { return uint16(o) }
+
 func (o OlympicLiftExerciseName) String() string {
 	switch o {
 	case OlympicLiftExerciseNameBarbellHangPowerClean:

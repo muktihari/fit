@@ -40,6 +40,8 @@ const (
 	ShoulderPressExerciseNameInvalid                                  ShoulderPressExerciseName = 0xFFFF
 )
 
+func (s ShoulderPressExerciseName) Uint16() uint16 { return uint16(s) }
+
 func (s ShoulderPressExerciseName) String() string {
 	switch s {
 	case ShoulderPressExerciseNameAlternatingDumbbellShoulderPress:

@@ -20,6 +20,8 @@ const (
 	WatchfaceModeInvalid   WatchfaceMode = 0xFF
 )
 
+func (w WatchfaceMode) Byte() byte { return byte(w) }
+
 func (w WatchfaceMode) String() string {
 	switch w {
 	case WatchfaceModeDigital:

@@ -19,6 +19,8 @@ const (
 	GoalSourceInvalid   GoalSource = 0xFF
 )
 
+func (g GoalSource) Byte() byte { return byte(g) }
+
 func (g GoalSource) String() string {
 	switch g {
 	case GoalSourceAuto:

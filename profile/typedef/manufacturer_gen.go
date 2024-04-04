@@ -238,6 +238,8 @@ const (
 	ManufacturerInvalid                Manufacturer = 0xFFFF
 )
 
+func (m Manufacturer) Uint16() uint16 { return uint16(m) }
+
 func (m Manufacturer) String() string {
 	switch m {
 	case ManufacturerGarmin:

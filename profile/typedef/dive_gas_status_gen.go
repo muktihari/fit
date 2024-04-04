@@ -19,6 +19,8 @@ const (
 	DiveGasStatusInvalid    DiveGasStatus = 0xFF
 )
 
+func (d DiveGasStatus) Byte() byte { return byte(d) }
+
 func (d DiveGasStatus) String() string {
 	switch d {
 	case DiveGasStatusDisabled:

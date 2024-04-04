@@ -49,6 +49,8 @@ const (
 	ShoulderStabilityExerciseNameInvalid                                ShoulderStabilityExerciseName = 0xFFFF
 )
 
+func (s ShoulderStabilityExerciseName) Uint16() uint16 { return uint16(s) }
+
 func (s ShoulderStabilityExerciseName) String() string {
 	switch s {
 	case ShoulderStabilityExerciseName90DegreeCableExternalRotation:

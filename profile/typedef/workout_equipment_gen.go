@@ -22,6 +22,8 @@ const (
 	WorkoutEquipmentInvalid       WorkoutEquipment = 0xFF
 )
 
+func (w WorkoutEquipment) Byte() byte { return byte(w) }
+
 func (w WorkoutEquipment) String() string {
 	switch w {
 	case WorkoutEquipmentNone:

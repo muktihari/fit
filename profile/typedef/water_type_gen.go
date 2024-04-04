@@ -20,6 +20,8 @@ const (
 	WaterTypeInvalid WaterType = 0xFF
 )
 
+func (w WaterType) Byte() byte { return byte(w) }
+
 func (w WaterType) String() string {
 	switch w {
 	case WaterTypeFresh:

@@ -30,6 +30,8 @@ const (
 	WorkoutCapabilitiesInvalid          WorkoutCapabilities = 0x0
 )
 
+func (w WorkoutCapabilities) Uint32() uint32 { return uint32(w) }
+
 func (w WorkoutCapabilities) String() string {
 	switch w {
 	case WorkoutCapabilitiesInterval:

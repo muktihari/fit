@@ -20,6 +20,8 @@ const (
 	WeatherReportInvalid        WeatherReport = 0xFF
 )
 
+func (w WeatherReport) Byte() byte { return byte(w) }
+
 func (w WeatherReport) String() string {
 	switch w {
 	case WeatherReportCurrent:

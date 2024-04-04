@@ -18,6 +18,8 @@ const (
 	DateModeInvalid  DateMode = 0xFF
 )
 
+func (d DateMode) Byte() byte { return byte(d) }
+
 func (d DateMode) String() string {
 	switch d {
 	case DateModeDayMonth:

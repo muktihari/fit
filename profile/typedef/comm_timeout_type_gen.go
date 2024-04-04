@@ -20,6 +20,8 @@ const (
 	CommTimeoutTypeInvalid                CommTimeoutType = 0xFFFF
 )
 
+func (c CommTimeoutType) Uint16() uint16 { return uint16(c) }
+
 func (c CommTimeoutType) String() string {
 	switch c {
 	case CommTimeoutTypeWildcardPairingTimeout:

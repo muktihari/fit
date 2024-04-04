@@ -24,6 +24,8 @@ const (
 	SupportedExdScreenLayoutsInvalid                   SupportedExdScreenLayouts = 0x0
 )
 
+func (s SupportedExdScreenLayouts) Uint32() uint32 { return uint32(s) }
+
 func (s SupportedExdScreenLayouts) String() string {
 	switch s {
 	case SupportedExdScreenLayoutsFullScreen:

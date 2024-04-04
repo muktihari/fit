@@ -62,6 +62,8 @@ const (
 	EventInvalid               Event = 0xFF
 )
 
+func (e Event) Byte() byte { return byte(e) }
+
 func (e Event) String() string {
 	switch e {
 	case EventTimer:

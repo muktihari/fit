@@ -50,6 +50,8 @@ const (
 	LateralRaiseExerciseNameInvalid                               LateralRaiseExerciseName = 0xFFFF
 )
 
+func (l LateralRaiseExerciseName) Uint16() uint16 { return uint16(l) }
+
 func (l LateralRaiseExerciseName) String() string {
 	switch l {
 	case LateralRaiseExerciseName45DegreeCableExternalRotation:

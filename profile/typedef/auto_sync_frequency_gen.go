@@ -21,6 +21,8 @@ const (
 	AutoSyncFrequencyInvalid      AutoSyncFrequency = 0xFF
 )
 
+func (a AutoSyncFrequency) Byte() byte { return byte(a) }
+
 func (a AutoSyncFrequency) String() string {
 	switch a {
 	case AutoSyncFrequencyNever:

@@ -47,6 +47,8 @@ const (
 	WktStepDurationInvalid                            WktStepDuration = 0xFF
 )
 
+func (w WktStepDuration) Byte() byte { return byte(w) }
+
 func (w WktStepDuration) String() string {
 	switch w {
 	case WktStepDurationTime:

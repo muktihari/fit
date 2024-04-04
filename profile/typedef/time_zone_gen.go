@@ -122,6 +122,8 @@ const (
 	TimeZoneInvalid                  TimeZone = 0xFF
 )
 
+func (t TimeZone) Byte() byte { return byte(t) }
+
 func (t TimeZone) String() string {
 	switch t {
 	case TimeZoneAlmaty:

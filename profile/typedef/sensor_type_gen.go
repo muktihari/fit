@@ -20,6 +20,8 @@ const (
 	SensorTypeInvalid       SensorType = 0xFF
 )
 
+func (s SensorType) Byte() byte { return byte(s) }
+
 func (s SensorType) String() string {
 	switch s {
 	case SensorTypeAccelerometer:

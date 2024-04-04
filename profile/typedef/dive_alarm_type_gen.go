@@ -19,6 +19,8 @@ const (
 	DiveAlarmTypeInvalid DiveAlarmType = 0xFF
 )
 
+func (d DiveAlarmType) Byte() byte { return byte(d) }
+
 func (d DiveAlarmType) String() string {
 	switch d {
 	case DiveAlarmTypeDepth:

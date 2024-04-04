@@ -35,6 +35,8 @@ const (
 	DeadliftExerciseNameInvalid                               DeadliftExerciseName = 0xFFFF
 )
 
+func (d DeadliftExerciseName) Uint16() uint16 { return uint16(d) }
+
 func (d DeadliftExerciseName) String() string {
 	switch d {
 	case DeadliftExerciseNameBarbellDeadlift:

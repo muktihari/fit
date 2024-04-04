@@ -21,6 +21,8 @@ const (
 	SleepLevelInvalid      SleepLevel = 0xFF
 )
 
+func (s SleepLevel) Byte() byte { return byte(s) }
+
 func (s SleepLevel) String() string {
 	switch s {
 	case SleepLevelUnmeasurable:

@@ -18,6 +18,8 @@ const (
 	DiveBacklightModeInvalid  DiveBacklightMode = 0xFF
 )
 
+func (d DiveBacklightMode) Byte() byte { return byte(d) }
+
 func (d DiveBacklightMode) String() string {
 	switch d {
 	case DiveBacklightModeAtDepth:

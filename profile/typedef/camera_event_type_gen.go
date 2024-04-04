@@ -29,6 +29,8 @@ const (
 	CameraEventTypeInvalid                     CameraEventType = 0xFF
 )
 
+func (c CameraEventType) Byte() byte { return byte(c) }
+
 func (c CameraEventType) String() string {
 	switch c {
 	case CameraEventTypeVideoStart:

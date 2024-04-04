@@ -20,6 +20,8 @@ const (
 	FitnessEquipmentStateInvalid FitnessEquipmentState = 0xFF
 )
 
+func (f FitnessEquipmentState) Byte() byte { return byte(f) }
+
 func (f FitnessEquipmentState) String() string {
 	switch f {
 	case FitnessEquipmentStateReady:

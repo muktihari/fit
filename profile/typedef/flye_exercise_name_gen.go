@@ -26,6 +26,8 @@ const (
 	FlyeExerciseNameInvalid                           FlyeExerciseName = 0xFFFF
 )
 
+func (f FlyeExerciseName) Uint16() uint16 { return uint16(f) }
+
 func (f FlyeExerciseName) String() string {
 	switch f {
 	case FlyeExerciseNameCableCrossover:

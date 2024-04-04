@@ -138,6 +138,8 @@ const (
 	MesgNumInvalid                     MesgNum = 0xFFFF
 )
 
+func (m MesgNum) Uint16() uint16 { return uint16(m) }
+
 var mesgnumToString = map[MesgNum]string{}
 var stringToMesgNum = map[string]MesgNum{}
 

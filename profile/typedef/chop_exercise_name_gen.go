@@ -39,6 +39,8 @@ const (
 	ChopExerciseNameInvalid                            ChopExerciseName = 0xFFFF
 )
 
+func (c ChopExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c ChopExerciseName) String() string {
 	switch c {
 	case ChopExerciseNameCablePullThrough:

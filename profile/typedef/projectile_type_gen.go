@@ -22,6 +22,8 @@ const (
 	ProjectileTypeInvalid         ProjectileType = 0xFF
 )
 
+func (p ProjectileType) Byte() byte { return byte(p) }
+
 func (p ProjectileType) String() string {
 	switch p {
 	case ProjectileTypeArrow:

@@ -20,6 +20,8 @@ const (
 	AutoscrollInvalid Autoscroll = 0xFF
 )
 
+func (a Autoscroll) Byte() byte { return byte(a) }
+
 func (a Autoscroll) String() string {
 	switch a {
 	case AutoscrollNone:

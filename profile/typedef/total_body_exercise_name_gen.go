@@ -29,6 +29,8 @@ const (
 	TotalBodyExerciseNameInvalid                          TotalBodyExerciseName = 0xFFFF
 )
 
+func (t TotalBodyExerciseName) Uint16() uint16 { return uint16(t) }
+
 func (t TotalBodyExerciseName) String() string {
 	switch t {
 	case TotalBodyExerciseNameBurpee:

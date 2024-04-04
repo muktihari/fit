@@ -37,6 +37,8 @@ const (
 	CalfRaiseExerciseNameInvalid                            CalfRaiseExerciseName = 0xFFFF
 )
 
+func (c CalfRaiseExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CalfRaiseExerciseName) String() string {
 	switch c {
 	case CalfRaiseExerciseName3WayCalfRaise:

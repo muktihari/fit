@@ -97,6 +97,8 @@ const (
 	LungeExerciseNameInvalid                                       LungeExerciseName = 0xFFFF
 )
 
+func (l LungeExerciseName) Uint16() uint16 { return uint16(l) }
+
 func (l LungeExerciseName) String() string {
 	switch l {
 	case LungeExerciseNameOverheadLunge:

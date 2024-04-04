@@ -19,6 +19,8 @@ const (
 	ActivityLevelInvalid ActivityLevel = 0xFF
 )
 
+func (a ActivityLevel) Byte() byte { return byte(a) }
+
 func (a ActivityLevel) String() string {
 	switch a {
 	case ActivityLevelLow:

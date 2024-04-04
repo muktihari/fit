@@ -56,6 +56,8 @@ const (
 	BodyLocationInvalid               BodyLocation = 0xFF
 )
 
+func (b BodyLocation) Byte() byte { return byte(b) }
+
 func (b BodyLocation) String() string {
 	switch b {
 	case BodyLocationLeftLeg:

@@ -18,6 +18,8 @@ const (
 	ChecksumInvalid Checksum = 0xFF
 )
 
+func (c Checksum) Uint8() uint8 { return uint8(c) }
+
 func (c Checksum) String() string {
 	switch c {
 	case ChecksumClear:

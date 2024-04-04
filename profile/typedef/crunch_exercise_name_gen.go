@@ -101,6 +101,8 @@ const (
 	CrunchExerciseNameInvalid                                 CrunchExerciseName = 0xFFFF
 )
 
+func (c CrunchExerciseName) Uint16() uint16 { return uint16(c) }
+
 func (c CrunchExerciseName) String() string {
 	switch c {
 	case CrunchExerciseNameBicycleCrunch:

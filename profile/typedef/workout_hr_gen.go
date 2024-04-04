@@ -17,6 +17,8 @@ const (
 	WorkoutHrInvalid   WorkoutHr = 0xFFFFFFFF
 )
 
+func (w WorkoutHr) Uint32() uint32 { return uint32(w) }
+
 func (w WorkoutHr) String() string {
 	switch w {
 	case WorkoutHrBpmOffset:

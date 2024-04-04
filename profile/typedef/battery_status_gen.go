@@ -23,6 +23,8 @@ const (
 	BatteryStatusInvalid  BatteryStatus = 0xFF
 )
 
+func (b BatteryStatus) Uint8() uint8 { return uint8(b) }
+
 func (b BatteryStatus) String() string {
 	switch b {
 	case BatteryStatusNew:

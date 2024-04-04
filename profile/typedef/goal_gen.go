@@ -23,6 +23,8 @@ const (
 	GoalInvalid       Goal = 0xFF
 )
 
+func (g Goal) Byte() byte { return byte(g) }
+
 func (g Goal) String() string {
 	switch g {
 	case GoalTime:

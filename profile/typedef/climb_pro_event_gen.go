@@ -19,6 +19,8 @@ const (
 	ClimbProEventInvalid  ClimbProEvent = 0xFF
 )
 
+func (c ClimbProEvent) Byte() byte { return byte(c) }
+
 func (c ClimbProEvent) String() string {
 	switch c {
 	case ClimbProEventApproach:

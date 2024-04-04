@@ -47,6 +47,8 @@ const (
 	WarmUpExerciseNameInvalid                     WarmUpExerciseName = 0xFFFF
 )
 
+func (w WarmUpExerciseName) Uint16() uint16 { return uint16(w) }
+
 func (w WarmUpExerciseName) String() string {
 	switch w {
 	case WarmUpExerciseNameQuadrupedRocking:

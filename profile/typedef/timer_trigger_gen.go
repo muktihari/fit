@@ -19,6 +19,8 @@ const (
 	TimerTriggerInvalid          TimerTrigger = 0xFF
 )
 
+func (t TimerTrigger) Byte() byte { return byte(t) }
+
 func (t TimerTrigger) String() string {
 	switch t {
 	case TimerTriggerManual:

@@ -18,6 +18,8 @@ const (
 	NoFlyTimeModeInvalid     NoFlyTimeMode = 0xFF
 )
 
+func (n NoFlyTimeMode) Byte() byte { return byte(n) }
+
 func (n NoFlyTimeMode) String() string {
 	switch n {
 	case NoFlyTimeModeStandard:

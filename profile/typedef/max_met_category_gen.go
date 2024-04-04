@@ -18,6 +18,8 @@ const (
 	MaxMetCategoryInvalid MaxMetCategory = 0xFF
 )
 
+func (m MaxMetCategory) Byte() byte { return byte(m) }
+
 func (m MaxMetCategory) String() string {
 	switch m {
 	case MaxMetCategoryGeneric:

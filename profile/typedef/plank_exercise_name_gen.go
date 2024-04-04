@@ -151,6 +151,8 @@ const (
 	PlankExerciseNameInvalid                                          PlankExerciseName = 0xFFFF
 )
 
+func (p PlankExerciseName) Uint16() uint16 { return uint16(p) }
+
 func (p PlankExerciseName) String() string {
 	switch p {
 	case PlankExerciseName45DegreePlank:

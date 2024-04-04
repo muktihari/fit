@@ -55,6 +55,8 @@ const (
 	LanguageInvalid             Language = 0xFF
 )
 
+func (l Language) Byte() byte { return byte(l) }
+
 func (l Language) String() string {
 	switch l {
 	case LanguageEnglish:

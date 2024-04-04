@@ -23,6 +23,8 @@ const (
 	AutoActivityDetectInvalid    AutoActivityDetect = 0xFFFFFFFF
 )
 
+func (a AutoActivityDetect) Uint32() uint32 { return uint32(a) }
+
 func (a AutoActivityDetect) String() string {
 	switch a {
 	case AutoActivityDetectNone:

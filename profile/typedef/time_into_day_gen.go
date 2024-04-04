@@ -16,6 +16,8 @@ const (
 	TimeIntoDayInvalid TimeIntoDay = 0xFFFFFFFF
 )
 
+func (t TimeIntoDay) Uint32() uint32 { return uint32(t) }
+
 func (t TimeIntoDay) String() string {
 	switch t {
 	default:

@@ -26,6 +26,8 @@ const (
 	EventTypeInvalid                EventType = 0xFF
 )
 
+func (e EventType) Byte() byte { return byte(e) }
+
 func (e EventType) String() string {
 	switch e {
 	case EventTypeStart:

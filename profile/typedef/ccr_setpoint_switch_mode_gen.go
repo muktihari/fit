@@ -18,6 +18,8 @@ const (
 	CcrSetpointSwitchModeInvalid   CcrSetpointSwitchMode = 0xFF
 )
 
+func (c CcrSetpointSwitchMode) Byte() byte { return byte(c) }
+
 func (c CcrSetpointSwitchMode) String() string {
 	switch c {
 	case CcrSetpointSwitchModeManual:

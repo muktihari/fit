@@ -24,6 +24,8 @@ const (
 	BleDeviceTypeInvalid          BleDeviceType = 0xFF
 )
 
+func (b BleDeviceType) Uint8() uint8 { return uint8(b) }
+
 func (b BleDeviceType) String() string {
 	switch b {
 	case BleDeviceTypeConnectedGps:

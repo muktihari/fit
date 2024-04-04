@@ -17,6 +17,8 @@ const (
 	LocalDateTimeInvalid LocalDateTime = 0xFFFFFFFF
 )
 
+func (l LocalDateTime) Uint32() uint32 { return uint32(l) }
+
 func (l LocalDateTime) String() string {
 	switch l {
 	case LocalDateTimeMin:

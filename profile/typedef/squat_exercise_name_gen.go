@@ -108,6 +108,8 @@ const (
 	SquatExerciseNameInvalid                                         SquatExerciseName = 0xFFFF
 )
 
+func (s SquatExerciseName) Uint16() uint16 { return uint16(s) }
+
 func (s SquatExerciseName) String() string {
 	switch s {
 	case SquatExerciseNameLegPress:

@@ -54,6 +54,8 @@ const (
 	TurnTypeInvalid                 TurnType = 0xFF
 )
 
+func (t TurnType) Byte() byte { return byte(t) }
+
 func (t TurnType) String() string {
 	switch t {
 	case TurnTypeArrivingIdx:

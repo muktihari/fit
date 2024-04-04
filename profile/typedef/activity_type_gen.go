@@ -25,6 +25,8 @@ const (
 	ActivityTypeInvalid          ActivityType = 0xFF
 )
 
+func (a ActivityType) Byte() byte { return byte(a) }
+
 func (a ActivityType) String() string {
 	switch a {
 	case ActivityTypeGeneric:

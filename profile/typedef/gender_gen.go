@@ -18,6 +18,8 @@ const (
 	GenderInvalid Gender = 0xFF
 )
 
+func (g Gender) Byte() byte { return byte(g) }
+
 func (g Gender) String() string {
 	switch g {
 	case GenderFemale:

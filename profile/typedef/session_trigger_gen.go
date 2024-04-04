@@ -20,6 +20,8 @@ const (
 	SessionTriggerInvalid          SessionTrigger = 0xFF
 )
 
+func (s SessionTrigger) Byte() byte { return byte(s) }
+
 func (s SessionTrigger) String() string {
 	switch s {
 	case SessionTriggerActivityEnd:

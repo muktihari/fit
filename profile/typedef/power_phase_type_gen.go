@@ -20,6 +20,8 @@ const (
 	PowerPhaseTypeInvalid              PowerPhaseType = 0xFF
 )
 
+func (p PowerPhaseType) Byte() byte { return byte(p) }
+
 func (p PowerPhaseType) String() string {
 	switch p {
 	case PowerPhaseTypePowerPhaseStartAngle:

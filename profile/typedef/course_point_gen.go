@@ -69,6 +69,8 @@ const (
 	CoursePointInvalid         CoursePoint = 0xFF
 )
 
+func (c CoursePoint) Byte() byte { return byte(c) }
+
 func (c CoursePoint) String() string {
 	switch c {
 	case CoursePointGeneric:

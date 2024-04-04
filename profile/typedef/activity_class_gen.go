@@ -19,6 +19,8 @@ const (
 	ActivityClassInvalid  ActivityClass = 0xFF
 )
 
+func (a ActivityClass) Byte() byte { return byte(a) }
+
 func (a ActivityClass) String() string {
 	switch a {
 	case ActivityClassLevel:

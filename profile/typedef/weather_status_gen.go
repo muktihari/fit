@@ -37,6 +37,8 @@ const (
 	WeatherStatusInvalid                WeatherStatus = 0xFF
 )
 
+func (w WeatherStatus) Byte() byte { return byte(w) }
+
 func (w WeatherStatus) String() string {
 	switch w {
 	case WeatherStatusClear:

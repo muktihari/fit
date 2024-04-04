@@ -18,6 +18,8 @@ const (
 	SegmentSelectionTypeInvalid   SegmentSelectionType = 0xFF
 )
 
+func (s SegmentSelectionType) Byte() byte { return byte(s) }
+
 func (s SegmentSelectionType) String() string {
 	switch s {
 	case SegmentSelectionTypeStarred:

@@ -43,6 +43,8 @@ const (
 	BenchPressExerciseNameInvalid                                  BenchPressExerciseName = 0xFFFF
 )
 
+func (b BenchPressExerciseName) Uint16() uint16 { return uint16(b) }
+
 func (b BenchPressExerciseName) String() string {
 	switch b {
 	case BenchPressExerciseNameAlternatingDumbbellChestPressOnSwissBall:

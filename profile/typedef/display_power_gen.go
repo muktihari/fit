@@ -18,6 +18,8 @@ const (
 	DisplayPowerInvalid    DisplayPower = 0xFF
 )
 
+func (d DisplayPower) Byte() byte { return byte(d) }
+
 func (d DisplayPower) String() string {
 	switch d {
 	case DisplayPowerWatts:

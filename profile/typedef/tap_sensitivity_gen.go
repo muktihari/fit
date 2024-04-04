@@ -19,6 +19,8 @@ const (
 	TapSensitivityInvalid TapSensitivity = 0xFF
 )
 
+func (t TapSensitivity) Byte() byte { return byte(t) }
+
 func (t TapSensitivity) String() string {
 	switch t {
 	case TapSensitivityHigh:

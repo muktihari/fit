@@ -54,6 +54,8 @@ const (
 	SitUpExerciseNameInvalid                             SitUpExerciseName = 0xFFFF
 )
 
+func (s SitUpExerciseName) Uint16() uint16 { return uint16(s) }
+
 func (s SitUpExerciseName) String() string {
 	switch s {
 	case SitUpExerciseNameAlternatingSitUp:

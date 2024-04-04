@@ -24,6 +24,8 @@ const (
 	SportBits5Invalid     SportBits5 = 0x0
 )
 
+func (s SportBits5) Uint8() uint8 { return uint8(s) }
+
 func (s SportBits5) String() string {
 	switch s {
 	case SportBits5WaterSkiing:

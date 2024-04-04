@@ -20,6 +20,8 @@ const (
 	RadarThreatLevelTypeInvalid               RadarThreatLevelType = 0xFF
 )
 
+func (r RadarThreatLevelType) Byte() byte { return byte(r) }
+
 func (r RadarThreatLevelType) String() string {
 	switch r {
 	case RadarThreatLevelTypeThreatUnknown:

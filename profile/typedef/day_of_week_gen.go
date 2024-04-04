@@ -23,6 +23,8 @@ const (
 	DayOfWeekInvalid   DayOfWeek = 0xFF
 )
 
+func (d DayOfWeek) Byte() byte { return byte(d) }
+
 func (d DayOfWeek) String() string {
 	switch d {
 	case DayOfWeekSunday:

@@ -19,6 +19,8 @@ const (
 	MaxMetSpeedSourceInvalid      MaxMetSpeedSource = 0xFF
 )
 
+func (m MaxMetSpeedSource) Byte() byte { return byte(m) }
+
 func (m MaxMetSpeedSource) String() string {
 	switch m {
 	case MaxMetSpeedSourceOnboardGps:

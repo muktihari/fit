@@ -22,6 +22,8 @@ const (
 	UserLocalIdInvalid       UserLocalId = 0xFFFF
 )
 
+func (u UserLocalId) Uint16() uint16 { return uint16(u) }
+
 func (u UserLocalId) String() string {
 	switch u {
 	case UserLocalIdLocalMin:

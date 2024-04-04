@@ -23,6 +23,8 @@ const (
 	AutolapTriggerInvalid          AutolapTrigger = 0xFF
 )
 
+func (a AutolapTrigger) Byte() byte { return byte(a) }
+
 func (a AutolapTrigger) String() string {
 	switch a {
 	case AutolapTriggerTime:

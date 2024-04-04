@@ -20,6 +20,8 @@ const (
 	BikeLightNetworkConfigTypeInvalid        BikeLightNetworkConfigType = 0xFF
 )
 
+func (b BikeLightNetworkConfigType) Byte() byte { return byte(b) }
+
 func (b BikeLightNetworkConfigType) String() string {
 	switch b {
 	case BikeLightNetworkConfigTypeAuto:

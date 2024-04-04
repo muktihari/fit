@@ -33,6 +33,8 @@ const (
 	ShrugExerciseNameInvalid                        ShrugExerciseName = 0xFFFF
 )
 
+func (s ShrugExerciseName) Uint16() uint16 { return uint16(s) }
+
 func (s ShrugExerciseName) String() string {
 	switch s {
 	case ShrugExerciseNameBarbellJumpShrug:

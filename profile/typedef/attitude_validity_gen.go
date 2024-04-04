@@ -29,6 +29,8 @@ const (
 	AttitudeValidityInvalid                AttitudeValidity = 0xFFFF
 )
 
+func (a AttitudeValidity) Uint16() uint16 { return uint16(a) }
+
 func (a AttitudeValidity) String() string {
 	switch a {
 	case AttitudeValidityTrackAngleHeadingValid:

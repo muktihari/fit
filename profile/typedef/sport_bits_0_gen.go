@@ -24,6 +24,8 @@ const (
 	SportBits0Invalid          SportBits0 = 0x0
 )
 
+func (s SportBits0) Uint8() uint8 { return uint8(s) }
+
 func (s SportBits0) String() string {
 	switch s {
 	case SportBits0Generic:
