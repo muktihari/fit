@@ -664,7 +664,9 @@ func TestAny(t *testing.T) {
 	}{
 		{value: int(0), expected: nil},
 		{value: uint(0), expected: nil},
-		{value: []any{}, expected: nil},
+		{value: []int{0}, expected: nil},
+		{value: []uint{0}, expected: nil},
+		{value: []any{0}, expected: nil},
 		{value: Bool(true), expected: true},
 		{value: bool(true), expected: bool(true)},
 		{value: bool(false), expected: bool(false)},

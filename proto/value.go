@@ -561,10 +561,10 @@ func SliceString[S []E, E ~string](s S) Value {
 
 // Any converts any value into Value. If the given v is not a primitive-type value (or a slice of primitive-type)
 // it will determine it using reflection, and if it's a slice it will make 1 alloc.
-// If v is not supported such as int, uint, []any, slice with zero len, etc., Value with TypeInvalid is returned.
+// If v is not supported such as int, uint, []int, []uint, []any, slice with zero len, etc., Value with TypeInvalid is returned.
 func Any(v any) Value {
 	switch val := v.(type) { // Fast path
-	case int, uint, []any: // Fast return on invalid value
+	case int, uint, []int, []uint, []any: // Fast return on invalid value
 		return Value{any: TypeInvalid}
 	case Value:
 		return val
