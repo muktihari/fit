@@ -55,17 +55,6 @@ const (
 	Uint64zInvalid uint64 = 0              // 0x0000000000000000
 )
 
-var (
-	float32InvalidInFloatForm = math.Float32frombits(Float32Invalid)
-	float64InvalidInFloatForm = math.Float64frombits(Float64Invalid)
-)
-
-// Float32InvalidInFloatForm is math.Float32frombits(Float32Invalid)
-func Float32InvalidInFloatForm() float32 { return float32InvalidInFloatForm }
-
-// Float64InvalidInFloatForm is math.Float64frombits(Float64Invalid)
-func Float64InvalidInFloatForm() float64 { return float64InvalidInFloatForm }
-
 // FromString convert given s into BaseType, if not valid 255 will be returned.
 func FromString(s string) BaseType {
 	switch s {
@@ -302,9 +291,9 @@ func (t BaseType) Invalid() any {
 	case String:
 		return StringInvalid
 	case Float32:
-		return float32InvalidInFloatForm
+		return math.Float32frombits(Float32Invalid)
 	case Float64:
-		return float64InvalidInFloatForm
+		return math.Float64frombits(Float64Invalid)
 	case Uint8z:
 		return Uint8zInvalid
 	case Uint16z:

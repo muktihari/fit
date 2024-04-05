@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -237,7 +238,7 @@ func (m *DiveSummary) ToMesg(options *Options) proto.Message {
 // If AvgDepth value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgDepthScaled() float64 {
 	if m.AvgDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
 }
@@ -247,7 +248,7 @@ func (m *DiveSummary) AvgDepthScaled() float64 {
 // If MaxDepth value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) MaxDepthScaled() float64 {
 	if m.MaxDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
 }
@@ -257,7 +258,7 @@ func (m *DiveSummary) MaxDepthScaled() float64 {
 // If BottomTime value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) BottomTimeScaled() float64 {
 	if m.BottomTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BottomTime, 1000, 0)
 }
@@ -267,7 +268,7 @@ func (m *DiveSummary) BottomTimeScaled() float64 {
 // If DescentTime value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) DescentTimeScaled() float64 {
 	if m.DescentTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.DescentTime, 1000, 0)
 }
@@ -277,7 +278,7 @@ func (m *DiveSummary) DescentTimeScaled() float64 {
 // If AscentTime value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AscentTimeScaled() float64 {
 	if m.AscentTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AscentTime, 1000, 0)
 }
@@ -287,7 +288,7 @@ func (m *DiveSummary) AscentTimeScaled() float64 {
 // If AvgAscentRate value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgAscentRateScaled() float64 {
 	if m.AvgAscentRate == basetype.Sint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgAscentRate, 1000, 0)
 }
@@ -297,7 +298,7 @@ func (m *DiveSummary) AvgAscentRateScaled() float64 {
 // If AvgDescentRate value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgDescentRateScaled() float64 {
 	if m.AvgDescentRate == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgDescentRate, 1000, 0)
 }
@@ -307,7 +308,7 @@ func (m *DiveSummary) AvgDescentRateScaled() float64 {
 // If MaxAscentRate value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) MaxAscentRateScaled() float64 {
 	if m.MaxAscentRate == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxAscentRate, 1000, 0)
 }
@@ -317,7 +318,7 @@ func (m *DiveSummary) MaxAscentRateScaled() float64 {
 // If MaxDescentRate value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) MaxDescentRateScaled() float64 {
 	if m.MaxDescentRate == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxDescentRate, 1000, 0)
 }
@@ -327,7 +328,7 @@ func (m *DiveSummary) MaxDescentRateScaled() float64 {
 // If HangTime value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) HangTimeScaled() float64 {
 	if m.HangTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.HangTime, 1000, 0)
 }
@@ -337,7 +338,7 @@ func (m *DiveSummary) HangTimeScaled() float64 {
 // If AvgPressureSac value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgPressureSacScaled() float64 {
 	if m.AvgPressureSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgPressureSac, 100, 0)
 }
@@ -347,7 +348,7 @@ func (m *DiveSummary) AvgPressureSacScaled() float64 {
 // If AvgVolumeSac value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgVolumeSacScaled() float64 {
 	if m.AvgVolumeSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgVolumeSac, 100, 0)
 }
@@ -357,7 +358,7 @@ func (m *DiveSummary) AvgVolumeSacScaled() float64 {
 // If AvgRmv value is invalid, float64 invalid value will be returned.
 func (m *DiveSummary) AvgRmvScaled() float64 {
 	if m.AvgRmv == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgRmv, 100, 0)
 }

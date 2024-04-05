@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -125,7 +126,7 @@ func (m *TimestampCorrelation) ToMesg(options *Options) proto.Message {
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
 func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }
@@ -135,7 +136,7 @@ func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
 // If FractionalSystemTimestamp value is invalid, float64 invalid value will be returned.
 func (m *TimestampCorrelation) FractionalSystemTimestampScaled() float64 {
 	if m.FractionalSystemTimestamp == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FractionalSystemTimestamp, 32768, 0)
 }

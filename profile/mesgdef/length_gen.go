@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -240,7 +241,7 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
 func (m *Length) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
@@ -250,7 +251,7 @@ func (m *Length) TotalElapsedTimeScaled() float64 {
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
 func (m *Length) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
@@ -260,7 +261,7 @@ func (m *Length) TotalTimerTimeScaled() float64 {
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *Length) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
@@ -270,7 +271,7 @@ func (m *Length) AvgSpeedScaled() float64 {
 // If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
 func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
 }
@@ -280,7 +281,7 @@ func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
 // If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
 func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }

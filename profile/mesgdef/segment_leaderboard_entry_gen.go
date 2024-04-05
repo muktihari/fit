@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SegmentLeaderboardEntry is a SegmentLeaderboardEntry message.
@@ -123,7 +124,7 @@ func (m *SegmentLeaderboardEntry) ToMesg(options *Options) proto.Message {
 // If SegmentTime value is invalid, float64 invalid value will be returned.
 func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
 	if m.SegmentTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SegmentTime, 1000, 0)
 }

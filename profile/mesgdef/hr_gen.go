@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -138,7 +139,7 @@ func (m *Hr) EventTimestampScaled() []float64 {
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
 func (m *Hr) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }
@@ -148,7 +149,7 @@ func (m *Hr) FractionalTimestampScaled() float64 {
 // If Time256 value is invalid, float64 invalid value will be returned.
 func (m *Hr) Time256Scaled() float64 {
 	if m.Time256 == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Time256, 256, 0)
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SpeedZone is a SpeedZone message.
@@ -95,7 +96,7 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 // If HighValue value is invalid, float64 invalid value will be returned.
 func (m *SpeedZone) HighValueScaled() float64 {
 	if m.HighValue == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.HighValue, 1000, 0)
 }

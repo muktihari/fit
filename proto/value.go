@@ -89,9 +89,9 @@ func (t Type) String() string {
 // Using == on two Values is disallowed.
 type Value struct {
 	_ [0]func() // disallow ==
-	// num holds numeric value when single value, hold slice's len when slice value.
+	// num holds a numeric value when it's single value, and hold slice's len when it's a slice value.
 	num uint64
-	// any holds Type when single value, hold a pointer to the slice when slice value.
+	// any holds a Type when it's a single value, and hold a pointer to the slice when it's slice value.
 	//
 	// This implementation takes advantage of compiler interface optimization:
 	// - Compiler adds global [256]byte array called 'staticbytes' to every binary.
@@ -245,7 +245,7 @@ func (v Value) Uint64z() uint64 {
 // Float32 returns Value as float32, if it's not a valid float32 value, it returns basetype.Float32Invalid (0xFFFFFFFF) in float32 value.
 func (v Value) Float32() float32 {
 	if v.any != TypeFloat32 {
-		return basetype.Float32InvalidInFloatForm()
+		return math.Float32frombits(basetype.Float32Invalid)
 	}
 	return math.Float32frombits(uint32(v.num))
 }
@@ -253,7 +253,7 @@ func (v Value) Float32() float32 {
 // Float64 returns Value as float64, if it's not a valid float64 value, it returns basetype.Float64Invalid (0xFFFFFFFFFFFFFFFF) in float64 value.
 func (v Value) Float64() float64 {
 	if v.any != TypeFloat64 {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return math.Float64frombits(v.num)
 }
@@ -645,7 +645,7 @@ func Any(v any) Value {
 		return String(rv.String())
 	case reflect.Slice: // Always alloc since it makes new slice.
 		if rv.Len() == 0 {
-			return Value{}
+			return Value{any: TypeInvalid}
 		}
 		switch rv.Index(0).Kind() {
 		case reflect.Bool:

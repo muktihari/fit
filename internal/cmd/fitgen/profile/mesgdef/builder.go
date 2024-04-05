@@ -189,6 +189,10 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
 			}
 
+			if !(f.Scale == 1 && f.Offset == 0) && f.Array != true {
+				imports["math"] = struct{}{}
+			}
+
 			if strings.HasPrefix(f.ComparableValue, "math") {
 				imports["math"] = struct{}{}
 			}

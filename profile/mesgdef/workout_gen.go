@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // Workout is a Workout message.
@@ -130,7 +131,7 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 // If PoolLength value is invalid, float64 invalid value will be returned.
 func (m *Workout) PoolLengthScaled() float64 {
 	if m.PoolLength == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.PoolLength, 100, 0)
 }

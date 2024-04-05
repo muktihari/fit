@@ -9,6 +9,7 @@ package factory
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/muktihari/fit/profile"
@@ -3646,7 +3647,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -3726,7 +3727,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			11: {
 				FieldBase: &proto.FieldBase{
@@ -7256,7 +7257,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			182: {
 				FieldBase: &proto.FieldBase{
@@ -7272,7 +7273,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			183: {
 				FieldBase: &proto.FieldBase{
@@ -7304,7 +7305,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			187: {
 				FieldBase: &proto.FieldBase{
@@ -7320,7 +7321,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			194: {
 				FieldBase: &proto.FieldBase{
@@ -9338,7 +9339,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			150: {
 				FieldBase: &proto.FieldBase{
@@ -9354,7 +9355,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			151: {
 				FieldBase: &proto.FieldBase{
@@ -9386,7 +9387,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			154: {
 				FieldBase: &proto.FieldBase{
@@ -9402,7 +9403,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			156: {
 				FieldBase: &proto.FieldBase{
@@ -10997,7 +10998,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			115: {
 				FieldBase: &proto.FieldBase{
@@ -11013,7 +11014,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			116: {
 				FieldBase: &proto.FieldBase{
@@ -14572,7 +14573,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -14588,7 +14589,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -14620,7 +14621,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -14636,7 +14637,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -15357,7 +15358,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -17668,7 +17669,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			85: {
 				FieldBase: &proto.FieldBase{
@@ -17684,7 +17685,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			86: {
 				FieldBase: &proto.FieldBase{
@@ -17700,7 +17701,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			87: {
 				FieldBase: &proto.FieldBase{
@@ -17716,7 +17717,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Float32(basetype.Float32InvalidInFloatForm()), /* Default Value: Invalid */
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 			89: {
 				FieldBase: &proto.FieldBase{

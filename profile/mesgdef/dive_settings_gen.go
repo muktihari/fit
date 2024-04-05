@@ -322,7 +322,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 // If CcrLowSetpointDepth value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
 	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
 }
@@ -332,7 +332,7 @@ func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
 // If CcrHighSetpointDepth value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
 	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
 }
@@ -342,7 +342,7 @@ func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
 // If Po2Warn value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) Po2WarnScaled() float64 {
 	if m.Po2Warn == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Po2Warn, 100, 0)
 }
@@ -352,7 +352,7 @@ func (m *DiveSettings) Po2WarnScaled() float64 {
 // If Po2Critical value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) Po2CriticalScaled() float64 {
 	if m.Po2Critical == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Po2Critical, 100, 0)
 }
@@ -362,7 +362,7 @@ func (m *DiveSettings) Po2CriticalScaled() float64 {
 // If Po2Deco value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) Po2DecoScaled() float64 {
 	if m.Po2Deco == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Po2Deco, 100, 0)
 }
@@ -372,7 +372,7 @@ func (m *DiveSettings) Po2DecoScaled() float64 {
 // If CcrLowSetpoint value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 	if m.CcrLowSetpoint == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CcrLowSetpoint, 100, 0)
 }
@@ -382,7 +382,7 @@ func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 // If CcrHighSetpoint value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 	if m.CcrHighSetpoint == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CcrHighSetpoint, 100, 0)
 }
@@ -392,7 +392,7 @@ func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 // If LastStopMultiple value is invalid, float64 invalid value will be returned.
 func (m *DiveSettings) LastStopMultipleScaled() float64 {
 	if m.LastStopMultiple == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LastStopMultiple, 10, 0)
 }

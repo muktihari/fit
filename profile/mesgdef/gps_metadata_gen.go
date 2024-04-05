@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -149,7 +150,7 @@ func (m *GpsMetadata) VelocityScaled() []float64 {
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
 func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
@@ -159,7 +160,7 @@ func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
 func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
 }
@@ -169,7 +170,7 @@ func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
 // If Heading value is invalid, float64 invalid value will be returned.
 func (m *GpsMetadata) HeadingScaled() float64 {
 	if m.Heading == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Heading, 100, 0)
 }

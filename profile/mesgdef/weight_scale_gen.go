@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -174,7 +175,7 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 // If Weight value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) WeightScaled() float64 {
 	if uint16(m.Weight) == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Weight, 100, 0)
 }
@@ -184,7 +185,7 @@ func (m *WeightScale) WeightScaled() float64 {
 // If PercentFat value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) PercentFatScaled() float64 {
 	if m.PercentFat == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.PercentFat, 100, 0)
 }
@@ -194,7 +195,7 @@ func (m *WeightScale) PercentFatScaled() float64 {
 // If PercentHydration value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) PercentHydrationScaled() float64 {
 	if m.PercentHydration == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.PercentHydration, 100, 0)
 }
@@ -204,7 +205,7 @@ func (m *WeightScale) PercentHydrationScaled() float64 {
 // If VisceralFatMass value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) VisceralFatMassScaled() float64 {
 	if m.VisceralFatMass == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VisceralFatMass, 100, 0)
 }
@@ -214,7 +215,7 @@ func (m *WeightScale) VisceralFatMassScaled() float64 {
 // If BoneMass value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) BoneMassScaled() float64 {
 	if m.BoneMass == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BoneMass, 100, 0)
 }
@@ -224,7 +225,7 @@ func (m *WeightScale) BoneMassScaled() float64 {
 // If MuscleMass value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) MuscleMassScaled() float64 {
 	if m.MuscleMass == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MuscleMass, 100, 0)
 }
@@ -234,7 +235,7 @@ func (m *WeightScale) MuscleMassScaled() float64 {
 // If BasalMet value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) BasalMetScaled() float64 {
 	if m.BasalMet == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BasalMet, 4, 0)
 }
@@ -244,7 +245,7 @@ func (m *WeightScale) BasalMetScaled() float64 {
 // If ActiveMet value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) ActiveMetScaled() float64 {
 	if m.ActiveMet == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.ActiveMet, 4, 0)
 }
@@ -254,7 +255,7 @@ func (m *WeightScale) ActiveMetScaled() float64 {
 // If Bmi value is invalid, float64 invalid value will be returned.
 func (m *WeightScale) BmiScaled() float64 {
 	if m.Bmi == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Bmi, 10, 0)
 }

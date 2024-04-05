@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -209,7 +210,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 // If SoftwareVersion value is invalid, float64 invalid value will be returned.
 func (m *DeviceInfo) SoftwareVersionScaled() float64 {
 	if m.SoftwareVersion == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SoftwareVersion, 100, 0)
 }
@@ -219,7 +220,7 @@ func (m *DeviceInfo) SoftwareVersionScaled() float64 {
 // If BatteryVoltage value is invalid, float64 invalid value will be returned.
 func (m *DeviceInfo) BatteryVoltageScaled() float64 {
 	if m.BatteryVoltage == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 	"unsafe"
 )
@@ -158,7 +159,7 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 // If Duration value is invalid, float64 invalid value will be returned.
 func (m *Set) DurationScaled() float64 {
 	if m.Duration == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Duration, 1000, 0)
 }
@@ -168,7 +169,7 @@ func (m *Set) DurationScaled() float64 {
 // If Weight value is invalid, float64 invalid value will be returned.
 func (m *Set) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Weight, 16, 0)
 }

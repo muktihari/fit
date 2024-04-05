@@ -730,7 +730,7 @@ func (m *Record) RightPowerPhasePeakScaled() []float64 {
 // If Distance value is invalid, float64 invalid value will be returned.
 func (m *Record) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
@@ -740,7 +740,7 @@ func (m *Record) DistanceScaled() float64 {
 // If TimeFromCourse value is invalid, float64 invalid value will be returned.
 func (m *Record) TimeFromCourseScaled() float64 {
 	if m.TimeFromCourse == basetype.Sint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TimeFromCourse, 1000, 0)
 }
@@ -750,7 +750,7 @@ func (m *Record) TimeFromCourseScaled() float64 {
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
 func (m *Record) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
 }
@@ -760,7 +760,7 @@ func (m *Record) EnhancedSpeedScaled() float64 {
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
 func (m *Record) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
@@ -770,7 +770,7 @@ func (m *Record) EnhancedAltitudeScaled() float64 {
 // If Depth value is invalid, float64 invalid value will be returned.
 func (m *Record) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Depth, 1000, 0)
 }
@@ -780,7 +780,7 @@ func (m *Record) DepthScaled() float64 {
 // If NextStopDepth value is invalid, float64 invalid value will be returned.
 func (m *Record) NextStopDepthScaled() float64 {
 	if m.NextStopDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.NextStopDepth, 1000, 0)
 }
@@ -790,7 +790,7 @@ func (m *Record) NextStopDepthScaled() float64 {
 // If AscentRate value is invalid, float64 invalid value will be returned.
 func (m *Record) AscentRateScaled() float64 {
 	if m.AscentRate == basetype.Sint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AscentRate, 1000, 0)
 }
@@ -800,7 +800,7 @@ func (m *Record) AscentRateScaled() float64 {
 // If Altitude value is invalid, float64 invalid value will be returned.
 func (m *Record) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
@@ -810,7 +810,7 @@ func (m *Record) AltitudeScaled() float64 {
 // If Speed value is invalid, float64 invalid value will be returned.
 func (m *Record) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
@@ -820,7 +820,7 @@ func (m *Record) SpeedScaled() float64 {
 // If Grade value is invalid, float64 invalid value will be returned.
 func (m *Record) GradeScaled() float64 {
 	if m.Grade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Grade, 100, 0)
 }
@@ -830,7 +830,7 @@ func (m *Record) GradeScaled() float64 {
 // If VerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *Record) VerticalSpeedScaled() float64 {
 	if m.VerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VerticalSpeed, 1000, 0)
 }
@@ -840,7 +840,7 @@ func (m *Record) VerticalSpeedScaled() float64 {
 // If VerticalOscillation value is invalid, float64 invalid value will be returned.
 func (m *Record) VerticalOscillationScaled() float64 {
 	if m.VerticalOscillation == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VerticalOscillation, 10, 0)
 }
@@ -850,7 +850,7 @@ func (m *Record) VerticalOscillationScaled() float64 {
 // If StanceTimePercent value is invalid, float64 invalid value will be returned.
 func (m *Record) StanceTimePercentScaled() float64 {
 	if m.StanceTimePercent == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.StanceTimePercent, 100, 0)
 }
@@ -860,7 +860,7 @@ func (m *Record) StanceTimePercentScaled() float64 {
 // If StanceTime value is invalid, float64 invalid value will be returned.
 func (m *Record) StanceTimeScaled() float64 {
 	if m.StanceTime == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.StanceTime, 10, 0)
 }
@@ -870,7 +870,7 @@ func (m *Record) StanceTimeScaled() float64 {
 // If BallSpeed value is invalid, float64 invalid value will be returned.
 func (m *Record) BallSpeedScaled() float64 {
 	if m.BallSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BallSpeed, 100, 0)
 }
@@ -880,7 +880,7 @@ func (m *Record) BallSpeedScaled() float64 {
 // If Cadence256 value is invalid, float64 invalid value will be returned.
 func (m *Record) Cadence256Scaled() float64 {
 	if m.Cadence256 == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Cadence256, 256, 0)
 }
@@ -890,7 +890,7 @@ func (m *Record) Cadence256Scaled() float64 {
 // If TotalHemoglobinConc value is invalid, float64 invalid value will be returned.
 func (m *Record) TotalHemoglobinConcScaled() float64 {
 	if m.TotalHemoglobinConc == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalHemoglobinConc, 100, 0)
 }
@@ -900,7 +900,7 @@ func (m *Record) TotalHemoglobinConcScaled() float64 {
 // If TotalHemoglobinConcMin value is invalid, float64 invalid value will be returned.
 func (m *Record) TotalHemoglobinConcMinScaled() float64 {
 	if m.TotalHemoglobinConcMin == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalHemoglobinConcMin, 100, 0)
 }
@@ -910,7 +910,7 @@ func (m *Record) TotalHemoglobinConcMinScaled() float64 {
 // If TotalHemoglobinConcMax value is invalid, float64 invalid value will be returned.
 func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
 	if m.TotalHemoglobinConcMax == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalHemoglobinConcMax, 100, 0)
 }
@@ -920,7 +920,7 @@ func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
 // If SaturatedHemoglobinPercent value is invalid, float64 invalid value will be returned.
 func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
 	if m.SaturatedHemoglobinPercent == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercent, 10, 0)
 }
@@ -930,7 +930,7 @@ func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
 // If SaturatedHemoglobinPercentMin value is invalid, float64 invalid value will be returned.
 func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
 	if m.SaturatedHemoglobinPercentMin == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMin, 10, 0)
 }
@@ -940,7 +940,7 @@ func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
 // If SaturatedHemoglobinPercentMax value is invalid, float64 invalid value will be returned.
 func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
 	if m.SaturatedHemoglobinPercentMax == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMax, 10, 0)
 }
@@ -950,7 +950,7 @@ func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
 // If VerticalRatio value is invalid, float64 invalid value will be returned.
 func (m *Record) VerticalRatioScaled() float64 {
 	if m.VerticalRatio == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VerticalRatio, 100, 0)
 }
@@ -960,7 +960,7 @@ func (m *Record) VerticalRatioScaled() float64 {
 // If StanceTimeBalance value is invalid, float64 invalid value will be returned.
 func (m *Record) StanceTimeBalanceScaled() float64 {
 	if m.StanceTimeBalance == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.StanceTimeBalance, 100, 0)
 }
@@ -970,7 +970,7 @@ func (m *Record) StanceTimeBalanceScaled() float64 {
 // If StepLength value is invalid, float64 invalid value will be returned.
 func (m *Record) StepLengthScaled() float64 {
 	if m.StepLength == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.StepLength, 10, 0)
 }
@@ -980,7 +980,7 @@ func (m *Record) StepLengthScaled() float64 {
 // If CycleLength16 value is invalid, float64 invalid value will be returned.
 func (m *Record) CycleLength16Scaled() float64 {
 	if m.CycleLength16 == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CycleLength16, 100, 0)
 }
@@ -990,7 +990,7 @@ func (m *Record) CycleLength16Scaled() float64 {
 // If EnhancedRespirationRate value is invalid, float64 invalid value will be returned.
 func (m *Record) EnhancedRespirationRateScaled() float64 {
 	if m.EnhancedRespirationRate == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedRespirationRate, 100, 0)
 }
@@ -1000,7 +1000,7 @@ func (m *Record) EnhancedRespirationRateScaled() float64 {
 // If CurrentStress value is invalid, float64 invalid value will be returned.
 func (m *Record) CurrentStressScaled() float64 {
 	if m.CurrentStress == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CurrentStress, 100, 0)
 }
@@ -1010,7 +1010,7 @@ func (m *Record) CurrentStressScaled() float64 {
 // If PressureSac value is invalid, float64 invalid value will be returned.
 func (m *Record) PressureSacScaled() float64 {
 	if m.PressureSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.PressureSac, 100, 0)
 }
@@ -1020,7 +1020,7 @@ func (m *Record) PressureSacScaled() float64 {
 // If VolumeSac value is invalid, float64 invalid value will be returned.
 func (m *Record) VolumeSacScaled() float64 {
 	if m.VolumeSac == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VolumeSac, 100, 0)
 }
@@ -1030,7 +1030,7 @@ func (m *Record) VolumeSacScaled() float64 {
 // If Rmv value is invalid, float64 invalid value will be returned.
 func (m *Record) RmvScaled() float64 {
 	if m.Rmv == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Rmv, 100, 0)
 }
@@ -1040,7 +1040,7 @@ func (m *Record) RmvScaled() float64 {
 // If CoreTemperature value is invalid, float64 invalid value will be returned.
 func (m *Record) CoreTemperatureScaled() float64 {
 	if m.CoreTemperature == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CoreTemperature, 100, 0)
 }
@@ -1050,7 +1050,7 @@ func (m *Record) CoreTemperatureScaled() float64 {
 // If CycleLength value is invalid, float64 invalid value will be returned.
 func (m *Record) CycleLengthScaled() float64 {
 	if m.CycleLength == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CycleLength, 100, 0)
 }
@@ -1060,7 +1060,7 @@ func (m *Record) CycleLengthScaled() float64 {
 // If LeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *Record) LeftTorqueEffectivenessScaled() float64 {
 	if m.LeftTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LeftTorqueEffectiveness, 2, 0)
 }
@@ -1070,7 +1070,7 @@ func (m *Record) LeftTorqueEffectivenessScaled() float64 {
 // If RightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *Record) RightTorqueEffectivenessScaled() float64 {
 	if m.RightTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.RightTorqueEffectiveness, 2, 0)
 }
@@ -1080,7 +1080,7 @@ func (m *Record) RightTorqueEffectivenessScaled() float64 {
 // If LeftPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Record) LeftPedalSmoothnessScaled() float64 {
 	if m.LeftPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LeftPedalSmoothness, 2, 0)
 }
@@ -1090,7 +1090,7 @@ func (m *Record) LeftPedalSmoothnessScaled() float64 {
 // If RightPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Record) RightPedalSmoothnessScaled() float64 {
 	if m.RightPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.RightPedalSmoothness, 2, 0)
 }
@@ -1100,7 +1100,7 @@ func (m *Record) RightPedalSmoothnessScaled() float64 {
 // If CombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Record) CombinedPedalSmoothnessScaled() float64 {
 	if m.CombinedPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CombinedPedalSmoothness, 2, 0)
 }
@@ -1110,7 +1110,7 @@ func (m *Record) CombinedPedalSmoothnessScaled() float64 {
 // If Time128 value is invalid, float64 invalid value will be returned.
 func (m *Record) Time128Scaled() float64 {
 	if m.Time128 == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Time128, 128, 0)
 }
@@ -1120,7 +1120,7 @@ func (m *Record) Time128Scaled() float64 {
 // If FractionalCadence value is invalid, float64 invalid value will be returned.
 func (m *Record) FractionalCadenceScaled() float64 {
 	if m.FractionalCadence == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FractionalCadence, 128, 0)
 }
@@ -1130,7 +1130,7 @@ func (m *Record) FractionalCadenceScaled() float64 {
 // If BatterySoc value is invalid, float64 invalid value will be returned.
 func (m *Record) BatterySocScaled() float64 {
 	if m.BatterySoc == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BatterySoc, 2, 0)
 }
@@ -1140,7 +1140,7 @@ func (m *Record) BatterySocScaled() float64 {
 // If Po2 value is invalid, float64 invalid value will be returned.
 func (m *Record) Po2Scaled() float64 {
 	if m.Po2 == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Po2, 100, 0)
 }

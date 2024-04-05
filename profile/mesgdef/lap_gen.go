@@ -1093,7 +1093,7 @@ func (m *Lap) AvgRightPowerPhasePeakScaled() []float64 {
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
@@ -1103,7 +1103,7 @@ func (m *Lap) TotalElapsedTimeScaled() float64 {
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
@@ -1113,7 +1113,7 @@ func (m *Lap) TotalTimerTimeScaled() float64 {
 // If TotalDistance value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
@@ -1123,7 +1123,7 @@ func (m *Lap) TotalDistanceScaled() float64 {
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
@@ -1133,7 +1133,7 @@ func (m *Lap) TotalMovingTimeScaled() float64 {
 // If TimeStanding value is invalid, float64 invalid value will be returned.
 func (m *Lap) TimeStandingScaled() float64 {
 	if m.TimeStanding == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
 }
@@ -1143,7 +1143,7 @@ func (m *Lap) TimeStandingScaled() float64 {
 // If EnhancedAvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedAvgSpeedScaled() float64 {
 	if m.EnhancedAvgSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAvgSpeed, 1000, 0)
 }
@@ -1153,7 +1153,7 @@ func (m *Lap) EnhancedAvgSpeedScaled() float64 {
 // If EnhancedMaxSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedMaxSpeedScaled() float64 {
 	if m.EnhancedMaxSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMaxSpeed, 1000, 0)
 }
@@ -1163,7 +1163,7 @@ func (m *Lap) EnhancedMaxSpeedScaled() float64 {
 // If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedAvgAltitudeScaled() float64 {
 	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
 }
@@ -1173,7 +1173,7 @@ func (m *Lap) EnhancedAvgAltitudeScaled() float64 {
 // If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedMinAltitudeScaled() float64 {
 	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
 }
@@ -1183,7 +1183,7 @@ func (m *Lap) EnhancedMinAltitudeScaled() float64 {
 // If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedMaxAltitudeScaled() float64 {
 	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
 }
@@ -1193,7 +1193,7 @@ func (m *Lap) EnhancedMaxAltitudeScaled() float64 {
 // If AvgDepth value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgDepthScaled() float64 {
 	if m.AvgDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
 }
@@ -1203,7 +1203,7 @@ func (m *Lap) AvgDepthScaled() float64 {
 // If MaxDepth value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxDepthScaled() float64 {
 	if m.MaxDepth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
 }
@@ -1213,7 +1213,7 @@ func (m *Lap) MaxDepthScaled() float64 {
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
@@ -1223,7 +1223,7 @@ func (m *Lap) AvgSpeedScaled() float64 {
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
@@ -1233,7 +1233,7 @@ func (m *Lap) MaxSpeedScaled() float64 {
 // If AvgStrokeDistance value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgStrokeDistanceScaled() float64 {
 	if m.AvgStrokeDistance == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgStrokeDistance, 100, 0)
 }
@@ -1243,7 +1243,7 @@ func (m *Lap) AvgStrokeDistanceScaled() float64 {
 // If AvgAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgAltitudeScaled() float64 {
 	if m.AvgAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgAltitude, 5, 500)
 }
@@ -1253,7 +1253,7 @@ func (m *Lap) AvgAltitudeScaled() float64 {
 // If MaxAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxAltitudeScaled() float64 {
 	if m.MaxAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxAltitude, 5, 500)
 }
@@ -1263,7 +1263,7 @@ func (m *Lap) MaxAltitudeScaled() float64 {
 // If AvgGrade value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgGradeScaled() float64 {
 	if m.AvgGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgGrade, 100, 0)
 }
@@ -1273,7 +1273,7 @@ func (m *Lap) AvgGradeScaled() float64 {
 // If AvgPosGrade value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgPosGradeScaled() float64 {
 	if m.AvgPosGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgPosGrade, 100, 0)
 }
@@ -1283,7 +1283,7 @@ func (m *Lap) AvgPosGradeScaled() float64 {
 // If AvgNegGrade value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgNegGradeScaled() float64 {
 	if m.AvgNegGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgNegGrade, 100, 0)
 }
@@ -1293,7 +1293,7 @@ func (m *Lap) AvgNegGradeScaled() float64 {
 // If MaxPosGrade value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxPosGradeScaled() float64 {
 	if m.MaxPosGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxPosGrade, 100, 0)
 }
@@ -1303,7 +1303,7 @@ func (m *Lap) MaxPosGradeScaled() float64 {
 // If MaxNegGrade value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxNegGradeScaled() float64 {
 	if m.MaxNegGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
@@ -1313,7 +1313,7 @@ func (m *Lap) MaxNegGradeScaled() float64 {
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgPosVerticalSpeedScaled() float64 {
 	if m.AvgPosVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgPosVerticalSpeed, 1000, 0)
 }
@@ -1323,7 +1323,7 @@ func (m *Lap) AvgPosVerticalSpeedScaled() float64 {
 // If AvgNegVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgNegVerticalSpeedScaled() float64 {
 	if m.AvgNegVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgNegVerticalSpeed, 1000, 0)
 }
@@ -1333,7 +1333,7 @@ func (m *Lap) AvgNegVerticalSpeedScaled() float64 {
 // If MaxPosVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxPosVerticalSpeedScaled() float64 {
 	if m.MaxPosVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxPosVerticalSpeed, 1000, 0)
 }
@@ -1343,7 +1343,7 @@ func (m *Lap) MaxPosVerticalSpeedScaled() float64 {
 // If MaxNegVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxNegVerticalSpeedScaled() float64 {
 	if m.MaxNegVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
 }
@@ -1353,7 +1353,7 @@ func (m *Lap) MaxNegVerticalSpeedScaled() float64 {
 // If MinAltitude value is invalid, float64 invalid value will be returned.
 func (m *Lap) MinAltitudeScaled() float64 {
 	if m.MinAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MinAltitude, 5, 500)
 }
@@ -1363,7 +1363,7 @@ func (m *Lap) MinAltitudeScaled() float64 {
 // If AvgVerticalOscillation value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgVerticalOscillationScaled() float64 {
 	if m.AvgVerticalOscillation == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgVerticalOscillation, 10, 0)
 }
@@ -1373,7 +1373,7 @@ func (m *Lap) AvgVerticalOscillationScaled() float64 {
 // If AvgStanceTimePercent value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgStanceTimePercentScaled() float64 {
 	if m.AvgStanceTimePercent == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgStanceTimePercent, 100, 0)
 }
@@ -1383,7 +1383,7 @@ func (m *Lap) AvgStanceTimePercentScaled() float64 {
 // If AvgStanceTime value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgStanceTimeScaled() float64 {
 	if m.AvgStanceTime == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgStanceTime, 10, 0)
 }
@@ -1393,7 +1393,7 @@ func (m *Lap) AvgStanceTimeScaled() float64 {
 // If AvgVerticalRatio value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgVerticalRatioScaled() float64 {
 	if m.AvgVerticalRatio == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgVerticalRatio, 100, 0)
 }
@@ -1403,7 +1403,7 @@ func (m *Lap) AvgVerticalRatioScaled() float64 {
 // If AvgStanceTimeBalance value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgStanceTimeBalanceScaled() float64 {
 	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgStanceTimeBalance, 100, 0)
 }
@@ -1413,7 +1413,7 @@ func (m *Lap) AvgStanceTimeBalanceScaled() float64 {
 // If AvgStepLength value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgStepLengthScaled() float64 {
 	if m.AvgStepLength == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgStepLength, 10, 0)
 }
@@ -1423,7 +1423,7 @@ func (m *Lap) AvgStepLengthScaled() float64 {
 // If AvgVam value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgVamScaled() float64 {
 	if m.AvgVam == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgVam, 1000, 0)
 }
@@ -1433,7 +1433,7 @@ func (m *Lap) AvgVamScaled() float64 {
 // If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
 }
@@ -1443,7 +1443,7 @@ func (m *Lap) EnhancedAvgRespirationRateScaled() float64 {
 // If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
 func (m *Lap) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }
@@ -1453,7 +1453,7 @@ func (m *Lap) EnhancedMaxRespirationRateScaled() float64 {
 // If AvgCoreTemperature value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgCoreTemperatureScaled() float64 {
 	if m.AvgCoreTemperature == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgCoreTemperature, 100, 0)
 }
@@ -1463,7 +1463,7 @@ func (m *Lap) AvgCoreTemperatureScaled() float64 {
 // If MinCoreTemperature value is invalid, float64 invalid value will be returned.
 func (m *Lap) MinCoreTemperatureScaled() float64 {
 	if m.MinCoreTemperature == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MinCoreTemperature, 100, 0)
 }
@@ -1473,7 +1473,7 @@ func (m *Lap) MinCoreTemperatureScaled() float64 {
 // If MaxCoreTemperature value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxCoreTemperatureScaled() float64 {
 	if m.MaxCoreTemperature == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxCoreTemperature, 100, 0)
 }
@@ -1483,7 +1483,7 @@ func (m *Lap) MaxCoreTemperatureScaled() float64 {
 // If AvgFractionalCadence value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgFractionalCadenceScaled() float64 {
 	if m.AvgFractionalCadence == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgFractionalCadence, 128, 0)
 }
@@ -1493,7 +1493,7 @@ func (m *Lap) AvgFractionalCadenceScaled() float64 {
 // If MaxFractionalCadence value is invalid, float64 invalid value will be returned.
 func (m *Lap) MaxFractionalCadenceScaled() float64 {
 	if m.MaxFractionalCadence == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxFractionalCadence, 128, 0)
 }
@@ -1503,7 +1503,7 @@ func (m *Lap) MaxFractionalCadenceScaled() float64 {
 // If TotalFractionalCycles value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalFractionalCyclesScaled() float64 {
 	if m.TotalFractionalCycles == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
 }
@@ -1513,7 +1513,7 @@ func (m *Lap) TotalFractionalCyclesScaled() float64 {
 // If AvgLeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgLeftTorqueEffectivenessScaled() float64 {
 	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgLeftTorqueEffectiveness, 2, 0)
 }
@@ -1523,7 +1523,7 @@ func (m *Lap) AvgLeftTorqueEffectivenessScaled() float64 {
 // If AvgRightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgRightTorqueEffectivenessScaled() float64 {
 	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgRightTorqueEffectiveness, 2, 0)
 }
@@ -1533,7 +1533,7 @@ func (m *Lap) AvgRightTorqueEffectivenessScaled() float64 {
 // If AvgLeftPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgLeftPedalSmoothnessScaled() float64 {
 	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgLeftPedalSmoothness, 2, 0)
 }
@@ -1543,7 +1543,7 @@ func (m *Lap) AvgLeftPedalSmoothnessScaled() float64 {
 // If AvgRightPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgRightPedalSmoothnessScaled() float64 {
 	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgRightPedalSmoothness, 2, 0)
 }
@@ -1553,7 +1553,7 @@ func (m *Lap) AvgRightPedalSmoothnessScaled() float64 {
 // If AvgCombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *Lap) AvgCombinedPedalSmoothnessScaled() float64 {
 	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
 }
@@ -1563,7 +1563,7 @@ func (m *Lap) AvgCombinedPedalSmoothnessScaled() float64 {
 // If LevBatteryConsumption value is invalid, float64 invalid value will be returned.
 func (m *Lap) LevBatteryConsumptionScaled() float64 {
 	if m.LevBatteryConsumption == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LevBatteryConsumption, 2, 0)
 }
@@ -1573,7 +1573,7 @@ func (m *Lap) LevBatteryConsumptionScaled() float64 {
 // If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalFractionalAscentScaled() float64 {
 	if m.TotalFractionalAscent == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalAscent, 100, 0)
 }
@@ -1583,7 +1583,7 @@ func (m *Lap) TotalFractionalAscentScaled() float64 {
 // If TotalFractionalDescent value is invalid, float64 invalid value will be returned.
 func (m *Lap) TotalFractionalDescentScaled() float64 {
 	if m.TotalFractionalDescent == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
 }

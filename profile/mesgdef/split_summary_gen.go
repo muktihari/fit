@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SplitSummary is a SplitSummary message.
@@ -172,7 +173,7 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
@@ -182,7 +183,7 @@ func (m *SplitSummary) TotalTimerTimeScaled() float64 {
 // If TotalDistance value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
@@ -192,7 +193,7 @@ func (m *SplitSummary) TotalDistanceScaled() float64 {
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
@@ -202,7 +203,7 @@ func (m *SplitSummary) AvgSpeedScaled() float64 {
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
@@ -212,7 +213,7 @@ func (m *SplitSummary) MaxSpeedScaled() float64 {
 // If AvgVertSpeed value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 	if m.AvgVertSpeed == basetype.Sint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
 }
@@ -222,7 +223,7 @@ func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
 func (m *SplitSummary) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }

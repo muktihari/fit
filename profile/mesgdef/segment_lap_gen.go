@@ -833,7 +833,7 @@ func (m *SegmentLap) AvgRightPowerPhasePeakScaled() []float64 {
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
@@ -843,7 +843,7 @@ func (m *SegmentLap) TotalElapsedTimeScaled() float64 {
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
@@ -853,7 +853,7 @@ func (m *SegmentLap) TotalTimerTimeScaled() float64 {
 // If TotalDistance value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
@@ -863,7 +863,7 @@ func (m *SegmentLap) TotalDistanceScaled() float64 {
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
@@ -873,7 +873,7 @@ func (m *SegmentLap) TotalMovingTimeScaled() float64 {
 // If ActiveTime value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) ActiveTimeScaled() float64 {
 	if m.ActiveTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
 }
@@ -883,7 +883,7 @@ func (m *SegmentLap) ActiveTimeScaled() float64 {
 // If TimeStanding value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TimeStandingScaled() float64 {
 	if m.TimeStanding == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
 }
@@ -893,7 +893,7 @@ func (m *SegmentLap) TimeStandingScaled() float64 {
 // If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
 	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
 }
@@ -903,7 +903,7 @@ func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
 // If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
 	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
 }
@@ -913,7 +913,7 @@ func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
 // If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
 	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
 }
@@ -923,7 +923,7 @@ func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
@@ -933,7 +933,7 @@ func (m *SegmentLap) AvgSpeedScaled() float64 {
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
@@ -943,7 +943,7 @@ func (m *SegmentLap) MaxSpeedScaled() float64 {
 // If AvgAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgAltitudeScaled() float64 {
 	if m.AvgAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgAltitude, 5, 500)
 }
@@ -953,7 +953,7 @@ func (m *SegmentLap) AvgAltitudeScaled() float64 {
 // If MaxAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxAltitudeScaled() float64 {
 	if m.MaxAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxAltitude, 5, 500)
 }
@@ -963,7 +963,7 @@ func (m *SegmentLap) MaxAltitudeScaled() float64 {
 // If AvgGrade value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgGradeScaled() float64 {
 	if m.AvgGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgGrade, 100, 0)
 }
@@ -973,7 +973,7 @@ func (m *SegmentLap) AvgGradeScaled() float64 {
 // If AvgPosGrade value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgPosGradeScaled() float64 {
 	if m.AvgPosGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgPosGrade, 100, 0)
 }
@@ -983,7 +983,7 @@ func (m *SegmentLap) AvgPosGradeScaled() float64 {
 // If AvgNegGrade value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgNegGradeScaled() float64 {
 	if m.AvgNegGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgNegGrade, 100, 0)
 }
@@ -993,7 +993,7 @@ func (m *SegmentLap) AvgNegGradeScaled() float64 {
 // If MaxPosGrade value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxPosGradeScaled() float64 {
 	if m.MaxPosGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxPosGrade, 100, 0)
 }
@@ -1003,7 +1003,7 @@ func (m *SegmentLap) MaxPosGradeScaled() float64 {
 // If MaxNegGrade value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxNegGradeScaled() float64 {
 	if m.MaxNegGrade == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
@@ -1013,7 +1013,7 @@ func (m *SegmentLap) MaxNegGradeScaled() float64 {
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgPosVerticalSpeedScaled() float64 {
 	if m.AvgPosVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgPosVerticalSpeed, 1000, 0)
 }
@@ -1023,7 +1023,7 @@ func (m *SegmentLap) AvgPosVerticalSpeedScaled() float64 {
 // If AvgNegVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgNegVerticalSpeedScaled() float64 {
 	if m.AvgNegVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgNegVerticalSpeed, 1000, 0)
 }
@@ -1033,7 +1033,7 @@ func (m *SegmentLap) AvgNegVerticalSpeedScaled() float64 {
 // If MaxPosVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxPosVerticalSpeedScaled() float64 {
 	if m.MaxPosVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxPosVerticalSpeed, 1000, 0)
 }
@@ -1043,7 +1043,7 @@ func (m *SegmentLap) MaxPosVerticalSpeedScaled() float64 {
 // If MaxNegVerticalSpeed value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxNegVerticalSpeedScaled() float64 {
 	if m.MaxNegVerticalSpeed == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
 }
@@ -1053,7 +1053,7 @@ func (m *SegmentLap) MaxNegVerticalSpeedScaled() float64 {
 // If MinAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MinAltitudeScaled() float64 {
 	if m.MinAltitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MinAltitude, 5, 500)
 }
@@ -1063,7 +1063,7 @@ func (m *SegmentLap) MinAltitudeScaled() float64 {
 // If AvgLeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgLeftTorqueEffectivenessScaled() float64 {
 	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgLeftTorqueEffectiveness, 2, 0)
 }
@@ -1073,7 +1073,7 @@ func (m *SegmentLap) AvgLeftTorqueEffectivenessScaled() float64 {
 // If AvgRightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgRightTorqueEffectivenessScaled() float64 {
 	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgRightTorqueEffectiveness, 2, 0)
 }
@@ -1083,7 +1083,7 @@ func (m *SegmentLap) AvgRightTorqueEffectivenessScaled() float64 {
 // If AvgLeftPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgLeftPedalSmoothnessScaled() float64 {
 	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgLeftPedalSmoothness, 2, 0)
 }
@@ -1093,7 +1093,7 @@ func (m *SegmentLap) AvgLeftPedalSmoothnessScaled() float64 {
 // If AvgRightPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgRightPedalSmoothnessScaled() float64 {
 	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgRightPedalSmoothness, 2, 0)
 }
@@ -1103,7 +1103,7 @@ func (m *SegmentLap) AvgRightPedalSmoothnessScaled() float64 {
 // If AvgCombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgCombinedPedalSmoothnessScaled() float64 {
 	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
 }
@@ -1113,7 +1113,7 @@ func (m *SegmentLap) AvgCombinedPedalSmoothnessScaled() float64 {
 // If AvgFractionalCadence value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) AvgFractionalCadenceScaled() float64 {
 	if m.AvgFractionalCadence == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgFractionalCadence, 128, 0)
 }
@@ -1123,7 +1123,7 @@ func (m *SegmentLap) AvgFractionalCadenceScaled() float64 {
 // If MaxFractionalCadence value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) MaxFractionalCadenceScaled() float64 {
 	if m.MaxFractionalCadence == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxFractionalCadence, 128, 0)
 }
@@ -1133,7 +1133,7 @@ func (m *SegmentLap) MaxFractionalCadenceScaled() float64 {
 // If TotalFractionalCycles value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalFractionalCyclesScaled() float64 {
 	if m.TotalFractionalCycles == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
 }
@@ -1143,7 +1143,7 @@ func (m *SegmentLap) TotalFractionalCyclesScaled() float64 {
 // If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalFractionalAscentScaled() float64 {
 	if m.TotalFractionalAscent == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalAscent, 100, 0)
 }
@@ -1153,7 +1153,7 @@ func (m *SegmentLap) TotalFractionalAscentScaled() float64 {
 // If TotalFractionalDescent value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) TotalFractionalDescentScaled() float64 {
 	if m.TotalFractionalDescent == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
 }

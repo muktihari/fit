@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SegmentPoint is a SegmentPoint message.
@@ -142,7 +143,7 @@ func (m *SegmentPoint) LeaderTimeScaled() []float64 {
 // If Distance value is invalid, float64 invalid value will be returned.
 func (m *SegmentPoint) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
@@ -152,7 +153,7 @@ func (m *SegmentPoint) DistanceScaled() float64 {
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
@@ -162,7 +163,7 @@ func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
 // If Altitude value is invalid, float64 invalid value will be returned.
 func (m *SegmentPoint) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }

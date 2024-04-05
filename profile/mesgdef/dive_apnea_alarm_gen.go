@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"unsafe"
 )
 
@@ -170,7 +171,7 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 // If Depth value is invalid, float64 invalid value will be returned.
 func (m *DiveApneaAlarm) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Depth, 1000, 0)
 }
@@ -180,7 +181,7 @@ func (m *DiveApneaAlarm) DepthScaled() float64 {
 // If Speed value is invalid, float64 invalid value will be returned.
 func (m *DiveApneaAlarm) SpeedScaled() float64 {
 	if m.Speed == basetype.Sint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }

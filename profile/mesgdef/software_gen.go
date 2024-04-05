@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // Software is a Software message.
@@ -95,7 +96,7 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 // If Version value is invalid, float64 invalid value will be returned.
 func (m *Software) VersionScaled() float64 {
 	if m.Version == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Version, 100, 0)
 }

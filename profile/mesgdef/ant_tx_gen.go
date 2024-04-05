@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -128,7 +129,7 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
 func (m *AntTx) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }

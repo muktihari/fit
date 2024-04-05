@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // BikeProfile is a BikeProfile message.
@@ -298,7 +299,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 // If Odometer value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
@@ -308,7 +309,7 @@ func (m *BikeProfile) OdometerScaled() float64 {
 // If CustomWheelsize value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) CustomWheelsizeScaled() float64 {
 	if m.CustomWheelsize == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CustomWheelsize, 1000, 0)
 }
@@ -318,7 +319,7 @@ func (m *BikeProfile) CustomWheelsizeScaled() float64 {
 // If AutoWheelsize value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) AutoWheelsizeScaled() float64 {
 	if m.AutoWheelsize == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AutoWheelsize, 1000, 0)
 }
@@ -328,7 +329,7 @@ func (m *BikeProfile) AutoWheelsizeScaled() float64 {
 // If BikeWeight value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) BikeWeightScaled() float64 {
 	if m.BikeWeight == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BikeWeight, 10, 0)
 }
@@ -338,7 +339,7 @@ func (m *BikeProfile) BikeWeightScaled() float64 {
 // If PowerCalFactor value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) PowerCalFactorScaled() float64 {
 	if m.PowerCalFactor == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.PowerCalFactor, 10, 0)
 }
@@ -348,7 +349,7 @@ func (m *BikeProfile) PowerCalFactorScaled() float64 {
 // If CrankLength value is invalid, float64 invalid value will be returned.
 func (m *BikeProfile) CrankLengthScaled() float64 {
 	if m.CrankLength == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CrankLength, 2, -110)
 }

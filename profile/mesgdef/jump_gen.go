@@ -156,7 +156,7 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
 func (m *Jump) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
 }
@@ -166,7 +166,7 @@ func (m *Jump) EnhancedSpeedScaled() float64 {
 // If Speed value is invalid, float64 invalid value will be returned.
 func (m *Jump) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }

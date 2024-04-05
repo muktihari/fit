@@ -313,11 +313,11 @@ func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
 	// Float is a special case since NaN is not comparable, so for example, basetype.Float32Invalid, is not a float,
 	// but its representation in integer form. This way we can compare it in its integer form later.
 	if b.baseTypeMapByProfileType[fieldType] == "float32" {
-		return "proto.Float32(basetype.Float32InvalidInFloatForm())" // same as `math.Float32frombits(basetype.Float32Invalid)`
+		return "proto.Float32(math.Float32frombits(basetype.Float32Invalid))" // same as `math.Float32frombits(basetype.Float32Invalid)`
 	}
 
 	if b.baseTypeMapByProfileType[fieldType] == "float64" {
-		return "proto.Float64(basetype.Float64InvalidInFloatForm())" // same as `math.Float64frombits(basetype.Float64Invalid)`
+		return "proto.Float64(math.Float64frombits(basetype.Float64Invalid))" // same as `math.Float64frombits(basetype.Float64Invalid)`
 	}
 
 	return fmt.Sprintf("proto.%s(basetype.%sInvalid)", protoFuncName, strings.Replace(baseType, "Int", "Sint", 1))

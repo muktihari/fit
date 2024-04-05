@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -289,7 +290,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 // If Distance value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
@@ -299,7 +300,7 @@ func (m *Monitoring) DistanceScaled() float64 {
 // If Cycles value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) CyclesScaled() float64 {
 	if m.Cycles == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Cycles, 2, 0)
 }
@@ -309,7 +310,7 @@ func (m *Monitoring) CyclesScaled() float64 {
 // If ActiveTime value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) ActiveTimeScaled() float64 {
 	if m.ActiveTime == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
 }
@@ -319,7 +320,7 @@ func (m *Monitoring) ActiveTimeScaled() float64 {
 // If Ascent value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) AscentScaled() float64 {
 	if m.Ascent == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Ascent, 1000, 0)
 }
@@ -329,7 +330,7 @@ func (m *Monitoring) AscentScaled() float64 {
 // If Descent value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) DescentScaled() float64 {
 	if m.Descent == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Descent, 1000, 0)
 }
@@ -339,7 +340,7 @@ func (m *Monitoring) DescentScaled() float64 {
 // If Temperature value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) TemperatureScaled() float64 {
 	if m.Temperature == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Temperature, 100, 0)
 }
@@ -349,7 +350,7 @@ func (m *Monitoring) TemperatureScaled() float64 {
 // If TemperatureMin value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) TemperatureMinScaled() float64 {
 	if m.TemperatureMin == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TemperatureMin, 100, 0)
 }
@@ -359,7 +360,7 @@ func (m *Monitoring) TemperatureMinScaled() float64 {
 // If TemperatureMax value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) TemperatureMaxScaled() float64 {
 	if m.TemperatureMax == basetype.Sint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TemperatureMax, 100, 0)
 }
@@ -369,7 +370,7 @@ func (m *Monitoring) TemperatureMaxScaled() float64 {
 // If Intensity value is invalid, float64 invalid value will be returned.
 func (m *Monitoring) IntensityScaled() float64 {
 	if m.Intensity == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Intensity, 10, 0)
 }

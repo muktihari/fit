@@ -121,7 +121,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 // If {{ .Name }} value is invalid,{{ if eq .Array true }} nil {{ else }} float64 invalid value {{ end -}} will be returned.
 func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ else }} float64 {{ end -}} {
 	if {{ .ComparableValue }} == {{ .InvalidValue }} {
-		return {{ if eq .Array true }} nil {{ else }} basetype.Float64InvalidInFloatForm() {{ end -}}
+		return {{ if eq .Array true }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
 	}
 	{{ if eq .Array true }} return scaleoffset.ApplySlice(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
 	{{ else }} return scaleoffset.Apply(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})

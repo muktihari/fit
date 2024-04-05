@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // MetZone is a MetZone message.
@@ -102,7 +103,7 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 // If Calories value is invalid, float64 invalid value will be returned.
 func (m *MetZone) CaloriesScaled() float64 {
 	if m.Calories == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Calories, 10, 0)
 }
@@ -112,7 +113,7 @@ func (m *MetZone) CaloriesScaled() float64 {
 // If FatCalories value is invalid, float64 invalid value will be returned.
 func (m *MetZone) FatCaloriesScaled() float64 {
 	if m.FatCalories == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.FatCalories, 10, 0)
 }

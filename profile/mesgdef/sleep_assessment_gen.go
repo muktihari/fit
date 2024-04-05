@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SleepAssessment is a SleepAssessment message.
@@ -172,7 +173,7 @@ func (m *SleepAssessment) ToMesg(options *Options) proto.Message {
 // If AverageStressDuringSleep value is invalid, float64 invalid value will be returned.
 func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 	if m.AverageStressDuringSleep == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
 }

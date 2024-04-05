@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -132,7 +133,7 @@ func (m *HrvStatusSummary) ToMesg(options *Options) proto.Message {
 // If WeeklyAverage value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
 	if m.WeeklyAverage == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.WeeklyAverage, 128, 0)
 }
@@ -142,7 +143,7 @@ func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
 // If LastNightAverage value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
 	if m.LastNightAverage == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LastNightAverage, 128, 0)
 }
@@ -152,7 +153,7 @@ func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
 // If LastNight5MinHigh value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
 	if m.LastNight5MinHigh == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LastNight5MinHigh, 128, 0)
 }
@@ -162,7 +163,7 @@ func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
 // If BaselineLowUpper value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
 	if m.BaselineLowUpper == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BaselineLowUpper, 128, 0)
 }
@@ -172,7 +173,7 @@ func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
 // If BaselineBalancedLower value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
 	if m.BaselineBalancedLower == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BaselineBalancedLower, 128, 0)
 }
@@ -182,7 +183,7 @@ func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
 // If BaselineBalancedUpper value is invalid, float64 invalid value will be returned.
 func (m *HrvStatusSummary) BaselineBalancedUpperScaled() float64 {
 	if m.BaselineBalancedUpper == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.BaselineBalancedUpper, 128, 0)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -97,7 +98,7 @@ func (m *ChronoShotData) ToMesg(options *Options) proto.Message {
 // If ShotSpeed value is invalid, float64 invalid value will be returned.
 func (m *ChronoShotData) ShotSpeedScaled() float64 {
 	if m.ShotSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.ShotSpeed, 1000, 0)
 }

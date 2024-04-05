@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -228,7 +229,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 // If RadarThreatAvgApproachSpeed value is invalid, float64 invalid value will be returned.
 func (m *Event) RadarThreatAvgApproachSpeedScaled() float64 {
 	if m.RadarThreatAvgApproachSpeed == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.RadarThreatAvgApproachSpeed, 10, 0)
 }
@@ -238,7 +239,7 @@ func (m *Event) RadarThreatAvgApproachSpeedScaled() float64 {
 // If RadarThreatMaxApproachSpeed value is invalid, float64 invalid value will be returned.
 func (m *Event) RadarThreatMaxApproachSpeedScaled() float64 {
 	if m.RadarThreatMaxApproachSpeed == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.RadarThreatMaxApproachSpeed, 10, 0)
 }

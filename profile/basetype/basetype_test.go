@@ -12,20 +12,6 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 )
 
-func TestFloat32InvalidInFloatForm(t *testing.T) {
-	f32 := basetype.Float32InvalidInFloatForm()
-	if u32 := math.Float32bits(f32); u32 != basetype.Float32Invalid {
-		t.Fatalf("expected: %d, got: %d", basetype.Float32Invalid, u32)
-	}
-}
-
-func TestFloat64InvalidInFloatForm(t *testing.T) {
-	f64 := basetype.Float64InvalidInFloatForm()
-	if u64 := math.Float64bits(f64); u64 != basetype.Float64Invalid {
-		t.Fatalf("expected: %d, got: %d", basetype.Float64Invalid, u64)
-	}
-}
-
 func TestFromStringAndString(t *testing.T) {
 	tt := []struct {
 		s        string
@@ -254,11 +240,11 @@ func TestInvalid(t *testing.T) {
 		{baseType: basetype.Sint32, invalid: basetype.Sint32Invalid},
 		{baseType: basetype.Uint32, invalid: basetype.Uint32Invalid},
 		{baseType: basetype.Uint32z, invalid: basetype.Uint32zInvalid},
-		{baseType: basetype.Float32, invalid: basetype.Float32InvalidInFloatForm()},
+		{baseType: basetype.Float32, invalid: math.Float32frombits(basetype.Float32Invalid)},
 		{baseType: basetype.Sint64, invalid: basetype.Sint64Invalid},
 		{baseType: basetype.Uint64, invalid: basetype.Uint64Invalid},
 		{baseType: basetype.Uint64z, invalid: basetype.Uint64zInvalid},
-		{baseType: basetype.Float64, invalid: basetype.Float64InvalidInFloatForm()},
+		{baseType: basetype.Float64, invalid: math.Float64frombits(basetype.Float64Invalid)},
 		{baseType: 255, invalid: "invalid"},
 	}
 	for _, tc := range tt {

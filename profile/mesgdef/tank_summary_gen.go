@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -111,7 +112,7 @@ func (m *TankSummary) ToMesg(options *Options) proto.Message {
 // If VolumeUsed value is invalid, float64 invalid value will be returned.
 func (m *TankSummary) VolumeUsedScaled() float64 {
 	if m.VolumeUsed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
 }
@@ -121,7 +122,7 @@ func (m *TankSummary) VolumeUsedScaled() float64 {
 // If StartPressure value is invalid, float64 invalid value will be returned.
 func (m *TankSummary) StartPressureScaled() float64 {
 	if m.StartPressure == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.StartPressure, 100, 0)
 }
@@ -131,7 +132,7 @@ func (m *TankSummary) StartPressureScaled() float64 {
 // If EndPressure value is invalid, float64 invalid value will be returned.
 func (m *TankSummary) EndPressureScaled() float64 {
 	if m.EndPressure == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.EndPressure, 100, 0)
 }

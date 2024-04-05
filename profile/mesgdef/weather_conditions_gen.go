@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -188,7 +189,7 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 // If WindSpeed value is invalid, float64 invalid value will be returned.
 func (m *WeatherConditions) WindSpeedScaled() float64 {
 	if m.WindSpeed == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.WindSpeed, 1000, 0)
 }

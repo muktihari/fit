@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -97,7 +98,7 @@ func (m *TankUpdate) ToMesg(options *Options) proto.Message {
 // If Pressure value is invalid, float64 invalid value will be returned.
 func (m *TankUpdate) PressureScaled() float64 {
 	if m.Pressure == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Pressure, 100, 0)
 }

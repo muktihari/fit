@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -125,7 +126,7 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 // If MinSpeed value is invalid, float64 invalid value will be returned.
 func (m *ChronoShotSession) MinSpeedScaled() float64 {
 	if m.MinSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MinSpeed, 1000, 0)
 }
@@ -135,7 +136,7 @@ func (m *ChronoShotSession) MinSpeedScaled() float64 {
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
 func (m *ChronoShotSession) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
@@ -145,7 +146,7 @@ func (m *ChronoShotSession) MaxSpeedScaled() float64 {
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
 func (m *ChronoShotSession) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
@@ -155,7 +156,7 @@ func (m *ChronoShotSession) AvgSpeedScaled() float64 {
 // If GrainWeight value is invalid, float64 invalid value will be returned.
 func (m *ChronoShotSession) GrainWeightScaled() float64 {
 	if m.GrainWeight == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.GrainWeight, 10, 0)
 }

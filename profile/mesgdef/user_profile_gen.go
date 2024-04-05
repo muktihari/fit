@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // UserProfile is a UserProfile message.
@@ -277,7 +278,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 // If Weight value is invalid, float64 invalid value will be returned.
 func (m *UserProfile) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Weight, 10, 0)
 }
@@ -287,7 +288,7 @@ func (m *UserProfile) WeightScaled() float64 {
 // If UserRunningStepLength value is invalid, float64 invalid value will be returned.
 func (m *UserProfile) UserRunningStepLengthScaled() float64 {
 	if m.UserRunningStepLength == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.UserRunningStepLength, 1000, 0)
 }
@@ -297,7 +298,7 @@ func (m *UserProfile) UserRunningStepLengthScaled() float64 {
 // If UserWalkingStepLength value is invalid, float64 invalid value will be returned.
 func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 	if m.UserWalkingStepLength == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.UserWalkingStepLength, 1000, 0)
 }
@@ -307,7 +308,7 @@ func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 // If Height value is invalid, float64 invalid value will be returned.
 func (m *UserProfile) HeightScaled() float64 {
 	if m.Height == basetype.Uint8Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Height, 100, 0)
 }

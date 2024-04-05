@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -132,7 +133,7 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 // If Vo2Max value is invalid, float64 invalid value will be returned.
 func (m *MaxMetData) Vo2MaxScaled() float64 {
 	if m.Vo2Max == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Vo2Max, 10, 0)
 }

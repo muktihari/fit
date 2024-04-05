@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // SdmProfile is a SdmProfile message.
@@ -130,7 +131,7 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 // If Odometer value is invalid, float64 invalid value will be returned.
 func (m *SdmProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
@@ -140,7 +141,7 @@ func (m *SdmProfile) OdometerScaled() float64 {
 // If SdmCalFactor value is invalid, float64 invalid value will be returned.
 func (m *SdmProfile) SdmCalFactorScaled() float64 {
 	if m.SdmCalFactor == basetype.Uint16Invalid {
-		return basetype.Float64InvalidInFloatForm()
+		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
 }
