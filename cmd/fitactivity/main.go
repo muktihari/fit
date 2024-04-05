@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/muktihari/fit/cmd/fitactivity/combiner"
 	"github.com/muktihari/fit/cmd/fitactivity/concealer"
@@ -37,9 +36,6 @@ type options struct {
 }
 
 func main() {
-	defer func(begin time.Time) {
-		fmt.Printf("took: %s\n", time.Since(begin))
-	}(time.Now())
 	var opts options
 	outputPathHelpText := "[option] Output of combined files: result.fit"
 	flag.StringVar(&opts.combineOutputPath, "o", "", outputPathHelpText)
@@ -179,7 +175,7 @@ func openAndConcealPosition(path string, opts *options) error {
 	}
 	defer f.Close()
 
-	var fits []*proto.Fit
+	var fits []*proto.FIT
 	dec := decoder.New(bufio.NewReader(f),
 		decoder.WithNoComponentExpansion(),
 	)

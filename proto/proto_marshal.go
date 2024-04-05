@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	"github.com/muktihari/fit/kit/byteorder"
-	"github.com/muktihari/fit/profile/typedef"
 )
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
@@ -160,17 +159,17 @@ func (m *Message) WriteTo(w io.Writer) (n int64, err error) {
 
 	for i := range m.Fields {
 		field := &m.Fields[i]
-		err = typedef.MarshalTo(&b, field.Value, byteorder.Select(m.Architecture))
+		err = MarshalTo(&b, field.Value, byteorder.Select(m.Architecture))
 		if err != nil {
-			return 0, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value, err)
+			return 0, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value.Any(), err)
 		}
 	}
 
 	for i := range m.DeveloperFields {
 		developerField := &m.DeveloperFields[i]
-		err = typedef.MarshalTo(&b, developerField.Value, byteorder.Select(m.Architecture))
+		err = MarshalTo(&b, developerField.Value, byteorder.Select(m.Architecture))
 		if err != nil {
-			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value, err)
+			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value.Any(), err)
 		}
 	}
 

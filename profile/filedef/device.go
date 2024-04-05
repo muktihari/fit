@@ -1,4 +1,4 @@
-// Copyright 2024 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2024 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -63,15 +63,15 @@ func (f *Device) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Device to proto.Fit. If options is nil, default options will be used.
-func (f *Device) ToFit(options *mesgdef.Options) proto.Fit {
+// ToFIT converts Device to proto.FIT. If options is nil, default options will be used.
+func (f *Device) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.Softwares) + len(f.Capabilities) + len(f.FileCapabilities) +
 		len(f.MesgCapabilities) + len(f.FieldCapabilities) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

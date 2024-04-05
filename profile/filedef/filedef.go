@@ -1,11 +1,11 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package filedef
 
 import (
-	"github.com/muktihari/fit/kit/typeconv"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -17,8 +17,8 @@ import (
 type File interface {
 	// Add adds message into file structure.
 	Add(mesg proto.Message)
-	// ToFit converts file back to proto.Fit structure.
-	ToFit(options *mesgdef.Options) proto.Fit
+	// ToFIT converts file back to proto.FIT structure.
+	ToFIT(options *mesgdef.Options) proto.FIT
 }
 
 // ToMesgs bulks convert mesgdef into proto.Message and append it to messages
@@ -37,23 +37,17 @@ type ToMesg interface {
 // When a message has no timestamp field, its order will not be changed.
 func SortMessagesByTimestamp(messages []proto.Message) {
 	slices.SortStableFunc(messages, func(m1, m2 proto.Message) int {
-		value1 := m1.FieldValueByNum(proto.FieldNumTimestamp)
-		if value1 == nil {
+		timestamp1 := m1.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp1 == basetype.Uint32Invalid {
 			return 0
 		}
-
-		value2 := m2.FieldValueByNum(proto.FieldNumTimestamp)
-		if value2 == nil {
+		timestamp2 := m2.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp2 == basetype.Uint32Invalid {
 			return 0
 		}
-
-		timestamp1 := typeconv.ToUint32[uint32](value1)
-		timestamp2 := typeconv.ToUint32[uint32](value2)
-
 		if timestamp1 <= timestamp2 {
 			return -1
 		}
-
 		return 1
 	})
 }

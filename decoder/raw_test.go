@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -236,7 +236,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
 						BaseType:           basetype.Uint8,
-						Value:              uint8(100),
+						Value:              proto.Uint8(100),
 					},
 				)
 				h := headerForTest()
@@ -271,7 +271,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
 						BaseType:           basetype.Uint8,
-						Value:              uint8(100),
+						Value:              proto.Uint8(100),
 					},
 				)
 				h := headerForTest()
@@ -306,7 +306,7 @@ func TestRawDecoderDecode(t *testing.T) {
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
 						BaseType:           basetype.Uint8,
-						Value:              uint8(100),
+						Value:              proto.Uint8(100),
 					},
 				)
 				h := headerForTest()

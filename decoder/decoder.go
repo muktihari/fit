@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -29,7 +29,7 @@ import (
 
 var (
 	// Integrity errors
-	ErrNotAFitFile         = errors.New("not a fit file")
+	ErrNotAFitFile         = errors.New("not a FIT file")
 	ErrDataSizeZero        = errors.New("data size zero")
 	ErrCRCChecksumMismatch = errors.New("crc checksum mismatch")
 
@@ -39,7 +39,7 @@ var (
 	ErrByteSizeMismatch       = errors.New("byte size mismath")
 )
 
-// Decoder is Fit file decoder. See New() for details.
+// Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
 	r           io.Reader
 	factory     Factory
@@ -58,18 +58,18 @@ type Decoder struct {
 
 	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
 	n                 int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
-	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained Fit file.
+	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
 	timestamp         uint32       // Active timestamp
 	lastTimeOffset    byte         // Last time offset
 	sequenceCompleted bool         // True after a decode is completed. Reset to false on Next().
 	err               error        // Any error occurs during process.
 
-	// Fit File Representation
+	// FIT File Representation
 	fileHeader proto.FileHeader
 	messages   []proto.Message
 	crc        uint16
 
-	// FileId Message is a special message that must present in a Fit file.
+	// FileId Message is a special message that must present in a FIT file.
 	fileId *mesgdef.FileId
 
 	// Message Definition Lookup
@@ -86,8 +86,6 @@ type Decoder struct {
 
 // Factory defines a contract that any Factory containing these method can be used by the Decoder.
 type Factory interface {
-	// CreateMesgOnly create new message with Fields and DeveloperFields are being nil. If not found, it returns new message with "unknown" name.
-	CreateMesgOnly(mesgNum typedef.MesgNum) proto.Message
 	// CreateField create new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
@@ -143,7 +141,7 @@ func WithMesgDefListener(listeners ...listener.MesgDefListener) Option {
 
 // WithBroadcastOnly directs the Decoder to only broadcast the messages without retaining them, reducing memory usage when
 // it's not going to be used anyway. This option is intended to be used with WithMesgListener and WithMesgDefListener.
-// When this option is specified, the Decode will return a fit with empty messages.
+// When this option is specified, the Decode will return a FIT with empty messages.
 func WithBroadcastOnly() Option {
 	return fnApply(func(o *options) { o.broadcastOnly = true })
 }
@@ -206,7 +204,7 @@ func (d *Decoder) initDecodeHeaderOnce() {
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
-// FileId message should be the first message of any Fit file, otherwise return an error.
+// FileId message should be the first message of any FIT file, otherwise return an error.
 //
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
@@ -288,7 +286,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 
 // discardMessages efficiently discards bytes used by messages.
 func (d *Decoder) discardMessages() (err error) {
-	arraySize := uint32(len(d.bytesArray))
+	const arraySize = uint32(len(d.bytesArray))
 	for d.cur < d.fileHeader.DataSize {
 		size := d.fileHeader.DataSize - d.cur
 		if size > arraySize {
@@ -344,7 +342,7 @@ func (d *Decoder) Discard() error {
 	return d.err
 }
 
-// Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
+// Next checks whether next bytes are still a valid FIT File sequence. Return false when invalid or reach EOF.
 func (d *Decoder) Next() bool {
 	if d.err != nil {
 		return false
@@ -354,7 +352,7 @@ func (d *Decoder) Next() bool {
 		return true
 	}
 
-	d.reset() // reset values for the next chained Fit file
+	d.reset() // reset values for the next chained FIT file
 
 	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeHeaderOnce() == nil
@@ -368,9 +366,7 @@ func (d *Decoder) reset() {
 	d.accumulator.Reset()
 	d.crc16.Reset()
 	d.fileHeader = proto.FileHeader{}
-	if !d.options.broadcastOnly {
-		d.messages = nil // Must create new.
-	}
+	d.messages = nil
 	d.fileId = nil
 	d.developerDataIds = d.developerDataIds[:0]
 	d.fieldDescriptions = d.fieldDescriptions[:0]
@@ -403,9 +399,9 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.mesgDefListeners = d.options.mesgDefListeners
 }
 
-// Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.
-// To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
-// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
+// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or an error if it occurs.
+// To decode a chained FIT file that contains more than one FIT data, this decode method should be invoked
+// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained FIT file.
 //
 //	for dec.Next() {
 //	     fit, err := dec.Decode()
@@ -413,7 +409,7 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 //	         return err
 //	     }
 //	}
-func (d *Decoder) Decode() (fit *proto.Fit, err error) {
+func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 	if d.err != nil {
 		return nil, d.err
 	}
@@ -432,7 +428,7 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 		return nil, err
 	}
 	d.sequenceCompleted = true
-	return &proto.Fit{
+	return &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
@@ -601,7 +597,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		return ErrMesgDefMissing
 	}
 
-	mesg := d.factory.CreateMesgOnly(mesgDef.MesgNum)
+	mesg := proto.Message{Num: mesgDef.MesgNum}
 	mesg.Header = header
 	mesg.Reserved = mesgDef.Reserved
 	mesg.Architecture = mesgDef.Architecture
@@ -613,7 +609,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		d.lastTimeOffset = timeOffset
 
 		timestampField := d.factory.CreateField(mesgDef.MesgNum, proto.FieldNumTimestamp)
-		timestampField.Value = d.timestamp
+		timestampField.Value = proto.Uint32(d.timestamp)
 
 		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
 	}
@@ -676,13 +672,13 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		if field.Num == proto.FieldNumTimestamp {
-			timestamp, ok := val.(uint32)
-			if !ok {
+			if val.Type() != proto.TypeUint32 {
 				// This can only happen when:
 				// 1. Profile.xlsx contain typo from official release or user add manufacturer specific message but specifying wrong type.
 				// 2. User register the message in the factory but using different type.
-				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val, ErrFieldValueTypeMismatch)
+				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val.Any(), ErrFieldValueTypeMismatch)
 			}
+			timestamp := val.Uint32()
 			d.timestamp = timestamp
 			d.lastTimeOffset = byte(timestamp & proto.CompressedTimeMask)
 		}
@@ -866,22 +862,16 @@ func (d *Decoder) readByte() (byte, error) {
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
-func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (any, error) {
+func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (val proto.Value, err error) {
 	b := d.bytesArray[:size]
 	if err := d.read(b); err != nil {
-		return nil, err
+		return val, err
 	}
-
-	val, err := typedef.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
-	if err != nil {
-		return nil, err
-	}
-
-	return val, nil
+	return proto.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
 }
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.
-func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
+func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.FIT, err error) {
 	if d.err != nil {
 		return nil, d.err
 	}
@@ -909,7 +899,7 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 		return nil, err
 	}
 	d.sequenceCompleted = true
-	return &proto.Fit{
+	return &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,

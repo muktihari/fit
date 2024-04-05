@@ -1,4 +1,4 @@
-// Copyright 2024 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2024 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,26 +6,11 @@ package basetype_test
 
 import (
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/profile/basetype"
 )
-
-func TestFloat32InvalidInFloatForm(t *testing.T) {
-	f32 := basetype.Float32InvalidInFloatForm()
-	if u32 := math.Float32bits(f32); u32 != basetype.Float32Invalid {
-		t.Fatalf("expected: %d, got: %d", basetype.Float32Invalid, u32)
-	}
-}
-
-func TestFloat64InvalidInFloatForm(t *testing.T) {
-	f64 := basetype.Float64InvalidInFloatForm()
-	if u64 := math.Float64bits(f64); u64 != basetype.Float64Invalid {
-		t.Fatalf("expected: %d, got: %d", basetype.Float64Invalid, u64)
-	}
-}
 
 func TestFromStringAndString(t *testing.T) {
 	tt := []struct {
@@ -170,40 +155,6 @@ func TestGoType(t *testing.T) {
 	}
 }
 
-func TestKind(t *testing.T) {
-	tt := []struct {
-		baseType basetype.BaseType
-		kind     reflect.Kind
-	}{
-		{baseType: basetype.Sint8, kind: reflect.Int8},
-		{baseType: basetype.Enum, kind: reflect.Uint8},
-		{baseType: basetype.Byte, kind: reflect.Uint8},
-		{baseType: basetype.Uint8, kind: reflect.Uint8},
-		{baseType: basetype.Uint8z, kind: reflect.Uint8},
-		{baseType: basetype.String, kind: reflect.String},
-		{baseType: basetype.Sint16, kind: reflect.Int16},
-		{baseType: basetype.Uint16, kind: reflect.Uint16},
-		{baseType: basetype.Uint16z, kind: reflect.Uint16},
-		{baseType: basetype.Sint32, kind: reflect.Int32},
-		{baseType: basetype.Uint32, kind: reflect.Uint32},
-		{baseType: basetype.Uint32z, kind: reflect.Uint32},
-		{baseType: basetype.Float32, kind: reflect.Float32},
-		{baseType: basetype.Sint64, kind: reflect.Int64},
-		{baseType: basetype.Uint64, kind: reflect.Uint64},
-		{baseType: basetype.Uint64z, kind: reflect.Uint64},
-		{baseType: basetype.Float64, kind: reflect.Float64},
-		{baseType: 255, kind: reflect.Invalid},
-	}
-	for _, tc := range tt {
-		t.Run(tc.baseType.String(), func(t *testing.T) {
-			kind := tc.baseType.Kind()
-			if kind != tc.kind {
-				t.Fatalf("expected: %s, got: %s", tc.kind, kind)
-			}
-		})
-	}
-}
-
 func TestEndianAbility(t *testing.T) {
 	tt := []struct {
 		baseType  basetype.BaseType
@@ -289,11 +240,11 @@ func TestInvalid(t *testing.T) {
 		{baseType: basetype.Sint32, invalid: basetype.Sint32Invalid},
 		{baseType: basetype.Uint32, invalid: basetype.Uint32Invalid},
 		{baseType: basetype.Uint32z, invalid: basetype.Uint32zInvalid},
-		{baseType: basetype.Float32, invalid: basetype.Float32InvalidInFloatForm()},
+		{baseType: basetype.Float32, invalid: math.Float32frombits(basetype.Float32Invalid)},
 		{baseType: basetype.Sint64, invalid: basetype.Sint64Invalid},
 		{baseType: basetype.Uint64, invalid: basetype.Uint64Invalid},
 		{baseType: basetype.Uint64z, invalid: basetype.Uint64zInvalid},
-		{baseType: basetype.Float64, invalid: basetype.Float64InvalidInFloatForm()},
+		{baseType: basetype.Float64, invalid: math.Float64frombits(basetype.Float64Invalid)},
 		{baseType: 255, invalid: "invalid"},
 	}
 	for _, tc := range tt {

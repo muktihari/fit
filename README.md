@@ -310,6 +310,26 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
    Please see [Generate Custom FIT SDK](/docs/generating_code.md#Generate-Custom-FIT-SDK)
 
+## Benchmark
+
+We do not aim to compete with anyone; rather, we have created this FIT SDK with the intention of providing an alternative. However, having a benchmark can show us how relevant we are to the world.
+
+Here is a benchmark for decoding [./testdata/big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding FIT files. We use [./testdata/big_activity.fit](./testdata/big_activity.fit) since it does not contains any developer field data to ensure the fairness of the benchmark since tormoder's fit, @v0.15.0, still does not support developer field data.
+
+```js
+goos: darwin
+goarch: amd64
+pkg: benchmarkfit
+cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
+BenchmarkDecode/github.com/muktihari/fit_raw-4  10  109023300 ns/op  77077055 B/op  100048 allocs/op
+BenchmarkDecode/github.com/muktihari/fit-4       9  122470129 ns/op  96926349 B/op  200055 allocs/op
+BenchmarkDecode/github.com/tormoder/fit-4        9  111739558 ns/op  84115706 B/op  700069 allocs/op
+```
+
+NOTE: The first one on the list, "raw", means we decode the file into the original FIT protocol messages structure (similiar to the Official FIT SDK implementation in other language)
+
+The time spent is more or less the same, but we allocate way less object on the heap.
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](/CONTRIBUTING.md).

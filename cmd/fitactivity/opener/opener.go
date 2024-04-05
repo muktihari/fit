@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 )
 
 // Open opens all given paths concurrently.
-func Open(paths ...string) ([]proto.Fit, error) {
+func Open(paths ...string) ([]proto.FIT, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -34,7 +34,7 @@ func Open(paths ...string) ([]proto.Fit, error) {
 		close(resultc)
 	}()
 
-	fits := make([]proto.Fit, 0, len(paths))
+	fits := make([]proto.FIT, 0, len(paths))
 	for res := range resultc {
 		if res.err != nil {
 			return nil, res.err
@@ -46,7 +46,7 @@ func Open(paths ...string) ([]proto.Fit, error) {
 }
 
 type result struct {
-	fit *proto.Fit
+	fit *proto.FIT
 	err error
 }
 

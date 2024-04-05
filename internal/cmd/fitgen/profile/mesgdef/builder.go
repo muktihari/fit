@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -132,6 +132,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				Type:           b.transformType(field.Type, field.Array),
 				TypedValue:     b.transformTypedValue(field.Num, field.Type, field.Array),
 				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
+				ProtoValue:     b.transformToProtoValue(strutil.ToTitle(field.Name), field.Type, field.Array),
 				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
 				Comment:        field.Comment,
 				Array:          field.Array != "",
@@ -186,6 +187,19 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			if isTypeTime(field.Type) {
 				imports["time"] = struct{}{}
 				imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
+			}
+
+			if !(f.Scale == 1 && f.Offset == 0) && f.Array != true {
+				imports["math"] = struct{}{}
+			}
+
+			if strings.HasPrefix(f.ComparableValue, "math") {
+				imports["math"] = struct{}{}
+			}
+			if strings.Contains(f.ProtoValue, "unsafe") ||
+				strings.Contains(f.TypedValue, "unsafe") ||
+				strings.Contains(f.ComparableValue, "unsafe") {
+				imports["unsafe"] = struct{}{}
 			}
 		}
 
@@ -265,6 +279,33 @@ func isTypeTime(fieldType string) bool {
 	return false
 }
 
+func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array string) string {
+	if isTypeTime(fieldType) {
+		return fmt.Sprintf("proto.Uint32(datetime.ToUint32(m.%s))", fieldName)
+	}
+
+	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
+	baseType = baseTypeReplacer.Replace(baseType)
+
+	baseType = strings.TrimSuffix(baseType, "z")
+
+	goType := b.goTypesByProfileTypes[fieldType]
+
+	val := fmt.Sprintf("m.%s", fieldName)
+	if b.baseTypeMapByProfileType[fieldType] != fieldType {
+		if array == "" {
+			val = fmt.Sprintf("%s(%s)", goType, val)
+		}
+	}
+
+	slicePrefix := ""
+	if array != "" {
+		slicePrefix = "Slice"
+	}
+
+	return fmt.Sprintf("proto.%s%s(%s)", slicePrefix, baseType, val)
+}
+
 func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
@@ -279,28 +320,36 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 		return fmt.Sprintf("%s(m.%s)", goType, fieldName)
 	}
 
-	slicePrefix := ""
 	if array != "" {
-		slicePrefix = "Slice"
+		return fmt.Sprintf("m.%s", fieldName)
 	}
 
-	return fmt.Sprintf("typeconv.To%s%s[%s](m.%s)",
-		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), b.goTypesByProfileTypes[fieldType], fieldName)
+	return fmt.Sprintf("%s(m.%s)", goType, fieldName)
 }
 
+var baseTypeReplacer = strings.NewReplacer(
+	"Enum", "Uint8",
+	"Sint", "Int",
+	"Byte", "Uint8",
+)
+
 func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) string {
+	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
+	baseType = baseTypeReplacer.Replace(baseType)
+	if array != "" && strings.HasSuffix(baseType, "z") {
+		baseType = strings.TrimSuffix(baseType, "z")
+	}
+
 	if fieldType == "fit_base_type" {
-		return fmt.Sprintf("typeconv.ToUint8[basetype.BaseType](vals[%d])", num)
+		return fmt.Sprintf("basetype.BaseType((vals[%d]).%s())", num, baseType)
 	}
 
 	if isTypeTime(fieldType) {
-		return fmt.Sprintf("datetime.ToTime(vals[%d])", num)
+		return fmt.Sprintf("datetime.ToTime(vals[%d].Uint32())", num)
 	}
 
 	var _type string
-	if v, ok := b.goTypesByBaseTypes[fieldType]; ok {
-		_type = v
-	} else {
+	if _, ok := b.goTypesByBaseTypes[fieldType]; !ok {
 		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
 	}
 
@@ -309,17 +358,34 @@ func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) 
 		slicePrefix = "Slice"
 	}
 
-	return fmt.Sprintf("typeconv.To%s%s[%s](vals[%d])",
-		slicePrefix, strutil.ToTitle(b.baseTypeMapByProfileType[fieldType]), _type, num)
+	res := fmt.Sprintf("vals[%d].%s%s()",
+		num,
+		slicePrefix,
+		baseType,
+	)
+
+	if _type != "" {
+		if array != "" {
+			res = fmt.Sprintf(`func() []%s {
+				sliceValue := %s
+				ptr := unsafe.SliceData(sliceValue)
+				return unsafe.Slice((*%s)(ptr), len(sliceValue))
+			}()`, _type, res, _type)
+		} else {
+			res = fmt.Sprintf("%s(%s)", _type, res)
+		}
+	}
+
+	return res
 }
 
 func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveValue string) string {
 	if array == "" {
 		switch b.baseTypeMapByProfileType[fieldType] {
 		case "float32":
-			return fmt.Sprintf("typeconv.ToUint32[uint32](%s)", primitiveValue)
+			return fmt.Sprintf("math.Float32bits(%s)", primitiveValue)
 		case "float64":
-			return fmt.Sprintf("typeconv.ToUint64[uint64](%s)", primitiveValue)
+			return fmt.Sprintf("math.Float32bits(%s)", primitiveValue)
 		}
 	}
 
@@ -333,14 +399,6 @@ func (b *mesgdefBuilder) invalidValueOf(fieldType, array string) string {
 
 	if array != "" {
 		return "nil"
-	}
-
-	if b.baseTypeMapByProfileType[fieldType] == "float32" {
-		return "basetype.Uint32Invalid"
-	}
-
-	if b.baseTypeMapByProfileType[fieldType] == "float64" {
-		return "basetype.Uint64Invalid"
 	}
 
 	bt := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).String()

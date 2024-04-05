@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
@@ -361,17 +360,19 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 			name, units = subField.Name, subField.Units
 		}
 
-		if vals, ok := sliceAny(field.Value); ok { // array
+		var value proto.Value
+		if !c.options.printRawValue {
+			value = scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset)
+		}
+
+		if vals, ok := sliceAny(value.Any()); ok { // array
 			c.buf.WriteString(name)
 			c.buf.WriteByte(',')
 
 			c.buf.WriteByte('"')
+
 			for i := range vals {
-				value := vals[i]
-				if !c.options.printRawValue {
-					value = scaleoffset.ApplyAny(vals[i], field.Scale, field.Offset)
-				}
-				c.buf.WriteString(format(value))
+				c.buf.WriteString(format(vals[i]))
 				if i < len(vals)-1 {
 					c.buf.WriteByte('|')
 				}
@@ -391,18 +392,18 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 		c.buf.WriteString(name)
 		c.buf.WriteByte(',')
 
-		value := field.Value
+		scaledValue := field.Value
 		if !c.options.printRawValue {
-			value = scaleoffset.ApplyAny(field.Value, field.Scale, field.Offset)
+			scaledValue = scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset)
 		}
 
 		if c.options.printSemicirclesInDegrees && field.Units == "semicircles" {
-			value = semicircles.ToDegrees(typeconv.ToSint32[int32](value))
+			scaledValue = proto.Float64(semicircles.ToDegrees(scaledValue.Int32()))
 			units = "degrees"
 		}
 
 		c.buf.WriteByte('"')
-		c.buf.WriteString(format(value))
+		c.buf.WriteString(format(scaledValue.Any()))
 		c.buf.WriteString("\",")
 
 		c.buf.WriteString(units)
@@ -416,7 +417,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 		c.buf.WriteString(devField.Name)
 		c.buf.WriteByte(',')
 
-		if vals, ok := sliceAny(devField.Value); ok { // array
+		if vals, ok := sliceAny(devField.Value.Any()); ok { // array
 			for i := range vals {
 				c.buf.WriteString(format(vals[i]))
 				if i < len(vals)-1 {
@@ -424,7 +425,7 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 				}
 			}
 		} else {
-			c.buf.WriteString(format(devField.Value))
+			c.buf.WriteString(format(devField.Value.Any()))
 		}
 
 		c.buf.WriteByte(',')
@@ -513,17 +514,17 @@ func sliceAny(val any) (vals []any, isSlice bool) {
 func isValueValid(field *proto.Field) bool {
 	switch field.BaseType {
 	case basetype.Float32:
-		f32 := typeconv.ToFloat32[float32](field.Value)
+		f32 := field.Value.Float32()
 		if math.Float32bits(f32) == basetype.Float32Invalid {
 			return false
 		}
 	case basetype.Float64:
-		f64 := typeconv.ToFloat64[float64](field.Value)
+		f64 := field.Value.Float64()
 		if math.Float64bits(f64) == basetype.Float64Invalid {
 			return false
 		}
 	default:
-		if field.Value == field.BaseType.Invalid() {
+		if field.Value.Type() == proto.TypeInvalid {
 			return false
 		}
 	}

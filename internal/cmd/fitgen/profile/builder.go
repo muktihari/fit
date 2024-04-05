@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -29,7 +29,7 @@ type profilebuilder struct {
 	template *template.Template
 
 	path           string        // path to generate the file
-	profileVersion string        // Fit SDK Profile Version
+	profileVersion string        // FIT SDK Profile Version
 	types          []parser.Type // type parsed from profile.xlsx
 }
 

@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,11 +11,12 @@ import (
 
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/proto"
 )
 
 var epoch = time.Date(1989, time.December, 31, 0, 0, 0, 0, time.UTC)
 
-// Epoch return fit epoch (31 Dec 1989 00:00:000 UTC) as time.Time
+// Epoch return FIT epoch (31 Dec 1989 00:00:000 UTC) as time.Time
 func Epoch() time.Time { return epoch }
 
 // ToTime return new time based on given v.
@@ -27,6 +28,8 @@ func ToTime(value any) time.Time {
 	var val uint32 = basetype.Uint32Invalid
 
 	switch v := value.(type) {
+	case proto.Value:
+		val = v.Uint32()
 	case uint32:
 		val = v
 	case typedef.DateTime:

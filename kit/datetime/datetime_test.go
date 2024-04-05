@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,6 +11,7 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/proto"
 )
 
 func TestToTime(t *testing.T) {
@@ -19,6 +20,11 @@ func TestToTime(t *testing.T) {
 		u32  any
 		time time.Time
 	}{
+		{
+			name: "Thu, 30 Dec 2021 21:52:08 GMT",
+			u32:  proto.Uint32(uint32(1009835528)),
+			time: time.Date(2021, time.December, 30, 21, 52, 8, 00, time.UTC),
+		},
 		{
 			name: "Thu, 30 Dec 2021 21:52:08 GMT",
 			u32:  uint32(1009835528),
@@ -37,6 +43,11 @@ func TestToTime(t *testing.T) {
 		{
 			name: "nil",
 			u32:  nil,
+			time: time.Time{},
+		},
+		{
+			name: "struct{}{}",
+			u32:  struct{}{},
 			time: time.Time{},
 		},
 	}

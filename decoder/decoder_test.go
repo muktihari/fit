@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -477,8 +477,8 @@ func headerForTest() proto.FileHeader {
 	}
 }
 
-func createFitForTest() (proto.Fit, []byte) {
-	fit := proto.Fit{
+func createFitForTest() (proto.FIT, []byte) {
+	fit := proto.FIT{
 		FileHeader: headerForTest(),
 		Messages: []proto.Message{
 			factory.CreateMesgOnly(mesgnum.FileId).WithFields(
@@ -513,7 +513,7 @@ func createFitForTest() (proto.Fit, []byte) {
 						NativeMesgNum:      mesgnum.Record,
 						NativeFieldNum:     fieldnum.RecordHeartRate,
 						BaseType:           basetype.Uint8,
-						Value:              uint8(100),
+						Value:              proto.Uint8(100),
 					},
 				),
 		},
@@ -560,7 +560,7 @@ func createFitForTest() (proto.Fit, []byte) {
 	// Update file header data size in []byte form as well
 	copy(b[4:8], dataSize)
 
-	// Update Fit File CRC
+	// Update FIT File CRC
 	fit.CRC = crc16checker.Sum16()
 	crc16checker.Reset()
 	var crc = make([]byte, 2)
@@ -676,7 +676,7 @@ func TestDiscardChained(t *testing.T) {
 
 	r := bytes.NewBuffer(b)
 
-	fits := make([]*proto.Fit, 0, 2)
+	fits := make([]*proto.FIT, 0, 2)
 	dec := New(r)
 	for dec.Next() {
 		fileId, err := dec.PeekFileId()
@@ -710,7 +710,7 @@ func TestNext(t *testing.T) {
 	// Setup
 	_, buf := createFitForTest()
 
-	// New header of the next chained Fit sequences.
+	// New header of the next chained FIT sequences.
 	header := headerForTest()
 	b, _ := header.MarshalBinary()
 	buf = append(buf, b...)
@@ -796,7 +796,7 @@ func TestNext(t *testing.T) {
 type decodeTestCase struct {
 	name string
 	r    io.Reader
-	fit  proto.Fit
+	fit  proto.FIT
 	err  error
 }
 
@@ -895,7 +895,11 @@ func TestDecode(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(*fit, tc.fit); diff != "" {
+			if diff := cmp.Diff(*fit, tc.fit,
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -1512,7 +1516,7 @@ func TestExpandMutipleComponents(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordCompressedSpeedDistance),
+		mesg.FieldValueByNum(fieldnum.RecordCompressedSpeedDistance).Any(),
 		[]byte{0, 4, 1},
 	); diff != "" {
 		t.Errorf("compressed_speed_distance: %s", diff)
@@ -1521,21 +1525,21 @@ func TestExpandMutipleComponents(t *testing.T) {
 	// Formula: value = (value / component_speed_scale) * destination_field_scale
 
 	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordSpeed),
+		mesg.FieldValueByNum(fieldnum.RecordSpeed).Any(),
 		uint16(10240), // (1024 / 100) * 1000
 	); diff != "" {
 		t.Errorf("speed: %s", diff)
 	}
 
 	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordDistance),
+		mesg.FieldValueByNum(fieldnum.RecordDistance).Any(),
 		uint32(100), // (1600 / 16) * 1
 	); diff != "" {
 		t.Errorf("distance: %s", diff)
 	}
 
 	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordEnhancedSpeed),
+		mesg.FieldValueByNum(fieldnum.RecordEnhancedSpeed).Any(),
 		uint32(10240), // (1024 / 1000) * 1000
 	); diff != "" {
 		t.Errorf("enhanced_speed: %s", diff)
@@ -1562,7 +1566,7 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 						Components: nil,
 						Scale:      1, Offset: 0,
 					},
-					Value: basetype.EnumInvalid,
+					Value: proto.Uint8(basetype.EnumInvalid),
 				},
 				{
 					FieldBase: &proto.FieldBase{
@@ -1598,7 +1602,7 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 						},
 						Scale: 1, Offset: 0,
 					},
-					Value: basetype.Uint32Invalid,
+					Value: proto.Uint32(basetype.Uint32Invalid),
 				},
 			},
 		},
@@ -1618,7 +1622,7 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(
-		mesg.FieldValueByNum(1),
+		mesg.FieldValueByNum(1).Any(),
 		uint32(10),
 	); diff != "" {
 		t.Errorf("data: %s", diff)
@@ -1787,7 +1791,7 @@ func TestReadValue(t *testing.T) {
 		size     byte
 		baseType basetype.BaseType
 		arch     byte
-		result   any
+		result   proto.Value
 		err      error
 	}{
 		{
@@ -1796,7 +1800,7 @@ func TestReadValue(t *testing.T) {
 			size:     1,
 			baseType: basetype.Sint8,
 			arch:     0,
-			result:   int8(0),
+			result:   proto.Int8(0),
 		},
 		{
 			name:     "readValue happy flow",
@@ -1804,7 +1808,7 @@ func TestReadValue(t *testing.T) {
 			size:     1,
 			baseType: basetype.BaseType(100), // invalid basetype.
 			arch:     0,
-			err:      typedef.ErrTypeNotSupported,
+			err:      proto.ErrTypeNotSupported,
 		},
 	}
 
@@ -1818,7 +1822,11 @@ func TestReadValue(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(res, tc.result); diff != "" {
+			if diff := cmp.Diff(res, tc.result,
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -1840,7 +1848,11 @@ func TestDecodeWithContext(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(*fit, tc.fit); diff != "" {
+			if diff := cmp.Diff(*fit, tc.fit,
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -1977,6 +1989,9 @@ func TestReset(t *testing.T) {
 				cmp.Transformer("factory", func(t Factory) uintptr {
 					return reflect.ValueOf(t).Pointer()
 				}),
+				cmp.Transformer("Value", func(v proto.Value) any {
+					return v.Any()
+				}),
 				cmp.Comparer(func(a, b []listener.MesgListener) bool {
 					if len(a) != len(b) {
 						return false
@@ -2010,7 +2025,10 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(typedef.MesgNumRecord)
 	mesgDef := proto.CreateMessageDefinition(&mesg)
-	mesgb, _ := mesg.MarshalBinary()
+	mesgb, err := mesg.MarshalBinary()
+	if err != nil {
+		b.Fatalf("marshal binary: %v", err)
+	}
 	buf := bytes.NewBuffer(mesgb)
 	dec := New(buf, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
 	dec.localMessageDefinitions[0] = &mesgDef

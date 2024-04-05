@@ -1,4 +1,4 @@
-// Copyright 2024 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2024 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -52,13 +52,13 @@ func TestSchedulesCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileSchedules, schedules.FileId.Type)
 	}
 
-	fit := schedules.ToFit(nil) // use standard factory
+	fit := schedules.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]

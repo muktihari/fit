@@ -1,11 +1,10 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package filedef
 
 import (
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -55,9 +54,7 @@ func (f fnApply) apply(o *options) { f(o) }
 // WithChannelBuffer sets the size of buffered channel, default is 1000.
 func WithChannelBuffer(size uint) Option {
 	return fnApply(func(o *options) {
-		if size > 0 {
-			o.channelBuffer = size
-		}
+		o.channelBuffer = size
 	})
 }
 
@@ -104,7 +101,7 @@ func NewListener(opts ...Option) *Listener {
 func (l *Listener) loop() {
 	for mesg := range l.mesgc {
 		if mesg.Num == mesgnum.FileId {
-			fileType := typeconv.ToByte[typedef.File](mesg.FieldValueByNum(fieldnum.FileIdType))
+			fileType := typedef.File(mesg.FieldValueByNum(fieldnum.FileIdType).Uint8())
 			newFile, ok := l.options.fileSets[fileType]
 			if !ok {
 				continue

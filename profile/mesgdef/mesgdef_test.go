@@ -6,6 +6,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -27,5 +30,31 @@ func TestDefaultOptions(t *testing.T) {
 	}),
 	); diff != "" {
 		t.Fatal(diff)
+	}
+}
+
+func TestUnsafeCast(t *testing.T) {
+	attitudeValidities := []typedef.AttitudeValidity{
+		typedef.AttitudeValidityNoGps,
+		typedef.AttitudeValidityHwFail,
+		typedef.AttitudeValiditySolutionCoasting,
+	}
+	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+		fieldnum.AviationAttitudeValidity: attitudeValidities,
+	})
+
+	aviationAttitude := NewAviationAttitude(&mesg)
+	newMesg := aviationAttitude.ToMesg(nil)
+
+	newAttitudeValidities := newMesg.FieldValueByNum(fieldnum.AviationAttitudeValidity).SliceUint16()
+
+	if len(attitudeValidities) != len(newAttitudeValidities) {
+		t.Fatalf("expected len: %d, got: %d", len(attitudeValidities), len(newAttitudeValidities))
+	}
+
+	for i := range attitudeValidities {
+		if attitudeValidities[i] != typedef.AttitudeValidity(newAttitudeValidities[i]) {
+			t.Errorf("[%d] expected: %v, got: %v", i, attitudeValidities[i], newAttitudeValidities[i])
+		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -54,9 +54,9 @@ const (
 	headerOptionCompressedTimestamp headerOption = 1
 )
 
-// Encoder is Fit file encoder. See New() for details.
+// Encoder is FIT file encoder. See New() for details.
 type Encoder struct {
-	w             io.Writer   // A writer to write the bytes encoded fit.
+	w             io.Writer   // A writer to write the encoded FIT bytes.
 	n             int64       // Total bytes written to w, will keep counting for every Encode invocation.
 	lastHeaderPos int64       // The byte position of the last header.
 	crc16         hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
@@ -68,7 +68,7 @@ type Encoder struct {
 	options           *options         // Encoder's options.
 	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
 
-	dataSize uint32 // Data size of messages in bytes for a single Fit file.
+	dataSize uint32 // Data size of messages in bytes for a single FIT file.
 
 	// This timestamp reference serves as current active timestamp when 'headerOptionCompressedTimestamp' is specified.
 	// The first timestamp value is retrieved from the first message containing a valid timestamp field,
@@ -163,7 +163,7 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 //
 // # Encoding Strategy
 //
-// Since an invalid file header means an invalid Fit file, we need to ensure that the header is correct,
+// Since an invalid file header means an invalid FIT file, we need to ensure that the header is correct,
 // specifically the header's DataSize (size of messages in bytes) and header's CRC checksum should be correct after everything is written.
 //
 // There are two strategies to achieve that and it depends on what kind of [io.Writer] is provided:
@@ -172,7 +172,7 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 //   - [io.Writer]: Encoder needs to iterate through the messages once to calculate
 //     the correct header's DataSize (calculating discarded bytes to [io.Discard]), then re-iterate through the messages again for the actual writing.
 //
-// Loading everything in memory and then writing it all later should preferably be avoided. While a Fit file is commonly small-sized, but by design, it can
+// Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file is commonly small-sized, but by design, it can
 // hold up to approximately 4GB. This is because the DataSize is of type uint32, and its maximum value is around that number.
 // And also The FIT protocol allows for multiple FIT files to be chained together in a single FIT file. Each FIT file in the chain must be a properly
 // formatted FIT file (header, data records, CRC), making it more dynamic in size.
@@ -214,18 +214,18 @@ func New(w io.Writer, opts ...Option) *Encoder {
 	return e
 }
 
-// Encode encodes fit into the dest writer. Encoder will do the following validations:
-//  1. Calculating Header's CRC & DataSize and Fit's CRC: any mismatch calculation will be corrected and updated to the given fit structure.
+// Encode encodes FIT into the dest writer. Encoder will do the following validations:
+//  1. Calculating Header's CRC & DataSize and FIT's CRC: any mismatch calculation will be corrected and updated to the given FIT structure.
 //  2. Checking if fit.Messages are having all of its mesg definitions, return error if it's missing any mesg definition.
 //
-// Multiple Fit files can be chained together into a single Fit file by calling Encode for each fit data.
+// Multiple FIT files can be chained together into a single FIT file by calling Encode for each FIT data.
 //
 //	for _, fit := range fits {
 //	   err := enc.Encode(fit)
 //	}
 //
 // Encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
-func (e *Encoder) Encode(fit *proto.Fit) error {
+func (e *Encoder) Encode(fit *proto.FIT) error {
 	defer e.reset()
 
 	// Encode Strategy
@@ -240,7 +240,7 @@ func (e *Encoder) Encode(fit *proto.Fit) error {
 }
 
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing, it updates the actual size of the messages that being written to the proto.
-func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
+func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.FIT) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
 }
 
 // encodeWithEarlyCheckStrategy does early calculation of the size of the messages that will be written and then do the encoding process.
-func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.Fit) error {
+func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	if err := e.calculateDataSize(fit); err != nil {
 		return err
 	}
@@ -321,7 +321,7 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 }
 
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.
-func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
+func (e *Encoder) calculateDataSize(fit *proto.FIT) error {
 	n := e.n
 
 	if err := e.encodeMessages(io.Discard, fit.Messages); err != nil {
@@ -440,16 +440,11 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 		return
 	}
 
-	var timestamp uint32
-	switch val := field.Value.(type) {
-	case uint32:
-		timestamp = val
-	case typedef.DateTime:
-		timestamp = uint32(val)
-	default:
+	if field.Value.Type() != proto.TypeUint32 {
 		return // not supported
 	}
 
+	timestamp := field.Value.Uint32()
 	if timestamp < uint32(typedef.DateTimeMin) {
 		return
 	}
@@ -532,7 +527,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 }
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
-func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
+func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
 	defer e.reset()
 
 	// Encode Strategy
@@ -546,7 +541,7 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err er
 	return ErrNilWriter
 }
 
-func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.FIT) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
@@ -563,7 +558,7 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 	return nil
 }
 
-func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.FIT) error {
 	n := e.n
 
 	if err := e.encodeMessagesWithContext(ctx, io.Discard, fit.Messages); err != nil {
@@ -580,7 +575,7 @@ func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.F
 	return nil
 }
 
-func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.FIT) error {
 	if err := e.calculateDataSizeWithContext(ctx, fit); err != nil {
 		return err
 	}

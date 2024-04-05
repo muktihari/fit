@@ -52,7 +52,7 @@ func main() {
 
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
-    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType)) // FileId is always the first message; 4 = activity
+    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any()) // FileId is always the first message; 4 = activity
 
     // Output:
     // FileHeader DataSize: 94080
@@ -222,7 +222,7 @@ func main() {
 
 ### Peek FileId
 
-We don't need to decode the entire Fit file to verify its type. Instead, we can use the 'PeekFileId' method to check the corresponding type. After invoking this method, we can decide whether to proceed with decoding the file or to stop. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
+We don't need to decode the entire FIT file to verify its type. Instead, we can use the 'PeekFileId' method to check the corresponding type. After invoking this method, we can decide whether to proceed with decoding the file or to stop. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 
 ```go
 package main
@@ -596,7 +596,7 @@ func main() {
 
     now := time.Now()
 
-    fit := &proto.Fit{
+    fit := &proto.FIT{
         Messages: []proto.Message{
             factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
                 fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
@@ -708,7 +708,7 @@ func main() {
         SetNumSessions(1)
 
     // Convert back to FIT protocol messages
-    fit := activity.ToFit(nil)
+    fit := activity.ToFIT(nil)
 
     bw := bufferedwriter.New(f)
     defer bw.Flush()
@@ -726,7 +726,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
 ```go
     ...
-    /* Assume you retrive the activity file from decoding a Fit file. */
+    /* Assume you retrive the activity file from decoding a FIT file. */
 
     fin, err := os.Open("Activity.fit")
     if err != nil {
@@ -751,10 +751,10 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
     /* Do something with the Activity File, for example changing manufacturer and product like this */
     activity.FileId.Manufacturer = typedef.ManufacturerGarmin
-    activity.FileId.Product = uint16(typedef.GarminProductEdge530)
+    activity.FileId.Product = typedef.GarminProductEdge530.Uint16()
 
     // Convert back to RAW Protocol Messages
-    fit := activity.ToFit(nil)
+    fit := activity.ToFIT(nil)
 
     fout, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
     if err != nil {
@@ -832,7 +832,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
 ### Stream Encoder
 
-This is a new feature to enable encode per message basis or in streaming fashion rather than bulk per `proto.Fit`. To enable this, the Encoder's Writer should either implement io.WriterAt or io.WriteSeeker, since we need to be able to update FileHeader (the first 14 bytes) for every sequence completed. This is another building block that we can use.
+This is a new feature to enable encode per message basis or in streaming fashion rather than bulk per `proto.FIT`. To enable this, the Encoder's Writer should either implement io.WriterAt or io.WriteSeeker, since we need to be able to update FileHeader (the first 14 bytes) for every sequence completed. This is another building block that we can use.
 
 ```go
 package main

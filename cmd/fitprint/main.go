@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -108,5 +108,5 @@ func formatValue(field *proto.Field) string {
 		return datetime.ToTime(field.Value).String()
 	}
 	return fmt.Sprintf("%v %s",
-		scaleoffset.ApplyAny(field.Value, field.Scale, field.Offset), field.Units)
+		scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset), field.Units)
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -144,6 +144,7 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			if diff := cmp.Diff(tc.result, result,
 				createFloat32Comparer(),
 				createFloat64Comparer(),
+				valueTransformer(),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -188,6 +189,7 @@ func TestListenerForChainedFitFile(t *testing.T) {
 	if diff := cmp.Diff(expectedResult, result,
 		createFloat32Comparer(),
 		createFloat64Comparer(),
+		valueTransformer(),
 	); diff != "" {
 		t.Fatal(diff)
 	}

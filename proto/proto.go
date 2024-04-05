@@ -1,18 +1,17 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package proto
 
 import (
-	"github.com/muktihari/fit/kit/typeconv"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"golang.org/x/exp/slices"
 )
 
-// NOTE: The term "Global Fit Profile" refers to the definition provided in the Profile.xlsx proto.
+// NOTE: The term "Global FIT Profile" refers to the definition provided in the Profile.xlsx proto.
 
 const ( // header is 1 byte ->	 0bxxxxxxxx
 	MesgDefinitionMask         = 0b01000000 // Mask for determining if the message type is a message definition.
@@ -62,7 +61,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.Fields {
 		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
 			Num:      mesg.Fields[i].Num,
-			Size:     byte(typedef.Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
+			Size:     byte(Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
 			BaseType: mesg.Fields[i].BaseType,
 		})
 	}
@@ -86,25 +85,25 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	}
 }
 
-// Fit represents a structure for Fit Files.
-type Fit struct {
+// FIT represents a structure for FIT Files.
+type FIT struct {
 	FileHeader FileHeader // File Header contains either 12 or 14 bytes
 	Messages   []Message  // Messages.
 	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
 }
 
-// WithMessages set Messages and return the pointer to the Fit.
-func (f *Fit) WithMessages(messages ...Message) *Fit {
+// WithMessages set Messages and return the pointer to the FIT.
+func (f *FIT) WithMessages(messages ...Message) *FIT {
 	f.Messages = make([]Message, len(messages))
 	copy(f.Messages, messages)
 	return f
 }
 
-// FileHeader is a Fit's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
+// FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
 type FileHeader struct {
 	Size            byte   // Header size either 12 (legacy) or 14.
-	ProtocolVersion byte   // The Fit Protocol version which is being used to encode the Fit file.
-	ProfileVersion  uint16 // The Fit Profile Version (associated with data defined in Global Fit Profile).
+	ProtocolVersion byte   // The FIT Protocol version which is being used to encode the FIT file.
+	ProfileVersion  uint16 // The FIT Profile Version (associated with data defined in Global FIT Profile).
 	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
 	DataType        string // ".FIT" (a string constant)
 	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity if the header. (this field will be automatically updated by the encoder)
@@ -144,7 +143,7 @@ type DeveloperFieldDefinition struct { // 3 bits
 // Message is a FIT protocol message containing the data defined in the Message Definition
 type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
-	Num             typedef.MesgNum  // Global Message Number defined in Global Fit Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
+	Num             typedef.MesgNum  // Global Message Number defined in Global FIT Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
 	Reserved        byte             // Currently undetermined; the default value is 0.
 	Architecture    byte             // Architecture type / Endianness. Must be the same
 	Fields          []Field          // List of Field
@@ -166,8 +165,8 @@ func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
 		if !ok {
 			continue
 		}
-		if value != nil { // message created from factory should be non-nil, extra check for user-defined message.
-			m.Fields[i].Value = value
+		if value != TypeInvalid { // message created from factory should be non-nil, extra check for user-defined message.
+			m.Fields[i].Value = Any(value)
 		}
 	}
 	return m
@@ -191,13 +190,13 @@ func (m *Message) FieldByNum(num byte) *Field {
 }
 
 // FieldValueByNum returns the value of the Field in a Messsage, if not found return nil.
-func (m *Message) FieldValueByNum(num byte) any {
+func (m *Message) FieldValueByNum(num byte) Value {
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {
 			return m.Fields[i].Value
 		}
 	}
-	return nil
+	return Value{}
 }
 
 // RemoveFieldByNum removes Field in a Message by num.
@@ -212,16 +211,18 @@ func (m *Message) RemoveFieldByNum(num byte) {
 
 // Clone clones Message.
 func (m Message) Clone() Message {
+	m.Fields = slices.Clone(m.Fields)
 	for i := range m.Fields {
 		m.Fields[i] = m.Fields[i].Clone()
 	}
+	m.DeveloperFields = slices.Clone(m.DeveloperFields)
 	for i := range m.DeveloperFields {
 		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
 	}
 	return m
 }
 
-// FieldBase acts as a fundamental representation of a field as defined in the Global Fit Profile.
+// FieldBase acts as a fundamental representation of a field as defined in the Global FIT Profile.
 // The value of this representation should not be altered, except in the case of an unknown field.
 type FieldBase struct {
 	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
@@ -237,20 +238,14 @@ type FieldBase struct {
 	SubFields  []SubField          // List of sub-fields
 }
 
-// Field represents the full representation of a field, as specified in the Global Fit Profile.
+// Field represents the full representation of a field, as specified in the Global FIT Profile.
 type Field struct {
 	// PERF: Embedding the struct as a pointer to avoid runtime duffcopy when creating a field since FieldBase should not be altered.
 	*FieldBase
 
-	// The decoded value, composed by decoder, will always in a form of a primitive-type (or a slice of primitive types):
-	// - int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, float64 and string.
-	// - []int8, []uint8, []int16, []uint16, []int32, []uint32, []int64, []uint64, []float32, []float64 and []string.
-	//
-	// When the field is manually composed, you may use type-defined value as long as it refer to any of primitive-types
-	// (e.g. typedef.FileActivity). However, please note that marshaling type-defined value requires reflection.
-	//
-	// NOTE: You can not use distinct types such as int and uint.
-	Value any
+	// Value holds any primitive-type single value (or slice value) in a form of proto.Value.
+	// We use proto.Value instead of interface{} because interface{} is heap-allocated, whereas proto.Value is not.
+	Value Value
 
 	// A flag to detect whether this field is generated through component expansion.
 	IsExpandedField bool
@@ -258,7 +253,7 @@ type Field struct {
 
 // WithValue returns a Field containing v value.
 func (f Field) WithValue(v any) Field {
-	f.Value = v
+	f.Value = Any(v)
 	return f
 }
 
@@ -281,13 +276,36 @@ func (f *Field) SubFieldSubtitution(mesgRef *Message) *SubField {
 }
 
 // isValueEqualTo compare if Value == SubField's Map RefFieldValue.
-// fit documentation on dynamic fields says: reference fields must be of integer type, floating point reference values are not supported.
+// The FIT documentation on dynamic fields says: reference fields must be of integer type, floating point reference values are not supported.
 func (f *Field) isValueEqualTo(refFieldValue int64) bool {
-	v, ok := typeconv.IntegerToInt64(f.Value)
+	fieldValue, ok := convertToInt64(f.Value)
 	if !ok {
 		return ok
 	}
-	return v == refFieldValue
+	return fieldValue == refFieldValue
+}
+
+// convertToInt64 converts any integer value of val to int64, if val is non-integer value return false.
+func convertToInt64(val Value) (int64, bool) {
+	switch val.Type() {
+	case TypeInt8:
+		return int64(val.Int8()), true
+	case TypeUint8:
+		return int64(val.Uint8()), true
+	case TypeInt16:
+		return int64(val.Int16()), true
+	case TypeUint16:
+		return int64(val.Uint16()), true
+	case TypeInt32:
+		return int64(val.Int32()), true
+	case TypeUint32:
+		return int64(val.Uint32()), true
+	case TypeInt64:
+		return val.Int64(), true
+	case TypeUint64:
+		return int64(val.Uint64()), true
+	}
+	return 0, false
 }
 
 // Clone clones Field
@@ -323,7 +341,7 @@ type DeveloperField struct {
 	BaseType           basetype.BaseType
 	Name               string
 	Units              string
-	Value              any
+	Value              Value
 }
 
 // Clone clones DeveloperField

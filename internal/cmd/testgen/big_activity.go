@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -32,7 +32,7 @@ func createBigActivityFile(ctx context.Context) error {
 	defer f.Close()
 
 	now := time.Now()
-	fit := new(proto.Fit)
+	fit := new(proto.FIT)
 	fit.Messages = make([]proto.Message, 0, RecordSize)
 	fit.Messages = append(fit.Messages,
 		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{

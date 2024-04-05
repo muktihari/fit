@@ -9,7 +9,6 @@ import (
 )
 
 type Factory interface {
-	CreateMesgOnly(num typedef.MesgNum) proto.Message
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 

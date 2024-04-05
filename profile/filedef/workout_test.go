@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -58,13 +58,13 @@ func TestWorkoutCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, workout.FileId.Type)
 	}
 
-	fit := workout.ToFit(nil)
+	fit := workout.ToFIT(nil)
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgs, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]

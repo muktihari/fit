@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,9 +28,9 @@ import (
 )
 
 var aboutFitgen = `
-The Fit SDK Generator in Go, also known as "fitgen", is a program designed to create 
+The FIT SDK Generator in Go, also known as "fitgen", is a program designed to create 
 several *.go files using Garmin SDK specifications (Profile.xlsx). These generated files
-enable this Fit SDK to carry out the decoding and encoding process of Fit files.
+enable this FIT SDK to carry out the decoding and encoding process of FIT files.
 
 The files are organized into distinct packages: 
  - profile: mesgdef, typedef, untyped
@@ -46,7 +46,7 @@ Example:
  - "./fitgen -f Profile-copy.xlsx -p ../../../ -b all --profile-version 21.115 -v -y"
 
 Note: The existing Garmin SDK specifications must not be altered, since it might 
-result in data that does not align with the terms and conditions of the Fit Protocol.
+result in data that does not align with the terms and conditions of the FIT Protocol.
 `
 
 func main() {
@@ -67,7 +67,7 @@ func main() {
 	flag.StringVar(&whichBuilder, "b", "", whichBuilderHelp)
 	flag.StringVar(&whichBuilder, "builders", "", whichBuilderHelp)
 
-	var profileVersion, profileVersionHelp = "", "Garmin Fit SDK Profile Version (e.g. \"21.115\")"
+	var profileVersion, profileVersionHelp = "", "Garmin FIT SDK Profile Version (e.g. \"21.115\")"
 	flag.StringVar(&profileVersion, "profile-version", "", profileVersionHelp)
 
 	var confirm, confirmHelp = false, "Confirm action"

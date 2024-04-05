@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -169,12 +169,12 @@ func TestMessageMarshaler(t *testing.T) {
 				Header: 0,
 				Num:    typedef.MesgNumFileId,
 				Fields: []proto.Field{
-					{Value: uint8(4)},
-					{Value: uint16(292)},
-					{Value: uint16(100)},
-					{Value: uint32(120188)},
-					{Value: string("XOSS iOS APP")},
-					{Value: uint16(1873)},
+					{Value: proto.Uint8(4)},
+					{Value: proto.Uint16(292)},
+					{Value: proto.Uint16(100)},
+					{Value: proto.Uint32(120188)},
+					{Value: proto.String("XOSS iOS APP")},
+					{Value: proto.Uint16(1873)},
 				},
 				DeveloperFields: nil,
 			},
@@ -194,15 +194,15 @@ func TestMessageMarshaler(t *testing.T) {
 				Header: 0,
 				Num:    typedef.MesgNumRecord,
 				Fields: []proto.Field{
-					{Value: uint8(4)},
-					{Value: uint16(292)},
-					{Value: uint16(100)},
-					{Value: uint32(120188)},
-					{Value: string("XOSS iOS APP")},
-					{Value: uint16(1873)},
+					{Value: proto.Uint8(4)},
+					{Value: proto.Uint16(292)},
+					{Value: proto.Uint16(100)},
+					{Value: proto.Uint32(120188)},
+					{Value: proto.String("XOSS iOS APP")},
+					{Value: proto.Uint16(1873)},
 				},
 				DeveloperFields: []proto.DeveloperField{
-					{Value: uint8(10)},
+					{Value: proto.Uint8(10)},
 				},
 			},
 			b: []byte{
@@ -222,11 +222,11 @@ func TestMessageMarshaler(t *testing.T) {
 				Header: 0,
 				Num:    typedef.MesgNumFileId,
 				Fields: []proto.Field{
-					{FieldBase: &proto.FieldBase{Num: 99, Name: "error"}, Value: struct{}{}},
+					{FieldBase: &proto.FieldBase{Num: 99, Name: "error"}, Value: proto.Value{}}, // TODO: check later
 				},
 				DeveloperFields: nil,
 			},
-			err: typedef.ErrTypeNotSupported,
+			err: proto.ErrTypeNotSupported,
 		},
 		{
 			name: "marshal fields return error",
@@ -234,10 +234,10 @@ func TestMessageMarshaler(t *testing.T) {
 				Header: 0,
 				Num:    typedef.MesgNumFileId,
 				DeveloperFields: []proto.DeveloperField{
-					{Num: 0, DeveloperDataIndex: 0, Value: struct{}{}},
+					{Num: 0, DeveloperDataIndex: 0, Value: proto.Value{}},
 				},
 			},
-			err: typedef.ErrTypeNotSupported,
+			err: proto.ErrTypeNotSupported,
 		},
 	}
 
@@ -296,9 +296,9 @@ func BenchmarkMessageDefinitionWriteTo(b *testing.B) {
 func BenchmarkMessageMarshalBinary(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.RecordPositionLat:  int32(1000),
-		fieldnum.RecordPositionLong: int32(1000),
-		fieldnum.RecordSpeed:        uint16(1000),
+		fieldnum.RecordPositionLat:  proto.Int32(1000),
+		fieldnum.RecordPositionLong: proto.Int32(1000),
+		fieldnum.RecordSpeed:        proto.Uint16(1000),
 	})
 	b.StartTimer()
 
@@ -310,9 +310,9 @@ func BenchmarkMessageMarshalBinary(b *testing.B) {
 func BenchmarkMessageWriterTo(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.RecordPositionLat:  int32(1000),
-		fieldnum.RecordPositionLong: int32(1000),
-		fieldnum.RecordSpeed:        uint16(1000),
+		fieldnum.RecordPositionLat:  proto.Int32(1000),
+		fieldnum.RecordPositionLong: proto.Int32(1000),
+		fieldnum.RecordSpeed:        proto.Uint16(1000),
 	})
 	b.StartTimer()
 

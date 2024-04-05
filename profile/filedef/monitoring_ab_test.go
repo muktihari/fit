@@ -1,4 +1,4 @@
-// Copyright 2024 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2024 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -61,7 +61,7 @@ func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 func newMonitoringBMessageForTest(now time.Time) []proto.Message {
 	mesgsB := slices.Clone(newMonitoringAMessageForTest(time.Now()))
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = uint8(typedef.FileMonitoringB)
+	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 	return mesgsB
 }
 
@@ -73,13 +73,13 @@ func TestMonitoringABCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, monitoringA.FileId.Type)
 	}
 
-	fit := monitoringA.ToFit(nil) // use standard factory
+	fit := monitoringA.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgsA)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgsA, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgsA, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]
@@ -91,20 +91,20 @@ func TestMonitoringABCorrectness(t *testing.T) {
 
 	mesgsB := newMonitoringBMessageForTest(time.Now())
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = uint8(typedef.FileMonitoringB)
+	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 
 	monitoringB := filedef.NewMonitoringAB(mesgsB...)
 	if monitoringB.FileId.Type != typedef.FileMonitoringB {
 		t.Fatalf("expected: %v, got: %v", typedef.FileMonitoringB, monitoringA.FileId.Type)
 	}
 
-	fit = monitoringB.ToFit(nil) // use standard factory
+	fit = monitoringB.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgsB)
 	sortFields(fit.Messages)
 
-	if diff := cmp.Diff(mesgsB, fit.Messages, createFieldComparer()); diff != "" {
+	if diff := cmp.Diff(mesgsB, fit.Messages, valueTransformer()); diff != "" {
 		fmt.Println("messages order:")
 		for i := range fit.Messages {
 			mesg := fit.Messages[i]

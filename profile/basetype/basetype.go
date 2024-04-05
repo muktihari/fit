@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,14 +6,13 @@ package basetype
 
 import (
 	"math"
-	"reflect"
 )
 
 // BaseTypeNumMask used to get the index/order of the constants (start from 0, Enum).
 // Example: (Sint16 & BaseTypeNumMask) -> 3.
 const BaseTypeNumMask = 0x1F
 
-// BaseType is the base of all types used in Fit.
+// BaseType is the base of all types used in FIT.
 type BaseType byte
 
 const (
@@ -55,17 +54,6 @@ const (
 	Uint64Invalid  uint64 = math.MaxUint64 // 0xFFFFFFFFFFFFFFFF
 	Uint64zInvalid uint64 = 0              // 0x0000000000000000
 )
-
-var (
-	float32InvalidInFloatForm = math.Float32frombits(Float32Invalid)
-	float64InvalidInFloatForm = math.Float64frombits(Float64Invalid)
-)
-
-// Float32InvalidInFloatForm is math.Float32frombits(Float32Invalid)
-func Float32InvalidInFloatForm() float32 { return float32InvalidInFloatForm }
-
-// Float64InvalidInFloatForm is math.Float64frombits(Float64Invalid)
-func Float64InvalidInFloatForm() float64 { return float64InvalidInFloatForm }
 
 // FromString convert given s into BaseType, if not valid 255 will be returned.
 func FromString(s string) BaseType {
@@ -226,34 +214,6 @@ func (t BaseType) GoType() string {
 	return "invalid"
 }
 
-func (t BaseType) Kind() reflect.Kind {
-	switch t {
-	case Enum, Byte, Uint8, Uint8z:
-		return reflect.Uint8
-	case Sint8:
-		return reflect.Int8
-	case Sint16:
-		return reflect.Int16
-	case Uint16, Uint16z:
-		return reflect.Uint16
-	case Sint32:
-		return reflect.Int32
-	case Uint32, Uint32z:
-		return reflect.Uint32
-	case String:
-		return reflect.String
-	case Float32:
-		return reflect.Float32
-	case Float64:
-		return reflect.Float64
-	case Sint64:
-		return reflect.Int64
-	case Uint64, Uint64z:
-		return reflect.Uint64
-	}
-	return reflect.Invalid
-}
-
 // EndianAbility return whether t have endianness.
 func (t BaseType) EndianAbility() byte {
 	switch t {
@@ -331,9 +291,9 @@ func (t BaseType) Invalid() any {
 	case String:
 		return StringInvalid
 	case Float32:
-		return float32InvalidInFloatForm
+		return math.Float32frombits(Float32Invalid)
 	case Float64:
-		return float64InvalidInFloatForm
+		return math.Float64frombits(Float64Invalid)
 	case Uint8z:
 		return Uint8zInvalid
 	case Uint16z:

@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -73,14 +73,14 @@ func (f *Course) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Course to proto.Fit. If options is nil, default options will be used.
-func (f *Course) ToFit(options *mesgdef.Options) proto.Fit {
+// ToFIT converts Course to proto.FIT. If options is nil, default options will be used.
+func (f *Course) ToFIT(options *mesgdef.Options) proto.FIT {
 	size := 3 /* non slice fields */
 
 	size += len(f.Records) + len(f.Events) + len(f.CoursePoints) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

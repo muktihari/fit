@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -59,7 +59,7 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 
 	type Uint16 uint16
 
-	fit := new(proto.Fit).WithMessages(
+	fit := new(proto.FIT).WithMessages(
 		factory.CreateMesgOnly(typedef.MesgNumFileId).WithFields(
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("something ss"),
