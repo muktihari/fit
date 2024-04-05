@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -24,7 +24,7 @@ var fitTable = &Table{
 func MakeFitTable() *Table { return fitTable }
 
 // New creates a new hash.Hash16 computing the CRC-16 checksum using the polynomial represented by the Table.
-// The computing algorithm is using Fit algorithm defined in [https://developer.garmin.com/fit/protocol].
+// The computing algorithm is using FIT algorithm defined in [https://developer.garmin.com/fit/protocol].
 // Its Sum method will lay the value out in big-endian byte order.
 func New(table *Table) hash.Hash16 {
 	return &crc16{table: table}

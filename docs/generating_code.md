@@ -2,7 +2,7 @@
 
 This SDK relies heavily on code generation, as the specification is defined in the `Profile.xlsx` file provided by Garmin in their Official SDK release. This document serves as guidance for generating the files, outlines considerations before generation, and provides recovery steps in case issues arise during code generation.
 
-We only generate `Global Profile` specified in `Profile.xlsx` retrieved from the Official SDK. For generating your own custom SDK containing `Product Profile`, please see [How to customize the Fit SDK](#How-to-customize-the-Fit-SDK)
+We only generate `Global Profile` specified in `Profile.xlsx` retrieved from the Official SDK. For generating your own custom SDK containing `Product Profile`, please see [How to customize the FIT SDK](#How-to-customize-the-FIT-SDK)
 
 ## Conventions to follow
 
@@ -11,7 +11,7 @@ We only generate `Global Profile` specified in `Profile.xlsx` retrieved from the
    ^// Code generated .* DO NOT EDIT\.$
    ```
 1. While there is no naming convention for generated go files, we use the suffix `_gen` for all files created by `fitgen` to easily distinguish code-generated files from others. For example: `activity_gen.go`
-1. Items not adequately defined in `Profile.xlsx` or lacking sufficient details are encouraged to code manually when possible to enhance robustness. For example: `Fit Base Type` segregated into `profile/basetype/basetype.go`
+1. Items not adequately defined in `Profile.xlsx` or lacking sufficient details are encouraged to code manually when possible to enhance robustness. For example: `FIT Base Type` segregated into `profile/basetype/basetype.go`
 
 ## How we generate
 
@@ -32,7 +32,7 @@ To work with these files perfectly, we must include the specification in `Profil
 Here are the steps to follow:
 
 1. Clone this repository to your local machine.
-1. Make a copy of `Profile.xlsx` (the file retrieved from official Fit SDK), let's say `Profile-copy.xlsx`.
+1. Make a copy of `Profile.xlsx` (the file retrieved from official FIT SDK), let's say `Profile-copy.xlsx`.
 1. Add manufacturer specific types and messages to `Profile-copy.xlsx` file.
 1. Remember, modifying official specifications is prohibited, you can only add/edit your own specifications.
 1. Go to fit/internal/cmd/fitgen, run the CLI and point it to the updated `Profile-copy.xlsx`. Example:

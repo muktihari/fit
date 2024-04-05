@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -398,7 +398,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 		{
 			name: "fields only with string value",
 			mesg: proto.Message{Num: mesgnum.FileId}.WithFields(
-				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("Fit SDK Go"),
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("FIT SDK Go"),
 			),
 			mesgDef: proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -406,7 +406,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 				FieldDefinitions: []proto.FieldDefinition{
 					{
 						Num:      fieldnum.FileIdProductName,
-						Size:     1 * 11, // len("Fit SDK Go") == 10 + '0x00'
+						Size:     1 * 11, // len("FIT SDK Go") == 10 + '0x00'
 						BaseType: basetype.String,
 					},
 				},
@@ -437,7 +437,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "Fit SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: proto.Uint8(1),
+						Num: 0, Name: "FIT SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: proto.Uint8(1),
 					},
 				),
 			mesgDef: proto.MessageDefinition{

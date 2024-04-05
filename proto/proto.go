@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// NOTE: The term "Global Fit Profile" refers to the definition provided in the Profile.xlsx proto.
+// NOTE: The term "Global FIT Profile" refers to the definition provided in the Profile.xlsx proto.
 
 const ( // header is 1 byte ->	 0bxxxxxxxx
 	MesgDefinitionMask         = 0b01000000 // Mask for determining if the message type is a message definition.
@@ -92,18 +92,18 @@ type FIT struct {
 	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
 }
 
-// WithMessages set Messages and return the pointer to the Fit.
+// WithMessages set Messages and return the pointer to the FIT.
 func (f *FIT) WithMessages(messages ...Message) *FIT {
 	f.Messages = make([]Message, len(messages))
 	copy(f.Messages, messages)
 	return f
 }
 
-// FileHeader is a Fit's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
+// FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
 type FileHeader struct {
 	Size            byte   // Header size either 12 (legacy) or 14.
-	ProtocolVersion byte   // The Fit Protocol version which is being used to encode the Fit file.
-	ProfileVersion  uint16 // The Fit Profile Version (associated with data defined in Global Fit Profile).
+	ProtocolVersion byte   // The FIT Protocol version which is being used to encode the FIT file.
+	ProfileVersion  uint16 // The FIT Profile Version (associated with data defined in Global FIT Profile).
 	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
 	DataType        string // ".FIT" (a string constant)
 	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity if the header. (this field will be automatically updated by the encoder)
@@ -143,7 +143,7 @@ type DeveloperFieldDefinition struct { // 3 bits
 // Message is a FIT protocol message containing the data defined in the Message Definition
 type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
-	Num             typedef.MesgNum  // Global Message Number defined in Global Fit Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
+	Num             typedef.MesgNum  // Global Message Number defined in Global FIT Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
 	Reserved        byte             // Currently undetermined; the default value is 0.
 	Architecture    byte             // Architecture type / Endianness. Must be the same
 	Fields          []Field          // List of Field
@@ -222,7 +222,7 @@ func (m Message) Clone() Message {
 	return m
 }
 
-// FieldBase acts as a fundamental representation of a field as defined in the Global Fit Profile.
+// FieldBase acts as a fundamental representation of a field as defined in the Global FIT Profile.
 // The value of this representation should not be altered, except in the case of an unknown field.
 type FieldBase struct {
 	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
@@ -238,7 +238,7 @@ type FieldBase struct {
 	SubFields  []SubField          // List of sub-fields
 }
 
-// Field represents the full representation of a field, as specified in the Global Fit Profile.
+// Field represents the full representation of a field, as specified in the Global FIT Profile.
 type Field struct {
 	// PERF: Embedding the struct as a pointer to avoid runtime duffcopy when creating a field since FieldBase should not be altered.
 	*FieldBase
@@ -276,7 +276,7 @@ func (f *Field) SubFieldSubtitution(mesgRef *Message) *SubField {
 }
 
 // isValueEqualTo compare if Value == SubField's Map RefFieldValue.
-// fit documentation on dynamic fields says: reference fields must be of integer type, floating point reference values are not supported.
+// The FIT documentation on dynamic fields says: reference fields must be of integer type, floating point reference values are not supported.
 func (f *Field) isValueEqualTo(refFieldValue int64) bool {
 	fieldValue, ok := convertToInt64(f.Value)
 	if !ok {

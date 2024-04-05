@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 // Example: (Sint16 & BaseTypeNumMask) -> 3.
 const BaseTypeNumMask = 0x1F
 
-// BaseType is the base of all types used in Fit.
+// BaseType is the base of all types used in FIT.
 type BaseType byte
 
 const (

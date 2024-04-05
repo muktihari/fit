@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// ConcealPosition removes coordinates (lat, long) as far as start distance and end distance from the given fit file.
+// ConcealPosition removes coordinates (lat, long) as far as start distance and end distance from the given FIT file.
 // If startDistance and endDistance == 0, it will not do anything, nil will be returned.
 func ConcealPosition(fit *proto.FIT, startDistance, endDistance uint32) error {
 	if err := ConcealPositionStart(fit, startDistance); err != nil {
@@ -21,7 +21,7 @@ func ConcealPosition(fit *proto.FIT, startDistance, endDistance uint32) error {
 	return ConcealPositionEnd(fit, endDistance)
 }
 
-// ConcealPositionStart removes coordinates (lat, long) as far as start distance from the given fit file.
+// ConcealPositionStart removes coordinates (lat, long) as far as start distance from the given FIT file.
 // If concealDistance == 0, it will not do anything, nil will be returned.
 func ConcealPositionStart(fit *proto.FIT, concealDistance uint32) error {
 	if concealDistance == 0 {
@@ -107,7 +107,7 @@ loop:
 	return nil
 }
 
-// ConcealPositionEnd removes coordinates (lat, long) as far as end distance from the given fit file.
+// ConcealPositionEnd removes coordinates (lat, long) as far as end distance from the given FIT file.
 // If concealDistance == 0, it will not do anything, nil will be returned.
 func ConcealPositionEnd(fit *proto.FIT, concealDistance uint32) error {
 	if concealDistance == 0 {

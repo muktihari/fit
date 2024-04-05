@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -374,7 +374,7 @@ func TestIsValueTypeAligned(t *testing.T) {
 		{value: proto.Int64(1.0), baseType: basetype.Sint64, expected: true},
 		{value: proto.Uint64(1), baseType: basetype.Uint64, expected: true},
 		{value: proto.Uint64(1), baseType: basetype.Uint64z, expected: true},
-		{value: proto.String("Fit SDK"), baseType: basetype.String, expected: true},
+		{value: proto.String("FIT SDK"), baseType: basetype.String, expected: true},
 		{value: proto.SliceInt8([]int8{1}), baseType: basetype.Sint8, expected: true},
 		{value: proto.SliceUint8([]uint8{1}), baseType: basetype.Uint8, expected: true},
 		{value: proto.SliceUint8([]uint8{1}), baseType: basetype.Uint8z, expected: true},
@@ -389,8 +389,8 @@ func TestIsValueTypeAligned(t *testing.T) {
 		{value: proto.SliceInt64([]int64{1}), baseType: basetype.Sint64, expected: true},
 		{value: proto.SliceUint64([]uint64{1}), baseType: basetype.Uint64, expected: true},
 		{value: proto.SliceUint64([]uint64{1}), baseType: basetype.Uint64z, expected: true},
-		{value: proto.SliceString([]string{"Fit SDK"}), baseType: basetype.String, expected: true},
-		{value: proto.SliceUint8([]byte("Fit SDK")), baseType: basetype.Byte, expected: true},
+		{value: proto.SliceString([]string{"FIT SDK"}), baseType: basetype.String, expected: true},
+		{value: proto.SliceUint8([]byte("FIT SDK")), baseType: basetype.Byte, expected: true},
 		{value: proto.SliceInt8([]int8{1, 2, 3}), baseType: basetype.Sint8, expected: true},
 	}
 
@@ -415,7 +415,7 @@ func TestHasValidValue(t *testing.T) {
 		{value: proto.Uint16(0), expected: true},
 		{value: proto.Int32(0), expected: true},
 		{value: proto.Uint32(0), expected: true},
-		{value: proto.String("Fit SDK Go"), expected: true},
+		{value: proto.String("FIT SDK Go"), expected: true},
 		{value: proto.String(""), expected: false},
 		{value: proto.String("\x00"), expected: false},
 		{value: proto.Float32(0.2), expected: true},
@@ -431,7 +431,7 @@ func TestHasValidValue(t *testing.T) {
 		{value: proto.SliceInt16([]int16{0, basetype.Sint16Invalid}), expected: true},
 		{value: proto.SliceUint16([]uint16{0, basetype.Uint16Invalid}), expected: true},
 		{value: proto.SliceInt32([]int32{0, basetype.Sint32Invalid}), expected: true},
-		{value: proto.SliceString([]string{"Fit SDK Go"}), expected: true},
+		{value: proto.SliceString([]string{"FIT SDK Go"}), expected: true},
 		{value: proto.SliceString([]string{""}), expected: false},
 		{value: proto.SliceString([]string{"\x00"}), expected: false},
 		{value: proto.SliceUint32([]uint32{0, basetype.Uint32Invalid}), expected: true},

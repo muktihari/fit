@@ -1,4 +1,4 @@
-// Copyright 2024 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2024 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -60,7 +60,7 @@ func (f *Segment) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Segment to proto.Fit. If options is nil, default options will be used.
+// ToFit converts Segment to proto.FIT. If options is nil, default options will be used.
 func (f *Segment) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 4 // non slice fields
 

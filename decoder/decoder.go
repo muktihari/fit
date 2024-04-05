@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -29,7 +29,7 @@ import (
 
 var (
 	// Integrity errors
-	ErrNotAFitFile         = errors.New("not a fit file")
+	ErrNotAFitFile         = errors.New("not a FIT file")
 	ErrDataSizeZero        = errors.New("data size zero")
 	ErrCRCChecksumMismatch = errors.New("crc checksum mismatch")
 
@@ -39,7 +39,7 @@ var (
 	ErrByteSizeMismatch       = errors.New("byte size mismath")
 )
 
-// Decoder is Fit file decoder. See New() for details.
+// Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
 	r           io.Reader
 	factory     Factory
@@ -58,18 +58,18 @@ type Decoder struct {
 
 	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
 	n                 int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
-	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained Fit file.
+	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
 	timestamp         uint32       // Active timestamp
 	lastTimeOffset    byte         // Last time offset
 	sequenceCompleted bool         // True after a decode is completed. Reset to false on Next().
 	err               error        // Any error occurs during process.
 
-	// Fit File Representation
+	// FIT File Representation
 	fileHeader proto.FileHeader
 	messages   []proto.Message
 	crc        uint16
 
-	// FileId Message is a special message that must present in a Fit file.
+	// FileId Message is a special message that must present in a FIT file.
 	fileId *mesgdef.FileId
 
 	// Message Definition Lookup
@@ -141,7 +141,7 @@ func WithMesgDefListener(listeners ...listener.MesgDefListener) Option {
 
 // WithBroadcastOnly directs the Decoder to only broadcast the messages without retaining them, reducing memory usage when
 // it's not going to be used anyway. This option is intended to be used with WithMesgListener and WithMesgDefListener.
-// When this option is specified, the Decode will return a fit with empty messages.
+// When this option is specified, the Decode will return a FIT with empty messages.
 func WithBroadcastOnly() Option {
 	return fnApply(func(o *options) { o.broadcastOnly = true })
 }
@@ -204,7 +204,7 @@ func (d *Decoder) initDecodeHeaderOnce() {
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
-// FileId message should be the first message of any Fit file, otherwise return an error.
+// FileId message should be the first message of any FIT file, otherwise return an error.
 //
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
@@ -342,7 +342,7 @@ func (d *Decoder) Discard() error {
 	return d.err
 }
 
-// Next checks whether next bytes are still a valid Fit File sequence. Return false when invalid or reach EOF.
+// Next checks whether next bytes are still a valid FIT File sequence. Return false when invalid or reach EOF.
 func (d *Decoder) Next() bool {
 	if d.err != nil {
 		return false
@@ -352,7 +352,7 @@ func (d *Decoder) Next() bool {
 		return true
 	}
 
-	d.reset() // reset values for the next chained Fit file
+	d.reset() // reset values for the next chained FIT file
 
 	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeHeaderOnce() == nil
@@ -399,9 +399,9 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.mesgDefListeners = d.options.mesgDefListeners
 }
 
-// Decode method decodes `r` into Fit data. One invocation will produce one valid Fit data or an error if it occurs.
-// To decode a chained Fit file that contains more than one Fit data, this decode method should be invoked
-// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained fit file.
+// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or an error if it occurs.
+// To decode a chained FIT file that contains more than one FIT data, this decode method should be invoked
+// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained FIT file.
 //
 //	for dec.Next() {
 //	     fit, err := dec.Decode()

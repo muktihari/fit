@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 type File interface {
 	// Add adds message into file structure.
 	Add(mesg proto.Message)
-	// ToFit converts file back to proto.Fit structure.
+	// ToFit converts file back to proto.FIT structure.
 	ToFit(options *mesgdef.Options) proto.FIT
 }
 

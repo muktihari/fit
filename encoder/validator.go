@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,7 +28,7 @@ var (
 
 // MessageValidator is an interface for implementing message validation before encoding the message.
 type MessageValidator interface {
-	// Validate performs message validation before encoding to avoid resulting a corrupt Fit file.
+	// Validate performs message validation before encoding to avoid resulting a corrupt FIT file.
 	//
 	// The validation process includes:
 	//   1. Removing fields created during component expansion.

@@ -1,6 +1,6 @@
 # Register Manufacturer Specific Types & Messages at Runtime
 
-The `typedef` and `factory` packages contains predefined types and messages declared in [Profile.xlsx] provided in the Official Fit SDK. These packages can be updated through [code generation](./generating_code.md) using `fitgen` by providing your custom `Profile.xlsx`.
+The `typedef` and `factory` packages contains predefined types and messages declared in [Profile.xlsx] provided in the Official FIT SDK. These packages can be updated through [code generation](./generating_code.md) using `fitgen` by providing your custom `Profile.xlsx`.
 
 However, code generation is not for everyone, when using code generation they need to maintain their custom SDK always align with this SDK release. We make a simple approach to allowing register manufacturer specific massage at runtime. It has limitations but it should be sufficient for simple case.
 

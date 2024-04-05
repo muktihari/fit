@@ -1,6 +1,6 @@
-// // Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
-// // Use of this source code is governed by a BSD-style
-// // license that can be found in the LICENSE file.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package proto
 
@@ -70,7 +70,7 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: Float32(-8979123.546734)},
 		{b: kit.Ptr([]byte{}), value: Float64(8192934298908979.192321)},
 		{b: kit.Ptr([]byte{}), value: Float64(-897912398989898.546734)},
-		{b: kit.Ptr([]byte{}), value: String("Fit SDK")},
+		{b: kit.Ptr([]byte{}), value: String("FIT SDK")},
 		{b: kit.Ptr([]byte{}), value: String("")},
 		{b: kit.Ptr([]byte{}), value: SliceBool([]bool{true, false})},
 		{b: kit.Ptr([]byte{}), value: SliceUint8([]byte{1, 2})},

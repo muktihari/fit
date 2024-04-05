@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -45,7 +45,7 @@ func TestUnmarshal(t *testing.T) {
 		{value: proto.Float32(-15.1), ref: basetype.Float32},
 		{value: proto.Float64(15.1), ref: basetype.Float64},
 		{value: proto.Float64(-15.1), ref: basetype.Float64},
-		{value: proto.String("Fit SDK"), ref: basetype.String},
+		{value: proto.String("FIT SDK"), ref: basetype.String},
 		{value: proto.String(""), ref: basetype.String},
 		{value: proto.SliceUint8([]byte{1, 1}), ref: basetype.Enum, isArray: true},
 		{value: proto.SliceUint8([]byte{1, 2}), ref: basetype.Byte, isArray: true},

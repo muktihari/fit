@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -58,7 +58,7 @@ func (f *Workout) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Workout to proto.Fit. If options is nil, default options will be used.
+// ToFit converts Workout to proto.FIT. If options is nil, default options will be used.
 func (f *Workout) ToFit(options *mesgdef.Options) proto.FIT {
 	size := 2 /* non slice fields */
 

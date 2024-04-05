@@ -1,4 +1,4 @@
-// Copyright 2023 The Fit SDK for Go Authors. All rights reserved.
+// Copyright 2023 The FIT SDK for Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -560,7 +560,7 @@ func createFitForTest() (proto.FIT, []byte) {
 	// Update file header data size in []byte form as well
 	copy(b[4:8], dataSize)
 
-	// Update Fit File CRC
+	// Update FIT File CRC
 	fit.CRC = crc16checker.Sum16()
 	crc16checker.Reset()
 	var crc = make([]byte, 2)
@@ -710,7 +710,7 @@ func TestNext(t *testing.T) {
 	// Setup
 	_, buf := createFitForTest()
 
-	// New header of the next chained Fit sequences.
+	// New header of the next chained FIT sequences.
 	header := headerForTest()
 	b, _ := header.MarshalBinary()
 	buf = append(buf, b...)
