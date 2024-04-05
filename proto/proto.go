@@ -85,15 +85,15 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	}
 }
 
-// Fit represents a structure for Fit Files.
-type Fit struct {
+// FIT represents a structure for FIT Files.
+type FIT struct {
 	FileHeader FileHeader // File Header contains either 12 or 14 bytes
 	Messages   []Message  // Messages.
 	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
 }
 
 // WithMessages set Messages and return the pointer to the Fit.
-func (f *Fit) WithMessages(messages ...Message) *Fit {
+func (f *FIT) WithMessages(messages ...Message) *FIT {
 	f.Messages = make([]Message, len(messages))
 	copy(f.Messages, messages)
 	return f

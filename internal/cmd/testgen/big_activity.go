@@ -32,7 +32,7 @@ func createBigActivityFile(ctx context.Context) error {
 	defer f.Close()
 
 	now := time.Now()
-	fit := new(proto.Fit)
+	fit := new(proto.FIT)
 	fit.Messages = make([]proto.Message, 0, RecordSize)
 	fit.Messages = append(fit.Messages,
 		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{

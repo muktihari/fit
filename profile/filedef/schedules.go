@@ -52,13 +52,13 @@ func (f *Schedules) Add(mesg proto.Message) {
 }
 
 // ToFit converts Schedules to proto.Fit. If options is nil, default options will be used.
-func (f *Schedules) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Schedules) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.Schedules) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

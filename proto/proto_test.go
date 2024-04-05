@@ -66,7 +66,7 @@ func TestFitWithMessages(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			fit := new(proto.Fit).WithMessages(tc.messages...)
+			fit := new(proto.FIT).WithMessages(tc.messages...)
 			if diff := cmp.Diff(fit.Messages, tc.messages,
 				cmp.Transformer("Value", func(v proto.Value) any {
 					return v.Any()

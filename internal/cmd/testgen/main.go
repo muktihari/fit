@@ -59,7 +59,7 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 
 	type Uint16 uint16
 
-	fit := new(proto.Fit).WithMessages(
+	fit := new(proto.FIT).WithMessages(
 		factory.CreateMesgOnly(typedef.MesgNumFileId).WithFields(
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("something ss"),

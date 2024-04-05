@@ -225,7 +225,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 //	}
 //
 // Encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
-func (e *Encoder) Encode(fit *proto.Fit) error {
+func (e *Encoder) Encode(fit *proto.FIT) error {
 	defer e.reset()
 
 	// Encode Strategy
@@ -240,7 +240,7 @@ func (e *Encoder) Encode(fit *proto.Fit) error {
 }
 
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing, it updates the actual size of the messages that being written to the proto.
-func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
+func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.FIT) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.Fit) error {
 }
 
 // encodeWithEarlyCheckStrategy does early calculation of the size of the messages that will be written and then do the encoding process.
-func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.Fit) error {
+func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	if err := e.calculateDataSize(fit); err != nil {
 		return err
 	}
@@ -321,7 +321,7 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 }
 
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.
-func (e *Encoder) calculateDataSize(fit *proto.Fit) error {
+func (e *Encoder) calculateDataSize(fit *proto.FIT) error {
 	n := e.n
 
 	if err := e.encodeMessages(io.Discard, fit.Messages); err != nil {
@@ -527,7 +527,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 }
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
-func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err error) {
+func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
 	defer e.reset()
 
 	// Encode Strategy
@@ -541,7 +541,7 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.Fit) (err er
 	return ErrNilWriter
 }
 
-func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.FIT) error {
 	if err := e.encodeHeader(&fit.FileHeader); err != nil {
 		return err
 	}
@@ -558,7 +558,7 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 	return nil
 }
 
-func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.FIT) error {
 	n := e.n
 
 	if err := e.encodeMessagesWithContext(ctx, io.Discard, fit.Messages); err != nil {
@@ -575,7 +575,7 @@ func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.F
 	return nil
 }
 
-func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.Fit) error {
+func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, fit *proto.FIT) error {
 	if err := e.calculateDataSizeWithContext(ctx, fit); err != nil {
 		return err
 	}

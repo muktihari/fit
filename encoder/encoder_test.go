@@ -37,7 +37,7 @@ var (
 
 func TestEncodeRealFiles(t *testing.T) {
 	now := time.Date(2023, 9, 15, 6, 0, 0, 0, time.UTC)
-	fit := &proto.Fit{
+	fit := &proto.FIT{
 		Messages: []proto.Message{
 			factory.CreateMesgOnly(mesgnum.FileId).WithFields(
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
@@ -196,7 +196,7 @@ func TestEncode(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.Encode(&proto.Fit{})
+			_ = enc.Encode(&proto.FIT{})
 		})
 	}
 
@@ -204,14 +204,14 @@ func TestEncode(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.EncodeWithContext(context.Background(), &proto.Fit{})
+			_ = enc.EncodeWithContext(context.Background(), &proto.FIT{})
 		})
 	}
 }
 
 type encodeWithDirectUpdateTestCase struct {
 	name string
-	fit  *proto.Fit
+	fit  *proto.FIT
 	w    io.Writer
 }
 
@@ -219,7 +219,7 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 	return []encodeWithDirectUpdateTestCase{
 		{
 			name: "happy flow coverage",
-			fit: &proto.Fit{Messages: []proto.Message{
+			fit: &proto.FIT{Messages: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 				),
@@ -228,17 +228,17 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 		},
 		{
 			name: "encode header error",
-			fit:  &proto.Fit{},
+			fit:  &proto.FIT{},
 			w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
 		},
 		{
 			name: "encode messages error",
-			fit:  &proto.Fit{Messages: []proto.Message{{}}},
+			fit:  &proto.FIT{Messages: []proto.Message{{}}},
 			w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
 		},
 		{
 			name: "encode crc error",
-			fit: &proto.Fit{Messages: []proto.Message{
+			fit: &proto.FIT{Messages: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 				),
@@ -259,7 +259,7 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 		},
 		{
 			name: "update error",
-			fit: &proto.Fit{FileHeader: proto.FileHeader{Size: 14, DataSize: 100, DataType: proto.DataTypeFIT}, Messages: []proto.Message{
+			fit: &proto.FIT{FileHeader: proto.FileHeader{Size: 14, DataSize: 100, DataType: proto.DataTypeFIT}, Messages: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 				),
@@ -292,7 +292,7 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 
 type encodeWithEarlyCheckStrategyTestCase struct {
 	name string
-	fit  *proto.Fit
+	fit  *proto.FIT
 	w    io.Writer
 	err  error
 }
@@ -301,12 +301,12 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 	return []encodeWithEarlyCheckStrategyTestCase{
 		{
 			name: "happy flow coverage",
-			fit:  &proto.Fit{Messages: []proto.Message{{}}},
+			fit:  &proto.FIT{Messages: []proto.Message{{}}},
 			w:    fnWriteOK,
 		},
 		{
 			name: "calculate data size error",
-			fit:  &proto.Fit{Messages: []proto.Message{}},
+			fit:  &proto.FIT{Messages: []proto.Message{}},
 			w: func() io.Writer {
 				fnInstances := []io.Writer{fnWriteErr}
 				index := 0
@@ -321,7 +321,7 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 		},
 		{
 			name: "encode header error",
-			fit: &proto.Fit{Messages: []proto.Message{
+			fit: &proto.FIT{Messages: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
 				),
@@ -331,7 +331,7 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 		},
 		{
 			name: "encode messages error",
-			fit: &proto.Fit{Messages: []proto.Message{
+			fit: &proto.FIT{Messages: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFields(
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
 				),
@@ -350,7 +350,7 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 		},
 		{
 			name: "encode crc error",
-			fit:  &proto.Fit{Messages: []proto.Message{{}}},
+			fit:  &proto.FIT{Messages: []proto.Message{{}}},
 			w: func() io.Writer {
 				fnInstances := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
 				index := 0
@@ -1021,9 +1021,9 @@ func TestReset(t *testing.T) {
 	}
 }
 
-func createFitForBenchmark(recodSize int) *proto.Fit {
+func createFitForBenchmark(recodSize int) *proto.FIT {
 	now := time.Now()
-	fit := new(proto.Fit)
+	fit := new(proto.FIT)
 	fit.Messages = make([]proto.Message, 0, recodSize)
 	fit.Messages = append(fit.Messages,
 		factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{

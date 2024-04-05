@@ -175,7 +175,7 @@ func openAndConcealPosition(path string, opts *options) error {
 	}
 	defer f.Close()
 
-	var fits []*proto.Fit
+	var fits []*proto.FIT
 	dec := decoder.New(bufio.NewReader(f),
 		decoder.WithNoComponentExpansion(),
 	)

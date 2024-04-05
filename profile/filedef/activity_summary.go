@@ -58,13 +58,13 @@ func (f *ActivitySummary) Add(mesg proto.Message) {
 }
 
 // ToFit converts ActivitySummary to proto.Fit. If options is nil, default options will be used.
-func (f *ActivitySummary) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *ActivitySummary) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.Sessions) + len(f.Laps) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

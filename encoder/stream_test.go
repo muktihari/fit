@@ -72,7 +72,7 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 
 	expected := bytes.NewBuffer(nil)
 	expectedEnc := New(expected)
-	expectedEnc.Encode(&proto.Fit{
+	expectedEnc.Encode(&proto.FIT{
 		Messages: []proto.Message{fileIdMesg, recordMesg},
 	})
 
@@ -102,7 +102,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	// Valid bytes to checking the correctness
 	valid := bytes.NewBuffer(nil)
 	validEnc := New(valid)
-	validEnc.Encode(&proto.Fit{
+	validEnc.Encode(&proto.FIT{
 		Messages: []proto.Message{mesg},
 	})
 

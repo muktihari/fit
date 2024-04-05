@@ -409,7 +409,7 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 //	         return err
 //	     }
 //	}
-func (d *Decoder) Decode() (fit *proto.Fit, err error) {
+func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 	if d.err != nil {
 		return nil, d.err
 	}
@@ -428,7 +428,7 @@ func (d *Decoder) Decode() (fit *proto.Fit, err error) {
 		return nil, err
 	}
 	d.sequenceCompleted = true
-	return &proto.Fit{
+	return &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
@@ -871,7 +871,7 @@ func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool,
 }
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.
-func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err error) {
+func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.FIT, err error) {
 	if d.err != nil {
 		return nil, d.err
 	}
@@ -899,7 +899,7 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.Fit, err er
 		return nil, err
 	}
 	d.sequenceCompleted = true
-	return &proto.Fit{
+	return &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,

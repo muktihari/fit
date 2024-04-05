@@ -477,8 +477,8 @@ func headerForTest() proto.FileHeader {
 	}
 }
 
-func createFitForTest() (proto.Fit, []byte) {
-	fit := proto.Fit{
+func createFitForTest() (proto.FIT, []byte) {
+	fit := proto.FIT{
 		FileHeader: headerForTest(),
 		Messages: []proto.Message{
 			factory.CreateMesgOnly(mesgnum.FileId).WithFields(
@@ -676,7 +676,7 @@ func TestDiscardChained(t *testing.T) {
 
 	r := bytes.NewBuffer(b)
 
-	fits := make([]*proto.Fit, 0, 2)
+	fits := make([]*proto.FIT, 0, 2)
 	dec := New(r)
 	for dec.Next() {
 		fileId, err := dec.PeekFileId()
@@ -796,7 +796,7 @@ func TestNext(t *testing.T) {
 type decodeTestCase struct {
 	name string
 	r    io.Reader
-	fit  proto.Fit
+	fit  proto.FIT
 	err  error
 }
 

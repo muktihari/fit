@@ -64,14 +64,14 @@ func (f *Settings) Add(mesg proto.Message) {
 }
 
 // ToFit converts Settings to proto.Fit. If options is nil, default options will be used.
-func (f *Settings) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Settings) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.UserProfiles) + len(f.HrmProfiles) + len(f.SdmProfiles) +
 		len(f.BikeProfiles) + len(f.DeviceSettings) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

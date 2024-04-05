@@ -24,12 +24,12 @@ var (
 	ErrSportMismatch  = errors.New("sport mismatch")
 )
 
-func Combine(fits ...proto.Fit) (*proto.Fit, error) {
+func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 	if len(fits) < 2 {
 		return nil, fmt.Errorf("provide at least 2 fits to combine: %w", ErrMinimalCombine)
 	}
 
-	slices.SortStableFunc(fits, func(f1, f2 proto.Fit) int {
+	slices.SortStableFunc(fits, func(f1, f2 proto.FIT) int {
 		if len(f1.Messages) == 0 || len(f2.Messages) == 0 {
 			return 0
 		}

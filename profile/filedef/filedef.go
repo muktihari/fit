@@ -18,7 +18,7 @@ type File interface {
 	// Add adds message into file structure.
 	Add(mesg proto.Message)
 	// ToFit converts file back to proto.Fit structure.
-	ToFit(options *mesgdef.Options) proto.Fit
+	ToFit(options *mesgdef.Options) proto.FIT
 }
 
 // ToMesgs bulks convert mesgdef into proto.Message and append it to messages

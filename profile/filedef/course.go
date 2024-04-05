@@ -74,13 +74,13 @@ func (f *Course) Add(mesg proto.Message) {
 }
 
 // ToFit converts Course to proto.Fit. If options is nil, default options will be used.
-func (f *Course) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Course) ToFit(options *mesgdef.Options) proto.FIT {
 	size := 3 /* non slice fields */
 
 	size += len(f.Records) + len(f.Events) + len(f.CoursePoints) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

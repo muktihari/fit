@@ -61,13 +61,13 @@ func (f *Segment) Add(mesg proto.Message) {
 }
 
 // ToFit converts Segment to proto.Fit. If options is nil, default options will be used.
-func (f *Segment) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Segment) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 4 // non slice fields
 
 	size += len(f.SegmentPoints) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

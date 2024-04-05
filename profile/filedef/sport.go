@@ -70,14 +70,14 @@ func (f *Sport) Add(mesg proto.Message) {
 }
 
 // ToFit converts Sport to proto.Fit. If options is nil, default options will be used.
-func (f *Sport) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Sport) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.ZonesTargets) + len(f.HrZones) + len(f.PowerZones) +
 		len(f.MetZones) + len(f.SpeedZones) + len(f.CadenceZones) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 

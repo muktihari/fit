@@ -58,13 +58,13 @@ func (f *Weight) Add(mesg proto.Message) {
 }
 
 // ToFit converts Weight to proto.Fit. If options is nil, default options will be used.
-func (f *Weight) ToFit(options *mesgdef.Options) proto.Fit {
+func (f *Weight) ToFit(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.WeightScales) + len(f.DeviceInfos) +
 		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
-	fit := proto.Fit{
+	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
 	}
 
