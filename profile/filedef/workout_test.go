@@ -58,7 +58,7 @@ func TestWorkoutCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, workout.FileId.Type)
 	}
 
-	fit := workout.ToFit(nil)
+	fit := workout.ToFIT(nil)
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

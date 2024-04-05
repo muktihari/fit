@@ -68,7 +68,7 @@ func TestDeviceCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileDevice, device.FileId.Type)
 	}
 
-	fit := device.ToFit(nil) // use standard factory
+	fit := device.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

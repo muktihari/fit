@@ -52,8 +52,8 @@ func (f *Totals) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Totals to proto.FIT. If options is nil, default options will be used.
-func (f *Totals) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Totals to proto.FIT. If options is nil, default options will be used.
+func (f *Totals) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 3 // non slice fields
 
 	size += len(f.Totals) + len(f.DeveloperDataIds) +

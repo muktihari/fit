@@ -52,7 +52,7 @@ func TestSchedulesCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileSchedules, schedules.FileId.Type)
 	}
 
-	fit := schedules.ToFit(nil) // use standard factory
+	fit := schedules.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

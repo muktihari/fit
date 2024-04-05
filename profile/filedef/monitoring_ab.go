@@ -61,8 +61,8 @@ func (f *MonitoringAB) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts MonitoringAB to proto.FIT. If options is nil, default options will be used.
-func (f *MonitoringAB) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts MonitoringAB to proto.FIT. If options is nil, default options will be used.
+func (f *MonitoringAB) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.Monitorings) + len(f.DeviceInfos) +

@@ -52,7 +52,7 @@ func TestGoalsCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileGoals, goals.FileId.Type)
 	}
 
-	fit := goals.ToFit(nil) // use standard factory
+	fit := goals.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

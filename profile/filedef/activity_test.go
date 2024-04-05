@@ -140,7 +140,7 @@ func TestActivityCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, activity.FileId.Type)
 	}
 
-	fit := activity.ToFit(nil) // use standard factory
+	fit := activity.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

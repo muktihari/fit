@@ -61,7 +61,7 @@ func TestBloodPressureCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileBloodPressure, bloodPressure.FileId.Type)
 	}
 
-	fit := bloodPressure.ToFit(nil) // use standard factory
+	fit := bloodPressure.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

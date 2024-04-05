@@ -708,7 +708,7 @@ func main() {
         SetNumSessions(1)
 
     // Convert back to FIT protocol messages
-    fit := activity.ToFit(nil)
+    fit := activity.ToFIT(nil)
 
     bw := bufferedwriter.New(f)
     defer bw.Flush()
@@ -754,7 +754,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     activity.FileId.Product = typedef.GarminProductEdge530.Uint16()
 
     // Convert back to RAW Protocol Messages
-    fit := activity.ToFit(nil)
+    fit := activity.ToFIT(nil)
 
     fout, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
     if err != nil {

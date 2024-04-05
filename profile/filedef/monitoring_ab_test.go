@@ -73,7 +73,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, monitoringA.FileId.Type)
 	}
 
-	fit := monitoringA.ToFit(nil) // use standard factory
+	fit := monitoringA.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgsA)
@@ -98,7 +98,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileMonitoringB, monitoringA.FileId.Type)
 	}
 
-	fit = monitoringB.ToFit(nil) // use standard factory
+	fit = monitoringB.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgsB)

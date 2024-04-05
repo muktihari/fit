@@ -51,8 +51,8 @@ func (f *Goals) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Goals to proto.FIT. If options is nil, default options will be used.
-func (f *Goals) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Goals to proto.FIT. If options is nil, default options will be used.
+func (f *Goals) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.Goals) + len(f.DeveloperDataIds) +

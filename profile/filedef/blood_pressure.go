@@ -57,8 +57,8 @@ func (f *BloodPressure) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts BloodPressure to proto.FIT. If options is nil, default options will be used.
-func (f *BloodPressure) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts BloodPressure to proto.FIT. If options is nil, default options will be used.
+func (f *BloodPressure) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.BloodPressures) + len(f.DeviceInfos) +

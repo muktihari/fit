@@ -51,8 +51,8 @@ func (f *Schedules) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Schedules to proto.FIT. If options is nil, default options will be used.
-func (f *Schedules) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Schedules to proto.FIT. If options is nil, default options will be used.
+func (f *Schedules) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.Schedules) + len(f.DeveloperDataIds) +

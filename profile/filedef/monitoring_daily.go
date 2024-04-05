@@ -57,8 +57,8 @@ func (f *MonitoringDaily) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts MonitoringDaily to proto.FIT. If options is nil, default options will be used.
-func (f *MonitoringDaily) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts MonitoringDaily to proto.FIT. If options is nil, default options will be used.
+func (f *MonitoringDaily) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.Monitorings) + len(f.DeviceInfos) +

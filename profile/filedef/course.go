@@ -73,8 +73,8 @@ func (f *Course) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Course to proto.FIT. If options is nil, default options will be used.
-func (f *Course) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Course to proto.FIT. If options is nil, default options will be used.
+func (f *Course) ToFIT(options *mesgdef.Options) proto.FIT {
 	size := 3 /* non slice fields */
 
 	size += len(f.Records) + len(f.Events) + len(f.CoursePoints) +

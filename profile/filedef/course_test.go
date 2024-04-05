@@ -76,7 +76,7 @@ func TestCourseCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, course.FileId.Type)
 	}
 
-	fit := course.ToFit(nil)
+	fit := course.ToFIT(nil)
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

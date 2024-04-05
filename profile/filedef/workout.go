@@ -58,8 +58,8 @@ func (f *Workout) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Workout to proto.FIT. If options is nil, default options will be used.
-func (f *Workout) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Workout to proto.FIT. If options is nil, default options will be used.
+func (f *Workout) ToFIT(options *mesgdef.Options) proto.FIT {
 	size := 2 /* non slice fields */
 
 	size += len(f.WorkoutSteps) + len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)

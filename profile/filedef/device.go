@@ -63,8 +63,8 @@ func (f *Device) Add(mesg proto.Message) {
 	}
 }
 
-// ToFit converts Device to proto.FIT. If options is nil, default options will be used.
-func (f *Device) ToFit(options *mesgdef.Options) proto.FIT {
+// ToFIT converts Device to proto.FIT. If options is nil, default options will be used.
+func (f *Device) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 1 // non slice fields
 
 	size += len(f.Softwares) + len(f.Capabilities) + len(f.FileCapabilities) +

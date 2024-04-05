@@ -64,7 +64,7 @@ func TestSettingsCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileSettings, settings.FileId.Type)
 	}
 
-	fit := settings.ToFit(nil) // use standard factory
+	fit := settings.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)

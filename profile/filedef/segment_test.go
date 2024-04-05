@@ -61,7 +61,7 @@ func TestSegmentCorrectness(t *testing.T) {
 		t.Fatalf("expected: %v, got: %v", typedef.FileSegment, segment.FileId.Type)
 	}
 
-	fit := segment.ToFit(nil) // use standard factory
+	fit := segment.ToFIT(nil) // use standard factory
 
 	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
 	sortFields(mesgs)
