@@ -26,7 +26,6 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
-	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/filedef"
@@ -157,8 +156,8 @@ func TestOptions(t *testing.T) {
 			options: &options{
 				factory:               decoderFactory,
 				shouldChecksum:        false,
-				mesgListeners:         []listener.MesgListener{mesglis, mesglis},
-				mesgDefListeners:      []listener.MesgDefListener{mesgDefLis, mesgDefLis},
+				mesgListeners:         []MesgListener{mesglis, mesglis},
+				mesgDefListeners:      []MesgDefListener{mesgDefLis, mesgDefLis},
 				broadcastOnly:         true,
 				shouldExpandComponent: false,
 			},
@@ -174,7 +173,7 @@ func TestOptions(t *testing.T) {
 				cmp.Transformer("factory", func(t Factory) uintptr {
 					return reflect.ValueOf(t).Pointer()
 				}),
-				cmp.Comparer(func(a, b []listener.MesgListener) bool {
+				cmp.Comparer(func(a, b []MesgListener) bool {
 					if len(a) != len(b) {
 						return false
 					}
@@ -185,7 +184,7 @@ func TestOptions(t *testing.T) {
 					}
 					return true
 				}),
-				cmp.Comparer(func(a, b []listener.MesgDefListener) bool {
+				cmp.Comparer(func(a, b []MesgDefListener) bool {
 					if len(a) != len(b) {
 						return false
 					}
@@ -1992,7 +1991,7 @@ func TestReset(t *testing.T) {
 				cmp.Transformer("Value", func(v proto.Value) any {
 					return v.Any()
 				}),
-				cmp.Comparer(func(a, b []listener.MesgListener) bool {
+				cmp.Comparer(func(a, b []MesgListener) bool {
 					if len(a) != len(b) {
 						return false
 					}
@@ -2003,7 +2002,7 @@ func TestReset(t *testing.T) {
 					}
 					return true
 				}),
-				cmp.Comparer(func(a, b []listener.MesgDefListener) bool {
+				cmp.Comparer(func(a, b []MesgDefListener) bool {
 					if len(a) != len(b) {
 						return false
 					}

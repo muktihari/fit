@@ -13,10 +13,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
-	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	_ listener.MesgDefListener = &FitToCsvConv{}
-	_ listener.MesgListener    = &FitToCsvConv{}
+	_ decoder.MesgDefListener = &FitToCsvConv{}
+	_ decoder.MesgListener    = &FitToCsvConv{}
 )
 
 // FitToCsvConv is an implementation for listeners that receive message events and convert them into CSV records.
