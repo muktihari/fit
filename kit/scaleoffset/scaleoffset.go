@@ -155,11 +155,7 @@ func DiscardSlice[T Numeric](values []float64, scale, offset float64) []T {
 }
 
 // DiscardValue restores scaled value in the form of float64 or []float64 to its basetype's form.
-func DiscardValue(val any, baseType basetype.BaseType, scale, offset float64) proto.Value {
-	value, ok := val.(proto.Value)
-	if !ok {
-		return proto.Any(DiscardAny(val, baseType, scale, offset))
-	}
+func DiscardValue(value proto.Value, baseType basetype.BaseType, scale, offset float64) proto.Value {
 	switch value.Type() {
 	case proto.TypeFloat64:
 		dv := Discard(value.Float64(), scale, offset)
