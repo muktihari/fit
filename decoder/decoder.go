@@ -18,7 +18,6 @@ import (
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
@@ -80,8 +79,8 @@ type Decoder struct {
 	fieldDescriptions []*mesgdef.FieldDescription
 
 	// Listeners
-	mesgListeners    []listener.MesgListener    // Each listener will received every decoded message.
-	mesgDefListeners []listener.MesgDefListener // Each listener will received every decoded message definition.
+	mesgListeners    []MesgListener    // Each listener will received every decoded message.
+	mesgDefListeners []MesgDefListener // Each listener will received every decoded message definition.
 }
 
 // Factory defines a contract that any Factory containing these method can be used by the Decoder.
@@ -92,8 +91,8 @@ type Factory interface {
 
 type options struct {
 	factory               Factory
-	mesgListeners         []listener.MesgListener
-	mesgDefListeners      []listener.MesgDefListener
+	mesgListeners         []MesgListener
+	mesgDefListeners      []MesgDefListener
 	shouldChecksum        bool
 	broadcastOnly         bool
 	shouldExpandComponent bool
@@ -125,7 +124,7 @@ func WithFactory(factory Factory) Option {
 
 // WithMesgListener adds listeners to the listener pool, where each listener is broadcasted every message.
 // The listeners will be appended not replaced. If users need to reset use Reset().
-func WithMesgListener(listeners ...listener.MesgListener) Option {
+func WithMesgListener(listeners ...MesgListener) Option {
 	return fnApply(func(o *options) {
 		o.mesgListeners = append(o.mesgListeners, listeners...)
 	})
@@ -133,14 +132,14 @@ func WithMesgListener(listeners ...listener.MesgListener) Option {
 
 // WithMesgDefListener adds listeners to the listener pool, where each listener is broadcasted every message definition.
 // The listeners will be appended not replaced. If users need to reset use Reset().
-func WithMesgDefListener(listeners ...listener.MesgDefListener) Option {
+func WithMesgDefListener(listeners ...MesgDefListener) Option {
 	return fnApply(func(o *options) {
 		o.mesgDefListeners = append(o.mesgDefListeners, listeners...)
 	})
 }
 
 // WithBroadcastOnly directs the Decoder to only broadcast the messages without retaining them, reducing memory usage when
-// it's not going to be used anyway. This option is intended to be used with WithMesgListener and WithMesgDefListener.
+// it's not going to be used anyway. This option is intended to be used with WithMesgListener and
 // When this option is specified, the Decode will return a FIT with empty messages.
 func WithBroadcastOnly() Option {
 	return fnApply(func(o *options) { o.broadcastOnly = true })

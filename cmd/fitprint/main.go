@@ -14,7 +14,6 @@ import (
 	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
-	"github.com/muktihari/fit/listener"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/proto"
 )
@@ -64,7 +63,7 @@ func fatalf(format string, args ...any) {
 	os.Exit(1)
 }
 
-var _ listener.MesgListener = &printer{}
+var _ decoder.MesgListener = &printer{}
 
 type printer struct {
 	w       io.Writer

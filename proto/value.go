@@ -13,7 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 )
 
-// stringptr is a string pointer identifier to distinguish it from pointer of []string.
+// stringptr is an identifier distinguish a string pointer to a []byte pointer which both are *byte.
 type stringptr *byte
 
 // Type is value's type
@@ -560,7 +560,7 @@ func SliceString[S []E, E ~string](s S) Value {
 }
 
 // Any converts any value into Value. If the given v is not a primitive-type value (or a slice of primitive-type)
-// it will determine it using reflection, and if it's a slice it will make 1 alloc.
+// it will determine it using reflection, and if it's a non-primitive-type slice it will make 1 alloc.
 // If v is not supported such as int, uint, []int, []uint, []any, slice with zero len, etc., Value with TypeInvalid is returned.
 func Any(v any) Value {
 	switch val := v.(type) { // Fast path

@@ -94,8 +94,7 @@ type FIT struct {
 
 // WithMessages set Messages and return the pointer to the FIT.
 func (f *FIT) WithMessages(messages ...Message) *FIT {
-	f.Messages = make([]Message, len(messages))
-	copy(f.Messages, messages)
+	f.Messages = messages
 	return f
 }
 
@@ -150,32 +149,31 @@ type Message struct {
 	DeveloperFields []DeveloperField // List of DeveloperField
 }
 
-// WithFields copies the provided fields into the message's fields.
+// WithFields puts the provided fields into the message's fields.
 func (m Message) WithFields(fields ...Field) Message {
-	m.Fields = make([]Field, len(fields))
-	copy(m.Fields, fields)
+	m.Fields = fields
 	return m
 }
 
 // WithFieldValues assigns the values of the targeted fields with the given map,
 // where map[byte]any represents the field numbers and their respective values.
+// If the specified fieldNum does not have a corresponding target match in the fields, no value will be assigned.
 func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
 	for i := range m.Fields {
 		value, ok := fieldNumValues[m.Fields[i].Num]
 		if !ok {
 			continue
 		}
-		if value != TypeInvalid { // message created from factory should be non-nil, extra check for user-defined message.
+		if value != nil { // only accept non-nil value.
 			m.Fields[i].Value = Any(value)
 		}
 	}
 	return m
 }
 
-// WithFields copies the provided fields into the message's fields.
+// WithFields puts the provided fields into the message's fields.
 func (m Message) WithDeveloperFields(developerFields ...DeveloperField) Message {
-	m.DeveloperFields = make([]DeveloperField, len(developerFields))
-	copy(m.DeveloperFields, developerFields)
+	m.DeveloperFields = developerFields
 	return m
 }
 

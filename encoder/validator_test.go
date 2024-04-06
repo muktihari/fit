@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -25,21 +26,8 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-type ( // custom type for test
-	test_int8    int8
-	test_uint8   uint8
-	test_int16   int16
-	test_uint16  uint16
-	test_int32   int32
-	test_uint32  uint32
-	test_string  string
-	test_float32 float32
-	test_float64 float64
-	test_int64   int64
-	test_uint64  uint64
-)
-
 func TestMessageValidatorOption(t *testing.T) {
+	fac := factory.New()
 	tt := []struct {
 		name    string
 		opts    []ValidatorOption
@@ -49,22 +37,30 @@ func TestMessageValidatorOption(t *testing.T) {
 			name: "defaultValidatorOptions",
 			options: &validatorOptions{
 				omitInvalidValues: true,
+				factory:           factory.StandardFactory(),
 			},
 		},
 		{
 			name: "with options",
 			opts: []ValidatorOption{
 				ValidatorWithPreserveInvalidValues(),
+				ValidatorWithFactory(fac),
 			},
 			options: &validatorOptions{
 				omitInvalidValues: false,
+				factory:           fac,
 			},
 		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			mv := NewMessageValidator(tc.opts...).(*messageValidator)
-			if diff := cmp.Diff(mv.options, tc.options, cmp.AllowUnexported(validatorOptions{})); diff != "" {
+			if diff := cmp.Diff(mv.options, tc.options,
+				cmp.AllowUnexported(validatorOptions{}),
+				cmp.Transformer("factory", func(factory Factory) any {
+					return reflect.ValueOf(factory).Pointer()
+				}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -116,6 +112,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 							NativeMesgNum:      mesgnum.Record,
 							NativeFieldNum:     fieldnum.RecordHeartRate,
 							BaseType:           basetype.Uint8,
+							Value:              proto.Uint8(60),
 						},
 					},
 				},
@@ -237,6 +234,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "n developer fields exceed allowed",
 			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
+				}),
 				{
 					Num: mesgnum.Record,
 					Fields: []proto.Field{
@@ -245,38 +254,21 @@ func TestMessageValidatorValidate(t *testing.T) {
 					DeveloperFields: func() []proto.DeveloperField {
 						devFields := make([]proto.DeveloperField, 256)
 						for i := range devFields {
+							// dummy data
 							devFields[i].DeveloperDataIndex = 0
-							devFields[i].Num = 255
+							devFields[i].Num = 0
+							devFields[i].Size = 1
+							devFields[i].Name = "Heart Rate"
+							devFields[i].NativeMesgNum = mesgnum.Record
+							devFields[i].NativeFieldNum = fieldnum.RecordHeartRate
+							devFields[i].BaseType = basetype.Uint8
+							devFields[i].Value = proto.Uint8(60)
 						}
 						return devFields
 					}(),
 				},
 			},
-			mesgValidator: func() MessageValidator {
-				mesgValidator := NewMessageValidator().(*messageValidator)
-				developerDataId := proto.Message{
-					Num: mesgnum.DeveloperDataId,
-					Fields: []proto.Field{
-						factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-					},
-				}
-				mesgValidator.developerDataIds = []*mesgdef.DeveloperDataId{
-					mesgdef.NewDeveloperDataId(&developerDataId),
-				}
-
-				fieldDescription := proto.Message{
-					Num: mesgnum.FieldDescription,
-					Fields: []proto.Field{
-						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(255)),
-					},
-				}
-				mesgValidator.fieldDescriptions = []*mesgdef.FieldDescription{
-					mesgdef.NewFieldDescription(&fieldDescription),
-				}
-				return mesgValidator
-			}(),
-			errs: []error{ErrExceedMaxAllowed},
+			errs: []error{nil, nil, ErrExceedMaxAllowed},
 		},
 		{
 			name: "field value size exceed max allowed",
@@ -325,10 +317,113 @@ func TestMessageValidatorValidate(t *testing.T) {
 			},
 			errs: []error{ErrExceedMaxAllowed},
 		},
+		{
+			name: "valid message with developer fields invalid value",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
+				}),
+				{
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "Heart Rate",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     fieldnum.RecordHeartRate,
+							BaseType:           basetype.Uint8,
+							Value:              proto.Uint8(basetype.Uint8Invalid),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "mesg contain developer field with native value scaled",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "Altitude",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordAltitude),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
+				}),
+				{
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "Heart Rate",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     fieldnum.RecordAltitude,
+							BaseType:           basetype.Uint16,
+							Value:              proto.Float64(6960.8),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "mesg contain developer field with unknown native",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "??",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(255),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
+				}),
+				{
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "??",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     255,
+							BaseType:           basetype.Uint16,
+							Value:              proto.Float64(0), // Scaled value + targeted Native Field not found
+						},
+					},
+				},
+			},
+			errs: []error{nil, nil, ErrValueTypeMismatch},
+		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			mesgValidator := tc.mesgValidator
 			if mesgValidator == nil {
 				mesgValidator = NewMessageValidator()
@@ -338,10 +433,10 @@ func TestMessageValidatorValidate(t *testing.T) {
 				tc.errs = make([]error, len(tc.mesgs))
 			}
 
-			for i, mesg := range tc.mesgs {
+			for j, mesg := range tc.mesgs {
 				err := mesgValidator.Validate(&mesg)
-				if !errors.Is(err, tc.errs[i]) {
-					t.Fatalf("expected err: %v, got: %v", tc.errs[i], err)
+				if !errors.Is(err, tc.errs[j]) {
+					t.Fatalf("expected err: %v, got: %v", tc.errs[j], err)
 				}
 				if err != nil {
 					continue
@@ -426,6 +521,8 @@ func TestHasValidValue(t *testing.T) {
 		{value: proto.Float64(math.Float64frombits(basetype.Float64Invalid - 1)), expected: true},
 		{value: proto.Int64(0), expected: true},
 		{value: proto.Uint64(0), expected: true},
+		{value: proto.SliceBool([]bool{true, false}), expected: true},
+		{value: proto.SliceBool([]bool{false, false}), expected: true}, // true even it all false.
 		{value: proto.SliceInt8([]int8{0, basetype.Sint8Invalid}), expected: true},
 		{value: proto.SliceUint8([]uint8{0, basetype.Uint8Invalid}), expected: true},
 		{value: proto.SliceInt16([]int16{0, basetype.Sint16Invalid}), expected: true},

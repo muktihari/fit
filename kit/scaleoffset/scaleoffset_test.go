@@ -16,7 +16,7 @@ import (
 
 func TestApplyValue(t *testing.T) {
 	tt := []struct {
-		value  any
+		value  proto.Value
 		scale  float64
 		offset float64
 		result proto.Value
@@ -46,16 +46,10 @@ func TestApplyValue(t *testing.T) {
 		{value: proto.SliceInt8([]int8{10}), scale: 5, offset: 1, result: proto.SliceFloat64([]float64{1})},
 		{value: proto.String("fit"), scale: 1, offset: 0, result: proto.String("fit")},
 		{value: proto.String("fit"), scale: 255, offset: 255, result: proto.String("fit")},
-		{value: uint16(37304), scale: 5, offset: 500, result: proto.Float64(6960.8)},
 	}
 
 	for i, tc := range tt {
-		name := fmt.Sprintf("[%d] %#v", i, tc.value)
-		value, ok := tc.value.(proto.Value)
-		if ok {
-			name = fmt.Sprintf("[%d] %#v", i, value.Any())
-		}
-		t.Run(name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("[%d] %#v", i, tc.value.Any()), func(t *testing.T) {
 			result := scaleoffset.ApplyValue(tc.value, tc.scale, tc.offset)
 			if diff := cmp.Diff(result, tc.result,
 				cmp.Transformer("Value", func(v proto.Value) any {
@@ -121,7 +115,7 @@ func TestApplyAny(t *testing.T) {
 func TestDiscardValue(t *testing.T) {
 	tt := []struct {
 		name     string
-		value    any
+		value    proto.Value
 		scale    float64
 		offset   float64
 		baseType basetype.BaseType
@@ -160,16 +154,10 @@ func TestDiscardValue(t *testing.T) {
 		{value: proto.SliceFloat64([]float64{6960.8}), scale: 5, offset: 500, baseType: basetype.Float64, result: proto.SliceFloat64([]float64{37304})},
 		{value: proto.SliceFloat64([]float64{6960.8}), scale: 1, offset: 0, baseType: basetype.Float64, result: proto.SliceFloat64([]float64{6960.8})},
 		{value: proto.String("fit"), scale: 5, offset: 500, baseType: basetype.Float64, result: proto.String("fit")},
-		{value: float64(6960.8), scale: 5, offset: 500, baseType: basetype.Uint16z, result: proto.Uint16(37304)},
 	}
 
 	for i, tc := range tt {
-		name := fmt.Sprintf("[%d] %#v", i, tc.value)
-		value, ok := tc.value.(proto.Value)
-		if ok {
-			name = fmt.Sprintf("[%d] %#v", i, value.Any())
-		}
-		t.Run(name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("[%d] %#v", i, tc.value.Any()), func(t *testing.T) {
 			result := scaleoffset.DiscardValue(tc.value, tc.baseType, tc.scale, tc.offset)
 			if diff := cmp.Diff(result, tc.result,
 				cmp.Transformer("Value", func(v proto.Value) any {

@@ -125,7 +125,7 @@ func (l *Listener) Close() {
 }
 
 // File returns the resulting file after the a single decode process is completed. If we the current decoded result is not listed
-// in fileSets, nil will be returned, it's  recommended to use switch type assertion to check. This will reset fields used by listener
+// in fileSets, nil will be returned, it's recommended to use switch type assertion to check. This will reset fields used by listener
 // and the listener is ready to be used for next chained FIT file.
 func (l *Listener) File() File {
 	l.Close()
