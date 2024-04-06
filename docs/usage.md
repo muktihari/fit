@@ -218,7 +218,7 @@ func main() {
 }
 ```
 
-**The ability to broadcast every message as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/listener/listener.go) interface.**
+**The ability to broadcast every message as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.**
 
 ### Peek FileId
 
@@ -786,13 +786,33 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
 1. **WithMessageValidator**: directs the Encoder to use this message validator instead of the default one.
 
-   Example:
+   - Encode Invalid Values (default: Invalid values are omitted)
 
-   ```go
-   enc := encoder.New(f, encoder.WithMessageValidator(
-       encoder.NewMessageValidator(encoder.ValidatorWithPreserveInvalidValues())),
-   )
-   ```
+     Example:
+
+     ```go
+     enc := encoder.New(f, encoder.WithMessageValidator(
+         encoder.NewMessageValidator(
+             encoder.ValidatorWithPreserveInvalidValues(),
+         )),
+     )
+     ```
+
+   - Validate Developer Field with custom Factory (default: factory.StandardFactory())
+
+     If Developer Field contains a valid NativeMesgNum and NativeFieldNum, the value should be treated as native value (scale, offset, etc shall apply). To be able to check Nativeness, we need to look up the message's field in the factory and only then we can validate it such as validating scale & offset of the value. By applying this option, user can now use their own Factory.
+
+     Example:
+
+     ```go
+     fac := factory.New()
+     /* fill manufacturer specific messages in fac */
+     enc := encoder.New(f, encoder.WithMessageValidator(
+         encoder.NewMessageValidator(
+             encoder.ValidatorWithFactory(fac),
+         )),
+     )
+     ```
 
 1. **WithBigEndian**: directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 
