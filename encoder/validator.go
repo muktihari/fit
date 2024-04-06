@@ -10,9 +10,11 @@ import (
 	"math"
 	"unicode/utf8"
 
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -43,6 +45,7 @@ type MessageValidator interface {
 
 type validatorOptions struct {
 	omitInvalidValues bool // default: true -> field containing invalid values will be omitted.
+	factory           Factory
 }
 
 type ValidatorOption interface{ apply(o *validatorOptions) }
@@ -54,12 +57,27 @@ func (f fnApplyValidatorOption) apply(o *validatorOptions) { f(o) }
 func defaultValidatorOptions() *validatorOptions {
 	return &validatorOptions{
 		omitInvalidValues: true,
+		factory:           factory.StandardFactory(),
 	}
+}
+
+// Factory defines a contract that any Factory containing these method can be used by the Encoder's Validator.
+type Factory interface {
+	// CreateField create new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
+	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 
 func ValidatorWithPreserveInvalidValues() ValidatorOption {
 	return fnApplyValidatorOption(func(o *validatorOptions) {
 		o.omitInvalidValues = false
+	})
+}
+
+func ValidatorWithFactory(factory Factory) ValidatorOption {
+	return fnApplyValidatorOption(func(o *validatorOptions) {
+		if o.factory != nil {
+			o.factory = factory
+		}
 	})
 }
 
@@ -105,35 +123,8 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			)
 		}
 
-		// Now that the value is sanitized, we can check whether the type and value are aligned.
-		if !isValueTypeAligned(field.Value, field.BaseType) {
-			return fmt.Errorf(
-				"type '%T' is not align with the expected type '%s (%s)' for fieldIndex: %d, fieldNum: %d, fieldName: %q, fieldValue: '%v': %w",
-				field.Value, field.Type, field.BaseType, i, field.Num, field.Name, field.Value, ErrValueTypeMismatch)
-		}
-
-		// UTF-8 String Validation
-		switch field.Value.Type() {
-		case proto.TypeString:
-			val := field.Value.String()
-			if !utf8.ValidString(val) {
-				return fmt.Errorf("%q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
-					val, i, field.Num, field.Name, ErrInvalidUTF8String)
-			}
-		case proto.TypeSliceString:
-			val := field.Value.SliceString()
-			for j := range val {
-				if !utf8.ValidString(val[j]) {
-					return fmt.Errorf("[valueIndex: %d] %q is not a valid utf-8 string for fieldIndex: %d, fieldNum: %d, fieldName: %q,: %w",
-						j, val[j], i, field.Num, field.Name, ErrInvalidUTF8String)
-				}
-			}
-		}
-
-		// Size of value should not exceed 255 bytes since proto.FieldDefinition's Size is a type of byte.
-		valBytes := proto.Sizeof(field.Value, field.BaseType)
-		if valBytes > 255 {
-			return fmt.Errorf("max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
+		if err := valueIntegrity(field.Value, field.BaseType); err != nil {
+			return fmt.Errorf("field index: %d, num: %d, name: %s: %w", i, field.Num, field.Name, err)
 		}
 
 		mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
@@ -159,46 +150,80 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		return nil
 	}
 
+	valid = 0
 	for i := range mesg.DeveloperFields {
-		devField := &mesg.DeveloperFields[i]
+		developerField := &mesg.DeveloperFields[i]
 
-		var isDeveloperDataIndexPresent bool
-		for _, developerDataId := range v.developerDataIds {
-			if devField.DeveloperDataIndex == developerDataId.DeveloperDataIndex {
-				isDeveloperDataIndexPresent = true
-				break
-			}
+		if err := v.validateReference(developerField); err != nil {
+			return fmt.Errorf("developer field index: %d, num: %d, name: %s: %w",
+				i, developerField.Num, developerField.Name, err)
 		}
 
-		if !isDeveloperDataIndexPresent {
-			return fmt.Errorf("developer field index: %d, num: %d: %w", i, devField.Num, ErrMissingDeveloperDataId)
+		if v.options.omitInvalidValues && !hasValidValue(developerField.Value) {
+			continue
 		}
 
-		var isFieldDescriptionPresent bool
-		for _, fieldDescription := range v.fieldDescriptions {
-			if devField.DeveloperDataIndex == fieldDescription.DeveloperDataIndex &&
-				devField.Num == fieldDescription.FieldDefinitionNumber {
-				isFieldDescriptionPresent = true
-				break
-			}
+		v.handleNativeValue(developerField)
+
+		if err := valueIntegrity(developerField.Value, developerField.BaseType); err != nil {
+			return fmt.Errorf("developer field index: %d, num: %d, name: %s: %w",
+				i, developerField.Num, developerField.Name, err)
 		}
 
-		if !isFieldDescriptionPresent {
-			return fmt.Errorf("developer field index: %d, num: %d: %w", i, devField.Num, ErrMissingFieldDescription)
+		mesg.DeveloperFields[i], mesg.DeveloperFields[valid] = mesg.DeveloperFields[valid], mesg.DeveloperFields[i]
+		if valid == 255 {
+			return fmt.Errorf("max n developer fields is 255: %w", ErrExceedMaxAllowed)
 		}
-
-		// Size of value should not exceed 255 bytes since proto.DeveloperFieldDefinition's Size is a type of byte.
-		valBytes := proto.Sizeof(devField.Value, devField.BaseType)
-		if valBytes > 255 {
-			return fmt.Errorf("developer field max value size in bytes is 255, got: %d: %w", valBytes, ErrExceedMaxAllowed)
-		}
+		valid++
 	}
 
-	if len(mesg.DeveloperFields) > 255 {
-		return fmt.Errorf("max n developer fields is 255, got: %d: %w", len(mesg.DeveloperFields), ErrExceedMaxAllowed)
-	}
+	mesg.DeveloperFields = mesg.DeveloperFields[:valid]
 
 	return nil
+}
+
+func (v *messageValidator) validateReference(developerField *proto.DeveloperField) error {
+	var ok bool
+	for _, d := range v.developerDataIds {
+		if developerField.DeveloperDataIndex == d.DeveloperDataIndex {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return ErrMissingDeveloperDataId
+	}
+
+	for _, f := range v.fieldDescriptions {
+		if developerField.DeveloperDataIndex == f.DeveloperDataIndex &&
+			developerField.Num == f.FieldDefinitionNumber {
+			return nil
+		}
+	}
+	return ErrMissingFieldDescription
+}
+
+// If Developer Field contains a valid NativeMesgNum and NativeFieldNum,
+// the value should be treated as native value (scale, offset, etc shall apply).
+func (v *messageValidator) handleNativeValue(developerField *proto.DeveloperField) {
+	if developerField.NativeMesgNum == 0 && developerField.NativeFieldNum == 0 {
+		return
+	}
+
+	field := v.options.factory.CreateField(developerField.NativeMesgNum, developerField.NativeFieldNum)
+	if field.Name == factory.NameUnknown { // Unknown Field will always have Scale: 1 and Offset: 0.
+		return
+	}
+
+	// Restore any scaled float64 value back into its corresponding integer representation.
+	if field.Scale != 1 && field.Offset != 0 {
+		developerField.Value = scaleoffset.DiscardValue(
+			developerField.Value,
+			field.BaseType,
+			field.Scale,
+			field.Offset,
+		)
+	}
 }
 
 func (v *messageValidator) Reset() {
@@ -206,7 +231,39 @@ func (v *messageValidator) Reset() {
 	v.fieldDescriptions = v.fieldDescriptions[:0]
 }
 
-// isValueTypeAligned checks whether the value is aligned with type. The value should be a concrete type not pointer to a value.
+func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
+	if !isValueTypeAligned(value, baseType) {
+		val := value.Any()
+		return fmt.Errorf("value %v with type '%T' is not align with the expected type '%s': %w",
+			val, val, baseType, ErrValueTypeMismatch)
+	}
+
+	// UTF-8 String Validation
+	switch value.Type() {
+	case proto.TypeString:
+		val := value.String()
+		if !utf8.ValidString(val) {
+			return fmt.Errorf("%q is not a valid utf-8 string: %w", val, ErrInvalidUTF8String)
+		}
+	case proto.TypeSliceString:
+		val := value.SliceString()
+		for i := range val {
+			if !utf8.ValidString(val[i]) {
+				return fmt.Errorf("[%d] %q is not a valid utf-8 string: %w", i, val[i], ErrInvalidUTF8String)
+			}
+		}
+	}
+
+	// Both proto.FieldDefinition's Size and proto.DeveloperFieldDefinition's Size is a type of byte.
+	size := proto.Sizeof(value, baseType)
+	if size > 255 {
+		return fmt.Errorf("max value size in bytes is 255, got: %d: %w", size, ErrExceedMaxAllowed)
+	}
+
+	return nil
+}
+
+// isValueTypeAligned checks whether the value is aligned with type.
 func isValueTypeAligned(value proto.Value, baseType basetype.BaseType) bool {
 	switch value.Type() {
 	case proto.TypeBool, proto.TypeSliceBool:
@@ -242,8 +299,15 @@ func isValueTypeAligned(value proto.Value, baseType basetype.BaseType) bool {
 
 // hasValidValue checks whether given val has any valid value.
 // If val is a slice, even though only one value is valid, it will be counted a valid value.
+//
+// Special case: bool or slice of bool will always be valid since bool type is often used as a flag and
+// there are only two possibility (true/false).
 func hasValidValue(val proto.Value) bool {
-	switch val.Type() { // Fast Path
+	var invalidCount int
+
+	switch val.Type() {
+	case proto.TypeBool, proto.TypeSliceBool:
+		return true // Mark as valid
 	case proto.TypeInt8:
 		return val.Int8() != basetype.Sint8Invalid
 	case proto.TypeUint8:
@@ -268,104 +332,93 @@ func hasValidValue(val proto.Value) bool {
 	case proto.TypeUint64:
 		return val.Uint64() != basetype.Uint64Invalid
 	case proto.TypeSliceInt8:
-		invalidcounter := 0
 		vals := val.SliceInt8()
 		for i := range vals {
 			if vals[i] == basetype.Sint8Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceUint8:
 		vals := val.SliceUint8()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Uint8Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceInt16:
 		vals := val.SliceInt16()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Sint16Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceUint16:
 		vals := val.SliceUint16()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Uint16Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceInt32:
 		vals := val.SliceInt32()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Sint32Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceUint32:
 		vals := val.SliceUint32()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Uint32Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceString:
 		vals := val.SliceString()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.StringInvalid || vals[i] == "" {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceFloat32:
 		vals := val.SliceFloat32()
-		invalidcounter := 0
 		for i := range vals {
 			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceFloat64:
 		vals := val.SliceFloat64()
-		invalidcounter := 0
 		for i := range vals {
 			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceInt64:
 		vals := val.SliceInt64()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Sint64Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	case proto.TypeSliceUint64:
 		vals := val.SliceUint64()
-		invalidcounter := 0
 		for i := range vals {
 			if vals[i] == basetype.Uint64Invalid {
-				invalidcounter++
+				invalidCount++
 			}
 		}
-		return invalidcounter != len(vals)
+		return invalidCount != len(vals)
 	}
 
 	return false
