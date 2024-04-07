@@ -67,7 +67,7 @@ func main() {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintUnknownMesgNum())
 	}
 	if flagPrintDegrees {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintSemicirclesInDegrees())
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintGPSPositionInDegrees())
 	}
 	if flagPrintOnlyValidValue {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintOnlyValidValue())

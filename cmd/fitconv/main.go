@@ -30,17 +30,23 @@ func main() {
 	var flagUseDisk bool
 	flag.BoolVar(&flagUseDisk, "disk", false, "Use disk instead of load everything in memory")
 
-	var flagPrintRawValue bool
-	flag.BoolVar(&flagPrintRawValue, "raw", false, "Use raw value instead of scaled value")
-
-	var flagPrintDegrees bool
-	flag.BoolVar(&flagPrintDegrees, "deg", false, "Print GPS position in degrees instead of semicircles")
-
 	var flagPrintUnknownMesgNum bool
 	flag.BoolVar(&flagPrintUnknownMesgNum, "unknown", false, "Print unknown mesg num e.g. 'unknown(68)' instead of 'unknown'")
 
 	var flagPrintOnlyValidValue bool
 	flag.BoolVar(&flagPrintOnlyValidValue, "valid", false, "Print only valid value")
+
+	var flagPrintRawValue bool
+	flag.BoolVar(&flagPrintRawValue, "raw", false, "Use raw value instead of scaled value")
+
+	var flagPrintDegrees bool
+	flag.BoolVar(&flagPrintDegrees, "deg", false, "Print GPS position (Lat & Long) in degrees instead of semicircles")
+
+	var flagTrimTrailingCommas bool
+	flag.BoolVar(&flagTrimTrailingCommas, "trim", false, "Trim trailing commas in every line")
+
+	var flagNoExpandComponents bool
+	flag.BoolVar(&flagNoExpandComponents, "no-expand", false, "[Decode Option] Do not expand components")
 
 	flag.Parse()
 
@@ -64,10 +70,13 @@ func main() {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintUnknownMesgNum())
 	}
 	if flagPrintDegrees {
-		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintSemicirclesInDegrees())
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintGPSPositionInDegrees())
 	}
 	if flagPrintOnlyValidValue {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintOnlyValidValue())
+	}
+	if flagTrimTrailingCommas {
+		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithTrimTrailingCommas())
 	}
 
 	paths := flag.Args()
@@ -78,14 +87,14 @@ func main() {
 
 	for _, path := range paths {
 		if flagFitToCsv {
-			if err := fitToCsv(path, fitToCsvOptions...); err != nil {
+			if err := fitToCsv(path, flagNoExpandComponents, fitToCsvOptions...); err != nil {
 				fmt.Fprintf(os.Stderr, "could not convert %q to csv: %v\n", path, err)
 			}
 		}
 	}
 }
 
-func fitToCsv(path string, opts ...fitcsv.Option) error {
+func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error {
 	ff, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("could not open file: %s: %w", path, err)
@@ -117,11 +126,15 @@ func fitToCsv(path string, opts ...fitcsv.Option) error {
 	bw := bufio.NewWriterSize(cf, blockSize)
 	conv := fitcsv.NewConverter(bw, opts...)
 
-	dec := decoder.New(bufio.NewReaderSize(ff, blockSize),
+	options := []decoder.Option{
 		decoder.WithMesgDefListener(conv),
 		decoder.WithMesgListener(conv),
 		decoder.WithBroadcastOnly(),
-	)
+	}
+	if noExpandComponents {
+		options = append(options, decoder.WithNoComponentExpansion())
+	}
+	dec := decoder.New(bufio.NewReaderSize(ff, blockSize), options...)
 
 	var sequenceCounter int
 	defer func() {

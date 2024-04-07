@@ -7,43 +7,129 @@ package fitcsv
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"sync"
+
+	"github.com/muktihari/fit/proto"
 )
+
+var bufPool = sync.Pool{
+	New: func() any {
+		return &strings.Builder{}
+	},
+}
 
 // format formats given val into string
 //
 //	custom formating:
-//	  - float64: 0 -> 0.0, 1,2300 -> 1.23, 1,2340001 -> 1,2340001
-func format(val any) string {
-	switch v := val.(type) { // fast path
-	case int8:
-		return strconv.FormatInt(int64(v), 10)
-	case uint8:
-		return strconv.FormatUint(uint64(v), 10)
-	case int16:
-		return strconv.FormatInt(int64(v), 10)
-	case uint16:
-		return strconv.FormatUint(uint64(v), 10)
-	case int32:
-		return strconv.FormatInt(int64(v), 10)
-	case uint32:
-		return strconv.FormatUint(uint64(v), 10)
-	case int64:
-		return strconv.FormatInt(int64(v), 10)
-	case uint64:
-		return strconv.FormatUint(uint64(v), 10)
-	case float32:
-		if v == float32(int64(v)) {
-			return strconv.FormatFloat(float64(v), 'f', 1, 64)
+//	- float64: 0 -> 0.0, 1,2300 -> 1.23, 1,2340001 -> 1,2340001
+//
+//	slice formatting: every value element will be separated by '|' pipe symbol.
+//	- []uint8{1,2,3} -> "1|2|3"
+func format(val proto.Value) string {
+	switch val.Type() { // fast path
+	case proto.TypeBool:
+		return strconv.FormatBool(val.Bool())
+	case proto.TypeInt8:
+		return strconv.FormatInt(int64(val.Int8()), 10)
+	case proto.TypeUint8:
+		return strconv.FormatUint(uint64(val.Uint8()), 10)
+	case proto.TypeInt16:
+		return strconv.FormatInt(int64(val.Int16()), 10)
+	case proto.TypeUint16:
+		return strconv.FormatUint(uint64(val.Uint16()), 10)
+	case proto.TypeInt32:
+		return strconv.FormatInt(int64(val.Int32()), 10)
+	case proto.TypeUint32:
+		return strconv.FormatUint(uint64(val.Uint32()), 10)
+	case proto.TypeInt64:
+		return strconv.FormatInt(int64(val.Uint64()), 10)
+	case proto.TypeUint64:
+		return strconv.FormatUint(uint64(val.Uint64()), 10)
+	case proto.TypeFloat32:
+		value := val.Float32()
+		if value == float32(int64(value)) {
+			return strconv.FormatFloat(float64(value), 'f', 1, 64)
 		}
-		return strconv.FormatFloat(float64(v), 'g', -1, 64)
-	case float64:
-		if v == float64(int64(v)) {
-			return strconv.FormatFloat(v, 'f', 1, 64)
+		return strconv.FormatFloat(float64(value), 'g', -1, 64)
+	case proto.TypeFloat64:
+		value := val.Float64()
+		if value == float64(int64(value)) {
+			return strconv.FormatFloat(value, 'f', 1, 64)
 		}
-		return strconv.FormatFloat(v, 'g', -1, 64)
-	case string:
-		return v
+		return strconv.FormatFloat(value, 'g', -1, 64)
+	case proto.TypeString:
+		return val.String()
+	case proto.TypeSliceBool:
+		return concat(val.SliceBool(), func(v bool) string {
+			return strconv.FormatBool(v)
+		})
+	case proto.TypeSliceInt8:
+		return concat(val.SliceInt8(), func(v int8) string {
+			return strconv.FormatInt(int64(v), 10)
+		})
+	case proto.TypeSliceUint8:
+		return concat(val.SliceUint8(), func(v uint8) string {
+			return strconv.FormatUint(uint64(v), 10)
+		})
+	case proto.TypeSliceInt16:
+		return concat(val.SliceInt16(), func(v int16) string {
+			return strconv.FormatInt(int64(v), 10)
+		})
+	case proto.TypeSliceUint16:
+		return concat(val.SliceUint16(), func(v uint16) string {
+			return strconv.FormatUint(uint64(v), 10)
+		})
+	case proto.TypeSliceInt32:
+		return concat(val.SliceInt32(), func(v int32) string {
+			return strconv.FormatInt(int64(v), 10)
+		})
+	case proto.TypeSliceUint32:
+		return concat(val.SliceUint32(), func(v uint32) string {
+			return strconv.FormatUint(uint64(v), 10)
+		})
+	case proto.TypeSliceInt64:
+		return concat(val.SliceInt64(), func(v int64) string {
+			return strconv.FormatInt(v, 10)
+		})
+	case proto.TypeSliceUint64:
+		return concat(val.SliceUint64(), func(v uint64) string {
+			return strconv.FormatUint(v, 10)
+		})
+	case proto.TypeSliceFloat32:
+		return concat(val.SliceFloat32(), func(v float32) string {
+			if v == float32(int32(v)) {
+				return strconv.FormatFloat(float64(v), 'f', 1, 64)
+			}
+			return strconv.FormatFloat(float64(v), 'g', -1, 64)
+		})
+	case proto.TypeSliceFloat64:
+		return concat(val.SliceFloat64(), func(v float64) string {
+			if v == float64(int64(v)) {
+				return strconv.FormatFloat(v, 'f', 1, 64)
+			}
+			return strconv.FormatFloat(v, 'g', -1, 64)
+		})
+	case proto.TypeSliceString:
+		return concat(val.SliceString(), func(v string) string {
+			return v
+		})
 	default:
 		return fmt.Sprintf("%v", val)
 	}
+}
+
+func concat[S []E, E any](s S, formatFn func(v E) string) string {
+	strbldr := bufPool.Get().(*strings.Builder)
+	defer bufPool.Put(strbldr)
+	strbldr.Reset()
+
+	for i := range s {
+		strbldr.WriteString(formatFn(s[i]))
+		if i < len(s)-1 {
+			strbldr.WriteByte('|')
+		}
+	}
+
+	return strbldr.String()
 }

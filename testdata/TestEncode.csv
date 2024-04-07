@@ -1,9 +1,9 @@
 Type,Local Number,Message,Field 1,Value 1,Units 1,Field 2,Value 2,Units 2,Field 3,Value 3,Units 3,Field 4,Value 4,Units 4
-Definition,0,file_id,time_created,1,,manufacturer,1,,product_name,18,,
-Data,0,file_id,time_created,"1063692000",,manufacturer,"267",,product_name,"Bryton Active App",,
-Definition,0,activity,type,1,,timestamp,1,,num_sessions,1,,
-Data,0,activity,type,"2",,timestamp,"1063692000",,num_sessions,"1",,
-Definition,0,session,avg_speed,1,,avg_cadence,1,,avg_heart_rate,1,,
-Data,0,session,avg_speed,"1.0",m/s,avg_cadence,"78",rpm,avg_heart_rate,"100",bpm,enhanced_avg_speed,"1.0",m/s,
-Definition,0,record,speed,1,,cadence,1,,heart_rate,1,,
-Data,0,record,speed,"1.0",m/s,cadence,"78",rpm,heart_rate,"100",bpm,enhanced_speed,"1.0",m/s,
+Definition,0,file_id,time_created,1,,manufacturer,1,,product_name,18,,,,
+Data,0,file_id,time_created,"1063692000",,manufacturer,"267",,product_name,"Bryton Active App",,,,
+Definition,0,activity,type,1,,timestamp,1,,num_sessions,1,,,,
+Data,0,activity,type,"2",,timestamp,"1063692000",,num_sessions,"1",,,,
+Definition,0,session,avg_speed,1,,avg_cadence,1,,avg_heart_rate,1,,,,
+Data,0,session,avg_speed,"1.0",m/s,avg_cadence,"78",rpm,avg_heart_rate,"100",bpm,enhanced_avg_speed,"1.0",m/s
+Definition,0,record,speed,1,,cadence,1,,heart_rate,1,,,,
+Data,0,record,speed,"1.0",m/s,cadence,"78",rpm,heart_rate,"100",bpm,enhanced_speed,"1.0",m/s
