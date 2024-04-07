@@ -24,6 +24,7 @@ func TestApplyValue(t *testing.T) {
 		{value: proto.Uint16(37304), scale: 5, offset: 500, result: proto.Float64(6960.8)},
 		{value: proto.Int8(10), scale: 5, offset: 1, result: proto.Float64(1)},
 		{value: proto.Uint8(10), scale: 5, offset: 1, result: proto.Float64(1)},
+		{value: proto.Uint8(10), scale: 1, offset: 0, result: proto.Uint8(10)}, // not a scaled value
 		{value: proto.Int16(10), scale: 5, offset: 1, result: proto.Float64(1)},
 		{value: proto.Uint16(10), scale: 5, offset: 1, result: proto.Float64(1)},
 		{value: proto.Int32(10), scale: 5, offset: 1, result: proto.Float64(1)},
