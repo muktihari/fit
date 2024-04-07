@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -17,7 +16,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -61,7 +59,8 @@ type options struct {
 	printRawValue             bool // Print scaled value as is in the binary form (sint, uint, etc.) than in its representation.
 	printUnknownMesgNum       bool // Print 'unknown(68)' instead of 'unknown'.
 	printOnlyValidValue       bool // Print invalid value e.g. 65535 for uint16.
-	printSemicirclesInDegrees bool // Print latitude and longitude in degrees instead of semicircles.
+	printGPSPositionInDegrees bool // Print latitude and longitude in degrees instead of semicircles.
+	trimTrailingCommas        bool
 }
 
 func defaultOptions() *options {
@@ -72,7 +71,8 @@ func defaultOptions() *options {
 		printRawValue:             false,
 		printUnknownMesgNum:       false,
 		printOnlyValidValue:       false,
-		printSemicirclesInDegrees: false,
+		printGPSPositionInDegrees: false,
+		trimTrailingCommas:        false,
 	}
 }
 
@@ -111,9 +111,15 @@ func WithPrintOnlyValidValue() Option {
 	})
 }
 
-func WithPrintSemicirclesInDegrees() Option {
+func WithPrintGPSPositionInDegrees() Option {
 	return fnApply(func(o *options) {
-		o.printSemicirclesInDegrees = true
+		o.printGPSPositionInDegrees = true
+	})
+}
+
+func WithTrimTrailingCommas() Option {
+	return fnApply(func(o *options) {
+		o.trimTrailingCommas = true
 	})
 }
 
@@ -140,7 +146,7 @@ func NewConverter(w io.Writer, opts ...Option) *FitToCsvConv {
 		}
 		c.ondiskBufferWriter = bufio.NewWriterSize(c.ondisk, options.ondiskWriteBuffer)
 	} else {
-		c.inmem = bytes.NewBuffer(nil)
+		c.inmem = bytes.NewBuffer(make([]byte, 0, 1000<<10))
 	}
 
 	go c.handleEvent() // spawn only once.
@@ -201,6 +207,8 @@ func (c *FitToCsvConv) finalize() {
 		return
 	}
 
+	maxCommaCount := 2 + (c.maxFields * 3)
+
 	if c.options.useDisk {
 		c.err = c.ondiskBufferWriter.Flush() // flush remaining buffer
 		if c.err != nil {
@@ -210,10 +218,56 @@ func (c *FitToCsvConv) finalize() {
 		if c.err != nil {
 			return
 		}
-		_, c.err = io.Copy(c.w, c.ondisk) // do not wrap with bufio.Reader
+		c.err = c.copy(c.w, c.ondisk, maxCommaCount) // do not wrap with bufio.Reader
 	} else {
-		_, c.err = io.Copy(c.w, c.inmem)
+		c.err = c.copy(c.w, c.inmem, maxCommaCount)
 	}
+}
+
+// copy reads src; for every read line, fill the missing comma before write into dest.
+func (c *FitToCsvConv) copy(dest io.Writer, src io.Reader, maxCommaCount int) error {
+	if c.options.trimTrailingCommas { //By default, we only populate a number of commas just right for field values.
+		_, err := io.Copy(dest, src)
+		return err
+	}
+
+	// Fill Padding Comma ','
+	scanner := bufio.NewScanner(src)
+
+	for scanner.Scan() {
+		b := scanner.Bytes()
+		_, err := dest.Write(b)
+		if err != nil {
+			return err
+		}
+
+		var count int
+		var inQuote bool
+		for _, c := range b {
+			switch c {
+			case '"':
+				inQuote = !inQuote
+			case ',':
+				if !inQuote {
+					count++
+				}
+			}
+		}
+
+		missing := maxCommaCount - count
+		padding := bytes.Repeat([]byte{','}, missing)
+		_, err = dest.Write(padding)
+		if err != nil {
+			return err
+		}
+
+		_, err = dest.Write([]byte{'\n'})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c *FitToCsvConv) printHeader() {
@@ -294,6 +348,8 @@ func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 		c.buf.WriteByte(',')
 	}
 
+	c.buf.Truncate(c.buf.Len() - 1) // trim last ','
+
 	size := len(mesgDef.FieldDefinitions) + len(mesgDef.DeveloperFieldDefinitions)
 	if size > c.maxFields {
 		c.maxFields = size
@@ -352,6 +408,12 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 	var fieldCounter int
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
+
+		value := field.Value
+		if c.options.printOnlyValidValue && !field.Value.Valid(field.BaseType) {
+			continue
+		}
+
 		name, units := field.Name, field.Units
 		if c.options.printUnknownMesgNum && field.Name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
@@ -360,54 +422,24 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 			name, units = subField.Name, subField.Units
 		}
 
-		var value proto.Value
+		c.buf.WriteString(name)
+
 		if !c.options.printRawValue {
 			value = scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset)
 		}
 
-		if vals, ok := sliceAny(value.Any()); ok { // array
-			c.buf.WriteString(name)
-			c.buf.WriteByte(',')
-
-			c.buf.WriteByte('"')
-
-			for i := range vals {
-				c.buf.WriteString(format(vals[i]))
-				if i < len(vals)-1 {
-					c.buf.WriteByte('|')
-				}
-			}
-			c.buf.WriteString("\",")
-
-			c.buf.WriteString(units)
-			c.buf.WriteByte(',')
-			fieldCounter++
-			continue
-		}
-
-		if c.options.printOnlyValidValue && !isValueValid(field) {
-			continue
-		}
-
-		c.buf.WriteString(name)
-		c.buf.WriteByte(',')
-
-		scaledValue := field.Value
-		if !c.options.printRawValue {
-			scaledValue = scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset)
-		}
-
-		if c.options.printSemicirclesInDegrees && field.Units == "semicircles" {
-			scaledValue = proto.Float64(semicircles.ToDegrees(scaledValue.Int32()))
+		if c.options.printGPSPositionInDegrees && field.Units == "semicircles" {
+			value = proto.Float64(semicircles.ToDegrees(value.Int32()))
 			units = "degrees"
 		}
 
-		c.buf.WriteByte('"')
-		c.buf.WriteString(format(scaledValue.Any()))
+		c.buf.WriteString(",\"")
+		c.buf.WriteString(format(value))
 		c.buf.WriteString("\",")
 
 		c.buf.WriteString(units)
 		c.buf.WriteByte(',')
+
 		fieldCounter++
 	}
 
@@ -415,28 +447,22 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 		devField := &mesg.DeveloperFields[i]
 
 		c.buf.WriteString(devField.Name)
-		c.buf.WriteByte(',')
 
-		if vals, ok := sliceAny(devField.Value.Any()); ok { // array
-			for i := range vals {
-				c.buf.WriteString(format(vals[i]))
-				if i < len(vals)-1 {
-					c.buf.WriteByte('|')
-				}
-			}
-		} else {
-			c.buf.WriteString(format(devField.Value.Any()))
-		}
+		c.buf.WriteString(",\"")
+		c.buf.WriteString(format(devField.Value))
+		c.buf.WriteString("\",")
 
-		c.buf.WriteByte(',')
 		c.buf.WriteString(devField.Units)
 		c.buf.WriteByte(',')
+
 		fieldCounter++
 	}
 
 	if fieldCounter > c.maxFields {
 		c.maxFields = fieldCounter
 	}
+
+	c.buf.Truncate(c.buf.Len() - 1) // trim last ','
 
 	c.buf.WriteByte('\n') // line break
 
@@ -446,87 +472,4 @@ func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
 		_, c.err = c.inmem.Write(c.buf.Bytes())
 	}
 	c.buf.Reset()
-}
-
-func sliceAny(val any) (vals []any, isSlice bool) {
-	isSlice = true
-	switch vs := val.(type) {
-	case []int8:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []uint8:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []int16:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []uint16:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []int32:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []uint32:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []int64:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []uint64:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []float32:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []float64:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	case []string:
-		for i := range vs {
-			vals = append(vals, vs[i])
-		}
-		return
-	}
-
-	return nil, false
-}
-
-func isValueValid(field *proto.Field) bool {
-	switch field.BaseType {
-	case basetype.Float32:
-		f32 := field.Value.Float32()
-		if math.Float32bits(f32) == basetype.Float32Invalid {
-			return false
-		}
-	case basetype.Float64:
-		f64 := field.Value.Float64()
-		if math.Float64bits(f64) == basetype.Float64Invalid {
-			return false
-		}
-	default:
-		if field.Value.Type() == proto.TypeInvalid {
-			return false
-		}
-	}
-	return true
 }
