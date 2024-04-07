@@ -30,6 +30,10 @@ func ApplySlice[S []E, E Numeric](values S, scale, offset float64) []float64 {
 
 // ApplyValue applies scale and offset when possible and return it as primitive-types value. Otherwise return original value.
 func ApplyValue(value proto.Value, scale, offset float64) proto.Value {
+	if scale == 1 && offset == 0 {
+		return value
+	}
+
 	switch value.Type() {
 	case proto.TypeInt8:
 		return proto.Float64(Apply(value.Int8(), scale, offset))
