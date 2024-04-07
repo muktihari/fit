@@ -706,6 +706,7 @@ func TestAny(t *testing.T) {
 		{value: test_float32(10), expected: float32(10)},
 		{value: test_float64(10), expected: float64(10)},
 		{value: test_string("fit"), expected: string("fit")},
+		{value: []test_bool{true, false}, expected: []bool{true, false}},
 		{value: []test_int8{1, 2}, expected: []int8{1, 2}},
 		{value: []test_uint8{1, 2}, expected: []uint8{1, 2}},
 		{value: []test_int16{1, 2}, expected: []int16{1, 2}},
@@ -729,6 +730,115 @@ func TestAny(t *testing.T) {
 				cmp.Transformer("Value", func(v Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestValueAlign(t *testing.T) {
+	tt := []struct {
+		value    Value
+		baseType basetype.BaseType
+		expected bool
+	}{
+		{value: Value{}, baseType: basetype.Sint8, expected: false},
+		{value: Bool(true), baseType: basetype.Enum, expected: true},
+		{value: SliceBool([]bool{true, false}), baseType: basetype.Enum, expected: true},
+		{value: Int8(1), baseType: basetype.Sint8, expected: true},
+		{value: Uint8(1), baseType: basetype.Uint8, expected: true},
+		{value: Uint8(1), baseType: basetype.Uint8z, expected: true},
+		{value: Int16(1), baseType: basetype.Sint16, expected: true},
+		{value: Uint16(1), baseType: basetype.Uint16, expected: true},
+		{value: Uint16(1), baseType: basetype.Uint16z, expected: true},
+		{value: Int32(1), baseType: basetype.Sint32, expected: true},
+		{value: Uint32(1), baseType: basetype.Uint32, expected: true},
+		{value: Uint32(1), baseType: basetype.Uint32z, expected: true},
+		{value: Float32(1.0), baseType: basetype.Float32, expected: true},
+		{value: Float64(1.0), baseType: basetype.Float64, expected: true},
+		{value: Int64(1.0), baseType: basetype.Sint64, expected: true},
+		{value: Uint64(1), baseType: basetype.Uint64, expected: true},
+		{value: Uint64(1), baseType: basetype.Uint64z, expected: true},
+		{value: String("FIT SDK"), baseType: basetype.String, expected: true},
+		{value: SliceInt8([]int8{1}), baseType: basetype.Sint8, expected: true},
+		{value: SliceUint8([]uint8{1}), baseType: basetype.Uint8, expected: true},
+		{value: SliceUint8([]uint8{1}), baseType: basetype.Uint8z, expected: true},
+		{value: SliceInt16([]int16{1}), baseType: basetype.Sint16, expected: true},
+		{value: SliceUint16([]uint16{1}), baseType: basetype.Uint16, expected: true},
+		{value: SliceUint16([]uint16{1}), baseType: basetype.Uint16z, expected: true},
+		{value: SliceInt32([]int32{1}), baseType: basetype.Sint32, expected: true},
+		{value: SliceUint32([]uint32{1}), baseType: basetype.Uint32, expected: true},
+		{value: SliceUint32([]uint32{1}), baseType: basetype.Uint32z, expected: true},
+		{value: SliceFloat32([]float32{1.0}), baseType: basetype.Float32, expected: true},
+		{value: SliceFloat64([]float64{1.0}), baseType: basetype.Float64, expected: true},
+		{value: SliceInt64([]int64{1}), baseType: basetype.Sint64, expected: true},
+		{value: SliceUint64([]uint64{1}), baseType: basetype.Uint64, expected: true},
+		{value: SliceUint64([]uint64{1}), baseType: basetype.Uint64z, expected: true},
+		{value: SliceString([]string{"FIT SDK"}), baseType: basetype.String, expected: true},
+		{value: SliceUint8([]byte("FIT SDK")), baseType: basetype.Byte, expected: true},
+		{value: SliceInt8([]int8{1, 2, 3}), baseType: basetype.Sint8, expected: true},
+	}
+
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("%v (%T): %s", tc.value, tc.value, tc.baseType), func(t *testing.T) {
+			if align := tc.value.Align(tc.baseType); align != tc.expected {
+				t.Fatalf("expected: %t, got %t", tc.expected, align)
+			}
+		})
+	}
+}
+
+func TestValueValid(t *testing.T) {
+	tt := []struct {
+		value    Value
+		baseType basetype.BaseType
+		expected bool
+	}{
+		{value: Value{}, baseType: basetype.Sint8, expected: false},
+		{value: Int8(0), baseType: basetype.Sint8, expected: true},
+		{value: Uint8(0), baseType: basetype.Uint8, expected: true},
+		{value: Uint8(0), baseType: basetype.Uint8z, expected: false},
+		{value: Uint8(basetype.EnumInvalid), baseType: basetype.Enum, expected: false},
+		{value: Uint8(basetype.ByteInvalid), baseType: basetype.Byte, expected: false},
+		{value: Uint8(0), baseType: basetype.Uint16, expected: false},
+		{value: Int16(0), baseType: basetype.Sint16, expected: true},
+		{value: Uint16(0), baseType: basetype.Uint16, expected: true},
+		{value: Uint16(0), baseType: basetype.Uint16z, expected: false},
+		{value: Int32(0), baseType: basetype.Sint32, expected: true},
+		{value: Uint32(0), baseType: basetype.Uint32, expected: true},
+		{value: Uint32(0), baseType: basetype.Uint32z, expected: false},
+		{value: String("FIT SDK Go"), baseType: basetype.String, expected: true},
+		{value: String(""), baseType: basetype.String, expected: false},
+		{value: String("\x00"), baseType: basetype.String, expected: false},
+		{value: Float32(0.2), baseType: basetype.String, expected: true},
+		{value: Float32(math.Float32frombits(basetype.Float32Invalid)), baseType: basetype.Float32, expected: false},
+		{value: Float32(math.Float32frombits(basetype.Float32Invalid - 1)), baseType: basetype.Float32, expected: true},
+		{value: Float64(0.5), baseType: basetype.Float64, expected: true},
+		{value: Float64(math.Float64frombits(basetype.Float64Invalid)), baseType: basetype.Float64, expected: false},
+		{value: Float64(math.Float64frombits(basetype.Float64Invalid - 1)), baseType: basetype.Float64, expected: true},
+		{value: Int64(0), baseType: basetype.Sint64, expected: true},
+		{value: Uint64(0), baseType: basetype.Uint64, expected: true},
+		{value: Uint64(0), baseType: basetype.Uint64z, expected: false},
+		{value: SliceBool([]bool{true, false}), baseType: basetype.Enum, expected: true},
+		{value: SliceBool([]bool{false, false}), baseType: basetype.Enum, expected: true}, // true even it all false.
+		{value: SliceInt8([]int8{0, basetype.Sint8Invalid}), baseType: basetype.Sint8, expected: true},
+		{value: SliceUint8([]uint8{0, basetype.Uint8Invalid}), baseType: basetype.Uint8, expected: true},
+		{value: SliceInt16([]int16{0, basetype.Sint16Invalid}), baseType: basetype.Sint16, expected: true},
+		{value: SliceUint16([]uint16{0, basetype.Uint16Invalid}), baseType: basetype.Uint16, expected: true},
+		{value: SliceInt32([]int32{0, basetype.Sint32Invalid}), baseType: basetype.Sint32, expected: true},
+		{value: SliceString([]string{"FIT SDK Go"}), baseType: basetype.String, expected: true},
+		{value: SliceString([]string{""}), baseType: basetype.String, expected: false},
+		{value: SliceString([]string{"\x00"}), baseType: basetype.String, expected: false},
+		{value: SliceUint32([]uint32{0, basetype.Uint32Invalid}), baseType: basetype.Uint32, expected: true},
+		{value: SliceFloat32([]float32{0.2, math.Float32frombits(basetype.Float32Invalid)}), baseType: basetype.Float32, expected: true},
+		{value: SliceFloat64([]float64{0.5, math.Float64frombits(basetype.Float64Invalid)}), baseType: basetype.Float64, expected: true},
+		{value: SliceInt64([]int64{0, basetype.Sint64Invalid}), baseType: basetype.Sint64, expected: true},
+		{value: SliceUint64([]uint64{0, basetype.Uint64Invalid}), baseType: basetype.Uint64, expected: true},
+	}
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v (%T)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
+			result := tc.value.Valid(tc.baseType)
+			if result != tc.expected {
+				t.Fatalf("expected: %t, got: %t", tc.expected, result)
 			}
 		})
 	}
