@@ -7,7 +7,6 @@ package encoder
 import (
 	"errors"
 	"fmt"
-	"math"
 	"unicode/utf8"
 
 	"github.com/muktihari/fit/factory"
@@ -109,7 +108,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			continue
 		}
 
-		if v.options.omitInvalidValues && !hasValidValue(field.Value) {
+		if v.options.omitInvalidValues && !field.Value.Valid(field.BaseType) {
 			continue
 		}
 
@@ -159,7 +158,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 				i, developerField.Num, developerField.Name, err)
 		}
 
-		if v.options.omitInvalidValues && !hasValidValue(developerField.Value) {
+		if v.options.omitInvalidValues && !developerField.Value.Valid(developerField.BaseType) {
 			continue
 		}
 
@@ -232,7 +231,7 @@ func (v *messageValidator) Reset() {
 }
 
 func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
-	if !isValueTypeAligned(value, baseType) {
+	if !value.Align(baseType) {
 		val := value.Any()
 		return fmt.Errorf("value %v with type '%T' is not align with the expected type '%s': %w",
 			val, val, baseType, ErrValueTypeMismatch)
@@ -261,165 +260,4 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	}
 
 	return nil
-}
-
-// isValueTypeAligned checks whether the value is aligned with type.
-func isValueTypeAligned(value proto.Value, baseType basetype.BaseType) bool {
-	switch value.Type() {
-	case proto.TypeBool, proto.TypeSliceBool:
-		return baseType == basetype.Enum
-	case proto.TypeInt8, proto.TypeSliceInt8:
-		return baseType == basetype.Sint8
-	case proto.TypeUint8, proto.TypeSliceUint8: // == byte
-		return baseType == basetype.Enum ||
-			baseType == basetype.Byte ||
-			baseType == basetype.Uint8 ||
-			baseType == basetype.Uint8z
-	case proto.TypeInt16, proto.TypeSliceInt16:
-		return baseType == basetype.Sint16
-	case proto.TypeUint16, proto.TypeSliceUint16:
-		return baseType == basetype.Uint16 || baseType == basetype.Uint16z
-	case proto.TypeInt32, proto.TypeSliceInt32:
-		return baseType == basetype.Sint32
-	case proto.TypeUint32, proto.TypeSliceUint32:
-		return baseType == basetype.Uint32 || baseType == basetype.Uint32z
-	case proto.TypeFloat32, proto.TypeSliceFloat32:
-		return baseType == basetype.Float32
-	case proto.TypeFloat64, proto.TypeSliceFloat64:
-		return baseType == basetype.Float64
-	case proto.TypeInt64, proto.TypeSliceInt64:
-		return baseType == basetype.Sint64
-	case proto.TypeUint64, proto.TypeSliceUint64:
-		return baseType == basetype.Uint64 || baseType == basetype.Uint64z
-	case proto.TypeString, proto.TypeSliceString:
-		return baseType == basetype.String
-	}
-	return false
-}
-
-// hasValidValue checks whether given val has any valid value.
-// If val is a slice, even though only one value is valid, it will be counted a valid value.
-//
-// Special case: bool or slice of bool will always be valid since bool type is often used as a flag and
-// there are only two possibility (true/false).
-func hasValidValue(val proto.Value) bool {
-	var invalidCount int
-
-	switch val.Type() {
-	case proto.TypeBool, proto.TypeSliceBool:
-		return true // Mark as valid
-	case proto.TypeInt8:
-		return val.Int8() != basetype.Sint8Invalid
-	case proto.TypeUint8:
-		return val.Uint8() != basetype.Uint8Invalid
-	case proto.TypeInt16:
-		return val.Int16() != basetype.Sint16Invalid
-	case proto.TypeUint16:
-		return val.Uint16() != basetype.Uint16Invalid
-	case proto.TypeInt32:
-		return val.Int32() != basetype.Sint32Invalid
-	case proto.TypeUint32:
-		return val.Uint32() != basetype.Uint32Invalid
-	case proto.TypeString:
-		s := val.String()
-		return s != basetype.StringInvalid && s != ""
-	case proto.TypeFloat32:
-		return math.Float32bits(val.Float32()) != basetype.Float32Invalid
-	case proto.TypeFloat64:
-		return math.Float64bits(val.Float64()) != basetype.Float64Invalid
-	case proto.TypeInt64:
-		return val.Int64() != basetype.Sint64Invalid
-	case proto.TypeUint64:
-		return val.Uint64() != basetype.Uint64Invalid
-	case proto.TypeSliceInt8:
-		vals := val.SliceInt8()
-		for i := range vals {
-			if vals[i] == basetype.Sint8Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceUint8:
-		vals := val.SliceUint8()
-		for i := range vals {
-			if vals[i] == basetype.Uint8Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceInt16:
-		vals := val.SliceInt16()
-		for i := range vals {
-			if vals[i] == basetype.Sint16Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceUint16:
-		vals := val.SliceUint16()
-		for i := range vals {
-			if vals[i] == basetype.Uint16Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceInt32:
-		vals := val.SliceInt32()
-		for i := range vals {
-			if vals[i] == basetype.Sint32Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceUint32:
-		vals := val.SliceUint32()
-		for i := range vals {
-			if vals[i] == basetype.Uint32Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceString:
-		vals := val.SliceString()
-		for i := range vals {
-			if vals[i] == basetype.StringInvalid || vals[i] == "" {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceFloat32:
-		vals := val.SliceFloat32()
-		for i := range vals {
-			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceFloat64:
-		vals := val.SliceFloat64()
-		for i := range vals {
-			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceInt64:
-		vals := val.SliceInt64()
-		for i := range vals {
-			if vals[i] == basetype.Sint64Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case proto.TypeSliceUint64:
-		vals := val.SliceUint64()
-		for i := range vals {
-			if vals[i] == basetype.Uint64Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	}
-
-	return false
 }

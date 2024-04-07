@@ -431,6 +431,185 @@ func (v Value) Any() any {
 	return nil
 }
 
+func (v Value) Align(t basetype.BaseType) bool {
+	switch v.Type() {
+	case TypeBool, TypeSliceBool:
+		return t == basetype.Enum
+	case TypeInt8, TypeSliceInt8:
+		return t == basetype.Sint8
+	case TypeUint8, TypeSliceUint8:
+		return t == basetype.Enum ||
+			t == basetype.Byte ||
+			t == basetype.Uint8 ||
+			t == basetype.Uint8z
+	case TypeInt16, TypeSliceInt16:
+		return t == basetype.Sint16
+	case TypeUint16, TypeSliceUint16:
+		return t == basetype.Uint16 || t == basetype.Uint16z
+	case TypeInt32, TypeSliceInt32:
+		return t == basetype.Sint32
+	case TypeUint32, TypeSliceUint32:
+		return t == basetype.Uint32 || t == basetype.Uint32z
+	case TypeInt64, TypeSliceInt64:
+		return t == basetype.Sint64
+	case TypeUint64, TypeSliceUint64:
+		return t == basetype.Uint64 || t == basetype.Uint64z
+	case TypeFloat32, TypeSliceFloat32:
+		return t == basetype.Float32
+	case TypeFloat64, TypeSliceFloat64:
+		return t == basetype.Float64
+	case TypeString, TypeSliceString:
+		return t == basetype.String
+	}
+	return false
+}
+
+// Valid checks whether the Value is valid based on given basetype. This does not verify whether the Type of
+// the Value aligns with the provided BaseType. For slices, even though only one element is valid, the Value will be counted a valid value.
+//
+// Special case: bool or slice of bool will always be valid since bool type is often used as a flag and
+// there are only two possibility (true/false).
+func (v Value) Valid(t basetype.BaseType) bool {
+	var invalidCount int
+
+	switch v.Type() {
+	case TypeBool, TypeSliceBool:
+		return true // Mark as valid
+	case TypeInt8:
+		return v.Int8() != basetype.Sint8Invalid
+	case TypeUint8:
+		val := v.Uint8()
+		switch t {
+		case basetype.Enum:
+			return val != basetype.EnumInvalid
+		case basetype.Byte:
+			return val != basetype.ByteInvalid
+		case basetype.Uint8:
+			return val != basetype.Uint8Invalid
+		case basetype.Uint8z:
+			return val != basetype.Uint8zInvalid
+		}
+		return false
+	case TypeInt16:
+		return v.Int16() != basetype.Sint16Invalid
+	case TypeUint16:
+		if t == basetype.Uint16z {
+			return v.Uint16() != basetype.Uint16zInvalid
+		}
+		return v.Uint16() != basetype.Uint16Invalid
+	case TypeInt32:
+		return v.Int32() != basetype.Sint32Invalid
+	case TypeUint32:
+		if t == basetype.Uint32z {
+			return v.Uint32() != basetype.Uint32zInvalid
+		}
+		return v.Uint32() != basetype.Uint32Invalid
+	case TypeFloat32:
+		return math.Float32bits(v.Float32()) != basetype.Float32Invalid
+	case TypeFloat64:
+		return math.Float64bits(v.Float64()) != basetype.Float64Invalid
+	case TypeInt64:
+		return v.Int64() != basetype.Sint64Invalid
+	case TypeUint64:
+		if t == basetype.Uint64z {
+			return v.Uint64() != basetype.Uint64zInvalid
+		}
+		return v.Uint64() != basetype.Uint64Invalid
+	case TypeString:
+		s := v.String()
+		return s != basetype.StringInvalid && s != ""
+	case TypeSliceInt8:
+		vals := v.SliceInt8()
+		for i := range vals {
+			if vals[i] == basetype.Sint8Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceUint8:
+		vals := v.SliceUint8()
+		for i := range vals {
+			if vals[i] == basetype.Uint8Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceInt16:
+		vals := v.SliceInt16()
+		for i := range vals {
+			if vals[i] == basetype.Sint16Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceUint16:
+		vals := v.SliceUint16()
+		for i := range vals {
+			if vals[i] == basetype.Uint16Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceInt32:
+		vals := v.SliceInt32()
+		for i := range vals {
+			if vals[i] == basetype.Sint32Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceUint32:
+		vals := v.SliceUint32()
+		for i := range vals {
+			if vals[i] == basetype.Uint32Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceFloat32:
+		vals := v.SliceFloat32()
+		for i := range vals {
+			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceFloat64:
+		vals := v.SliceFloat64()
+		for i := range vals {
+			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceInt64:
+		vals := v.SliceInt64()
+		for i := range vals {
+			if vals[i] == basetype.Sint64Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceUint64:
+		vals := v.SliceUint64()
+		for i := range vals {
+			if vals[i] == basetype.Uint64Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceString:
+		vals := v.SliceString()
+		for i := range vals {
+			if vals[i] == basetype.StringInvalid || vals[i] == "" {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	}
+	return false
+}
+
 // Bool converts bool as Value.
 func Bool(v bool) Value {
 	var num uint64
@@ -592,6 +771,8 @@ func Any(v any) Value {
 		return Float64(val)
 	case string:
 		return String(val)
+	case []bool:
+		return SliceBool(val)
 	case []int8:
 		return SliceInt8(val)
 	case []uint8:
