@@ -23,8 +23,8 @@ var (
 	big_activity      = filepath.Join(testdata, "big_activity.fit")
 )
 
-func BenchmarkDec(b *testing.B) {
-	b.Run("github.com/muktihari/fit raw", func(b *testing.B) {
+func BenchmarkDecode(b *testing.B) {
+	b.Run("muktihari/fit raw", func(b *testing.B) {
 		b.StopTimer()
 		// NOTE: We use os.ReadFile to remove syscall process in our decoding process. So we have pure decoding performance.
 		f, err := os.ReadFile(big_activity)
@@ -42,7 +42,7 @@ func BenchmarkDec(b *testing.B) {
 			}
 		}
 	})
-	b.Run("github.com/muktihari/fit", func(b *testing.B) {
+	b.Run("muktihari/fit", func(b *testing.B) {
 		b.StopTimer()
 		f, err := os.ReadFile(big_activity)
 		if err != nil {
@@ -64,7 +64,7 @@ func BenchmarkDec(b *testing.B) {
 			al.Close()
 		}
 	})
-	b.Run("github.com/tormoder/fit", func(b *testing.B) {
+	b.Run("tormoder/fit", func(b *testing.B) {
 		b.StopTimer()
 		f, err := os.ReadFile(big_activity)
 		if err != nil {
@@ -92,8 +92,8 @@ func (discardAt) Write(p []byte) (int, error) { return len(p), nil }
 
 func (discardAt) WriteAt(p []byte, off int64) (n int, err error) { return len(p), nil }
 
-func BenchmarkEnc(b *testing.B) {
-	b.Run("github.com/muktihari/fit raw", func(b *testing.B) {
+func BenchmarkEncode(b *testing.B) {
+	b.Run("muktihari/fit raw", func(b *testing.B) {
 		b.StopTimer()
 		f, err := os.ReadFile(big_activity)
 		if err != nil {
@@ -107,16 +107,16 @@ func BenchmarkEnc(b *testing.B) {
 			b.Fatalf("decode error: %v", err)
 		}
 
-		enc := encoder.New(discard)
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
+			enc := encoder.New(discard) // include the encoder creation.
 			if err := enc.Encode(fit); err != nil {
 				b.Fatalf("encode error: %v", err)
 			}
 		}
 	})
-	b.Run("github.com/muktihari/fit", func(b *testing.B) {
+	b.Run("muktihari/fit", func(b *testing.B) {
 		b.StopTimer()
 		f, err := os.ReadFile(big_activity)
 		if err != nil {
@@ -138,17 +138,17 @@ func BenchmarkEnc(b *testing.B) {
 
 		activity := al.File().(*filedef.Activity)
 
-		enc := encoder.New(discard)
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
 			fit := activity.ToFIT(nil)
+			enc := encoder.New(discard)
 			if err := enc.Encode(&fit); err != nil {
 				b.Fatalf("encode error: %v", err)
 			}
 		}
 	})
-	b.Run("github.com/tormoder/fit", func(b *testing.B) {
+	b.Run("tormoder/fit", func(b *testing.B) {
 		b.StopTimer()
 		f, err := os.ReadFile(big_activity)
 		if err != nil {
