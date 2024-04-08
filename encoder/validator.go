@@ -113,7 +113,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 
 		// Restore any scaled float64 value back into its corresponding integer representation.
-		if field.Scale != 1 && field.Offset != 0 {
+		if field.Scale != 1 || field.Offset != 0 {
 			field.Value = scaleoffset.DiscardValue(
 				field.Value,
 				field.BaseType,
@@ -215,7 +215,7 @@ func (v *messageValidator) handleNativeValue(developerField *proto.DeveloperFiel
 	}
 
 	// Restore any scaled float64 value back into its corresponding integer representation.
-	if field.Scale != 1 && field.Offset != 0 {
+	if field.Scale != 1 || field.Offset != 0 {
 		developerField.Value = scaleoffset.DiscardValue(
 			developerField.Value,
 			field.BaseType,

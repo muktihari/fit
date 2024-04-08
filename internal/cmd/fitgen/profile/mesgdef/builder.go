@@ -170,7 +170,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				}
 			}
 
-			if !(f.Scale == 1 && f.Offset == 0) {
+			if f.Scale != 1 || f.Offset != 0 {
 				imports["github.com/muktihari/fit/kit/scaleoffset"] = struct{}{}
 			}
 
@@ -189,7 +189,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
 			}
 
-			if !(f.Scale == 1 && f.Offset == 0) && f.Array != true {
+			if (f.Scale != 1 || f.Offset != 0) && !f.Array {
 				imports["math"] = struct{}{}
 			}
 
