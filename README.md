@@ -304,7 +304,7 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
 1. Register Manufacturer Specific Messages at Runtime
 
-   For those who prefer using this SDK as it is without need to generate their own custom SDK, we provide `factory` package as an abstraction to hold the profile messages. For example, please see [Register at Runtime](/docs/runtime_registration.md).
+   For those who prefer using this SDK as it is without need to generate their own custom SDK, we provide `factory` package as an abstraction to hold the profile messages. See [Register at Runtime](/docs/runtime_registration.md).
 
 2. Generate Custom FIT SDK
 
@@ -314,21 +314,32 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
 We do not aim to compete with anyone; rather, we have created this FIT SDK with the intention of providing an alternative. However, having a benchmark can show us how relevant we are to the world.
 
-Here is a benchmark for decoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding FIT files.
+Here is a benchmark for decoding and encoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding FIT files. See [./internal/cmd/benchfit/benchfit_test.go](./internal/cmd/benchfit/benchfit_test.go)
+
+```sh
+cd internal/cmd/benchfit
+go test -bench=. -benchmem
+```
 
 ```js
 goos: darwin
 goarch: amd64
-pkg: benchmarkfit
+pkg: benchfit
 cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
-Benchmark/github.com/muktihari/fit_raw-4  10  109023300 ns/op  77077055 B/op  100048 allocs/op
-Benchmark/github.com/muktihari/fit-4       9  122470129 ns/op  96926349 B/op  200055 allocs/op
-Benchmark/github.com/tormoder/fit-4        9  111739558 ns/op  84115706 B/op  700069 allocs/op
+BenchmarkDec/github.com/muktihari/fit_raw-4  10   108122640 ns/op   77077265 B/op    100047 allocs/op
+BenchmarkDec/github.com/muktihari/fit-4       9   119712969 ns/op   97035622 B/op    200067 allocs/op
+BenchmarkDec/github.com/tormoder/fit-4       10   107630537 ns/op   84108936 B/op    700051 allocs/op
+-----------------------------------------------------------------------------------------------------
+BenchmarkEnc/github.com/muktihari/fit_raw-4  13    87780351 ns/op      10217 B/op         2 allocs/op
+BenchmarkEnc/github.com/muktihari/fit-4       7   151018842 ns/op   44027624 B/op    100007 allocs/op
+BenchmarkEnc/github.com/tormoder/fit-4        1  1389844685 ns/op  101592576 B/op  12100312 allocs/op
+PASS
+ok  	benchfit	9.004s
 ```
 
-NOTE: The `1st` on the list, "raw", means we decode the file into the original FIT protocol messages structure (similiar to the Official FIT SDK implementation in other language). While the `2nd` decodes messages to structs which should be equivalent to the `3rd` does.
+NOTE: The `1st` on the list, "raw", means we decode the file into the original FIT protocol message structure (similar to the Official FIT SDK implementation in other languages). While the `2nd` decodes messages to **Activity File** struct, which should be equivalent to what the `3rd` does.
 
-The time spent is more or less the same, but we allocate way less object on the heap.
+The time spent is more or less the same for decoding, but we allocate way fewer objects on the heap for both decoding and encoding. We achieve significantly faster encoding.
 
 ## Contributing
 
