@@ -418,6 +418,27 @@ func TestMessageValidatorValidate(t *testing.T) {
 			},
 			errs: []error{nil, nil, ErrValueTypeMismatch},
 		},
+		{
+			// in Profile.xlsx (v21.133) there is no field with scale 1 and offset other than 0, but just in case in future update.
+			name: "message having field with scale: 1, offset: 20",
+			mesgs: []proto.Message{
+				{
+					Fields: []proto.Field{
+						{
+							FieldBase: &proto.FieldBase{
+								Num:      254,
+								Name:     "Unknown",
+								Scale:    1,
+								Offset:   20,
+								Type:     profile.Uint16,
+								BaseType: basetype.Uint16,
+							},
+							Value: proto.Float64(200),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for i, tc := range tt {
