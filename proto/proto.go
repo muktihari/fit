@@ -39,14 +39,16 @@ func LocalMesgNum(header byte) byte {
 }
 
 // CreateMessageDefinition creates new MessageDefinition base on given Message.
-// It will panic if mesg is nil.
+// It will panic if mesg is nil. And mesg must be validated first, for instance
+// if field.Value's size is more than 255 bytes, overflow will occurs.
 func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
 	CreateMessageDefinitionTo(&mesgDef, mesg)
 	return
 }
 
 // CreateMessageDefinitionTo create MessageDefinition base on given Message and put it at target object to avoid allocation.
-// It will panic if either target or mesg is nil.
+// It will panic if either target or mesg is nil. And mesg must be validated first, for instance
+// if field.Value's size is more than 255 bytes, overflow will occurs.
 func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	target.Header = MesgDefinitionMask
 	target.Reserved = mesg.Reserved
