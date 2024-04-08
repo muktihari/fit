@@ -326,15 +326,14 @@ goos: darwin
 goarch: amd64
 pkg: benchfit
 cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
-BenchmarkDec/github.com/muktihari/fit_raw-4  10   108122640 ns/op   77077265 B/op    100047 allocs/op
-BenchmarkDec/github.com/muktihari/fit-4       9   119712969 ns/op   97035622 B/op    200067 allocs/op
-BenchmarkDec/github.com/tormoder/fit-4       10   107630537 ns/op   84108936 B/op    700051 allocs/op
------------------------------------------------------------------------------------------------------
-BenchmarkEnc/github.com/muktihari/fit_raw-4  13    87780351 ns/op      10217 B/op         2 allocs/op
-BenchmarkEnc/github.com/muktihari/fit-4       7   151018842 ns/op   44027624 B/op    100007 allocs/op
-BenchmarkEnc/github.com/tormoder/fit-4        1  1389844685 ns/op  101592576 B/op  12100312 allocs/op
+BenchmarkDecode/muktihari/fit_raw-4  10   110165214 ns/op   77077057 B/op    100047 allocs/op
+BenchmarkDecode/muktihari/fit-4       9   121938626 ns/op   97035515 B/op    200066 allocs/op
+BenchmarkDecode/tormoder/fit-4        9   112157057 ns/op   84108961 B/op    700051 allocs/op
+BenchmarkEncode/muktihari/fit_raw-4  13    87579657 ns/op      12444 B/op        16 allocs/op
+BenchmarkEncode/muktihari/fit-4       7   151469391 ns/op   44065838 B/op    100021 allocs/op
+BenchmarkEncode/tormoder/fit-4        1  1300131309 ns/op  101992736 B/op  12100314 allocs/op
 PASS
-ok  	benchfit	9.004s
+ok  	benchfit	10.811s
 ```
 
 NOTE: The `1st` on the list, "raw", means we decode the file into the original FIT protocol message structure (similar to the Official FIT SDK implementation in other languages). While the `2nd` decodes messages to **Activity File** struct, which should be equivalent to what the `3rd` does.
