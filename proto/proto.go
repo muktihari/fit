@@ -79,7 +79,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.DeveloperFields {
 		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
 			Num:                mesg.DeveloperFields[i].Num,
-			Size:               mesg.DeveloperFields[i].BaseType.Size(),
+			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value, mesg.DeveloperFields[i].BaseType)),
 			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
 		})
 	}

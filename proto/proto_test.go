@@ -457,13 +457,67 @@ func TestCreateMessageDefinition(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "developer fields with string value \"FIT SDK Go\", size should be 11",
+			mesg: proto.Message{Num: mesgnum.UserProfile}.
+				WithFields(
+					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
+				WithDeveloperFields(
+					proto.DeveloperField{
+						Num: 0, Name: "FIT SDK Go", BaseType: basetype.String, DeveloperDataIndex: 0, Value: proto.String("FIT SDK Go"),
+					},
+				),
+			mesgDef: proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num: 0, Size: 11, DeveloperDataIndex: 0,
+					},
+				},
+			},
+		},
+		{
+			name: "developer fields with value []uint16{1,2,3}, size should be 3*2 = 6",
+			mesg: proto.Message{Num: mesgnum.UserProfile}.
+				WithFields(
+					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
+				WithDeveloperFields(
+					proto.DeveloperField{
+						Num: 0, Name: "FIT SDK Go", BaseType: basetype.Uint16, DeveloperDataIndex: 0, Value: proto.SliceUint16([]uint16{1, 2, 3}),
+					},
+				),
+			mesgDef: proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num: 0, Size: 6, DeveloperDataIndex: 0,
+					},
+				},
+			},
+		},
 	}
 
 	for i, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			mesgDef := proto.CreateMessageDefinition(&tc.mesg)
 			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
-				t.Fatal(i, diff)
+				t.Fatal(diff)
 			}
 		})
 	}
