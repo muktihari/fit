@@ -39,14 +39,16 @@ func LocalMesgNum(header byte) byte {
 }
 
 // CreateMessageDefinition creates new MessageDefinition base on given Message.
-// It will panic if mesg is nil.
+// It will panic if mesg is nil. And mesg must be validated first, for instance
+// if field.Value's size is more than 255 bytes, overflow will occurs.
 func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
 	CreateMessageDefinitionTo(&mesgDef, mesg)
 	return
 }
 
 // CreateMessageDefinitionTo create MessageDefinition base on given Message and put it at target object to avoid allocation.
-// It will panic if either target or mesg is nil.
+// It will panic if either target or mesg is nil. And mesg must be validated first, for instance
+// if field.Value's size is more than 255 bytes, overflow will occurs.
 func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	target.Header = MesgDefinitionMask
 	target.Reserved = mesg.Reserved
@@ -79,7 +81,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.DeveloperFields {
 		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
 			Num:                mesg.DeveloperFields[i].Num,
-			Size:               mesg.DeveloperFields[i].BaseType.Size(),
+			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value, mesg.DeveloperFields[i].BaseType)),
 			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
 		})
 	}
