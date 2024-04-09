@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:generate go run fitcsv/lookup.go
+
 package main
 
 import (
@@ -14,6 +16,7 @@ import (
 
 	"github.com/muktihari/fit/cmd/fitconv/fitcsv"
 	"github.com/muktihari/fit/decoder"
+	"github.com/muktihari/fit/kit/bufferedwriter"
 )
 
 var version = "dev"
@@ -21,11 +24,13 @@ var version = "dev"
 const blockSize = 8 << 10
 
 func main() {
+	var opt string
+	if version != "dev" {
+		flag.StringVar(&opt, "opt", "", "")
+	}
+
 	var flagVersion bool
 	flag.BoolVar(&flagVersion, "v", false, "Show version")
-
-	var flagFitToCsv bool
-	flag.BoolVar(&flagFitToCsv, "csv", false, "Convert FIT to CSV (default if not specified)")
 
 	var flagUseDisk bool
 	flag.BoolVar(&flagUseDisk, "disk", false, "Use disk instead of load everything in memory")
@@ -55,9 +60,27 @@ func main() {
 		return
 	}
 
-	if !flagFitToCsv {
-		flagFitToCsv = true // default
-	}
+	/*
+		// For Debugging
+		switch opt {
+		case "cpu":
+			defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+		case "mem":
+			defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+		case "clock":
+			defer profile.Start(profile.ClockProfile, profile.ProfilePath(".")).Stop()
+		case "trace":
+			defer profile.Start(profile.TraceProfile, profile.ProfilePath(".")).Stop()
+		case "threadcreation":
+			defer profile.Start(profile.ThreadcreationProfile, profile.ProfilePath(".")).Stop()
+		case "block":
+			defer profile.Start(profile.BlockProfile, profile.ProfilePath(".")).Stop()
+		case "took":
+			defer func(begin time.Time) {
+				fmt.Printf("took: %s\n", time.Since(begin))
+			}(time.Now())
+		}
+	*/
 
 	var fitToCsvOptions []fitcsv.Option
 	if flagUseDisk {
@@ -86,10 +109,18 @@ func main() {
 	}
 
 	for _, path := range paths {
-		if flagFitToCsv {
+		ext := filepath.Ext(path)
+		switch ext {
+		case ".fit":
 			if err := fitToCsv(path, flagNoExpandComponents, fitToCsvOptions...); err != nil {
 				fmt.Fprintf(os.Stderr, "could not convert %q to csv: %v\n", path, err)
 			}
+		case ".csv":
+			if err := csvToFit(path); err != nil {
+				fmt.Fprintf(os.Stderr, "could not convert %q to fit: %v\n", path, err)
+			}
+		default:
+			fmt.Fprintf(os.Stderr, "unrecognized format: %s\n", ext)
 		}
 	}
 }
@@ -104,10 +135,6 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 	base := filepath.Base(path)
 	dir := filepath.Dir(path)
 	ext := filepath.Ext(path)
-
-	if strings.ToLower(ext) != ".fit" {
-		return fmt.Errorf("expected *.fit, got %s", ext)
-	}
 
 	name := base
 	if len(ext) < len(base) {
@@ -124,7 +151,7 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 	defer cf.Close()
 
 	bw := bufio.NewWriterSize(cf, blockSize)
-	conv := fitcsv.NewConverter(bw, opts...)
+	conv := fitcsv.NewFITToCSVConv(bw, opts...)
 
 	options := []decoder.Option{
 		decoder.WithMesgDefListener(conv),
@@ -161,7 +188,64 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 		return fmt.Errorf("could not flush buffered data: %w", err)
 	}
 
-	fmt.Printf("Converted! %s\n", filepath.Join(dir, namecsv))
+	fmt.Printf("📄 %q -> %q\n", filepath.Join(dir, path), filepath.Join(dir, namecsv))
+
+	return nil
+}
+
+func csvToFit(path string) error {
+	cf, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("could not open file: %s: %w", path, err)
+	}
+	defer cf.Close()
+
+	base := filepath.Base(path)
+	dir := filepath.Dir(path)
+	ext := filepath.Ext(path)
+
+	name := base
+	if len(ext) < len(base) {
+		name = base[:len(base)-len(ext)]
+	}
+
+	namefit := name + "-test.fit"
+	pathfit := filepath.Join(dir, namefit)
+
+	ff, err := os.OpenFile(pathfit, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+	if err != nil {
+		return err
+	}
+	defer ff.Close()
+
+	bw := bufferedwriter.NewSize(ff, blockSize)
+	defer bw.Flush()
+
+	conv := fitcsv.NewCSVToFITConv(bw, bufio.NewReaderSize(cf, blockSize))
+
+	if err := conv.Convert(); err != nil {
+		return err
+	}
+
+	resultInfo := conv.ResultInfo()
+	skipped := []string{}
+
+	if resultInfo.UnknownMesg != 0 {
+		skipped = append(skipped, fmt.Sprintf("%d unknown messages", resultInfo.UnknownMesg))
+	}
+	if resultInfo.UnknownField != 0 {
+		skipped = append(skipped, fmt.Sprintf("%d unknown fields", resultInfo.UnknownField))
+	}
+	if resultInfo.UnknownDynamicField != 0 {
+		skipped = append(skipped, fmt.Sprintf("%d unknown dynamic fields", resultInfo.UnknownDynamicField))
+	}
+
+	var info string
+	if len(skipped) > 0 {
+		info = fmt.Sprintf(" [Info: %s are skipped]", strings.Join(skipped, ", "))
+	}
+
+	fmt.Printf("🚀 %q -> %q.%s\n", filepath.Join(dir, path), filepath.Join(dir, namefit), info)
 
 	return nil
 }

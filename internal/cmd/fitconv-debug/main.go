@@ -138,7 +138,7 @@ func fitToCsv(path string, opts ...fitcsv.Option) error {
 
 	const bsize = 1 * blockSize
 	bw := bufio.NewWriterSize(cf, bsize)
-	conv := fitcsv.NewConverter(bw, opts...)
+	conv := fitcsv.NewFITToCSVConv(bw, opts...)
 
 	dec := decoder.New(bufio.NewReaderSize(ff, bsize),
 		decoder.WithMesgDefListener(conv),
