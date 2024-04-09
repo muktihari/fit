@@ -292,7 +292,7 @@ Here is the sample of what **Developer Fields** would look like in a **.fit** th
 We provide some CLI programs to interact with FIT files that can be found in `cmd` folder.
 
 1. `fitactivity`: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
-2. `fitconv`: Converts FIT file to a CSV file, allowing us to read the FIT file in a human-readable format. [README.md](/cmd/fitconv/README.md)
+2. `fitconv`: Converts FIT files to CSV format, enabling us to read the FIT data in a human-readable format. Conversely, it also converts CSV files back to FIT format, enabling us to create or edit FIT files in CSV form. [README.md](/cmd/fitconv/README.md)
 
 The programs are automatically built during release; for Linux, Windows, and macOS platforms. They are available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
