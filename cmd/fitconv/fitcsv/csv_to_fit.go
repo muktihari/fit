@@ -6,7 +6,6 @@ package fitcsv
 
 import (
 	"encoding/csv"
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -22,8 +21,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
-
-var errUnknown = errors.New("unknown")
 
 type CSVToFITConv struct {
 	enc       *encoder.Encoder
@@ -127,10 +124,7 @@ loop:
 				c.seq++
 			}
 
-			mesg, err := c.createMesg(record)
-			if errors.Is(err, errUnknown) {
-				continue loop
-			}
+			mesg, err := c.createMesg(mesgNum, record)
 			if err != nil {
 				return err
 			}
@@ -174,14 +168,7 @@ type dynamicFieldRef struct {
 	value string
 }
 
-func (c *CSVToFITConv) createMesg(record []string) (proto.Message, error) {
-	name := record[2]
-	num, ok := mesgNumLookup[name]
-	if !ok {
-		c.unknownMesg++
-		return proto.Message{}, errUnknown
-	}
-
+func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.Message, error) {
 	mesg := proto.Message{
 		Num:             num,
 		Fields:          c.fieldsArray[:0],
@@ -198,7 +185,7 @@ func (c *CSVToFITConv) createMesg(record []string) (proto.Message, error) {
 		var (
 			fieldName = record[i+0]
 			strValue  = record[i+1]
-			units     = record[i+2] // units
+			units     = record[i+2]
 		)
 		if fieldName == "" {
 			continue
@@ -243,6 +230,8 @@ func (c *CSVToFITConv) createMesg(record []string) (proto.Message, error) {
 		}
 	}
 
+	removeExpandedComponents(&mesg)
+
 	return mesg, nil
 }
 
@@ -253,7 +242,7 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 	if len(sliceValues) != 1 || field.Array {
 		protoValues := c.protoValuesArray[:0]
 		for i := range sliceValues {
-			value, err := c.parseValue(
+			value, err := parseValue(
 				sliceValues[i],
 				field.BaseType,
 				field.Scale,
@@ -270,7 +259,7 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 		return
 	}
 
-	field.Value, err = c.parseValue(
+	field.Value, err = parseValue(
 		strValue,
 		field.BaseType,
 		field.Scale,
@@ -287,11 +276,10 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 
 func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devField proto.DeveloperField, err error) {
 	var fieldDescription *mesgdef.FieldDescription
-loop:
 	for i := range c.fieldDescriptions {
 		if strings.Join(c.fieldDescriptions[i].FieldName, "|") == name {
 			fieldDescription = c.fieldDescriptions[i]
-			break loop
+			break
 		}
 	}
 	if fieldDescription == nil {
@@ -318,7 +306,7 @@ loop:
 	if len(sliceValues) != 1 {
 		protoValues := c.protoValuesArray[:0]
 		for i := range sliceValues {
-			value, err := c.parseValue(
+			value, err := parseValue(
 				sliceValues[i],
 				devField.BaseType,
 				scale,
@@ -335,7 +323,7 @@ loop:
 		return
 	}
 
-	devField.Value, err = c.parseValue(
+	devField.Value, err = parseValue(
 		strValue,
 		devField.BaseType,
 		scale,
@@ -358,7 +346,6 @@ func (c *CSVToFITConv) reverseSubFieldSubtitution(mesgRef *proto.Message, ref dy
 			if subField.Name != ref.name {
 				continue
 			}
-
 			for _, smap := range subField.Maps {
 				valRef, ok := convertToInt64(mesgRef.FieldValueByNum(smap.RefFieldNum))
 				if !ok {
@@ -366,7 +353,7 @@ func (c *CSVToFITConv) reverseSubFieldSubtitution(mesgRef *proto.Message, ref dy
 				}
 
 				if smap.RefFieldValue == valRef {
-					fieldRef.Value, err = c.parseValue(
+					fieldRef.Value, err = parseValue(
 						ref.value,
 						fieldRef.BaseType,
 						fieldRef.Scale,
@@ -388,7 +375,37 @@ func (c *CSVToFITConv) reverseSubFieldSubtitution(mesgRef *proto.Message, ref dy
 	return nil
 }
 
-func (c *CSVToFITConv) parseValue(strValue string, baseType basetype.BaseType, scale, offset float64, units string) (value proto.Value, err error) {
+func removeExpandedComponents(mesg *proto.Message) {
+	fields := map[byte]struct{}{}
+	for _, field := range mesg.Fields {
+		fields[field.Num] = struct{}{}
+	}
+
+	// NOTE: brute-force checking all possible candidates, if too slow optimize this.
+	removeCandidates := map[byte]struct{}{}
+	for _, field := range mesg.Fields {
+		for _, subField := range field.SubFields {
+			for _, component := range subField.Components {
+				_, ok := fields[component.FieldNum]
+				if ok {
+					removeCandidates[component.FieldNum] = struct{}{}
+				}
+			}
+		}
+		for _, component := range field.Components {
+			_, ok := fields[component.FieldNum]
+			if ok {
+				removeCandidates[component.FieldNum] = struct{}{}
+			}
+		}
+	}
+
+	for num := range removeCandidates {
+		mesg.RemoveFieldByNum(num)
+	}
+}
+
+func parseValue(strValue string, baseType basetype.BaseType, scale, offset float64, units string) (value proto.Value, err error) {
 	if units == "degrees" { // Special case
 		degrees, err := strconv.ParseFloat(strValue, 64)
 		if err != nil {
