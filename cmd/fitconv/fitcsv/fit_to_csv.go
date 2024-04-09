@@ -22,13 +22,14 @@ import (
 )
 
 var (
-	_ decoder.MesgDefListener = &FitToCsvConv{}
-	_ decoder.MesgListener    = &FitToCsvConv{}
+	_ decoder.MesgDefListener = &FITToCSVConv{}
+	_ decoder.MesgListener    = &FITToCSVConv{}
 )
 
-// FitToCsvConv is an implementation for listeners that receive message events and convert them into CSV records.
-type FitToCsvConv struct {
-	w io.Writer // A writer to write the complete csv data.
+// FITToCSVConv is an implementation for listeners that receive message events and convert them into CSV records.
+type FITToCSVConv struct {
+	iter int
+	w    io.Writer // A writer to write the complete csv data.
 
 	// Temporary writers that can be used to write the csv data (without header). Default: immem.
 	// Since we can only write the correct header after all data is retrieved.
@@ -123,15 +124,15 @@ func WithTrimTrailingCommas() Option {
 	})
 }
 
-// NewConverter creates a new fit to csv converter.
+// NewFITToCSVConv creates a new FIT to CSV converter.
 // The caller must call Wait() to wait all events are received and finalizing the convert process.
-func NewConverter(w io.Writer, opts ...Option) *FitToCsvConv {
+func NewFITToCSVConv(w io.Writer, opts ...Option) *FITToCSVConv {
 	options := defaultOptions()
 	for _, opt := range opts {
 		opt.apply(options)
 	}
 
-	c := &FitToCsvConv{
+	c := &FITToCSVConv{
 		w:       w,
 		buf:     new(bytes.Buffer),
 		options: options,
@@ -155,20 +156,21 @@ func NewConverter(w io.Writer, opts ...Option) *FitToCsvConv {
 }
 
 // Err returns any error that occur during processing events.
-func (c *FitToCsvConv) Err() error { return c.err }
+func (c *FITToCSVConv) Err() error { return c.err }
 
 // OnMesgDef receive message definition from broadcaster
-func (c *FitToCsvConv) OnMesgDef(mesgDef proto.MessageDefinition) { c.mesgc <- mesgDef }
+func (c *FITToCSVConv) OnMesgDef(mesgDef proto.MessageDefinition) { c.mesgc <- mesgDef }
 
 // OnMesgDef receive message from broadcaster
-func (c *FitToCsvConv) OnMesg(mesg proto.Message) { c.mesgc <- mesg }
+func (c *FITToCSVConv) OnMesg(mesg proto.Message) { c.mesgc <- mesg }
 
 // handleEvent processes events from a buffered channel.
 // It should not be concurrently spawned multiple times, as it relies on maintaining event order.
-func (c *FitToCsvConv) handleEvent() {
+func (c *FITToCSVConv) handleEvent() {
 	for event := range c.mesgc {
 		switch mesg := event.(type) {
 		case proto.MessageDefinition:
+			c.iter++
 			c.writeMesgDef(mesg)
 		case proto.Message:
 			switch mesg.Num {
@@ -184,13 +186,13 @@ func (c *FitToCsvConv) handleEvent() {
 }
 
 // Wait closes the buffered channel and wait until all event handling is completed and finalize the data.
-func (c *FitToCsvConv) Wait() {
+func (c *FITToCSVConv) Wait() {
 	close(c.mesgc)
 	<-c.done
 	c.finalize()
 }
 
-func (c *FitToCsvConv) removeTemporaryFile() {
+func (c *FITToCSVConv) removeTemporaryFile() {
 	if c.ondisk == nil {
 		return
 	}
@@ -199,7 +201,7 @@ func (c *FitToCsvConv) removeTemporaryFile() {
 	os.Remove(name)
 }
 
-func (c *FitToCsvConv) finalize() {
+func (c *FITToCSVConv) finalize() {
 	defer c.removeTemporaryFile()
 
 	c.printHeader()
@@ -225,7 +227,7 @@ func (c *FitToCsvConv) finalize() {
 }
 
 // copy reads src; for every read line, fill the missing comma before write into dest.
-func (c *FitToCsvConv) copy(dest io.Writer, src io.Reader, maxCommaCount int) error {
+func (c *FITToCSVConv) copy(dest io.Writer, src io.Reader, maxCommaCount int) error {
 	if c.options.trimTrailingCommas { //By default, we only populate a number of commas just right for field values.
 		_, err := io.Copy(dest, src)
 		return err
@@ -270,7 +272,7 @@ func (c *FitToCsvConv) copy(dest io.Writer, src io.Reader, maxCommaCount int) er
 	return nil
 }
 
-func (c *FitToCsvConv) printHeader() {
+func (c *FITToCSVConv) printHeader() {
 	if c.err != nil {
 		return
 	}
@@ -297,7 +299,7 @@ func formatUnknown(num int) string {
 	return "unknown(" + strconv.Itoa(num) + ")"
 }
 
-func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
+func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	if c.err != nil {
 		return
 	}
@@ -365,7 +367,7 @@ func (c *FitToCsvConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	c.buf.Reset()
 }
 
-func (c *FitToCsvConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition) string {
+func (c *FITToCSVConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition) string {
 	var fieldDescription *mesgdef.FieldDescription
 	for i := range c.fieldDescriptions {
 		fieldDef := c.fieldDescriptions[i]
@@ -387,7 +389,7 @@ func (c *FitToCsvConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition)
 	return factory.NameUnknown
 }
 
-func (c *FitToCsvConv) writeMesg(mesg proto.Message) {
+func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 	if c.err != nil {
 		return
 	}
