@@ -209,7 +209,7 @@ func csvToFit(path string) error {
 		name = base[:len(base)-len(ext)]
 	}
 
-	namefit := name + "-test.fit"
+	namefit := name + ".fit"
 	pathfit := filepath.Join(dir, namefit)
 
 	ff, err := os.OpenFile(pathfit, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)

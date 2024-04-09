@@ -16,7 +16,7 @@ go run main.go activity.fit activity2.csv
 
 # Output:
 # 📄 "activity.fit" -> "activity.csv"
-# 🚀 "activity2.csv" -> "activity2.fit". [In total, 2 unknown messages are skipped]
+# 🚀 "activity2.csv" -> "activity2.fit". [Info: 2 unknown messages are skipped]
 
 ls
 # activity.fit activity.csv activity2.fit activity2.csv
@@ -31,7 +31,7 @@ ls
 | -unknown   | FIT to CSV only | Print 'unknown(68)' instead of 'unknown'               |
 | -valid     | FIT to CSV only | Print only valid value and omit invalid value          |
 | -raw       | FIT to CSV only | Use raw value instead of scaled value                  |
-| -deg       | FIT to CSV only | Print GPS Positions in degress instead of semicircles. |
+| -deg       | FIT to CSV only | Print GPS Positions in degrees instead of semicircles. |
 | -trim      | FIT to CSV only | Trim trailing commas in every line (save storage)      |
 | -no-expand | FIT to CSV only | [Decode Option] Do not expand components               |
 
