@@ -373,7 +373,7 @@ func TestCheckIntegrity(t *testing.T) {
 				h := proto.FileHeader{
 					Size:            14,
 					ProtocolVersion: byte(proto.V2),
-					ProfileVersion:  profile.Version(),
+					ProfileVersion:  profile.Version,
 					DataSize:        0,
 					DataType:        proto.DataTypeFIT,
 				}

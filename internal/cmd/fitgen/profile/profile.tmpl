@@ -37,11 +37,9 @@ func (p ProfileType) BaseType() basetype.BaseType {
 
 package {{ .Package }}
 
-const version = {{ .Version }}
+// Version is the current profile version, v{{ .ProfileVersion }}, in uint16 representation. 
+//  -> "{{ .Major }}" + "{{ .Minor }}" = "{{ .Version }}" -> {{ .Version }}.
+const Version uint16 = {{ .Version }}
 
-// Version returns the current profile version, v{{ .ProfileVersion }}, in its uint16 form: (Major * 1000) + Minor = {{ .Version }}.
-func Version() uint16 { 
-	return version
-}
 
 {{ end }}

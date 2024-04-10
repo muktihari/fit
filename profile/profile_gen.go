@@ -215,6 +215,8 @@ const (
 	Invalid
 )
 
+func (p ProfileType) Uint16() uint16 { return uint16(p) }
+
 func (p ProfileType) String() string {
 	switch p {
 	case Enum:
