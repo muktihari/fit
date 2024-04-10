@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -141,6 +142,7 @@ func TestOptions(t *testing.T) {
 				shouldChecksum:        true,
 				broadcastOnly:         false,
 				shouldExpandComponent: true,
+				logWriter:             io.Discard,
 			},
 		},
 		{
@@ -152,6 +154,7 @@ func TestOptions(t *testing.T) {
 				WithMesgDefListener(mesgDefLis, mesgDefLis),
 				WithBroadcastOnly(),
 				WithNoComponentExpansion(),
+				WithLogWriter(os.Stderr),
 			},
 			options: &options{
 				factory:               decoderFactory,
@@ -160,18 +163,22 @@ func TestOptions(t *testing.T) {
 				mesgDefListeners:      []MesgDefListener{mesgDefLis, mesgDefLis},
 				broadcastOnly:         true,
 				shouldExpandComponent: false,
+				logWriter:             os.Stderr,
 			},
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(nil, tc.opts...)
 
 			if diff := cmp.Diff(dec.options, tc.options,
 				cmp.AllowUnexported(options{}),
 				cmp.Transformer("factory", func(t Factory) uintptr {
 					return reflect.ValueOf(t).Pointer()
+				}),
+				cmp.Transformer("logWriter", func(t io.Writer) string {
+					return fmt.Sprintf("%T", t)
 				}),
 				cmp.Comparer(func(a, b []MesgListener) bool {
 					if len(a) != len(b) {
@@ -1302,12 +1309,13 @@ func TestDecodeMessageData(t *testing.T) {
 
 func TestDecodeFields(t *testing.T) {
 	tt := []struct {
-		name    string
-		r       io.Reader
-		opts    []Option
-		mesgdef *proto.MessageDefinition
-		mesg    proto.Message
-		err     error
+		name       string
+		r          io.Reader
+		opts       []Option
+		mesgdef    *proto.MessageDefinition
+		mesg       proto.Message
+		validateFn func(mesg proto.Message) error
+		err        error
 	}{
 		{
 			name: "decode fields happy flow",
@@ -1406,14 +1414,70 @@ func TestDecodeFields(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "decode fields field def's size 1 < 4 size of uint32 ",
+			r: func() io.Reader {
+				mesg := proto.Message{
+					Num: 68,
+					Fields: []proto.Field{
+						{
+							FieldBase: &proto.FieldBase{
+								Num:  1,
+								Name: "Unknown",
+							},
+							Value: proto.Uint32(1),
+						},
+					},
+				}
+				mesgb, _ := mesg.MarshalBinary()
+				mesgb = mesgb[1:] // splice mesg header
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					cur += copy(b, mesgb[cur:])
+					return len(b), nil
+				})
+			}(),
+			mesgdef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: 68,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      1,
+						Size:     1,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+			validateFn: func(mesg proto.Message) error {
+				if mesg.Fields[0].Value.Type() != proto.TypeUint32 {
+					return fmt.Errorf("expected proto value type: %s, got: %s",
+						proto.TypeUint32, mesg.Fields[0].Value.Type(),
+					)
+				}
+				if mesg.Fields[0].Value.Uint32() != 1 {
+					return fmt.Errorf("expected value: 1, got: %d", mesg.Fields[0].Value.Any())
+				}
+				return nil
+			},
+			err: nil,
+		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r, tc.opts...)
 			err := dec.decodeFields(tc.mesgdef, &tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+			if tc.validateFn == nil {
+				return
+			}
+			if err := tc.validateFn(tc.mesg); err != nil {
+				t.Fatalf("expected nil, got: %v", err)
 			}
 		})
 	}

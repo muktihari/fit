@@ -362,84 +362,94 @@ func main() {
 
 ### Available Decode Options
 
-1. **WithFactory**: allow us to use custom Factory, for example if we are working with multiple manufacturer specific messages at the same time.
+1.  **WithFactory**: allow us to use custom Factory, for example if we are working with multiple manufacturer specific messages at the same time.
 
-   Example
+    Example
 
-   ```go
-   fac := factory.New()
-   fac.RegisterMesg(proto.Message{
-       Num:  65281,
-       Fields: []proto.Field{
-           {
-               FieldBase: &proto.FieldBase{
-                   Num:    253,
-                   Name:   "Timestamp",
-                   Type:   profile.Uint32,
-                   Size:   4,
-                   Scale:  1,
-                   Offset: 0,
-                   Units:  "s",
-               },
-           },
-       },
-   })
+    ```go
+    fac := factory.New()
+    fac.RegisterMesg(proto.Message{
+        Num:  65281,
+        Fields: []proto.Field{
+            {
+                FieldBase: &proto.FieldBase{
+                    Num:    253,
+                    Name:   "Timestamp",
+                    Type:   profile.Uint32,
+                    Size:   4,
+                    Scale:  1,
+                    Offset: 0,
+                    Units:  "s",
+                },
+            },
+        },
+    })
 
-   dec := decoder.New(f, decoder.WithFactory(fac))
-   ```
+    dec := decoder.New(f, decoder.WithFactory(fac))
+    ```
 
-1. **WithMesgListener**: adds message listener to the listener pool so that we can receive the messages as soon as it is decoded.
+1.  **WithMesgListener**: adds message listener to the listener pool so that we can receive the messages as soon as it is decoded.
 
-   Example:
+    Example:
 
-   ```go
-   al := filedef.NewListener()
-   dec := decoder.New(f,
-       decoder.WithMesgListener(al),
-   )
-   ```
+    ```go
+    al := filedef.NewListener()
+    dec := decoder.New(f,
+        decoder.WithMesgListener(al),
+    )
+    ```
 
-1. **WithMesgDefListener**: adds message definition listener to the listener pool so that we can receive the message definitions as soon as it is decoded.
+1.  **WithMesgDefListener**: adds message definition listener to the listener pool so that we can receive the message definitions as soon as it is decoded.
 
-   Example:
+    Example:
 
-   ```go
-   conv := fitcsv.NewConverter(bw)
-   defer conv.Wait()
+    ```go
+    conv := fitcsv.NewConverter(bw)
+    defer conv.Wait()
 
-   dec := decoder.New(f,
-       decoder.WithMesgDefListener(conv),
-       decoder.WithMesgListener(conv),
-   )
-   ```
+    dec := decoder.New(f,
+        decoder.WithMesgDefListener(conv),
+        decoder.WithMesgListener(conv),
+    )
+    ```
 
-1. **WithBroadcastOnly**: directs the decoder to only broadcast the messages without retaining them.
+1.  **WithBroadcastOnly**: directs the decoder to only broadcast the messages without retaining them.
 
-   Example:
+    Example:
 
-   ```go
-   al := filedef.NewListener()
-   dec := decoder.New(f,
-       decoder.WithMesgListener(al),
-       decoder.WithBroadcastOnly(),
-   )
-   ```
+    ```go
+    al := filedef.NewListener()
+    dec := decoder.New(f,
+        decoder.WithMesgListener(al),
+        decoder.WithBroadcastOnly(),
+    )
+    ```
 
-1. **WithIgnoreChecksum**: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
+1.  **WithIgnoreChecksum**: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
 
-   Example:
+    Example:
 
-   ```go
-   dec := decoder.New(f, decoder.WithIgnoreChecksum())
-   ```
+    ```go
+    dec := decoder.New(f, decoder.WithIgnoreChecksum())
+    ```
 
-1. **WithNoComponentExpansion**: directs the Decoder to not expand the components.
+1.  **WithNoComponentExpansion**: directs the Decoder to not expand the components.
 
-   Example:
+    Example:
 
-   ```go
-   dec := decoder.New(f, decoder.WithNoComponentExpansion())
-   ```
+    ```go
+    dec := decoder.New(f, decoder.WithNoComponentExpansion())
+    ```
+
+1.  **WithLogWriter**: specifies where the log messages will be written to. By default, the Decoder writes log message to io.Discard.
+    The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
+
+    - Field Definition's Size is less than its basetype's size. e.g. Size 1 byte but having basetype uint32 (4 bytes).
+    - Encounter a Developer Field without prior Field Description Message.
+
+    ```go
+    dec := decoder.New(f, decoder.WithLogWriter(os.Stdout))
+    ```
 
 ### RawDecoder (Low-Level Abstraction)
 

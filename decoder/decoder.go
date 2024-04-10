@@ -91,6 +91,7 @@ type Factory interface {
 
 type options struct {
 	factory               Factory
+	logWriter             io.Writer
 	mesgListeners         []MesgListener
 	mesgDefListeners      []MesgDefListener
 	shouldChecksum        bool
@@ -101,6 +102,7 @@ type options struct {
 func defaultOptions() *options {
 	return &options{
 		factory:               factory.StandardFactory(),
+		logWriter:             io.Discard,
 		shouldChecksum:        true,
 		broadcastOnly:         false,
 		shouldExpandComponent: true,
@@ -153,6 +155,14 @@ func WithIgnoreChecksum() Option {
 // WithNoComponentExpansion directs the Decoder to not expand the components.
 func WithNoComponentExpansion() Option {
 	return fnApply(func(o *options) { o.shouldExpandComponent = false })
+}
+
+// WithLogWriter specifies where the log messages will be written to. By default, the Decoder writes log message to io.Discard.
+// The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
+//   - Field Definition's Size is less than basetype's size. e.g. Size 1 bytes but having basetype uint32 (4 bytes).
+//   - Encountering a Developer Field without prior Field Description Message.
+func WithLogWriter(w io.Writer) Option {
+	return fnApply(func(o *options) { o.logWriter = w })
 }
 
 // New returns a FIT File Decoder to decode given r.
@@ -495,6 +505,10 @@ func (d *Decoder) decodeHeader() error {
 
 func (d *Decoder) decodeMessages() error {
 	for d.cur < d.fileHeader.DataSize {
+		if d.n >= 41114 {
+			a := 10
+			_ = a
+		}
 		if err := d.decodeMessage(); err != nil {
 			return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
 		}
@@ -665,9 +679,33 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			field.Array = fieldDef.Size > fieldDef.BaseType.Size() && fieldDef.Size%fieldDef.BaseType.Size() == 0
 		}
 
-		val, err := d.readValue(fieldDef.Size, fieldDef.BaseType, field.Array, mesgDef.Architecture)
+		var (
+			baseType = fieldDef.BaseType
+			array    = field.Array
+		)
+
+		// In case we are encountering a poorly encoded FIT file with a size smaller than the type's required size.
+		// Instead of failing, let's decode it as a byte type and send a warning message to logWritter if specified.
+		if fieldDef.Size < fieldDef.BaseType.Size() {
+			baseType = basetype.Byte
+			array = fieldDef.Size > baseType.Size() && fieldDef.Size&baseType.Size() == 0
+
+			fmt.Fprintf(d.options.logWriter,
+				"[WARN] mesg.Num: %d: field def's size must be at least %d bytes (type: %s) got %d bytes. "+
+					"fallback: decode as a byte type and cast the value type back once done. [bytes pos: %d]\n",
+				mesg.Num, fieldDef.BaseType.Size(), fieldDef.BaseType, fieldDef.Size, d.n,
+			)
+		}
+
+		val, err := d.readValue(fieldDef.Size, baseType, array, mesgDef.Architecture)
 		if err != nil {
 			return err
+		}
+
+		if baseType != fieldDef.BaseType {
+			// Convert the value back to the expected value type.
+			bitVal, _ := bitsFromValue(val)
+			val = valueFromBits(bitVal, fieldDef.BaseType)
 		}
 
 		if field.Num == proto.FieldNumTimestamp {
@@ -783,7 +821,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if fieldDescription == nil {
-			// Can't interpret this DeveloperField, no FieldDescription found. Just read acquired bytes and move forward.
+			fmt.Fprintf(d.options.logWriter,
+				"[WARN] mesg.Num: %d: Can't interpret developer field, no field description mesg found. "+
+					"Just read acquired bytes and move forward. [byte pos: %d]\n",
+				mesg.Num, d.n,
+			)
 			if err := d.read(d.bytesArray[:devFieldDef.Size]); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
