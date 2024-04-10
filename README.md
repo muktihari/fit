@@ -4,7 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)
 [![CodeCov](https://codecov.io/gh/muktihari/fit/branch/master/graph/badge.svg)](https://codecov.io/gh/muktihari/fit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/muktihari/fit)](https://goreportcard.com/report/github.com/muktihari/fit)
-[![Profile Version](https://img.shields.io/badge/profile-v21.113-lightblue.svg?style=flat)](https://developer.garmin.com/fit/download)
+[![Profile Version](https://img.shields.io/badge/profile-v21.133-lightblue.svg?style=flat)](https://developer.garmin.com/fit/download)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8731/badge)](https://www.bestpractices.dev/projects/8731)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
