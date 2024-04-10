@@ -6,7 +6,6 @@ package profile
 
 import (
 	"fmt"
-	"math"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -138,11 +137,7 @@ func (b *profilebuilder) buildVersion() builder.Data {
 		TemplateExec: "version",
 		Path:         b.path,
 		Filename:     "version_gen.go",
-		Data: VersionData{
-			ProfileVersion: b.profileVersion,
-			Package:        "profile",
-			Version:        toVersion(b.profileVersion),
-		},
+		Data:         createVersionData(b.profileVersion),
 	}
 }
 
@@ -150,27 +145,35 @@ func transformBaseType(s string) string {
 	return "basetype." + s
 }
 
-func toVersion(profileVersion string) uint16 {
+func createVersionData(profileVersion string) VersionData {
 	// On error, use panic so we can get stack trace, should not generate when version is invalid.
 	parts := strings.Split(profileVersion, ".")
 	if len(parts) < 2 {
 		panic(fmt.Errorf("malformed profile version, should in the form of <major>.<minor>, got: %s", profileVersion))
 	}
+	var (
+		majorPart = parts[0]
+		minorPart = parts[1]
+	)
 
-	major, err := strconv.ParseUint(parts[0], 10, 64)
+	major, err := strconv.ParseUint(majorPart, 10, 16)
 	if err != nil {
 		panic(fmt.Errorf("invalid major version: %w", err))
 	}
-	minor, err := strconv.ParseUint(parts[1], 10, 64)
+	minor, err := strconv.ParseUint(minorPart, 10, 16)
 	if err != nil {
 		panic(fmt.Errorf("invalid minor version: %w", err))
 	}
-
-	version := (major * 1000) + minor
-
-	if version >= math.MaxUint16 {
-		panic(fmt.Errorf("version should not exceed max uint16, expected < %d, got: %d", math.MaxUint16, version))
+	version, err := strconv.ParseUint(majorPart+minorPart, 10, 16)
+	if err != nil {
+		panic(fmt.Errorf("invalid version: %w", err))
 	}
 
-	return uint16(version)
+	return VersionData{
+		Package:        "profile",
+		ProfileVersion: profileVersion,
+		Major:          uint16(major),
+		Minor:          uint16(minor),
+		Version:        uint16(version),
+	}
 }

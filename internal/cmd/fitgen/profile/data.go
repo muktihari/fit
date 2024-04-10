@@ -23,5 +23,7 @@ type ProfileTypeBaseType struct {
 type VersionData struct {
 	ProfileVersion string
 	Package        string
+	Major          uint16
+	Minor          uint16
 	Version        uint16
 }

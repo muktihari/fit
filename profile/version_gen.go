@@ -6,9 +6,7 @@
 
 package profile
 
-const version = 21133
-
-// Version returns the current profile version, v21.133, in its uint16 form: (Major * 1000) + Minor = 21133.
-func Version() uint16 {
-	return version
-}
+// Version is the current profile version, v21.133, in uint16 representation.
+//
+//	-> "21" + "133" = "21133" -> 21133.
+const Version uint16 = 21133

@@ -475,7 +475,7 @@ func TestEncodeHeader(t *testing.T) {
 					0, 0, // crc checksum will be calculated
 				}
 
-				binary.LittleEndian.PutUint16(b[2:4], profile.Version())
+				binary.LittleEndian.PutUint16(b[2:4], profile.Version)
 
 				crc := crc16.New(crc16.MakeFitTable())
 				crc.Write(b[:12])

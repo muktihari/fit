@@ -201,7 +201,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		defaultFileHeader: proto.FileHeader{
 			Size:            proto.DefaultFileHeaderSize,
 			ProtocolVersion: byte(options.protocolVersion),
-			ProfileVersion:  profile.Version(),
+			ProfileVersion:  profile.Version,
 			DataSize:        0, // calculated during encoding
 			DataType:        proto.DataTypeFIT,
 			CRC:             0, // calculated during encoding
