@@ -57,6 +57,9 @@ jobs:
           go run main.go -f Profile.xlsx -p ../../../ -b all --profile-version ${{ steps.check-comment.outputs.profile_version }} --verbose -y
           cd $wd
           sed -E -i 's/profile\-v[0-9]+\.[0-9]+-lightblue.svg/\profile-v${{ steps.check-comment.outputs.profile_version }}-lightblue.svg/' README.md
+          cd cmd/fitconv
+          go generate
+          cd $wd
 
       - name: Commit and Push
         if: steps.check-comment.outputs.trigger == 'true'
