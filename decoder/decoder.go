@@ -505,10 +505,6 @@ func (d *Decoder) decodeHeader() error {
 
 func (d *Decoder) decodeMessages() error {
 	for d.cur < d.fileHeader.DataSize {
-		if d.n >= 41114 {
-			a := 10
-			_ = a
-		}
 		if err := d.decodeMessage(); err != nil {
 			return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
 		}
