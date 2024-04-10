@@ -126,7 +126,7 @@ loop:
 
 			mesg, err := c.createMesg(mesgNum, record)
 			if err != nil {
-				return err
+				return fmt.Errorf("could not create mesg: %w", err)
 			}
 
 			if mesg.Num == mesgnum.FieldDescription {
@@ -200,9 +200,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 			if err != nil {
 				return mesg, fmt.Errorf("could not create field: %w", err)
 			}
-			if field.FieldBase != nil {
-				mesg.Fields = append(mesg.Fields, field)
-			}
+			mesg.Fields = append(mesg.Fields, field)
 			continue
 		}
 
@@ -215,8 +213,8 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 			return mesg, nil
 		}
 
-		// If we could not find it in fieldNumLookup and it's not a valid developer field either,
-		// mark it as dynamic field.
+		// If the field cannot be found in fieldNumLookup and isn't a valid developer field,
+		// let's marked as a dynamic field and revert it later.
 		dynamicFieldRefs = append(dynamicFieldRefs, dynamicFieldRef{
 			index: len(mesg.Fields),
 			name:  fieldName,
@@ -225,7 +223,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 	}
 
 	for _, ref := range dynamicFieldRefs {
-		if err := c.reverseSubFieldSubtitution(&mesg, ref); err != nil {
+		if err := c.revertSubFieldSubtitution(&mesg, ref); err != nil {
 			return mesg, err
 		}
 	}
@@ -339,7 +337,7 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 	return
 }
 
-func (c *CSVToFITConv) reverseSubFieldSubtitution(mesgRef *proto.Message, ref dynamicFieldRef) (err error) {
+func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dynamicFieldRef) (err error) {
 	mesgLookup := factory.CreateMesg(mesgRef.Num)
 	for _, fieldRef := range mesgLookup.Fields {
 		for _, subField := range fieldRef.SubFields {

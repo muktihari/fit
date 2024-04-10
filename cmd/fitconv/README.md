@@ -1,13 +1,13 @@
 # Fitconv
 
-Fitconv converts the FIT file into a CSV file, allowing us to read the FIT file in a human-readable format. And vice-versa, it converts CSV file back to FIT file allowing us editing FIT file in its CSV form using only code editor.
+Fitconv converts FIT files to CSV format, enabling us to read the FIT data in a human-readable format. Conversely, it also converts CSV files back to FIT format, enabling us to create or edit FIT files in CSV form.
 
 This is designed to work seamlessly with CSVs produced by the Official FIT SDK's `FitCSVTool.jar`.
 
 Note:
 
-- Currently only `FIT to CSV` conversion and vice-versa (`CSV to FIT`) are supported, other format might be added later when necessary (or requested).
-- When converting `CSV to FIT`, unknown message and unknown fields are both skipped since we can't get the correct value's type since we don't have any context about it.
+- Currently, only conversions between FIT and CSV formats are supported. Other formats may be added in the future as needed or upon request.
+- When converting from CSV to FIT, any unknown messages and fields are omitted due to the inability to ascertain their correct value types without additional context.
 
 ## Usage Examples
 
