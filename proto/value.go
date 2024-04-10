@@ -517,7 +517,7 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		return v.Uint64() != basetype.Uint64Invalid
 	case TypeString:
 		s := v.String()
-		return s != basetype.StringInvalid && s != ""
+		return s != basetype.StringInvalid && s != "\x00"
 	case TypeSliceInt8:
 		vals := v.SliceInt8()
 		for i := range vals {
@@ -601,7 +601,7 @@ func (v Value) Valid(t basetype.BaseType) bool {
 	case TypeSliceString:
 		vals := v.SliceString()
 		for i := range vals {
-			if vals[i] == basetype.StringInvalid || vals[i] == "" {
+			if vals[i] == basetype.StringInvalid || vals[i] == "\x00" {
 				invalidCount++
 			}
 		}
