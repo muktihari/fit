@@ -13,9 +13,20 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"runtime"
 
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/typedef"
+)
+
+var (
+	// Regardless the current working directory where this script is executed,
+	// make generated files relative to this file.
+	_, path, _, _ = runtime.Caller(0)
+	dir           = filepath.Dir(path)
+	filename      = filepath.Join(dir, "lookup_gen.go")
 )
 
 func genLookup() {
@@ -32,9 +43,17 @@ func genLookup() {
 package fitcsv
 
 import (
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/typedef"
 )
+`)
 
+	buf.WriteString(fmt.Sprintf(`
+// Compile-time assertion, build will fail if profile.Version is updated 
+// but this code is not yet regenerated, ensuring we are generating safer code.
+func _() { _ = [1]struct{}{}[profile.Version-%d] }`, profile.Version))
+
+	buf.WriteString(`
 var mesgNumLookup = map[string]typedef.MesgNum{
 	`)
 	for _, mesgNum := range mesgNums {
@@ -62,7 +81,6 @@ var fieldNumLookup = [...]map[string]byte{
 	}
 	buf.WriteByte('}')
 
-	filename := "fitcsv/lookup_gen.go"
 	err := os.WriteFile(filename, buf.Bytes(), 0666)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "mesgnum_lookup: %s\n", err)

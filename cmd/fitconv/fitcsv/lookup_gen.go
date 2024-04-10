@@ -7,8 +7,13 @@
 package fitcsv
 
 import (
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/typedef"
 )
+
+// Compile-time assertion, build will fail if profile.Version is updated
+// but this code is not yet regenerated, ensuring we are generating safer code.
+func _() { _ = [1]struct{}{}[profile.Version-21133] }
 
 var mesgNumLookup = map[string]typedef.MesgNum{
 	"file_id":                        0,
