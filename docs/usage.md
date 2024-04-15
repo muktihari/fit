@@ -18,6 +18,8 @@ Table of Contents:
 
 ## Decoding
 
+NOTE: Decoder already implements efficient io.Reader buffering, so there's no need to wrap io.Reader (such as *os.File) using *bufio.Reader for optimal performance.
+
 ### Decode RAW Protocol Messages
 
 Decode as RAW Protocol Messages allows us to interact with FIT files through their original protocol message structures
@@ -27,7 +29,6 @@ without the needs to do conversions.
 package main
 
 import (
-    "bufio"
     "context"
     "fmt"
     "os"
@@ -43,7 +44,7 @@ func main() {
     }
     defer f.Close()
 
-    dec := decoder.New(bufio.NewReader(f))
+    dec := decoder.New(f)
 
     fit, err := dec.Decode()
     if err != nil {
@@ -68,7 +69,7 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
 ```go
     ...
 
-    dec := decoder.New(bufio.NewReader(f))
+    dec := decoder.New(f)
     for dec.Next() {
         fit, err := dec.Decode()
         if err != nil {
@@ -90,7 +91,6 @@ Decode to Common File Types enables us to interact with FIT files through common
 package main
 
 import (
-    "bufio"
     "fmt"
     "os"
 
@@ -105,7 +105,7 @@ func main() {
     }
     defer f.Close()
 
-    dec := decoder.New(bufio.NewReader(f))
+    dec := decoder.New(f)
 
     for dec.Next() {
         fit, err := dec.Decode()
@@ -150,7 +150,6 @@ func main() {
 package main
 
 import (
-    "bufio"
     "fmt"
     "os"
 
@@ -170,7 +169,7 @@ func main() {
     al := filedef.NewListener()
     defer al.Close() // release channel used by listener
 
-    dec := decoder.New(bufio.NewReader(f),
+    dec := decoder.New(f,
         decoder.WithMesgListener(al), // Add activity listener to the decoder
         decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
     )
@@ -228,7 +227,6 @@ We don't need to decode the entire FIT file to verify its type. Instead, we can 
 package main
 
 import (
-    "bufio"
     "fmt"
     "os"
 
@@ -247,7 +245,7 @@ func main() {
     al := filedef.NewListener()
     defer al.Close() // release channel used by listener
 
-    dec := decoder.New(bufio.NewReader(f),
+    dec := decoder.New(f,
         decoder.WithMesgListener(al),
         decoder.WithBroadcastOnly(),
     )
@@ -320,7 +318,6 @@ More about this: [https://developer.garmin.com/fit/cookbook/isfit-checkintegrity
 package main
 
 import (
-    "bufio"
     "io"
     "os"
 
@@ -334,7 +331,7 @@ func main() {
     }
     defer f.Close()
 
-    dec := decoder.New(bufio.NewReader(f))
+    dec := decoder.New(f)
 
     // Fyi, we can invoke PeekFileId() first to check the type of the first FIT File sequence before checking the integrity.
     // For most cases, we wouldn't want to check integrity of Activity File.
@@ -747,7 +744,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     al := filedef.NewListener()
     defer al.Close()
 
-    dec := decoder.New(bufio.NewReader(fin),
+    dec := decoder.New(fin),
         decoder.WithMesgListener(al),
         decoder.WithBroadcastOnly(),
     )
