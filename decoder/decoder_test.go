@@ -5,7 +5,6 @@
 package decoder
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/binary"
@@ -65,7 +64,7 @@ func TestDecodeRealFiles(t *testing.T) {
 			}
 			defer f.Close()
 
-			dec := New(bufio.NewReader(f))
+			dec := New(f)
 
 			_, err = dec.DecodeWithContext(context.Background())
 			if err != nil {
@@ -103,7 +102,7 @@ func TestDecodeRealFiles(t *testing.T) {
 			}
 			defer f.Close()
 
-			dec := New(bufio.NewReader(f))
+			dec := New(f)
 
 			_, err = dec.DecodeWithContext(context.Background())
 			if err != nil {
@@ -139,6 +138,7 @@ func TestOptions(t *testing.T) {
 			name: "defaultOptions",
 			options: &options{
 				factory:               factory.StandardFactory(),
+				readBufferSize:        defaultReadBufferSize,
 				shouldChecksum:        true,
 				broadcastOnly:         false,
 				shouldExpandComponent: true,
@@ -155,9 +155,11 @@ func TestOptions(t *testing.T) {
 				WithBroadcastOnly(),
 				WithNoComponentExpansion(),
 				WithLogWriter(os.Stderr),
+				WithReadBufferSize(8192),
 			},
 			options: &options{
 				factory:               decoderFactory,
+				readBufferSize:        8192,
 				shouldChecksum:        false,
 				mesgListeners:         []MesgListener{mesglis, mesglis},
 				mesgDefListeners:      []MesgDefListener{mesgDefLis, mesgDefLis},
@@ -294,11 +296,16 @@ func TestPeekFileId(t *testing.T) {
 			r: func() io.Reader {
 				buf, cur := slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					if cur >= len(buf) {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					m := len(buf)
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return n, nil
 				})
 			}(),
 			fileId: mesgdef.NewFileId(&fit.Messages[0]),
@@ -318,11 +325,16 @@ func TestPeekFileId(t *testing.T) {
 			r: func() io.Reader {
 				buf, cur := slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == 14 { // only decode header
+					m := 14
+					if cur >= m { // only decode header
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			fileId: mesgdef.NewFileId(&fit.Messages[0]),
@@ -330,8 +342,8 @@ func TestPeekFileId(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
 			fileId, err := dec.PeekFileId()
 			if !errors.Is(err, tc.err) {
@@ -396,14 +408,19 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "read message return error",
 			r: func() io.Reader {
-				bb := slices.Clone(b)
+				buf := slices.Clone(b)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == 14 {
+					m := 14
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, bb[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			n:   0,
@@ -412,14 +429,19 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "decode crc return error",
 			r: func() io.Reader {
-				bb := slices.Clone(b)
+				buf := slices.Clone(b)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(bb)-2 {
+					m := len(buf) - 2
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, bb[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			n:   0,
@@ -428,15 +450,20 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "crc checksum mismatch",
 			r: func() io.Reader {
-				bb := slices.Clone(b)
+				buf := slices.Clone(b)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(bb)-2 {
+					m := len(buf) - 2
+					if cur == m {
 						cur += copy(b, []byte{255, 255}) // crc intentionally altered
 						return len(b), nil
 					}
-					cur += copy(b, bb[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			n:   0,
@@ -598,11 +625,16 @@ func TestDiscard(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: nil,
@@ -619,11 +651,16 @@ func TestDiscard(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur > 14 {
+					m := 14
+					if cur >= m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: io.EOF,
@@ -633,11 +670,16 @@ func TestDiscard(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf)-2 {
+					m := len(buf) - 2
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: io.EOF,
@@ -726,11 +768,16 @@ func TestNext(t *testing.T) {
 		buf, cur := make([]byte, len(bbbuf)), 0
 		copy(buf, bbbuf)
 		return fnReader(func(b []byte) (n int, err error) {
-			if cur == len(buf) {
+			m := len(buf)
+			if cur == m {
 				return 0, io.EOF
 			}
-			cur += copy(b, buf[cur:cur+len(b)])
-			return len(b), nil
+			if cur+len(b) < m {
+				m = cur + len(b)
+			}
+			n = copy(b, buf[cur:m])
+			cur += n
+			return
 		})
 	}()
 
@@ -814,11 +861,16 @@ func makeDecodeTableTest() []decodeTestCase {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			fit: fit,
@@ -829,11 +881,16 @@ func makeDecodeTableTest() []decodeTestCase {
 				var buf, cur = slices.Clone(buf), 0
 				buf[0] = 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: ErrNotAFitFile,
@@ -843,11 +900,16 @@ func makeDecodeTableTest() []decodeTestCase {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == 14 {
+					m := 14
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			fit: fit,
@@ -858,11 +920,16 @@ func makeDecodeTableTest() []decodeTestCase {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf)-2 {
+					m := len(buf) - 2
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			fit: fit,
@@ -873,13 +940,17 @@ func makeDecodeTableTest() []decodeTestCase {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					ln := len(buf) - 2
-					if cur == ln {
+					m := len(buf) - 2
+					if cur == m {
 						copy(b, []byte{0, 0}) // zeroing crc
 						return 2, nil
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			fit: fit,
@@ -891,8 +962,8 @@ func makeDecodeTableTest() []decodeTestCase {
 func TestDecode(t *testing.T) {
 	tt := makeDecodeTableTest()
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
 			fit, err := dec.Decode()
 			if !errors.Is(err, tc.err) {
@@ -926,11 +997,16 @@ func TestDecodeHeader(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf), 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			header: fit.FileHeader,
@@ -941,11 +1017,16 @@ func TestDecodeHeader(t *testing.T) {
 				var buf, cur = slices.Clone(buf), 0
 				buf[0] = 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: ErrNotAFitFile,
@@ -956,11 +1037,16 @@ func TestDecodeHeader(t *testing.T) {
 				var buf, cur = slices.Clone(buf), 0
 				buf = buf[:1] // trimmed
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: io.EOF,
@@ -971,11 +1057,16 @@ func TestDecodeHeader(t *testing.T) {
 				var buf, cur = slices.Clone(buf), 0
 				buf[1] = 100 // invalid protocol
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: proto.ErrProtocolVersionNotSupported,
@@ -986,11 +1077,16 @@ func TestDecodeHeader(t *testing.T) {
 				var buf, cur = slices.Clone(buf), 0
 				copy(buf[5:9], []byte("F.IT"))
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: ErrNotAFitFile,
@@ -1002,11 +1098,16 @@ func TestDecodeHeader(t *testing.T) {
 				buf[12], buf[13] = 0, 0
 
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			header: func() proto.FileHeader {
@@ -1022,11 +1123,16 @@ func TestDecodeHeader(t *testing.T) {
 				buf[12], buf[13] = 0, 1
 
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: ErrCRCChecksumMismatch,
@@ -1066,11 +1172,16 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf[15:]), 0 // trim header
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			opts: []Option{
@@ -1089,11 +1200,16 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			r: func() io.Reader {
 				var buf, cur = slices.Clone(buf[15:]), 0 // trim header
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == 5 {
+					m := 5
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			err: io.EOF,
@@ -1104,11 +1220,16 @@ func TestDecodeMessageDefinition(t *testing.T) {
 				buf := []byte{0, 0, 0, 0, 1 /* n fields */, 0, 0, 0}
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			header: proto.MesgDefinitionMask | proto.DevDataMask,
@@ -1120,11 +1241,16 @@ func TestDecodeMessageDefinition(t *testing.T) {
 				buf := []byte{0, 0, 0, 0, 1 /* n fields */, 0, 0, 0, 1 /* dev fields */}
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf) {
+					m := len(buf)
+					if cur == m {
 						return 0, io.EOF
 					}
-					cur += copy(b, buf[cur:cur+len(b)])
-					return len(b), nil
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
 				})
 			}(),
 			header: proto.MesgDefinitionMask | proto.DevDataMask,
@@ -1166,8 +1292,7 @@ func TestDecodeMessageData(t *testing.T) {
 			r:      fnReaderOK,
 			header: 0,
 			mesgdef: &proto.MessageDefinition{
-				Header: proto.MesgDefinitionMask,
-				// LocalMesgNum: 0,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1184,8 +1309,7 @@ func TestDecodeMessageData(t *testing.T) {
 			opts:   []Option{WithNoComponentExpansion()},
 			header: 0,
 			mesgdef: &proto.MessageDefinition{
-				Header: proto.MesgDefinitionMask,
-				// LocalMesgNum: 0,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1201,8 +1325,7 @@ func TestDecodeMessageData(t *testing.T) {
 			r:      fnReaderOK,
 			header: proto.MesgCompressedHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header: proto.MesgDefinitionMask,
-				// LocalMesgNum: 0,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1232,8 +1355,7 @@ func TestDecodeMessageData(t *testing.T) {
 			r:      fnReaderErr,
 			header: proto.MesgCompressedHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header: proto.MesgDefinitionMask,
-				// LocalMesgNum: 0,
+				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1246,19 +1368,22 @@ func TestDecodeMessageData(t *testing.T) {
 			err: io.EOF,
 		},
 		{
-			name: "decode message data decode developer fields return error",
+			name: "decode message data decode n developer fields return error",
 			r: func() io.Reader {
-				fnIntances, cur := []io.Reader{fnReaderOK, fnReaderErr}, 0
+				buf := []byte{0, 96, 232, 251, 60} // header + 1023141984
+				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
-					f := fnIntances[cur]
-					cur++
-					return f.Read(b)
+					if cur == len(buf) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return n, nil
 				})
 			}(),
 			header: proto.MesgNormalHeaderMask,
 			mesgdef: &proto.MessageDefinition{
-				Header: proto.MesgDefinitionMask | proto.DevDataMask,
-				// LocalMesgNum: 0,
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
 				MesgNum: mesgnum.Record,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1283,8 +1408,8 @@ func TestDecodeMessageData(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			opts := append(tc.opts, WithMesgListener(fnMesgListener(func(mesg proto.Message) {})))
 			dec := New(tc.r, opts...)
 			if tc.mesgdef != nil {
@@ -1901,8 +2026,8 @@ func TestDecodeWithContext(t *testing.T) {
 	var ctx context.Context
 
 	// Testing logic same as Decode()
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
 			fit, err := dec.DecodeWithContext(ctx)
 			if !errors.Is(err, tc.err) {
@@ -1928,47 +2053,57 @@ func TestDecodeWithContext(t *testing.T) {
 		err  error
 	}
 
-	// Test context related logic
-	tt2 := []strct{
-		{
-			name: "context canceled before decode header",
-			ctx: func() context.Context {
+	t.Run("context", func(t *testing.T) {
+		// Test context related logic
+		tt2 := []strct{
+			{
+				name: "context canceled before decode header",
+				ctx: func() context.Context {
+					ctx, cancel := context.WithCancel(context.Background())
+					cancel()
+					return ctx
+				}(),
+				err: context.Canceled,
+			},
+			func() strct {
 				ctx, cancel := context.WithCancel(context.Background())
-				cancel()
-				return ctx
-			}(),
-			err: context.Canceled,
-		},
-		func() strct {
-			ctx, cancel := context.WithCancel(context.Background())
-			_, buffer := createFitForTest()
-			buf, cur := slices.Clone(buffer), 0
-			r := fnReader(func(b []byte) (n int, err error) {
-				cur += copy(b, buf[cur:cur+len(b)])
-				if cur == len(buf)-2 {
-					cancel() // cancel right after completing decode messages
+				_, buffer := createFitForTest()
+				buf, cur := slices.Clone(buffer), 0
+				r := fnReader(func(b []byte) (n int, err error) {
+					if cur == len(buf)-3 {
+						cancel() // cancel right after completing decode messages
+					}
+					m := len(buf) - 2
+					if cur+len(b)-2 < m {
+						m = cur + len(b) - 2
+					}
+					if cur == 0 {
+						m -= 1
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return n, nil
+				})
+
+				return strct{
+					name: "context canceled before decode crc",
+					r:    r,
+					ctx:  ctx,
+					err:  context.Canceled,
 				}
-				return len(b), nil
+			}(),
+		}
+
+		for i, tc := range tt2 {
+			t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+				dec := New(tc.r)
+				_, err := dec.DecodeWithContext(tc.ctx)
+				if !errors.Is(err, tc.err) {
+					t.Fatalf("expected err: %v, got: %v", tc.err, err)
+				}
 			})
-
-			return strct{
-				name: "context canceled before decode crc",
-				r:    r,
-				ctx:  ctx,
-				err:  context.Canceled,
-			}
-		}(),
-	}
-
-	for _, tc := range tt2 {
-		t.Run(tc.name, func(t *testing.T) {
-			dec := New(tc.r)
-			_, err := dec.DecodeWithContext(tc.ctx)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err: %v, got: %v", tc.err, err)
-			}
-		})
-	}
+		}
+	})
 }
 
 func TestDecodeMessagesWithContext(t *testing.T) {
@@ -2046,6 +2181,7 @@ func TestReset(t *testing.T) {
 			if diff := cmp.Diff(dec, tc.dec,
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
+				cmp.AllowUnexported(readBuffer{}),
 				cmp.FilterValues(func(x, y io.Reader) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y func() error) bool { return true }, cmp.Ignore()),
@@ -2156,7 +2292,10 @@ func BenchmarkDecodeWithFiledef(b *testing.B) {
 
 	al := filedef.NewListener()
 	buf := bytes.NewBuffer(all)
-	dec := New(buf, WithMesgListener(al), WithBroadcastOnly())
+	dec := New(buf,
+		WithMesgListener(al),
+		WithBroadcastOnly(),
+	)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
