@@ -40,14 +40,10 @@ var (
 
 // Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
-	r           io.Reader
+	readBuffer  *readBuffer // read from io.Reader with buffer without extra copying.
 	factory     Factory
 	accumulator *Accumulator
 	crc16       hash.Hash16
-
-	// The maximum n field definition in a mesg is 255 and we need 3 byte per field. 255 * 3 = 765.
-	// So we will never exceed 765.
-	bytesArray [255 * 3]byte
 
 	// The maximum n field in a mesg is 255, with this backing array, we don't have to worry about component expansions
 	// that require allocating additional fields triggering runtime.mallocgc.
@@ -94,6 +90,7 @@ type options struct {
 	logWriter             io.Writer
 	mesgListeners         []MesgListener
 	mesgDefListeners      []MesgDefListener
+	readBufferSize        int
 	shouldChecksum        bool
 	broadcastOnly         bool
 	shouldExpandComponent bool
@@ -103,6 +100,7 @@ func defaultOptions() *options {
 	return &options{
 		factory:               factory.StandardFactory(),
 		logWriter:             io.Discard,
+		readBufferSize:        defaultReadBufferSize,
 		shouldChecksum:        true,
 		broadcastOnly:         false,
 		shouldExpandComponent: true,
@@ -165,6 +163,11 @@ func WithLogWriter(w io.Writer) Option {
 	return fnApply(func(o *options) { o.logWriter = w })
 }
 
+// WithReadBufferSize directs the Decoder to use this buffer size for reading from io.Reader instead of default 4096.
+func WithReadBufferSize(size int) Option {
+	return fnApply(func(o *options) { o.readBufferSize = size })
+}
+
 // New returns a FIT File Decoder to decode given r.
 //
 // The FIT protocol allows for multiple FIT files to be chained together in a single FIT file.
@@ -176,9 +179,8 @@ func WithLogWriter(w io.Writer) Option {
 //	   fit, err := dec.Decode()
 //	}
 //
-// Note: We encourage wrapping r into a buffered reader such as bufio.NewReader(r),
-// decode process requires byte by byte reading and having frequent read on non-buffered reader might impact performance,
-// especially if it involves syscall such as reading a file.
+// Note: Decoder already implements efficient io.Reader buffering, so there's no need to wrap 'r' using *bufio.Reader
+// for optimal performance.
 func New(r io.Reader, opts ...Option) *Decoder {
 	options := defaultOptions()
 	for i := range opts {
@@ -186,7 +188,7 @@ func New(r io.Reader, opts ...Option) *Decoder {
 	}
 
 	d := &Decoder{
-		r:                       r,
+		readBuffer:              newReadBuffer(r, options.readBufferSize),
 		options:                 options,
 		factory:                 options.factory,
 		accumulator:             NewAccumulator(),
@@ -295,13 +297,12 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 
 // discardMessages efficiently discards bytes used by messages.
 func (d *Decoder) discardMessages() (err error) {
-	const arraySize = uint32(len(d.bytesArray))
 	for d.cur < d.fileHeader.DataSize {
-		size := d.fileHeader.DataSize - d.cur
-		if size > arraySize {
-			size = arraySize
+		size := int(d.fileHeader.DataSize - d.cur)
+		if size > reservedbuf {
+			size = reservedbuf
 		}
-		if err = d.read(d.bytesArray[:size]); err != nil { // Discard bytes
+		if _, err = d.readN(size); err != nil { // Discard bytes
 			return err
 		}
 	}
@@ -344,7 +345,7 @@ func (d *Decoder) Discard() error {
 	if d.err = d.discardMessages(); d.err != nil {
 		return d.err
 	}
-	if d.err = d.read(d.bytesArray[:2]); d.err != nil { // Discard File CRC
+	if _, d.err = d.readN(2); d.err != nil { // Discard File CRC
 		return d.err
 	}
 	d.sequenceCompleted = true
@@ -396,12 +397,13 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.reset()
 	d.n = 0 // Must reset bytes counter since it's a full reset.
 	d.err = nil
-	d.r = r
 
 	d.options = defaultOptions()
 	for i := range opts {
 		opts[i].apply(d.options)
 	}
+
+	d.readBuffer.Reset(r, d.options.readBufferSize)
 
 	d.factory = d.options.factory
 	d.mesgListeners = d.options.mesgListeners
@@ -445,24 +447,23 @@ func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 }
 
 func (d *Decoder) decodeHeader() error {
-	b := d.bytesArray[:1]
-	n, err := io.ReadFull(d.r, b)
-	d.n += int64(n)
+	b, err := d.readBuffer.ReadN(1)
 	if err != nil {
 		return err
 	}
+	d.n += 1
 
 	if b[0] != 12 && b[0] != 14 { // current spec is either 12 or 14
 		return fmt.Errorf("header size [%d] is invalid: %w", b[0], ErrNotAFitFile)
 	}
+	_, _ = d.crc16.Write(b)
 
 	size := b[0]
-	b = d.bytesArray[1:size]
-	n, err = io.ReadFull(d.r, b)
-	d.n += int64(n)
+	b, err = d.readBuffer.ReadN(int(size - 1))
 	if err != nil {
 		return err
 	}
+	d.n += int64(size)
 
 	d.fileHeader = proto.FileHeader{
 		Size:            size,
@@ -493,7 +494,7 @@ func (d *Decoder) decodeHeader() error {
 		return nil
 	}
 
-	_, _ = d.crc16.Write(d.bytesArray[:12])
+	_, _ = d.crc16.Write(b[:len(b)-2])
 	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
 		return fmt.Errorf("expected header's crc: %d, got: %d: %w", d.fileHeader.CRC, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
@@ -513,10 +514,11 @@ func (d *Decoder) decodeMessages() error {
 }
 
 func (d *Decoder) decodeMessage() error {
-	header, err := d.readByte()
+	b, err := d.readN(1)
 	if err != nil {
 		return err
 	}
+	header := b[0]
 
 	if (header & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
 		return d.decodeMessageDefinition(header)
@@ -526,8 +528,8 @@ func (d *Decoder) decodeMessage() error {
 }
 
 func (d *Decoder) decodeMessageDefinition(header byte) error {
-	b := d.bytesArray[:5]
-	if err := d.read(b); err != nil {
+	b, err := d.readN(5)
+	if err != nil {
 		return err
 	}
 
@@ -543,14 +545,14 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	mesgDef.Architecture = b[1]
 	mesgDef.MesgNum = typedef.MesgNum(byteorder.Select(b[1]).Uint16(b[2:4]))
 
-	n := b[4]
-	b = d.bytesArray[:uint16(n)*3] // 3 byte per field
-	if err := d.read(b); err != nil {
+	n := int(b[4])
+	b, err = d.readN(n * 3) // 3 byte per field
+	if err != nil {
 		return err
 	}
 
 	mesgDef.FieldDefinitions = mesgDef.FieldDefinitions[:0]
-	if byte(cap(mesgDef.FieldDefinitions)) < n { // PERF: Only alloc when necessary
+	if cap(mesgDef.FieldDefinitions) < n { // PERF: Only alloc when necessary
 		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
 	}
 
@@ -564,17 +566,18 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 
 	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
 	if (header & proto.DevDataMask) == proto.DevDataMask {
-		n, err := d.readByte()
+		b, err = d.readN(1)
 		if err != nil {
 			return err
 		}
 
-		b := d.bytesArray[:uint16(n)*3] // 3 byte per field
-		if err := d.read(b); err != nil {
+		n := int(b[0])
+		b, err = d.readN(n * 3) // 3 byte per field
+		if err != nil {
 			return err
 		}
 
-		if byte(cap(mesgDef.DeveloperFieldDefinitions)) < n { // PERF: Only alloc when necessary
+		if cap(mesgDef.DeveloperFieldDefinitions) < n { // PERF: Only alloc when necessary
 			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
 		}
 
@@ -822,7 +825,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 					"Just read acquired bytes and move forward. [byte pos: %d]\n",
 				mesg.Num, d.n,
 			)
-			if err := d.read(d.bytesArray[:devFieldDef.Size]); err != nil {
+			if _, err := d.readN(int(devFieldDef.Size)); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
 			continue
@@ -868,40 +871,31 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 }
 
 func (d *Decoder) decodeCRC() error {
-	b := d.bytesArray[:2]
-	n, err := io.ReadFull(d.r, b)
-	d.n += int64(n)
+	b, err := d.readBuffer.ReadN(2)
 	if err != nil {
 		return err
 	}
+	d.n += 2
 	d.crc = binary.LittleEndian.Uint16(b)
 	return nil
 }
 
-// read is used for reading messages from reader as this will mark the position and also calculate the crc as we read.
-func (d *Decoder) read(b []byte) error {
-	n, err := io.ReadFull(d.r, b)
-	d.n, d.cur = d.n+int64(n), d.cur+uint32(n)
+func (d *Decoder) readN(n int) ([]byte, error) {
+	b, err := d.readBuffer.ReadN(n)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	d.n, d.cur = d.n+int64(n), d.cur+uint32(n)
 	if d.options.shouldChecksum {
 		_, _ = d.crc16.Write(b)
 	}
-	return nil
-}
-
-// readByte is shorthand for read([1]byte).
-func (d *Decoder) readByte() (byte, error) {
-	b := d.bytesArray[:1]
-	err := d.read(b)
-	return b[0], err
+	return b, nil
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type.
 func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (val proto.Value, err error) {
-	b := d.bytesArray[:size]
-	if err := d.read(b); err != nil {
+	b, err := d.readN(int(size))
+	if err != nil {
 		return val, err
 	}
 	return proto.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
