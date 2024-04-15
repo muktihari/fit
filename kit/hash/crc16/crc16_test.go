@@ -14,7 +14,7 @@ func TestCRC16(t *testing.T) {
 	b := []byte{14, 32, 84, 8, 214, 204, 9, 0, 46, 70, 73, 84} // example from some fit header.
 	crc := uint16(12856)                                       // should match this checksum.
 
-	c16 := crc16.New(crc16.MakeFitTable())
+	c16 := crc16.New(nil)
 
 	if c16.BlockSize() != 1 {
 		t.Fatalf("blocksize mismatch")
@@ -41,5 +41,16 @@ func TestCRC16(t *testing.T) {
 
 	if c16.Sum16() != 0 {
 		t.Fatalf("expected 0 after reset, got: %v", c16.Sum16())
+	}
+}
+
+func BenchmarkWrite(b *testing.B) {
+	b.StopTimer()
+	buf := make([]byte, 4096)
+	h := crc16.New(nil)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.Write(buf)
 	}
 }

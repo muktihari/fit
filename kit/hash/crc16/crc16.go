@@ -15,18 +15,24 @@ const (
 	Size = 2 // An uint16 requires 2 bytes to be represented in its binary form.
 )
 
-var fitTable = &Table{
+var fitTable = Table{
 	0x0000, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
 	0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400,
 }
 
-// MakeFitTable is the table defined in [https://developer.garmin.com/fit/protocol]
-func MakeFitTable() *Table { return fitTable }
+// MakeFITTable makes new table as defined in [https://developer.garmin.com/fit/protocol]
+func MakeFITTable() *Table {
+	t := fitTable
+	return &t
+}
 
 // New creates a new hash.Hash16 computing the CRC-16 checksum using the polynomial represented by the Table.
-// The computing algorithm is using FIT algorithm defined in [https://developer.garmin.com/fit/protocol].
-// Its Sum method will lay the value out in big-endian byte order.
+// If table is nil, default FIT table will be used. The computing algorithm is using FIT algorithm defined in
+// [https://developer.garmin.com/fit/protocol]. Its Sum method will lay the value out in big-endian byte order.
 func New(table *Table) hash.Hash16 {
+	if table == nil {
+		table = &fitTable
+	}
 	return &crc16{table: table}
 }
 
@@ -36,9 +42,11 @@ type crc16 struct {
 }
 
 func (c *crc16) Write(p []byte) (n int, err error) {
+	crc := c.crc // PERF: Reduce pointer dereference every time 'c.crc' is computed.
 	for _, b := range p {
-		c.crc = c.compute(c.crc, b)
+		crc = c.compute(crc, b)
 	}
+	c.crc = crc
 	return len(p), nil
 }
 

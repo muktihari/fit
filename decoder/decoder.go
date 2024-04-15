@@ -190,7 +190,7 @@ func New(r io.Reader, opts ...Option) *Decoder {
 		options:                 options,
 		factory:                 options.factory,
 		accumulator:             NewAccumulator(),
-		crc16:                   crc16.New(crc16.MakeFitTable()),
+		crc16:                   crc16.New(nil),
 		localMessageDefinitions: [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{},
 		mesgListeners:           options.mesgListeners,
 		mesgDefListeners:        options.mesgDefListeners,
