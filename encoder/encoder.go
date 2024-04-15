@@ -191,7 +191,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		lruCapacity = options.multipleLocalMessageType + 1
 	}
 
-	crc16 := crc16.New(crc16.MakeFitTable())
+	crc16 := crc16.New(nil)
 	e := &Encoder{
 		w:                 w,
 		options:           options,
