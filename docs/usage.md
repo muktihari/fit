@@ -390,9 +390,11 @@ func main() {
     Example:
 
     ```go
-    al := filedef.NewListener()
+    lis := filedef.NewListener()
+    defer lis.Close()
+
     dec := decoder.New(f,
-        decoder.WithMesgListener(al),
+        decoder.WithMesgListener(lis),
     )
     ```
 
@@ -401,7 +403,7 @@ func main() {
     Example:
 
     ```go
-    conv := fitcsv.NewConverter(bw)
+    conv := fitcsv.NewFITToCSVConv(bw)
     defer conv.Wait()
 
     dec := decoder.New(f,
@@ -415,11 +417,25 @@ func main() {
     Example:
 
     ```go
-    al := filedef.NewListener()
+    lis := filedef.NewListener()
+    defer lis.Close()
+
     dec := decoder.New(f,
-        decoder.WithMesgListener(al),
+        decoder.WithMesgListener(lis),
         decoder.WithBroadcastOnly(),
     )
+    ```
+
+1.  **WithBroadcastMesgCopy**: directs the Decoder to copy the mesg before passing it to listeners. It was the default behavior on <= v0.14.0.
+
+    ```go
+    lis := NewLegacyNonBlockingListener() /* any legacy non-blocking listener created on version <= v0.14.0) */
+    dec := decoder.New(f,
+        decoder.WithMesgListener(lis),
+        decoder.WithBroadcastOnly(),
+        decoder.WithBroadcastMesgCopy(),
+    )
+
     ```
 
 1.  **WithIgnoreChecksum**: directs the decoder to ignore the checksum, which is useful when we want to retrieve the data without considering its integrity.
@@ -438,10 +454,11 @@ func main() {
     dec := decoder.New(f, decoder.WithNoComponentExpansion())
     ```
 
-1.  **WithLogWriter**: specifies where the log messages will be written to. By default, the Decoder writes log message to io.Discard.
-    The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
+1.  **WithLogWriter**: specifies where the log messages will be written to. By default, the Decoder do not write any log if log writer is not specified. The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
 
-    - Field Definition's Size is less than its basetype's size. e.g. Size 1 byte but having basetype uint32 (4 bytes).
+    - Field Definition's Size (or Developer Field Definition's Size) is zero.
+    - Field Definition's Size (or Developer Field Definition's Size) is less than its basetype's size.
+      e.g. Size 1 byte but having basetype uint32 (4 bytes).
     - Encounter a Developer Field without prior Field Description Message.
 
     ```go
