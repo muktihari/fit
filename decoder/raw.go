@@ -224,6 +224,8 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 		}
 
 		seq++
+
+		d.reset() // reset for next FIT sequence.
 	}
 }
 
