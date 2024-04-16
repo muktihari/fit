@@ -59,7 +59,7 @@ func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 }
 
 func newMonitoringBMessageForTest(now time.Time) []proto.Message {
-	mesgsB := slices.Clone(newMonitoringAMessageForTest(time.Now()))
+	mesgsB := slices.Clone(newMonitoringAMessageForTest(now))
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
 	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 	return mesgsB

@@ -45,9 +45,8 @@ type Decoder struct {
 	accumulator *Accumulator
 	crc16       hash.Hash16
 
-	// The maximum n field in a mesg is 255, with this backing array, we don't have to worry about component expansions
-	// that require allocating additional fields triggering runtime.mallocgc.
-	fieldsArray [256]proto.Field
+	fieldsArray           [256]proto.Field
+	developersFieldsArray [256]proto.DeveloperField
 
 	options *options
 
@@ -94,6 +93,7 @@ type options struct {
 	shouldChecksum        bool
 	broadcastOnly         bool
 	shouldExpandComponent bool
+	broadcastMesgCopy     bool
 }
 
 func defaultOptions() *options {
@@ -104,6 +104,7 @@ func defaultOptions() *options {
 		shouldChecksum:        true,
 		broadcastOnly:         false,
 		shouldExpandComponent: true,
+		broadcastMesgCopy:     false,
 	}
 }
 
@@ -145,6 +146,12 @@ func WithBroadcastOnly() Option {
 	return fnApply(func(o *options) { o.broadcastOnly = true })
 }
 
+// WithBroadcastMesgCopy directs the Decoder to copy the mesg before passing it to listeners
+// (it was the default behavior on version <= v0.14.0).
+func WithBroadcastMesgCopy() Option {
+	return fnApply(func(o *options) { o.broadcastMesgCopy = true })
+}
+
 // WithIgnoreChecksum directs the Decoder to not checking data integrity (CRC Checksum).
 func WithIgnoreChecksum() Option {
 	return fnApply(func(o *options) { o.shouldChecksum = false })
@@ -157,7 +164,9 @@ func WithNoComponentExpansion() Option {
 
 // WithLogWriter specifies where the log messages will be written to. By default, the Decoder writes log message to io.Discard.
 // The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
-//   - Field Definition's Size is less than basetype's size. e.g. Size 1 bytes but having basetype uint32 (4 bytes).
+//   - Field Definition's Size (or Developer Field Definition's Size) is zero.
+//   - Field Definition's Size (or Developer Field Definition's Size) is less than basetype's size.
+//     e.g. Size 1 bytes but having basetype uint32 (4 bytes).
 //   - Encountering a Developer Field without prior Field Description Message.
 func WithLogWriter(w io.Writer) Option {
 	return fnApply(func(o *options) { o.logWriter = w })
@@ -630,9 +639,6 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		return err
 	}
 
-	mesg.Fields = make([]proto.Field, len(mesg.Fields))
-	copy(mesg.Fields, d.fieldsArray[:])
-
 	// FileId Message
 	if d.fileId == nil && mesg.Num == mesgnum.FileId {
 		d.fileId = mesgdef.NewFileId(&mesg)
@@ -649,8 +655,19 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	}
 
 	if len(mesgDef.DeveloperFieldDefinitions) != 0 {
+		mesg.DeveloperFields = d.developersFieldsArray[:0]
 		if err := d.decodeDeveloperFields(mesgDef, &mesg); err != nil {
 			return err
+		}
+	}
+
+	if !d.options.broadcastOnly || d.options.broadcastMesgCopy {
+		mesg.Fields = make([]proto.Field, len(mesg.Fields))
+		copy(mesg.Fields, d.fieldsArray[:len(mesg.Fields)])
+
+		if mesg.DeveloperFields != nil {
+			mesg.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
+			copy(mesg.DeveloperFields, d.developersFieldsArray[:len(mesg.DeveloperFields)])
 		}
 	}
 
@@ -798,7 +815,6 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 }
 
 func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *proto.Message) error {
-	mesg.DeveloperFields = make([]proto.DeveloperField, 0, len(mesgDef.DeveloperFieldDefinitions))
 	for i := range mesgDef.DeveloperFieldDefinitions {
 		devFieldDef := &mesgDef.DeveloperFieldDefinitions[i]
 

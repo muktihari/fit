@@ -11,6 +11,20 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+// Listener is Message Listener.
+type Listener struct {
+	options *options
+	file    File
+	poolc   chan proto.Message // pool of reusable objects to minimalize slice allocations. do not close this channel.
+	mesgc   chan proto.Message // queue messages to be processed concurrently.
+	done    chan struct{}
+	active  bool
+}
+
+// FileSets is a set of file type mapped to a function to create that File.
+// This alias is created for documentation purpose.
+type FileSets = map[typedef.File]func() File
+
 type options struct {
 	channelBuffer uint
 	fileSets      FileSets
@@ -53,13 +67,8 @@ func (f fnApply) apply(o *options) { f(o) }
 
 // WithChannelBuffer sets the size of buffered channel, default is 1000.
 func WithChannelBuffer(size uint) Option {
-	return fnApply(func(o *options) {
-		o.channelBuffer = size
-	})
+	return fnApply(func(o *options) { o.channelBuffer = size })
 }
-
-// FileSets is a set of file type mapped to a function to create that File.
-type FileSets = map[typedef.File]func() File
 
 // WithFileSets sets what kind of file listener should listen to, when we encounter a file type that is not listed in fileset,
 // that file type will be skipped. This will replace the default filesets registered in listener, if you intend to append your own
@@ -72,14 +81,6 @@ func WithFileSets(fileSets FileSets) Option {
 	})
 }
 
-// Listener is Message Listener.
-type Listener struct {
-	options    *options
-	activeFile File
-	mesgc      chan proto.Message
-	done       chan struct{}
-}
-
 // NewListener creates mesg listener.
 func NewListener(opts ...Option) *Listener {
 	options := defaultOptions()
@@ -87,10 +88,12 @@ func NewListener(opts ...Option) *Listener {
 		opt.apply(options)
 	}
 
-	l := &Listener{
-		options: options,
-		mesgc:   make(chan proto.Message, options.channelBuffer),
-		done:    make(chan struct{}),
+	l := &Listener{options: options, active: true}
+	l.reset()
+
+	l.poolc = make(chan proto.Message, options.channelBuffer)
+	for i := 0; i < int(options.channelBuffer); i++ {
+		l.poolc <- proto.Message{} // fill pool with empty message and alloc its slices as needed.
 	}
 
 	go l.loop()
@@ -100,28 +103,66 @@ func NewListener(opts ...Option) *Listener {
 
 func (l *Listener) loop() {
 	for mesg := range l.mesgc {
-		if mesg.Num == mesgnum.FileId {
-			fileType := typedef.File(mesg.FieldValueByNum(fieldnum.FileIdType).Uint8())
-			newFile, ok := l.options.fileSets[fileType]
-			if !ok {
-				continue
-			}
-			l.activeFile = newFile()
-		}
-		if l.activeFile == nil {
-			continue // No file is created since not defined in fileSets. Skip.
-		}
-		l.activeFile.Add(mesg)
+		l.processMesg(mesg)
+		l.poolc <- mesg // put the message back to the pool to be recycled.
 	}
 	close(l.done)
 }
 
-func (l *Listener) OnMesg(mesg proto.Message) { l.mesgc <- mesg }
+func (l *Listener) processMesg(mesg proto.Message) {
+	if mesg.Num == mesgnum.FileId {
+		fileType := typedef.File(mesg.FieldValueByNum(fieldnum.FileIdType).Uint8())
+		fnNew, ok := l.options.fileSets[fileType]
+		if !ok {
+			return
+		}
+		l.file = fnNew()
+	}
+	if l.file == nil {
+		return // No file is created since not defined in fileSets. Skip.
+	}
+	l.file.Add(mesg)
+}
+
+func (l *Listener) OnMesg(mesg proto.Message) {
+	if !l.active {
+		l.reset()
+		go l.loop()
+		l.active = true
+	}
+	l.mesgc <- l.prep(mesg)
+}
+
+func (l *Listener) prep(mesg proto.Message) proto.Message {
+	m := <-l.poolc
+
+	if cap(m.Fields) < len(mesg.Fields) {
+		m.Fields = make([]proto.Field, len(mesg.Fields))
+	}
+	copy(m.Fields, mesg.Fields)
+	mesg.Fields = m.Fields[:len(mesg.Fields)]
+
+	if mesg.DeveloperFields == nil {
+		return mesg
+	}
+
+	if cap(m.DeveloperFields) < len(mesg.DeveloperFields) {
+		m.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
+	}
+	copy(m.DeveloperFields, mesg.DeveloperFields)
+	mesg.DeveloperFields = m.DeveloperFields[:len(mesg.DeveloperFields)]
+
+	return mesg
+}
 
 // Close closes channel and wait until all messages is consumed.
 func (l *Listener) Close() {
+	if !l.active {
+		return
+	}
 	close(l.mesgc)
 	<-l.done
+	l.active = false
 }
 
 // File returns the resulting file after the a single decode process is completed. If we the current decoded result is not listed
@@ -129,17 +170,11 @@ func (l *Listener) Close() {
 // and the listener is ready to be used for next chained FIT file.
 func (l *Listener) File() File {
 	l.Close()
-
-	file := l.activeFile
-	l.reset()
-
-	go l.loop()
-
-	return file
+	return l.file
 }
 
 func (l *Listener) reset() {
-	l.activeFile = nil
+	l.file = nil
 	l.mesgc = make(chan proto.Message, l.options.channelBuffer)
 	l.done = make(chan struct{})
 }
