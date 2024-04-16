@@ -157,6 +157,7 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 		decoder.WithMesgDefListener(conv),
 		decoder.WithMesgListener(conv),
 		decoder.WithBroadcastOnly(),
+		decoder.WithBroadcastMesgCopy(),
 	}
 	if noExpandComponents {
 		options = append(options, decoder.WithNoComponentExpansion())

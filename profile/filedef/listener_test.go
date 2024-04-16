@@ -10,8 +10,13 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/filedef"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -30,13 +35,15 @@ func createFloat64Comparer() cmp.Option {
 }
 
 func TestListenerForSingleFitFile(t *testing.T) {
-	now := time.Now()
-	tt := []struct {
+	type table struct {
 		name    string
 		options []filedef.Option
 		mesgs   []proto.Message
 		result  filedef.File
-	}{
+	}
+
+	now := time.Now()
+	tt := []table{
 		{
 			name:   "default listener for device",
 			mesgs:  newDeviceMessageForTest(now),
@@ -128,6 +135,32 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			mesgs:  newWorkoutMessageForTest(now),
 			result: nil,
 		},
+		func() table {
+			mesgs := newActivityMessageForTest(now)
+			mesgs = append(mesgs,
+				factory.CreateMesgOnly(mesgnum.Record).
+					WithFields(
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+					).
+					WithDeveloperFields(
+						proto.DeveloperField{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "Heart Rate",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     fieldnum.RecordHeartRate,
+							BaseType:           basetype.Uint8,
+							Value:              proto.Uint8(100),
+						},
+					),
+			)
+			return table{
+				name:   "default listener for activity containing developer fields",
+				mesgs:  mesgs,
+				result: filedef.NewActivity(mesgs...),
+			}
+		}(),
 	}
 
 	for _, tc := range tt {
@@ -193,4 +226,16 @@ func TestListenerForChainedFitFile(t *testing.T) {
 	); diff != "" {
 		t.Fatal(diff)
 	}
+}
+
+func TestClose(t *testing.T) {
+	defer func() {
+		if err := recover(); err != nil {
+			t.Fatalf("expected not panic, got: %v", err)
+		}
+	}()
+
+	l := filedef.NewListener()
+	l.Close()
+	l.Close() // already closed, should not panic
 }

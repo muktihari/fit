@@ -138,11 +138,12 @@ func TestOptions(t *testing.T) {
 			name: "defaultOptions",
 			options: &options{
 				factory:               factory.StandardFactory(),
+				logWriter:             nil,
 				readBufferSize:        defaultReadBufferSize,
 				shouldChecksum:        true,
 				broadcastOnly:         false,
 				shouldExpandComponent: true,
-				logWriter:             nil,
+				broadcastMesgCopy:     false,
 			},
 		},
 		{
@@ -156,6 +157,7 @@ func TestOptions(t *testing.T) {
 				WithNoComponentExpansion(),
 				WithLogWriter(os.Stderr),
 				WithReadBufferSize(8192),
+				WithBroadcastMesgCopy(),
 			},
 			options: &options{
 				factory:               decoderFactory,
@@ -166,6 +168,7 @@ func TestOptions(t *testing.T) {
 				broadcastOnly:         true,
 				shouldExpandComponent: false,
 				logWriter:             os.Stderr,
+				broadcastMesgCopy:     true,
 			},
 		},
 	}
@@ -2410,10 +2413,12 @@ func BenchmarkDecodeWithFiledef(b *testing.B) {
 		panic(err)
 	}
 
-	al := filedef.NewListener()
+	lis := filedef.NewListener()
+	defer lis.Close()
+
 	buf := bytes.NewBuffer(all)
 	dec := New(buf,
-		WithMesgListener(al),
+		WithMesgListener(lis),
 		WithBroadcastOnly(),
 	)
 	b.StartTimer()
@@ -2425,7 +2430,7 @@ func BenchmarkDecodeWithFiledef(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
-		_ = al.File()
+		_ = lis.File()
 		dec.reset()
 	}
 }
