@@ -116,6 +116,31 @@ func TestReadBufferReadN(t *testing.T) {
 				return err
 			},
 		},
+		{
+			name: "when remaining is zero, cur and last should reset",
+			r: func() io.Reader {
+				buf := make([]byte, 4096)
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(buf) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return
+				})
+			}(),
+			testFn: func(buf *readBuffer) error {
+				_, _ = buf.ReadN(4096)
+				// try read when remaining is now zero to triger reset
+				_, _ = buf.ReadN(1)
+				if buf.cur != reservedbuf && buf.last != reservedbuf {
+					return fmt.Errorf("expected cur: %d, last: %d, got: cur: %d, last: %d",
+						reservedbuf, reservedbuf, buf.cur, buf.last)
+				}
+				return nil
+			},
+		},
 	}
 
 	for i, tc := range tt {

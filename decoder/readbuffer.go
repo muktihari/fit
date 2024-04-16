@@ -60,6 +60,7 @@ func (b *readBuffer) ReadN(n int) ([]byte, error) {
 	remaining := b.last - b.cur
 	if remaining == 0 {
 		b.cur = reservedbuf
+		b.last = reservedbuf
 	} else if n > remaining {
 		b.cur = reservedbuf - remaining               // cursor is now pointing at index on 'reserved section'
 		copy(b.buf[b.cur:], b.buf[b.last-remaining:]) // memmove remaining bytes to 'reserved section'.
