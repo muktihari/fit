@@ -5,7 +5,6 @@
 package encoder
 
 import (
-	"bytes"
 	"context"
 	"encoding/binary"
 	"errors"
@@ -61,12 +60,9 @@ type Encoder struct {
 	lastHeaderPos int64       // The byte position of the last header.
 	crc16         hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
 
-	// A wrapper that act as a multi writer for writing message definitions and messages to w and crc16 simultaneously.
-	// We don't use io.MultiWriter since we need to change w on every encode message.
-	wrapWriterAndCrc16 *wrapWriterAndCrc16
-
 	options           *options         // Encoder's options.
 	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
+	localMesgNumLRU   *lru             // LRU cache for writing local message definition
 
 	dataSize uint32 // Data size of messages in bytes for a single FIT file.
 
@@ -75,12 +71,8 @@ type Encoder struct {
 	// and will change every RolloverEvent occurrence.
 	timestampReference uint32
 
-	localMesgNumLRU *lru // LRU cache for writing local message definition
-
-	mesgDef *proto.MessageDefinition // Temporary message definition to reduce alloc.
-	buf     *bytes.Buffer            // Temporary bytes buffer to reduce alloc.
-
-	bytesArray [proto.MaxBytesPerMessageDefinition]byte // Underlying array for buf as well as general purpose array for encoding process.
+	mesgDef    *proto.MessageDefinition       // Temporary message definition to reduce alloc.
+	bytesArray [proto.MaxBytesPerMessage]byte // General purpose array for encoding process.
 
 	defaultFileHeader proto.FileHeader // Default header to encode when not specified.
 }
@@ -206,10 +198,8 @@ func New(w io.Writer, opts ...Option) *Encoder {
 			DataType:        proto.DataTypeFIT,
 			CRC:             0, // calculated during encoding
 		},
-		mesgDef:            &proto.MessageDefinition{},
-		wrapWriterAndCrc16: &wrapWriterAndCrc16{writer: w, crc16: crc16},
+		mesgDef: &proto.MessageDefinition{},
 	}
-	e.buf = bytes.NewBuffer(e.bytesArray[:])
 
 	return e
 }
@@ -285,9 +275,7 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 
 	header.DataSize = e.dataSize
 
-	e.buf.Reset()
-	_, _ = header.WriteTo(e.buf)
-	b := e.buf.Bytes()
+	b, _ := header.MarshalAppend(e.bytesArray[:0])
 
 	if header.Size >= 14 {
 		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since header is changed.
@@ -346,9 +334,7 @@ func (e *Encoder) encodeHeader(header *proto.FileHeader) error {
 	}
 	header.ProtocolVersion = byte(e.options.protocolVersion)
 
-	e.buf.Reset()
-	_, _ = header.WriteTo(e.buf)
-	b := e.buf.Bytes()
+	b, _ := header.MarshalAppend(e.bytesArray[:0])
 
 	if header.Size < 14 {
 		n, err := e.w.Write(b[:header.Size])
@@ -406,30 +392,31 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 		return err
 	}
 
-	e.buf.Reset()
-	_, _ = e.mesgDef.WriteTo(e.buf)
-	mesgDefBytes := e.buf.Bytes()
-	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(mesgDefBytes)            // This might alloc memory since we need to copy the item.
-	mesgDefBytes[0] = (mesgDefBytes[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
+	b, _ := e.mesgDef.MarshalAppend(e.bytesArray[:0])
+	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
+	b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
 	mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
 
-	e.wrapWriterAndCrc16.writer = w // Change writer
-
 	if isNewMesgDef {
-		n, err := e.wrapWriterAndCrc16.Write(mesgDefBytes)
-		e.dataSize += uint32(n)
-		e.n += int64(n)
+		n, err := w.Write(b)
+		e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 		if err != nil {
 			return fmt.Errorf("write message definition failed: %w", err)
 		}
+		_, _ = e.crc16.Write(b)
 	}
 
-	n, err := mesg.WriteTo(e.wrapWriterAndCrc16)
-	e.dataSize += uint32(n)
-	e.n += int64(n)
+	b, err := mesg.MarshalAppend(e.bytesArray[:0])
+	if err != nil {
+		return fmt.Errorf("marshal mesg failed: %w", err)
+	}
+
+	n, err := w.Write(b)
+	e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 	if err != nil {
 		return fmt.Errorf("write message failed: %w", err)
 	}
+	_, _ = e.crc16.Write(b)
 
 	return nil
 }
@@ -462,20 +449,6 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
 	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
-}
-
-type wrapWriterAndCrc16 struct {
-	writer io.Writer
-	crc16  hash.Hash16
-}
-
-func (w *wrapWriterAndCrc16) Write(p []byte) (n int, err error) {
-	n, err = w.writer.Write(p)
-	if err != nil {
-		return
-	}
-	_, _ = w.crc16.Write(p)
-	return
 }
 
 func (e *Encoder) encodeCRC() error {
@@ -523,7 +496,6 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 
 	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 	e.defaultFileHeader.ProtocolVersion = byte(e.options.protocolVersion)
-	e.wrapWriterAndCrc16.writer = w
 }
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.

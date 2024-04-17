@@ -5,7 +5,6 @@
 package proto_test
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"testing"
@@ -80,46 +79,48 @@ func TestUnmarshal(t *testing.T) {
 	}
 
 	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %T(%v)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
-			b, err := proto.Marshal(tc.value, binary.LittleEndian)
-			if err != nil {
-				t.Fatalf("marshal failed: %v", err)
-			}
-
-			v, err := proto.Unmarshal(b, binary.LittleEndian, tc.ref, tc.isArray)
-			if err != nil {
-				if !errors.Is(err, tc.err) {
-					t.Fatalf("expected err: %v, got: %v", tc.err, err)
+		for arch := byte(0); arch <= 1; arch++ {
+			t.Run(fmt.Sprintf("[%d] %T(%v)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
+				b, err := tc.value.MarshalAppend(nil, arch)
+				if err != nil {
+					t.Fatalf("marshal failed: %v", err)
 				}
-				return
-			}
 
-			if tc.expected.Type() == proto.TypeInvalid {
-				tc.expected = tc.value
-			}
-			if diff := cmp.Diff(v, tc.expected,
-				cmp.Transformer("Value", func(val proto.Value) any {
-					return val.Any()
-				}),
-			); diff != "" {
-				t.Fatal(diff)
-			}
-
-			// Extra check for bytes, the value should be copied
-			if in := tc.value.SliceUint8(); in != nil {
-				out := v.SliceUint8()
-				if out == nil {
+				v, err := proto.UnmarshalValue(b, arch, tc.ref, tc.isArray)
+				if err != nil {
+					if !errors.Is(err, tc.err) {
+						t.Fatalf("expected err: %v, got: %v", tc.err, err)
+					}
 					return
 				}
 
-				in[0] = 255
-				out[0] = 100
-
-				if in[0] == out[0] {
-					t.Fatalf("slice of bytes should not be referenced")
+				if tc.expected.Type() == proto.TypeInvalid {
+					tc.expected = tc.value
 				}
-			}
-		})
+				if diff := cmp.Diff(v, tc.expected,
+					cmp.Transformer("Value", func(val proto.Value) any {
+						return val.Any()
+					}),
+				); diff != "" {
+					t.Fatal(diff)
+				}
+
+				// Extra check for bytes, the value should be copied
+				if in := tc.value.SliceUint8(); in != nil {
+					out := v.SliceUint8()
+					if out == nil {
+						return
+					}
+
+					in[0] = 255
+					out[0] = 100
+
+					if in[0] == out[0] {
+						t.Fatalf("slice of bytes should not be referenced")
+					}
+				}
+			})
+		}
 	}
 }
 
@@ -129,4 +130,15 @@ func stringsToBytes(vals ...string) []byte {
 		b = append(b, vals[i]...)
 	}
 	return b
+}
+
+func BenchmarkUnmarshalValue(b *testing.B) {
+	b.StopTimer()
+	v := proto.Uint32(100)
+	buf, _ := v.MarshalAppend(nil, 0)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = proto.UnmarshalValue(buf, 0, basetype.Uint32, false)
+	}
 }

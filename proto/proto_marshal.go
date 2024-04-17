@@ -5,15 +5,13 @@
 package proto
 
 import (
-	"bytes"
 	"encoding"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"sync"
-
-	"github.com/muktihari/fit/kit/byteorder"
 )
+
+const littleEndian = 0
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
@@ -23,93 +21,61 @@ const MaxBytesPerMessage = 1 + (255*255)*2
 // Header + Reserved + Architecture + MesgNum (2 bytes) + n Fields + (Max n Fields * 3) + n DevFields + (Max n DevFields * 3).
 const MaxBytesPerMessageDefinition = 5 + 1 + (255 * 3) + 1 + (255 * 3)
 
-var arrayPool = sync.Pool{
-	New: func() any {
-		b := [MaxBytesPerMessage]byte{}
-		return &b
-	},
-}
-
-var bufPool = sync.Pool{
-	New: func() any {
-		return bytes.NewBuffer(make([]byte, MaxBytesPerMessage))
-	},
-}
+var pool = sync.Pool{New: func() any { return new([MaxBytesPerMessage]byte) }}
 
 var (
-	// Zero alloc marshaler for efficient marshaling.
-	_ io.WriterTo = &FileHeader{}
-	_ io.WriterTo = &Message{}
-	_ io.WriterTo = &MessageDefinition{}
-
 	_ encoding.BinaryMarshaler = &FileHeader{}
 	_ encoding.BinaryMarshaler = &MessageDefinition{}
 	_ encoding.BinaryMarshaler = &Message{}
 )
 
-func (h *FileHeader) MarshalBinary() ([]byte, error) {
-	buf := bufPool.Get().(*bytes.Buffer)
-	defer bufPool.Put(buf)
-	buf.Reset()
+// MarshalBinary returns the FIT format encoding of FileHeader and nil error.
+func (h FileHeader) MarshalBinary() ([]byte, error) {
+	arr := pool.Get().(*[MaxBytesPerMessage]byte)
+	defer pool.Put(arr)
+	b := arr[:0]
 
-	_, _ = h.WriteTo(buf)
+	b, _ = h.MarshalAppend(b)
 
-	b := make([]byte, buf.Len())
-	copy(b, buf.Bytes())
-
-	return b, nil
+	return append([]byte{}, b...), nil
 }
 
-func (h *FileHeader) WriteTo(w io.Writer) (n int64, err error) {
-	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
-	defer arrayPool.Put(arr)
-
-	b := (*arr)[:h.Size]
-
-	b[0] = h.Size
-	b[1] = h.ProtocolVersion
-
-	binary.LittleEndian.PutUint16(b[2:4], h.ProfileVersion)
-	binary.LittleEndian.PutUint32(b[4:8], h.DataSize)
-
-	copy(b[8:12], h.DataType)
-
+// MarshalAppend appends the FIT format encoding of FileHeader to b, returning the result.
+func (h FileHeader) MarshalAppend(b []byte) ([]byte, error) {
+	b = append(b, h.Size, h.ProtocolVersion)
+	b = binary.LittleEndian.AppendUint16(b, h.ProfileVersion)
+	b = binary.LittleEndian.AppendUint32(b, h.DataSize)
+	b = append(b, h.DataType[:4]...)
 	if h.Size >= 14 {
-		binary.LittleEndian.PutUint16(b[12:14], h.CRC)
+		b = binary.LittleEndian.AppendUint16(b, h.CRC)
 	}
-
-	nn, err := w.Write(b)
-	return int64(nn), err
-}
-
-func (m *MessageDefinition) MarshalBinary() ([]byte, error) {
-	buf := bufPool.Get().(*bytes.Buffer)
-	defer bufPool.Put(buf)
-	buf.Reset()
-
-	_, _ = m.WriteTo(buf)
-
-	b := make([]byte, buf.Len())
-	copy(b, buf.Bytes())
-
 	return b, nil
 }
 
-// WriteTo zero alloc marshal then copy it to w.
-func (m *MessageDefinition) WriteTo(w io.Writer) (n int64, err error) {
-	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
-	defer arrayPool.Put(arr)
-	b := (*arr)[:0]
+// MarshalBinary returns the FIT format encoding of MessageDefinition and nil error.
+func (m MessageDefinition) MarshalBinary() ([]byte, error) {
+	arr := pool.Get().(*[MaxBytesPerMessage]byte)
+	defer pool.Put(arr)
+	b := arr[:0]
 
+	b, _ = m.MarshalAppend(b)
+
+	return append([]byte{}, b...), nil
+}
+
+// MarshalAppend appends the FIT format encoding of MessageDefinition to b, returning the result.
+func (m MessageDefinition) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, m.Header)
 	b = append(b, m.Reserved)
 	b = append(b, m.Architecture)
 
-	b = append(b, 0, 0)
-	byteorder.Select(m.Architecture).PutUint16(b[len(b)-2:], uint16(m.MesgNum))
+	if m.Architecture == littleEndian {
+		b = binary.LittleEndian.AppendUint16(b, uint16(m.MesgNum))
+	} else {
+		b = binary.BigEndian.AppendUint16(b, uint16(m.MesgNum))
+	}
 
 	b = append(b, byte(len(m.FieldDefinitions)))
-
 	for i := range m.FieldDefinitions {
 		b = append(b,
 			m.FieldDefinitions[i].Num,
@@ -129,50 +95,43 @@ func (m *MessageDefinition) WriteTo(w io.Writer) (n int64, err error) {
 		}
 	}
 
-	nn, err := w.Write(b)
-	return int64(nn), err
+	return b, nil
 }
 
-func (m *Message) MarshalBinary() ([]byte, error) {
-	buf := bufPool.Get().(*bytes.Buffer)
-	defer bufPool.Put(buf)
-	buf.Reset()
+// MarshalBinary returns the FIT format encoding of Message and any error encountered during marshal.
+func (m Message) MarshalBinary() ([]byte, error) {
+	arr := pool.Get().(*[MaxBytesPerMessage]byte)
+	defer pool.Put(arr)
+	b := arr[:0]
 
-	_, err := m.WriteTo(buf)
+	b, err := m.MarshalAppend(b)
 	if err != nil {
 		return nil, err
 	}
 
-	b := make([]byte, buf.Len())
-	copy(b, buf.Bytes())
-
-	return b, nil
+	return append([]byte{}, b...), nil
 }
 
-// WriteTo zero alloc marshal then copy it to w.
-func (m *Message) WriteTo(w io.Writer) (n int64, err error) {
-	arr := arrayPool.Get().(*[MaxBytesPerMessage]byte)
-	defer arrayPool.Put(arr)
-	b := (*arr)[:0]
-
+// MarshalAppend appends the FIT format encoding of Message to b, returning the result.
+func (m Message) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, m.Header)
 
+	var err error
 	for i := range m.Fields {
-		field := &m.Fields[i]
-		err = MarshalTo(&b, field.Value, byteorder.Select(m.Architecture))
+		b, err = m.Fields[i].Value.MarshalAppend(b, m.Architecture)
 		if err != nil {
-			return 0, fmt.Errorf("field: [num: %d, value: %v]: %w", field.Num, field.Value.Any(), err)
+			return nil, fmt.Errorf("field: [num: %d, value: %v]: %w",
+				m.Fields[i].Num, m.Fields[i].Value.Any(), err)
 		}
 	}
 
 	for i := range m.DeveloperFields {
-		developerField := &m.DeveloperFields[i]
-		err = MarshalTo(&b, developerField.Value, byteorder.Select(m.Architecture))
+		b, err = m.DeveloperFields[i].Value.MarshalAppend(b, m.Architecture)
 		if err != nil {
-			return 0, fmt.Errorf("developer field: [num: %d, value: %v]: %w", developerField.Num, developerField.Value.Any(), err)
+			return nil, fmt.Errorf("developer field: [num: %d, value: %v]: %w",
+				m.DeveloperFields[i].Num, m.DeveloperFields[i].Value.Any(), err)
 		}
 	}
 
-	nn, err := w.Write(b)
-	return int64(nn), err
+	return b, nil
 }

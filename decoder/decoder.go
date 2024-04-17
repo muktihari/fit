@@ -14,7 +14,6 @@ import (
 	"sync"
 
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/byteorder"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/kit/scaleoffset"
@@ -37,6 +36,8 @@ var (
 	ErrFieldValueTypeMismatch = errors.New("field value type mismatch")
 	ErrByteSizeMismatch       = errors.New("byte size mismath")
 )
+
+const littleEndian = 0
 
 // Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
@@ -552,7 +553,11 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	mesgDef.Header = header
 	mesgDef.Reserved = b[0]
 	mesgDef.Architecture = b[1]
-	mesgDef.MesgNum = typedef.MesgNum(byteorder.Select(b[1]).Uint16(b[2:4]))
+	if mesgDef.Architecture == littleEndian {
+		mesgDef.MesgNum = typedef.MesgNum(binary.LittleEndian.Uint16(b[2:4]))
+	} else {
+		mesgDef.MesgNum = typedef.MesgNum(binary.BigEndian.Uint16(b[2:4]))
+	}
 
 	n := int(b[4])
 	b, err = d.readN(n * 3) // 3 byte per field
@@ -927,7 +932,7 @@ func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool,
 	if err != nil {
 		return val, err
 	}
-	return proto.Unmarshal(b, byteorder.Select(arch), baseType, isArray)
+	return proto.UnmarshalValue(b, arch, baseType, isArray)
 }
 
 // log logs only if logWriter is not nil.

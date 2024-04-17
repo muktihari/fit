@@ -17,37 +17,7 @@ import (
 	"github.com/muktihari/fit/kit"
 )
 
-func TestMarshal(t *testing.T) {
-	tt := []struct {
-		value Value
-		err   error
-	}{
-		{value: Float32(819293429.192321), err: nil},
-		{value: Value{}, err: ErrTypeNotSupported},
-	}
-
-	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%T(%v))", tc.value.Any(), tc.value.Any()), func(t *testing.T) {
-			b, err := Marshal(tc.value, binary.LittleEndian)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err %s nil, got: %v", tc.err, err)
-			}
-			if err != nil {
-				return
-			}
-			buf := new(bytes.Buffer)
-			err = marshalWithReflectionForTest(buf, tc.value)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if diff := cmp.Diff(b, buf.Bytes()); diff != "" {
-				t.Fatal(diff)
-			}
-		})
-	}
-}
-
-func TestMarshalTo(t *testing.T) {
+func TestValueMarshalAppend(t *testing.T) {
 	tt := []struct {
 		b     *[]byte
 		value Value
@@ -96,39 +66,44 @@ func TestMarshalTo(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: SliceFloat64([]float64{8192934298908979.192321})},
 		{b: kit.Ptr([]byte{}), value: SliceFloat64([]float64{-897912398989898.546734})},
 		{b: kit.Ptr([]byte{}), value: Value{}, err: ErrTypeNotSupported},
-		{b: nil, value: Value{}, err: ErrNilDest},
 	}
 
 	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %T(%v))", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
-			err := MarshalTo(tc.b, tc.value, binary.LittleEndian)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err: %v, got: %v", tc.err, err)
-			}
-			if err != nil {
-				return
-			}
+		for arch := byte(0); arch <= 1; arch++ {
+			t.Run(fmt.Sprintf("[%d] %T(%v))", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
+				arr := pool.Get().(*[MaxBytesPerMessage]byte)
+				defer pool.Put(arr)
+				b := arr[:0]
 
-			buf := new(bytes.Buffer)
-			if err := marshalWithReflectionForTest(buf, tc.value); err != nil {
-				t.Fatalf("marshalWithReflectionForTest: %v", err)
-			}
+				var err error
+				*tc.b, err = tc.value.MarshalAppend(b, arch)
+				if !errors.Is(err, tc.err) {
+					t.Fatalf("expected err: %v, got: %v", tc.err, err)
+				}
+				if err != nil {
+					return
+				}
 
-			if len(*tc.b) == 0 && len(buf.Bytes()) == 0 {
-				return
-			}
+				buf := new(bytes.Buffer)
+				if err := marshalValueWithReflectionForTest(buf, tc.value, arch); err != nil {
+					t.Fatalf("marshalWithReflectionForTest: %v", err)
+				}
 
-			if diff := cmp.Diff(*tc.b, buf.Bytes()); diff != "" {
-				fmt.Printf("value: %v, b: %v, buf: %v\n", tc.value.Any(), *tc.b, buf.Bytes())
-				t.Fatal(diff)
-			}
+				if len(*tc.b) == 0 && len(buf.Bytes()) == 0 {
+					return
+				}
 
-		})
+				if diff := cmp.Diff(*tc.b, buf.Bytes()); diff != "" {
+					fmt.Printf("value: %v, b: %v, buf: %v\n", tc.value.Any(), *tc.b, buf.Bytes())
+					t.Fatal(diff)
+				}
+
+			})
+		}
 	}
 }
 
-// using little-endian
-func marshalWithReflectionForTest(w io.Writer, value Value) error {
+func marshalValueWithReflectionForTest(w io.Writer, value Value, arch byte) error {
 	if value.Type() == TypeInvalid {
 		return fmt.Errorf("can't interface '%T': %w", value, ErrTypeNotSupported)
 	}
@@ -150,7 +125,7 @@ func marshalWithReflectionForTest(w io.Writer, value Value) error {
 			}
 			iface := rv.Index(i).Interface()
 			val := Any(iface)
-			if err := marshalWithReflectionForTest(w, val); err != nil {
+			if err := marshalValueWithReflectionForTest(w, val, arch); err != nil {
 				return err
 			}
 		}
@@ -164,8 +139,14 @@ func marshalWithReflectionForTest(w io.Writer, value Value) error {
 		} else if b[len(b)-1] != '\x00' {
 			b = append([]byte(b), '\x00')
 		}
-		return binary.Write(w, binary.LittleEndian, b)
+		if arch == 0 {
+			return binary.Write(w, binary.LittleEndian, b)
+		} else {
+			return binary.Write(w, binary.BigEndian, b)
+		}
 	}
-
-	return binary.Write(w, binary.LittleEndian, rv.Interface())
+	if arch == 0 {
+		return binary.Write(w, binary.LittleEndian, rv.Interface())
+	}
+	return binary.Write(w, binary.BigEndian, rv.Interface())
 }

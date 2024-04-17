@@ -6,7 +6,7 @@ package proto_test
 
 import (
 	"errors"
-	"io"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -115,7 +115,7 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 			name: "mesg def fields and developer fields",
 			mesgdef: &proto.MessageDefinition{
 				Header:       64 | 32,
-				Architecture: 0,
+				Architecture: 1,
 				MesgNum:      typedef.MesgNumFileId,
 				FieldDefinitions: []proto.FieldDefinition{
 					{Num: 0, Size: 1, BaseType: basetype.Enum},
@@ -131,7 +131,7 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 			b: []byte{
 				64 | 32, // Header
 				0,       // Reserved
-				0,       // Architecture
+				1,       // Architecture
 				0, 0,    // MesgNum
 				6, // len(FieldDefinitions)
 				0, 1, 0,
@@ -146,8 +146,8 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			b, _ := tc.mesgdef.MarshalBinary()
 			if diff := cmp.Diff(b, tc.b); diff != "" {
 				t.Fatal(diff)
@@ -271,6 +271,24 @@ func BenchmarkHeaderMarshalBinary(b *testing.B) {
 	}
 }
 
+func BenchmarkHeaderMarshalAppend(b *testing.B) {
+	b.StopTimer()
+	header := proto.FileHeader{
+		Size:            14,
+		ProtocolVersion: 32,
+		ProfileVersion:  2132,
+		DataSize:        642262,
+		DataType:        ".FIT",
+		CRC:             12856,
+	}
+	arr := [proto.MaxBytesPerMessageDefinition]byte{}
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = header.MarshalAppend(arr[:0])
+	}
+}
+
 func BenchmarkMessageDefinitionMarshalBinary(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record)
@@ -282,14 +300,15 @@ func BenchmarkMessageDefinitionMarshalBinary(b *testing.B) {
 	}
 }
 
-func BenchmarkMessageDefinitionWriteTo(b *testing.B) {
+func BenchmarkMessageDefinitionMarshalAppend(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record)
 	mesgDef := proto.CreateMessageDefinition(&mesg)
+	arr := [proto.MaxBytesPerMessageDefinition]byte{}
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = mesgDef.WriteTo(io.Discard)
+		_, _ = mesgDef.MarshalAppend(arr[:0])
 	}
 }
 
@@ -307,16 +326,17 @@ func BenchmarkMessageMarshalBinary(b *testing.B) {
 	}
 }
 
-func BenchmarkMessageWriterTo(b *testing.B) {
+func BenchmarkMessageMarshalAppend(b *testing.B) {
 	b.StopTimer()
 	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
 		fieldnum.RecordPositionLat:  proto.Int32(1000),
 		fieldnum.RecordPositionLong: proto.Int32(1000),
 		fieldnum.RecordSpeed:        proto.Uint16(1000),
 	})
+	arr := [proto.MaxBytesPerMessage]byte{}
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = mesg.WriteTo(io.Discard)
+		_, _ = mesg.MarshalAppend(arr[:0])
 	}
 }

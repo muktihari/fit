@@ -34,8 +34,7 @@ func BenchmarkDecode(b *testing.B) {
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
-			// NOTE: We wrap it with *bufio.Reader since tormoder's fit is already implementing similar concept under the hood while we don't.
-			dec := decoder.New(bufio.NewReader(bytes.NewReader(f)))
+			dec := decoder.New(bytes.NewReader(f))
 			_, err = dec.Decode()
 			if err != nil {
 				b.Fatalf("decode error: %v", err)
@@ -52,7 +51,7 @@ func BenchmarkDecode(b *testing.B) {
 
 		for i := 0; i < b.N; i++ {
 			al := filedef.NewListener()
-			dec := decoder.New(bufio.NewReader(bytes.NewReader(f)),
+			dec := decoder.New(bytes.NewReader(f),
 				decoder.WithMesgListener(al),
 				decoder.WithBroadcastOnly(),
 			)
