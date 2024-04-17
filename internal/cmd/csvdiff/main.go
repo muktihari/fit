@@ -79,10 +79,22 @@ func splitByField(s string) []string {
 	buf.WriteString(s)
 
 	reader := csv.NewReader(buf)
+	reader.FieldsPerRecord = -1
 	cols, _ := reader.Read()
 
-	ss := make([]string, 0, len(cols)/3)
-	for i := 0; i < len(cols); i += 3 {
+	if len(cols) < 2 {
+		return nil
+	}
+
+	ss := make([]string, 0, ((len(cols)-2)/3)+2)
+
+	strbuf.Reset()
+	strbuf.WriteString(cols[0]) // Data/Definition
+	strbuf.WriteByte(',')
+	strbuf.WriteString(cols[1]) // LocalNum
+	ss = append(ss, strbuf.String())
+
+	for i := 2; i < len(cols)-2; i += 3 {
 		strbuf.Reset()
 		strbuf.WriteString(cols[i])
 		strbuf.WriteByte(',')
@@ -90,7 +102,7 @@ func splitByField(s string) []string {
 		strbuf.WriteByte(',')
 		strbuf.WriteString(cols[i+2])
 		strbuf.WriteByte(',')
-		ss = append(ss, strbuf.String()) // no need to copy, strings is immutable.
+		ss = append(ss, strbuf.String())
 	}
 	return ss
 }

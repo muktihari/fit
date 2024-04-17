@@ -20,9 +20,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-const (
-	RecordSize = 200_000
-)
+const RecordSize = 100_000
 
 func createBigActivityFile(ctx context.Context) error {
 	f, err := os.OpenFile(filepath.Join(testdata, "big_activity.fit"), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
@@ -31,7 +29,7 @@ func createBigActivityFile(ctx context.Context) error {
 	}
 	defer f.Close()
 
-	now := time.Now()
+	now := datetime.ToTime(uint32(1062766519))
 	fit := new(proto.FIT)
 	fit.Messages = make([]proto.Message, 0, RecordSize)
 	fit.Messages = append(fit.Messages,
@@ -75,7 +73,8 @@ func createBigActivityFile(ctx context.Context) error {
 		}),
 	)
 
-	for i := 0; i < RecordSize-len(fit.Messages); i++ {
+	n := RecordSize - len(fit.Messages)
+	for i := 0; i < n; i++ {
 		now = now.Add(time.Second) // only time is moving forward
 		fit.Messages = append(fit.Messages, factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
 			fieldnum.RecordTimestamp:    datetime.ToUint32(now),
@@ -94,7 +93,7 @@ func createBigActivityFile(ctx context.Context) error {
 	defer bw.Flush()
 
 	enc := encoder.New(bw)
-	if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
+	if err := enc.EncodeWithContext(ctx, fit); err != nil {
 		return err
 	}
 
