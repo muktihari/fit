@@ -109,10 +109,10 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumDeviceSettings}
 
 	if m.TimeOffset != nil {
@@ -243,6 +243,9 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// ClockTimeUint32 returns ClockTime in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *DeviceSettings) ClockTimeUint32() uint32 { return datetime.ToUint32(m.ClockTime) }
 
 // TimeZoneOffsetScaled return TimeZoneOffset in its scaled value [Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments].
 //

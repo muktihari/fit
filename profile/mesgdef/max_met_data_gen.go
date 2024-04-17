@@ -73,10 +73,10 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumMaxMetData}
 
 	if datetime.ToUint32(m.UpdateTime) != basetype.Uint32Invalid {
@@ -127,6 +127,9 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// UpdateTimeUint32 returns UpdateTime in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *MaxMetData) UpdateTimeUint32() uint32 { return datetime.ToUint32(m.UpdateTime) }
 
 // Vo2MaxScaled return Vo2Max in its scaled value [Scale: 10; Units: mL/kg/min].
 //

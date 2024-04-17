@@ -85,10 +85,10 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWeightScale}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -169,6 +169,9 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *WeightScale) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
 // WeightScaled return Weight in its scaled value [Scale: 100; Units: kg].
 //

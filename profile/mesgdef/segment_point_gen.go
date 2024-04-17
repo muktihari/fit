@@ -9,6 +9,7 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -77,10 +78,10 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSegmentPoint}
 
 	if m.LeaderTime != nil {
@@ -167,6 +168,12 @@ func (m *SegmentPoint) AltitudeScaled() float64 {
 	}
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
+
+// PositionLatDegrees returns PositionLat in degrees instead of semicircles.
+func (m *SegmentPoint) PositionLatDegrees() float64 { return semicircles.ToDegrees(m.PositionLat) }
+
+// PositionLongDegrees returns PositionLong in degrees instead of semicircles.
+func (m *SegmentPoint) PositionLongDegrees() float64 { return semicircles.ToDegrees(m.PositionLong) }
 
 // SetLeaderTime sets SegmentPoint value.
 //

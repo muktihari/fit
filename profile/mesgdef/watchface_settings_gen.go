@@ -59,10 +59,10 @@ func (m *WatchfaceSettings) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWatchfaceSettings}
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {

@@ -10,6 +10,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -89,10 +90,10 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWeatherConditions}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -184,6 +185,12 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *WeatherConditions) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// ObservedAtTimeUint32 returns ObservedAtTime in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *WeatherConditions) ObservedAtTimeUint32() uint32 { return datetime.ToUint32(m.ObservedAtTime) }
+
 // WindSpeedScaled return WindSpeed in its scaled value [Scale: 1000; Units: m/s].
 //
 // If WindSpeed value is invalid, float64 invalid value will be returned.
@@ -192,6 +199,16 @@ func (m *WeatherConditions) WindSpeedScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.WindSpeed, 1000, 0)
+}
+
+// ObservedLocationLatDegrees returns ObservedLocationLat in degrees instead of semicircles.
+func (m *WeatherConditions) ObservedLocationLatDegrees() float64 {
+	return semicircles.ToDegrees(m.ObservedLocationLat)
+}
+
+// ObservedLocationLongDegrees returns ObservedLocationLong in degrees instead of semicircles.
+func (m *WeatherConditions) ObservedLocationLongDegrees() float64 {
+	return semicircles.ToDegrees(m.ObservedLocationLong)
 }
 
 // SetTimestamp sets WeatherConditions value.

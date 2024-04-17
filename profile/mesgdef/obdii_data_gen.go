@@ -73,10 +73,10 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumObdiiData}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -132,6 +132,12 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *ObdiiData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// StartTimestampUint32 returns StartTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *ObdiiData) StartTimestampUint32() uint32 { return datetime.ToUint32(m.StartTimestamp) }
 
 // SetTimestamp sets ObdiiData value.
 //

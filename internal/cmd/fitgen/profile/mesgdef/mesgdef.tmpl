@@ -87,10 +87,10 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 
     fac := options.Factory
 
-    fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-    defer fieldsPool.Put(fieldsArray)
+    arr := pool.Get().(*[256]proto.Field)
+    defer pool.Put(arr)
     
-    fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+    fields := arr[:0] // Create slice from array with zero len.
     mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
 	
     {{ range .Fields -}}
@@ -115,6 +115,13 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 }
 
 {{ range .Fields -}}
+{{ if eq .Type "time.Time" }}
+// {{ .Name }}Uint32 returns {{ .Name }} in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *{{ $.Name }}) {{ .Name }}Uint32() uint32 { return datetime.ToUint32(m.{{ .Name }}) }
+{{ end }}
+{{ end }}
+
+{{ range .Fields -}}
 {{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) }}
 // {{ .Name }}Scaled return {{ .Name }} in its scaled value [{{ .Comment }}].
 // 
@@ -127,6 +134,14 @@ func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ 
 	{{ else }} return scaleoffset.Apply(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
 	{{ end -}}
 }
+{{ end }}
+{{ end }}
+
+
+{{ range .Fields -}}
+{{ if eq .Units "semicircles" }}
+// {{ .Name }}Degrees returns {{ .Name }} in degrees instead of semicircles.
+func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 { return semicircles.ToDegrees(m.{{ .Name }}) }
 {{ end }}
 {{ end }}
 

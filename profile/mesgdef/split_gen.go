@@ -10,6 +10,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -95,10 +96,10 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSplit}
 
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
@@ -205,6 +206,12 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *Split) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
+
+// EndTimeUint32 returns EndTime in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *Split) EndTimeUint32() uint32 { return datetime.ToUint32(m.EndTime) }
+
 // TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s].
 //
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
@@ -284,6 +291,18 @@ func (m *Split) TotalMovingTimeScaled() float64 {
 	}
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
+
+// StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
+func (m *Split) StartPositionLatDegrees() float64 { return semicircles.ToDegrees(m.StartPositionLat) }
+
+// StartPositionLongDegrees returns StartPositionLong in degrees instead of semicircles.
+func (m *Split) StartPositionLongDegrees() float64 { return semicircles.ToDegrees(m.StartPositionLong) }
+
+// EndPositionLatDegrees returns EndPositionLat in degrees instead of semicircles.
+func (m *Split) EndPositionLatDegrees() float64 { return semicircles.ToDegrees(m.EndPositionLat) }
+
+// EndPositionLongDegrees returns EndPositionLong in degrees instead of semicircles.
+func (m *Split) EndPositionLongDegrees() float64 { return semicircles.ToDegrees(m.EndPositionLong) }
 
 // SetStartTime sets Split value.
 func (m *Split) SetStartTime(v time.Time) *Split {

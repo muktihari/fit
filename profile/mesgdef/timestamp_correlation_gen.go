@@ -71,10 +71,10 @@ func (m *TimestampCorrelation) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumTimestampCorrelation}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -119,6 +119,19 @@ func (m *TimestampCorrelation) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
+}
+
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *TimestampCorrelation) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// SystemTimestampUint32 returns SystemTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *TimestampCorrelation) SystemTimestampUint32() uint32 {
+	return datetime.ToUint32(m.SystemTimestamp)
+}
+
+// LocalTimestampUint32 returns LocalTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *TimestampCorrelation) LocalTimestampUint32() uint32 {
+	return datetime.ToUint32(m.LocalTimestamp)
 }
 
 // FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.].

@@ -13,8 +13,8 @@ import (
 )
 
 func TestFieldPool(t *testing.T) {
-	fields, ok := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fields)
+	arr, ok := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 	if !ok {
 		t.Fatalf("expected ok, got not ok")
 	}

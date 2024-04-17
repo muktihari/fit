@@ -27,6 +27,7 @@ type Field struct {
 	ComparableValue string
 	InvalidValue    string
 	Comment         string
+	Units           string
 	Scale           float64
 	Offset          float64
 	Array           bool

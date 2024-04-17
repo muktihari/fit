@@ -136,6 +136,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
 				Comment:        field.Comment,
 				Array:          field.Array != "",
+				Units:          field.Units,
 			}
 
 			if _, ok := canExpandMap[field.Name]; ok {
@@ -200,6 +201,9 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				strings.Contains(f.TypedValue, "unsafe") ||
 				strings.Contains(f.ComparableValue, "unsafe") {
 				imports["unsafe"] = struct{}{}
+			}
+			if f.Units == "semicircles" {
+				imports["github.com/muktihari/fit/kit/semicircles"] = struct{}{}
 			}
 		}
 

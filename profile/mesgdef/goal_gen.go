@@ -81,10 +81,10 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumGoal}
 
 	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
@@ -160,6 +160,12 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// StartDateUint32 returns StartDate in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *Goal) StartDateUint32() uint32 { return datetime.ToUint32(m.StartDate) }
+
+// EndDateUint32 returns EndDate in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *Goal) EndDateUint32() uint32 { return datetime.ToUint32(m.EndDate) }
 
 // SetStartDate sets Goal value.
 func (m *Goal) SetStartDate(v time.Time) *Goal {
