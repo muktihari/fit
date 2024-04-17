@@ -5,4 +5,5 @@
 // Package proto defines the abstraction for FIT Protocol.
 //
 // FIT Protocol is the core of a FIT file and it's the fundamental building block for decoding and encoding FIT files.
+// test should trigger CI since go files is modified.
 package proto
