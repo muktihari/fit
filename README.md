@@ -1,4 +1,4 @@
-# FIT SDK for Go
+# FIT SDK for Go (test modified non go files do not trigger ci)
 
 ![GitHub Workflow Status](https://github.com/muktihari/fit/workflows/CI/badge.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)
