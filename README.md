@@ -326,19 +326,19 @@ goos: darwin
 goarch: amd64
 pkg: benchfit
 cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
-BenchmarkDecode/muktihari/fit_raw-4  10   110165214 ns/op   77077057 B/op    100047 allocs/op
-BenchmarkDecode/muktihari/fit-4       9   121938626 ns/op   97035515 B/op    200066 allocs/op
-BenchmarkDecode/tormoder/fit-4        9   112157057 ns/op   84108961 B/op    700051 allocs/op
-BenchmarkEncode/muktihari/fit_raw-4  13    87579657 ns/op      12444 B/op        16 allocs/op
-BenchmarkEncode/muktihari/fit-4       7   151469391 ns/op   44065838 B/op    100021 allocs/op
-BenchmarkEncode/tormoder/fit-4        1  1300131309 ns/op  101992736 B/op  12100314 allocs/op
+BenchmarkDecode/muktihari/fit_raw-4  12    95655408 ns/op   77092784 B/op    100047 allocs/op
+BenchmarkDecode/muktihari/fit-4      13    87700988 ns/op   52699547 B/op    101064 allocs/op
+BenchmarkDecode/tormoder/fit-4       10   106331934 ns/op   84108932 B/op    700051 allocs/op
+BenchmarkEncode/muktihari/fit_raw-4  15    75523944 ns/op     131522 B/op        14 allocs/op
+BenchmarkEncode/muktihari/fit-4       8   147434340 ns/op   44139516 B/op    100018 allocs/op
+BenchmarkEncode/tormoder/fit-4        1  1301732705 ns/op  101992544 B/op  12100312 allocs/op
 PASS
-ok  	benchfit	10.811s
+ok      benchfit        10.958s
 ```
 
 NOTE: The `1st` on the list, "raw", means we decode the file into the original FIT protocol message structure (similar to the Official FIT SDK implementation in other languages). While the `2nd` decodes messages to **Activity File** struct, which should be equivalent to what the `3rd` does.
 
-The time spent is more or less the same for decoding, but we allocate way fewer objects on the heap for both decoding and encoding. We achieve significantly faster encoding.
+We decode slightly faster and encode significantly faster. We allocate far fewer objects on the heap and have a smaller memory footprint for both decoding and encoding.
 
 ## Contributing
 

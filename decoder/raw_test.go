@@ -8,12 +8,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"testing"
 	"time"
-	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
@@ -500,7 +498,6 @@ func BenchmarkRawDecoderDecode(b *testing.B) {
 
 	buf := bytes.NewBuffer(all)
 	dec := NewRaw()
-	fmt.Println(unsafe.Sizeof(*dec))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		buf.Reset()

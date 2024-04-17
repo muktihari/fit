@@ -12,205 +12,208 @@ import (
 )
 
 var (
-	ErrNilDest          = errors.New("nil dest")
 	ErrTypeNotSupported = errors.New("type is not supported")
 )
 
-// Marshal v into []byte. It returns an error when v is an invalid value.
-func Marshal(v Value, bo binary.ByteOrder) (b []byte, err error) {
-	if err := MarshalTo(&b, v, bo); err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-// MarshalTo is a zero-alloc marshal function that will marshal v into []byte and append it to given dest.
-// It returns an error when v is an invalid value.
-func MarshalTo(dest *[]byte, value Value, bo binary.ByteOrder) error {
-	if dest == nil {
-		return fmt.Errorf("dest could not be: %w", ErrNilDest)
-	}
-
-	switch value.Type() { // Fast path
+// MarshalAppend appends the FIT format encoding of Value to b. Returning the result.
+// If arch is 0, marshal in Little-Endian, otherwise marshal in Big-Endian.
+func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
+	switch v.Type() {
 	case TypeBool:
-		var boolean byte
-		if value.Bool() {
-			boolean = 1
+		if v.Bool() {
+			b = append(b, 1)
+		} else {
+			b = append(b, 0)
 		}
-		*dest = append(*dest, boolean)
-		return nil
+		return b, nil
 	case TypeSliceBool:
-		val := value.SliceBool()
-		for i := range val {
-			if val[i] {
-				*dest = append(*dest, 1)
+		vals := v.SliceBool()
+		for i := range vals {
+			if vals[i] {
+				b = append(b, 1)
 			} else {
-				*dest = append(*dest, 0)
+				b = append(b, 0)
 			}
 		}
-		return nil
+		return b, nil
 	case TypeInt8:
-		*dest = append(*dest, uint8(value.Int8()))
-		return nil
+		b = append(b, uint8(v.Int8()))
+		return b, nil
 	case TypeSliceInt8:
-		val := value.SliceInt8()
-		for i := range val {
-			*dest = append(*dest, uint8(val[i]))
+		vals := v.SliceInt8()
+		for i := range vals {
+			b = append(b, uint8(vals[i]))
 		}
-		return nil
+		return b, nil
 	case TypeUint8:
-		*dest = append(*dest, uint8(value.Uint8()))
-		return nil
+		b = append(b, uint8(v.Uint8()))
+		return b, nil
 	case TypeSliceUint8:
-		*dest = append(*dest, value.SliceUint8()...)
-		return nil
+		b = append(b, v.SliceUint8()...)
+		return b, nil
 	case TypeInt16:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0)
-		bo.PutUint16((*dest)[cur:], uint16(value.Int16()))
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint16(b, uint16(v.Int16()))
+		} else {
+			b = binary.BigEndian.AppendUint16(b, uint16(v.Int16()))
+		}
+		return b, nil
 	case TypeSliceUint16:
-		val := value.SliceUint16()
-		const n = 2
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0)
-			bo.PutUint16((*dest)[cur:cur+n], uint16(val[i]))
-			cur += n
+		vals := v.SliceUint16()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint16(b, uint16(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint16(b, uint16(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeUint16:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0)
-		bo.PutUint16((*dest)[cur:], value.Uint16())
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint16(b, v.Uint16())
+		} else {
+			b = binary.BigEndian.AppendUint16(b, v.Uint16())
+		}
+		return b, nil
 	case TypeSliceInt16:
-		val := value.SliceInt16()
-		const n = 2
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0)
-			bo.PutUint16((*dest)[cur:cur+n], uint16(val[i]))
-			cur += n
+		vals := v.SliceInt16()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint16(b, uint16(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint16(b, uint16(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeInt32:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0, 0, 0)
-		bo.PutUint32((*dest)[cur:], uint32(value.Int32()))
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint32(b, uint32(v.Int32()))
+		} else {
+			b = binary.BigEndian.AppendUint32(b, uint32(v.Int32()))
+		}
+		return b, nil
 	case TypeSliceInt32:
-		val := value.SliceInt32()
-		const n = 4
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0)
-			bo.PutUint32((*dest)[cur:cur+n], uint32(val[i]))
-			cur += n
+		vals := v.SliceInt32()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint32(b, uint32(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint32(b, uint32(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeUint32:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0, 0, 0)
-		bo.PutUint32((*dest)[cur:], value.Uint32())
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint32(b, v.Uint32())
+		} else {
+			b = binary.BigEndian.AppendUint32(b, v.Uint32())
+		}
+		return b, nil
 	case TypeSliceUint32:
-		val := value.SliceUint32()
-		const n = 4
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0)
-			bo.PutUint32((*dest)[cur:cur+n], val[i])
-			cur += n
+		vals := v.SliceUint32()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint32(b, vals[i])
+			} else {
+				b = binary.BigEndian.AppendUint32(b, vals[i])
+			}
 		}
-		return nil
+		return b, nil
 	case TypeInt64:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-		bo.PutUint64((*dest)[cur:], uint64(value.Int64()))
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint64(b, uint64(v.Int64()))
+		} else {
+			b = binary.BigEndian.AppendUint64(b, uint64(v.Int64()))
+		}
+		return b, nil
 	case TypeSliceInt64:
-		val := value.SliceInt64()
-		const n = 8
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-			bo.PutUint64((*dest)[cur:cur+n], uint64(val[i]))
-			cur += n
+		vals := v.SliceInt64()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint64(b, uint64(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint64(b, uint64(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeUint64:
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-		bo.PutUint64((*dest)[cur:], value.Uint64())
-		return nil
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint64(b, v.Uint64())
+		} else {
+			b = binary.BigEndian.AppendUint64(b, v.Uint64())
+		}
+		return b, nil
 	case TypeSliceUint64:
-		val := value.SliceUint64()
-		const n = 8
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-			bo.PutUint64((*dest)[cur:cur+n], val[i])
-			cur += n
+		vals := v.SliceUint64()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint64(b, vals[i])
+			} else {
+				b = binary.BigEndian.AppendUint64(b, vals[i])
+			}
 		}
-		return nil
+		return b, nil
 	case TypeFloat32:
-		cur := len(*dest)
-		v := math.Float32bits(value.Float32())
-		*dest = append(*dest, 0, 0, 0, 0)
-		bo.PutUint32((*dest)[cur:], v)
-		return nil
+		v := math.Float32bits(v.Float32())
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint32(b, v)
+		} else {
+			b = binary.BigEndian.AppendUint32(b, v)
+		}
+		return b, nil
 	case TypeSliceFloat32:
-		val := value.SliceFloat32()
-		const n = 4
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0)
-			bo.PutUint32((*dest)[cur:cur+n], math.Float32bits(val[i]))
-			cur += n
+		vals := v.SliceFloat32()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint32(b, math.Float32bits(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint32(b, math.Float32bits(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeFloat64:
-		v := math.Float64bits(value.Float64())
-		cur := len(*dest)
-		*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-		bo.PutUint64((*dest)[cur:], v)
-		return nil
+		v := math.Float64bits(v.Float64())
+		if arch == 0 {
+			b = binary.LittleEndian.AppendUint64(b, v)
+		} else {
+			b = binary.BigEndian.AppendUint64(b, v)
+		}
+		return b, nil
 	case TypeSliceFloat64:
-		val := value.SliceFloat64()
-		const n = 8
-		cur := len(*dest)
-		for i := range val {
-			*dest = append(*dest, 0, 0, 0, 0, 0, 0, 0, 0)
-			bo.PutUint64((*dest)[cur:cur+n], math.Float64bits(val[i]))
-			cur += n
+		vals := v.SliceFloat64()
+		for i := range vals {
+			if arch == 0 {
+				b = binary.LittleEndian.AppendUint64(b, math.Float64bits(vals[i]))
+			} else {
+				b = binary.BigEndian.AppendUint64(b, math.Float64bits(vals[i]))
+			}
 		}
-		return nil
+		return b, nil
 	case TypeString:
-		val := value.String()
+		val := v.String()
 		if len(val) == 0 {
-			*dest = append(*dest, 0x00)
-			return nil
+			b = append(b, 0x00)
+			return b, nil
 		}
-		*dest = append(*dest, val...)
+		b = append(b, val...)
 		if val[len(val)-1] != '\x00' {
-			*dest = append(*dest, '\x00') // add utf-8 null-terminated string
+			b = append(b, '\x00') // add utf-8 null-terminated string
 		}
-		return nil
+		return b, nil
 	case TypeSliceString:
-		val := value.SliceString()
-		for i := range val {
-			if len(val[i]) == 0 {
-				*dest = append(*dest, '\x00')
+		vals := v.SliceString()
+		for i := range vals {
+			if len(vals[i]) == 0 {
+				b = append(b, '\x00')
 				continue
 			}
-			*dest = append(*dest, val[i]...)
-			if val[i][len(val[i])-1] != '\x00' {
-				*dest = append(*dest, '\x00')
+			b = append(b, vals[i]...)
+			if vals[i][len(vals[i])-1] != '\x00' {
+				b = append(b, '\x00')
 			}
 		}
-		return nil
+		return b, nil
 	default:
-		return fmt.Errorf("type Value(%T) is not supported: %w", value.Type(), ErrTypeNotSupported)
+		return b, fmt.Errorf("type Value(%T) is not supported: %w", v.Type(), ErrTypeNotSupported)
 	}
 }
