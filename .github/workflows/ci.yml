@@ -6,8 +6,13 @@ name: CI
 on:
   push:
     branches: ["master"]
+    paths:
+      - "**.go" # Trigger only when Go files are modified
+
   pull_request:
     branches: ["master"]
+    paths:
+      - "**.go" # Trigger only when Go files are modified
 
 permissions: {}
 
