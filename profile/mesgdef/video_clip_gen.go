@@ -69,10 +69,10 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumVideoClip}
 
 	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
@@ -118,6 +118,12 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// StartTimestampUint32 returns StartTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *VideoClip) StartTimestampUint32() uint32 { return datetime.ToUint32(m.StartTimestamp) }
+
+// EndTimestampUint32 returns EndTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *VideoClip) EndTimestampUint32() uint32 { return datetime.ToUint32(m.EndTimestamp) }
 
 // SetStartTimestamp sets VideoClip value.
 func (m *VideoClip) SetStartTimestamp(v time.Time) *VideoClip {

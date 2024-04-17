@@ -10,6 +10,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -75,10 +76,10 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumGpsMetadata}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -135,6 +136,12 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *GpsMetadata) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// UtcTimestampUint32 returns UtcTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *GpsMetadata) UtcTimestampUint32() uint32 { return datetime.ToUint32(m.UtcTimestamp) }
+
 // VelocityScaled return Velocity in its scaled value [Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.].
 //
 // If Velocity value is invalid, nil will be returned.
@@ -174,6 +181,12 @@ func (m *GpsMetadata) HeadingScaled() float64 {
 	}
 	return scaleoffset.Apply(m.Heading, 100, 0)
 }
+
+// PositionLatDegrees returns PositionLat in degrees instead of semicircles.
+func (m *GpsMetadata) PositionLatDegrees() float64 { return semicircles.ToDegrees(m.PositionLat) }
+
+// PositionLongDegrees returns PositionLong in degrees instead of semicircles.
+func (m *GpsMetadata) PositionLongDegrees() float64 { return semicircles.ToDegrees(m.PositionLong) }
 
 // SetTimestamp sets GpsMetadata value.
 //

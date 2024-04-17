@@ -12,12 +12,7 @@ type Factory interface {
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 
-var fieldsPool = sync.Pool{
-	New: func() any {
-		fields := [256]proto.Field{}
-		return &fields
-	},
-}
+var pool = sync.Pool{New: func() any { return new([256]proto.Field) }}
 
 type Options struct {
 	Factory               Factory // If not specified, factory.StandardFactory() will be used.

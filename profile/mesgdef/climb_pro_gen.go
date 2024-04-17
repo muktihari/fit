@@ -9,6 +9,7 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -70,10 +71,10 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	fieldsArray := fieldsPool.Get().(*[256]proto.Field)
-	defer fieldsPool.Put(fieldsArray)
+	arr := pool.Get().(*[256]proto.Field)
+	defer pool.Put(arr)
 
-	fields := (*fieldsArray)[:0] // Create slice from array with zero len.
+	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumClimbPro}
 
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
@@ -119,6 +120,15 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *ClimbPro) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// PositionLatDegrees returns PositionLat in degrees instead of semicircles.
+func (m *ClimbPro) PositionLatDegrees() float64 { return semicircles.ToDegrees(m.PositionLat) }
+
+// PositionLongDegrees returns PositionLong in degrees instead of semicircles.
+func (m *ClimbPro) PositionLongDegrees() float64 { return semicircles.ToDegrees(m.PositionLong) }
 
 // SetTimestamp sets ClimbPro value.
 //
