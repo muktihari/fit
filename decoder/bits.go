@@ -61,7 +61,7 @@ func valueFromBits(bits uint32, baseType basetype.BaseType) proto.Value {
 	switch baseType {
 	case basetype.Sint8:
 		return proto.Int8(int8(bits))
-	case basetype.Uint8, basetype.Uint8z:
+	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
 		return proto.Uint8(uint8(bits))
 	case basetype.Sint16:
 		return proto.Int16(int16(bits))
