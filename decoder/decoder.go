@@ -51,13 +51,13 @@ type Decoder struct {
 
 	options *options
 
-	decodeHeaderOnce  func() error // The func to decode header exactly once, return the error of the first invocation if any. Initialized on New().
-	n                 int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
-	cur               uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
-	timestamp         uint32       // Active timestamp
-	lastTimeOffset    byte         // Last time offset
-	sequenceCompleted bool         // True after a decode is completed. Reset to false on Next().
-	err               error        // Any error occurs during process.
+	decodeFileHeaderOnce func() error // The func to decode file header exactly once, return the error of the first invocation if any. Initialized on New().
+	n                    int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
+	cur                  uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
+	timestamp            uint32       // Active timestamp
+	lastTimeOffset       byte         // Last time offset
+	sequenceCompleted    bool         // True after a decode is completed. Reset to false on Next().
+	err                  error        // Any error occurs during process.
 
 	// FIT File Representation
 	fileHeader proto.FileHeader
@@ -163,8 +163,8 @@ func WithNoComponentExpansion() Option {
 	return fnApply(func(o *options) { o.shouldExpandComponent = false })
 }
 
-// WithLogWriter specifies where the log messages will be written to. By default, the Decoder writes log message to io.Discard.
-// The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
+// WithLogWriter specifies where the log messages will be written to. By default, the Decoder do not write any log if
+// log writer is not specified. The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
 //   - Field Definition's Size (or Developer Field Definition's Size) is zero.
 //   - Field Definition's Size (or Developer Field Definition's Size) is less than basetype's size.
 //     e.g. Size 1 bytes but having basetype uint32 (4 bytes).
@@ -218,10 +218,24 @@ func New(r io.Reader, opts ...Option) *Decoder {
 // during the first invocation, the error will be returned everytime decodeHeaderOnce() is invoked.
 func (d *Decoder) initDecodeHeaderOnce() {
 	var once = sync.Once{}
-	d.decodeHeaderOnce = func() error {
-		once.Do(func() { d.err = d.decodeHeader() })
+	d.decodeFileHeaderOnce = func() error {
+		once.Do(func() { d.err = d.decodeFileHeader() })
 		return d.err
 	}
+}
+
+// PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader.
+//
+// After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
+// This method is idempotent and can be invoked even after Decode has been invoked.
+func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
+	if d.err != nil {
+		return nil, d.err
+	}
+	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
+		return nil, d.err
+	}
+	return &d.fileHeader, nil
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
@@ -234,7 +248,7 @@ func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 		return nil, d.err
 	}
 	defer func() { d.err = err }()
-	if err = d.decodeHeaderOnce(); err != nil {
+	if err = d.decodeFileHeaderOnce(); err != nil {
 		return
 	}
 	for d.fileId == nil {
@@ -266,7 +280,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 	for {
 		// Check Header Integrity
 		pos := d.n
-		if err = d.decodeHeaderOnce(); err != nil {
+		if err = d.decodeFileHeaderOnce(); err != nil {
 			if pos != 0 && pos == d.n && err == io.EOF {
 				// When EOF error occurs exactly after a sequence has been completed,
 				// make the error as nil, it means we have reached the desirable EOF.
@@ -349,7 +363,7 @@ func (d *Decoder) Discard() error {
 	d.options.shouldChecksum = false
 	defer func() { d.options.shouldChecksum = optionsShouldChecksum }()
 
-	if d.err = d.decodeHeaderOnce(); d.err != nil {
+	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return d.err
 	}
 	if d.err = d.discardMessages(); d.err != nil {
@@ -375,7 +389,7 @@ func (d *Decoder) Next() bool {
 	d.reset() // reset values for the next chained FIT file
 
 	// err is saved in the func, any exported will call this func anyway.
-	return d.decodeHeaderOnce() == nil
+	return d.decodeFileHeaderOnce() == nil
 }
 
 func (d *Decoder) reset() {
@@ -435,7 +449,7 @@ func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 		return nil, d.err
 	}
 	defer func() { d.err = err }()
-	if err = d.decodeHeaderOnce(); err != nil {
+	if err = d.decodeFileHeaderOnce(); err != nil {
 		return nil, err
 	}
 	if err = d.decodeMessages(); err != nil {
@@ -456,7 +470,7 @@ func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 	}, nil
 }
 
-func (d *Decoder) decodeHeader() error {
+func (d *Decoder) decodeFileHeader() error {
 	b, err := d.readBuffer.ReadN(1)
 	if err != nil {
 		return err
@@ -967,7 +981,7 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.FIT, err er
 	if err = checkContext(ctx); err != nil {
 		return nil, err
 	}
-	if err = d.decodeHeaderOnce(); err != nil {
+	if err = d.decodeFileHeaderOnce(); err != nil {
 		return nil, err
 	}
 	if err = d.decodeMessagesWithContext(ctx); err != nil {

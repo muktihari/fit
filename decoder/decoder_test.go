@@ -250,15 +250,15 @@ func TestDecodeHeaderOnce(t *testing.T) {
 	}()
 
 	dec := New(r)
-	err1 := dec.decodeHeaderOnce()
-	err2 := dec.decodeHeaderOnce()
+	err1 := dec.decodeFileHeaderOnce()
+	err2 := dec.decodeFileHeaderOnce()
 	if err1 != nil || !errors.Is(err1, err2) {
 		t.Fatalf("expected %v: err1 == err2, got: %v == %v", nil, err1, err2)
 	}
 
 	dec = New(fnReaderErr)
-	err1 = dec.decodeHeaderOnce()
-	err2 = dec.decodeHeaderOnce()
+	err1 = dec.decodeFileHeaderOnce()
+	err2 = dec.decodeFileHeaderOnce()
 	if !errors.Is(err1, io.EOF) || !errors.Is(err1, err2) {
 		t.Fatalf("expected %v: err1 == err2, got: %v == %v", io.EOF, err1, err2)
 	}
@@ -269,6 +269,9 @@ func TestReinvocationOfExportedMethodsWhenDecoderHasExistingError(t *testing.T) 
 	dec.err = errors.New("intentional error")
 
 	if _, err := dec.CheckIntegrity(); !errors.Is(err, dec.err) {
+		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+	if _, err := dec.PeekFileHeader(); !errors.Is(err, dec.err) {
 		t.Fatalf("expected err: %v, got: %v", dec.err, err)
 	}
 	if _, err := dec.PeekFileId(); !errors.Is(err, dec.err) {
@@ -282,6 +285,62 @@ func TestReinvocationOfExportedMethodsWhenDecoderHasExistingError(t *testing.T) 
 	}
 	if _, err := dec.DecodeWithContext(context.Background()); !errors.Is(err, dec.err) {
 		t.Fatalf("expected err: %v, got: %v", dec.err, err)
+	}
+}
+
+func TestPeekFileHeader(t *testing.T) {
+	fit, buf := createFitForTest()
+
+	tt := []struct {
+		name       string
+		r          io.Reader
+		fileHeader proto.FileHeader
+		err        error
+	}{
+		{
+			name: "peek file header happy flow",
+			r: func() io.Reader {
+				buf, cur := slices.Clone(buf), 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur >= 14 {
+						return 0, io.EOF
+					}
+					m := 14
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return n, nil
+				})
+			}(),
+			fileHeader: fit.FileHeader,
+		},
+		{
+			name: "peek file header return error",
+			r: func() io.Reader {
+				return fnReader(func(b []byte) (n int, err error) {
+					return 0, io.EOF
+				})
+			}(),
+			err: io.EOF,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			dec := New(tc.r)
+			fileHeader, err := dec.PeekFileHeader()
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected err: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+			if diff := cmp.Diff(*fileHeader, tc.fileHeader); diff != "" {
+				t.Fatal(diff)
+			}
+		})
 	}
 }
 
@@ -1145,7 +1204,7 @@ func TestDecodeHeader(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			dec := New(tc.r)
-			err := dec.decodeHeader()
+			err := dec.decodeFileHeader()
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
