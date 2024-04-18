@@ -25,7 +25,7 @@ Please see [Usage](/docs/usage.md).
 
 Version 2.0 introduced [**Developer Fields**](https://developer.garmin.com/fit/cookbook/developer-data) as a way to add custom data fields to existing messages. We strives to support **Developer Fields** and carefully thought about how to implement it since the inception of the SDK. While this may still need to be battle-tested to ensure correctness, this is generally work and usable.
 
-Here is the sample of what **Developer Fields** would look like in a **.fit** that have been converted to **.csv** by `fitconv`. The **device_info** message has some **Developer Fields** defined in **field_description** (the ones that are being bold):
+Here is the sample of what **Developer Fields** would look like in a **.fit** that have been converted to **.csv** by [fitconv](/cmd/fitconv/README.md). The **device_info** message has some **Developer Fields** defined in **field_description** (the ones that are being bold):
 
 <table class="table table-bordered table-hover table-condensed">
 <thead>
@@ -289,12 +289,14 @@ Here is the sample of what **Developer Fields** would look like in a **.fit** th
 
 ## CLIs
 
-We provide some CLI programs to interact with FIT files that can be found in `cmd` folder.
+We provide some CLI programs to interact with FIT files that can be found in [cmd](/cmd/doc.go) folder.
 
-1. `fitactivity`: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
-2. `fitconv`: Converts FIT files to CSV format, enabling us to read the FIT data in a human-readable format. Conversely, it also converts CSV files back to FIT format, enabling us to create or edit FIT files in CSV form. [README.md](/cmd/fitconv/README.md)
+1. **fitactivity**: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
+2. **fitconv**: Converts FIT files to CSV format, enabling us to read the FIT data in a human-readable format. Conversely, it also converts CSV files back to FIT format, enabling us to create or edit FIT files in CSV form. The programs is designed to work seamlessly with CSVs produced by the Official FIT SDK's _FitCSVTool.jar_. [README.md](/cmd/fitconv/README.md)
+3. **fitprint**: Generates comprehensive human-readable **\*.txt** file containing details extracted from FIT files. [README.md](/cmd/fitprint/README.md)
+4. **fitdump**: Dumps the FIT file(s) into segmented bytes in a **\*.txt** file format. [README.md](/cmd/fitdump/README.md)
 
-The programs are automatically built during release; for Linux, Windows, and macOS platforms. They are available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
+Some programs are automatically built during release; for Linux, Windows, and macOS platforms. They are available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
 ## Custom FIT SDK
 

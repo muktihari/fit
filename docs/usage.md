@@ -5,6 +5,7 @@ Table of Contents:
 1. [Dicoding](./usage.md#Decoding)
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
    - [Decode to Common File Types](#Decode-to-Common-File-Types)
+   - [Peek FileHeader](#Peek-FileHeader)
    - [Peek FileId](#Peek-FileId)
    - [Discard FIT File Sequences](#Discard-FIT-File-Sequences)
    - [Check Integrity](#Check-Integrity)
@@ -218,6 +219,40 @@ func main() {
 ```
 
 **The ability to broadcast every message as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.**
+
+### Peek FileHeader
+
+We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero. This method is idempotent and can be invoked even after Decode has been invoked.
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+)
+
+func main() {
+    f, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+    dec := decoder.New(f)
+
+    fileHeader, err := dec.PeekFileHeader()
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("%v\n", fileHeader)
+
+    // Output:
+    // &{14 32 2147 94080 .FIT 17310}
+}
+```
 
 ### Peek FileId
 
