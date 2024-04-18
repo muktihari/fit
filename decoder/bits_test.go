@@ -54,13 +54,18 @@ func TestValueFromBits(t *testing.T) {
 		expected proto.Value
 	}{
 		{bitsVal: 10, basetype: basetype.Sint8, expected: proto.Int8(10)},
+		{bitsVal: 10, basetype: basetype.Enum, expected: proto.Uint8(10)},
 		{bitsVal: 10, basetype: basetype.Uint8, expected: proto.Uint8(10)},
+		{bitsVal: 10, basetype: basetype.Uint8z, expected: proto.Uint8(10)},
 		{bitsVal: 10, basetype: basetype.Sint16, expected: proto.Int16(10)},
 		{bitsVal: 10, basetype: basetype.Uint16, expected: proto.Uint16(10)},
+		{bitsVal: 10, basetype: basetype.Uint16z, expected: proto.Uint16(10)},
 		{bitsVal: 10, basetype: basetype.Sint32, expected: proto.Int32(10)},
 		{bitsVal: 10, basetype: basetype.Uint32, expected: proto.Uint32(10)},
+		{bitsVal: 10, basetype: basetype.Uint32z, expected: proto.Uint32(10)},
 		{bitsVal: 10, basetype: basetype.Sint64, expected: proto.Int64(10)},
 		{bitsVal: 10, basetype: basetype.Uint64, expected: proto.Uint64(10)},
+		{bitsVal: 10, basetype: basetype.Uint64z, expected: proto.Uint64(10)},
 		{bitsVal: 10, basetype: basetype.Float32, expected: proto.Float32(10)},
 		{bitsVal: 10, basetype: basetype.Float64, expected: proto.Float64(10)},
 		{bitsVal: 10, basetype: basetype.String, expected: proto.Value{}},
