@@ -205,6 +205,48 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetDeviceType returns Dynamic Field interpretation of DeviceType. Otherwise, returns the original value of DeviceType.
+//
+// Based on m.SourceType:
+//   - name: "ble_device_type", value: typedef.BleDeviceType(m.DeviceType)
+//   - name: "antplus_device_type", value: typedef.AntplusDeviceType(m.DeviceType)
+//   - name: "ant_device_type", value: uint8(m.DeviceType)
+//   - name: "local_device_type", value: typedef.LocalDeviceType(m.DeviceType)
+//
+// Otherwise:
+//   - name: "device_type", value: m.DeviceType
+func (m *DeviceInfo) GetDeviceType() (name string, value any) {
+	switch m.SourceType {
+	case typedef.SourceTypeBluetoothLowEnergy:
+		return "ble_device_type", typedef.BleDeviceType(m.DeviceType)
+	case typedef.SourceTypeAntplus:
+		return "antplus_device_type", typedef.AntplusDeviceType(m.DeviceType)
+	case typedef.SourceTypeAnt:
+		return "ant_device_type", uint8(m.DeviceType)
+	case typedef.SourceTypeLocal:
+		return "local_device_type", typedef.LocalDeviceType(m.DeviceType)
+	}
+	return "device_type", m.DeviceType
+}
+
+// GetProduct returns Dynamic Field interpretation of Product. Otherwise, returns the original value of Product.
+//
+// Based on m.Manufacturer:
+//   - name: "favero_product", value: typedef.FaveroProduct(m.Product)
+//   - name: "garmin_product", value: typedef.GarminProduct(m.Product)
+//
+// Otherwise:
+//   - name: "product", value: m.Product
+func (m *DeviceInfo) GetProduct() (name string, value any) {
+	switch m.Manufacturer {
+	case typedef.ManufacturerFaveroElectronics:
+		return "favero_product", typedef.FaveroProduct(m.Product)
+	case typedef.ManufacturerGarmin, typedef.ManufacturerDynastream, typedef.ManufacturerDynastreamOem, typedef.ManufacturerTacx:
+		return "garmin_product", typedef.GarminProduct(m.Product)
+	}
+	return "product", m.Product
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DeviceInfo) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

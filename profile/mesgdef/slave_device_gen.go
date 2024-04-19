@@ -82,6 +82,24 @@ func (m *SlaveDevice) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetProduct returns Dynamic Field interpretation of Product. Otherwise, returns the original value of Product.
+//
+// Based on m.Manufacturer:
+//   - name: "favero_product", value: typedef.FaveroProduct(m.Product)
+//   - name: "garmin_product", value: typedef.GarminProduct(m.Product)
+//
+// Otherwise:
+//   - name: "product", value: m.Product
+func (m *SlaveDevice) GetProduct() (name string, value any) {
+	switch m.Manufacturer {
+	case typedef.ManufacturerFaveroElectronics:
+		return "favero_product", typedef.FaveroProduct(m.Product)
+	case typedef.ManufacturerGarmin, typedef.ManufacturerDynastream, typedef.ManufacturerDynastreamOem, typedef.ManufacturerTacx:
+		return "garmin_product", typedef.GarminProduct(m.Product)
+	}
+	return "product", m.Product
+}
+
 // SetManufacturer sets SlaveDevice value.
 func (m *SlaveDevice) SetManufacturer(v typedef.Manufacturer) *SlaveDevice {
 	m.Manufacturer = v

@@ -9,6 +9,7 @@ type Data struct {
 	Imports           []string
 	Name              string
 	Fields            []Field
+	DynamicFields     []DynamicField
 	MaxFieldNum       byte
 	MaxFieldExpandNum byte
 }
@@ -32,4 +33,26 @@ type Field struct {
 	Offset          float64
 	Array           bool
 	CanExpand       bool
+}
+
+type DynamicField struct {
+	Name        string
+	SwitchCases []SwitchCase
+	Default     ReturnValue
+}
+
+type SwitchCase struct {
+	Name       string
+	CondsValue []CondValue
+}
+
+type CondValue struct {
+	Conds       string
+	ReturnValue ReturnValue
+}
+
+type ReturnValue struct {
+	Name  string
+	Units string
+	Value string
 }

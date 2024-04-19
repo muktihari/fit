@@ -224,6 +224,102 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetData returns Dynamic Field interpretation of Data. Otherwise, returns the original value of Data.
+//
+// Based on m.Event:
+//   - name: "timer_trigger", value: typedef.TimerTrigger(m.Data)
+//   - name: "distance_duration_alert", units: "m" , value: (float64(m.Data) * 100) - 0
+//   - name: "rider_position", value: typedef.RiderPositionType(m.Data)
+//   - name: "battery_level", units: "V" , value: (float64(m.Data) * 1000) - 0
+//   - name: "time_duration_alert", units: "s" , value: (float64(m.Data) * 1000) - 0
+//   - name: "gear_change_data", value: uint32(m.Data)
+//   - name: "auto_activity_detect_duration", units: "min" , value: uint16(m.Data)
+//   - name: "virtual_partner_speed", units: "m/s" , value: (float64(m.Data) * 1000) - 0
+//   - name: "hr_low_alert", units: "bpm" , value: uint8(m.Data)
+//   - name: "power_low_alert", units: "watts" , value: uint16(m.Data)
+//   - name: "dive_alert", value: typedef.DiveAlert(m.Data)
+//   - name: "radar_threat_alert", value: uint32(m.Data)
+//   - name: "course_point_index", value: typedef.MessageIndex(m.Data)
+//   - name: "hr_high_alert", units: "bpm" , value: uint8(m.Data)
+//   - name: "speed_high_alert", units: "m/s" , value: (float64(m.Data) * 1000) - 0
+//   - name: "speed_low_alert", units: "m/s" , value: (float64(m.Data) * 1000) - 0
+//   - name: "cad_high_alert", units: "rpm" , value: uint16(m.Data)
+//   - name: "cad_low_alert", units: "rpm" , value: uint16(m.Data)
+//   - name: "power_high_alert", units: "watts" , value: uint16(m.Data)
+//   - name: "calorie_duration_alert", units: "calories" , value: uint32(m.Data)
+//   - name: "fitness_equipment_state", value: typedef.FitnessEquipmentState(m.Data)
+//   - name: "sport_point", value: uint32(m.Data)
+//   - name: "comm_timeout", value: typedef.CommTimeoutType(m.Data)
+//
+// Otherwise:
+//   - name: "data", value: m.Data
+func (m *Event) GetData() (name string, value any) {
+	switch m.Event {
+	case typedef.EventTimer:
+		return "timer_trigger", typedef.TimerTrigger(m.Data)
+	case typedef.EventDistanceDurationAlert:
+		return "distance_duration_alert", (float64(m.Data) * 100) - 0
+	case typedef.EventRiderPositionChange:
+		return "rider_position", typedef.RiderPositionType(m.Data)
+	case typedef.EventBattery:
+		return "battery_level", (float64(m.Data) * 1000) - 0
+	case typedef.EventTimeDurationAlert:
+		return "time_duration_alert", (float64(m.Data) * 1000) - 0
+	case typedef.EventFrontGearChange, typedef.EventRearGearChange:
+		return "gear_change_data", uint32(m.Data)
+	case typedef.EventAutoActivityDetect:
+		return "auto_activity_detect_duration", uint16(m.Data)
+	case typedef.EventVirtualPartnerPace:
+		return "virtual_partner_speed", (float64(m.Data) * 1000) - 0
+	case typedef.EventHrLowAlert:
+		return "hr_low_alert", uint8(m.Data)
+	case typedef.EventPowerLowAlert:
+		return "power_low_alert", uint16(m.Data)
+	case typedef.EventDiveAlert:
+		return "dive_alert", typedef.DiveAlert(m.Data)
+	case typedef.EventRadarThreatAlert:
+		return "radar_threat_alert", uint32(m.Data)
+	case typedef.EventCoursePoint:
+		return "course_point_index", typedef.MessageIndex(m.Data)
+	case typedef.EventHrHighAlert:
+		return "hr_high_alert", uint8(m.Data)
+	case typedef.EventSpeedHighAlert:
+		return "speed_high_alert", (float64(m.Data) * 1000) - 0
+	case typedef.EventSpeedLowAlert:
+		return "speed_low_alert", (float64(m.Data) * 1000) - 0
+	case typedef.EventCadHighAlert:
+		return "cad_high_alert", uint16(m.Data)
+	case typedef.EventCadLowAlert:
+		return "cad_low_alert", uint16(m.Data)
+	case typedef.EventPowerHighAlert:
+		return "power_high_alert", uint16(m.Data)
+	case typedef.EventCalorieDurationAlert:
+		return "calorie_duration_alert", uint32(m.Data)
+	case typedef.EventFitnessEquipment:
+		return "fitness_equipment_state", typedef.FitnessEquipmentState(m.Data)
+	case typedef.EventSportPoint:
+		return "sport_point", uint32(m.Data)
+	case typedef.EventCommTimeout:
+		return "comm_timeout", typedef.CommTimeoutType(m.Data)
+	}
+	return "data", m.Data
+}
+
+// GetStartTimestamp returns Dynamic Field interpretation of StartTimestamp. Otherwise, returns the original value of StartTimestamp.
+//
+// Based on m.Event:
+//   - name: "auto_activity_detect_start_timestamp", units: "s" , value: time.Time(m.StartTimestamp)
+//
+// Otherwise:
+//   - name: "start_timestamp", units: "s" , value: m.StartTimestamp
+func (m *Event) GetStartTimestamp() (name string, value any) {
+	switch m.Event {
+	case typedef.EventAutoActivityDetect:
+		return "auto_activity_detect_start_timestamp", time.Time(m.StartTimestamp)
+	}
+	return "start_timestamp", m.StartTimestamp
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Event) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

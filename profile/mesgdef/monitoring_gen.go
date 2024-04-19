@@ -285,6 +285,24 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetCycles returns Dynamic Field interpretation of Cycles. Otherwise, returns the original value of Cycles.
+//
+// Based on m.ActivityType:
+//   - name: "strokes", units: "strokes" , value: (float64(m.Cycles) * 2) - 0
+//   - name: "steps", units: "steps" , value: uint32(m.Cycles)
+//
+// Otherwise:
+//   - name: "cycles", units: "cycles" , value: m.Cycles
+func (m *Monitoring) GetCycles() (name string, value any) {
+	switch m.ActivityType {
+	case typedef.ActivityTypeCycling, typedef.ActivityTypeSwimming:
+		return "strokes", (float64(m.Cycles) * 2) - 0
+	case typedef.ActivityTypeWalking, typedef.ActivityTypeRunning:
+		return "steps", uint32(m.Cycles)
+	}
+	return "cycles", m.Cycles
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Monitoring) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

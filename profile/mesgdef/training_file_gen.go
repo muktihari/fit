@@ -112,6 +112,24 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetProduct returns Dynamic Field interpretation of Product. Otherwise, returns the original value of Product.
+//
+// Based on m.Manufacturer:
+//   - name: "favero_product", value: typedef.FaveroProduct(m.Product)
+//   - name: "garmin_product", value: typedef.GarminProduct(m.Product)
+//
+// Otherwise:
+//   - name: "product", value: m.Product
+func (m *TrainingFile) GetProduct() (name string, value any) {
+	switch m.Manufacturer {
+	case typedef.ManufacturerFaveroElectronics:
+		return "favero_product", typedef.FaveroProduct(m.Product)
+	case typedef.ManufacturerGarmin, typedef.ManufacturerDynastream, typedef.ManufacturerDynastreamOem, typedef.ManufacturerTacx:
+		return "garmin_product", typedef.GarminProduct(m.Product)
+	}
+	return "product", m.Product
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *TrainingFile) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

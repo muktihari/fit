@@ -112,6 +112,21 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetCalibrationFactor returns Dynamic Field interpretation of CalibrationFactor. Otherwise, returns the original value of CalibrationFactor.
+//
+// Based on m.SensorType:
+//   - name: "baro_cal_factor", units: "Pa" , value: uint32(m.CalibrationFactor)
+//
+// Otherwise:
+//   - name: "calibration_factor", value: m.CalibrationFactor
+func (m *OneDSensorCalibration) GetCalibrationFactor() (name string, value any) {
+	switch m.SensorType {
+	case typedef.SensorTypeBarometer:
+		return "baro_cal_factor", uint32(m.CalibrationFactor)
+	}
+	return "calibration_factor", m.CalibrationFactor
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *OneDSensorCalibration) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

@@ -120,6 +120,24 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetCalibrationFactor returns Dynamic Field interpretation of CalibrationFactor. Otherwise, returns the original value of CalibrationFactor.
+//
+// Based on m.SensorType:
+//   - name: "accel_cal_factor", units: "g" , value: uint32(m.CalibrationFactor)
+//   - name: "gyro_cal_factor", units: "deg/s" , value: uint32(m.CalibrationFactor)
+//
+// Otherwise:
+//   - name: "calibration_factor", value: m.CalibrationFactor
+func (m *ThreeDSensorCalibration) GetCalibrationFactor() (name string, value any) {
+	switch m.SensorType {
+	case typedef.SensorTypeAccelerometer:
+		return "accel_cal_factor", uint32(m.CalibrationFactor)
+	case typedef.SensorTypeGyroscope:
+		return "gyro_cal_factor", uint32(m.CalibrationFactor)
+	}
+	return "calibration_factor", m.CalibrationFactor
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *ThreeDSensorCalibration) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

@@ -114,6 +114,30 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+{{ range .DynamicFields -}}
+// Get{{ .Name }} returns Dynamic Field interpretation of {{ .Name }}. Otherwise, returns the original value of {{ .Name }}.
+// 
+{{ range .SwitchCases -}} 
+// Based on {{ .Name }}:
+	{{ range .CondsValue -}}
+//   - name: "{{ .ReturnValue.Name }}" {{- if .ReturnValue.Units -}}, units: "{{ .ReturnValue.Units }}" {{ end }}, value: {{ .ReturnValue.Value }}
+	{{ end -}}
+{{ end -}}
+// Otherwise:
+//   - name: "{{ .Default.Name }}" {{- if .Default.Units -}}, units: "{{ .Default.Units }}" {{ end }}, value: {{ .Default.Value }}
+func (m *{{ $.Name }}) Get{{ .Name }}() (name string, value any) {
+{{ range .SwitchCases -}}
+	switch {{ .Name -}} {
+	{{- range .CondsValue }}
+	case {{ .Conds }}:
+		return "{{ .ReturnValue.Name }}", {{ .ReturnValue.Value -}}
+	{{ end}}
+	}
+{{ end -}}
+	return "{{ .Default.Name }}", {{ .Default.Value }}
+}
+{{ end }}
+
 {{ range .Fields -}}
 {{ if eq .Type "time.Time" }}
 // {{ .Name }}Uint32 returns {{ .Name }} in uint32 (seconds since FIT's epoch) instead of time.Time.

@@ -19,6 +19,18 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+type ( // type aliasing for better code reading.
+	// types
+	BaseType = string
+
+	// messages
+	MessageName = string
+	FieldName   = string
+
+	// profile
+	ProfileType = string
+)
+
 type mesgdefBuilder struct {
 	template     *template.Template
 	templateExec string
@@ -30,11 +42,11 @@ type mesgdefBuilder struct {
 	messages []parser.Message
 	types    []parser.Type
 
-	goTypesByBaseTypes       map[string]string // (k -> v) enum -> byte
-	goTypesByProfileTypes    map[string]string // (k -> v) typedef.DateTime -> uint32
-	baseTypeMapByProfileType map[string]string // (k -> v) enum -> enum, typedef.DateTime -> uint32
+	goTypesByBaseTypes       map[BaseType]string      // (k -> v) enum -> byte
+	goTypesByProfileTypes    map[ProfileType]string   // (k -> v) typedef.DateTime -> uint32
+	baseTypeMapByProfileType map[ProfileType]BaseType // (k -> v) enum -> enum, typedef.DateTime -> uint32
 
-	fieldByMesgNameByFieldName map[string]map[string]parser.Field
+	fieldMapByMessageNameByFieldName map[MessageName]map[FieldName]parser.Field // e.g. map[file_createor][software_version] -> Field{}
 }
 
 func NewBuilder(path string, message []parser.Message, types []parser.Type) builder.Builder {
@@ -43,14 +55,14 @@ func NewBuilder(path string, message []parser.Message, types []parser.Type) buil
 	return &mesgdefBuilder{
 		template: template.Must(template.New("main").
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
-		templateExec:               "mesgdef",
-		path:                       filepath.Join(path, "profile", "mesgdef"),
-		messages:                   message,
-		types:                      types,
-		goTypesByBaseTypes:         make(map[string]string),
-		goTypesByProfileTypes:      make(map[string]string),
-		baseTypeMapByProfileType:   make(map[string]string),
-		fieldByMesgNameByFieldName: make(map[string]map[string]parser.Field),
+		templateExec:                     "mesgdef",
+		path:                             filepath.Join(path, "profile", "mesgdef"),
+		messages:                         message,
+		types:                            types,
+		goTypesByBaseTypes:               make(map[string]string),
+		goTypesByProfileTypes:            make(map[string]string),
+		baseTypeMapByProfileType:         make(map[string]string),
+		fieldMapByMessageNameByFieldName: make(map[string]map[string]parser.Field),
 	}
 }
 
@@ -72,9 +84,9 @@ func (b *mesgdefBuilder) populateLookupData() {
 	}
 
 	for _, mesg := range b.messages {
-		b.fieldByMesgNameByFieldName[mesg.Name] = make(map[string]parser.Field)
+		b.fieldMapByMessageNameByFieldName[mesg.Name] = make(map[string]parser.Field)
 		for _, field := range mesg.Fields {
-			b.fieldByMesgNameByFieldName[mesg.Name][field.Name] = field
+			b.fieldMapByMessageNameByFieldName[mesg.Name][field.Name] = field
 		}
 	}
 }
@@ -88,7 +100,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		var maxFieldExpandNum byte
 		for _, field := range mesg.Fields {
 			for _, component := range field.Components {
-				ref := b.fieldByMesgNameByFieldName[mesg.Name][component]
+				ref := b.fieldMapByMessageNameByFieldName[mesg.Name][component]
 				canExpandMap[ref.Name] = ref.Num
 				if ref.Num > maxFieldExpandNum {
 					maxFieldExpandNum = ref.Num
@@ -96,7 +108,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			}
 			for _, subfield := range field.SubFields {
 				for _, component := range subfield.Components {
-					ref := b.fieldByMesgNameByFieldName[mesg.Name][component]
+					ref := b.fieldMapByMessageNameByFieldName[mesg.Name][component]
 					canExpandMap[ref.Name] = ref.Num
 					if ref.Num > maxFieldExpandNum {
 						maxFieldExpandNum = ref.Num
@@ -113,19 +125,17 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		}
 
 		imports := map[string]struct{}{}
-
 		var maxFieldNum byte
+		var dynamicFields []DynamicField
 		fields := make([]Field, 0, len(mesg.Fields))
-		for i := range mesg.Fields {
-			field := &mesg.Fields[i]
-
+		for _, field := range mesg.Fields {
 			if field.Num > maxFieldNum {
 				maxFieldNum = field.Num
 			}
 
 			f := Field{
 				Num:            field.Num,
-				Name:           strutil.ToTitle(mesg.Fields[i].Name),
+				Name:           strutil.ToTitle(field.Name),
 				String:         field.Name,
 				ProfileType:    field.Type,
 				BaseType:       b.baseTypeMapByProfileType[field.Type],
@@ -205,6 +215,77 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			if f.Units == "semicircles" {
 				imports["github.com/muktihari/fit/kit/semicircles"] = struct{}{}
 			}
+
+			if len(field.SubFields) != 0 {
+				dynamicField := DynamicField{
+					Name: f.Name,
+					Default: ReturnValue{
+						Name:  field.Name,
+						Units: field.Units,
+						Value: fmt.Sprintf("m.%s", f.Name),
+					},
+				}
+
+				maps := map[string]map[string][]string{}
+				for _, subField := range field.SubFields {
+					var nameValueUnits string
+					scale := scaleOrDefault(subField.Scales, 0)
+					offset := offsetOrDefault(subField.Offsets, 0)
+					if scale != 1 || offset != 0 {
+						nameValueUnits = fmt.Sprintf("%s|%s|(float64(m.%s) * %g) - %g",
+							subField.Name, subField.Units, f.Name, scale, offset)
+					} else {
+						nameValueUnits = fmt.Sprintf("%s|%s|%s(m.%s)",
+							subField.Name, subField.Units, b.transformType(subField.Type, ""), f.Name)
+					}
+
+					for i, refValueName := range subField.RefFieldNames {
+						fieldRef := b.fieldMapByMessageNameByFieldName[mesg.Name][refValueName]
+
+						m := maps[fieldRef.Name]
+						if m == nil {
+							m = map[string][]string{}
+						}
+
+						m[nameValueUnits] = append(m[nameValueUnits],
+							fmt.Sprintf("%s%s",
+								b.transformType(fieldRef.Type, fieldRef.Array), strutil.ToTitle(subField.RefFieldValue[i])))
+
+						maps[fieldRef.Name] = m
+					}
+
+					scs := make([]SwitchCase, 0, len(maps))
+					for fieldRefName, rawSwitchCases := range maps {
+						sc := SwitchCase{Name: fmt.Sprintf("m.%s", strutil.ToTitle(fieldRefName))}
+
+						for nameUnitsValue, conditions := range rawSwitchCases {
+							parts := strings.Split(nameUnitsValue, "|")
+
+							sc.CondsValue = append(sc.CondsValue, CondValue{
+								Conds: strings.Join(conditions, ","),
+								ReturnValue: ReturnValue{
+									Name:  parts[0],
+									Units: parts[1],
+									Value: parts[2],
+								},
+							})
+						}
+						scs = append(scs, sc)
+					}
+
+					slices.SortStableFunc(scs, func(a, b SwitchCase) int {
+						if a.Name < b.Name {
+							return -1
+						} else if a.Name > b.Name {
+							return 1
+						}
+						return 0
+					})
+
+					dynamicField.SwitchCases = scs
+				}
+				dynamicFields = append(dynamicFields, dynamicField)
+			}
 		}
 
 		// Optimize memory usage by aligning the memory in the struct.
@@ -215,6 +296,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			Imports:           []string{},
 			Name:              strutil.ToTitle(mesg.Name),
 			Fields:            fields,
+			DynamicFields:     dynamicFields,
 			MaxFieldNum:       maxFieldNum + 1,
 			MaxFieldExpandNum: maxFieldExpandNum + 1,
 		}

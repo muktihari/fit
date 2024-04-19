@@ -317,6 +317,24 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetHeartRateSource returns Dynamic Field interpretation of HeartRateSource. Otherwise, returns the original value of HeartRateSource.
+//
+// Based on m.HeartRateSourceType:
+//   - name: "heart_rate_antplus_device_type", value: typedef.AntplusDeviceType(m.HeartRateSource)
+//   - name: "heart_rate_local_device_type", value: typedef.LocalDeviceType(m.HeartRateSource)
+//
+// Otherwise:
+//   - name: "heart_rate_source", value: m.HeartRateSource
+func (m *DiveSettings) GetHeartRateSource() (name string, value any) {
+	switch m.HeartRateSourceType {
+	case typedef.SourceTypeAntplus:
+		return "heart_rate_antplus_device_type", typedef.AntplusDeviceType(m.HeartRateSource)
+	case typedef.SourceTypeLocal:
+		return "heart_rate_local_device_type", typedef.LocalDeviceType(m.HeartRateSource)
+	}
+	return "heart_rate_source", m.HeartRateSource
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DiveSettings) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
