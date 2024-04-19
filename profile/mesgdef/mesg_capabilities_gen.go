@@ -103,6 +103,27 @@ func (m *MesgCapabilities) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetCount returns Dynamic Field interpretation of Count. Otherwise, returns the original value of Count.
+//
+// Based on m.CountType:
+//   - name: "num_per_file", value: uint16(m.Count)
+//   - name: "max_per_file", value: uint16(m.Count)
+//   - name: "max_per_file_type", value: uint16(m.Count)
+//
+// Otherwise:
+//   - name: "count", value: m.Count
+func (m *MesgCapabilities) GetCount() (name string, value any) {
+	switch m.CountType {
+	case typedef.MesgCountNumPerFile:
+		return "num_per_file", uint16(m.Count)
+	case typedef.MesgCountMaxPerFile:
+		return "max_per_file", uint16(m.Count)
+	case typedef.MesgCountMaxPerFileType:
+		return "max_per_file_type", uint16(m.Count)
+	}
+	return "count", m.Count
+}
+
 // SetMessageIndex sets MesgCapabilities value.
 func (m *MesgCapabilities) SetMessageIndex(v typedef.MessageIndex) *MesgCapabilities {
 	m.MessageIndex = v

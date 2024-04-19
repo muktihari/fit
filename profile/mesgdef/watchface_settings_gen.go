@@ -89,6 +89,24 @@ func (m *WatchfaceSettings) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetLayout returns Dynamic Field interpretation of Layout. Otherwise, returns the original value of Layout.
+//
+// Based on m.Mode:
+//   - name: "digital_layout", value: typedef.DigitalWatchfaceLayout(m.Layout)
+//   - name: "analog_layout", value: typedef.AnalogWatchfaceLayout(m.Layout)
+//
+// Otherwise:
+//   - name: "layout", value: m.Layout
+func (m *WatchfaceSettings) GetLayout() (name string, value any) {
+	switch m.Mode {
+	case typedef.WatchfaceModeDigital:
+		return "digital_layout", typedef.DigitalWatchfaceLayout(m.Layout)
+	case typedef.WatchfaceModeAnalog:
+		return "analog_layout", typedef.AnalogWatchfaceLayout(m.Layout)
+	}
+	return "layout", m.Layout
+}
+
 // SetMessageIndex sets WatchfaceSettings value.
 func (m *WatchfaceSettings) SetMessageIndex(v typedef.MessageIndex) *WatchfaceSettings {
 	m.MessageIndex = v

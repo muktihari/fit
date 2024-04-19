@@ -749,6 +749,21 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetTotalCycles returns Dynamic Field interpretation of TotalCycles. Otherwise, returns the original value of TotalCycles.
+//
+// Based on m.Sport:
+//   - name: "total_strokes", units: "strokes" , value: uint32(m.TotalCycles)
+//
+// Otherwise:
+//   - name: "total_cycles", units: "cycles" , value: m.TotalCycles
+func (m *SegmentLap) GetTotalCycles() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportCycling:
+		return "total_strokes", uint32(m.TotalCycles)
+	}
+	return "total_cycles", m.TotalCycles
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *SegmentLap) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 

@@ -949,6 +949,54 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// GetTotalCycles returns Dynamic Field interpretation of TotalCycles. Otherwise, returns the original value of TotalCycles.
+//
+// Based on m.Sport:
+//   - name: "total_strides", units: "strides" , value: uint32(m.TotalCycles)
+//   - name: "total_strokes", units: "strokes" , value: uint32(m.TotalCycles)
+//
+// Otherwise:
+//   - name: "total_cycles", units: "cycles" , value: m.TotalCycles
+func (m *Lap) GetTotalCycles() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning, typedef.SportWalking:
+		return "total_strides", uint32(m.TotalCycles)
+	case typedef.SportCycling, typedef.SportSwimming, typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "total_strokes", uint32(m.TotalCycles)
+	}
+	return "total_cycles", m.TotalCycles
+}
+
+// GetAvgCadence returns Dynamic Field interpretation of AvgCadence. Otherwise, returns the original value of AvgCadence.
+//
+// Based on m.Sport:
+//   - name: "avg_running_cadence", units: "strides/min" , value: uint8(m.AvgCadence)
+//
+// Otherwise:
+//   - name: "avg_cadence", units: "rpm" , value: m.AvgCadence
+func (m *Lap) GetAvgCadence() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning:
+		return "avg_running_cadence", uint8(m.AvgCadence)
+	}
+	return "avg_cadence", m.AvgCadence
+}
+
+// GetMaxCadence returns Dynamic Field interpretation of MaxCadence. Otherwise, returns the original value of MaxCadence.
+//
+// Based on m.Sport:
+//   - name: "max_running_cadence", units: "strides/min" , value: uint8(m.MaxCadence)
+//
+// Otherwise:
+//   - name: "max_cadence", units: "rpm" , value: m.MaxCadence
+func (m *Lap) GetMaxCadence() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning:
+		return "max_running_cadence", uint8(m.MaxCadence)
+	}
+	return "max_cadence", m.MaxCadence
+}
+
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Lap) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
