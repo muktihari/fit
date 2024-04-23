@@ -16,6 +16,9 @@ import (
 )
 
 // BeatIntervals is a BeatIntervals message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type BeatIntervals struct {
 	Timestamp   time.Time
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
@@ -44,8 +47,8 @@ func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 
 	return &BeatIntervals{
 		Timestamp:   datetime.ToTime(vals[253].Uint32()),
-		Time:        vals[1].SliceUint16(),
 		TimestampMs: vals[0].Uint16(),
+		Time:        vals[1].SliceUint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,14 +75,14 @@ func (m *BeatIntervals) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.Time != nil {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceUint16(m.Time)
-		fields = append(fields, field)
-	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
+	if m.Time != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.SliceUint16(m.Time)
 		fields = append(fields, field)
 	}
 
@@ -100,19 +103,19 @@ func (m *BeatIntervals) SetTimestamp(v time.Time) *BeatIntervals {
 	return m
 }
 
-// SetTime sets BeatIntervals value.
-//
-// Array: [N]; Units: ms; Array of millisecond times between beats
-func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
-	m.Time = v
-	return m
-}
-
 // SetTimestampMs sets BeatIntervals value.
 //
 // Units: ms; Milliseconds past date_time
 func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
 	m.TimestampMs = v
+	return m
+}
+
+// SetTime sets BeatIntervals value.
+//
+// Array: [N]; Units: ms; Array of millisecond times between beats
+func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
+	m.Time = v
 	return m
 }
 

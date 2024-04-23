@@ -17,6 +17,9 @@ import (
 )
 
 // HsaWristTemperatureData is a HsaWristTemperatureData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaWristTemperatureData struct {
 	Timestamp          time.Time // Units: s
 	Value              []uint16  // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
@@ -45,8 +48,8 @@ func NewHsaWristTemperatureData(mesg *proto.Message) *HsaWristTemperatureData {
 
 	return &HsaWristTemperatureData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		Value:              vals[1].SliceUint16(),
 		ProcessingInterval: vals[0].Uint16(),
+		Value:              vals[1].SliceUint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -73,14 +76,14 @@ func (m *HsaWristTemperatureData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.Value != nil {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceUint16(m.Value)
-		fields = append(fields, field)
-	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
+	if m.Value != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.SliceUint16(m.Value)
 		fields = append(fields, field)
 	}
 
@@ -113,19 +116,19 @@ func (m *HsaWristTemperatureData) SetTimestamp(v time.Time) *HsaWristTemperature
 	return m
 }
 
-// SetValue sets HsaWristTemperatureData value.
-//
-// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
-func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData {
-	m.Value = v
-	return m
-}
-
 // SetProcessingInterval sets HsaWristTemperatureData value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaWristTemperatureData) SetProcessingInterval(v uint16) *HsaWristTemperatureData {
 	m.ProcessingInterval = v
+	return m
+}
+
+// SetValue sets HsaWristTemperatureData value.
+//
+// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData {
+	m.Value = v
 	return m
 }
 

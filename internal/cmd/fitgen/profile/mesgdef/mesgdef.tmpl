@@ -19,8 +19,11 @@ import (
 )
 
 // {{ .Name }} is a {{ .Name }} message.
+// 
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type {{ .Name }} struct {
-	{{ range .Fields -}}
+	{{ range .OptimizedFields -}}
 	{{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
 	{{ end }}
 
@@ -119,7 +122,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 // 
 {{ range .SwitchCases -}} 
 // Based on {{ .Name }}:
-	{{ range .CondsValue -}}
+	{{ range .CondValues -}}
 //   - name: "{{ .ReturnValue.Name }}" {{- if .ReturnValue.Units -}}, units: "{{ .ReturnValue.Units }}" {{ end }}, value: {{ .ReturnValue.Value }}
 	{{ end -}}
 {{ end -}}
@@ -128,8 +131,8 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 func (m *{{ $.Name }}) Get{{ .Name }}() (name string, value any) {
 {{ range .SwitchCases -}}
 	switch {{ .Name -}} {
-	{{- range .CondsValue }}
-	case {{ .Conds }}:
+	{{- range .CondValues }}
+	case {{ stringsJoin .Conds "," }}:
 		return "{{ .ReturnValue.Name }}", {{ .ReturnValue.Value -}}
 	{{ end}}
 	}

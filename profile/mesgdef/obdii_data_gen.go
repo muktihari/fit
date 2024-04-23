@@ -16,6 +16,9 @@ import (
 )
 
 // ObdiiData is a ObdiiData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ObdiiData struct {
 	Timestamp        time.Time // Units: s; Timestamp message was output
 	TimeOffset       []uint16  // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
@@ -50,14 +53,14 @@ func NewObdiiData(mesg *proto.Message) *ObdiiData {
 
 	return &ObdiiData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
 		TimeOffset:       vals[1].SliceUint16(),
+		Pid:              vals[2].Uint8(),
 		RawData:          vals[3].SliceUint8(),
 		PidDataSize:      vals[4].SliceUint8(),
 		SystemTime:       vals[5].SliceUint32(),
 		StartTimestamp:   datetime.ToTime(vals[6].Uint32()),
-		TimestampMs:      vals[0].Uint16(),
 		StartTimestampMs: vals[7].Uint16(),
-		Pid:              vals[2].Uint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -84,9 +87,19 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
 	if m.TimeOffset != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint16(m.TimeOffset)
+		fields = append(fields, field)
+	}
+	if m.Pid != basetype.ByteInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint8(m.Pid)
 		fields = append(fields, field)
 	}
 	if m.RawData != nil {
@@ -109,19 +122,9 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint16(m.StartTimestampMs)
-		fields = append(fields, field)
-	}
-	if m.Pid != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint8(m.Pid)
 		fields = append(fields, field)
 	}
 
@@ -147,11 +150,27 @@ func (m *ObdiiData) SetTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
+// SetTimestampMs sets ObdiiData value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
+	m.TimestampMs = v
+	return m
+}
+
 // SetTimeOffset sets ObdiiData value.
 //
 // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
 func (m *ObdiiData) SetTimeOffset(v []uint16) *ObdiiData {
 	m.TimeOffset = v
+	return m
+}
+
+// SetPid sets ObdiiData value.
+//
+// Parameter ID
+func (m *ObdiiData) SetPid(v byte) *ObdiiData {
+	m.Pid = v
 	return m
 }
 
@@ -187,27 +206,11 @@ func (m *ObdiiData) SetStartTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
-// SetTimestampMs sets ObdiiData value.
-//
-// Units: ms; Fractional part of timestamp, added to timestamp
-func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
-	m.TimestampMs = v
-	return m
-}
-
 // SetStartTimestampMs sets ObdiiData value.
 //
 // Units: ms; Fractional part of start_timestamp
 func (m *ObdiiData) SetStartTimestampMs(v uint16) *ObdiiData {
 	m.StartTimestampMs = v
-	return m
-}
-
-// SetPid sets ObdiiData value.
-//
-// Parameter ID
-func (m *ObdiiData) SetPid(v byte) *ObdiiData {
-	m.Pid = v
 	return m
 }
 

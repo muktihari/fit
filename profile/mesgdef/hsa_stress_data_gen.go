@@ -16,6 +16,9 @@ import (
 )
 
 // HsaStressData is a HsaStressData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaStressData struct {
 	Timestamp          time.Time
 	StressLevel        []int8 // Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
@@ -44,8 +47,8 @@ func NewHsaStressData(mesg *proto.Message) *HsaStressData {
 
 	return &HsaStressData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		StressLevel:        vals[1].SliceInt8(),
 		ProcessingInterval: vals[0].Uint16(),
+		StressLevel:        vals[1].SliceInt8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,14 +75,14 @@ func (m *HsaStressData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.StressLevel != nil {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceInt8(m.StressLevel)
-		fields = append(fields, field)
-	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
+	if m.StressLevel != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.SliceInt8(m.StressLevel)
 		fields = append(fields, field)
 	}
 
@@ -100,19 +103,19 @@ func (m *HsaStressData) SetTimestamp(v time.Time) *HsaStressData {
 	return m
 }
 
-// SetStressLevel sets HsaStressData value.
-//
-// Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
-func (m *HsaStressData) SetStressLevel(v []int8) *HsaStressData {
-	m.StressLevel = v
-	return m
-}
-
 // SetProcessingInterval sets HsaStressData value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaStressData) SetProcessingInterval(v uint16) *HsaStressData {
 	m.ProcessingInterval = v
+	return m
+}
+
+// SetStressLevel sets HsaStressData value.
+//
+// Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+func (m *HsaStressData) SetStressLevel(v []int8) *HsaStressData {
+	m.StressLevel = v
 	return m
 }
 

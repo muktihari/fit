@@ -17,6 +17,9 @@ import (
 )
 
 // SegmentPoint is a SegmentPoint message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SegmentPoint struct {
 	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 	PositionLat      int32    // Units: semicircles
@@ -54,13 +57,13 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	}
 
 	return &SegmentPoint{
-		LeaderTime:       vals[5].SliceUint32(),
+		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
 		PositionLat:      vals[1].Int32(),
 		PositionLong:     vals[2].Int32(),
 		Distance:         vals[3].Uint32(),
-		EnhancedAltitude: vals[6].Uint32(),
-		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
 		Altitude:         vals[4].Uint16(),
+		LeaderTime:       vals[5].SliceUint32(),
+		EnhancedAltitude: vals[6].Uint32(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -84,9 +87,9 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSegmentPoint}
 
-	if m.LeaderTime != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceUint32(m.LeaderTime)
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -104,20 +107,20 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
+	if m.Altitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint16(m.Altitude)
+		fields = append(fields, field)
+	}
+	if m.LeaderTime != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.SliceUint32(m.LeaderTime)
+		fields = append(fields, field)
+	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint32(m.EnhancedAltitude)
 		field.IsExpandedField = m.IsExpandedFields[6]
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
-	if m.Altitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint16(m.Altitude)
 		fields = append(fields, field)
 	}
 
@@ -127,16 +130,6 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// LeaderTimeScaled return LeaderTime in its scaled value [Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.].
-//
-// If LeaderTime value is invalid, nil will be returned.
-func (m *SegmentPoint) LeaderTimeScaled() []float64 {
-	if m.LeaderTime == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
 }
 
 // DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance along the segment at the described point].
@@ -149,16 +142,6 @@ func (m *SegmentPoint) DistanceScaled() float64 {
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
 
-// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
-//
-// If EnhancedAltitude value is invalid, float64 invalid value will be returned.
-func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
-	if m.EnhancedAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
-}
-
 // AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
 //
 // If Altitude value is invalid, float64 invalid value will be returned.
@@ -169,17 +152,35 @@ func (m *SegmentPoint) AltitudeScaled() float64 {
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
 
+// LeaderTimeScaled return LeaderTime in its scaled value [Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.].
+//
+// If LeaderTime value is invalid, nil will be returned.
+func (m *SegmentPoint) LeaderTimeScaled() []float64 {
+	if m.LeaderTime == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
+}
+
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
+//
+// If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
+	if m.EnhancedAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+}
+
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
 func (m *SegmentPoint) PositionLatDegrees() float64 { return semicircles.ToDegrees(m.PositionLat) }
 
 // PositionLongDegrees returns PositionLong in degrees instead of semicircles.
 func (m *SegmentPoint) PositionLongDegrees() float64 { return semicircles.ToDegrees(m.PositionLong) }
 
-// SetLeaderTime sets SegmentPoint value.
-//
-// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
-func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
-	m.LeaderTime = v
+// SetMessageIndex sets SegmentPoint value.
+func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
+	m.MessageIndex = v
 	return m
 }
 
@@ -207,25 +208,27 @@ func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
 	return m
 }
 
-// SetEnhancedAltitude sets SegmentPoint value.
-//
-// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
-func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
-	m.EnhancedAltitude = v
-	return m
-}
-
-// SetMessageIndex sets SegmentPoint value.
-func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
-	m.MessageIndex = v
-	return m
-}
-
 // SetAltitude sets SegmentPoint value.
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
 	m.Altitude = v
+	return m
+}
+
+// SetLeaderTime sets SegmentPoint value.
+//
+// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
+func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
+	m.LeaderTime = v
+	return m
+}
+
+// SetEnhancedAltitude sets SegmentPoint value.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
+	m.EnhancedAltitude = v
 	return m
 }
 

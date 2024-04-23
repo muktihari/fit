@@ -14,6 +14,9 @@ import (
 )
 
 // DeveloperDataId is a DeveloperDataId message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type DeveloperDataId struct {
 	DeveloperId        []byte // Array: [N]
 	ApplicationId      []byte // Array: [N]
@@ -39,9 +42,9 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 	return &DeveloperDataId{
 		DeveloperId:        vals[0].SliceUint8(),
 		ApplicationId:      vals[1].SliceUint8(),
-		ApplicationVersion: vals[4].Uint32(),
 		ManufacturerId:     typedef.Manufacturer(vals[2].Uint16()),
 		DeveloperDataIndex: vals[3].Uint8(),
+		ApplicationVersion: vals[4].Uint32(),
 	}
 }
 
@@ -71,11 +74,6 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.ApplicationId)
 		fields = append(fields, field)
 	}
-	if m.ApplicationVersion != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint32(m.ApplicationVersion)
-		fields = append(fields, field)
-	}
 	if uint16(m.ManufacturerId) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.ManufacturerId))
@@ -84,6 +82,11 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.DeveloperDataIndex)
+		fields = append(fields, field)
+	}
+	if m.ApplicationVersion != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint32(m.ApplicationVersion)
 		fields = append(fields, field)
 	}
 
@@ -109,12 +112,6 @@ func (m *DeveloperDataId) SetApplicationId(v []byte) *DeveloperDataId {
 	return m
 }
 
-// SetApplicationVersion sets DeveloperDataId value.
-func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
-	m.ApplicationVersion = v
-	return m
-}
-
 // SetManufacturerId sets DeveloperDataId value.
 func (m *DeveloperDataId) SetManufacturerId(v typedef.Manufacturer) *DeveloperDataId {
 	m.ManufacturerId = v
@@ -124,5 +121,11 @@ func (m *DeveloperDataId) SetManufacturerId(v typedef.Manufacturer) *DeveloperDa
 // SetDeveloperDataIndex sets DeveloperDataId value.
 func (m *DeveloperDataId) SetDeveloperDataIndex(v uint8) *DeveloperDataId {
 	m.DeveloperDataIndex = v
+	return m
+}
+
+// SetApplicationVersion sets DeveloperDataId value.
+func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
+	m.ApplicationVersion = v
 	return m
 }

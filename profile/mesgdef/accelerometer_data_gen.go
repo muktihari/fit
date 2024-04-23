@@ -16,6 +16,9 @@ import (
 )
 
 // AccelerometerData is a AccelerometerData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type AccelerometerData struct {
 	Timestamp                  time.Time // Units: s; Whole second part of the timestamp
 	SampleTimeOffset           []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
@@ -53,6 +56,7 @@ func NewAccelerometerData(mesg *proto.Message) *AccelerometerData {
 
 	return &AccelerometerData{
 		Timestamp:                  datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:                vals[0].Uint16(),
 		SampleTimeOffset:           vals[1].SliceUint16(),
 		AccelX:                     vals[2].SliceUint16(),
 		AccelY:                     vals[3].SliceUint16(),
@@ -63,7 +67,6 @@ func NewAccelerometerData(mesg *proto.Message) *AccelerometerData {
 		CompressedCalibratedAccelX: vals[8].SliceInt16(),
 		CompressedCalibratedAccelY: vals[9].SliceInt16(),
 		CompressedCalibratedAccelZ: vals[10].SliceInt16(),
-		TimestampMs:                vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -88,6 +91,11 @@ func (m *AccelerometerData) ToMesg(options *Options) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
@@ -140,11 +148,6 @@ func (m *AccelerometerData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceInt16(m.CompressedCalibratedAccelZ)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -162,6 +165,14 @@ func (m *AccelerometerData) TimestampUint32() uint32 { return datetime.ToUint32(
 // Units: s; Whole second part of the timestamp
 func (m *AccelerometerData) SetTimestamp(v time.Time) *AccelerometerData {
 	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets AccelerometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
+	m.TimestampMs = v
 	return m
 }
 
@@ -242,14 +253,6 @@ func (m *AccelerometerData) SetCompressedCalibratedAccelY(v []int16) *Accelerome
 // Array: [N]; Units: mG; Calibrated accel reading
 func (m *AccelerometerData) SetCompressedCalibratedAccelZ(v []int16) *AccelerometerData {
 	m.CompressedCalibratedAccelZ = v
-	return m
-}
-
-// SetTimestampMs sets AccelerometerData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
-	m.TimestampMs = v
 	return m
 }
 

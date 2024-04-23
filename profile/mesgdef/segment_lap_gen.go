@@ -19,6 +19,9 @@ import (
 )
 
 // SegmentLap is a SegmentLap message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SegmentLap struct {
 	Timestamp                   time.Time // Units: s; Lap end time.
 	StartTime                   time.Time
@@ -144,22 +147,11 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 	}
 
 	return &SegmentLap{
+		MessageIndex:                typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:                   datetime.ToTime(vals[253].Uint32()),
+		Event:                       typedef.Event(vals[0].Uint8()),
+		EventType:                   typedef.EventType(vals[1].Uint8()),
 		StartTime:                   datetime.ToTime(vals[2].Uint32()),
-		Name:                        vals[29].String(),
-		TimeInHrZone:                vals[49].SliceUint32(),
-		TimeInSpeedZone:             vals[50].SliceUint32(),
-		TimeInCadenceZone:           vals[51].SliceUint32(),
-		TimeInPowerZone:             vals[52].SliceUint32(),
-		Uuid:                        vals[65].String(),
-		AvgLeftPowerPhase:           vals[75].SliceUint8(),
-		AvgLeftPowerPhasePeak:       vals[76].SliceUint8(),
-		AvgRightPowerPhase:          vals[77].SliceUint8(),
-		AvgRightPowerPhasePeak:      vals[78].SliceUint8(),
-		AvgPowerPosition:            vals[79].SliceUint16(),
-		MaxPowerPosition:            vals[80].SliceUint16(),
-		AvgCadencePosition:          vals[81].SliceUint8(),
-		MaxCadencePosition:          vals[82].SliceUint8(),
 		StartPositionLat:            vals[3].Int32(),
 		StartPositionLong:           vals[4].Int32(),
 		EndPositionLat:              vals[5].Int32(),
@@ -168,63 +160,53 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 		TotalTimerTime:              vals[8].Uint32(),
 		TotalDistance:               vals[9].Uint32(),
 		TotalCycles:                 vals[10].Uint32(),
-		NecLat:                      vals[25].Int32(),
-		NecLong:                     vals[26].Int32(),
-		SwcLat:                      vals[27].Int32(),
-		SwcLong:                     vals[28].Int32(),
-		TotalWork:                   vals[33].Uint32(),
-		TotalMovingTime:             vals[44].Uint32(),
-		ActiveTime:                  vals[56].Uint32(),
-		TimeStanding:                vals[71].Uint32(),
-		TotalGrit:                   vals[84].Float32(),
-		TotalFlow:                   vals[85].Float32(),
-		AvgGrit:                     vals[86].Float32(),
-		AvgFlow:                     vals[87].Float32(),
-		EnhancedAvgAltitude:         vals[91].Uint32(),
-		EnhancedMaxAltitude:         vals[92].Uint32(),
-		EnhancedMinAltitude:         vals[93].Uint32(),
-		MessageIndex:                typedef.MessageIndex(vals[254].Uint16()),
 		TotalCalories:               vals[11].Uint16(),
 		TotalFatCalories:            vals[12].Uint16(),
 		AvgSpeed:                    vals[13].Uint16(),
 		MaxSpeed:                    vals[14].Uint16(),
+		AvgHeartRate:                vals[15].Uint8(),
+		MaxHeartRate:                vals[16].Uint8(),
+		AvgCadence:                  vals[17].Uint8(),
+		MaxCadence:                  vals[18].Uint8(),
 		AvgPower:                    vals[19].Uint16(),
 		MaxPower:                    vals[20].Uint16(),
 		TotalAscent:                 vals[21].Uint16(),
 		TotalDescent:                vals[22].Uint16(),
+		Sport:                       typedef.Sport(vals[23].Uint8()),
+		EventGroup:                  vals[24].Uint8(),
+		NecLat:                      vals[25].Int32(),
+		NecLong:                     vals[26].Int32(),
+		SwcLat:                      vals[27].Int32(),
+		SwcLong:                     vals[28].Int32(),
+		Name:                        vals[29].String(),
 		NormalizedPower:             vals[30].Uint16(),
 		LeftRightBalance:            typedef.LeftRightBalance100(vals[31].Uint16()),
+		SubSport:                    typedef.SubSport(vals[32].Uint8()),
+		TotalWork:                   vals[33].Uint32(),
 		AvgAltitude:                 vals[34].Uint16(),
 		MaxAltitude:                 vals[35].Uint16(),
+		GpsAccuracy:                 vals[36].Uint8(),
 		AvgGrade:                    vals[37].Int16(),
 		AvgPosGrade:                 vals[38].Int16(),
 		AvgNegGrade:                 vals[39].Int16(),
 		MaxPosGrade:                 vals[40].Int16(),
 		MaxNegGrade:                 vals[41].Int16(),
+		AvgTemperature:              vals[42].Int8(),
+		MaxTemperature:              vals[43].Int8(),
+		TotalMovingTime:             vals[44].Uint32(),
 		AvgPosVerticalSpeed:         vals[45].Int16(),
 		AvgNegVerticalSpeed:         vals[46].Int16(),
 		MaxPosVerticalSpeed:         vals[47].Int16(),
 		MaxNegVerticalSpeed:         vals[48].Int16(),
+		TimeInHrZone:                vals[49].SliceUint32(),
+		TimeInSpeedZone:             vals[50].SliceUint32(),
+		TimeInCadenceZone:           vals[51].SliceUint32(),
+		TimeInPowerZone:             vals[52].SliceUint32(),
 		RepetitionNum:               vals[53].Uint16(),
 		MinAltitude:                 vals[54].Uint16(),
-		WktStepIndex:                typedef.MessageIndex(vals[57].Uint16()),
-		FrontGearShiftCount:         vals[69].Uint16(),
-		RearGearShiftCount:          vals[70].Uint16(),
-		StandCount:                  vals[72].Uint16(),
-		Manufacturer:                typedef.Manufacturer(vals[83].Uint16()),
-		Event:                       typedef.Event(vals[0].Uint8()),
-		EventType:                   typedef.EventType(vals[1].Uint8()),
-		AvgHeartRate:                vals[15].Uint8(),
-		MaxHeartRate:                vals[16].Uint8(),
-		AvgCadence:                  vals[17].Uint8(),
-		MaxCadence:                  vals[18].Uint8(),
-		Sport:                       typedef.Sport(vals[23].Uint8()),
-		EventGroup:                  vals[24].Uint8(),
-		SubSport:                    typedef.SubSport(vals[32].Uint8()),
-		GpsAccuracy:                 vals[36].Uint8(),
-		AvgTemperature:              vals[42].Int8(),
-		MaxTemperature:              vals[43].Int8(),
 		MinHeartRate:                vals[55].Uint8(),
+		ActiveTime:                  vals[56].Uint32(),
+		WktStepIndex:                typedef.MessageIndex(vals[57].Uint16()),
 		SportEvent:                  typedef.SportEvent(vals[58].Uint8()),
 		AvgLeftTorqueEffectiveness:  vals[59].Uint8(),
 		AvgRightTorqueEffectiveness: vals[60].Uint8(),
@@ -232,13 +214,34 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 		AvgRightPedalSmoothness:     vals[62].Uint8(),
 		AvgCombinedPedalSmoothness:  vals[63].Uint8(),
 		Status:                      typedef.SegmentLapStatus(vals[64].Uint8()),
+		Uuid:                        vals[65].String(),
 		AvgFractionalCadence:        vals[66].Uint8(),
 		MaxFractionalCadence:        vals[67].Uint8(),
 		TotalFractionalCycles:       vals[68].Uint8(),
+		FrontGearShiftCount:         vals[69].Uint16(),
+		RearGearShiftCount:          vals[70].Uint16(),
+		TimeStanding:                vals[71].Uint32(),
+		StandCount:                  vals[72].Uint16(),
 		AvgLeftPco:                  vals[73].Int8(),
 		AvgRightPco:                 vals[74].Int8(),
+		AvgLeftPowerPhase:           vals[75].SliceUint8(),
+		AvgLeftPowerPhasePeak:       vals[76].SliceUint8(),
+		AvgRightPowerPhase:          vals[77].SliceUint8(),
+		AvgRightPowerPhasePeak:      vals[78].SliceUint8(),
+		AvgPowerPosition:            vals[79].SliceUint16(),
+		MaxPowerPosition:            vals[80].SliceUint16(),
+		AvgCadencePosition:          vals[81].SliceUint8(),
+		MaxCadencePosition:          vals[82].SliceUint8(),
+		Manufacturer:                typedef.Manufacturer(vals[83].Uint16()),
+		TotalGrit:                   vals[84].Float32(),
+		TotalFlow:                   vals[85].Float32(),
+		AvgGrit:                     vals[86].Float32(),
+		AvgFlow:                     vals[87].Float32(),
 		TotalFractionalAscent:       vals[89].Uint8(),
 		TotalFractionalDescent:      vals[90].Uint8(),
+		EnhancedAvgAltitude:         vals[91].Uint32(),
+		EnhancedMaxAltitude:         vals[92].Uint32(),
+		EnhancedMinAltitude:         vals[93].Uint32(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -262,84 +265,29 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSegmentLap}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if byte(m.Event) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Event))
+		fields = append(fields, field)
+	}
+	if byte(m.EventType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.EventType))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
-		fields = append(fields, field)
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 29)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
-	if m.TimeInHrZone != nil {
-		field := fac.CreateField(mesg.Num, 49)
-		field.Value = proto.SliceUint32(m.TimeInHrZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInSpeedZone != nil {
-		field := fac.CreateField(mesg.Num, 50)
-		field.Value = proto.SliceUint32(m.TimeInSpeedZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInCadenceZone != nil {
-		field := fac.CreateField(mesg.Num, 51)
-		field.Value = proto.SliceUint32(m.TimeInCadenceZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInPowerZone != nil {
-		field := fac.CreateField(mesg.Num, 52)
-		field.Value = proto.SliceUint32(m.TimeInPowerZone)
-		fields = append(fields, field)
-	}
-	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
-		field := fac.CreateField(mesg.Num, 65)
-		field.Value = proto.String(m.Uuid)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPowerPhase != nil {
-		field := fac.CreateField(mesg.Num, 75)
-		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPowerPhasePeak != nil {
-		field := fac.CreateField(mesg.Num, 76)
-		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPowerPhase != nil {
-		field := fac.CreateField(mesg.Num, 77)
-		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPowerPhasePeak != nil {
-		field := fac.CreateField(mesg.Num, 78)
-		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
-		fields = append(fields, field)
-	}
-	if m.AvgPowerPosition != nil {
-		field := fac.CreateField(mesg.Num, 79)
-		field.Value = proto.SliceUint16(m.AvgPowerPosition)
-		fields = append(fields, field)
-	}
-	if m.MaxPowerPosition != nil {
-		field := fac.CreateField(mesg.Num, 80)
-		field.Value = proto.SliceUint16(m.MaxPowerPosition)
-		fields = append(fields, field)
-	}
-	if m.AvgCadencePosition != nil {
-		field := fac.CreateField(mesg.Num, 81)
-		field.Value = proto.SliceUint8(m.AvgCadencePosition)
-		fields = append(fields, field)
-	}
-	if m.MaxCadencePosition != nil {
-		field := fac.CreateField(mesg.Num, 82)
-		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -382,89 +330,6 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TotalCycles)
 		fields = append(fields, field)
 	}
-	if m.NecLat != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 25)
-		field.Value = proto.Int32(m.NecLat)
-		fields = append(fields, field)
-	}
-	if m.NecLong != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 26)
-		field.Value = proto.Int32(m.NecLong)
-		fields = append(fields, field)
-	}
-	if m.SwcLat != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 27)
-		field.Value = proto.Int32(m.SwcLat)
-		fields = append(fields, field)
-	}
-	if m.SwcLong != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 28)
-		field.Value = proto.Int32(m.SwcLong)
-		fields = append(fields, field)
-	}
-	if m.TotalWork != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 33)
-		field.Value = proto.Uint32(m.TotalWork)
-		fields = append(fields, field)
-	}
-	if m.TotalMovingTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 44)
-		field.Value = proto.Uint32(m.TotalMovingTime)
-		fields = append(fields, field)
-	}
-	if m.ActiveTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 56)
-		field.Value = proto.Uint32(m.ActiveTime)
-		fields = append(fields, field)
-	}
-	if m.TimeStanding != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 71)
-		field.Value = proto.Uint32(m.TimeStanding)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 84)
-		field.Value = proto.Float32(m.TotalGrit)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.TotalFlow) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 85)
-		field.Value = proto.Float32(m.TotalFlow)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.AvgGrit) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 86)
-		field.Value = proto.Float32(m.AvgGrit)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 87)
-		field.Value = proto.Float32(m.AvgFlow)
-		fields = append(fields, field)
-	}
-	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[91] && options.IncludeExpandedFields) || !m.IsExpandedFields[91]) {
-		field := fac.CreateField(mesg.Num, 91)
-		field.Value = proto.Uint32(m.EnhancedAvgAltitude)
-		field.IsExpandedField = m.IsExpandedFields[91]
-		fields = append(fields, field)
-	}
-	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[92] && options.IncludeExpandedFields) || !m.IsExpandedFields[92]) {
-		field := fac.CreateField(mesg.Num, 92)
-		field.Value = proto.Uint32(m.EnhancedMaxAltitude)
-		field.IsExpandedField = m.IsExpandedFields[92]
-		fields = append(fields, field)
-	}
-	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[93] && options.IncludeExpandedFields) || !m.IsExpandedFields[93]) {
-		field := fac.CreateField(mesg.Num, 93)
-		field.Value = proto.Uint32(m.EnhancedMinAltitude)
-		field.IsExpandedField = m.IsExpandedFields[93]
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
 	if m.TotalCalories != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint16(m.TotalCalories)
@@ -483,6 +348,26 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	if m.MaxSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint16(m.MaxSpeed)
+		fields = append(fields, field)
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint8(m.AvgHeartRate)
+		fields = append(fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = proto.Uint8(m.MaxHeartRate)
+		fields = append(fields, field)
+	}
+	if m.AvgCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = proto.Uint8(m.AvgCadence)
+		fields = append(fields, field)
+	}
+	if m.MaxCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = proto.Uint8(m.MaxCadence)
 		fields = append(fields, field)
 	}
 	if m.AvgPower != basetype.Uint16Invalid {
@@ -505,6 +390,41 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.TotalDescent)
 		fields = append(fields, field)
 	}
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = proto.Uint8(byte(m.Sport))
+		fields = append(fields, field)
+	}
+	if m.EventGroup != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = proto.Uint8(m.EventGroup)
+		fields = append(fields, field)
+	}
+	if m.NecLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 25)
+		field.Value = proto.Int32(m.NecLat)
+		fields = append(fields, field)
+	}
+	if m.NecLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 26)
+		field.Value = proto.Int32(m.NecLong)
+		fields = append(fields, field)
+	}
+	if m.SwcLat != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 27)
+		field.Value = proto.Int32(m.SwcLat)
+		fields = append(fields, field)
+	}
+	if m.SwcLong != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 28)
+		field.Value = proto.Int32(m.SwcLong)
+		fields = append(fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 29)
+		field.Value = proto.String(m.Name)
+		fields = append(fields, field)
+	}
 	if m.NormalizedPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = proto.Uint16(m.NormalizedPower)
@@ -515,6 +435,16 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
 		fields = append(fields, field)
 	}
+	if byte(m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 32)
+		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
+	if m.TotalWork != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 33)
+		field.Value = proto.Uint32(m.TotalWork)
+		fields = append(fields, field)
+	}
 	if m.AvgAltitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 34)
 		field.Value = proto.Uint16(m.AvgAltitude)
@@ -523,6 +453,11 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	if m.MaxAltitude != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 35)
 		field.Value = proto.Uint16(m.MaxAltitude)
+		fields = append(fields, field)
+	}
+	if m.GpsAccuracy != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 36)
+		field.Value = proto.Uint8(m.GpsAccuracy)
 		fields = append(fields, field)
 	}
 	if m.AvgGrade != basetype.Sint16Invalid {
@@ -550,6 +485,21 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int16(m.MaxNegGrade)
 		fields = append(fields, field)
 	}
+	if m.AvgTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 42)
+		field.Value = proto.Int8(m.AvgTemperature)
+		fields = append(fields, field)
+	}
+	if m.MaxTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 43)
+		field.Value = proto.Int8(m.MaxTemperature)
+		fields = append(fields, field)
+	}
+	if m.TotalMovingTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 44)
+		field.Value = proto.Uint32(m.TotalMovingTime)
+		fields = append(fields, field)
+	}
 	if m.AvgPosVerticalSpeed != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 45)
 		field.Value = proto.Int16(m.AvgPosVerticalSpeed)
@@ -570,6 +520,26 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int16(m.MaxNegVerticalSpeed)
 		fields = append(fields, field)
 	}
+	if m.TimeInHrZone != nil {
+		field := fac.CreateField(mesg.Num, 49)
+		field.Value = proto.SliceUint32(m.TimeInHrZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInSpeedZone != nil {
+		field := fac.CreateField(mesg.Num, 50)
+		field.Value = proto.SliceUint32(m.TimeInSpeedZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInCadenceZone != nil {
+		field := fac.CreateField(mesg.Num, 51)
+		field.Value = proto.SliceUint32(m.TimeInCadenceZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInPowerZone != nil {
+		field := fac.CreateField(mesg.Num, 52)
+		field.Value = proto.SliceUint32(m.TimeInPowerZone)
+		fields = append(fields, field)
+	}
 	if m.RepetitionNum != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 53)
 		field.Value = proto.Uint16(m.RepetitionNum)
@@ -580,94 +550,19 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.MinAltitude)
 		fields = append(fields, field)
 	}
-	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 57)
-		field.Value = proto.Uint16(uint16(m.WktStepIndex))
-		fields = append(fields, field)
-	}
-	if m.FrontGearShiftCount != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 69)
-		field.Value = proto.Uint16(m.FrontGearShiftCount)
-		fields = append(fields, field)
-	}
-	if m.RearGearShiftCount != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 70)
-		field.Value = proto.Uint16(m.RearGearShiftCount)
-		fields = append(fields, field)
-	}
-	if m.StandCount != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 72)
-		field.Value = proto.Uint16(m.StandCount)
-		fields = append(fields, field)
-	}
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 83)
-		field.Value = proto.Uint16(uint16(m.Manufacturer))
-		fields = append(fields, field)
-	}
-	if byte(m.Event) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Event))
-		fields = append(fields, field)
-	}
-	if byte(m.EventType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.EventType))
-		fields = append(fields, field)
-	}
-	if m.AvgHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Uint8(m.AvgHeartRate)
-		fields = append(fields, field)
-	}
-	if m.MaxHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 16)
-		field.Value = proto.Uint8(m.MaxHeartRate)
-		fields = append(fields, field)
-	}
-	if m.AvgCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 17)
-		field.Value = proto.Uint8(m.AvgCadence)
-		fields = append(fields, field)
-	}
-	if m.MaxCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 18)
-		field.Value = proto.Uint8(m.MaxCadence)
-		fields = append(fields, field)
-	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 23)
-		field.Value = proto.Uint8(byte(m.Sport))
-		fields = append(fields, field)
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 24)
-		field.Value = proto.Uint8(m.EventGroup)
-		fields = append(fields, field)
-	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 32)
-		field.Value = proto.Uint8(byte(m.SubSport))
-		fields = append(fields, field)
-	}
-	if m.GpsAccuracy != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 36)
-		field.Value = proto.Uint8(m.GpsAccuracy)
-		fields = append(fields, field)
-	}
-	if m.AvgTemperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 42)
-		field.Value = proto.Int8(m.AvgTemperature)
-		fields = append(fields, field)
-	}
-	if m.MaxTemperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 43)
-		field.Value = proto.Int8(m.MaxTemperature)
-		fields = append(fields, field)
-	}
 	if m.MinHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 55)
 		field.Value = proto.Uint8(m.MinHeartRate)
+		fields = append(fields, field)
+	}
+	if m.ActiveTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 56)
+		field.Value = proto.Uint32(m.ActiveTime)
+		fields = append(fields, field)
+	}
+	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 57)
+		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.SportEvent) != basetype.EnumInvalid {
@@ -705,6 +600,11 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
 	}
+	if m.Uuid != basetype.StringInvalid && m.Uuid != "" {
+		field := fac.CreateField(mesg.Num, 65)
+		field.Value = proto.String(m.Uuid)
+		fields = append(fields, field)
+	}
 	if m.AvgFractionalCadence != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 66)
 		field.Value = proto.Uint8(m.AvgFractionalCadence)
@@ -720,6 +620,26 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.TotalFractionalCycles)
 		fields = append(fields, field)
 	}
+	if m.FrontGearShiftCount != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 69)
+		field.Value = proto.Uint16(m.FrontGearShiftCount)
+		fields = append(fields, field)
+	}
+	if m.RearGearShiftCount != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 70)
+		field.Value = proto.Uint16(m.RearGearShiftCount)
+		fields = append(fields, field)
+	}
+	if m.TimeStanding != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 71)
+		field.Value = proto.Uint32(m.TimeStanding)
+		fields = append(fields, field)
+	}
+	if m.StandCount != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 72)
+		field.Value = proto.Uint16(m.StandCount)
+		fields = append(fields, field)
+	}
 	if m.AvgLeftPco != basetype.Sint8Invalid {
 		field := fac.CreateField(mesg.Num, 73)
 		field.Value = proto.Int8(m.AvgLeftPco)
@@ -730,6 +650,71 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int8(m.AvgRightPco)
 		fields = append(fields, field)
 	}
+	if m.AvgLeftPowerPhase != nil {
+		field := fac.CreateField(mesg.Num, 75)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPowerPhasePeak != nil {
+		field := fac.CreateField(mesg.Num, 76)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhase != nil {
+		field := fac.CreateField(mesg.Num, 77)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhasePeak != nil {
+		field := fac.CreateField(mesg.Num, 78)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgPowerPosition != nil {
+		field := fac.CreateField(mesg.Num, 79)
+		field.Value = proto.SliceUint16(m.AvgPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.MaxPowerPosition != nil {
+		field := fac.CreateField(mesg.Num, 80)
+		field.Value = proto.SliceUint16(m.MaxPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.AvgCadencePosition != nil {
+		field := fac.CreateField(mesg.Num, 81)
+		field.Value = proto.SliceUint8(m.AvgCadencePosition)
+		fields = append(fields, field)
+	}
+	if m.MaxCadencePosition != nil {
+		field := fac.CreateField(mesg.Num, 82)
+		field.Value = proto.SliceUint8(m.MaxCadencePosition)
+		fields = append(fields, field)
+	}
+	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 83)
+		field.Value = proto.Uint16(uint16(m.Manufacturer))
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 84)
+		field.Value = proto.Float32(m.TotalGrit)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.TotalFlow) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 85)
+		field.Value = proto.Float32(m.TotalFlow)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.AvgGrit) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 86)
+		field.Value = proto.Float32(m.AvgGrit)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 87)
+		field.Value = proto.Float32(m.AvgFlow)
+		fields = append(fields, field)
+	}
 	if m.TotalFractionalAscent != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 89)
 		field.Value = proto.Uint8(m.TotalFractionalAscent)
@@ -738,6 +723,24 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	if m.TotalFractionalDescent != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 90)
 		field.Value = proto.Uint8(m.TotalFractionalDescent)
+		fields = append(fields, field)
+	}
+	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[91] && options.IncludeExpandedFields) || !m.IsExpandedFields[91]) {
+		field := fac.CreateField(mesg.Num, 91)
+		field.Value = proto.Uint32(m.EnhancedAvgAltitude)
+		field.IsExpandedField = m.IsExpandedFields[91]
+		fields = append(fields, field)
+	}
+	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[92] && options.IncludeExpandedFields) || !m.IsExpandedFields[92]) {
+		field := fac.CreateField(mesg.Num, 92)
+		field.Value = proto.Uint32(m.EnhancedMaxAltitude)
+		field.IsExpandedField = m.IsExpandedFields[92]
+		fields = append(fields, field)
+	}
+	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[93] && options.IncludeExpandedFields) || !m.IsExpandedFields[93]) {
+		field := fac.CreateField(mesg.Num, 93)
+		field.Value = proto.Uint32(m.EnhancedMinAltitude)
+		field.IsExpandedField = m.IsExpandedFields[93]
 		fields = append(fields, field)
 	}
 
@@ -770,86 +773,6 @@ func (m *SegmentLap) TimestampUint32() uint32 { return datetime.ToUint32(m.Times
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *SegmentLap) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInHrZone value is invalid, nil will be returned.
-func (m *SegmentLap) TimeInHrZoneScaled() []float64 {
-	if m.TimeInHrZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
-}
-
-// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInSpeedZone value is invalid, nil will be returned.
-func (m *SegmentLap) TimeInSpeedZoneScaled() []float64 {
-	if m.TimeInSpeedZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
-}
-
-// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInCadenceZone value is invalid, nil will be returned.
-func (m *SegmentLap) TimeInCadenceZoneScaled() []float64 {
-	if m.TimeInCadenceZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
-}
-
-// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInPowerZone value is invalid, nil will be returned.
-func (m *SegmentLap) TimeInPowerZoneScaled() []float64 {
-	if m.TimeInPowerZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
-}
-
-// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgLeftPowerPhase value is invalid, nil will be returned.
-func (m *SegmentLap) AvgLeftPowerPhaseScaled() []float64 {
-	if m.AvgLeftPowerPhase == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
-}
-
-// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
-func (m *SegmentLap) AvgLeftPowerPhasePeakScaled() []float64 {
-	if m.AvgLeftPowerPhasePeak == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
-}
-
-// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgRightPowerPhase value is invalid, nil will be returned.
-func (m *SegmentLap) AvgRightPowerPhaseScaled() []float64 {
-	if m.AvgRightPowerPhase == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
-}
-
-// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgRightPowerPhasePeak value is invalid, nil will be returned.
-func (m *SegmentLap) AvgRightPowerPhasePeakScaled() []float64 {
-	if m.AvgRightPowerPhasePeak == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
-}
-
 // TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s; Time (includes pauses)].
 //
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
@@ -878,66 +801,6 @@ func (m *SegmentLap) TotalDistanceScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
-}
-
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
-// If TotalMovingTime value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) TotalMovingTimeScaled() float64 {
-	if m.TotalMovingTime == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
-}
-
-// ActiveTimeScaled return ActiveTime in its scaled value [Scale: 1000; Units: s].
-//
-// If ActiveTime value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) ActiveTimeScaled() float64 {
-	if m.ActiveTime == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
-}
-
-// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spent in the standing position].
-//
-// If TimeStanding value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) TimeStandingScaled() float64 {
-	if m.TimeStanding == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
-}
-
-// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
-	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
-}
-
-// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
-	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
-}
-
-// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
-func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
-	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
@@ -1030,6 +893,16 @@ func (m *SegmentLap) MaxNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
 
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalMovingTime value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) TotalMovingTimeScaled() float64 {
+	if m.TotalMovingTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+}
+
 // AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
 //
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
@@ -1070,6 +943,46 @@ func (m *SegmentLap) MaxNegVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
 }
 
+// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInHrZone value is invalid, nil will be returned.
+func (m *SegmentLap) TimeInHrZoneScaled() []float64 {
+	if m.TimeInHrZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
+}
+
+// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInSpeedZone value is invalid, nil will be returned.
+func (m *SegmentLap) TimeInSpeedZoneScaled() []float64 {
+	if m.TimeInSpeedZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
+}
+
+// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInCadenceZone value is invalid, nil will be returned.
+func (m *SegmentLap) TimeInCadenceZoneScaled() []float64 {
+	if m.TimeInCadenceZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
+}
+
+// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInPowerZone value is invalid, nil will be returned.
+func (m *SegmentLap) TimeInPowerZoneScaled() []float64 {
+	if m.TimeInPowerZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
+}
+
 // MinAltitudeScaled return MinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
 //
 // If MinAltitude value is invalid, float64 invalid value will be returned.
@@ -1078,6 +991,16 @@ func (m *SegmentLap) MinAltitudeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MinAltitude, 5, 500)
+}
+
+// ActiveTimeScaled return ActiveTime in its scaled value [Scale: 1000; Units: s].
+//
+// If ActiveTime value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) ActiveTimeScaled() float64 {
+	if m.ActiveTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
 }
 
 // AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
@@ -1160,6 +1083,56 @@ func (m *SegmentLap) TotalFractionalCyclesScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
 }
 
+// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spent in the standing position].
+//
+// If TimeStanding value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) TimeStandingScaled() float64 {
+	if m.TimeStanding == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
+}
+
+// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgLeftPowerPhase value is invalid, nil will be returned.
+func (m *SegmentLap) AvgLeftPowerPhaseScaled() []float64 {
+	if m.AvgLeftPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
+}
+
+// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
+func (m *SegmentLap) AvgLeftPowerPhasePeakScaled() []float64 {
+	if m.AvgLeftPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
+}
+
+// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgRightPowerPhase value is invalid, nil will be returned.
+func (m *SegmentLap) AvgRightPowerPhaseScaled() []float64 {
+	if m.AvgRightPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
+}
+
+// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgRightPowerPhasePeak value is invalid, nil will be returned.
+func (m *SegmentLap) AvgRightPowerPhasePeakScaled() []float64 {
+	if m.AvgRightPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
+}
+
 // TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value [Scale: 100; Units: m; fractional part of total_ascent].
 //
 // If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
@@ -1178,6 +1151,36 @@ func (m *SegmentLap) TotalFractionalDescentScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
+}
+
+// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
+	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
+}
+
+// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
+	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
+}
+
+// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
+func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
+	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
 }
 
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
@@ -1210,6 +1213,12 @@ func (m *SegmentLap) SwcLatDegrees() float64 { return semicircles.ToDegrees(m.Sw
 // SwcLongDegrees returns SwcLong in degrees instead of semicircles.
 func (m *SegmentLap) SwcLongDegrees() float64 { return semicircles.ToDegrees(m.SwcLong) }
 
+// SetMessageIndex sets SegmentLap value.
+func (m *SegmentLap) SetMessageIndex(v typedef.MessageIndex) *SegmentLap {
+	m.MessageIndex = v
+	return m
+}
+
 // SetTimestamp sets SegmentLap value.
 //
 // Units: s; Lap end time.
@@ -1218,117 +1227,21 @@ func (m *SegmentLap) SetTimestamp(v time.Time) *SegmentLap {
 	return m
 }
 
+// SetEvent sets SegmentLap value.
+func (m *SegmentLap) SetEvent(v typedef.Event) *SegmentLap {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets SegmentLap value.
+func (m *SegmentLap) SetEventType(v typedef.EventType) *SegmentLap {
+	m.EventType = v
+	return m
+}
+
 // SetStartTime sets SegmentLap value.
 func (m *SegmentLap) SetStartTime(v time.Time) *SegmentLap {
 	m.StartTime = v
-	return m
-}
-
-// SetName sets SegmentLap value.
-func (m *SegmentLap) SetName(v string) *SegmentLap {
-	m.Name = v
-	return m
-}
-
-// SetTimeInHrZone sets SegmentLap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *SegmentLap) SetTimeInHrZone(v []uint32) *SegmentLap {
-	m.TimeInHrZone = v
-	return m
-}
-
-// SetTimeInSpeedZone sets SegmentLap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *SegmentLap) SetTimeInSpeedZone(v []uint32) *SegmentLap {
-	m.TimeInSpeedZone = v
-	return m
-}
-
-// SetTimeInCadenceZone sets SegmentLap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *SegmentLap) SetTimeInCadenceZone(v []uint32) *SegmentLap {
-	m.TimeInCadenceZone = v
-	return m
-}
-
-// SetTimeInPowerZone sets SegmentLap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *SegmentLap) SetTimeInPowerZone(v []uint32) *SegmentLap {
-	m.TimeInPowerZone = v
-	return m
-}
-
-// SetUuid sets SegmentLap value.
-func (m *SegmentLap) SetUuid(v string) *SegmentLap {
-	m.Uuid = v
-	return m
-}
-
-// SetAvgLeftPowerPhase sets SegmentLap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
-func (m *SegmentLap) SetAvgLeftPowerPhase(v []uint8) *SegmentLap {
-	m.AvgLeftPowerPhase = v
-	return m
-}
-
-// SetAvgLeftPowerPhasePeak sets SegmentLap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
-func (m *SegmentLap) SetAvgLeftPowerPhasePeak(v []uint8) *SegmentLap {
-	m.AvgLeftPowerPhasePeak = v
-	return m
-}
-
-// SetAvgRightPowerPhase sets SegmentLap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
-func (m *SegmentLap) SetAvgRightPowerPhase(v []uint8) *SegmentLap {
-	m.AvgRightPowerPhase = v
-	return m
-}
-
-// SetAvgRightPowerPhasePeak sets SegmentLap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
-func (m *SegmentLap) SetAvgRightPowerPhasePeak(v []uint8) *SegmentLap {
-	m.AvgRightPowerPhasePeak = v
-	return m
-}
-
-// SetAvgPowerPosition sets SegmentLap value.
-//
-// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
-func (m *SegmentLap) SetAvgPowerPosition(v []uint16) *SegmentLap {
-	m.AvgPowerPosition = v
-	return m
-}
-
-// SetMaxPowerPosition sets SegmentLap value.
-//
-// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
-func (m *SegmentLap) SetMaxPowerPosition(v []uint16) *SegmentLap {
-	m.MaxPowerPosition = v
-	return m
-}
-
-// SetAvgCadencePosition sets SegmentLap value.
-//
-// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
-func (m *SegmentLap) SetAvgCadencePosition(v []uint8) *SegmentLap {
-	m.AvgCadencePosition = v
-	return m
-}
-
-// SetMaxCadencePosition sets SegmentLap value.
-//
-// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
-func (m *SegmentLap) SetMaxCadencePosition(v []uint8) *SegmentLap {
-	m.MaxCadencePosition = v
 	return m
 }
 
@@ -1396,132 +1309,6 @@ func (m *SegmentLap) SetTotalCycles(v uint32) *SegmentLap {
 	return m
 }
 
-// SetNecLat sets SegmentLap value.
-//
-// Units: semicircles; North east corner latitude.
-func (m *SegmentLap) SetNecLat(v int32) *SegmentLap {
-	m.NecLat = v
-	return m
-}
-
-// SetNecLong sets SegmentLap value.
-//
-// Units: semicircles; North east corner longitude.
-func (m *SegmentLap) SetNecLong(v int32) *SegmentLap {
-	m.NecLong = v
-	return m
-}
-
-// SetSwcLat sets SegmentLap value.
-//
-// Units: semicircles; South west corner latitude.
-func (m *SegmentLap) SetSwcLat(v int32) *SegmentLap {
-	m.SwcLat = v
-	return m
-}
-
-// SetSwcLong sets SegmentLap value.
-//
-// Units: semicircles; South west corner latitude.
-func (m *SegmentLap) SetSwcLong(v int32) *SegmentLap {
-	m.SwcLong = v
-	return m
-}
-
-// SetTotalWork sets SegmentLap value.
-//
-// Units: J
-func (m *SegmentLap) SetTotalWork(v uint32) *SegmentLap {
-	m.TotalWork = v
-	return m
-}
-
-// SetTotalMovingTime sets SegmentLap value.
-//
-// Scale: 1000; Units: s
-func (m *SegmentLap) SetTotalMovingTime(v uint32) *SegmentLap {
-	m.TotalMovingTime = v
-	return m
-}
-
-// SetActiveTime sets SegmentLap value.
-//
-// Scale: 1000; Units: s
-func (m *SegmentLap) SetActiveTime(v uint32) *SegmentLap {
-	m.ActiveTime = v
-	return m
-}
-
-// SetTimeStanding sets SegmentLap value.
-//
-// Scale: 1000; Units: s; Total time spent in the standing position
-func (m *SegmentLap) SetTimeStanding(v uint32) *SegmentLap {
-	m.TimeStanding = v
-	return m
-}
-
-// SetTotalGrit sets SegmentLap value.
-//
-// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-func (m *SegmentLap) SetTotalGrit(v float32) *SegmentLap {
-	m.TotalGrit = v
-	return m
-}
-
-// SetTotalFlow sets SegmentLap value.
-//
-// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-func (m *SegmentLap) SetTotalFlow(v float32) *SegmentLap {
-	m.TotalFlow = v
-	return m
-}
-
-// SetAvgGrit sets SegmentLap value.
-//
-// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-func (m *SegmentLap) SetAvgGrit(v float32) *SegmentLap {
-	m.AvgGrit = v
-	return m
-}
-
-// SetAvgFlow sets SegmentLap value.
-//
-// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-func (m *SegmentLap) SetAvgFlow(v float32) *SegmentLap {
-	m.AvgFlow = v
-	return m
-}
-
-// SetEnhancedAvgAltitude sets SegmentLap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *SegmentLap) SetEnhancedAvgAltitude(v uint32) *SegmentLap {
-	m.EnhancedAvgAltitude = v
-	return m
-}
-
-// SetEnhancedMaxAltitude sets SegmentLap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *SegmentLap) SetEnhancedMaxAltitude(v uint32) *SegmentLap {
-	m.EnhancedMaxAltitude = v
-	return m
-}
-
-// SetEnhancedMinAltitude sets SegmentLap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *SegmentLap) SetEnhancedMinAltitude(v uint32) *SegmentLap {
-	m.EnhancedMinAltitude = v
-	return m
-}
-
-// SetMessageIndex sets SegmentLap value.
-func (m *SegmentLap) SetMessageIndex(v typedef.MessageIndex) *SegmentLap {
-	m.MessageIndex = v
-	return m
-}
-
 // SetTotalCalories sets SegmentLap value.
 //
 // Units: kcal
@@ -1551,6 +1338,38 @@ func (m *SegmentLap) SetAvgSpeed(v uint16) *SegmentLap {
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetMaxSpeed(v uint16) *SegmentLap {
 	m.MaxSpeed = v
+	return m
+}
+
+// SetAvgHeartRate sets SegmentLap value.
+//
+// Units: bpm
+func (m *SegmentLap) SetAvgHeartRate(v uint8) *SegmentLap {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets SegmentLap value.
+//
+// Units: bpm
+func (m *SegmentLap) SetMaxHeartRate(v uint8) *SegmentLap {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetAvgCadence sets SegmentLap value.
+//
+// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
+func (m *SegmentLap) SetAvgCadence(v uint8) *SegmentLap {
+	m.AvgCadence = v
+	return m
+}
+
+// SetMaxCadence sets SegmentLap value.
+//
+// Units: rpm
+func (m *SegmentLap) SetMaxCadence(v uint8) *SegmentLap {
+	m.MaxCadence = v
 	return m
 }
 
@@ -1586,6 +1405,56 @@ func (m *SegmentLap) SetTotalDescent(v uint16) *SegmentLap {
 	return m
 }
 
+// SetSport sets SegmentLap value.
+func (m *SegmentLap) SetSport(v typedef.Sport) *SegmentLap {
+	m.Sport = v
+	return m
+}
+
+// SetEventGroup sets SegmentLap value.
+func (m *SegmentLap) SetEventGroup(v uint8) *SegmentLap {
+	m.EventGroup = v
+	return m
+}
+
+// SetNecLat sets SegmentLap value.
+//
+// Units: semicircles; North east corner latitude.
+func (m *SegmentLap) SetNecLat(v int32) *SegmentLap {
+	m.NecLat = v
+	return m
+}
+
+// SetNecLong sets SegmentLap value.
+//
+// Units: semicircles; North east corner longitude.
+func (m *SegmentLap) SetNecLong(v int32) *SegmentLap {
+	m.NecLong = v
+	return m
+}
+
+// SetSwcLat sets SegmentLap value.
+//
+// Units: semicircles; South west corner latitude.
+func (m *SegmentLap) SetSwcLat(v int32) *SegmentLap {
+	m.SwcLat = v
+	return m
+}
+
+// SetSwcLong sets SegmentLap value.
+//
+// Units: semicircles; South west corner latitude.
+func (m *SegmentLap) SetSwcLong(v int32) *SegmentLap {
+	m.SwcLong = v
+	return m
+}
+
+// SetName sets SegmentLap value.
+func (m *SegmentLap) SetName(v string) *SegmentLap {
+	m.Name = v
+	return m
+}
+
 // SetNormalizedPower sets SegmentLap value.
 //
 // Units: watts
@@ -1597,6 +1466,20 @@ func (m *SegmentLap) SetNormalizedPower(v uint16) *SegmentLap {
 // SetLeftRightBalance sets SegmentLap value.
 func (m *SegmentLap) SetLeftRightBalance(v typedef.LeftRightBalance100) *SegmentLap {
 	m.LeftRightBalance = v
+	return m
+}
+
+// SetSubSport sets SegmentLap value.
+func (m *SegmentLap) SetSubSport(v typedef.SubSport) *SegmentLap {
+	m.SubSport = v
+	return m
+}
+
+// SetTotalWork sets SegmentLap value.
+//
+// Units: J
+func (m *SegmentLap) SetTotalWork(v uint32) *SegmentLap {
+	m.TotalWork = v
 	return m
 }
 
@@ -1613,6 +1496,14 @@ func (m *SegmentLap) SetAvgAltitude(v uint16) *SegmentLap {
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetMaxAltitude(v uint16) *SegmentLap {
 	m.MaxAltitude = v
+	return m
+}
+
+// SetGpsAccuracy sets SegmentLap value.
+//
+// Units: m
+func (m *SegmentLap) SetGpsAccuracy(v uint8) *SegmentLap {
+	m.GpsAccuracy = v
 	return m
 }
 
@@ -1656,6 +1547,30 @@ func (m *SegmentLap) SetMaxNegGrade(v int16) *SegmentLap {
 	return m
 }
 
+// SetAvgTemperature sets SegmentLap value.
+//
+// Units: C
+func (m *SegmentLap) SetAvgTemperature(v int8) *SegmentLap {
+	m.AvgTemperature = v
+	return m
+}
+
+// SetMaxTemperature sets SegmentLap value.
+//
+// Units: C
+func (m *SegmentLap) SetMaxTemperature(v int8) *SegmentLap {
+	m.MaxTemperature = v
+	return m
+}
+
+// SetTotalMovingTime sets SegmentLap value.
+//
+// Scale: 1000; Units: s
+func (m *SegmentLap) SetTotalMovingTime(v uint32) *SegmentLap {
+	m.TotalMovingTime = v
+	return m
+}
+
 // SetAvgPosVerticalSpeed sets SegmentLap value.
 //
 // Scale: 1000; Units: m/s
@@ -1688,6 +1603,38 @@ func (m *SegmentLap) SetMaxNegVerticalSpeed(v int16) *SegmentLap {
 	return m
 }
 
+// SetTimeInHrZone sets SegmentLap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInHrZone(v []uint32) *SegmentLap {
+	m.TimeInHrZone = v
+	return m
+}
+
+// SetTimeInSpeedZone sets SegmentLap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInSpeedZone(v []uint32) *SegmentLap {
+	m.TimeInSpeedZone = v
+	return m
+}
+
+// SetTimeInCadenceZone sets SegmentLap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInCadenceZone(v []uint32) *SegmentLap {
+	m.TimeInCadenceZone = v
+	return m
+}
+
+// SetTimeInPowerZone sets SegmentLap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInPowerZone(v []uint32) *SegmentLap {
+	m.TimeInPowerZone = v
+	return m
+}
+
 // SetRepetitionNum sets SegmentLap value.
 func (m *SegmentLap) SetRepetitionNum(v uint16) *SegmentLap {
 	m.RepetitionNum = v
@@ -1702,131 +1649,25 @@ func (m *SegmentLap) SetMinAltitude(v uint16) *SegmentLap {
 	return m
 }
 
-// SetWktStepIndex sets SegmentLap value.
-func (m *SegmentLap) SetWktStepIndex(v typedef.MessageIndex) *SegmentLap {
-	m.WktStepIndex = v
-	return m
-}
-
-// SetFrontGearShiftCount sets SegmentLap value.
-func (m *SegmentLap) SetFrontGearShiftCount(v uint16) *SegmentLap {
-	m.FrontGearShiftCount = v
-	return m
-}
-
-// SetRearGearShiftCount sets SegmentLap value.
-func (m *SegmentLap) SetRearGearShiftCount(v uint16) *SegmentLap {
-	m.RearGearShiftCount = v
-	return m
-}
-
-// SetStandCount sets SegmentLap value.
-//
-// Number of transitions to the standing state
-func (m *SegmentLap) SetStandCount(v uint16) *SegmentLap {
-	m.StandCount = v
-	return m
-}
-
-// SetManufacturer sets SegmentLap value.
-//
-// Manufacturer that produced the segment
-func (m *SegmentLap) SetManufacturer(v typedef.Manufacturer) *SegmentLap {
-	m.Manufacturer = v
-	return m
-}
-
-// SetEvent sets SegmentLap value.
-func (m *SegmentLap) SetEvent(v typedef.Event) *SegmentLap {
-	m.Event = v
-	return m
-}
-
-// SetEventType sets SegmentLap value.
-func (m *SegmentLap) SetEventType(v typedef.EventType) *SegmentLap {
-	m.EventType = v
-	return m
-}
-
-// SetAvgHeartRate sets SegmentLap value.
-//
-// Units: bpm
-func (m *SegmentLap) SetAvgHeartRate(v uint8) *SegmentLap {
-	m.AvgHeartRate = v
-	return m
-}
-
-// SetMaxHeartRate sets SegmentLap value.
-//
-// Units: bpm
-func (m *SegmentLap) SetMaxHeartRate(v uint8) *SegmentLap {
-	m.MaxHeartRate = v
-	return m
-}
-
-// SetAvgCadence sets SegmentLap value.
-//
-// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
-func (m *SegmentLap) SetAvgCadence(v uint8) *SegmentLap {
-	m.AvgCadence = v
-	return m
-}
-
-// SetMaxCadence sets SegmentLap value.
-//
-// Units: rpm
-func (m *SegmentLap) SetMaxCadence(v uint8) *SegmentLap {
-	m.MaxCadence = v
-	return m
-}
-
-// SetSport sets SegmentLap value.
-func (m *SegmentLap) SetSport(v typedef.Sport) *SegmentLap {
-	m.Sport = v
-	return m
-}
-
-// SetEventGroup sets SegmentLap value.
-func (m *SegmentLap) SetEventGroup(v uint8) *SegmentLap {
-	m.EventGroup = v
-	return m
-}
-
-// SetSubSport sets SegmentLap value.
-func (m *SegmentLap) SetSubSport(v typedef.SubSport) *SegmentLap {
-	m.SubSport = v
-	return m
-}
-
-// SetGpsAccuracy sets SegmentLap value.
-//
-// Units: m
-func (m *SegmentLap) SetGpsAccuracy(v uint8) *SegmentLap {
-	m.GpsAccuracy = v
-	return m
-}
-
-// SetAvgTemperature sets SegmentLap value.
-//
-// Units: C
-func (m *SegmentLap) SetAvgTemperature(v int8) *SegmentLap {
-	m.AvgTemperature = v
-	return m
-}
-
-// SetMaxTemperature sets SegmentLap value.
-//
-// Units: C
-func (m *SegmentLap) SetMaxTemperature(v int8) *SegmentLap {
-	m.MaxTemperature = v
-	return m
-}
-
 // SetMinHeartRate sets SegmentLap value.
 //
 // Units: bpm
 func (m *SegmentLap) SetMinHeartRate(v uint8) *SegmentLap {
 	m.MinHeartRate = v
+	return m
+}
+
+// SetActiveTime sets SegmentLap value.
+//
+// Scale: 1000; Units: s
+func (m *SegmentLap) SetActiveTime(v uint32) *SegmentLap {
+	m.ActiveTime = v
+	return m
+}
+
+// SetWktStepIndex sets SegmentLap value.
+func (m *SegmentLap) SetWktStepIndex(v typedef.MessageIndex) *SegmentLap {
+	m.WktStepIndex = v
 	return m
 }
 
@@ -1882,6 +1723,12 @@ func (m *SegmentLap) SetStatus(v typedef.SegmentLapStatus) *SegmentLap {
 	return m
 }
 
+// SetUuid sets SegmentLap value.
+func (m *SegmentLap) SetUuid(v string) *SegmentLap {
+	m.Uuid = v
+	return m
+}
+
 // SetAvgFractionalCadence sets SegmentLap value.
 //
 // Scale: 128; Units: rpm; fractional part of the avg_cadence
@@ -1906,6 +1753,34 @@ func (m *SegmentLap) SetTotalFractionalCycles(v uint8) *SegmentLap {
 	return m
 }
 
+// SetFrontGearShiftCount sets SegmentLap value.
+func (m *SegmentLap) SetFrontGearShiftCount(v uint16) *SegmentLap {
+	m.FrontGearShiftCount = v
+	return m
+}
+
+// SetRearGearShiftCount sets SegmentLap value.
+func (m *SegmentLap) SetRearGearShiftCount(v uint16) *SegmentLap {
+	m.RearGearShiftCount = v
+	return m
+}
+
+// SetTimeStanding sets SegmentLap value.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *SegmentLap) SetTimeStanding(v uint32) *SegmentLap {
+	m.TimeStanding = v
+	return m
+}
+
+// SetStandCount sets SegmentLap value.
+//
+// Number of transitions to the standing state
+func (m *SegmentLap) SetStandCount(v uint16) *SegmentLap {
+	m.StandCount = v
+	return m
+}
+
 // SetAvgLeftPco sets SegmentLap value.
 //
 // Units: mm; Average left platform center offset
@@ -1922,6 +1797,110 @@ func (m *SegmentLap) SetAvgRightPco(v int8) *SegmentLap {
 	return m
 }
 
+// SetAvgLeftPowerPhase sets SegmentLap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgLeftPowerPhase(v []uint8) *SegmentLap {
+	m.AvgLeftPowerPhase = v
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets SegmentLap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgLeftPowerPhasePeak(v []uint8) *SegmentLap {
+	m.AvgLeftPowerPhasePeak = v
+	return m
+}
+
+// SetAvgRightPowerPhase sets SegmentLap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgRightPowerPhase(v []uint8) *SegmentLap {
+	m.AvgRightPowerPhase = v
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets SegmentLap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgRightPowerPhasePeak(v []uint8) *SegmentLap {
+	m.AvgRightPowerPhasePeak = v
+	return m
+}
+
+// SetAvgPowerPosition sets SegmentLap value.
+//
+// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+func (m *SegmentLap) SetAvgPowerPosition(v []uint16) *SegmentLap {
+	m.AvgPowerPosition = v
+	return m
+}
+
+// SetMaxPowerPosition sets SegmentLap value.
+//
+// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+func (m *SegmentLap) SetMaxPowerPosition(v []uint16) *SegmentLap {
+	m.MaxPowerPosition = v
+	return m
+}
+
+// SetAvgCadencePosition sets SegmentLap value.
+//
+// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
+func (m *SegmentLap) SetAvgCadencePosition(v []uint8) *SegmentLap {
+	m.AvgCadencePosition = v
+	return m
+}
+
+// SetMaxCadencePosition sets SegmentLap value.
+//
+// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
+func (m *SegmentLap) SetMaxCadencePosition(v []uint8) *SegmentLap {
+	m.MaxCadencePosition = v
+	return m
+}
+
+// SetManufacturer sets SegmentLap value.
+//
+// Manufacturer that produced the segment
+func (m *SegmentLap) SetManufacturer(v typedef.Manufacturer) *SegmentLap {
+	m.Manufacturer = v
+	return m
+}
+
+// SetTotalGrit sets SegmentLap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *SegmentLap) SetTotalGrit(v float32) *SegmentLap {
+	m.TotalGrit = v
+	return m
+}
+
+// SetTotalFlow sets SegmentLap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *SegmentLap) SetTotalFlow(v float32) *SegmentLap {
+	m.TotalFlow = v
+	return m
+}
+
+// SetAvgGrit sets SegmentLap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *SegmentLap) SetAvgGrit(v float32) *SegmentLap {
+	m.AvgGrit = v
+	return m
+}
+
+// SetAvgFlow sets SegmentLap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *SegmentLap) SetAvgFlow(v float32) *SegmentLap {
+	m.AvgFlow = v
+	return m
+}
+
 // SetTotalFractionalAscent sets SegmentLap value.
 //
 // Scale: 100; Units: m; fractional part of total_ascent
@@ -1935,6 +1914,30 @@ func (m *SegmentLap) SetTotalFractionalAscent(v uint8) *SegmentLap {
 // Scale: 100; Units: m; fractional part of total_descent
 func (m *SegmentLap) SetTotalFractionalDescent(v uint8) *SegmentLap {
 	m.TotalFractionalDescent = v
+	return m
+}
+
+// SetEnhancedAvgAltitude sets SegmentLap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedAvgAltitude(v uint32) *SegmentLap {
+	m.EnhancedAvgAltitude = v
+	return m
+}
+
+// SetEnhancedMaxAltitude sets SegmentLap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedMaxAltitude(v uint32) *SegmentLap {
+	m.EnhancedMaxAltitude = v
+	return m
+}
+
+// SetEnhancedMinAltitude sets SegmentLap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedMinAltitude(v uint32) *SegmentLap {
+	m.EnhancedMinAltitude = v
 	return m
 }
 

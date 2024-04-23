@@ -16,6 +16,9 @@ import (
 )
 
 // MonitoringHrData is a MonitoringHrData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MonitoringHrData struct {
 	Timestamp                  time.Time // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	RestingHeartRate           uint8     // Units: bpm; 7-day rolling average

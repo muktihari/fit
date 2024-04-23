@@ -14,6 +14,9 @@ import (
 )
 
 // FileCreator is a FileCreator message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type FileCreator struct {
 	SoftwareVersion uint16
 	HardwareVersion uint8

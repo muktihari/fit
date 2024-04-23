@@ -15,6 +15,9 @@ import (
 )
 
 // SegmentFile is a SegmentFile message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SegmentFile struct {
 	FileUuid               string                           // UUID of the segment file
 	LeaderType             []typedef.SegmentLeaderboardType // Array: [N]; Leader type of each leader in the segment file
@@ -23,8 +26,8 @@ type SegmentFile struct {
 	LeaderActivityIdString []string                         // Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
 	UserProfilePrimaryKey  uint32                           // Primary key of the user that created the segment file
 	MessageIndex           typedef.MessageIndex
-	DefaultRaceLeader      uint8 // Index for the Leader Board entry selected as the default race participant
 	Enabled                bool  // Enabled state of the segment file
+	DefaultRaceLeader      uint8 // Index for the Leader Board entry selected as the default race participant
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -48,7 +51,10 @@ func NewSegmentFile(mesg *proto.Message) *SegmentFile {
 	}
 
 	return &SegmentFile{
-		FileUuid: vals[1].String(),
+		MessageIndex:          typedef.MessageIndex(vals[254].Uint16()),
+		FileUuid:              vals[1].String(),
+		Enabled:               vals[3].Bool(),
+		UserProfilePrimaryKey: vals[4].Uint32(),
 		LeaderType: func() []typedef.SegmentLeaderboardType {
 			sliceValue := vals[7].SliceUint8()
 			ptr := unsafe.SliceData(sliceValue)
@@ -57,10 +63,7 @@ func NewSegmentFile(mesg *proto.Message) *SegmentFile {
 		LeaderGroupPrimaryKey:  vals[8].SliceUint32(),
 		LeaderActivityId:       vals[9].SliceUint32(),
 		LeaderActivityIdString: vals[10].SliceString(),
-		UserProfilePrimaryKey:  vals[4].Uint32(),
-		MessageIndex:           typedef.MessageIndex(vals[254].Uint16()),
 		DefaultRaceLeader:      vals[11].Uint8(),
-		Enabled:                vals[3].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,9 +85,24 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSegmentFile}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if m.FileUuid != basetype.StringInvalid && m.FileUuid != "" {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.String(m.FileUuid)
+		fields = append(fields, field)
+	}
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Bool(m.Enabled)
+		fields = append(fields, field)
+	}
+	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint32(m.UserProfilePrimaryKey)
 		fields = append(fields, field)
 	}
 	if m.LeaderType != nil {
@@ -107,24 +125,9 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceString(m.LeaderActivityIdString)
 		fields = append(fields, field)
 	}
-	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint32(m.UserProfilePrimaryKey)
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(m.DefaultRaceLeader)
-		fields = append(fields, field)
-	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 
@@ -136,11 +139,33 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// SetMessageIndex sets SegmentFile value.
+func (m *SegmentFile) SetMessageIndex(v typedef.MessageIndex) *SegmentFile {
+	m.MessageIndex = v
+	return m
+}
+
 // SetFileUuid sets SegmentFile value.
 //
 // UUID of the segment file
 func (m *SegmentFile) SetFileUuid(v string) *SegmentFile {
 	m.FileUuid = v
+	return m
+}
+
+// SetEnabled sets SegmentFile value.
+//
+// Enabled state of the segment file
+func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
+	m.Enabled = v
+	return m
+}
+
+// SetUserProfilePrimaryKey sets SegmentFile value.
+//
+// Primary key of the user that created the segment file
+func (m *SegmentFile) SetUserProfilePrimaryKey(v uint32) *SegmentFile {
+	m.UserProfilePrimaryKey = v
 	return m
 }
 
@@ -176,33 +201,11 @@ func (m *SegmentFile) SetLeaderActivityIdString(v []string) *SegmentFile {
 	return m
 }
 
-// SetUserProfilePrimaryKey sets SegmentFile value.
-//
-// Primary key of the user that created the segment file
-func (m *SegmentFile) SetUserProfilePrimaryKey(v uint32) *SegmentFile {
-	m.UserProfilePrimaryKey = v
-	return m
-}
-
-// SetMessageIndex sets SegmentFile value.
-func (m *SegmentFile) SetMessageIndex(v typedef.MessageIndex) *SegmentFile {
-	m.MessageIndex = v
-	return m
-}
-
 // SetDefaultRaceLeader sets SegmentFile value.
 //
 // Index for the Leader Board entry selected as the default race participant
 func (m *SegmentFile) SetDefaultRaceLeader(v uint8) *SegmentFile {
 	m.DefaultRaceLeader = v
-	return m
-}
-
-// SetEnabled sets SegmentFile value.
-//
-// Enabled state of the segment file
-func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
-	m.Enabled = v
 	return m
 }
 

@@ -18,6 +18,9 @@ import (
 )
 
 // ClimbPro is a ClimbPro message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ClimbPro struct {
 	Timestamp     time.Time // Units: s
 	PositionLat   int32     // Units: semicircles
@@ -52,10 +55,10 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 		Timestamp:     datetime.ToTime(vals[253].Uint32()),
 		PositionLat:   vals[0].Int32(),
 		PositionLong:  vals[1].Int32(),
-		CurrentDist:   vals[5].Float32(),
-		ClimbNumber:   vals[3].Uint16(),
 		ClimbProEvent: typedef.ClimbProEvent(vals[2].Uint8()),
+		ClimbNumber:   vals[3].Uint16(),
 		ClimbCategory: vals[4].Uint8(),
+		CurrentDist:   vals[5].Float32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -92,9 +95,9 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
-	if math.Float32bits(m.CurrentDist) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Float32(m.CurrentDist)
+	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint8(byte(m.ClimbProEvent))
 		fields = append(fields, field)
 	}
 	if m.ClimbNumber != basetype.Uint16Invalid {
@@ -102,14 +105,14 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ClimbNumber)
 		fields = append(fields, field)
 	}
-	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint8(byte(m.ClimbProEvent))
-		fields = append(fields, field)
-	}
 	if m.ClimbCategory != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(m.ClimbCategory)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.CurrentDist) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Float32(m.CurrentDist)
 		fields = append(fields, field)
 	}
 
@@ -154,11 +157,9 @@ func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
 	return m
 }
 
-// SetCurrentDist sets ClimbPro value.
-//
-// Units: m
-func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
-	m.CurrentDist = v
+// SetClimbProEvent sets ClimbPro value.
+func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
+	m.ClimbProEvent = v
 	return m
 }
 
@@ -168,15 +169,17 @@ func (m *ClimbPro) SetClimbNumber(v uint16) *ClimbPro {
 	return m
 }
 
-// SetClimbProEvent sets ClimbPro value.
-func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
-	m.ClimbProEvent = v
-	return m
-}
-
 // SetClimbCategory sets ClimbPro value.
 func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
 	m.ClimbCategory = v
+	return m
+}
+
+// SetCurrentDist sets ClimbPro value.
+//
+// Units: m
+func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
+	m.CurrentDist = v
 	return m
 }
 

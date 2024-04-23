@@ -14,6 +14,9 @@ import (
 )
 
 // ZonesTarget is a ZonesTarget message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ZonesTarget struct {
 	FunctionalThresholdPower uint16
 	MaxHeartRate             uint8
@@ -43,9 +46,9 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 	}
 
 	return &ZonesTarget{
-		FunctionalThresholdPower: vals[3].Uint16(),
 		MaxHeartRate:             vals[1].Uint8(),
 		ThresholdHeartRate:       vals[2].Uint8(),
+		FunctionalThresholdPower: vals[3].Uint16(),
 		HrCalcType:               typedef.HrZoneCalc(vals[5].Uint8()),
 		PwrCalcType:              typedef.PwrZoneCalc(vals[7].Uint8()),
 
@@ -69,11 +72,6 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumZonesTarget}
 
-	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint16(m.FunctionalThresholdPower)
-		fields = append(fields, field)
-	}
 	if m.MaxHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.MaxHeartRate)
@@ -82,6 +80,11 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	if m.ThresholdHeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(m.ThresholdHeartRate)
+		fields = append(fields, field)
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint16(m.FunctionalThresholdPower)
 		fields = append(fields, field)
 	}
 	if byte(m.HrCalcType) != basetype.EnumInvalid {
@@ -103,12 +106,6 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetFunctionalThresholdPower sets ZonesTarget value.
-func (m *ZonesTarget) SetFunctionalThresholdPower(v uint16) *ZonesTarget {
-	m.FunctionalThresholdPower = v
-	return m
-}
-
 // SetMaxHeartRate sets ZonesTarget value.
 func (m *ZonesTarget) SetMaxHeartRate(v uint8) *ZonesTarget {
 	m.MaxHeartRate = v
@@ -118,6 +115,12 @@ func (m *ZonesTarget) SetMaxHeartRate(v uint8) *ZonesTarget {
 // SetThresholdHeartRate sets ZonesTarget value.
 func (m *ZonesTarget) SetThresholdHeartRate(v uint8) *ZonesTarget {
 	m.ThresholdHeartRate = v
+	return m
+}
+
+// SetFunctionalThresholdPower sets ZonesTarget value.
+func (m *ZonesTarget) SetFunctionalThresholdPower(v uint16) *ZonesTarget {
+	m.FunctionalThresholdPower = v
 	return m
 }
 

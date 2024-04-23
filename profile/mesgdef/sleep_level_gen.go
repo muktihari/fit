@@ -16,6 +16,9 @@ import (
 )
 
 // SleepLevel is a SleepLevel message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SleepLevel struct {
 	Timestamp  time.Time // Units: s
 	SleepLevel typedef.SleepLevel

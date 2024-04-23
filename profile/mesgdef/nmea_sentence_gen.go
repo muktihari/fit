@@ -16,6 +16,9 @@ import (
 )
 
 // NmeaSentence is a NmeaSentence message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type NmeaSentence struct {
 	Timestamp   time.Time // Units: s; Timestamp message was output
 	Sentence    string    // NMEA sentence
@@ -44,8 +47,8 @@ func NewNmeaSentence(mesg *proto.Message) *NmeaSentence {
 
 	return &NmeaSentence{
 		Timestamp:   datetime.ToTime(vals[253].Uint32()),
-		Sentence:    vals[1].String(),
 		TimestampMs: vals[0].Uint16(),
+		Sentence:    vals[1].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,14 +75,14 @@ func (m *NmeaSentence) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.Sentence != basetype.StringInvalid && m.Sentence != "" {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.String(m.Sentence)
-		fields = append(fields, field)
-	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
+	if m.Sentence != basetype.StringInvalid && m.Sentence != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.String(m.Sentence)
 		fields = append(fields, field)
 	}
 
@@ -102,19 +105,19 @@ func (m *NmeaSentence) SetTimestamp(v time.Time) *NmeaSentence {
 	return m
 }
 
-// SetSentence sets NmeaSentence value.
-//
-// NMEA sentence
-func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {
-	m.Sentence = v
-	return m
-}
-
 // SetTimestampMs sets NmeaSentence value.
 //
 // Units: ms; Fractional part of timestamp, added to timestamp
 func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
 	m.TimestampMs = v
+	return m
+}
+
+// SetSentence sets NmeaSentence value.
+//
+// NMEA sentence
+func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {
+	m.Sentence = v
 	return m
 }
 

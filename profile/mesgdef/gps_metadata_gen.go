@@ -19,6 +19,9 @@ import (
 )
 
 // GpsMetadata is a GpsMetadata message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type GpsMetadata struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp.
 	UtcTimestamp     time.Time // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
@@ -53,14 +56,14 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 
 	return &GpsMetadata{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
-		UtcTimestamp:     datetime.ToTime(vals[6].Uint32()),
-		Velocity:         vals[7].SliceInt16(),
+		TimestampMs:      vals[0].Uint16(),
 		PositionLat:      vals[1].Int32(),
 		PositionLong:     vals[2].Int32(),
 		EnhancedAltitude: vals[3].Uint32(),
 		EnhancedSpeed:    vals[4].Uint32(),
-		TimestampMs:      vals[0].Uint16(),
 		Heading:          vals[5].Uint16(),
+		UtcTimestamp:     datetime.ToTime(vals[6].Uint32()),
+		Velocity:         vals[7].SliceInt16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -87,14 +90,9 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(datetime.ToUint32(m.UtcTimestamp))
-		fields = append(fields, field)
-	}
-	if m.Velocity != nil {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.SliceInt16(m.Velocity)
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -117,14 +115,19 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.EnhancedSpeed)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 	if m.Heading != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.Heading)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.UtcTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Uint32(datetime.ToUint32(m.UtcTimestamp))
+		fields = append(fields, field)
+	}
+	if m.Velocity != nil {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = proto.SliceInt16(m.Velocity)
 		fields = append(fields, field)
 	}
 
@@ -141,16 +144,6 @@ func (m *GpsMetadata) TimestampUint32() uint32 { return datetime.ToUint32(m.Time
 
 // UtcTimestampUint32 returns UtcTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *GpsMetadata) UtcTimestampUint32() uint32 { return datetime.ToUint32(m.UtcTimestamp) }
-
-// VelocityScaled return Velocity in its scaled value [Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.].
-//
-// If Velocity value is invalid, nil will be returned.
-func (m *GpsMetadata) VelocityScaled() []float64 {
-	if m.Velocity == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.Velocity, 100, 0)
-}
 
 // EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
 //
@@ -182,6 +175,16 @@ func (m *GpsMetadata) HeadingScaled() float64 {
 	return scaleoffset.Apply(m.Heading, 100, 0)
 }
 
+// VelocityScaled return Velocity in its scaled value [Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.].
+//
+// If Velocity value is invalid, nil will be returned.
+func (m *GpsMetadata) VelocityScaled() []float64 {
+	if m.Velocity == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.Velocity, 100, 0)
+}
+
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
 func (m *GpsMetadata) PositionLatDegrees() float64 { return semicircles.ToDegrees(m.PositionLat) }
 
@@ -196,19 +199,11 @@ func (m *GpsMetadata) SetTimestamp(v time.Time) *GpsMetadata {
 	return m
 }
 
-// SetUtcTimestamp sets GpsMetadata value.
+// SetTimestampMs sets GpsMetadata value.
 //
-// Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
-func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
-	m.UtcTimestamp = v
-	return m
-}
-
-// SetVelocity sets GpsMetadata value.
-//
-// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
-func (m *GpsMetadata) SetVelocity(v []int16) *GpsMetadata {
-	m.Velocity = v
+// Units: ms; Millisecond part of the timestamp.
+func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
+	m.TimestampMs = v
 	return m
 }
 
@@ -244,19 +239,27 @@ func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
 	return m
 }
 
-// SetTimestampMs sets GpsMetadata value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
-	m.TimestampMs = v
-	return m
-}
-
 // SetHeading sets GpsMetadata value.
 //
 // Scale: 100; Units: degrees
 func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
 	m.Heading = v
+	return m
+}
+
+// SetUtcTimestamp sets GpsMetadata value.
+//
+// Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
+func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
+	m.UtcTimestamp = v
+	return m
+}
+
+// SetVelocity sets GpsMetadata value.
+//
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) SetVelocity(v []int16) *GpsMetadata {
+	m.Velocity = v
 	return m
 }
 

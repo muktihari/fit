@@ -17,6 +17,9 @@ import (
 )
 
 // ThreeDSensorCalibration is a ThreeDSensorCalibration message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ThreeDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
 	OffsetCal          []int32            // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
@@ -49,12 +52,12 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 
 	return &ThreeDSensorCalibration{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		OffsetCal:          vals[4].SliceInt32(),
-		OrientationMatrix:  vals[5].SliceInt32(),
+		SensorType:         typedef.SensorType(vals[0].Uint8()),
 		CalibrationFactor:  vals[1].Uint32(),
 		CalibrationDivisor: vals[2].Uint32(),
 		LevelShift:         vals[3].Uint32(),
-		SensorType:         typedef.SensorType(vals[0].Uint8()),
+		OffsetCal:          vals[4].SliceInt32(),
+		OrientationMatrix:  vals[5].SliceInt32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,14 +84,9 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.OffsetCal != nil {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceInt32(m.OffsetCal)
-		fields = append(fields, field)
-	}
-	if m.OrientationMatrix != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceInt32(m.OrientationMatrix)
+	if byte(m.SensorType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.SensorType))
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
@@ -106,9 +104,14 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.LevelShift)
 		fields = append(fields, field)
 	}
-	if byte(m.SensorType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.SensorType))
+	if m.OffsetCal != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.SliceInt32(m.OffsetCal)
+		fields = append(fields, field)
+	}
+	if m.OrientationMatrix != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.SliceInt32(m.OrientationMatrix)
 		fields = append(fields, field)
 	}
 
@@ -159,19 +162,11 @@ func (m *ThreeDSensorCalibration) SetTimestamp(v time.Time) *ThreeDSensorCalibra
 	return m
 }
 
-// SetOffsetCal sets ThreeDSensorCalibration value.
+// SetSensorType sets ThreeDSensorCalibration value.
 //
-// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
-	m.OffsetCal = v
-	return m
-}
-
-// SetOrientationMatrix sets ThreeDSensorCalibration value.
-//
-// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
-func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
-	m.OrientationMatrix = v
+// Indicates which sensor the calibration is for
+func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
+	m.SensorType = v
 	return m
 }
 
@@ -199,11 +194,19 @@ func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibrati
 	return m
 }
 
-// SetSensorType sets ThreeDSensorCalibration value.
+// SetOffsetCal sets ThreeDSensorCalibration value.
 //
-// Indicates which sensor the calibration is for
-func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
-	m.SensorType = v
+// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
+func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
+	m.OffsetCal = v
+	return m
+}
+
+// SetOrientationMatrix sets ThreeDSensorCalibration value.
+//
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
+	m.OrientationMatrix = v
 	return m
 }
 

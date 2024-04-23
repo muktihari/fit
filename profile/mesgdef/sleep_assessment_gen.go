@@ -16,6 +16,9 @@ import (
 )
 
 // SleepAssessment is a SleepAssessment message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SleepAssessment struct {
 	AverageStressDuringSleep uint16 // Scale: 100; Excludes stress during awake periods in the sleep window
 	CombinedAwakeScore       uint8  // Average of awake_time_score and awakenings_count_score. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
@@ -54,7 +57,6 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 	}
 
 	return &SleepAssessment{
-		AverageStressDuringSleep: vals[15].Uint16(),
 		CombinedAwakeScore:       vals[0].Uint8(),
 		AwakeTimeScore:           vals[1].Uint8(),
 		AwakeningsCountScore:     vals[2].Uint8(),
@@ -68,6 +70,7 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 		SleepRestlessnessScore:   vals[10].Uint8(),
 		AwakeningsCount:          vals[11].Uint8(),
 		InterruptionsScore:       vals[14].Uint8(),
+		AverageStressDuringSleep: vals[15].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -89,11 +92,6 @@ func (m *SleepAssessment) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSleepAssessment}
 
-	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Uint16(m.AverageStressDuringSleep)
-		fields = append(fields, field)
-	}
 	if m.CombinedAwakeScore != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.CombinedAwakeScore)
@@ -159,6 +157,11 @@ func (m *SleepAssessment) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.InterruptionsScore)
 		fields = append(fields, field)
 	}
+	if m.AverageStressDuringSleep != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint16(m.AverageStressDuringSleep)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -176,14 +179,6 @@ func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
-}
-
-// SetAverageStressDuringSleep sets SleepAssessment value.
-//
-// Scale: 100; Excludes stress during awake periods in the sleep window
-func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
-	m.AverageStressDuringSleep = v
-	return m
 }
 
 // SetCombinedAwakeScore sets SleepAssessment value.
@@ -287,6 +282,14 @@ func (m *SleepAssessment) SetAwakeningsCount(v uint8) *SleepAssessment {
 // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetInterruptionsScore(v uint8) *SleepAssessment {
 	m.InterruptionsScore = v
+	return m
+}
+
+// SetAverageStressDuringSleep sets SleepAssessment value.
+//
+// Scale: 100; Excludes stress during awake periods in the sleep window
+func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
+	m.AverageStressDuringSleep = v
 	return m
 }
 

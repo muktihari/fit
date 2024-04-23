@@ -16,6 +16,9 @@ import (
 )
 
 // RawBbi is a RawBbi message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type RawBbi struct {
 	Timestamp   time.Time
 	Data        []uint16 // Array: [N]; 1 bit for gap indicator, 1 bit for quality indicator, and 14 bits for Beat-to-Beat interval values in whole-integer millisecond resolution
@@ -53,11 +56,11 @@ func NewRawBbi(mesg *proto.Message) *RawBbi {
 
 	return &RawBbi{
 		Timestamp:   datetime.ToTime(vals[253].Uint32()),
+		TimestampMs: vals[0].Uint16(),
 		Data:        vals[1].SliceUint16(),
 		Time:        vals[2].SliceUint16(),
 		Quality:     vals[3].SliceUint8(),
 		Gap:         vals[4].SliceUint8(),
-		TimestampMs: vals[0].Uint16(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -86,6 +89,11 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
 	if m.Data != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint16(m.Data)
@@ -109,11 +117,6 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[4]
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -129,6 +132,14 @@ func (m *RawBbi) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp
 // SetTimestamp sets RawBbi value.
 func (m *RawBbi) SetTimestamp(v time.Time) *RawBbi {
 	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets RawBbi value.
+//
+// Units: ms; ms since last overnight_raw_bbi message
+func (m *RawBbi) SetTimestampMs(v uint16) *RawBbi {
+	m.TimestampMs = v
 	return m
 }
 
@@ -161,14 +172,6 @@ func (m *RawBbi) SetQuality(v []uint8) *RawBbi {
 // Array: [N]
 func (m *RawBbi) SetGap(v []uint8) *RawBbi {
 	m.Gap = v
-	return m
-}
-
-// SetTimestampMs sets RawBbi value.
-//
-// Units: ms; ms since last overnight_raw_bbi message
-func (m *RawBbi) SetTimestampMs(v uint16) *RawBbi {
-	m.TimestampMs = v
 	return m
 }
 

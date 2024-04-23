@@ -14,6 +14,9 @@ import (
 )
 
 // Hrv is a Hrv message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Hrv struct {
 	Time []uint16 // Array: [N]; Scale: 1000; Units: s; Time between beats
 

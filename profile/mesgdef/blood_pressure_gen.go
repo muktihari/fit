@@ -16,6 +16,9 @@ import (
 )
 
 // BloodPressure is a BloodPressure message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type BloodPressure struct {
 	Timestamp            time.Time            // Units: s
 	SystolicPressure     uint16               // Units: mmHg
@@ -58,10 +61,10 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 		Map3SampleMean:       vals[3].Uint16(),
 		MapMorningValues:     vals[4].Uint16(),
 		MapEveningValues:     vals[5].Uint16(),
-		UserProfileIndex:     typedef.MessageIndex(vals[9].Uint16()),
 		HeartRate:            vals[6].Uint8(),
 		HeartRateType:        typedef.HrType(vals[7].Uint8()),
 		Status:               typedef.BpStatus(vals[8].Uint8()),
+		UserProfileIndex:     typedef.MessageIndex(vals[9].Uint16()),
 
 		DeveloperFields: developerFields,
 	}
@@ -118,11 +121,6 @@ func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.MapEveningValues)
 		fields = append(fields, field)
 	}
-	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
-		fields = append(fields, field)
-	}
 	if m.HeartRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.HeartRate)
@@ -136,6 +134,11 @@ func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 	if byte(m.Status) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.Status))
+		fields = append(fields, field)
+	}
+	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
 		fields = append(fields, field)
 	}
 
@@ -206,14 +209,6 @@ func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
 	return m
 }
 
-// SetUserProfileIndex sets BloodPressure value.
-//
-// Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
-func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {
-	m.UserProfileIndex = v
-	return m
-}
-
 // SetHeartRate sets BloodPressure value.
 //
 // Units: bpm
@@ -231,6 +226,14 @@ func (m *BloodPressure) SetHeartRateType(v typedef.HrType) *BloodPressure {
 // SetStatus sets BloodPressure value.
 func (m *BloodPressure) SetStatus(v typedef.BpStatus) *BloodPressure {
 	m.Status = v
+	return m
+}
+
+// SetUserProfileIndex sets BloodPressure value.
+//
+// Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
+func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {
+	m.UserProfileIndex = v
 	return m
 }
 

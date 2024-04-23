@@ -16,6 +16,9 @@ import (
 )
 
 // OneDSensorCalibration is a OneDSensorCalibration message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type OneDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
@@ -47,11 +50,11 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 
 	return &OneDSensorCalibration{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		SensorType:         typedef.SensorType(vals[0].Uint8()),
 		CalibrationFactor:  vals[1].Uint32(),
 		CalibrationDivisor: vals[2].Uint32(),
 		LevelShift:         vals[3].Uint32(),
 		OffsetCal:          vals[4].Int32(),
-		SensorType:         typedef.SensorType(vals[0].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -78,6 +81,11 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if byte(m.SensorType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.SensorType))
+		fields = append(fields, field)
+	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint32(m.CalibrationFactor)
@@ -96,11 +104,6 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 	if m.OffsetCal != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Int32(m.OffsetCal)
-		fields = append(fields, field)
-	}
-	if byte(m.SensorType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.SensorType))
 		fields = append(fields, field)
 	}
 
@@ -138,6 +141,14 @@ func (m *OneDSensorCalibration) SetTimestamp(v time.Time) *OneDSensorCalibration
 	return m
 }
 
+// SetSensorType sets OneDSensorCalibration value.
+//
+// Indicates which sensor the calibration is for
+func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorCalibration {
+	m.SensorType = v
+	return m
+}
+
 // SetCalibrationFactor sets OneDSensorCalibration value.
 //
 // Calibration factor used to convert from raw ADC value to degrees, g, etc.
@@ -167,14 +178,6 @@ func (m *OneDSensorCalibration) SetLevelShift(v uint32) *OneDSensorCalibration {
 // Internal Calibration factor
 func (m *OneDSensorCalibration) SetOffsetCal(v int32) *OneDSensorCalibration {
 	m.OffsetCal = v
-	return m
-}
-
-// SetSensorType sets OneDSensorCalibration value.
-//
-// Indicates which sensor the calibration is for
-func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorCalibration {
-	m.SensorType = v
 	return m
 }
 

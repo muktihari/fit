@@ -16,6 +16,9 @@ import (
 )
 
 // WeatherAlert is a WeatherAlert message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WeatherAlert struct {
 	Timestamp  time.Time
 	ReportId   string                    // Unique identifier from GCS report ID string, length is 12

@@ -16,6 +16,9 @@ import (
 )
 
 // HsaStepData is a HsaStepData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaStepData struct {
 	Timestamp          time.Time // Units: s
 	Steps              []uint32  // Array: [N]; Units: steps; Total step sum
@@ -44,8 +47,8 @@ func NewHsaStepData(mesg *proto.Message) *HsaStepData {
 
 	return &HsaStepData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		Steps:              vals[1].SliceUint32(),
 		ProcessingInterval: vals[0].Uint16(),
+		Steps:              vals[1].SliceUint32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,14 +75,14 @@ func (m *HsaStepData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.Steps != nil {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceUint32(m.Steps)
-		fields = append(fields, field)
-	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
+	if m.Steps != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.SliceUint32(m.Steps)
 		fields = append(fields, field)
 	}
 
@@ -102,19 +105,19 @@ func (m *HsaStepData) SetTimestamp(v time.Time) *HsaStepData {
 	return m
 }
 
-// SetSteps sets HsaStepData value.
-//
-// Array: [N]; Units: steps; Total step sum
-func (m *HsaStepData) SetSteps(v []uint32) *HsaStepData {
-	m.Steps = v
-	return m
-}
-
 // SetProcessingInterval sets HsaStepData value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaStepData) SetProcessingInterval(v uint16) *HsaStepData {
 	m.ProcessingInterval = v
+	return m
+}
+
+// SetSteps sets HsaStepData value.
+//
+// Array: [N]; Units: steps; Total step sum
+func (m *HsaStepData) SetSteps(v []uint32) *HsaStepData {
+	m.Steps = v
 	return m
 }
 

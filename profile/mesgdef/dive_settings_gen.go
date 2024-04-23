@@ -18,6 +18,9 @@ import (
 )
 
 // DiveSettings is a DiveSettings message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type DiveSettings struct {
 	Timestamp                 time.Time
 	Name                      string
@@ -38,6 +41,8 @@ type DiveSettings struct {
 	Po2Warn                   uint8 // Scale: 100; Units: percent; Typically 1.40
 	Po2Critical               uint8 // Scale: 100; Units: percent; Typically 1.60
 	Po2Deco                   uint8 // Scale: 100; Units: percent
+	SafetyStopEnabled         bool
+	ApneaCountdownEnabled     bool
 	BacklightMode             typedef.DiveBacklightMode
 	BacklightBrightness       uint8
 	BacklightTimeout          typedef.BacklightTimeout
@@ -48,12 +53,10 @@ type DiveSettings struct {
 	CcrHighSetpointSwitchMode typedef.CcrSetpointSwitchMode  // If high PO2 should be switched to automatically
 	CcrHighSetpoint           uint8                          // Scale: 100; Units: percent; Target PO2 when using high setpoint
 	GasConsumptionDisplay     typedef.GasConsumptionRateType // Type of gas consumption rate to display. Some values are only valid if tank volume is known.
+	UpKeyEnabled              bool                           // Indicates whether the up key is enabled during dives
 	DiveSounds                typedef.Tone                   // Sounds and vibration enabled or disabled in-dive
 	LastStopMultiple          uint8                          // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 	NoFlyTimeMode             typedef.NoFlyTimeMode          // Indicates which guidelines to use for no-fly surface interval.
-	SafetyStopEnabled         bool
-	ApneaCountdownEnabled     bool
-	UpKeyEnabled              bool // Indicates whether the up key is enabled during dives
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -78,40 +81,40 @@ func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 
 	return &DiveSettings{
 		Timestamp:                 datetime.ToTime(vals[253].Uint32()),
-		Name:                      vals[0].String(),
-		WaterDensity:              vals[5].Float32(),
-		BottomDepth:               vals[10].Float32(),
-		BottomTime:                vals[11].Uint32(),
-		ApneaCountdownTime:        vals[13].Uint32(),
-		CcrLowSetpointDepth:       vals[24].Uint32(),
-		CcrHighSetpointDepth:      vals[27].Uint32(),
 		MessageIndex:              typedef.MessageIndex(vals[254].Uint16()),
-		RepeatDiveInterval:        vals[17].Uint16(),
-		SafetyStopTime:            vals[18].Uint16(),
-		TravelGas:                 typedef.MessageIndex(vals[21].Uint16()),
+		Name:                      vals[0].String(),
 		Model:                     typedef.TissueModelType(vals[1].Uint8()),
 		GfLow:                     vals[2].Uint8(),
 		GfHigh:                    vals[3].Uint8(),
 		WaterType:                 typedef.WaterType(vals[4].Uint8()),
+		WaterDensity:              vals[5].Float32(),
 		Po2Warn:                   vals[6].Uint8(),
 		Po2Critical:               vals[7].Uint8(),
 		Po2Deco:                   vals[8].Uint8(),
+		SafetyStopEnabled:         vals[9].Bool(),
+		BottomDepth:               vals[10].Float32(),
+		BottomTime:                vals[11].Uint32(),
+		ApneaCountdownEnabled:     vals[12].Bool(),
+		ApneaCountdownTime:        vals[13].Uint32(),
 		BacklightMode:             typedef.DiveBacklightMode(vals[14].Uint8()),
 		BacklightBrightness:       vals[15].Uint8(),
 		BacklightTimeout:          typedef.BacklightTimeout(vals[16].Uint8()),
+		RepeatDiveInterval:        vals[17].Uint16(),
+		SafetyStopTime:            vals[18].Uint16(),
 		HeartRateSourceType:       typedef.SourceType(vals[19].Uint8()),
 		HeartRateSource:           vals[20].Uint8(),
+		TravelGas:                 typedef.MessageIndex(vals[21].Uint16()),
 		CcrLowSetpointSwitchMode:  typedef.CcrSetpointSwitchMode(vals[22].Uint8()),
 		CcrLowSetpoint:            vals[23].Uint8(),
+		CcrLowSetpointDepth:       vals[24].Uint32(),
 		CcrHighSetpointSwitchMode: typedef.CcrSetpointSwitchMode(vals[25].Uint8()),
 		CcrHighSetpoint:           vals[26].Uint8(),
+		CcrHighSetpointDepth:      vals[27].Uint32(),
 		GasConsumptionDisplay:     typedef.GasConsumptionRateType(vals[29].Uint8()),
+		UpKeyEnabled:              vals[30].Bool(),
 		DiveSounds:                typedef.Tone(vals[35].Uint8()),
 		LastStopMultiple:          vals[36].Uint8(),
 		NoFlyTimeMode:             typedef.NoFlyTimeMode(vals[37].Uint8()),
-		SafetyStopEnabled:         vals[9].Bool(),
-		ApneaCountdownEnabled:     vals[12].Bool(),
-		UpKeyEnabled:              vals[30].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -138,59 +141,14 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.WaterDensity) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Float32(m.WaterDensity)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.BottomDepth) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 10)
-		field.Value = proto.Float32(m.BottomDepth)
-		fields = append(fields, field)
-	}
-	if m.BottomTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Uint32(m.BottomTime)
-		fields = append(fields, field)
-	}
-	if m.ApneaCountdownTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = proto.Uint32(m.ApneaCountdownTime)
-		fields = append(fields, field)
-	}
-	if m.CcrLowSetpointDepth != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 24)
-		field.Value = proto.Uint32(m.CcrLowSetpointDepth)
-		fields = append(fields, field)
-	}
-	if m.CcrHighSetpointDepth != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 27)
-		field.Value = proto.Uint32(m.CcrHighSetpointDepth)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if m.RepeatDiveInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 17)
-		field.Value = proto.Uint16(m.RepeatDiveInterval)
-		fields = append(fields, field)
-	}
-	if m.SafetyStopTime != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 18)
-		field.Value = proto.Uint16(m.SafetyStopTime)
-		fields = append(fields, field)
-	}
-	if uint16(m.TravelGas) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 21)
-		field.Value = proto.Uint16(uint16(m.TravelGas))
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if byte(m.Model) != basetype.EnumInvalid {
@@ -213,6 +171,11 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.WaterType))
 		fields = append(fields, field)
 	}
+	if math.Float32bits(m.WaterDensity) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Float32(m.WaterDensity)
+		fields = append(fields, field)
+	}
 	if m.Po2Warn != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.Po2Warn)
@@ -226,6 +189,31 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 	if m.Po2Deco != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(m.Po2Deco)
+		fields = append(fields, field)
+	}
+	if m.SafetyStopEnabled != false {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Bool(m.SafetyStopEnabled)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.BottomDepth) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = proto.Float32(m.BottomDepth)
+		fields = append(fields, field)
+	}
+	if m.BottomTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint32(m.BottomTime)
+		fields = append(fields, field)
+	}
+	if m.ApneaCountdownEnabled != false {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = proto.Bool(m.ApneaCountdownEnabled)
+		fields = append(fields, field)
+	}
+	if m.ApneaCountdownTime != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = proto.Uint32(m.ApneaCountdownTime)
 		fields = append(fields, field)
 	}
 	if byte(m.BacklightMode) != basetype.EnumInvalid {
@@ -243,6 +231,16 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(uint8(m.BacklightTimeout))
 		fields = append(fields, field)
 	}
+	if m.RepeatDiveInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = proto.Uint16(m.RepeatDiveInterval)
+		fields = append(fields, field)
+	}
+	if m.SafetyStopTime != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = proto.Uint16(m.SafetyStopTime)
+		fields = append(fields, field)
+	}
 	if byte(m.HeartRateSourceType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = proto.Uint8(byte(m.HeartRateSourceType))
@@ -251,6 +249,11 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 	if m.HeartRateSource != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = proto.Uint8(m.HeartRateSource)
+		fields = append(fields, field)
+	}
+	if uint16(m.TravelGas) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = proto.Uint16(uint16(m.TravelGas))
 		fields = append(fields, field)
 	}
 	if byte(m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
@@ -263,6 +266,11 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.CcrLowSetpoint)
 		fields = append(fields, field)
 	}
+	if m.CcrLowSetpointDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = proto.Uint32(m.CcrLowSetpointDepth)
+		fields = append(fields, field)
+	}
 	if byte(m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(byte(m.CcrHighSetpointSwitchMode))
@@ -273,9 +281,19 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.CcrHighSetpoint)
 		fields = append(fields, field)
 	}
+	if m.CcrHighSetpointDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 27)
+		field.Value = proto.Uint32(m.CcrHighSetpointDepth)
+		fields = append(fields, field)
+	}
 	if byte(m.GasConsumptionDisplay) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = proto.Uint8(byte(m.GasConsumptionDisplay))
+		fields = append(fields, field)
+	}
+	if m.UpKeyEnabled != false {
+		field := fac.CreateField(mesg.Num, 30)
+		field.Value = proto.Bool(m.UpKeyEnabled)
 		fields = append(fields, field)
 	}
 	if byte(m.DiveSounds) != basetype.EnumInvalid {
@@ -291,21 +309,6 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 	if byte(m.NoFlyTimeMode) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 37)
 		field.Value = proto.Uint8(byte(m.NoFlyTimeMode))
-		fields = append(fields, field)
-	}
-	if m.SafetyStopEnabled != false {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Bool(m.SafetyStopEnabled)
-		fields = append(fields, field)
-	}
-	if m.ApneaCountdownEnabled != false {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = proto.Bool(m.ApneaCountdownEnabled)
-		fields = append(fields, field)
-	}
-	if m.UpKeyEnabled != false {
-		field := fac.CreateField(mesg.Num, 30)
-		field.Value = proto.Bool(m.UpKeyEnabled)
 		fields = append(fields, field)
 	}
 
@@ -337,26 +340,6 @@ func (m *DiveSettings) GetHeartRateSource() (name string, value any) {
 
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DiveSettings) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
-
-// CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode].
-//
-// If CcrLowSetpointDepth value is invalid, float64 invalid value will be returned.
-func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
-	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
-}
-
-// CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode].
-//
-// If CcrHighSetpointDepth value is invalid, float64 invalid value will be returned.
-func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
-	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
-}
 
 // Po2WarnScaled return Po2Warn in its scaled value [Scale: 100; Units: percent; Typically 1.40].
 //
@@ -398,6 +381,16 @@ func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 	return scaleoffset.Apply(m.CcrLowSetpoint, 100, 0)
 }
 
+// CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode].
+//
+// If CcrLowSetpointDepth value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
+	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
+}
+
 // CcrHighSetpointScaled return CcrHighSetpoint in its scaled value [Scale: 100; Units: percent; Target PO2 when using high setpoint].
 //
 // If CcrHighSetpoint value is invalid, float64 invalid value will be returned.
@@ -406,6 +399,16 @@ func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.CcrHighSetpoint, 100, 0)
+}
+
+// CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode].
+//
+// If CcrHighSetpointDepth value is invalid, float64 invalid value will be returned.
+func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
+	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
 }
 
 // LastStopMultipleScaled return LastStopMultiple in its scaled value [Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft].
@@ -424,81 +427,15 @@ func (m *DiveSettings) SetTimestamp(v time.Time) *DiveSettings {
 	return m
 }
 
-// SetName sets DiveSettings value.
-func (m *DiveSettings) SetName(v string) *DiveSettings {
-	m.Name = v
-	return m
-}
-
-// SetWaterDensity sets DiveSettings value.
-//
-// Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
-func (m *DiveSettings) SetWaterDensity(v float32) *DiveSettings {
-	m.WaterDensity = v
-	return m
-}
-
-// SetBottomDepth sets DiveSettings value.
-func (m *DiveSettings) SetBottomDepth(v float32) *DiveSettings {
-	m.BottomDepth = v
-	return m
-}
-
-// SetBottomTime sets DiveSettings value.
-func (m *DiveSettings) SetBottomTime(v uint32) *DiveSettings {
-	m.BottomTime = v
-	return m
-}
-
-// SetApneaCountdownTime sets DiveSettings value.
-func (m *DiveSettings) SetApneaCountdownTime(v uint32) *DiveSettings {
-	m.ApneaCountdownTime = v
-	return m
-}
-
-// SetCcrLowSetpointDepth sets DiveSettings value.
-//
-// Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
-func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
-	m.CcrLowSetpointDepth = v
-	return m
-}
-
-// SetCcrHighSetpointDepth sets DiveSettings value.
-//
-// Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
-func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
-	m.CcrHighSetpointDepth = v
-	return m
-}
-
 // SetMessageIndex sets DiveSettings value.
 func (m *DiveSettings) SetMessageIndex(v typedef.MessageIndex) *DiveSettings {
 	m.MessageIndex = v
 	return m
 }
 
-// SetRepeatDiveInterval sets DiveSettings value.
-//
-// Units: s; Time between surfacing and ending the activity
-func (m *DiveSettings) SetRepeatDiveInterval(v uint16) *DiveSettings {
-	m.RepeatDiveInterval = v
-	return m
-}
-
-// SetSafetyStopTime sets DiveSettings value.
-//
-// Units: s; Time at safety stop (if enabled)
-func (m *DiveSettings) SetSafetyStopTime(v uint16) *DiveSettings {
-	m.SafetyStopTime = v
-	return m
-}
-
-// SetTravelGas sets DiveSettings value.
-//
-// Index of travel dive_gas message
-func (m *DiveSettings) SetTravelGas(v typedef.MessageIndex) *DiveSettings {
-	m.TravelGas = v
+// SetName sets DiveSettings value.
+func (m *DiveSettings) SetName(v string) *DiveSettings {
+	m.Name = v
 	return m
 }
 
@@ -530,6 +467,14 @@ func (m *DiveSettings) SetWaterType(v typedef.WaterType) *DiveSettings {
 	return m
 }
 
+// SetWaterDensity sets DiveSettings value.
+//
+// Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
+func (m *DiveSettings) SetWaterDensity(v float32) *DiveSettings {
+	m.WaterDensity = v
+	return m
+}
+
 // SetPo2Warn sets DiveSettings value.
 //
 // Scale: 100; Units: percent; Typically 1.40
@@ -554,6 +499,36 @@ func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
 	return m
 }
 
+// SetSafetyStopEnabled sets DiveSettings value.
+func (m *DiveSettings) SetSafetyStopEnabled(v bool) *DiveSettings {
+	m.SafetyStopEnabled = v
+	return m
+}
+
+// SetBottomDepth sets DiveSettings value.
+func (m *DiveSettings) SetBottomDepth(v float32) *DiveSettings {
+	m.BottomDepth = v
+	return m
+}
+
+// SetBottomTime sets DiveSettings value.
+func (m *DiveSettings) SetBottomTime(v uint32) *DiveSettings {
+	m.BottomTime = v
+	return m
+}
+
+// SetApneaCountdownEnabled sets DiveSettings value.
+func (m *DiveSettings) SetApneaCountdownEnabled(v bool) *DiveSettings {
+	m.ApneaCountdownEnabled = v
+	return m
+}
+
+// SetApneaCountdownTime sets DiveSettings value.
+func (m *DiveSettings) SetApneaCountdownTime(v uint32) *DiveSettings {
+	m.ApneaCountdownTime = v
+	return m
+}
+
 // SetBacklightMode sets DiveSettings value.
 func (m *DiveSettings) SetBacklightMode(v typedef.DiveBacklightMode) *DiveSettings {
 	m.BacklightMode = v
@@ -572,6 +547,22 @@ func (m *DiveSettings) SetBacklightTimeout(v typedef.BacklightTimeout) *DiveSett
 	return m
 }
 
+// SetRepeatDiveInterval sets DiveSettings value.
+//
+// Units: s; Time between surfacing and ending the activity
+func (m *DiveSettings) SetRepeatDiveInterval(v uint16) *DiveSettings {
+	m.RepeatDiveInterval = v
+	return m
+}
+
+// SetSafetyStopTime sets DiveSettings value.
+//
+// Units: s; Time at safety stop (if enabled)
+func (m *DiveSettings) SetSafetyStopTime(v uint16) *DiveSettings {
+	m.SafetyStopTime = v
+	return m
+}
+
 // SetHeartRateSourceType sets DiveSettings value.
 func (m *DiveSettings) SetHeartRateSourceType(v typedef.SourceType) *DiveSettings {
 	m.HeartRateSourceType = v
@@ -581,6 +572,14 @@ func (m *DiveSettings) SetHeartRateSourceType(v typedef.SourceType) *DiveSetting
 // SetHeartRateSource sets DiveSettings value.
 func (m *DiveSettings) SetHeartRateSource(v uint8) *DiveSettings {
 	m.HeartRateSource = v
+	return m
+}
+
+// SetTravelGas sets DiveSettings value.
+//
+// Index of travel dive_gas message
+func (m *DiveSettings) SetTravelGas(v typedef.MessageIndex) *DiveSettings {
+	m.TravelGas = v
 	return m
 }
 
@@ -600,6 +599,14 @@ func (m *DiveSettings) SetCcrLowSetpoint(v uint8) *DiveSettings {
 	return m
 }
 
+// SetCcrLowSetpointDepth sets DiveSettings value.
+//
+// Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
+func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
+	m.CcrLowSetpointDepth = v
+	return m
+}
+
 // SetCcrHighSetpointSwitchMode sets DiveSettings value.
 //
 // If high PO2 should be switched to automatically
@@ -616,11 +623,27 @@ func (m *DiveSettings) SetCcrHighSetpoint(v uint8) *DiveSettings {
 	return m
 }
 
+// SetCcrHighSetpointDepth sets DiveSettings value.
+//
+// Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
+func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
+	m.CcrHighSetpointDepth = v
+	return m
+}
+
 // SetGasConsumptionDisplay sets DiveSettings value.
 //
 // Type of gas consumption rate to display. Some values are only valid if tank volume is known.
 func (m *DiveSettings) SetGasConsumptionDisplay(v typedef.GasConsumptionRateType) *DiveSettings {
 	m.GasConsumptionDisplay = v
+	return m
+}
+
+// SetUpKeyEnabled sets DiveSettings value.
+//
+// Indicates whether the up key is enabled during dives
+func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
+	m.UpKeyEnabled = v
 	return m
 }
 
@@ -645,26 +668,6 @@ func (m *DiveSettings) SetLastStopMultiple(v uint8) *DiveSettings {
 // Indicates which guidelines to use for no-fly surface interval.
 func (m *DiveSettings) SetNoFlyTimeMode(v typedef.NoFlyTimeMode) *DiveSettings {
 	m.NoFlyTimeMode = v
-	return m
-}
-
-// SetSafetyStopEnabled sets DiveSettings value.
-func (m *DiveSettings) SetSafetyStopEnabled(v bool) *DiveSettings {
-	m.SafetyStopEnabled = v
-	return m
-}
-
-// SetApneaCountdownEnabled sets DiveSettings value.
-func (m *DiveSettings) SetApneaCountdownEnabled(v bool) *DiveSettings {
-	m.ApneaCountdownEnabled = v
-	return m
-}
-
-// SetUpKeyEnabled sets DiveSettings value.
-//
-// Indicates whether the up key is enabled during dives
-func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
-	m.UpKeyEnabled = v
 	return m
 }
 

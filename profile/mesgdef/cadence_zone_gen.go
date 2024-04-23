@@ -14,6 +14,9 @@ import (
 )
 
 // CadenceZone is a CadenceZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type CadenceZone struct {
 	Name         string
 	MessageIndex typedef.MessageIndex
@@ -41,9 +44,9 @@ func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 	}
 
 	return &CadenceZone{
-		Name:         vals[1].String(),
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[0].Uint8(),
+		Name:         vals[1].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,11 +68,6 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumCadenceZone}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -80,6 +78,11 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.HighValue)
 		fields = append(fields, field)
 	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.String(m.Name)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -87,12 +90,6 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetName sets CadenceZone value.
-func (m *CadenceZone) SetName(v string) *CadenceZone {
-	m.Name = v
-	return m
 }
 
 // SetMessageIndex sets CadenceZone value.
@@ -106,6 +103,12 @@ func (m *CadenceZone) SetMessageIndex(v typedef.MessageIndex) *CadenceZone {
 // Units: rpm
 func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
 	m.HighValue = v
+	return m
+}
+
+// SetName sets CadenceZone value.
+func (m *CadenceZone) SetName(v string) *CadenceZone {
+	m.Name = v
 	return m
 }
 

@@ -16,6 +16,9 @@ import (
 )
 
 // Workout is a Workout message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Workout struct {
 	WktName        string
 	Capabilities   typedef.WorkoutCapabilities
@@ -48,13 +51,13 @@ func NewWorkout(mesg *proto.Message) *Workout {
 	}
 
 	return &Workout{
-		WktName:        vals[8].String(),
-		Capabilities:   typedef.WorkoutCapabilities(vals[5].Uint32z()),
 		MessageIndex:   typedef.MessageIndex(vals[254].Uint16()),
-		NumValidSteps:  vals[6].Uint16(),
-		PoolLength:     vals[14].Uint16(),
 		Sport:          typedef.Sport(vals[4].Uint8()),
+		Capabilities:   typedef.WorkoutCapabilities(vals[5].Uint32z()),
+		NumValidSteps:  vals[6].Uint16(),
+		WktName:        vals[8].String(),
 		SubSport:       typedef.SubSport(vals[11].Uint8()),
+		PoolLength:     vals[14].Uint16(),
 		PoolLengthUnit: typedef.DisplayMeasure(vals[15].Uint8()),
 
 		DeveloperFields: developerFields,
@@ -77,29 +80,9 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWorkout}
 
-	if m.WktName != basetype.StringInvalid && m.WktName != "" {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.String(m.WktName)
-		fields = append(fields, field)
-	}
-	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(uint32(m.Capabilities))
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
-	if m.NumValidSteps != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint16(m.NumValidSteps)
-		fields = append(fields, field)
-	}
-	if m.PoolLength != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
-		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
@@ -107,9 +90,29 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
+	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint32(uint32(m.Capabilities))
+		fields = append(fields, field)
+	}
+	if m.NumValidSteps != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Uint16(m.NumValidSteps)
+		fields = append(fields, field)
+	}
+	if m.WktName != basetype.StringInvalid && m.WktName != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = proto.String(m.WktName)
+		fields = append(fields, field)
+	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
+	if m.PoolLength != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
 	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
@@ -136,21 +139,21 @@ func (m *Workout) PoolLengthScaled() float64 {
 	return scaleoffset.Apply(m.PoolLength, 100, 0)
 }
 
-// SetWktName sets Workout value.
-func (m *Workout) SetWktName(v string) *Workout {
-	m.WktName = v
+// SetMessageIndex sets Workout value.
+func (m *Workout) SetMessageIndex(v typedef.MessageIndex) *Workout {
+	m.MessageIndex = v
+	return m
+}
+
+// SetSport sets Workout value.
+func (m *Workout) SetSport(v typedef.Sport) *Workout {
+	m.Sport = v
 	return m
 }
 
 // SetCapabilities sets Workout value.
 func (m *Workout) SetCapabilities(v typedef.WorkoutCapabilities) *Workout {
 	m.Capabilities = v
-	return m
-}
-
-// SetMessageIndex sets Workout value.
-func (m *Workout) SetMessageIndex(v typedef.MessageIndex) *Workout {
-	m.MessageIndex = v
 	return m
 }
 
@@ -162,23 +165,23 @@ func (m *Workout) SetNumValidSteps(v uint16) *Workout {
 	return m
 }
 
-// SetPoolLength sets Workout value.
-//
-// Scale: 100; Units: m
-func (m *Workout) SetPoolLength(v uint16) *Workout {
-	m.PoolLength = v
-	return m
-}
-
-// SetSport sets Workout value.
-func (m *Workout) SetSport(v typedef.Sport) *Workout {
-	m.Sport = v
+// SetWktName sets Workout value.
+func (m *Workout) SetWktName(v string) *Workout {
+	m.WktName = v
 	return m
 }
 
 // SetSubSport sets Workout value.
 func (m *Workout) SetSubSport(v typedef.SubSport) *Workout {
 	m.SubSport = v
+	return m
+}
+
+// SetPoolLength sets Workout value.
+//
+// Scale: 100; Units: m
+func (m *Workout) SetPoolLength(v uint16) *Workout {
+	m.PoolLength = v
 	return m
 }
 

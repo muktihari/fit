@@ -9,37 +9,29 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
-	"sync"
+	"strings"
 	"text/template"
 
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
-	"github.com/muktihari/fit/profile/basetype"
 	"golang.org/x/exp/slices"
-)
-
-type (
-	ProfileType = string
-	BaseType    = string
 )
 
 type fieldnumBuilder struct {
 	template     *template.Template
 	templateExec string
 
-	path     string // path to generate the file
+	path string // path to generate the file
+
+	lookup   *lookup.Lookup
 	messages []parser.Message
 	types    []parser.Type
-
-	once sync.Once
-
-	baseTypeMapByProfileType  map[ProfileType]BaseType
-	constantsMapByProfileType map[ProfileType][]string
 }
 
-func NewBuilder(path string, message []parser.Message, types []parser.Type) builder.Builder {
+func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &fieldnumBuilder{
@@ -50,67 +42,28 @@ func NewBuilder(path string, message []parser.Message, types []parser.Type) buil
 				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
 		templateExec: "fieldnum",
 		path:         filepath.Join(path, "profile", "untyped", "fieldnum"),
+		lookup:       lookup,
 		messages:     message,
 		types:        types,
 	}
 }
 
-func (b *fieldnumBuilder) prepopulateLookup() {
-	b.baseTypeMapByProfileType = make(map[ProfileType]BaseType)
-	for _, t := range basetype.List() { // map to itself
-		b.baseTypeMapByProfileType[t.String()] = t.String()
-	}
-
-	b.constantsMapByProfileType = make(map[ProfileType][]string)
-	for _, _type := range b.types {
-		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
-		for _, value := range _type.Values {
-			b.constantsMapByProfileType[_type.Name] = append(b.constantsMapByProfileType[_type.Name], value.Name, value.Value)
-		}
-	}
-	b.baseTypeMapByProfileType["bool"] = "bool"
-}
-
 func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
-	b.once.Do(func() { b.prepopulateLookup() })
-
-	_type := "FieldNum"
 	constants := make([]shared.Constant, 0)
 	for _, mesg := range b.messages {
 		for _, field := range mesg.Fields {
-			var scaleOffset string
-			scale := scaleOrDefault(field.Scales, 0)
-			offset := offsetOrDefault(field.Offsets, 0)
-			if scale != 1 || offset != 0 {
-				scaleOffset = fmt.Sprintf(", Scale: %g, Offset: %g", scale, offset)
+			baseType := b.lookup.BaseType(field.Type).String()
+			if field.Type == "bool" {
+				baseType = fmt.Sprintf("bool | %s", baseType)
 			}
 
-			var units string
-			if field.Units != "" {
-				units = fmt.Sprintf(", Units: %s", field.Units)
-			}
-			var array string
-			if field.Array != "" {
-				array = fmt.Sprintf(", Array: %s", field.Array)
-			}
-
-			c := shared.Constant{
-				Name:   strutil.ToTitle(mesg.Name) + strutil.ToTitle(field.Name),
-				Type:   _type,
-				Op:     "=",
-				Value:  strconv.Itoa(int(field.Num)),
-				String: mesg.Name + ": " + field.Name,
-				Comment: fmt.Sprintf("[ %s ] [Type: %s, Base: %s%s%s%s]; %s",
-					strutil.ToTitle(mesg.Name),
-					strutil.ToTitle(field.Type),
-					b.baseTypeMapByProfileType[field.Type],
-					array,
-					scaleOffset,
-					units,
-					field.Comment,
-				),
-			}
-			constants = append(constants, c)
+			constants = append(constants, shared.Constant{
+				Name:    strutil.ToTitle(mesg.Name) + strutil.ToTitle(field.Name),
+				Op:      "=",
+				Value:   strconv.Itoa(int(field.Num)),
+				String:  mesg.Name + ": " + field.Name,
+				Comment: createComment(mesg.Name, &field, baseType),
+			})
 		}
 	}
 	slices.SortStableFunc(constants, func(x, y shared.Constant) int {
@@ -124,7 +77,6 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 
 	constants = append(constants, shared.Constant{
 		Name:   "Invalid",
-		Type:   _type,
 		Op:     "=",
 		Value:  "255", // max byte
 		String: "invalid",
@@ -137,13 +89,41 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 		Filename:     "fieldnum_gen.go",
 		Data: shared.ConstantData{
 			Package:   "fieldnum",
-			Type:      _type,
-			Base:      "byte",
 			Constants: constants,
 		},
 	}
 
 	return []builder.Data{dataBuilder}, nil
+}
+
+func createComment(mesgName string, field *parser.Field, baseType string) string {
+	buf := new(strings.Builder)
+	buf.WriteString(fmt.Sprintf("[ %s ] [Type: %s, Base: %s",
+		strutil.ToTitle(mesgName), strutil.ToTitle(field.Type), baseType))
+
+	if field.Array != "" {
+		buf.WriteString(", Array: ")
+		buf.WriteString(field.Array)
+	}
+
+	scale := scaleOrDefault(field.Scales, 0)
+	offset := offsetOrDefault(field.Offsets, 0)
+	if scale != 1 || offset != 0 {
+		buf.WriteString(", Scale: ")
+		buf.WriteString(strconv.FormatFloat(scale, 'g', -1, 64))
+		buf.WriteString(", Offset: ")
+		buf.WriteString(strconv.FormatFloat(offset, 'g', -1, 64))
+	}
+
+	if field.Units != "" {
+		buf.WriteString(", Units: ")
+		buf.WriteString(field.Units)
+	}
+
+	buf.WriteString("]; ")
+	buf.WriteString(field.Comment)
+
+	return buf.String()
 }
 
 // Profile.xlsx says unless otherwise specified, scale of 1 is assumed.

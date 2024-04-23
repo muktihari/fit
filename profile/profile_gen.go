@@ -212,7 +212,7 @@ const (
 	MaxMetHeartRateSource
 	HrvStatus
 	NoFlyTimeMode
-	Invalid
+	Invalid ProfileType = 65535
 )
 
 func (p ProfileType) Uint16() uint16 { return uint16(p) }

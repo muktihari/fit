@@ -18,6 +18,9 @@ import (
 )
 
 // AviationAttitude is a AviationAttitude message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type AviationAttitude struct {
 	Timestamp             time.Time                  // Units: s; Timestamp message was output
 	SystemTime            []uint32                   // Array: [N]; Units: ms; System time associated with sample expressed in ms.
@@ -55,6 +58,7 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 
 	return &AviationAttitude{
 		Timestamp:    datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:  vals[0].Uint16(),
 		SystemTime:   vals[1].SliceUint32(),
 		Pitch:        vals[2].SliceInt16(),
 		Roll:         vals[3].SliceInt16(),
@@ -73,7 +77,6 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 			ptr := unsafe.SliceData(sliceValue)
 			return unsafe.Slice((*typedef.AttitudeValidity)(ptr), len(sliceValue))
 		}(),
-		TimestampMs: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -98,6 +101,11 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SystemTime != nil {
@@ -148,11 +156,6 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 	if m.Validity != nil {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.SliceUint16(m.Validity)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 
@@ -235,6 +238,14 @@ func (m *AviationAttitude) SetTimestamp(v time.Time) *AviationAttitude {
 	return m
 }
 
+// SetTimestampMs sets AviationAttitude value.
+//
+// Units: ms; Fractional part of timestamp, added to timestamp
+func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
+	m.TimestampMs = v
+	return m
+}
+
 // SetSystemTime sets AviationAttitude value.
 //
 // Array: [N]; Units: ms; System time associated with sample expressed in ms.
@@ -312,14 +323,6 @@ func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
 // Array: [N]
 func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAttitude {
 	m.Validity = v
-	return m
-}
-
-// SetTimestampMs sets AviationAttitude value.
-//
-// Units: ms; Fractional part of timestamp, added to timestamp
-func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
-	m.TimestampMs = v
 	return m
 }
 

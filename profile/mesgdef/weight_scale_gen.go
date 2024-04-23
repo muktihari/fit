@@ -18,6 +18,9 @@ import (
 )
 
 // WeightScale is a WeightScale message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WeightScale struct {
 	Timestamp         time.Time            // Units: s
 	Weight            typedef.Weight       // Scale: 100; Units: kg
@@ -64,12 +67,12 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 		BoneMass:          vals[4].Uint16(),
 		MuscleMass:        vals[5].Uint16(),
 		BasalMet:          vals[7].Uint16(),
-		ActiveMet:         vals[9].Uint16(),
-		UserProfileIndex:  typedef.MessageIndex(vals[12].Uint16()),
-		Bmi:               vals[13].Uint16(),
 		PhysiqueRating:    vals[8].Uint8(),
+		ActiveMet:         vals[9].Uint16(),
 		MetabolicAge:      vals[10].Uint8(),
 		VisceralFatRating: vals[11].Uint8(),
+		UserProfileIndex:  typedef.MessageIndex(vals[12].Uint16()),
+		Bmi:               vals[13].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -131,24 +134,14 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.BasalMet)
 		fields = append(fields, field)
 	}
-	if m.ActiveMet != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint16(m.ActiveMet)
-		fields = append(fields, field)
-	}
-	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
-		fields = append(fields, field)
-	}
-	if m.Bmi != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = proto.Uint16(m.Bmi)
-		fields = append(fields, field)
-	}
 	if m.PhysiqueRating != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(m.PhysiqueRating)
+		fields = append(fields, field)
+	}
+	if m.ActiveMet != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Uint16(m.ActiveMet)
 		fields = append(fields, field)
 	}
 	if m.MetabolicAge != basetype.Uint8Invalid {
@@ -159,6 +152,16 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 	if m.VisceralFatRating != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(m.VisceralFatRating)
+		fields = append(fields, field)
+	}
+	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
+		fields = append(fields, field)
+	}
+	if m.Bmi != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = proto.Uint16(m.Bmi)
 		fields = append(fields, field)
 	}
 
@@ -327,11 +330,31 @@ func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
 	return m
 }
 
+// SetPhysiqueRating sets WeightScale value.
+func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
+	m.PhysiqueRating = v
+	return m
+}
+
 // SetActiveMet sets WeightScale value.
 //
 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
 	m.ActiveMet = v
+	return m
+}
+
+// SetMetabolicAge sets WeightScale value.
+//
+// Units: years
+func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
+	m.MetabolicAge = v
+	return m
+}
+
+// SetVisceralFatRating sets WeightScale value.
+func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
+	m.VisceralFatRating = v
 	return m
 }
 
@@ -348,26 +371,6 @@ func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
 // Scale: 10; Units: kg/m^2
 func (m *WeightScale) SetBmi(v uint16) *WeightScale {
 	m.Bmi = v
-	return m
-}
-
-// SetPhysiqueRating sets WeightScale value.
-func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
-	m.PhysiqueRating = v
-	return m
-}
-
-// SetMetabolicAge sets WeightScale value.
-//
-// Units: years
-func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
-	m.MetabolicAge = v
-	return m
-}
-
-// SetVisceralFatRating sets WeightScale value.
-func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
-	m.VisceralFatRating = v
 	return m
 }
 

@@ -9,27 +9,17 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"text/template"
 
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
+	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
-	"github.com/muktihari/fit/profile/basetype"
 )
 
 type ( // type aliasing for better code reading.
-	// types
-	ValueName = string
-	BaseType  = string
-
-	// messages
 	MessageName = string
 	FieldName   = string
-	FieldNum    = byte
-
-	// profile
-	ProfileType = string
 )
 
 type factoryBuilder struct {
@@ -38,74 +28,35 @@ type factoryBuilder struct {
 	mesgnumPackageName string
 	profilePackageName string
 
-	path     string           // path to generate the file
+	path string // path to generate the file
+
+	lookup   *lookup.Lookup
 	messages []parser.Message // messages parsed from profile.xlsx
 	types    []parser.Type
-
-	once sync.Once
-
-	// types lookup
-	goTypesByProfileTypes            map[ProfileType]string                     // (k -> v) typedef.DateTime -> uint32
-	baseTypeMapByProfileType         map[ProfileType]BaseType                   // e.g. mesg_num 				 -> uint16 ,  data_time -> uint32
-	valueMapByProfileTypeByValueName map[ProfileType]map[ValueName]parser.Value // e.g. map[mesg_num][file_id] -> Value{}
-
-	// message-field lookup
-	fieldMapByMessageNameByFieldNum  map[MessageName]map[FieldNum]parser.Field  // e.g. map[file_id][0] 					 -> Field{}
-	fieldMapByMessageNameByFieldName map[MessageName]map[FieldName]parser.Field // e.g. map[file_createor][software_version] -> Field{}
 }
 
-func NewBuilder(path string, types []parser.Type, messages []parser.Message) builder.Builder {
+func NewBuilder(path string, lookup *lookup.Lookup, types []parser.Type, messages []parser.Message) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	return &factoryBuilder{
-		template:                         template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
-		path:                             filepath.Join(path, "factory"),
-		mesgnumPackageName:               "typedef",
-		profilePackageName:               "profile",
-		types:                            types,
-		messages:                         messages,
-		goTypesByProfileTypes:            make(map[ProfileType]string),
-		baseTypeMapByProfileType:         make(map[ProfileType]BaseType),
-		valueMapByProfileTypeByValueName: make(map[ProfileType]map[ValueName]parser.Value),
+	f := &factoryBuilder{
+		template:           template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
+		path:               filepath.Join(path, "factory"),
+		mesgnumPackageName: "typedef",
+		profilePackageName: "profile",
+		types:              types,
+		messages:           messages,
+		lookup:             lookup,
 	}
+	f.preproccessMessageField()
+	return f
 }
 
-func (b *factoryBuilder) populateLookupData() {
-	goTypesByBaseTypes := map[BaseType]string{
-		"bool":          "bool",
-		"fit_base_type": "basetype.BaseType",
-	}
-
-	for _, v := range basetype.List() { // map to itself
-		goTypesByBaseTypes[v.String()] = v.GoType()
-		b.goTypesByProfileTypes[v.String()] = v.GoType()
-		b.baseTypeMapByProfileType[v.String()] = v.String()
-	}
-
-	// additional profile type which is not defined in basetype.
-	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "enum"})
-
-	for _, _type := range b.types {
-		b.goTypesByProfileTypes[_type.Name] = goTypesByBaseTypes[_type.BaseType]
-		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
-		b.valueMapByProfileTypeByValueName[_type.Name] = make(map[ValueName]parser.Value)
-		for _, value := range _type.Values {
-			b.valueMapByProfileTypeByValueName[_type.Name][value.Name] = value
-		}
-	}
-
-	b.fieldMapByMessageNameByFieldNum = make(map[MessageName]map[FieldNum]parser.Field)
-	b.fieldMapByMessageNameByFieldName = make(map[MessageName]map[FieldName]parser.Field)
+func (b *factoryBuilder) preproccessMessageField() {
+	// Prepare lookup table for field indexes
 	fieldIndexMapByMessageNameByFieldName := make(map[MessageName]map[FieldName]int)
-
 	for _, message := range b.messages {
-		b.fieldMapByMessageNameByFieldNum[message.Name] = make(map[FieldNum]parser.Field)
-		b.fieldMapByMessageNameByFieldName[message.Name] = make(map[FieldName]parser.Field)
-
 		fieldIndexMapByMessageNameByFieldName[message.Name] = make(map[FieldName]int)
 		for i, field := range message.Fields {
-			b.fieldMapByMessageNameByFieldNum[message.Name][field.Num] = field
-			b.fieldMapByMessageNameByFieldName[message.Name][field.Name] = field
 			fieldIndexMapByMessageNameByFieldName[message.Name][field.Name] = i
 		}
 	}
@@ -128,8 +79,6 @@ func (b *factoryBuilder) populateLookupData() {
 }
 
 func (b *factoryBuilder) Build() ([]builder.Data, error) {
-	b.once.Do(func() { b.populateLookupData() })
-
 	// Create structure of []proto.Message as string using strings.Builder{},
 	// This way, we don't depend on generated value such as types and profile package to be able to generate factory.
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
@@ -182,7 +131,6 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 	strbuf := new(strings.Builder)
 	strbuf.WriteString("[256]proto.Field{\n")
 	for _, field := range message.Fields {
-		// strbuf.WriteString("{\n")
 		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
 		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
@@ -190,7 +138,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 		strbuf.WriteString(fmt.Sprintf("Type: %s,\n", b.transformProfileType(field.Type)))
 		strbuf.WriteString(fmt.Sprintf("BaseType: %s, /* (size: %d) */\n",
 			b.transformBaseType(field.Type),
-			basetype.FromString(b.baseTypeMapByProfileType[field.Type]).Size(),
+			b.lookup.BaseType(field.Type).Size(),
 		))
 		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
 		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(field, message.Name)))
@@ -216,7 +164,7 @@ func (b *factoryBuilder) makeComponents(compField parser.ComponentField, message
 	strbuf := new(strings.Builder)
 	strbuf.WriteString("[]proto.Component{\n")
 	for i, fieldNameRef := range compField.GetComponents() {
-		fieldRef := b.fieldMapByMessageNameByFieldName[messageName][fieldNameRef]
+		fieldRef := b.lookup.FieldByName(messageName, fieldNameRef)
 		strbuf.WriteString("{")
 		strbuf.WriteString(fmt.Sprintf("FieldNum: %d, /* %s */", fieldRef.Num, fieldRef.Name))
 		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(compField.GetScales(), i)))               // component index or default
@@ -261,12 +209,12 @@ func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName 
 	strbuf := new(strings.Builder)
 	strbuf.WriteString("[]proto.SubFieldMap{\n")
 	for i, refValueName := range subfield.RefFieldNames {
-		fieldRef := b.fieldMapByMessageNameByFieldName[messageName][refValueName]
+		fieldRef := b.lookup.FieldByName(messageName, refValueName)
 		strbuf.WriteString("{")
 		strbuf.WriteString(fmt.Sprintf("RefFieldNum: %d /* %s */,", fieldRef.Num, fieldRef.Name))
 
-		typeRef := b.valueMapByProfileTypeByValueName[fieldRef.Type][subfield.RefFieldValue[i]]
-		strbuf.WriteString(fmt.Sprintf("RefFieldValue: %s /* %s */,", typeRef.Value, typeRef.Name))
+		typeValue := b.lookup.TypeValue(fieldRef.Type, subfield.RefFieldValue[i])
+		strbuf.WriteString(fmt.Sprintf("RefFieldValue: %s /* %s */,", typeValue, subfield.RefFieldValue[i]))
 		strbuf.WriteString("},\n")
 	}
 	strbuf.WriteString("}")
@@ -278,11 +226,8 @@ func (b *factoryBuilder) transformProfileType(fieldType string) string {
 }
 
 func (b *factoryBuilder) transformBaseType(fieldType string) string {
-	baseType := b.baseTypeMapByProfileType[fieldType]
-	if baseType == "bool" {
-		baseType = "enum"
-	}
-	return "basetype." + strutil.ToTitle(baseType) // basetype.Uint16z
+	baseType := b.lookup.BaseType(fieldType)
+	return "basetype." + strutil.ToTitle(baseType.String()) // basetype.Uint16z
 }
 
 func (b *factoryBuilder) transformMesgnum(s string) string {
@@ -296,31 +241,34 @@ var baseTypeReplacer = strings.NewReplacer(
 )
 
 func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
-	if fieldType == "bool" {
+	if fieldType == "bool" { // Special type, bool does not have basetype
+		if array != "" {
+			return "proto.SliceBool([]bool(nil))"
+		}
 		return "proto.Bool(false)"
 	}
 
-	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
-	baseType = baseTypeReplacer.Replace(baseType)
+	var (
+		baseType      = strutil.ToTitle(b.lookup.BaseType(fieldType).String())
+		protoFuncName = strings.TrimSuffix(baseTypeReplacer.Replace(baseType), "z")
+		goType        = b.lookup.GoType(fieldType)
+	)
 
-	protoFuncName := strings.TrimSuffix(baseType, "z")
-
-	goType := b.goTypesByProfileTypes[fieldType]
 	if array != "" {
 		return fmt.Sprintf("proto.Slice%s([]%s(nil))", protoFuncName, goType)
 	}
 
 	// Float is a special case since NaN is not comparable, so for example, basetype.Float32Invalid, is not a float,
 	// but its representation in integer form. This way we can compare it in its integer form later.
-	if b.baseTypeMapByProfileType[fieldType] == "float32" {
+	if baseType == "Float32" {
 		return "proto.Float32(math.Float32frombits(basetype.Float32Invalid))" // same as `math.Float32frombits(basetype.Float32Invalid)`
 	}
 
-	if b.baseTypeMapByProfileType[fieldType] == "float64" {
+	if baseType == "Float64" {
 		return "proto.Float64(math.Float64frombits(basetype.Float64Invalid))" // same as `math.Float64frombits(basetype.Float64Invalid)`
 	}
 
-	return fmt.Sprintf("proto.%s(basetype.%sInvalid)", protoFuncName, strings.Replace(baseType, "Int", "Sint", 1))
+	return fmt.Sprintf("proto.%s(basetype.%sInvalid)", protoFuncName, baseType)
 
 }
 

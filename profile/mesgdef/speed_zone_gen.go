@@ -16,6 +16,9 @@ import (
 )
 
 // SpeedZone is a SpeedZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type SpeedZone struct {
 	Name         string
 	MessageIndex typedef.MessageIndex
@@ -43,9 +46,9 @@ func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 	}
 
 	return &SpeedZone{
-		Name:         vals[1].String(),
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[0].Uint16(),
+		Name:         vals[1].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,11 +70,6 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSpeedZone}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -80,6 +78,11 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 	if m.HighValue != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.HighValue)
+		fields = append(fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 
@@ -101,12 +104,6 @@ func (m *SpeedZone) HighValueScaled() float64 {
 	return scaleoffset.Apply(m.HighValue, 1000, 0)
 }
 
-// SetName sets SpeedZone value.
-func (m *SpeedZone) SetName(v string) *SpeedZone {
-	m.Name = v
-	return m
-}
-
 // SetMessageIndex sets SpeedZone value.
 func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
 	m.MessageIndex = v
@@ -118,6 +115,12 @@ func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
 // Scale: 1000; Units: m/s
 func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
 	m.HighValue = v
+	return m
+}
+
+// SetName sets SpeedZone value.
+func (m *SpeedZone) SetName(v string) *SpeedZone {
+	m.Name = v
 	return m
 }
 

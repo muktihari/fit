@@ -19,6 +19,9 @@ import (
 )
 
 // Lap is a Lap message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Lap struct {
 	Timestamp                     time.Time // Units: s; Lap end time.
 	StartTime                     time.Time
@@ -172,28 +175,11 @@ func NewLap(mesg *proto.Message) *Lap {
 	}
 
 	return &Lap{
+		MessageIndex:                  typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:                     datetime.ToTime(vals[253].Uint32()),
+		Event:                         typedef.Event(vals[0].Uint8()),
+		EventType:                     typedef.EventType(vals[1].Uint8()),
 		StartTime:                     datetime.ToTime(vals[2].Uint32()),
-		TimeInHrZone:                  vals[57].SliceUint32(),
-		TimeInSpeedZone:               vals[58].SliceUint32(),
-		TimeInCadenceZone:             vals[59].SliceUint32(),
-		TimeInPowerZone:               vals[60].SliceUint32(),
-		StrokeCount:                   vals[75].SliceUint16(),
-		ZoneCount:                     vals[76].SliceUint16(),
-		AvgTotalHemoglobinConc:        vals[84].SliceUint16(),
-		MinTotalHemoglobinConc:        vals[85].SliceUint16(),
-		MaxTotalHemoglobinConc:        vals[86].SliceUint16(),
-		AvgSaturatedHemoglobinPercent: vals[87].SliceUint16(),
-		MinSaturatedHemoglobinPercent: vals[88].SliceUint16(),
-		MaxSaturatedHemoglobinPercent: vals[89].SliceUint16(),
-		AvgLeftPowerPhase:             vals[102].SliceUint8(),
-		AvgLeftPowerPhasePeak:         vals[103].SliceUint8(),
-		AvgRightPowerPhase:            vals[104].SliceUint8(),
-		AvgRightPowerPhasePeak:        vals[105].SliceUint8(),
-		AvgPowerPosition:              vals[106].SliceUint16(),
-		MaxPowerPosition:              vals[107].SliceUint16(),
-		AvgCadencePosition:            vals[108].SliceUint8(),
-		MaxCadencePosition:            vals[109].SliceUint8(),
 		StartPositionLat:              vals[3].Int32(),
 		StartPositionLong:             vals[4].Int32(),
 		EndPositionLat:                vals[5].Int32(),
@@ -202,99 +188,116 @@ func NewLap(mesg *proto.Message) *Lap {
 		TotalTimerTime:                vals[8].Uint32(),
 		TotalDistance:                 vals[9].Uint32(),
 		TotalCycles:                   vals[10].Uint32(),
-		TotalWork:                     vals[41].Uint32(),
-		TotalMovingTime:               vals[52].Uint32(),
-		TimeStanding:                  vals[98].Uint32(),
-		EnhancedAvgSpeed:              vals[110].Uint32(),
-		EnhancedMaxSpeed:              vals[111].Uint32(),
-		EnhancedAvgAltitude:           vals[112].Uint32(),
-		EnhancedMinAltitude:           vals[113].Uint32(),
-		EnhancedMaxAltitude:           vals[114].Uint32(),
-		AvgDepth:                      vals[122].Uint32(),
-		MaxDepth:                      vals[123].Uint32(),
-		TotalGrit:                     vals[149].Float32(),
-		TotalFlow:                     vals[150].Float32(),
-		AvgGrit:                       vals[153].Float32(),
-		AvgFlow:                       vals[154].Float32(),
-		MessageIndex:                  typedef.MessageIndex(vals[254].Uint16()),
 		TotalCalories:                 vals[11].Uint16(),
 		TotalFatCalories:              vals[12].Uint16(),
 		AvgSpeed:                      vals[13].Uint16(),
 		MaxSpeed:                      vals[14].Uint16(),
+		AvgHeartRate:                  vals[15].Uint8(),
+		MaxHeartRate:                  vals[16].Uint8(),
+		AvgCadence:                    vals[17].Uint8(),
+		MaxCadence:                    vals[18].Uint8(),
 		AvgPower:                      vals[19].Uint16(),
 		MaxPower:                      vals[20].Uint16(),
 		TotalAscent:                   vals[21].Uint16(),
 		TotalDescent:                  vals[22].Uint16(),
+		Intensity:                     typedef.Intensity(vals[23].Uint8()),
+		LapTrigger:                    typedef.LapTrigger(vals[24].Uint8()),
+		Sport:                         typedef.Sport(vals[25].Uint8()),
+		EventGroup:                    vals[26].Uint8(),
 		NumLengths:                    vals[32].Uint16(),
 		NormalizedPower:               vals[33].Uint16(),
 		LeftRightBalance:              typedef.LeftRightBalance100(vals[34].Uint16()),
 		FirstLengthIndex:              vals[35].Uint16(),
 		AvgStrokeDistance:             vals[37].Uint16(),
+		SwimStroke:                    typedef.SwimStroke(vals[38].Uint8()),
+		SubSport:                      typedef.SubSport(vals[39].Uint8()),
 		NumActiveLengths:              vals[40].Uint16(),
+		TotalWork:                     vals[41].Uint32(),
 		AvgAltitude:                   vals[42].Uint16(),
 		MaxAltitude:                   vals[43].Uint16(),
+		GpsAccuracy:                   vals[44].Uint8(),
 		AvgGrade:                      vals[45].Int16(),
 		AvgPosGrade:                   vals[46].Int16(),
 		AvgNegGrade:                   vals[47].Int16(),
 		MaxPosGrade:                   vals[48].Int16(),
 		MaxNegGrade:                   vals[49].Int16(),
+		AvgTemperature:                vals[50].Int8(),
+		MaxTemperature:                vals[51].Int8(),
+		TotalMovingTime:               vals[52].Uint32(),
 		AvgPosVerticalSpeed:           vals[53].Int16(),
 		AvgNegVerticalSpeed:           vals[54].Int16(),
 		MaxPosVerticalSpeed:           vals[55].Int16(),
 		MaxNegVerticalSpeed:           vals[56].Int16(),
+		TimeInHrZone:                  vals[57].SliceUint32(),
+		TimeInSpeedZone:               vals[58].SliceUint32(),
+		TimeInCadenceZone:             vals[59].SliceUint32(),
+		TimeInPowerZone:               vals[60].SliceUint32(),
 		RepetitionNum:                 vals[61].Uint16(),
 		MinAltitude:                   vals[62].Uint16(),
+		MinHeartRate:                  vals[63].Uint8(),
 		WktStepIndex:                  typedef.MessageIndex(vals[71].Uint16()),
 		OpponentScore:                 vals[74].Uint16(),
+		StrokeCount:                   vals[75].SliceUint16(),
+		ZoneCount:                     vals[76].SliceUint16(),
 		AvgVerticalOscillation:        vals[77].Uint16(),
 		AvgStanceTimePercent:          vals[78].Uint16(),
 		AvgStanceTime:                 vals[79].Uint16(),
-		PlayerScore:                   vals[83].Uint16(),
-		StandCount:                    vals[99].Uint16(),
-		AvgLevMotorPower:              vals[115].Uint16(),
-		MaxLevMotorPower:              vals[116].Uint16(),
-		AvgVerticalRatio:              vals[118].Uint16(),
-		AvgStanceTimeBalance:          vals[119].Uint16(),
-		AvgStepLength:                 vals[120].Uint16(),
-		AvgVam:                        vals[121].Uint16(),
-		EnhancedAvgRespirationRate:    vals[136].Uint16(),
-		EnhancedMaxRespirationRate:    vals[137].Uint16(),
-		JumpCount:                     vals[151].Uint16(),
-		AvgCoreTemperature:            vals[158].Uint16(),
-		MinCoreTemperature:            vals[159].Uint16(),
-		MaxCoreTemperature:            vals[160].Uint16(),
-		Event:                         typedef.Event(vals[0].Uint8()),
-		EventType:                     typedef.EventType(vals[1].Uint8()),
-		AvgHeartRate:                  vals[15].Uint8(),
-		MaxHeartRate:                  vals[16].Uint8(),
-		AvgCadence:                    vals[17].Uint8(),
-		MaxCadence:                    vals[18].Uint8(),
-		Intensity:                     typedef.Intensity(vals[23].Uint8()),
-		LapTrigger:                    typedef.LapTrigger(vals[24].Uint8()),
-		Sport:                         typedef.Sport(vals[25].Uint8()),
-		EventGroup:                    vals[26].Uint8(),
-		SwimStroke:                    typedef.SwimStroke(vals[38].Uint8()),
-		SubSport:                      typedef.SubSport(vals[39].Uint8()),
-		GpsAccuracy:                   vals[44].Uint8(),
-		AvgTemperature:                vals[50].Int8(),
-		MaxTemperature:                vals[51].Int8(),
-		MinHeartRate:                  vals[63].Uint8(),
 		AvgFractionalCadence:          vals[80].Uint8(),
 		MaxFractionalCadence:          vals[81].Uint8(),
 		TotalFractionalCycles:         vals[82].Uint8(),
+		PlayerScore:                   vals[83].Uint16(),
+		AvgTotalHemoglobinConc:        vals[84].SliceUint16(),
+		MinTotalHemoglobinConc:        vals[85].SliceUint16(),
+		MaxTotalHemoglobinConc:        vals[86].SliceUint16(),
+		AvgSaturatedHemoglobinPercent: vals[87].SliceUint16(),
+		MinSaturatedHemoglobinPercent: vals[88].SliceUint16(),
+		MaxSaturatedHemoglobinPercent: vals[89].SliceUint16(),
 		AvgLeftTorqueEffectiveness:    vals[91].Uint8(),
 		AvgRightTorqueEffectiveness:   vals[92].Uint8(),
 		AvgLeftPedalSmoothness:        vals[93].Uint8(),
 		AvgRightPedalSmoothness:       vals[94].Uint8(),
 		AvgCombinedPedalSmoothness:    vals[95].Uint8(),
+		TimeStanding:                  vals[98].Uint32(),
+		StandCount:                    vals[99].Uint16(),
 		AvgLeftPco:                    vals[100].Int8(),
 		AvgRightPco:                   vals[101].Int8(),
+		AvgLeftPowerPhase:             vals[102].SliceUint8(),
+		AvgLeftPowerPhasePeak:         vals[103].SliceUint8(),
+		AvgRightPowerPhase:            vals[104].SliceUint8(),
+		AvgRightPowerPhasePeak:        vals[105].SliceUint8(),
+		AvgPowerPosition:              vals[106].SliceUint16(),
+		MaxPowerPosition:              vals[107].SliceUint16(),
+		AvgCadencePosition:            vals[108].SliceUint8(),
+		MaxCadencePosition:            vals[109].SliceUint8(),
+		EnhancedAvgSpeed:              vals[110].Uint32(),
+		EnhancedMaxSpeed:              vals[111].Uint32(),
+		EnhancedAvgAltitude:           vals[112].Uint32(),
+		EnhancedMinAltitude:           vals[113].Uint32(),
+		EnhancedMaxAltitude:           vals[114].Uint32(),
+		AvgLevMotorPower:              vals[115].Uint16(),
+		MaxLevMotorPower:              vals[116].Uint16(),
 		LevBatteryConsumption:         vals[117].Uint8(),
+		AvgVerticalRatio:              vals[118].Uint16(),
+		AvgStanceTimeBalance:          vals[119].Uint16(),
+		AvgStepLength:                 vals[120].Uint16(),
+		AvgVam:                        vals[121].Uint16(),
+		AvgDepth:                      vals[122].Uint32(),
+		MaxDepth:                      vals[123].Uint32(),
 		MinTemperature:                vals[124].Int8(),
+		EnhancedAvgRespirationRate:    vals[136].Uint16(),
+		EnhancedMaxRespirationRate:    vals[137].Uint16(),
 		AvgRespirationRate:            vals[147].Uint8(),
 		MaxRespirationRate:            vals[148].Uint8(),
+		TotalGrit:                     vals[149].Float32(),
+		TotalFlow:                     vals[150].Float32(),
+		JumpCount:                     vals[151].Uint16(),
+		AvgGrit:                       vals[153].Float32(),
+		AvgFlow:                       vals[154].Float32(),
 		TotalFractionalAscent:         vals[156].Uint8(),
 		TotalFractionalDescent:        vals[157].Uint8(),
+		AvgCoreTemperature:            vals[158].Uint16(),
+		MinCoreTemperature:            vals[159].Uint16(),
+		MaxCoreTemperature:            vals[160].Uint16(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -318,114 +321,29 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumLap}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if byte(m.Event) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Event))
+		fields = append(fields, field)
+	}
+	if byte(m.EventType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.EventType))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
-		fields = append(fields, field)
-	}
-	if m.TimeInHrZone != nil {
-		field := fac.CreateField(mesg.Num, 57)
-		field.Value = proto.SliceUint32(m.TimeInHrZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInSpeedZone != nil {
-		field := fac.CreateField(mesg.Num, 58)
-		field.Value = proto.SliceUint32(m.TimeInSpeedZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInCadenceZone != nil {
-		field := fac.CreateField(mesg.Num, 59)
-		field.Value = proto.SliceUint32(m.TimeInCadenceZone)
-		fields = append(fields, field)
-	}
-	if m.TimeInPowerZone != nil {
-		field := fac.CreateField(mesg.Num, 60)
-		field.Value = proto.SliceUint32(m.TimeInPowerZone)
-		fields = append(fields, field)
-	}
-	if m.StrokeCount != nil {
-		field := fac.CreateField(mesg.Num, 75)
-		field.Value = proto.SliceUint16(m.StrokeCount)
-		fields = append(fields, field)
-	}
-	if m.ZoneCount != nil {
-		field := fac.CreateField(mesg.Num, 76)
-		field.Value = proto.SliceUint16(m.ZoneCount)
-		fields = append(fields, field)
-	}
-	if m.AvgTotalHemoglobinConc != nil {
-		field := fac.CreateField(mesg.Num, 84)
-		field.Value = proto.SliceUint16(m.AvgTotalHemoglobinConc)
-		fields = append(fields, field)
-	}
-	if m.MinTotalHemoglobinConc != nil {
-		field := fac.CreateField(mesg.Num, 85)
-		field.Value = proto.SliceUint16(m.MinTotalHemoglobinConc)
-		fields = append(fields, field)
-	}
-	if m.MaxTotalHemoglobinConc != nil {
-		field := fac.CreateField(mesg.Num, 86)
-		field.Value = proto.SliceUint16(m.MaxTotalHemoglobinConc)
-		fields = append(fields, field)
-	}
-	if m.AvgSaturatedHemoglobinPercent != nil {
-		field := fac.CreateField(mesg.Num, 87)
-		field.Value = proto.SliceUint16(m.AvgSaturatedHemoglobinPercent)
-		fields = append(fields, field)
-	}
-	if m.MinSaturatedHemoglobinPercent != nil {
-		field := fac.CreateField(mesg.Num, 88)
-		field.Value = proto.SliceUint16(m.MinSaturatedHemoglobinPercent)
-		fields = append(fields, field)
-	}
-	if m.MaxSaturatedHemoglobinPercent != nil {
-		field := fac.CreateField(mesg.Num, 89)
-		field.Value = proto.SliceUint16(m.MaxSaturatedHemoglobinPercent)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPowerPhase != nil {
-		field := fac.CreateField(mesg.Num, 102)
-		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPowerPhasePeak != nil {
-		field := fac.CreateField(mesg.Num, 103)
-		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPowerPhase != nil {
-		field := fac.CreateField(mesg.Num, 104)
-		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPowerPhasePeak != nil {
-		field := fac.CreateField(mesg.Num, 105)
-		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
-		fields = append(fields, field)
-	}
-	if m.AvgPowerPosition != nil {
-		field := fac.CreateField(mesg.Num, 106)
-		field.Value = proto.SliceUint16(m.AvgPowerPosition)
-		fields = append(fields, field)
-	}
-	if m.MaxPowerPosition != nil {
-		field := fac.CreateField(mesg.Num, 107)
-		field.Value = proto.SliceUint16(m.MaxPowerPosition)
-		fields = append(fields, field)
-	}
-	if m.AvgCadencePosition != nil {
-		field := fac.CreateField(mesg.Num, 108)
-		field.Value = proto.SliceUint8(m.AvgCadencePosition)
-		fields = append(fields, field)
-	}
-	if m.MaxCadencePosition != nil {
-		field := fac.CreateField(mesg.Num, 109)
-		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -468,9 +386,179 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TotalCycles)
 		fields = append(fields, field)
 	}
+	if m.TotalCalories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint16(m.TotalCalories)
+		fields = append(fields, field)
+	}
+	if m.TotalFatCalories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = proto.Uint16(m.TotalFatCalories)
+		fields = append(fields, field)
+	}
+	if m.AvgSpeed != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 13)
+		field.Value = proto.Uint16(m.AvgSpeed)
+		fields = append(fields, field)
+	}
+	if m.MaxSpeed != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = proto.Uint16(m.MaxSpeed)
+		fields = append(fields, field)
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint8(m.AvgHeartRate)
+		fields = append(fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = proto.Uint8(m.MaxHeartRate)
+		fields = append(fields, field)
+	}
+	if m.AvgCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = proto.Uint8(m.AvgCadence)
+		fields = append(fields, field)
+	}
+	if m.MaxCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = proto.Uint8(m.MaxCadence)
+		fields = append(fields, field)
+	}
+	if m.AvgPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 19)
+		field.Value = proto.Uint16(m.AvgPower)
+		fields = append(fields, field)
+	}
+	if m.MaxPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = proto.Uint16(m.MaxPower)
+		fields = append(fields, field)
+	}
+	if m.TotalAscent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = proto.Uint16(m.TotalAscent)
+		fields = append(fields, field)
+	}
+	if m.TotalDescent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = proto.Uint16(m.TotalDescent)
+		fields = append(fields, field)
+	}
+	if byte(m.Intensity) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = proto.Uint8(byte(m.Intensity))
+		fields = append(fields, field)
+	}
+	if byte(m.LapTrigger) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 24)
+		field.Value = proto.Uint8(byte(m.LapTrigger))
+		fields = append(fields, field)
+	}
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 25)
+		field.Value = proto.Uint8(byte(m.Sport))
+		fields = append(fields, field)
+	}
+	if m.EventGroup != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 26)
+		field.Value = proto.Uint8(m.EventGroup)
+		fields = append(fields, field)
+	}
+	if m.NumLengths != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 32)
+		field.Value = proto.Uint16(m.NumLengths)
+		fields = append(fields, field)
+	}
+	if m.NormalizedPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 33)
+		field.Value = proto.Uint16(m.NormalizedPower)
+		fields = append(fields, field)
+	}
+	if uint16(m.LeftRightBalance) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 34)
+		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
+		fields = append(fields, field)
+	}
+	if m.FirstLengthIndex != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 35)
+		field.Value = proto.Uint16(m.FirstLengthIndex)
+		fields = append(fields, field)
+	}
+	if m.AvgStrokeDistance != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 37)
+		field.Value = proto.Uint16(m.AvgStrokeDistance)
+		fields = append(fields, field)
+	}
+	if byte(m.SwimStroke) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 38)
+		field.Value = proto.Uint8(byte(m.SwimStroke))
+		fields = append(fields, field)
+	}
+	if byte(m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 39)
+		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
+	if m.NumActiveLengths != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 40)
+		field.Value = proto.Uint16(m.NumActiveLengths)
+		fields = append(fields, field)
+	}
 	if m.TotalWork != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 41)
 		field.Value = proto.Uint32(m.TotalWork)
+		fields = append(fields, field)
+	}
+	if m.AvgAltitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 42)
+		field.Value = proto.Uint16(m.AvgAltitude)
+		fields = append(fields, field)
+	}
+	if m.MaxAltitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 43)
+		field.Value = proto.Uint16(m.MaxAltitude)
+		fields = append(fields, field)
+	}
+	if m.GpsAccuracy != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 44)
+		field.Value = proto.Uint8(m.GpsAccuracy)
+		fields = append(fields, field)
+	}
+	if m.AvgGrade != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 45)
+		field.Value = proto.Int16(m.AvgGrade)
+		fields = append(fields, field)
+	}
+	if m.AvgPosGrade != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 46)
+		field.Value = proto.Int16(m.AvgPosGrade)
+		fields = append(fields, field)
+	}
+	if m.AvgNegGrade != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 47)
+		field.Value = proto.Int16(m.AvgNegGrade)
+		fields = append(fields, field)
+	}
+	if m.MaxPosGrade != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 48)
+		field.Value = proto.Int16(m.MaxPosGrade)
+		fields = append(fields, field)
+	}
+	if m.MaxNegGrade != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 49)
+		field.Value = proto.Int16(m.MaxNegGrade)
+		fields = append(fields, field)
+	}
+	if m.AvgTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 50)
+		field.Value = proto.Int8(m.AvgTemperature)
+		fields = append(fields, field)
+	}
+	if m.MaxTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 51)
+		field.Value = proto.Int8(m.MaxTemperature)
 		fields = append(fields, field)
 	}
 	if m.TotalMovingTime != basetype.Uint32Invalid {
@@ -478,9 +566,229 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TotalMovingTime)
 		fields = append(fields, field)
 	}
+	if m.AvgPosVerticalSpeed != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 53)
+		field.Value = proto.Int16(m.AvgPosVerticalSpeed)
+		fields = append(fields, field)
+	}
+	if m.AvgNegVerticalSpeed != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 54)
+		field.Value = proto.Int16(m.AvgNegVerticalSpeed)
+		fields = append(fields, field)
+	}
+	if m.MaxPosVerticalSpeed != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 55)
+		field.Value = proto.Int16(m.MaxPosVerticalSpeed)
+		fields = append(fields, field)
+	}
+	if m.MaxNegVerticalSpeed != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 56)
+		field.Value = proto.Int16(m.MaxNegVerticalSpeed)
+		fields = append(fields, field)
+	}
+	if m.TimeInHrZone != nil {
+		field := fac.CreateField(mesg.Num, 57)
+		field.Value = proto.SliceUint32(m.TimeInHrZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInSpeedZone != nil {
+		field := fac.CreateField(mesg.Num, 58)
+		field.Value = proto.SliceUint32(m.TimeInSpeedZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInCadenceZone != nil {
+		field := fac.CreateField(mesg.Num, 59)
+		field.Value = proto.SliceUint32(m.TimeInCadenceZone)
+		fields = append(fields, field)
+	}
+	if m.TimeInPowerZone != nil {
+		field := fac.CreateField(mesg.Num, 60)
+		field.Value = proto.SliceUint32(m.TimeInPowerZone)
+		fields = append(fields, field)
+	}
+	if m.RepetitionNum != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 61)
+		field.Value = proto.Uint16(m.RepetitionNum)
+		fields = append(fields, field)
+	}
+	if m.MinAltitude != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 62)
+		field.Value = proto.Uint16(m.MinAltitude)
+		fields = append(fields, field)
+	}
+	if m.MinHeartRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 63)
+		field.Value = proto.Uint8(m.MinHeartRate)
+		fields = append(fields, field)
+	}
+	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 71)
+		field.Value = proto.Uint16(uint16(m.WktStepIndex))
+		fields = append(fields, field)
+	}
+	if m.OpponentScore != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 74)
+		field.Value = proto.Uint16(m.OpponentScore)
+		fields = append(fields, field)
+	}
+	if m.StrokeCount != nil {
+		field := fac.CreateField(mesg.Num, 75)
+		field.Value = proto.SliceUint16(m.StrokeCount)
+		fields = append(fields, field)
+	}
+	if m.ZoneCount != nil {
+		field := fac.CreateField(mesg.Num, 76)
+		field.Value = proto.SliceUint16(m.ZoneCount)
+		fields = append(fields, field)
+	}
+	if m.AvgVerticalOscillation != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 77)
+		field.Value = proto.Uint16(m.AvgVerticalOscillation)
+		fields = append(fields, field)
+	}
+	if m.AvgStanceTimePercent != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 78)
+		field.Value = proto.Uint16(m.AvgStanceTimePercent)
+		fields = append(fields, field)
+	}
+	if m.AvgStanceTime != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 79)
+		field.Value = proto.Uint16(m.AvgStanceTime)
+		fields = append(fields, field)
+	}
+	if m.AvgFractionalCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 80)
+		field.Value = proto.Uint8(m.AvgFractionalCadence)
+		fields = append(fields, field)
+	}
+	if m.MaxFractionalCadence != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 81)
+		field.Value = proto.Uint8(m.MaxFractionalCadence)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalCycles != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 82)
+		field.Value = proto.Uint8(m.TotalFractionalCycles)
+		fields = append(fields, field)
+	}
+	if m.PlayerScore != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 83)
+		field.Value = proto.Uint16(m.PlayerScore)
+		fields = append(fields, field)
+	}
+	if m.AvgTotalHemoglobinConc != nil {
+		field := fac.CreateField(mesg.Num, 84)
+		field.Value = proto.SliceUint16(m.AvgTotalHemoglobinConc)
+		fields = append(fields, field)
+	}
+	if m.MinTotalHemoglobinConc != nil {
+		field := fac.CreateField(mesg.Num, 85)
+		field.Value = proto.SliceUint16(m.MinTotalHemoglobinConc)
+		fields = append(fields, field)
+	}
+	if m.MaxTotalHemoglobinConc != nil {
+		field := fac.CreateField(mesg.Num, 86)
+		field.Value = proto.SliceUint16(m.MaxTotalHemoglobinConc)
+		fields = append(fields, field)
+	}
+	if m.AvgSaturatedHemoglobinPercent != nil {
+		field := fac.CreateField(mesg.Num, 87)
+		field.Value = proto.SliceUint16(m.AvgSaturatedHemoglobinPercent)
+		fields = append(fields, field)
+	}
+	if m.MinSaturatedHemoglobinPercent != nil {
+		field := fac.CreateField(mesg.Num, 88)
+		field.Value = proto.SliceUint16(m.MinSaturatedHemoglobinPercent)
+		fields = append(fields, field)
+	}
+	if m.MaxSaturatedHemoglobinPercent != nil {
+		field := fac.CreateField(mesg.Num, 89)
+		field.Value = proto.SliceUint16(m.MaxSaturatedHemoglobinPercent)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftTorqueEffectiveness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 91)
+		field.Value = proto.Uint8(m.AvgLeftTorqueEffectiveness)
+		fields = append(fields, field)
+	}
+	if m.AvgRightTorqueEffectiveness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 92)
+		field.Value = proto.Uint8(m.AvgRightTorqueEffectiveness)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPedalSmoothness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 93)
+		field.Value = proto.Uint8(m.AvgLeftPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPedalSmoothness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 94)
+		field.Value = proto.Uint8(m.AvgRightPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if m.AvgCombinedPedalSmoothness != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 95)
+		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
+		fields = append(fields, field)
+	}
 	if m.TimeStanding != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 98)
 		field.Value = proto.Uint32(m.TimeStanding)
+		fields = append(fields, field)
+	}
+	if m.StandCount != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 99)
+		field.Value = proto.Uint16(m.StandCount)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPco != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 100)
+		field.Value = proto.Int8(m.AvgLeftPco)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPco != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 101)
+		field.Value = proto.Int8(m.AvgRightPco)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPowerPhase != nil {
+		field := fac.CreateField(mesg.Num, 102)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPowerPhasePeak != nil {
+		field := fac.CreateField(mesg.Num, 103)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhase != nil {
+		field := fac.CreateField(mesg.Num, 104)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhasePeak != nil {
+		field := fac.CreateField(mesg.Num, 105)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgPowerPosition != nil {
+		field := fac.CreateField(mesg.Num, 106)
+		field.Value = proto.SliceUint16(m.AvgPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.MaxPowerPosition != nil {
+		field := fac.CreateField(mesg.Num, 107)
+		field.Value = proto.SliceUint16(m.MaxPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.AvgCadencePosition != nil {
+		field := fac.CreateField(mesg.Num, 108)
+		field.Value = proto.SliceUint8(m.AvgCadencePosition)
+		fields = append(fields, field)
+	}
+	if m.MaxCadencePosition != nil {
+		field := fac.CreateField(mesg.Num, 109)
+		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAvgSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[110] && options.IncludeExpandedFields) || !m.IsExpandedFields[110]) {
@@ -513,211 +821,6 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[114]
 		fields = append(fields, field)
 	}
-	if m.AvgDepth != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 122)
-		field.Value = proto.Uint32(m.AvgDepth)
-		fields = append(fields, field)
-	}
-	if m.MaxDepth != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 123)
-		field.Value = proto.Uint32(m.MaxDepth)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 149)
-		field.Value = proto.Float32(m.TotalGrit)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.TotalFlow) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 150)
-		field.Value = proto.Float32(m.TotalFlow)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.AvgGrit) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 153)
-		field.Value = proto.Float32(m.AvgGrit)
-		fields = append(fields, field)
-	}
-	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 154)
-		field.Value = proto.Float32(m.AvgFlow)
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
-	if m.TotalCalories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Uint16(m.TotalCalories)
-		fields = append(fields, field)
-	}
-	if m.TotalFatCalories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = proto.Uint16(m.TotalFatCalories)
-		fields = append(fields, field)
-	}
-	if m.AvgSpeed != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 13)
-		field.Value = proto.Uint16(m.AvgSpeed)
-		fields = append(fields, field)
-	}
-	if m.MaxSpeed != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
-		field.Value = proto.Uint16(m.MaxSpeed)
-		fields = append(fields, field)
-	}
-	if m.AvgPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 19)
-		field.Value = proto.Uint16(m.AvgPower)
-		fields = append(fields, field)
-	}
-	if m.MaxPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 20)
-		field.Value = proto.Uint16(m.MaxPower)
-		fields = append(fields, field)
-	}
-	if m.TotalAscent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 21)
-		field.Value = proto.Uint16(m.TotalAscent)
-		fields = append(fields, field)
-	}
-	if m.TotalDescent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = proto.Uint16(m.TotalDescent)
-		fields = append(fields, field)
-	}
-	if m.NumLengths != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 32)
-		field.Value = proto.Uint16(m.NumLengths)
-		fields = append(fields, field)
-	}
-	if m.NormalizedPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 33)
-		field.Value = proto.Uint16(m.NormalizedPower)
-		fields = append(fields, field)
-	}
-	if uint16(m.LeftRightBalance) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 34)
-		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
-		fields = append(fields, field)
-	}
-	if m.FirstLengthIndex != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 35)
-		field.Value = proto.Uint16(m.FirstLengthIndex)
-		fields = append(fields, field)
-	}
-	if m.AvgStrokeDistance != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 37)
-		field.Value = proto.Uint16(m.AvgStrokeDistance)
-		fields = append(fields, field)
-	}
-	if m.NumActiveLengths != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 40)
-		field.Value = proto.Uint16(m.NumActiveLengths)
-		fields = append(fields, field)
-	}
-	if m.AvgAltitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 42)
-		field.Value = proto.Uint16(m.AvgAltitude)
-		fields = append(fields, field)
-	}
-	if m.MaxAltitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 43)
-		field.Value = proto.Uint16(m.MaxAltitude)
-		fields = append(fields, field)
-	}
-	if m.AvgGrade != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 45)
-		field.Value = proto.Int16(m.AvgGrade)
-		fields = append(fields, field)
-	}
-	if m.AvgPosGrade != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 46)
-		field.Value = proto.Int16(m.AvgPosGrade)
-		fields = append(fields, field)
-	}
-	if m.AvgNegGrade != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 47)
-		field.Value = proto.Int16(m.AvgNegGrade)
-		fields = append(fields, field)
-	}
-	if m.MaxPosGrade != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 48)
-		field.Value = proto.Int16(m.MaxPosGrade)
-		fields = append(fields, field)
-	}
-	if m.MaxNegGrade != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 49)
-		field.Value = proto.Int16(m.MaxNegGrade)
-		fields = append(fields, field)
-	}
-	if m.AvgPosVerticalSpeed != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 53)
-		field.Value = proto.Int16(m.AvgPosVerticalSpeed)
-		fields = append(fields, field)
-	}
-	if m.AvgNegVerticalSpeed != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 54)
-		field.Value = proto.Int16(m.AvgNegVerticalSpeed)
-		fields = append(fields, field)
-	}
-	if m.MaxPosVerticalSpeed != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 55)
-		field.Value = proto.Int16(m.MaxPosVerticalSpeed)
-		fields = append(fields, field)
-	}
-	if m.MaxNegVerticalSpeed != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 56)
-		field.Value = proto.Int16(m.MaxNegVerticalSpeed)
-		fields = append(fields, field)
-	}
-	if m.RepetitionNum != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 61)
-		field.Value = proto.Uint16(m.RepetitionNum)
-		fields = append(fields, field)
-	}
-	if m.MinAltitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 62)
-		field.Value = proto.Uint16(m.MinAltitude)
-		fields = append(fields, field)
-	}
-	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 71)
-		field.Value = proto.Uint16(uint16(m.WktStepIndex))
-		fields = append(fields, field)
-	}
-	if m.OpponentScore != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 74)
-		field.Value = proto.Uint16(m.OpponentScore)
-		fields = append(fields, field)
-	}
-	if m.AvgVerticalOscillation != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 77)
-		field.Value = proto.Uint16(m.AvgVerticalOscillation)
-		fields = append(fields, field)
-	}
-	if m.AvgStanceTimePercent != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 78)
-		field.Value = proto.Uint16(m.AvgStanceTimePercent)
-		fields = append(fields, field)
-	}
-	if m.AvgStanceTime != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 79)
-		field.Value = proto.Uint16(m.AvgStanceTime)
-		fields = append(fields, field)
-	}
-	if m.PlayerScore != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 83)
-		field.Value = proto.Uint16(m.PlayerScore)
-		fields = append(fields, field)
-	}
-	if m.StandCount != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 99)
-		field.Value = proto.Uint16(m.StandCount)
-		fields = append(fields, field)
-	}
 	if m.AvgLevMotorPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 115)
 		field.Value = proto.Uint16(m.AvgLevMotorPower)
@@ -726,6 +829,11 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 	if m.MaxLevMotorPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 116)
 		field.Value = proto.Uint16(m.MaxLevMotorPower)
+		fields = append(fields, field)
+	}
+	if m.LevBatteryConsumption != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 117)
+		field.Value = proto.Uint8(m.LevBatteryConsumption)
 		fields = append(fields, field)
 	}
 	if m.AvgVerticalRatio != basetype.Uint16Invalid {
@@ -748,6 +856,21 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.AvgVam)
 		fields = append(fields, field)
 	}
+	if m.AvgDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 122)
+		field.Value = proto.Uint32(m.AvgDepth)
+		fields = append(fields, field)
+	}
+	if m.MaxDepth != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 123)
+		field.Value = proto.Uint32(m.MaxDepth)
+		fields = append(fields, field)
+	}
+	if m.MinTemperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 124)
+		field.Value = proto.Int8(m.MinTemperature)
+		fields = append(fields, field)
+	}
 	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[136] && options.IncludeExpandedFields) || !m.IsExpandedFields[136]) {
 		field := fac.CreateField(mesg.Num, 136)
 		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
@@ -760,9 +883,49 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[137]
 		fields = append(fields, field)
 	}
+	if m.AvgRespirationRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 147)
+		field.Value = proto.Uint8(m.AvgRespirationRate)
+		fields = append(fields, field)
+	}
+	if m.MaxRespirationRate != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 148)
+		field.Value = proto.Uint8(m.MaxRespirationRate)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 149)
+		field.Value = proto.Float32(m.TotalGrit)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.TotalFlow) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 150)
+		field.Value = proto.Float32(m.TotalFlow)
+		fields = append(fields, field)
+	}
 	if m.JumpCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 151)
 		field.Value = proto.Uint16(m.JumpCount)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.AvgGrit) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 153)
+		field.Value = proto.Float32(m.AvgGrit)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
+		field := fac.CreateField(mesg.Num, 154)
+		field.Value = proto.Float32(m.AvgFlow)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalAscent != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 156)
+		field.Value = proto.Uint8(m.TotalFractionalAscent)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalDescent != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 157)
+		field.Value = proto.Uint8(m.TotalFractionalDescent)
 		fields = append(fields, field)
 	}
 	if m.AvgCoreTemperature != basetype.Uint16Invalid {
@@ -778,166 +941,6 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 	if m.MaxCoreTemperature != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 160)
 		field.Value = proto.Uint16(m.MaxCoreTemperature)
-		fields = append(fields, field)
-	}
-	if byte(m.Event) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Event))
-		fields = append(fields, field)
-	}
-	if byte(m.EventType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.EventType))
-		fields = append(fields, field)
-	}
-	if m.AvgHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Uint8(m.AvgHeartRate)
-		fields = append(fields, field)
-	}
-	if m.MaxHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 16)
-		field.Value = proto.Uint8(m.MaxHeartRate)
-		fields = append(fields, field)
-	}
-	if m.AvgCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 17)
-		field.Value = proto.Uint8(m.AvgCadence)
-		fields = append(fields, field)
-	}
-	if m.MaxCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 18)
-		field.Value = proto.Uint8(m.MaxCadence)
-		fields = append(fields, field)
-	}
-	if byte(m.Intensity) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 23)
-		field.Value = proto.Uint8(byte(m.Intensity))
-		fields = append(fields, field)
-	}
-	if byte(m.LapTrigger) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 24)
-		field.Value = proto.Uint8(byte(m.LapTrigger))
-		fields = append(fields, field)
-	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 25)
-		field.Value = proto.Uint8(byte(m.Sport))
-		fields = append(fields, field)
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 26)
-		field.Value = proto.Uint8(m.EventGroup)
-		fields = append(fields, field)
-	}
-	if byte(m.SwimStroke) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 38)
-		field.Value = proto.Uint8(byte(m.SwimStroke))
-		fields = append(fields, field)
-	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 39)
-		field.Value = proto.Uint8(byte(m.SubSport))
-		fields = append(fields, field)
-	}
-	if m.GpsAccuracy != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 44)
-		field.Value = proto.Uint8(m.GpsAccuracy)
-		fields = append(fields, field)
-	}
-	if m.AvgTemperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 50)
-		field.Value = proto.Int8(m.AvgTemperature)
-		fields = append(fields, field)
-	}
-	if m.MaxTemperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 51)
-		field.Value = proto.Int8(m.MaxTemperature)
-		fields = append(fields, field)
-	}
-	if m.MinHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 63)
-		field.Value = proto.Uint8(m.MinHeartRate)
-		fields = append(fields, field)
-	}
-	if m.AvgFractionalCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 80)
-		field.Value = proto.Uint8(m.AvgFractionalCadence)
-		fields = append(fields, field)
-	}
-	if m.MaxFractionalCadence != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 81)
-		field.Value = proto.Uint8(m.MaxFractionalCadence)
-		fields = append(fields, field)
-	}
-	if m.TotalFractionalCycles != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 82)
-		field.Value = proto.Uint8(m.TotalFractionalCycles)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftTorqueEffectiveness != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 91)
-		field.Value = proto.Uint8(m.AvgLeftTorqueEffectiveness)
-		fields = append(fields, field)
-	}
-	if m.AvgRightTorqueEffectiveness != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 92)
-		field.Value = proto.Uint8(m.AvgRightTorqueEffectiveness)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPedalSmoothness != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 93)
-		field.Value = proto.Uint8(m.AvgLeftPedalSmoothness)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPedalSmoothness != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 94)
-		field.Value = proto.Uint8(m.AvgRightPedalSmoothness)
-		fields = append(fields, field)
-	}
-	if m.AvgCombinedPedalSmoothness != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 95)
-		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
-		fields = append(fields, field)
-	}
-	if m.AvgLeftPco != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 100)
-		field.Value = proto.Int8(m.AvgLeftPco)
-		fields = append(fields, field)
-	}
-	if m.AvgRightPco != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 101)
-		field.Value = proto.Int8(m.AvgRightPco)
-		fields = append(fields, field)
-	}
-	if m.LevBatteryConsumption != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 117)
-		field.Value = proto.Uint8(m.LevBatteryConsumption)
-		fields = append(fields, field)
-	}
-	if m.MinTemperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 124)
-		field.Value = proto.Int8(m.MinTemperature)
-		fields = append(fields, field)
-	}
-	if m.AvgRespirationRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 147)
-		field.Value = proto.Uint8(m.AvgRespirationRate)
-		fields = append(fields, field)
-	}
-	if m.MaxRespirationRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 148)
-		field.Value = proto.Uint8(m.MaxRespirationRate)
-		fields = append(fields, field)
-	}
-	if m.TotalFractionalAscent != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 156)
-		field.Value = proto.Uint8(m.TotalFractionalAscent)
-		fields = append(fields, field)
-	}
-	if m.TotalFractionalDescent != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 157)
-		field.Value = proto.Uint8(m.TotalFractionalDescent)
 		fields = append(fields, field)
 	}
 
@@ -1003,146 +1006,6 @@ func (m *Lap) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Lap) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInHrZone value is invalid, nil will be returned.
-func (m *Lap) TimeInHrZoneScaled() []float64 {
-	if m.TimeInHrZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
-}
-
-// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInSpeedZone value is invalid, nil will be returned.
-func (m *Lap) TimeInSpeedZoneScaled() []float64 {
-	if m.TimeInSpeedZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
-}
-
-// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInCadenceZone value is invalid, nil will be returned.
-func (m *Lap) TimeInCadenceZoneScaled() []float64 {
-	if m.TimeInCadenceZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
-}
-
-// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
-// If TimeInPowerZone value is invalid, nil will be returned.
-func (m *Lap) TimeInPowerZoneScaled() []float64 {
-	if m.TimeInPowerZone == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
-}
-
-// AvgTotalHemoglobinConcScaled return AvgTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin].
-//
-// If AvgTotalHemoglobinConc value is invalid, nil will be returned.
-func (m *Lap) AvgTotalHemoglobinConcScaled() []float64 {
-	if m.AvgTotalHemoglobinConc == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgTotalHemoglobinConc, 100, 0)
-}
-
-// MinTotalHemoglobinConcScaled return MinTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin].
-//
-// If MinTotalHemoglobinConc value is invalid, nil will be returned.
-func (m *Lap) MinTotalHemoglobinConcScaled() []float64 {
-	if m.MinTotalHemoglobinConc == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.MinTotalHemoglobinConc, 100, 0)
-}
-
-// MaxTotalHemoglobinConcScaled return MaxTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin].
-//
-// If MaxTotalHemoglobinConc value is invalid, nil will be returned.
-func (m *Lap) MaxTotalHemoglobinConcScaled() []float64 {
-	if m.MaxTotalHemoglobinConc == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.MaxTotalHemoglobinConc, 100, 0)
-}
-
-// AvgSaturatedHemoglobinPercentScaled return AvgSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen].
-//
-// If AvgSaturatedHemoglobinPercent value is invalid, nil will be returned.
-func (m *Lap) AvgSaturatedHemoglobinPercentScaled() []float64 {
-	if m.AvgSaturatedHemoglobinPercent == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgSaturatedHemoglobinPercent, 10, 0)
-}
-
-// MinSaturatedHemoglobinPercentScaled return MinSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen].
-//
-// If MinSaturatedHemoglobinPercent value is invalid, nil will be returned.
-func (m *Lap) MinSaturatedHemoglobinPercentScaled() []float64 {
-	if m.MinSaturatedHemoglobinPercent == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.MinSaturatedHemoglobinPercent, 10, 0)
-}
-
-// MaxSaturatedHemoglobinPercentScaled return MaxSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen].
-//
-// If MaxSaturatedHemoglobinPercent value is invalid, nil will be returned.
-func (m *Lap) MaxSaturatedHemoglobinPercentScaled() []float64 {
-	if m.MaxSaturatedHemoglobinPercent == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.MaxSaturatedHemoglobinPercent, 10, 0)
-}
-
-// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgLeftPowerPhase value is invalid, nil will be returned.
-func (m *Lap) AvgLeftPowerPhaseScaled() []float64 {
-	if m.AvgLeftPowerPhase == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
-}
-
-// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
-func (m *Lap) AvgLeftPowerPhasePeakScaled() []float64 {
-	if m.AvgLeftPowerPhasePeak == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
-}
-
-// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgRightPowerPhase value is invalid, nil will be returned.
-func (m *Lap) AvgRightPowerPhaseScaled() []float64 {
-	if m.AvgRightPowerPhase == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
-}
-
-// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.].
-//
-// If AvgRightPowerPhasePeak value is invalid, nil will be returned.
-func (m *Lap) AvgRightPowerPhasePeakScaled() []float64 {
-	if m.AvgRightPowerPhasePeak == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
-}
-
 // TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s; Time (includes pauses)].
 //
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
@@ -1171,96 +1034,6 @@ func (m *Lap) TotalDistanceScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
-}
-
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
-// If TotalMovingTime value is invalid, float64 invalid value will be returned.
-func (m *Lap) TotalMovingTimeScaled() float64 {
-	if m.TotalMovingTime == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
-}
-
-// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spent in the standing position].
-//
-// If TimeStanding value is invalid, float64 invalid value will be returned.
-func (m *Lap) TimeStandingScaled() float64 {
-	if m.TimeStanding == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
-}
-
-// EnhancedAvgSpeedScaled return EnhancedAvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
-// If EnhancedAvgSpeed value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedAvgSpeedScaled() float64 {
-	if m.EnhancedAvgSpeed == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedAvgSpeed, 1000, 0)
-}
-
-// EnhancedMaxSpeedScaled return EnhancedMaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
-// If EnhancedMaxSpeed value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedMaxSpeedScaled() float64 {
-	if m.EnhancedMaxSpeed == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMaxSpeed, 1000, 0)
-}
-
-// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedAvgAltitudeScaled() float64 {
-	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
-}
-
-// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedMinAltitudeScaled() float64 {
-	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
-}
-
-// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
-// If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedMaxAltitudeScaled() float64 {
-	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
-}
-
-// AvgDepthScaled return AvgDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
-// If AvgDepth value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgDepthScaled() float64 {
-	if m.AvgDepth == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
-}
-
-// MaxDepthScaled return MaxDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
-// If MaxDepth value is invalid, float64 invalid value will be returned.
-func (m *Lap) MaxDepthScaled() float64 {
-	if m.MaxDepth == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
@@ -1363,6 +1136,16 @@ func (m *Lap) MaxNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
 
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
+//
+// If TotalMovingTime value is invalid, float64 invalid value will be returned.
+func (m *Lap) TotalMovingTimeScaled() float64 {
+	if m.TotalMovingTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+}
+
 // AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
 //
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
@@ -1401,6 +1184,46 @@ func (m *Lap) MaxNegVerticalSpeedScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
+}
+
+// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInHrZone value is invalid, nil will be returned.
+func (m *Lap) TimeInHrZoneScaled() []float64 {
+	if m.TimeInHrZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
+}
+
+// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInSpeedZone value is invalid, nil will be returned.
+func (m *Lap) TimeInSpeedZoneScaled() []float64 {
+	if m.TimeInSpeedZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
+}
+
+// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInCadenceZone value is invalid, nil will be returned.
+func (m *Lap) TimeInCadenceZoneScaled() []float64 {
+	if m.TimeInCadenceZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
+}
+
+// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
+//
+// If TimeInPowerZone value is invalid, nil will be returned.
+func (m *Lap) TimeInPowerZoneScaled() []float64 {
+	if m.TimeInPowerZone == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
 }
 
 // MinAltitudeScaled return MinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
@@ -1443,96 +1266,6 @@ func (m *Lap) AvgStanceTimeScaled() float64 {
 	return scaleoffset.Apply(m.AvgStanceTime, 10, 0)
 }
 
-// AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value [Scale: 100; Units: percent].
-//
-// If AvgVerticalRatio value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgVerticalRatioScaled() float64 {
-	if m.AvgVerticalRatio == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgVerticalRatio, 100, 0)
-}
-
-// AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value [Scale: 100; Units: percent].
-//
-// If AvgStanceTimeBalance value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgStanceTimeBalanceScaled() float64 {
-	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgStanceTimeBalance, 100, 0)
-}
-
-// AvgStepLengthScaled return AvgStepLength in its scaled value [Scale: 10; Units: mm].
-//
-// If AvgStepLength value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgStepLengthScaled() float64 {
-	if m.AvgStepLength == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgStepLength, 10, 0)
-}
-
-// AvgVamScaled return AvgVam in its scaled value [Scale: 1000; Units: m/s].
-//
-// If AvgVam value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgVamScaled() float64 {
-	if m.AvgVam == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgVam, 1000, 0)
-}
-
-// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
-// If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedAvgRespirationRateScaled() float64 {
-	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
-}
-
-// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
-// If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
-func (m *Lap) EnhancedMaxRespirationRateScaled() float64 {
-	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
-}
-
-// AvgCoreTemperatureScaled return AvgCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
-// If AvgCoreTemperature value is invalid, float64 invalid value will be returned.
-func (m *Lap) AvgCoreTemperatureScaled() float64 {
-	if m.AvgCoreTemperature == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.AvgCoreTemperature, 100, 0)
-}
-
-// MinCoreTemperatureScaled return MinCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
-// If MinCoreTemperature value is invalid, float64 invalid value will be returned.
-func (m *Lap) MinCoreTemperatureScaled() float64 {
-	if m.MinCoreTemperature == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.MinCoreTemperature, 100, 0)
-}
-
-// MaxCoreTemperatureScaled return MaxCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
-// If MaxCoreTemperature value is invalid, float64 invalid value will be returned.
-func (m *Lap) MaxCoreTemperatureScaled() float64 {
-	if m.MaxCoreTemperature == basetype.Uint16Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.MaxCoreTemperature, 100, 0)
-}
-
 // AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value [Scale: 128; Units: rpm; fractional part of the avg_cadence].
 //
 // If AvgFractionalCadence value is invalid, float64 invalid value will be returned.
@@ -1561,6 +1294,66 @@ func (m *Lap) TotalFractionalCyclesScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
+}
+
+// AvgTotalHemoglobinConcScaled return AvgTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin].
+//
+// If AvgTotalHemoglobinConc value is invalid, nil will be returned.
+func (m *Lap) AvgTotalHemoglobinConcScaled() []float64 {
+	if m.AvgTotalHemoglobinConc == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgTotalHemoglobinConc, 100, 0)
+}
+
+// MinTotalHemoglobinConcScaled return MinTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin].
+//
+// If MinTotalHemoglobinConc value is invalid, nil will be returned.
+func (m *Lap) MinTotalHemoglobinConcScaled() []float64 {
+	if m.MinTotalHemoglobinConc == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.MinTotalHemoglobinConc, 100, 0)
+}
+
+// MaxTotalHemoglobinConcScaled return MaxTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin].
+//
+// If MaxTotalHemoglobinConc value is invalid, nil will be returned.
+func (m *Lap) MaxTotalHemoglobinConcScaled() []float64 {
+	if m.MaxTotalHemoglobinConc == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.MaxTotalHemoglobinConc, 100, 0)
+}
+
+// AvgSaturatedHemoglobinPercentScaled return AvgSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen].
+//
+// If AvgSaturatedHemoglobinPercent value is invalid, nil will be returned.
+func (m *Lap) AvgSaturatedHemoglobinPercentScaled() []float64 {
+	if m.AvgSaturatedHemoglobinPercent == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgSaturatedHemoglobinPercent, 10, 0)
+}
+
+// MinSaturatedHemoglobinPercentScaled return MinSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen].
+//
+// If MinSaturatedHemoglobinPercent value is invalid, nil will be returned.
+func (m *Lap) MinSaturatedHemoglobinPercentScaled() []float64 {
+	if m.MinSaturatedHemoglobinPercent == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.MinSaturatedHemoglobinPercent, 10, 0)
+}
+
+// MaxSaturatedHemoglobinPercentScaled return MaxSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen].
+//
+// If MaxSaturatedHemoglobinPercent value is invalid, nil will be returned.
+func (m *Lap) MaxSaturatedHemoglobinPercentScaled() []float64 {
+	if m.MaxSaturatedHemoglobinPercent == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.MaxSaturatedHemoglobinPercent, 10, 0)
 }
 
 // AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
@@ -1613,6 +1406,106 @@ func (m *Lap) AvgCombinedPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
 }
 
+// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spent in the standing position].
+//
+// If TimeStanding value is invalid, float64 invalid value will be returned.
+func (m *Lap) TimeStandingScaled() float64 {
+	if m.TimeStanding == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
+}
+
+// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgLeftPowerPhase value is invalid, nil will be returned.
+func (m *Lap) AvgLeftPowerPhaseScaled() []float64 {
+	if m.AvgLeftPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
+}
+
+// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
+func (m *Lap) AvgLeftPowerPhasePeakScaled() []float64 {
+	if m.AvgLeftPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
+}
+
+// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgRightPowerPhase value is invalid, nil will be returned.
+func (m *Lap) AvgRightPowerPhaseScaled() []float64 {
+	if m.AvgRightPowerPhase == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
+}
+
+// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.].
+//
+// If AvgRightPowerPhasePeak value is invalid, nil will be returned.
+func (m *Lap) AvgRightPowerPhasePeakScaled() []float64 {
+	if m.AvgRightPowerPhasePeak == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
+}
+
+// EnhancedAvgSpeedScaled return EnhancedAvgSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If EnhancedAvgSpeed value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedAvgSpeedScaled() float64 {
+	if m.EnhancedAvgSpeed == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedAvgSpeed, 1000, 0)
+}
+
+// EnhancedMaxSpeedScaled return EnhancedMaxSpeed in its scaled value [Scale: 1000; Units: m/s].
+//
+// If EnhancedMaxSpeed value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedMaxSpeedScaled() float64 {
+	if m.EnhancedMaxSpeed == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMaxSpeed, 1000, 0)
+}
+
+// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedAvgAltitudeScaled() float64 {
+	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
+}
+
+// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedMinAltitudeScaled() float64 {
+	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
+}
+
+// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
+//
+// If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedMaxAltitudeScaled() float64 {
+	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
+}
+
 // LevBatteryConsumptionScaled return LevBatteryConsumption in its scaled value [Scale: 2; Units: percent; lev battery consumption during lap].
 //
 // If LevBatteryConsumption value is invalid, float64 invalid value will be returned.
@@ -1621,6 +1514,86 @@ func (m *Lap) LevBatteryConsumptionScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.LevBatteryConsumption, 2, 0)
+}
+
+// AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value [Scale: 100; Units: percent].
+//
+// If AvgVerticalRatio value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgVerticalRatioScaled() float64 {
+	if m.AvgVerticalRatio == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgVerticalRatio, 100, 0)
+}
+
+// AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value [Scale: 100; Units: percent].
+//
+// If AvgStanceTimeBalance value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgStanceTimeBalanceScaled() float64 {
+	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgStanceTimeBalance, 100, 0)
+}
+
+// AvgStepLengthScaled return AvgStepLength in its scaled value [Scale: 10; Units: mm].
+//
+// If AvgStepLength value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgStepLengthScaled() float64 {
+	if m.AvgStepLength == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgStepLength, 10, 0)
+}
+
+// AvgVamScaled return AvgVam in its scaled value [Scale: 1000; Units: m/s].
+//
+// If AvgVam value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgVamScaled() float64 {
+	if m.AvgVam == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgVam, 1000, 0)
+}
+
+// AvgDepthScaled return AvgDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
+//
+// If AvgDepth value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgDepthScaled() float64 {
+	if m.AvgDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
+}
+
+// MaxDepthScaled return MaxDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
+//
+// If MaxDepth value is invalid, float64 invalid value will be returned.
+func (m *Lap) MaxDepthScaled() float64 {
+	if m.MaxDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
+}
+
+// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
+//
+// If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedAvgRespirationRateScaled() float64 {
+	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
+}
+
+// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
+//
+// If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
+func (m *Lap) EnhancedMaxRespirationRateScaled() float64 {
+	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }
 
 // TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value [Scale: 100; Units: m; fractional part of total_ascent].
@@ -1643,6 +1616,36 @@ func (m *Lap) TotalFractionalDescentScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
 }
 
+// AvgCoreTemperatureScaled return AvgCoreTemperature in its scaled value [Scale: 100; Units: C].
+//
+// If AvgCoreTemperature value is invalid, float64 invalid value will be returned.
+func (m *Lap) AvgCoreTemperatureScaled() float64 {
+	if m.AvgCoreTemperature == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.AvgCoreTemperature, 100, 0)
+}
+
+// MinCoreTemperatureScaled return MinCoreTemperature in its scaled value [Scale: 100; Units: C].
+//
+// If MinCoreTemperature value is invalid, float64 invalid value will be returned.
+func (m *Lap) MinCoreTemperatureScaled() float64 {
+	if m.MinCoreTemperature == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.MinCoreTemperature, 100, 0)
+}
+
+// MaxCoreTemperatureScaled return MaxCoreTemperature in its scaled value [Scale: 100; Units: C].
+//
+// If MaxCoreTemperature value is invalid, float64 invalid value will be returned.
+func (m *Lap) MaxCoreTemperatureScaled() float64 {
+	if m.MaxCoreTemperature == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.MaxCoreTemperature, 100, 0)
+}
+
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
 func (m *Lap) StartPositionLatDegrees() float64 { return semicircles.ToDegrees(m.StartPositionLat) }
 
@@ -1655,6 +1658,12 @@ func (m *Lap) EndPositionLatDegrees() float64 { return semicircles.ToDegrees(m.E
 // EndPositionLongDegrees returns EndPositionLong in degrees instead of semicircles.
 func (m *Lap) EndPositionLongDegrees() float64 { return semicircles.ToDegrees(m.EndPositionLong) }
 
+// SetMessageIndex sets Lap value.
+func (m *Lap) SetMessageIndex(v typedef.MessageIndex) *Lap {
+	m.MessageIndex = v
+	return m
+}
+
 // SetTimestamp sets Lap value.
 //
 // Units: s; Lap end time.
@@ -1663,169 +1672,21 @@ func (m *Lap) SetTimestamp(v time.Time) *Lap {
 	return m
 }
 
+// SetEvent sets Lap value.
+func (m *Lap) SetEvent(v typedef.Event) *Lap {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Lap value.
+func (m *Lap) SetEventType(v typedef.EventType) *Lap {
+	m.EventType = v
+	return m
+}
+
 // SetStartTime sets Lap value.
 func (m *Lap) SetStartTime(v time.Time) *Lap {
 	m.StartTime = v
-	return m
-}
-
-// SetTimeInHrZone sets Lap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *Lap) SetTimeInHrZone(v []uint32) *Lap {
-	m.TimeInHrZone = v
-	return m
-}
-
-// SetTimeInSpeedZone sets Lap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *Lap) SetTimeInSpeedZone(v []uint32) *Lap {
-	m.TimeInSpeedZone = v
-	return m
-}
-
-// SetTimeInCadenceZone sets Lap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *Lap) SetTimeInCadenceZone(v []uint32) *Lap {
-	m.TimeInCadenceZone = v
-	return m
-}
-
-// SetTimeInPowerZone sets Lap value.
-//
-// Array: [N]; Scale: 1000; Units: s
-func (m *Lap) SetTimeInPowerZone(v []uint32) *Lap {
-	m.TimeInPowerZone = v
-	return m
-}
-
-// SetStrokeCount sets Lap value.
-//
-// Array: [N]; Units: counts; stroke_type enum used as the index
-func (m *Lap) SetStrokeCount(v []uint16) *Lap {
-	m.StrokeCount = v
-	return m
-}
-
-// SetZoneCount sets Lap value.
-//
-// Array: [N]; Units: counts; zone number used as the index
-func (m *Lap) SetZoneCount(v []uint16) *Lap {
-	m.ZoneCount = v
-	return m
-}
-
-// SetAvgTotalHemoglobinConc sets Lap value.
-//
-// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
-func (m *Lap) SetAvgTotalHemoglobinConc(v []uint16) *Lap {
-	m.AvgTotalHemoglobinConc = v
-	return m
-}
-
-// SetMinTotalHemoglobinConc sets Lap value.
-//
-// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
-func (m *Lap) SetMinTotalHemoglobinConc(v []uint16) *Lap {
-	m.MinTotalHemoglobinConc = v
-	return m
-}
-
-// SetMaxTotalHemoglobinConc sets Lap value.
-//
-// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
-func (m *Lap) SetMaxTotalHemoglobinConc(v []uint16) *Lap {
-	m.MaxTotalHemoglobinConc = v
-	return m
-}
-
-// SetAvgSaturatedHemoglobinPercent sets Lap value.
-//
-// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
-func (m *Lap) SetAvgSaturatedHemoglobinPercent(v []uint16) *Lap {
-	m.AvgSaturatedHemoglobinPercent = v
-	return m
-}
-
-// SetMinSaturatedHemoglobinPercent sets Lap value.
-//
-// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
-func (m *Lap) SetMinSaturatedHemoglobinPercent(v []uint16) *Lap {
-	m.MinSaturatedHemoglobinPercent = v
-	return m
-}
-
-// SetMaxSaturatedHemoglobinPercent sets Lap value.
-//
-// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
-func (m *Lap) SetMaxSaturatedHemoglobinPercent(v []uint16) *Lap {
-	m.MaxSaturatedHemoglobinPercent = v
-	return m
-}
-
-// SetAvgLeftPowerPhase sets Lap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
-func (m *Lap) SetAvgLeftPowerPhase(v []uint8) *Lap {
-	m.AvgLeftPowerPhase = v
-	return m
-}
-
-// SetAvgLeftPowerPhasePeak sets Lap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
-func (m *Lap) SetAvgLeftPowerPhasePeak(v []uint8) *Lap {
-	m.AvgLeftPowerPhasePeak = v
-	return m
-}
-
-// SetAvgRightPowerPhase sets Lap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
-func (m *Lap) SetAvgRightPowerPhase(v []uint8) *Lap {
-	m.AvgRightPowerPhase = v
-	return m
-}
-
-// SetAvgRightPowerPhasePeak sets Lap value.
-//
-// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
-func (m *Lap) SetAvgRightPowerPhasePeak(v []uint8) *Lap {
-	m.AvgRightPowerPhasePeak = v
-	return m
-}
-
-// SetAvgPowerPosition sets Lap value.
-//
-// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
-func (m *Lap) SetAvgPowerPosition(v []uint16) *Lap {
-	m.AvgPowerPosition = v
-	return m
-}
-
-// SetMaxPowerPosition sets Lap value.
-//
-// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
-func (m *Lap) SetMaxPowerPosition(v []uint16) *Lap {
-	m.MaxPowerPosition = v
-	return m
-}
-
-// SetAvgCadencePosition sets Lap value.
-//
-// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
-func (m *Lap) SetAvgCadencePosition(v []uint8) *Lap {
-	m.AvgCadencePosition = v
-	return m
-}
-
-// SetMaxCadencePosition sets Lap value.
-//
-// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
-func (m *Lap) SetMaxCadencePosition(v []uint8) *Lap {
-	m.MaxCadencePosition = v
 	return m
 }
 
@@ -1893,124 +1754,6 @@ func (m *Lap) SetTotalCycles(v uint32) *Lap {
 	return m
 }
 
-// SetTotalWork sets Lap value.
-//
-// Units: J
-func (m *Lap) SetTotalWork(v uint32) *Lap {
-	m.TotalWork = v
-	return m
-}
-
-// SetTotalMovingTime sets Lap value.
-//
-// Scale: 1000; Units: s
-func (m *Lap) SetTotalMovingTime(v uint32) *Lap {
-	m.TotalMovingTime = v
-	return m
-}
-
-// SetTimeStanding sets Lap value.
-//
-// Scale: 1000; Units: s; Total time spent in the standing position
-func (m *Lap) SetTimeStanding(v uint32) *Lap {
-	m.TimeStanding = v
-	return m
-}
-
-// SetEnhancedAvgSpeed sets Lap value.
-//
-// Scale: 1000; Units: m/s
-func (m *Lap) SetEnhancedAvgSpeed(v uint32) *Lap {
-	m.EnhancedAvgSpeed = v
-	return m
-}
-
-// SetEnhancedMaxSpeed sets Lap value.
-//
-// Scale: 1000; Units: m/s
-func (m *Lap) SetEnhancedMaxSpeed(v uint32) *Lap {
-	m.EnhancedMaxSpeed = v
-	return m
-}
-
-// SetEnhancedAvgAltitude sets Lap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *Lap) SetEnhancedAvgAltitude(v uint32) *Lap {
-	m.EnhancedAvgAltitude = v
-	return m
-}
-
-// SetEnhancedMinAltitude sets Lap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *Lap) SetEnhancedMinAltitude(v uint32) *Lap {
-	m.EnhancedMinAltitude = v
-	return m
-}
-
-// SetEnhancedMaxAltitude sets Lap value.
-//
-// Scale: 5; Offset: 500; Units: m
-func (m *Lap) SetEnhancedMaxAltitude(v uint32) *Lap {
-	m.EnhancedMaxAltitude = v
-	return m
-}
-
-// SetAvgDepth sets Lap value.
-//
-// Scale: 1000; Units: m; 0 if above water
-func (m *Lap) SetAvgDepth(v uint32) *Lap {
-	m.AvgDepth = v
-	return m
-}
-
-// SetMaxDepth sets Lap value.
-//
-// Scale: 1000; Units: m; 0 if above water
-func (m *Lap) SetMaxDepth(v uint32) *Lap {
-	m.MaxDepth = v
-	return m
-}
-
-// SetTotalGrit sets Lap value.
-//
-// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-func (m *Lap) SetTotalGrit(v float32) *Lap {
-	m.TotalGrit = v
-	return m
-}
-
-// SetTotalFlow sets Lap value.
-//
-// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-func (m *Lap) SetTotalFlow(v float32) *Lap {
-	m.TotalFlow = v
-	return m
-}
-
-// SetAvgGrit sets Lap value.
-//
-// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-func (m *Lap) SetAvgGrit(v float32) *Lap {
-	m.AvgGrit = v
-	return m
-}
-
-// SetAvgFlow sets Lap value.
-//
-// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-func (m *Lap) SetAvgFlow(v float32) *Lap {
-	m.AvgFlow = v
-	return m
-}
-
-// SetMessageIndex sets Lap value.
-func (m *Lap) SetMessageIndex(v typedef.MessageIndex) *Lap {
-	m.MessageIndex = v
-	return m
-}
-
 // SetTotalCalories sets Lap value.
 //
 // Units: kcal
@@ -2043,6 +1786,38 @@ func (m *Lap) SetMaxSpeed(v uint16) *Lap {
 	return m
 }
 
+// SetAvgHeartRate sets Lap value.
+//
+// Units: bpm
+func (m *Lap) SetAvgHeartRate(v uint8) *Lap {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets Lap value.
+//
+// Units: bpm
+func (m *Lap) SetMaxHeartRate(v uint8) *Lap {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetAvgCadence sets Lap value.
+//
+// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
+func (m *Lap) SetAvgCadence(v uint8) *Lap {
+	m.AvgCadence = v
+	return m
+}
+
+// SetMaxCadence sets Lap value.
+//
+// Units: rpm
+func (m *Lap) SetMaxCadence(v uint8) *Lap {
+	m.MaxCadence = v
+	return m
+}
+
 // SetAvgPower sets Lap value.
 //
 // Units: watts; total_power / total_timer_time if non_zero_avg_power otherwise total_power / total_elapsed_time
@@ -2072,6 +1847,30 @@ func (m *Lap) SetTotalAscent(v uint16) *Lap {
 // Units: m
 func (m *Lap) SetTotalDescent(v uint16) *Lap {
 	m.TotalDescent = v
+	return m
+}
+
+// SetIntensity sets Lap value.
+func (m *Lap) SetIntensity(v typedef.Intensity) *Lap {
+	m.Intensity = v
+	return m
+}
+
+// SetLapTrigger sets Lap value.
+func (m *Lap) SetLapTrigger(v typedef.LapTrigger) *Lap {
+	m.LapTrigger = v
+	return m
+}
+
+// SetSport sets Lap value.
+func (m *Lap) SetSport(v typedef.Sport) *Lap {
+	m.Sport = v
+	return m
+}
+
+// SetEventGroup sets Lap value.
+func (m *Lap) SetEventGroup(v uint8) *Lap {
+	m.EventGroup = v
 	return m
 }
 
@@ -2111,11 +1910,31 @@ func (m *Lap) SetAvgStrokeDistance(v uint16) *Lap {
 	return m
 }
 
+// SetSwimStroke sets Lap value.
+func (m *Lap) SetSwimStroke(v typedef.SwimStroke) *Lap {
+	m.SwimStroke = v
+	return m
+}
+
+// SetSubSport sets Lap value.
+func (m *Lap) SetSubSport(v typedef.SubSport) *Lap {
+	m.SubSport = v
+	return m
+}
+
 // SetNumActiveLengths sets Lap value.
 //
 // Units: lengths; # of active lengths of swim pool
 func (m *Lap) SetNumActiveLengths(v uint16) *Lap {
 	m.NumActiveLengths = v
+	return m
+}
+
+// SetTotalWork sets Lap value.
+//
+// Units: J
+func (m *Lap) SetTotalWork(v uint32) *Lap {
+	m.TotalWork = v
 	return m
 }
 
@@ -2132,6 +1951,14 @@ func (m *Lap) SetAvgAltitude(v uint16) *Lap {
 // Scale: 5; Offset: 500; Units: m
 func (m *Lap) SetMaxAltitude(v uint16) *Lap {
 	m.MaxAltitude = v
+	return m
+}
+
+// SetGpsAccuracy sets Lap value.
+//
+// Units: m
+func (m *Lap) SetGpsAccuracy(v uint8) *Lap {
+	m.GpsAccuracy = v
 	return m
 }
 
@@ -2175,6 +2002,30 @@ func (m *Lap) SetMaxNegGrade(v int16) *Lap {
 	return m
 }
 
+// SetAvgTemperature sets Lap value.
+//
+// Units: C
+func (m *Lap) SetAvgTemperature(v int8) *Lap {
+	m.AvgTemperature = v
+	return m
+}
+
+// SetMaxTemperature sets Lap value.
+//
+// Units: C
+func (m *Lap) SetMaxTemperature(v int8) *Lap {
+	m.MaxTemperature = v
+	return m
+}
+
+// SetTotalMovingTime sets Lap value.
+//
+// Scale: 1000; Units: s
+func (m *Lap) SetTotalMovingTime(v uint32) *Lap {
+	m.TotalMovingTime = v
+	return m
+}
+
 // SetAvgPosVerticalSpeed sets Lap value.
 //
 // Scale: 1000; Units: m/s
@@ -2207,6 +2058,38 @@ func (m *Lap) SetMaxNegVerticalSpeed(v int16) *Lap {
 	return m
 }
 
+// SetTimeInHrZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Lap) SetTimeInHrZone(v []uint32) *Lap {
+	m.TimeInHrZone = v
+	return m
+}
+
+// SetTimeInSpeedZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Lap) SetTimeInSpeedZone(v []uint32) *Lap {
+	m.TimeInSpeedZone = v
+	return m
+}
+
+// SetTimeInCadenceZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Lap) SetTimeInCadenceZone(v []uint32) *Lap {
+	m.TimeInCadenceZone = v
+	return m
+}
+
+// SetTimeInPowerZone sets Lap value.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Lap) SetTimeInPowerZone(v []uint32) *Lap {
+	m.TimeInPowerZone = v
+	return m
+}
+
 // SetRepetitionNum sets Lap value.
 func (m *Lap) SetRepetitionNum(v uint16) *Lap {
 	m.RepetitionNum = v
@@ -2221,6 +2104,14 @@ func (m *Lap) SetMinAltitude(v uint16) *Lap {
 	return m
 }
 
+// SetMinHeartRate sets Lap value.
+//
+// Units: bpm
+func (m *Lap) SetMinHeartRate(v uint8) *Lap {
+	m.MinHeartRate = v
+	return m
+}
+
 // SetWktStepIndex sets Lap value.
 func (m *Lap) SetWktStepIndex(v typedef.MessageIndex) *Lap {
 	m.WktStepIndex = v
@@ -2230,6 +2121,22 @@ func (m *Lap) SetWktStepIndex(v typedef.MessageIndex) *Lap {
 // SetOpponentScore sets Lap value.
 func (m *Lap) SetOpponentScore(v uint16) *Lap {
 	m.OpponentScore = v
+	return m
+}
+
+// SetStrokeCount sets Lap value.
+//
+// Array: [N]; Units: counts; stroke_type enum used as the index
+func (m *Lap) SetStrokeCount(v []uint16) *Lap {
+	m.StrokeCount = v
+	return m
+}
+
+// SetZoneCount sets Lap value.
+//
+// Array: [N]; Units: counts; zone number used as the index
+func (m *Lap) SetZoneCount(v []uint16) *Lap {
+	m.ZoneCount = v
 	return m
 }
 
@@ -2257,226 +2164,6 @@ func (m *Lap) SetAvgStanceTime(v uint16) *Lap {
 	return m
 }
 
-// SetPlayerScore sets Lap value.
-func (m *Lap) SetPlayerScore(v uint16) *Lap {
-	m.PlayerScore = v
-	return m
-}
-
-// SetStandCount sets Lap value.
-//
-// Number of transitions to the standing state
-func (m *Lap) SetStandCount(v uint16) *Lap {
-	m.StandCount = v
-	return m
-}
-
-// SetAvgLevMotorPower sets Lap value.
-//
-// Units: watts; lev average motor power during lap
-func (m *Lap) SetAvgLevMotorPower(v uint16) *Lap {
-	m.AvgLevMotorPower = v
-	return m
-}
-
-// SetMaxLevMotorPower sets Lap value.
-//
-// Units: watts; lev maximum motor power during lap
-func (m *Lap) SetMaxLevMotorPower(v uint16) *Lap {
-	m.MaxLevMotorPower = v
-	return m
-}
-
-// SetAvgVerticalRatio sets Lap value.
-//
-// Scale: 100; Units: percent
-func (m *Lap) SetAvgVerticalRatio(v uint16) *Lap {
-	m.AvgVerticalRatio = v
-	return m
-}
-
-// SetAvgStanceTimeBalance sets Lap value.
-//
-// Scale: 100; Units: percent
-func (m *Lap) SetAvgStanceTimeBalance(v uint16) *Lap {
-	m.AvgStanceTimeBalance = v
-	return m
-}
-
-// SetAvgStepLength sets Lap value.
-//
-// Scale: 10; Units: mm
-func (m *Lap) SetAvgStepLength(v uint16) *Lap {
-	m.AvgStepLength = v
-	return m
-}
-
-// SetAvgVam sets Lap value.
-//
-// Scale: 1000; Units: m/s
-func (m *Lap) SetAvgVam(v uint16) *Lap {
-	m.AvgVam = v
-	return m
-}
-
-// SetEnhancedAvgRespirationRate sets Lap value.
-//
-// Scale: 100; Units: Breaths/min
-func (m *Lap) SetEnhancedAvgRespirationRate(v uint16) *Lap {
-	m.EnhancedAvgRespirationRate = v
-	return m
-}
-
-// SetEnhancedMaxRespirationRate sets Lap value.
-//
-// Scale: 100; Units: Breaths/min
-func (m *Lap) SetEnhancedMaxRespirationRate(v uint16) *Lap {
-	m.EnhancedMaxRespirationRate = v
-	return m
-}
-
-// SetJumpCount sets Lap value.
-func (m *Lap) SetJumpCount(v uint16) *Lap {
-	m.JumpCount = v
-	return m
-}
-
-// SetAvgCoreTemperature sets Lap value.
-//
-// Scale: 100; Units: C
-func (m *Lap) SetAvgCoreTemperature(v uint16) *Lap {
-	m.AvgCoreTemperature = v
-	return m
-}
-
-// SetMinCoreTemperature sets Lap value.
-//
-// Scale: 100; Units: C
-func (m *Lap) SetMinCoreTemperature(v uint16) *Lap {
-	m.MinCoreTemperature = v
-	return m
-}
-
-// SetMaxCoreTemperature sets Lap value.
-//
-// Scale: 100; Units: C
-func (m *Lap) SetMaxCoreTemperature(v uint16) *Lap {
-	m.MaxCoreTemperature = v
-	return m
-}
-
-// SetEvent sets Lap value.
-func (m *Lap) SetEvent(v typedef.Event) *Lap {
-	m.Event = v
-	return m
-}
-
-// SetEventType sets Lap value.
-func (m *Lap) SetEventType(v typedef.EventType) *Lap {
-	m.EventType = v
-	return m
-}
-
-// SetAvgHeartRate sets Lap value.
-//
-// Units: bpm
-func (m *Lap) SetAvgHeartRate(v uint8) *Lap {
-	m.AvgHeartRate = v
-	return m
-}
-
-// SetMaxHeartRate sets Lap value.
-//
-// Units: bpm
-func (m *Lap) SetMaxHeartRate(v uint8) *Lap {
-	m.MaxHeartRate = v
-	return m
-}
-
-// SetAvgCadence sets Lap value.
-//
-// Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
-func (m *Lap) SetAvgCadence(v uint8) *Lap {
-	m.AvgCadence = v
-	return m
-}
-
-// SetMaxCadence sets Lap value.
-//
-// Units: rpm
-func (m *Lap) SetMaxCadence(v uint8) *Lap {
-	m.MaxCadence = v
-	return m
-}
-
-// SetIntensity sets Lap value.
-func (m *Lap) SetIntensity(v typedef.Intensity) *Lap {
-	m.Intensity = v
-	return m
-}
-
-// SetLapTrigger sets Lap value.
-func (m *Lap) SetLapTrigger(v typedef.LapTrigger) *Lap {
-	m.LapTrigger = v
-	return m
-}
-
-// SetSport sets Lap value.
-func (m *Lap) SetSport(v typedef.Sport) *Lap {
-	m.Sport = v
-	return m
-}
-
-// SetEventGroup sets Lap value.
-func (m *Lap) SetEventGroup(v uint8) *Lap {
-	m.EventGroup = v
-	return m
-}
-
-// SetSwimStroke sets Lap value.
-func (m *Lap) SetSwimStroke(v typedef.SwimStroke) *Lap {
-	m.SwimStroke = v
-	return m
-}
-
-// SetSubSport sets Lap value.
-func (m *Lap) SetSubSport(v typedef.SubSport) *Lap {
-	m.SubSport = v
-	return m
-}
-
-// SetGpsAccuracy sets Lap value.
-//
-// Units: m
-func (m *Lap) SetGpsAccuracy(v uint8) *Lap {
-	m.GpsAccuracy = v
-	return m
-}
-
-// SetAvgTemperature sets Lap value.
-//
-// Units: C
-func (m *Lap) SetAvgTemperature(v int8) *Lap {
-	m.AvgTemperature = v
-	return m
-}
-
-// SetMaxTemperature sets Lap value.
-//
-// Units: C
-func (m *Lap) SetMaxTemperature(v int8) *Lap {
-	m.MaxTemperature = v
-	return m
-}
-
-// SetMinHeartRate sets Lap value.
-//
-// Units: bpm
-func (m *Lap) SetMinHeartRate(v uint8) *Lap {
-	m.MinHeartRate = v
-	return m
-}
-
 // SetAvgFractionalCadence sets Lap value.
 //
 // Scale: 128; Units: rpm; fractional part of the avg_cadence
@@ -2498,6 +2185,60 @@ func (m *Lap) SetMaxFractionalCadence(v uint8) *Lap {
 // Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *Lap) SetTotalFractionalCycles(v uint8) *Lap {
 	m.TotalFractionalCycles = v
+	return m
+}
+
+// SetPlayerScore sets Lap value.
+func (m *Lap) SetPlayerScore(v uint16) *Lap {
+	m.PlayerScore = v
+	return m
+}
+
+// SetAvgTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+func (m *Lap) SetAvgTotalHemoglobinConc(v []uint16) *Lap {
+	m.AvgTotalHemoglobinConc = v
+	return m
+}
+
+// SetMinTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Lap) SetMinTotalHemoglobinConc(v []uint16) *Lap {
+	m.MinTotalHemoglobinConc = v
+	return m
+}
+
+// SetMaxTotalHemoglobinConc sets Lap value.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Lap) SetMaxTotalHemoglobinConc(v []uint16) *Lap {
+	m.MaxTotalHemoglobinConc = v
+	return m
+}
+
+// SetAvgSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetAvgSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.AvgSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMinSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetMinSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.MinSaturatedHemoglobinPercent = v
+	return m
+}
+
+// SetMaxSaturatedHemoglobinPercent sets Lap value.
+//
+// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Lap) SetMaxSaturatedHemoglobinPercent(v []uint16) *Lap {
+	m.MaxSaturatedHemoglobinPercent = v
 	return m
 }
 
@@ -2541,6 +2282,22 @@ func (m *Lap) SetAvgCombinedPedalSmoothness(v uint8) *Lap {
 	return m
 }
 
+// SetTimeStanding sets Lap value.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *Lap) SetTimeStanding(v uint32) *Lap {
+	m.TimeStanding = v
+	return m
+}
+
+// SetStandCount sets Lap value.
+//
+// Number of transitions to the standing state
+func (m *Lap) SetStandCount(v uint16) *Lap {
+	m.StandCount = v
+	return m
+}
+
 // SetAvgLeftPco sets Lap value.
 //
 // Units: mm; Average left platform center offset
@@ -2557,6 +2314,126 @@ func (m *Lap) SetAvgRightPco(v int8) *Lap {
 	return m
 }
 
+// SetAvgLeftPowerPhase sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgLeftPowerPhase(v []uint8) *Lap {
+	m.AvgLeftPowerPhase = v
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgLeftPowerPhasePeak(v []uint8) *Lap {
+	m.AvgLeftPowerPhasePeak = v
+	return m
+}
+
+// SetAvgRightPowerPhase sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgRightPowerPhase(v []uint8) *Lap {
+	m.AvgRightPowerPhase = v
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets Lap value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Lap) SetAvgRightPowerPhasePeak(v []uint8) *Lap {
+	m.AvgRightPowerPhasePeak = v
+	return m
+}
+
+// SetAvgPowerPosition sets Lap value.
+//
+// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetAvgPowerPosition(v []uint16) *Lap {
+	m.AvgPowerPosition = v
+	return m
+}
+
+// SetMaxPowerPosition sets Lap value.
+//
+// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetMaxPowerPosition(v []uint16) *Lap {
+	m.MaxPowerPosition = v
+	return m
+}
+
+// SetAvgCadencePosition sets Lap value.
+//
+// Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetAvgCadencePosition(v []uint8) *Lap {
+	m.AvgCadencePosition = v
+	return m
+}
+
+// SetMaxCadencePosition sets Lap value.
+//
+// Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
+func (m *Lap) SetMaxCadencePosition(v []uint8) *Lap {
+	m.MaxCadencePosition = v
+	return m
+}
+
+// SetEnhancedAvgSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s
+func (m *Lap) SetEnhancedAvgSpeed(v uint32) *Lap {
+	m.EnhancedAvgSpeed = v
+	return m
+}
+
+// SetEnhancedMaxSpeed sets Lap value.
+//
+// Scale: 1000; Units: m/s
+func (m *Lap) SetEnhancedMaxSpeed(v uint32) *Lap {
+	m.EnhancedMaxSpeed = v
+	return m
+}
+
+// SetEnhancedAvgAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Lap) SetEnhancedAvgAltitude(v uint32) *Lap {
+	m.EnhancedAvgAltitude = v
+	return m
+}
+
+// SetEnhancedMinAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Lap) SetEnhancedMinAltitude(v uint32) *Lap {
+	m.EnhancedMinAltitude = v
+	return m
+}
+
+// SetEnhancedMaxAltitude sets Lap value.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Lap) SetEnhancedMaxAltitude(v uint32) *Lap {
+	m.EnhancedMaxAltitude = v
+	return m
+}
+
+// SetAvgLevMotorPower sets Lap value.
+//
+// Units: watts; lev average motor power during lap
+func (m *Lap) SetAvgLevMotorPower(v uint16) *Lap {
+	m.AvgLevMotorPower = v
+	return m
+}
+
+// SetMaxLevMotorPower sets Lap value.
+//
+// Units: watts; lev maximum motor power during lap
+func (m *Lap) SetMaxLevMotorPower(v uint16) *Lap {
+	m.MaxLevMotorPower = v
+	return m
+}
+
 // SetLevBatteryConsumption sets Lap value.
 //
 // Scale: 2; Units: percent; lev battery consumption during lap
@@ -2565,11 +2442,75 @@ func (m *Lap) SetLevBatteryConsumption(v uint8) *Lap {
 	return m
 }
 
+// SetAvgVerticalRatio sets Lap value.
+//
+// Scale: 100; Units: percent
+func (m *Lap) SetAvgVerticalRatio(v uint16) *Lap {
+	m.AvgVerticalRatio = v
+	return m
+}
+
+// SetAvgStanceTimeBalance sets Lap value.
+//
+// Scale: 100; Units: percent
+func (m *Lap) SetAvgStanceTimeBalance(v uint16) *Lap {
+	m.AvgStanceTimeBalance = v
+	return m
+}
+
+// SetAvgStepLength sets Lap value.
+//
+// Scale: 10; Units: mm
+func (m *Lap) SetAvgStepLength(v uint16) *Lap {
+	m.AvgStepLength = v
+	return m
+}
+
+// SetAvgVam sets Lap value.
+//
+// Scale: 1000; Units: m/s
+func (m *Lap) SetAvgVam(v uint16) *Lap {
+	m.AvgVam = v
+	return m
+}
+
+// SetAvgDepth sets Lap value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Lap) SetAvgDepth(v uint32) *Lap {
+	m.AvgDepth = v
+	return m
+}
+
+// SetMaxDepth sets Lap value.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Lap) SetMaxDepth(v uint32) *Lap {
+	m.MaxDepth = v
+	return m
+}
+
 // SetMinTemperature sets Lap value.
 //
 // Units: C
 func (m *Lap) SetMinTemperature(v int8) *Lap {
 	m.MinTemperature = v
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets Lap value.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Lap) SetEnhancedAvgRespirationRate(v uint16) *Lap {
+	m.EnhancedAvgRespirationRate = v
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets Lap value.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Lap) SetEnhancedMaxRespirationRate(v uint16) *Lap {
+	m.EnhancedMaxRespirationRate = v
 	return m
 }
 
@@ -2582,6 +2523,44 @@ func (m *Lap) SetAvgRespirationRate(v uint8) *Lap {
 // SetMaxRespirationRate sets Lap value.
 func (m *Lap) SetMaxRespirationRate(v uint8) *Lap {
 	m.MaxRespirationRate = v
+	return m
+}
+
+// SetTotalGrit sets Lap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Lap) SetTotalGrit(v float32) *Lap {
+	m.TotalGrit = v
+	return m
+}
+
+// SetTotalFlow sets Lap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Lap) SetTotalFlow(v float32) *Lap {
+	m.TotalFlow = v
+	return m
+}
+
+// SetJumpCount sets Lap value.
+func (m *Lap) SetJumpCount(v uint16) *Lap {
+	m.JumpCount = v
+	return m
+}
+
+// SetAvgGrit sets Lap value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Lap) SetAvgGrit(v float32) *Lap {
+	m.AvgGrit = v
+	return m
+}
+
+// SetAvgFlow sets Lap value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Lap) SetAvgFlow(v float32) *Lap {
+	m.AvgFlow = v
 	return m
 }
 
@@ -2598,6 +2577,30 @@ func (m *Lap) SetTotalFractionalAscent(v uint8) *Lap {
 // Scale: 100; Units: m; fractional part of total_descent
 func (m *Lap) SetTotalFractionalDescent(v uint8) *Lap {
 	m.TotalFractionalDescent = v
+	return m
+}
+
+// SetAvgCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C
+func (m *Lap) SetAvgCoreTemperature(v uint16) *Lap {
+	m.AvgCoreTemperature = v
+	return m
+}
+
+// SetMinCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C
+func (m *Lap) SetMinCoreTemperature(v uint16) *Lap {
+	m.MinCoreTemperature = v
+	return m
+}
+
+// SetMaxCoreTemperature sets Lap value.
+//
+// Scale: 100; Units: C
+func (m *Lap) SetMaxCoreTemperature(v uint16) *Lap {
+	m.MaxCoreTemperature = v
 	return m
 }
 

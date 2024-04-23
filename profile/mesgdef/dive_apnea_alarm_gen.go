@@ -17,6 +17,9 @@ import (
 )
 
 // DiveApneaAlarm is a DiveApneaAlarm message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type DiveApneaAlarm struct {
 	DiveTypes        []typedef.SubSport    // Array: [N]; Dive types the alarm will trigger on
 	Depth            uint32                // Scale: 1000; Units: m; Depth setting (m) for depth type alarms
@@ -24,9 +27,9 @@ type DiveApneaAlarm struct {
 	Id               uint32                // Alarm ID
 	Speed            int32                 // Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
 	MessageIndex     typedef.MessageIndex  // Index of the alarm
+	Enabled          bool                  // Enablement flag
 	AlarmType        typedef.DiveAlarmType // Alarm type setting
 	Sound            typedef.Tone          // Tone and Vibe setting for the alarm.
-	Enabled          bool                  // Enablement flag
 	PopupEnabled     bool                  // Show a visible pop-up for this alarm
 	TriggerOnDescent bool                  // Trigger the alarm on descent
 	TriggerOnAscent  bool                  // Trigger the alarm on ascent
@@ -54,23 +57,23 @@ func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
 	}
 
 	return &DiveApneaAlarm{
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
+		Depth:        vals[0].Uint32(),
+		Time:         vals[1].Int32(),
+		Enabled:      vals[2].Bool(),
+		AlarmType:    typedef.DiveAlarmType(vals[3].Uint8()),
+		Sound:        typedef.Tone(vals[4].Uint8()),
 		DiveTypes: func() []typedef.SubSport {
 			sliceValue := vals[5].SliceUint8()
 			ptr := unsafe.SliceData(sliceValue)
 			return unsafe.Slice((*typedef.SubSport)(ptr), len(sliceValue))
 		}(),
-		Depth:            vals[0].Uint32(),
-		Time:             vals[1].Int32(),
 		Id:               vals[6].Uint32(),
-		Speed:            vals[11].Int32(),
-		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
-		AlarmType:        typedef.DiveAlarmType(vals[3].Uint8()),
-		Sound:            typedef.Tone(vals[4].Uint8()),
-		Enabled:          vals[2].Bool(),
 		PopupEnabled:     vals[7].Bool(),
 		TriggerOnDescent: vals[8].Bool(),
 		TriggerOnAscent:  vals[9].Bool(),
 		Repeating:        vals[10].Bool(),
+		Speed:            vals[11].Int32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -92,9 +95,9 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumDiveApneaAlarm}
 
-	if m.DiveTypes != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceUint8(m.DiveTypes)
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Depth != basetype.Uint32Invalid {
@@ -107,19 +110,9 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.Time)
 		fields = append(fields, field)
 	}
-	if m.Id != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(m.Id)
-		fields = append(fields, field)
-	}
-	if m.Speed != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Int32(m.Speed)
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
+	if m.Enabled != false {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if byte(m.AlarmType) != basetype.EnumInvalid {
@@ -132,9 +125,14 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Sound))
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Bool(m.Enabled)
+	if m.DiveTypes != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.SliceUint8(m.DiveTypes)
+		fields = append(fields, field)
+	}
+	if m.Id != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Uint32(m.Id)
 		fields = append(fields, field)
 	}
 	if m.PopupEnabled != false {
@@ -155,6 +153,11 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 	if m.Repeating != false {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Repeating)
+		fields = append(fields, field)
+	}
+	if m.Speed != basetype.Sint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Int32(m.Speed)
 		fields = append(fields, field)
 	}
 
@@ -186,11 +189,11 @@ func (m *DiveApneaAlarm) SpeedScaled() float64 {
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
-// SetDiveTypes sets DiveApneaAlarm value.
+// SetMessageIndex sets DiveApneaAlarm value.
 //
-// Array: [N]; Dive types the alarm will trigger on
-func (m *DiveApneaAlarm) SetDiveTypes(v []typedef.SubSport) *DiveApneaAlarm {
-	m.DiveTypes = v
+// Index of the alarm
+func (m *DiveApneaAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveApneaAlarm {
+	m.MessageIndex = v
 	return m
 }
 
@@ -210,27 +213,11 @@ func (m *DiveApneaAlarm) SetTime(v int32) *DiveApneaAlarm {
 	return m
 }
 
-// SetId sets DiveApneaAlarm value.
+// SetEnabled sets DiveApneaAlarm value.
 //
-// Alarm ID
-func (m *DiveApneaAlarm) SetId(v uint32) *DiveApneaAlarm {
-	m.Id = v
-	return m
-}
-
-// SetSpeed sets DiveApneaAlarm value.
-//
-// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
-func (m *DiveApneaAlarm) SetSpeed(v int32) *DiveApneaAlarm {
-	m.Speed = v
-	return m
-}
-
-// SetMessageIndex sets DiveApneaAlarm value.
-//
-// Index of the alarm
-func (m *DiveApneaAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveApneaAlarm {
-	m.MessageIndex = v
+// Enablement flag
+func (m *DiveApneaAlarm) SetEnabled(v bool) *DiveApneaAlarm {
+	m.Enabled = v
 	return m
 }
 
@@ -250,11 +237,19 @@ func (m *DiveApneaAlarm) SetSound(v typedef.Tone) *DiveApneaAlarm {
 	return m
 }
 
-// SetEnabled sets DiveApneaAlarm value.
+// SetDiveTypes sets DiveApneaAlarm value.
 //
-// Enablement flag
-func (m *DiveApneaAlarm) SetEnabled(v bool) *DiveApneaAlarm {
-	m.Enabled = v
+// Array: [N]; Dive types the alarm will trigger on
+func (m *DiveApneaAlarm) SetDiveTypes(v []typedef.SubSport) *DiveApneaAlarm {
+	m.DiveTypes = v
+	return m
+}
+
+// SetId sets DiveApneaAlarm value.
+//
+// Alarm ID
+func (m *DiveApneaAlarm) SetId(v uint32) *DiveApneaAlarm {
+	m.Id = v
 	return m
 }
 
@@ -287,6 +282,14 @@ func (m *DiveApneaAlarm) SetTriggerOnAscent(v bool) *DiveApneaAlarm {
 // Repeat alarm each time threshold is crossed?
 func (m *DiveApneaAlarm) SetRepeating(v bool) *DiveApneaAlarm {
 	m.Repeating = v
+	return m
+}
+
+// SetSpeed sets DiveApneaAlarm value.
+//
+// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
+func (m *DiveApneaAlarm) SetSpeed(v int32) *DiveApneaAlarm {
+	m.Speed = v
 	return m
 }
 

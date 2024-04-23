@@ -18,6 +18,9 @@ import (
 )
 
 // Event is a Event message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Event struct {
 	Timestamp                   time.Time // Units: s
 	StartTimestamp              time.Time // Units: s; Timestamp of when the event started
@@ -68,20 +71,20 @@ func NewEvent(mesg *proto.Message) *Event {
 
 	return &Event{
 		Timestamp:                   datetime.ToTime(vals[253].Uint32()),
-		StartTimestamp:              datetime.ToTime(vals[15].Uint32()),
-		Data:                        vals[3].Uint32(),
-		Data16:                      vals[2].Uint16(),
-		Score:                       vals[7].Uint16(),
-		OpponentScore:               vals[8].Uint16(),
 		Event:                       typedef.Event(vals[0].Uint8()),
 		EventType:                   typedef.EventType(vals[1].Uint8()),
+		Data16:                      vals[2].Uint16(),
+		Data:                        vals[3].Uint32(),
 		EventGroup:                  vals[4].Uint8(),
+		Score:                       vals[7].Uint16(),
+		OpponentScore:               vals[8].Uint16(),
 		FrontGearNum:                vals[9].Uint8z(),
 		FrontGear:                   vals[10].Uint8z(),
 		RearGearNum:                 vals[11].Uint8z(),
 		RearGear:                    vals[12].Uint8z(),
 		DeviceIndex:                 typedef.DeviceIndex(vals[13].Uint8()),
 		ActivityType:                typedef.ActivityType(vals[14].Uint8()),
+		StartTimestamp:              datetime.ToTime(vals[15].Uint32()),
 		RadarThreatLevelMax:         typedef.RadarThreatLevelType(vals[21].Uint8()),
 		RadarThreatCount:            vals[22].Uint8(),
 		RadarThreatAvgApproachSpeed: vals[23].Uint8(),
@@ -114,9 +117,19 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
+	if byte(m.Event) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Event))
+		fields = append(fields, field)
+	}
+	if byte(m.EventType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.EventType))
+		fields = append(fields, field)
+	}
+	if m.Data16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint16(m.Data16)
 		fields = append(fields, field)
 	}
 	if m.Data != basetype.Uint32Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
@@ -125,9 +138,9 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		field.IsExpandedField = m.IsExpandedFields[3]
 		fields = append(fields, field)
 	}
-	if m.Data16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint16(m.Data16)
+	if m.EventGroup != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
 	if m.Score != basetype.Uint16Invalid && ((m.IsExpandedFields[7] && options.IncludeExpandedFields) || !m.IsExpandedFields[7]) {
@@ -140,21 +153,6 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint16(m.OpponentScore)
 		field.IsExpandedField = m.IsExpandedFields[8]
-		fields = append(fields, field)
-	}
-	if byte(m.Event) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Event))
-		fields = append(fields, field)
-	}
-	if byte(m.EventType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.EventType))
-		fields = append(fields, field)
-	}
-	if m.EventGroup != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
 	if uint8(m.FrontGearNum) != basetype.Uint8zInvalid && ((m.IsExpandedFields[9] && options.IncludeExpandedFields) || !m.IsExpandedFields[9]) {
@@ -189,6 +187,11 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 	if byte(m.ActivityType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint8(byte(m.ActivityType))
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
 		fields = append(fields, field)
 	}
 	if byte(m.RadarThreatLevelMax) != basetype.EnumInvalid && ((m.IsExpandedFields[21] && options.IncludeExpandedFields) || !m.IsExpandedFields[21]) {
@@ -228,28 +231,28 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 //
 // Based on m.Event:
 //   - name: "timer_trigger", value: typedef.TimerTrigger(m.Data)
-//   - name: "distance_duration_alert", units: "m" , value: (float64(m.Data) * 100) - 0
-//   - name: "rider_position", value: typedef.RiderPositionType(m.Data)
-//   - name: "battery_level", units: "V" , value: (float64(m.Data) * 1000) - 0
-//   - name: "time_duration_alert", units: "s" , value: (float64(m.Data) * 1000) - 0
-//   - name: "gear_change_data", value: uint32(m.Data)
-//   - name: "auto_activity_detect_duration", units: "min" , value: uint16(m.Data)
-//   - name: "virtual_partner_speed", units: "m/s" , value: (float64(m.Data) * 1000) - 0
-//   - name: "hr_low_alert", units: "bpm" , value: uint8(m.Data)
-//   - name: "power_low_alert", units: "watts" , value: uint16(m.Data)
-//   - name: "dive_alert", value: typedef.DiveAlert(m.Data)
-//   - name: "radar_threat_alert", value: uint32(m.Data)
 //   - name: "course_point_index", value: typedef.MessageIndex(m.Data)
+//   - name: "battery_level", units: "V" , value: (float64(m.Data) * 1000) - 0
+//   - name: "virtual_partner_speed", units: "m/s" , value: (float64(m.Data) * 1000) - 0
 //   - name: "hr_high_alert", units: "bpm" , value: uint8(m.Data)
+//   - name: "hr_low_alert", units: "bpm" , value: uint8(m.Data)
 //   - name: "speed_high_alert", units: "m/s" , value: (float64(m.Data) * 1000) - 0
 //   - name: "speed_low_alert", units: "m/s" , value: (float64(m.Data) * 1000) - 0
 //   - name: "cad_high_alert", units: "rpm" , value: uint16(m.Data)
 //   - name: "cad_low_alert", units: "rpm" , value: uint16(m.Data)
 //   - name: "power_high_alert", units: "watts" , value: uint16(m.Data)
+//   - name: "power_low_alert", units: "watts" , value: uint16(m.Data)
+//   - name: "time_duration_alert", units: "s" , value: (float64(m.Data) * 1000) - 0
+//   - name: "distance_duration_alert", units: "m" , value: (float64(m.Data) * 100) - 0
 //   - name: "calorie_duration_alert", units: "calories" , value: uint32(m.Data)
 //   - name: "fitness_equipment_state", value: typedef.FitnessEquipmentState(m.Data)
 //   - name: "sport_point", value: uint32(m.Data)
+//   - name: "gear_change_data", value: uint32(m.Data)
+//   - name: "rider_position", value: typedef.RiderPositionType(m.Data)
 //   - name: "comm_timeout", value: typedef.CommTimeoutType(m.Data)
+//   - name: "dive_alert", value: typedef.DiveAlert(m.Data)
+//   - name: "auto_activity_detect_duration", units: "min" , value: uint16(m.Data)
+//   - name: "radar_threat_alert", value: uint32(m.Data)
 //
 // Otherwise:
 //   - name: "data", value: m.Data
@@ -257,32 +260,16 @@ func (m *Event) GetData() (name string, value any) {
 	switch m.Event {
 	case typedef.EventTimer:
 		return "timer_trigger", typedef.TimerTrigger(m.Data)
-	case typedef.EventDistanceDurationAlert:
-		return "distance_duration_alert", (float64(m.Data) * 100) - 0
-	case typedef.EventRiderPositionChange:
-		return "rider_position", typedef.RiderPositionType(m.Data)
-	case typedef.EventBattery:
-		return "battery_level", (float64(m.Data) * 1000) - 0
-	case typedef.EventTimeDurationAlert:
-		return "time_duration_alert", (float64(m.Data) * 1000) - 0
-	case typedef.EventFrontGearChange, typedef.EventRearGearChange:
-		return "gear_change_data", uint32(m.Data)
-	case typedef.EventAutoActivityDetect:
-		return "auto_activity_detect_duration", uint16(m.Data)
-	case typedef.EventVirtualPartnerPace:
-		return "virtual_partner_speed", (float64(m.Data) * 1000) - 0
-	case typedef.EventHrLowAlert:
-		return "hr_low_alert", uint8(m.Data)
-	case typedef.EventPowerLowAlert:
-		return "power_low_alert", uint16(m.Data)
-	case typedef.EventDiveAlert:
-		return "dive_alert", typedef.DiveAlert(m.Data)
-	case typedef.EventRadarThreatAlert:
-		return "radar_threat_alert", uint32(m.Data)
 	case typedef.EventCoursePoint:
 		return "course_point_index", typedef.MessageIndex(m.Data)
+	case typedef.EventBattery:
+		return "battery_level", (float64(m.Data) * 1000) - 0
+	case typedef.EventVirtualPartnerPace:
+		return "virtual_partner_speed", (float64(m.Data) * 1000) - 0
 	case typedef.EventHrHighAlert:
 		return "hr_high_alert", uint8(m.Data)
+	case typedef.EventHrLowAlert:
+		return "hr_low_alert", uint8(m.Data)
 	case typedef.EventSpeedHighAlert:
 		return "speed_high_alert", (float64(m.Data) * 1000) - 0
 	case typedef.EventSpeedLowAlert:
@@ -293,14 +280,30 @@ func (m *Event) GetData() (name string, value any) {
 		return "cad_low_alert", uint16(m.Data)
 	case typedef.EventPowerHighAlert:
 		return "power_high_alert", uint16(m.Data)
+	case typedef.EventPowerLowAlert:
+		return "power_low_alert", uint16(m.Data)
+	case typedef.EventTimeDurationAlert:
+		return "time_duration_alert", (float64(m.Data) * 1000) - 0
+	case typedef.EventDistanceDurationAlert:
+		return "distance_duration_alert", (float64(m.Data) * 100) - 0
 	case typedef.EventCalorieDurationAlert:
 		return "calorie_duration_alert", uint32(m.Data)
 	case typedef.EventFitnessEquipment:
 		return "fitness_equipment_state", typedef.FitnessEquipmentState(m.Data)
 	case typedef.EventSportPoint:
 		return "sport_point", uint32(m.Data)
+	case typedef.EventFrontGearChange, typedef.EventRearGearChange:
+		return "gear_change_data", uint32(m.Data)
+	case typedef.EventRiderPositionChange:
+		return "rider_position", typedef.RiderPositionType(m.Data)
 	case typedef.EventCommTimeout:
 		return "comm_timeout", typedef.CommTimeoutType(m.Data)
+	case typedef.EventDiveAlert:
+		return "dive_alert", typedef.DiveAlert(m.Data)
+	case typedef.EventAutoActivityDetect:
+		return "auto_activity_detect_duration", uint16(m.Data)
+	case typedef.EventRadarThreatAlert:
+		return "radar_threat_alert", uint32(m.Data)
 	}
 	return "data", m.Data
 }
@@ -354,11 +357,21 @@ func (m *Event) SetTimestamp(v time.Time) *Event {
 	return m
 }
 
-// SetStartTimestamp sets Event value.
-//
-// Units: s; Timestamp of when the event started
-func (m *Event) SetStartTimestamp(v time.Time) *Event {
-	m.StartTimestamp = v
+// SetEvent sets Event value.
+func (m *Event) SetEvent(v typedef.Event) *Event {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Event value.
+func (m *Event) SetEventType(v typedef.EventType) *Event {
+	m.EventType = v
+	return m
+}
+
+// SetData16 sets Event value.
+func (m *Event) SetData16(v uint16) *Event {
+	m.Data16 = v
 	return m
 }
 
@@ -368,9 +381,9 @@ func (m *Event) SetData(v uint32) *Event {
 	return m
 }
 
-// SetData16 sets Event value.
-func (m *Event) SetData16(v uint16) *Event {
-	m.Data16 = v
+// SetEventGroup sets Event value.
+func (m *Event) SetEventGroup(v uint8) *Event {
+	m.EventGroup = v
 	return m
 }
 
@@ -387,24 +400,6 @@ func (m *Event) SetScore(v uint16) *Event {
 // Do not populate directly. Autogenerated by decoder for sport_point subfield components
 func (m *Event) SetOpponentScore(v uint16) *Event {
 	m.OpponentScore = v
-	return m
-}
-
-// SetEvent sets Event value.
-func (m *Event) SetEvent(v typedef.Event) *Event {
-	m.Event = v
-	return m
-}
-
-// SetEventType sets Event value.
-func (m *Event) SetEventType(v typedef.EventType) *Event {
-	m.EventType = v
-	return m
-}
-
-// SetEventGroup sets Event value.
-func (m *Event) SetEventGroup(v uint8) *Event {
-	m.EventGroup = v
 	return m
 }
 
@@ -451,6 +446,14 @@ func (m *Event) SetDeviceIndex(v typedef.DeviceIndex) *Event {
 // Activity Type associated with an auto_activity_detect event
 func (m *Event) SetActivityType(v typedef.ActivityType) *Event {
 	m.ActivityType = v
+	return m
+}
+
+// SetStartTimestamp sets Event value.
+//
+// Units: s; Timestamp of when the event started
+func (m *Event) SetStartTimestamp(v time.Time) *Event {
+	m.StartTimestamp = v
 	return m
 }
 

@@ -14,6 +14,9 @@ import (
 )
 
 // AntChannelId is a AntChannelId message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type AntChannelId struct {
 	DeviceNumber     uint16
 	ChannelNumber    uint8
@@ -43,9 +46,9 @@ func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 	}
 
 	return &AntChannelId{
-		DeviceNumber:     vals[2].Uint16z(),
 		ChannelNumber:    vals[0].Uint8(),
 		DeviceType:       vals[1].Uint8z(),
+		DeviceNumber:     vals[2].Uint16z(),
 		TransmissionType: vals[3].Uint8z(),
 		DeviceIndex:      typedef.DeviceIndex(vals[4].Uint8()),
 
@@ -69,11 +72,6 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumAntChannelId}
 
-	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint16(m.DeviceNumber)
-		fields = append(fields, field)
-	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ChannelNumber)
@@ -82,6 +80,11 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	if uint8(m.DeviceType) != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.DeviceType)
+		fields = append(fields, field)
+	}
+	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint16(m.DeviceNumber)
 		fields = append(fields, field)
 	}
 	if uint8(m.TransmissionType) != basetype.Uint8zInvalid {
@@ -103,12 +106,6 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetDeviceNumber sets AntChannelId value.
-func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
-	m.DeviceNumber = v
-	return m
-}
-
 // SetChannelNumber sets AntChannelId value.
 func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 	m.ChannelNumber = v
@@ -118,6 +115,12 @@ func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 // SetDeviceType sets AntChannelId value.
 func (m *AntChannelId) SetDeviceType(v uint8) *AntChannelId {
 	m.DeviceType = v
+	return m
+}
+
+// SetDeviceNumber sets AntChannelId value.
+func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
+	m.DeviceNumber = v
 	return m
 }
 

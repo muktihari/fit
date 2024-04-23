@@ -14,6 +14,9 @@ import (
 )
 
 // MemoGlob is a MemoGlob message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MemoGlob struct {
 	Memo        []byte               // Array: [N]; Deprecated. Use data field.
 	Data        []uint8              // Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
@@ -44,12 +47,12 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 	}
 
 	return &MemoGlob{
-		Memo:        vals[0].SliceUint8(),
-		Data:        vals[4].SliceUint8(),
 		PartIndex:   vals[250].Uint32(),
+		Memo:        vals[0].SliceUint8(),
 		MesgNum:     typedef.MesgNum(vals[1].Uint16()),
 		ParentIndex: typedef.MessageIndex(vals[2].Uint16()),
 		FieldNum:    vals[3].Uint8(),
+		Data:        vals[4].SliceUint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -71,19 +74,14 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumMemoGlob}
 
-	if m.Memo != nil {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.SliceUint8(m.Memo)
-		fields = append(fields, field)
-	}
-	if m.Data != nil {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceUint8(m.Data)
-		fields = append(fields, field)
-	}
 	if m.PartIndex != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 250)
 		field.Value = proto.Uint32(m.PartIndex)
+		fields = append(fields, field)
+	}
+	if m.Memo != nil {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.SliceUint8(m.Memo)
 		fields = append(fields, field)
 	}
 	if uint16(m.MesgNum) != basetype.Uint16Invalid {
@@ -101,6 +99,11 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.FieldNum)
 		fields = append(fields, field)
 	}
+	if m.Data != nil {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.SliceUint8(m.Data)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -110,27 +113,19 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMemo sets MemoGlob value.
-//
-// Array: [N]; Deprecated. Use data field.
-func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
-	m.Memo = v
-	return m
-}
-
-// SetData sets MemoGlob value.
-//
-// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
-func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
-	m.Data = v
-	return m
-}
-
 // SetPartIndex sets MemoGlob value.
 //
 // Sequence number of memo blocks
 func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
 	m.PartIndex = v
+	return m
+}
+
+// SetMemo sets MemoGlob value.
+//
+// Array: [N]; Deprecated. Use data field.
+func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
+	m.Memo = v
 	return m
 }
 
@@ -155,6 +150,14 @@ func (m *MemoGlob) SetParentIndex(v typedef.MessageIndex) *MemoGlob {
 // Field within the parent that this glob is associated with
 func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
 	m.FieldNum = v
+	return m
+}
+
+// SetData sets MemoGlob value.
+//
+// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
+	m.Data = v
 	return m
 }
 

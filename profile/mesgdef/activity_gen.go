@@ -18,6 +18,9 @@ import (
 )
 
 // Activity is a Activity message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Activity struct {
 	Timestamp      time.Time
 	LocalTimestamp time.Time // timestamp epoch expressed in local time, used to convert activity timestamps to local time
@@ -51,12 +54,12 @@ func NewActivity(mesg *proto.Message) *Activity {
 
 	return &Activity{
 		Timestamp:      datetime.ToTime(vals[253].Uint32()),
-		LocalTimestamp: datetime.ToTime(vals[5].Uint32()),
 		TotalTimerTime: vals[0].Uint32(),
 		NumSessions:    vals[1].Uint16(),
 		Type:           typedef.Activity(vals[2].Uint8()),
 		Event:          typedef.Event(vals[3].Uint8()),
 		EventType:      typedef.EventType(vals[4].Uint8()),
+		LocalTimestamp: datetime.ToTime(vals[5].Uint32()),
 		EventGroup:     vals[6].Uint8(),
 
 		DeveloperFields: developerFields,
@@ -84,11 +87,6 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
-		fields = append(fields, field)
-	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint32(m.TotalTimerTime)
@@ -112,6 +110,11 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 	if byte(m.EventType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.EventType))
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
@@ -150,14 +153,6 @@ func (m *Activity) SetTimestamp(v time.Time) *Activity {
 	return m
 }
 
-// SetLocalTimestamp sets Activity value.
-//
-// timestamp epoch expressed in local time, used to convert activity timestamps to local time
-func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
-	m.LocalTimestamp = v
-	return m
-}
-
 // SetTotalTimerTime sets Activity value.
 //
 // Scale: 1000; Units: s; Exclude pauses
@@ -187,6 +182,14 @@ func (m *Activity) SetEvent(v typedef.Event) *Activity {
 // SetEventType sets Activity value.
 func (m *Activity) SetEventType(v typedef.EventType) *Activity {
 	m.EventType = v
+	return m
+}
+
+// SetLocalTimestamp sets Activity value.
+//
+// timestamp epoch expressed in local time, used to convert activity timestamps to local time
+func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
+	m.LocalTimestamp = v
 	return m
 }
 

@@ -14,6 +14,9 @@ import (
 )
 
 // ExdDataFieldConfiguration is a ExdDataFieldConfiguration message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ExdDataFieldConfiguration struct {
 	Title        []string // Array: [32]
 	ScreenIndex  uint8
@@ -50,12 +53,12 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 	}
 
 	return &ExdDataFieldConfiguration{
-		Title:        vals[5].SliceString(),
 		ScreenIndex:  vals[0].Uint8(),
 		ConceptField: vals[1].Uint8(),
 		FieldId:      vals[2].Uint8(),
 		ConceptCount: vals[3].Uint8(),
 		DisplayType:  typedef.ExdDisplayType(vals[4].Uint8()),
+		Title:        vals[5].SliceString(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -79,11 +82,6 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumExdDataFieldConfiguration}
 
-	if m.Title != nil {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceString(m.Title)
-		fields = append(fields, field)
-	}
 	if m.ScreenIndex != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ScreenIndex)
@@ -111,6 +109,11 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.DisplayType))
 		fields = append(fields, field)
 	}
+	if m.Title != nil {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.SliceString(m.Title)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -118,14 +121,6 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetTitle sets ExdDataFieldConfiguration value.
-//
-// Array: [32]
-func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
-	m.Title = v
-	return m
 }
 
 // SetScreenIndex sets ExdDataFieldConfiguration value.
@@ -155,6 +150,14 @@ func (m *ExdDataFieldConfiguration) SetConceptCount(v uint8) *ExdDataFieldConfig
 // SetDisplayType sets ExdDataFieldConfiguration value.
 func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *ExdDataFieldConfiguration {
 	m.DisplayType = v
+	return m
+}
+
+// SetTitle sets ExdDataFieldConfiguration value.
+//
+// Array: [32]
+func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
+	m.Title = v
 	return m
 }
 

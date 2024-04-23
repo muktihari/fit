@@ -16,6 +16,9 @@ import (
 )
 
 // WorkoutSession is a WorkoutSession message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WorkoutSession struct {
 	MessageIndex   typedef.MessageIndex
 	NumValidSteps  uint16
@@ -48,11 +51,11 @@ func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 
 	return &WorkoutSession{
 		MessageIndex:   typedef.MessageIndex(vals[254].Uint16()),
+		Sport:          typedef.Sport(vals[0].Uint8()),
+		SubSport:       typedef.SubSport(vals[1].Uint8()),
 		NumValidSteps:  vals[2].Uint16(),
 		FirstStepIndex: vals[3].Uint16(),
 		PoolLength:     vals[4].Uint16(),
-		Sport:          typedef.Sport(vals[0].Uint8()),
-		SubSport:       typedef.SubSport(vals[1].Uint8()),
 		PoolLengthUnit: typedef.DisplayMeasure(vals[5].Uint8()),
 
 		DeveloperFields: developerFields,
@@ -80,6 +83,16 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Sport))
+		fields = append(fields, field)
+	}
+	if byte(m.SubSport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.NumValidSteps)
@@ -93,16 +106,6 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 	if m.PoolLength != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint16(m.PoolLength)
-		fields = append(fields, field)
-	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Sport))
-		fields = append(fields, field)
-	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
@@ -135,6 +138,18 @@ func (m *WorkoutSession) SetMessageIndex(v typedef.MessageIndex) *WorkoutSession
 	return m
 }
 
+// SetSport sets WorkoutSession value.
+func (m *WorkoutSession) SetSport(v typedef.Sport) *WorkoutSession {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets WorkoutSession value.
+func (m *WorkoutSession) SetSubSport(v typedef.SubSport) *WorkoutSession {
+	m.SubSport = v
+	return m
+}
+
 // SetNumValidSteps sets WorkoutSession value.
 func (m *WorkoutSession) SetNumValidSteps(v uint16) *WorkoutSession {
 	m.NumValidSteps = v
@@ -152,18 +167,6 @@ func (m *WorkoutSession) SetFirstStepIndex(v uint16) *WorkoutSession {
 // Scale: 100; Units: m
 func (m *WorkoutSession) SetPoolLength(v uint16) *WorkoutSession {
 	m.PoolLength = v
-	return m
-}
-
-// SetSport sets WorkoutSession value.
-func (m *WorkoutSession) SetSport(v typedef.Sport) *WorkoutSession {
-	m.Sport = v
-	return m
-}
-
-// SetSubSport sets WorkoutSession value.
-func (m *WorkoutSession) SetSubSport(v typedef.SubSport) *WorkoutSession {
-	m.SubSport = v
 	return m
 }
 

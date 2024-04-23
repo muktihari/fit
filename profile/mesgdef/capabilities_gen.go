@@ -15,6 +15,9 @@ import (
 )
 
 // Capabilities is a Capabilities message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Capabilities struct {
 	Languages             []uint8              // Array: [N]; Use language_bits_x types where x is index of array.
 	Sports                []typedef.SportBits0 // Array: [N]; Use sport_bits_x types where x is index of array.

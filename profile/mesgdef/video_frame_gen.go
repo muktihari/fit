@@ -16,6 +16,9 @@ import (
 )
 
 // VideoFrame is a VideoFrame message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type VideoFrame struct {
 	Timestamp   time.Time // Units: s; Whole second part of the timestamp
 	FrameNumber uint32    // Number of the frame that the timestamp and timestamp_ms correlate to
@@ -44,8 +47,8 @@ func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 
 	return &VideoFrame{
 		Timestamp:   datetime.ToTime(vals[253].Uint32()),
-		FrameNumber: vals[1].Uint32(),
 		TimestampMs: vals[0].Uint16(),
+		FrameNumber: vals[1].Uint32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -72,14 +75,14 @@ func (m *VideoFrame) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.FrameNumber != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint32(m.FrameNumber)
-		fields = append(fields, field)
-	}
 	if m.TimestampMs != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
+	if m.FrameNumber != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint32(m.FrameNumber)
 		fields = append(fields, field)
 	}
 
@@ -102,19 +105,19 @@ func (m *VideoFrame) SetTimestamp(v time.Time) *VideoFrame {
 	return m
 }
 
-// SetFrameNumber sets VideoFrame value.
-//
-// Number of the frame that the timestamp and timestamp_ms correlate to
-func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
-	m.FrameNumber = v
-	return m
-}
-
 // SetTimestampMs sets VideoFrame value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
 	m.TimestampMs = v
+	return m
+}
+
+// SetFrameNumber sets VideoFrame value.
+//
+// Number of the frame that the timestamp and timestamp_ms correlate to
+func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
+	m.FrameNumber = v
 	return m
 }
 

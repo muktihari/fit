@@ -18,6 +18,9 @@ import (
 )
 
 // Monitoring is a Monitoring message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Monitoring struct {
 	Timestamp                    time.Time           // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	LocalTimestamp               time.Time           // Must align to logging interval, for example, time must be 00:00:00 for daily log.
@@ -78,34 +81,34 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 
 	return &Monitoring{
 		Timestamp:                    datetime.ToTime(vals[253].Uint32()),
-		LocalTimestamp:               datetime.ToTime(vals[11].Uint32()),
-		ActivityTime:                 vals[16].SliceUint16(),
+		DeviceIndex:                  typedef.DeviceIndex(vals[0].Uint8()),
+		Calories:                     vals[1].Uint16(),
 		Distance:                     vals[2].Uint32(),
 		Cycles:                       vals[3].Uint32(),
 		ActiveTime:                   vals[4].Uint32(),
-		Duration:                     vals[30].Uint32(),
-		Ascent:                       vals[31].Uint32(),
-		Descent:                      vals[32].Uint32(),
-		Calories:                     vals[1].Uint16(),
-		Distance16:                   vals[8].Uint16(),
-		Cycles16:                     vals[9].Uint16(),
-		ActiveTime16:                 vals[10].Uint16(),
-		Temperature:                  vals[12].Int16(),
-		TemperatureMin:               vals[14].Int16(),
-		TemperatureMax:               vals[15].Int16(),
-		ActiveCalories:               vals[19].Uint16(),
-		Timestamp16:                  vals[26].Uint16(),
-		DurationMin:                  vals[29].Uint16(),
-		ModerateActivityMinutes:      vals[33].Uint16(),
-		VigorousActivityMinutes:      vals[34].Uint16(),
-		DeviceIndex:                  typedef.DeviceIndex(vals[0].Uint8()),
 		ActivityType:                 typedef.ActivityType(vals[5].Uint8()),
 		ActivitySubtype:              typedef.ActivitySubtype(vals[6].Uint8()),
 		ActivityLevel:                typedef.ActivityLevel(vals[7].Uint8()),
+		Distance16:                   vals[8].Uint16(),
+		Cycles16:                     vals[9].Uint16(),
+		ActiveTime16:                 vals[10].Uint16(),
+		LocalTimestamp:               datetime.ToTime(vals[11].Uint32()),
+		Temperature:                  vals[12].Int16(),
+		TemperatureMin:               vals[14].Int16(),
+		TemperatureMax:               vals[15].Int16(),
+		ActivityTime:                 vals[16].SliceUint16(),
+		ActiveCalories:               vals[19].Uint16(),
 		CurrentActivityTypeIntensity: vals[24].Uint8(),
 		TimestampMin8:                vals[25].Uint8(),
+		Timestamp16:                  vals[26].Uint16(),
 		HeartRate:                    vals[27].Uint8(),
 		Intensity:                    vals[28].Uint8(),
+		DurationMin:                  vals[29].Uint16(),
+		Duration:                     vals[30].Uint32(),
+		Ascent:                       vals[31].Uint32(),
+		Descent:                      vals[32].Uint32(),
+		ModerateActivityMinutes:      vals[33].Uint16(),
+		VigorousActivityMinutes:      vals[34].Uint16(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -134,14 +137,14 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
+	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
-	if m.ActivityTime != nil {
-		field := fac.CreateField(mesg.Num, 16)
-		field.Value = proto.SliceUint16(m.ActivityTime)
+	if m.Calories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint16(m.Calories)
 		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
@@ -157,86 +160,6 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 	if m.ActiveTime != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(m.ActiveTime)
-		fields = append(fields, field)
-	}
-	if m.Duration != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 30)
-		field.Value = proto.Uint32(m.Duration)
-		fields = append(fields, field)
-	}
-	if m.Ascent != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 31)
-		field.Value = proto.Uint32(m.Ascent)
-		fields = append(fields, field)
-	}
-	if m.Descent != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 32)
-		field.Value = proto.Uint32(m.Descent)
-		fields = append(fields, field)
-	}
-	if m.Calories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint16(m.Calories)
-		fields = append(fields, field)
-	}
-	if m.Distance16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.Uint16(m.Distance16)
-		fields = append(fields, field)
-	}
-	if m.Cycles16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint16(m.Cycles16)
-		fields = append(fields, field)
-	}
-	if m.ActiveTime16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 10)
-		field.Value = proto.Uint16(m.ActiveTime16)
-		fields = append(fields, field)
-	}
-	if m.Temperature != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 12)
-		field.Value = proto.Int16(m.Temperature)
-		fields = append(fields, field)
-	}
-	if m.TemperatureMin != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
-		field.Value = proto.Int16(m.TemperatureMin)
-		fields = append(fields, field)
-	}
-	if m.TemperatureMax != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Int16(m.TemperatureMax)
-		fields = append(fields, field)
-	}
-	if m.ActiveCalories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 19)
-		field.Value = proto.Uint16(m.ActiveCalories)
-		fields = append(fields, field)
-	}
-	if m.Timestamp16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 26)
-		field.Value = proto.Uint16(m.Timestamp16)
-		fields = append(fields, field)
-	}
-	if m.DurationMin != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 29)
-		field.Value = proto.Uint16(m.DurationMin)
-		fields = append(fields, field)
-	}
-	if m.ModerateActivityMinutes != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 33)
-		field.Value = proto.Uint16(m.ModerateActivityMinutes)
-		fields = append(fields, field)
-	}
-	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 34)
-		field.Value = proto.Uint16(m.VigorousActivityMinutes)
-		fields = append(fields, field)
-	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 	if byte(m.ActivityType) != basetype.EnumInvalid && ((m.IsExpandedFields[5] && options.IncludeExpandedFields) || !m.IsExpandedFields[5]) {
@@ -255,6 +178,51 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.ActivityLevel))
 		fields = append(fields, field)
 	}
+	if m.Distance16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = proto.Uint16(m.Distance16)
+		fields = append(fields, field)
+	}
+	if m.Cycles16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Uint16(m.Cycles16)
+		fields = append(fields, field)
+	}
+	if m.ActiveTime16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 10)
+		field.Value = proto.Uint16(m.ActiveTime16)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
+		fields = append(fields, field)
+	}
+	if m.Temperature != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 12)
+		field.Value = proto.Int16(m.Temperature)
+		fields = append(fields, field)
+	}
+	if m.TemperatureMin != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 14)
+		field.Value = proto.Int16(m.TemperatureMin)
+		fields = append(fields, field)
+	}
+	if m.TemperatureMax != basetype.Sint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Int16(m.TemperatureMax)
+		fields = append(fields, field)
+	}
+	if m.ActivityTime != nil {
+		field := fac.CreateField(mesg.Num, 16)
+		field.Value = proto.SliceUint16(m.ActivityTime)
+		fields = append(fields, field)
+	}
+	if m.ActiveCalories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 19)
+		field.Value = proto.Uint16(m.ActiveCalories)
+		fields = append(fields, field)
+	}
 	if m.CurrentActivityTypeIntensity != basetype.ByteInvalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = proto.Uint8(m.CurrentActivityTypeIntensity)
@@ -263,6 +231,11 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 	if m.TimestampMin8 != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(m.TimestampMin8)
+		fields = append(fields, field)
+	}
+	if m.Timestamp16 != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 26)
+		field.Value = proto.Uint16(m.Timestamp16)
 		fields = append(fields, field)
 	}
 	if m.HeartRate != basetype.Uint8Invalid {
@@ -274,6 +247,36 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = proto.Uint8(m.Intensity)
 		field.IsExpandedField = m.IsExpandedFields[28]
+		fields = append(fields, field)
+	}
+	if m.DurationMin != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 29)
+		field.Value = proto.Uint16(m.DurationMin)
+		fields = append(fields, field)
+	}
+	if m.Duration != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 30)
+		field.Value = proto.Uint32(m.Duration)
+		fields = append(fields, field)
+	}
+	if m.Ascent != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 31)
+		field.Value = proto.Uint32(m.Ascent)
+		fields = append(fields, field)
+	}
+	if m.Descent != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 32)
+		field.Value = proto.Uint32(m.Descent)
+		fields = append(fields, field)
+	}
+	if m.ModerateActivityMinutes != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 33)
+		field.Value = proto.Uint16(m.ModerateActivityMinutes)
+		fields = append(fields, field)
+	}
+	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 34)
+		field.Value = proto.Uint16(m.VigorousActivityMinutes)
 		fields = append(fields, field)
 	}
 
@@ -288,17 +291,17 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 // GetCycles returns Dynamic Field interpretation of Cycles. Otherwise, returns the original value of Cycles.
 //
 // Based on m.ActivityType:
-//   - name: "strokes", units: "strokes" , value: (float64(m.Cycles) * 2) - 0
 //   - name: "steps", units: "steps" , value: uint32(m.Cycles)
+//   - name: "strokes", units: "strokes" , value: (float64(m.Cycles) * 2) - 0
 //
 // Otherwise:
 //   - name: "cycles", units: "cycles" , value: m.Cycles
 func (m *Monitoring) GetCycles() (name string, value any) {
 	switch m.ActivityType {
-	case typedef.ActivityTypeCycling, typedef.ActivityTypeSwimming:
-		return "strokes", (float64(m.Cycles) * 2) - 0
 	case typedef.ActivityTypeWalking, typedef.ActivityTypeRunning:
 		return "steps", uint32(m.Cycles)
+	case typedef.ActivityTypeCycling, typedef.ActivityTypeSwimming:
+		return "strokes", (float64(m.Cycles) * 2) - 0
 	}
 	return "cycles", m.Cycles
 }
@@ -337,26 +340,6 @@ func (m *Monitoring) ActiveTimeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
-}
-
-// AscentScaled return Ascent in its scaled value [Scale: 1000; Units: m].
-//
-// If Ascent value is invalid, float64 invalid value will be returned.
-func (m *Monitoring) AscentScaled() float64 {
-	if m.Ascent == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.Ascent, 1000, 0)
-}
-
-// DescentScaled return Descent in its scaled value [Scale: 1000; Units: m].
-//
-// If Descent value is invalid, float64 invalid value will be returned.
-func (m *Monitoring) DescentScaled() float64 {
-	if m.Descent == basetype.Uint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
-	return scaleoffset.Apply(m.Descent, 1000, 0)
 }
 
 // TemperatureScaled return Temperature in its scaled value [Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp].
@@ -399,6 +382,26 @@ func (m *Monitoring) IntensityScaled() float64 {
 	return scaleoffset.Apply(m.Intensity, 10, 0)
 }
 
+// AscentScaled return Ascent in its scaled value [Scale: 1000; Units: m].
+//
+// If Ascent value is invalid, float64 invalid value will be returned.
+func (m *Monitoring) AscentScaled() float64 {
+	if m.Ascent == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.Ascent, 1000, 0)
+}
+
+// DescentScaled return Descent in its scaled value [Scale: 1000; Units: m].
+//
+// If Descent value is invalid, float64 invalid value will be returned.
+func (m *Monitoring) DescentScaled() float64 {
+	if m.Descent == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return scaleoffset.Apply(m.Descent, 1000, 0)
+}
+
 // SetTimestamp sets Monitoring value.
 //
 // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
@@ -407,19 +410,19 @@ func (m *Monitoring) SetTimestamp(v time.Time) *Monitoring {
 	return m
 }
 
-// SetLocalTimestamp sets Monitoring value.
+// SetDeviceIndex sets Monitoring value.
 //
-// Must align to logging interval, for example, time must be 00:00:00 for daily log.
-func (m *Monitoring) SetLocalTimestamp(v time.Time) *Monitoring {
-	m.LocalTimestamp = v
+// Associates this data to device_info message. Not required for file with single device (sensor).
+func (m *Monitoring) SetDeviceIndex(v typedef.DeviceIndex) *Monitoring {
+	m.DeviceIndex = v
 	return m
 }
 
-// SetActivityTime sets Monitoring value.
+// SetCalories sets Monitoring value.
 //
-// Array: [8]; Units: minutes; Indexed using minute_activity_level enum
-func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
-	m.ActivityTime = v
+// Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
+func (m *Monitoring) SetCalories(v uint16) *Monitoring {
+	m.Calories = v
 	return m
 }
 
@@ -447,35 +450,21 @@ func (m *Monitoring) SetActiveTime(v uint32) *Monitoring {
 	return m
 }
 
-// SetDuration sets Monitoring value.
-//
-// Units: s
-func (m *Monitoring) SetDuration(v uint32) *Monitoring {
-	m.Duration = v
+// SetActivityType sets Monitoring value.
+func (m *Monitoring) SetActivityType(v typedef.ActivityType) *Monitoring {
+	m.ActivityType = v
 	return m
 }
 
-// SetAscent sets Monitoring value.
-//
-// Scale: 1000; Units: m
-func (m *Monitoring) SetAscent(v uint32) *Monitoring {
-	m.Ascent = v
+// SetActivitySubtype sets Monitoring value.
+func (m *Monitoring) SetActivitySubtype(v typedef.ActivitySubtype) *Monitoring {
+	m.ActivitySubtype = v
 	return m
 }
 
-// SetDescent sets Monitoring value.
-//
-// Scale: 1000; Units: m
-func (m *Monitoring) SetDescent(v uint32) *Monitoring {
-	m.Descent = v
-	return m
-}
-
-// SetCalories sets Monitoring value.
-//
-// Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
-func (m *Monitoring) SetCalories(v uint16) *Monitoring {
-	m.Calories = v
+// SetActivityLevel sets Monitoring value.
+func (m *Monitoring) SetActivityLevel(v typedef.ActivityLevel) *Monitoring {
+	m.ActivityLevel = v
 	return m
 }
 
@@ -503,6 +492,14 @@ func (m *Monitoring) SetActiveTime16(v uint16) *Monitoring {
 	return m
 }
 
+// SetLocalTimestamp sets Monitoring value.
+//
+// Must align to logging interval, for example, time must be 00:00:00 for daily log.
+func (m *Monitoring) SetLocalTimestamp(v time.Time) *Monitoring {
+	m.LocalTimestamp = v
+	return m
+}
+
 // SetTemperature sets Monitoring value.
 //
 // Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
@@ -527,69 +524,19 @@ func (m *Monitoring) SetTemperatureMax(v int16) *Monitoring {
 	return m
 }
 
+// SetActivityTime sets Monitoring value.
+//
+// Array: [8]; Units: minutes; Indexed using minute_activity_level enum
+func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
+	m.ActivityTime = v
+	return m
+}
+
 // SetActiveCalories sets Monitoring value.
 //
 // Units: kcal
 func (m *Monitoring) SetActiveCalories(v uint16) *Monitoring {
 	m.ActiveCalories = v
-	return m
-}
-
-// SetTimestamp16 sets Monitoring value.
-//
-// Units: s
-func (m *Monitoring) SetTimestamp16(v uint16) *Monitoring {
-	m.Timestamp16 = v
-	return m
-}
-
-// SetDurationMin sets Monitoring value.
-//
-// Units: min
-func (m *Monitoring) SetDurationMin(v uint16) *Monitoring {
-	m.DurationMin = v
-	return m
-}
-
-// SetModerateActivityMinutes sets Monitoring value.
-//
-// Units: minutes
-func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
-	m.ModerateActivityMinutes = v
-	return m
-}
-
-// SetVigorousActivityMinutes sets Monitoring value.
-//
-// Units: minutes
-func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
-	m.VigorousActivityMinutes = v
-	return m
-}
-
-// SetDeviceIndex sets Monitoring value.
-//
-// Associates this data to device_info message. Not required for file with single device (sensor).
-func (m *Monitoring) SetDeviceIndex(v typedef.DeviceIndex) *Monitoring {
-	m.DeviceIndex = v
-	return m
-}
-
-// SetActivityType sets Monitoring value.
-func (m *Monitoring) SetActivityType(v typedef.ActivityType) *Monitoring {
-	m.ActivityType = v
-	return m
-}
-
-// SetActivitySubtype sets Monitoring value.
-func (m *Monitoring) SetActivitySubtype(v typedef.ActivitySubtype) *Monitoring {
-	m.ActivitySubtype = v
-	return m
-}
-
-// SetActivityLevel sets Monitoring value.
-func (m *Monitoring) SetActivityLevel(v typedef.ActivityLevel) *Monitoring {
-	m.ActivityLevel = v
 	return m
 }
 
@@ -609,6 +556,14 @@ func (m *Monitoring) SetTimestampMin8(v uint8) *Monitoring {
 	return m
 }
 
+// SetTimestamp16 sets Monitoring value.
+//
+// Units: s
+func (m *Monitoring) SetTimestamp16(v uint16) *Monitoring {
+	m.Timestamp16 = v
+	return m
+}
+
 // SetHeartRate sets Monitoring value.
 //
 // Units: bpm
@@ -622,6 +577,54 @@ func (m *Monitoring) SetHeartRate(v uint8) *Monitoring {
 // Scale: 10
 func (m *Monitoring) SetIntensity(v uint8) *Monitoring {
 	m.Intensity = v
+	return m
+}
+
+// SetDurationMin sets Monitoring value.
+//
+// Units: min
+func (m *Monitoring) SetDurationMin(v uint16) *Monitoring {
+	m.DurationMin = v
+	return m
+}
+
+// SetDuration sets Monitoring value.
+//
+// Units: s
+func (m *Monitoring) SetDuration(v uint32) *Monitoring {
+	m.Duration = v
+	return m
+}
+
+// SetAscent sets Monitoring value.
+//
+// Scale: 1000; Units: m
+func (m *Monitoring) SetAscent(v uint32) *Monitoring {
+	m.Ascent = v
+	return m
+}
+
+// SetDescent sets Monitoring value.
+//
+// Scale: 1000; Units: m
+func (m *Monitoring) SetDescent(v uint32) *Monitoring {
+	m.Descent = v
+	return m
+}
+
+// SetModerateActivityMinutes sets Monitoring value.
+//
+// Units: minutes
+func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
+	m.ModerateActivityMinutes = v
+	return m
+}
+
+// SetVigorousActivityMinutes sets Monitoring value.
+//
+// Units: minutes
+func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
+	m.VigorousActivityMinutes = v
 	return m
 }
 

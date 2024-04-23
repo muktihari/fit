@@ -14,6 +14,9 @@ import (
 )
 
 // Sport is a Sport message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Sport struct {
 	Name     string
 	Sport    typedef.Sport
@@ -41,9 +44,9 @@ func NewSport(mesg *proto.Message) *Sport {
 	}
 
 	return &Sport{
-		Name:     vals[3].String(),
 		Sport:    typedef.Sport(vals[0].Uint8()),
 		SubSport: typedef.SubSport(vals[1].Uint8()),
+		Name:     vals[3].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,11 +68,6 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSport}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if byte(m.Sport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Sport))
@@ -78,6 +76,11 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 	if byte(m.SubSport) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 
@@ -89,12 +92,6 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetName sets Sport value.
-func (m *Sport) SetName(v string) *Sport {
-	m.Name = v
-	return m
-}
-
 // SetSport sets Sport value.
 func (m *Sport) SetSport(v typedef.Sport) *Sport {
 	m.Sport = v
@@ -104,6 +101,12 @@ func (m *Sport) SetSport(v typedef.Sport) *Sport {
 // SetSubSport sets Sport value.
 func (m *Sport) SetSubSport(v typedef.SubSport) *Sport {
 	m.SubSport = v
+	return m
+}
+
+// SetName sets Sport value.
+func (m *Sport) SetName(v string) *Sport {
+	m.Name = v
 	return m
 }
 

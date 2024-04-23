@@ -17,6 +17,9 @@ import (
 )
 
 // HsaRespirationData is a HsaRespirationData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaRespirationData struct {
 	Timestamp          time.Time // Units: s
 	RespirationRate    []int16   // Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
@@ -45,8 +48,8 @@ func NewHsaRespirationData(mesg *proto.Message) *HsaRespirationData {
 
 	return &HsaRespirationData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		RespirationRate:    vals[1].SliceInt16(),
 		ProcessingInterval: vals[0].Uint16(),
+		RespirationRate:    vals[1].SliceInt16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -73,14 +76,14 @@ func (m *HsaRespirationData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.RespirationRate != nil {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.SliceInt16(m.RespirationRate)
-		fields = append(fields, field)
-	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
+	if m.RespirationRate != nil {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.SliceInt16(m.RespirationRate)
 		fields = append(fields, field)
 	}
 
@@ -113,19 +116,19 @@ func (m *HsaRespirationData) SetTimestamp(v time.Time) *HsaRespirationData {
 	return m
 }
 
-// SetRespirationRate sets HsaRespirationData value.
-//
-// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
-func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
-	m.RespirationRate = v
-	return m
-}
-
 // SetProcessingInterval sets HsaRespirationData value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaRespirationData) SetProcessingInterval(v uint16) *HsaRespirationData {
 	m.ProcessingInterval = v
+	return m
+}
+
+// SetRespirationRate sets HsaRespirationData value.
+//
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
+	m.RespirationRate = v
 	return m
 }
 

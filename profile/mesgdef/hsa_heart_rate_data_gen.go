@@ -16,6 +16,9 @@ import (
 )
 
 // HsaHeartRateData is a HsaHeartRateData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaHeartRateData struct {
 	Timestamp          time.Time // Units: s
 	HeartRate          []uint8   // Array: [N]; Units: bpm; Beats / min
@@ -45,9 +48,9 @@ func NewHsaHeartRateData(mesg *proto.Message) *HsaHeartRateData {
 
 	return &HsaHeartRateData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		HeartRate:          vals[2].SliceUint8(),
 		ProcessingInterval: vals[0].Uint16(),
 		Status:             vals[1].Uint8(),
+		HeartRate:          vals[2].SliceUint8(),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,11 +77,6 @@ func (m *HsaHeartRateData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.HeartRate != nil {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.SliceUint8(m.HeartRate)
-		fields = append(fields, field)
-	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
@@ -87,6 +85,11 @@ func (m *HsaHeartRateData) ToMesg(options *Options) proto.Message {
 	if m.Status != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.Status)
+		fields = append(fields, field)
+	}
+	if m.HeartRate != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.SliceUint8(m.HeartRate)
 		fields = append(fields, field)
 	}
 
@@ -109,14 +112,6 @@ func (m *HsaHeartRateData) SetTimestamp(v time.Time) *HsaHeartRateData {
 	return m
 }
 
-// SetHeartRate sets HsaHeartRateData value.
-//
-// Array: [N]; Units: bpm; Beats / min
-func (m *HsaHeartRateData) SetHeartRate(v []uint8) *HsaHeartRateData {
-	m.HeartRate = v
-	return m
-}
-
 // SetProcessingInterval sets HsaHeartRateData value.
 //
 // Units: s; Processing interval length in seconds
@@ -130,6 +125,14 @@ func (m *HsaHeartRateData) SetProcessingInterval(v uint16) *HsaHeartRateData {
 // Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
 func (m *HsaHeartRateData) SetStatus(v uint8) *HsaHeartRateData {
 	m.Status = v
+	return m
+}
+
+// SetHeartRate sets HsaHeartRateData value.
+//
+// Array: [N]; Units: bpm; Beats / min
+func (m *HsaHeartRateData) SetHeartRate(v []uint8) *HsaHeartRateData {
+	m.HeartRate = v
 	return m
 }
 

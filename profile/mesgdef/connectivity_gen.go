@@ -14,6 +14,9 @@ import (
 )
 
 // Connectivity is a Connectivity message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Connectivity struct {
 	Name                        string
 	BluetoothEnabled            bool // Use Bluetooth for connectivity features
@@ -51,10 +54,10 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 	}
 
 	return &Connectivity{
-		Name:                        vals[3].String(),
 		BluetoothEnabled:            vals[0].Bool(),
 		BluetoothLeEnabled:          vals[1].Bool(),
 		AntEnabled:                  vals[2].Bool(),
+		Name:                        vals[3].String(),
 		LiveTrackingEnabled:         vals[4].Bool(),
 		WeatherConditionsEnabled:    vals[5].Bool(),
 		WeatherAlertsEnabled:        vals[6].Bool(),
@@ -85,11 +88,6 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumConnectivity}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if m.BluetoothEnabled != false {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.BluetoothEnabled)
@@ -103,6 +101,11 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 	if m.AntEnabled != false {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.AntEnabled)
+		fields = append(fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.LiveTrackingEnabled != false {
@@ -159,12 +162,6 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetName sets Connectivity value.
-func (m *Connectivity) SetName(v string) *Connectivity {
-	m.Name = v
-	return m
-}
-
 // SetBluetoothEnabled sets Connectivity value.
 //
 // Use Bluetooth for connectivity features
@@ -186,6 +183,12 @@ func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
 // Use ANT for connectivity features
 func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
 	m.AntEnabled = v
+	return m
+}
+
+// SetName sets Connectivity value.
+func (m *Connectivity) SetName(v string) *Connectivity {
+	m.Name = v
 	return m
 }
 

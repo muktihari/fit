@@ -16,6 +16,9 @@ import (
 )
 
 // Spo2Data is a Spo2Data message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Spo2Data struct {
 	Timestamp         time.Time // Units: s
 	ReadingSpo2       uint8     // Units: percent

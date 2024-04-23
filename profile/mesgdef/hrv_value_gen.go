@@ -18,6 +18,9 @@ import (
 )
 
 // HrvValue is a HrvValue message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HrvValue struct {
 	Timestamp time.Time
 	Value     uint16 // Scale: 128; Units: ms; 5 minute RMSSD

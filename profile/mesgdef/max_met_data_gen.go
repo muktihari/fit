@@ -18,15 +18,18 @@ import (
 )
 
 // MaxMetData is a MaxMetData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MaxMetData struct {
 	UpdateTime     time.Time // Time maxMET and vo2 were calculated
 	Vo2Max         uint16    // Scale: 10; Units: mL/kg/min
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	MaxMetCategory typedef.MaxMetCategory
+	CalibratedData bool                          // Indicates if calibrated data was used in the calculation
 	HrSource       typedef.MaxMetHeartRateSource // Indicates if the estimate was obtained using a chest strap or wrist heart rate
 	SpeedSource    typedef.MaxMetSpeedSource     // Indidcates if the estimate was obtained using onboard GPS or connected GPS
-	CalibratedData bool                          // Indicates if calibrated data was used in the calculation
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -55,9 +58,9 @@ func NewMaxMetData(mesg *proto.Message) *MaxMetData {
 		Sport:          typedef.Sport(vals[5].Uint8()),
 		SubSport:       typedef.SubSport(vals[6].Uint8()),
 		MaxMetCategory: typedef.MaxMetCategory(vals[8].Uint8()),
+		CalibratedData: vals[9].Bool(),
 		HrSource:       typedef.MaxMetHeartRateSource(vals[12].Uint8()),
 		SpeedSource:    typedef.MaxMetSpeedSource(vals[13].Uint8()),
-		CalibratedData: vals[9].Bool(),
 
 		DeveloperFields: developerFields,
 	}
@@ -104,6 +107,11 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.MaxMetCategory))
 		fields = append(fields, field)
 	}
+	if m.CalibratedData != false {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Bool(m.CalibratedData)
+		fields = append(fields, field)
+	}
 	if byte(m.HrSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.HrSource))
@@ -112,11 +120,6 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 	if byte(m.SpeedSource) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint8(byte(m.SpeedSource))
-		fields = append(fields, field)
-	}
-	if m.CalibratedData != false {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Bool(m.CalibratedData)
 		fields = append(fields, field)
 	}
 
@@ -175,6 +178,14 @@ func (m *MaxMetData) SetMaxMetCategory(v typedef.MaxMetCategory) *MaxMetData {
 	return m
 }
 
+// SetCalibratedData sets MaxMetData value.
+//
+// Indicates if calibrated data was used in the calculation
+func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
+	m.CalibratedData = v
+	return m
+}
+
 // SetHrSource sets MaxMetData value.
 //
 // Indicates if the estimate was obtained using a chest strap or wrist heart rate
@@ -188,14 +199,6 @@ func (m *MaxMetData) SetHrSource(v typedef.MaxMetHeartRateSource) *MaxMetData {
 // Indidcates if the estimate was obtained using onboard GPS or connected GPS
 func (m *MaxMetData) SetSpeedSource(v typedef.MaxMetSpeedSource) *MaxMetData {
 	m.SpeedSource = v
-	return m
-}
-
-// SetCalibratedData sets MaxMetData value.
-//
-// Indicates if calibrated data was used in the calculation
-func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
-	m.CalibratedData = v
 	return m
 }
 
