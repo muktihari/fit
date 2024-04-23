@@ -14,6 +14,9 @@ import (
 )
 
 // VideoTitle is a VideoTitle message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type VideoTitle struct {
 	Text         string
 	MessageIndex typedef.MessageIndex // Long titles will be split into multiple parts
@@ -41,9 +44,9 @@ func NewVideoTitle(mesg *proto.Message) *VideoTitle {
 	}
 
 	return &VideoTitle{
-		Text:         vals[1].String(),
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		MessageCount: vals[0].Uint16(),
+		Text:         vals[1].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,11 +68,6 @@ func (m *VideoTitle) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumVideoTitle}
 
-	if m.Text != basetype.StringInvalid && m.Text != "" {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.String(m.Text)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -80,6 +78,11 @@ func (m *VideoTitle) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.MessageCount)
 		fields = append(fields, field)
 	}
+	if m.Text != basetype.StringInvalid && m.Text != "" {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.String(m.Text)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -87,12 +90,6 @@ func (m *VideoTitle) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetText sets VideoTitle value.
-func (m *VideoTitle) SetText(v string) *VideoTitle {
-	m.Text = v
-	return m
 }
 
 // SetMessageIndex sets VideoTitle value.
@@ -108,6 +105,12 @@ func (m *VideoTitle) SetMessageIndex(v typedef.MessageIndex) *VideoTitle {
 // Total number of title parts
 func (m *VideoTitle) SetMessageCount(v uint16) *VideoTitle {
 	m.MessageCount = v
+	return m
+}
+
+// SetText sets VideoTitle value.
+func (m *VideoTitle) SetText(v string) *VideoTitle {
+	m.Text = v
 	return m
 }
 

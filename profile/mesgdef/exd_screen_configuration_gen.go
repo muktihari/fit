@@ -14,6 +14,9 @@ import (
 )
 
 // ExdScreenConfiguration is a ExdScreenConfiguration message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ExdScreenConfiguration struct {
 	ScreenIndex   uint8
 	FieldCount    uint8 // number of fields in screen

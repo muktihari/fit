@@ -14,6 +14,9 @@ import (
 )
 
 // HrZone is a HrZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HrZone struct {
 	Name         string
 	MessageIndex typedef.MessageIndex
@@ -41,9 +44,9 @@ func NewHrZone(mesg *proto.Message) *HrZone {
 	}
 
 	return &HrZone{
-		Name:         vals[2].String(),
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighBpm:      vals[1].Uint8(),
+		Name:         vals[2].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,11 +68,6 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumHrZone}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -80,6 +78,11 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.HighBpm)
 		fields = append(fields, field)
 	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.String(m.Name)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -87,12 +90,6 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetName sets HrZone value.
-func (m *HrZone) SetName(v string) *HrZone {
-	m.Name = v
-	return m
 }
 
 // SetMessageIndex sets HrZone value.
@@ -106,6 +103,12 @@ func (m *HrZone) SetMessageIndex(v typedef.MessageIndex) *HrZone {
 // Units: bpm
 func (m *HrZone) SetHighBpm(v uint8) *HrZone {
 	m.HighBpm = v
+	return m
+}
+
+// SetName sets HrZone value.
+func (m *HrZone) SetName(v string) *HrZone {
+	m.Name = v
 	return m
 }
 

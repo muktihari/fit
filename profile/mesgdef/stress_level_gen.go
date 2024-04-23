@@ -16,6 +16,9 @@ import (
 )
 
 // StressLevel is a StressLevel message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type StressLevel struct {
 	StressLevelTime  time.Time // Units: s; Time stress score was calculated
 	StressLevelValue int16
@@ -42,8 +45,8 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 	}
 
 	return &StressLevel{
-		StressLevelTime:  datetime.ToTime(vals[1].Uint32()),
 		StressLevelValue: vals[0].Int16(),
+		StressLevelTime:  datetime.ToTime(vals[1].Uint32()),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,14 +68,14 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumStressLevel}
 
-	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StressLevelTime))
-		fields = append(fields, field)
-	}
 	if m.StressLevelValue != basetype.Sint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Int16(m.StressLevelValue)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.StressLevelTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StressLevelTime))
 		fields = append(fields, field)
 	}
 
@@ -87,17 +90,17 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 // StressLevelTimeUint32 returns StressLevelTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *StressLevel) StressLevelTimeUint32() uint32 { return datetime.ToUint32(m.StressLevelTime) }
 
+// SetStressLevelValue sets StressLevel value.
+func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
+	m.StressLevelValue = v
+	return m
+}
+
 // SetStressLevelTime sets StressLevel value.
 //
 // Units: s; Time stress score was calculated
 func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
 	m.StressLevelTime = v
-	return m
-}
-
-// SetStressLevelValue sets StressLevel value.
-func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
-	m.StressLevelValue = v
 	return m
 }
 

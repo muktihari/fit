@@ -180,7 +180,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -658,7 +658,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -759,7 +759,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -791,7 +791,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -863,7 +863,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -1012,7 +1012,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			36: {
 				FieldBase: &proto.FieldBase{
@@ -1092,7 +1092,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			55: {
 				FieldBase: &proto.FieldBase{
@@ -1108,7 +1108,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			56: {
 				FieldBase: &proto.FieldBase{
@@ -1124,7 +1124,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			57: {
 				FieldBase: &proto.FieldBase{
@@ -1220,7 +1220,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			90: {
 				FieldBase: &proto.FieldBase{
@@ -1268,7 +1268,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			134: {
 				FieldBase: &proto.FieldBase{
@@ -1284,7 +1284,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			174: {
 				FieldBase: &proto.FieldBase{
@@ -1300,7 +1300,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -1353,7 +1353,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -1417,7 +1417,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -1433,7 +1433,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			7: {
 				FieldBase: &proto.FieldBase{
@@ -1449,7 +1449,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -1529,7 +1529,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			13: {
 				FieldBase: &proto.FieldBase{
@@ -1545,7 +1545,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			14: {
 				FieldBase: &proto.FieldBase{
@@ -1561,7 +1561,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			16: {
 				FieldBase: &proto.FieldBase{
@@ -1577,7 +1577,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			17: {
 				FieldBase: &proto.FieldBase{
@@ -1593,7 +1593,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			18: {
 				FieldBase: &proto.FieldBase{
@@ -1609,7 +1609,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			21: {
 				FieldBase: &proto.FieldBase{
@@ -1625,7 +1625,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			22: {
 				FieldBase: &proto.FieldBase{
@@ -1705,7 +1705,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			31: {
 				FieldBase: &proto.FieldBase{
@@ -1753,7 +1753,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			49: {
 				FieldBase: &proto.FieldBase{
@@ -2040,7 +2040,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -2056,7 +2056,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -2754,7 +2754,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -2783,7 +2783,7 @@ var mesgs = [...]message{
 						},
 					},
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -2820,7 +2820,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -3017,7 +3017,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			11: {
 				FieldBase: &proto.FieldBase{
@@ -3081,7 +3081,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			15: {
 				FieldBase: &proto.FieldBase{
@@ -3166,7 +3166,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			7: {
 				FieldBase: &proto.FieldBase{
@@ -3182,7 +3182,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -3203,7 +3203,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -3219,7 +3219,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -3585,7 +3585,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -3633,7 +3633,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -3793,7 +3793,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			15: {
 				FieldBase: &proto.FieldBase{
@@ -3873,7 +3873,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			20: {
 				FieldBase: &proto.FieldBase{
@@ -3934,7 +3934,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			23: {
 				FieldBase: &proto.FieldBase{
@@ -3982,7 +3982,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			26: {
 				FieldBase: &proto.FieldBase{
@@ -4030,7 +4030,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			30: {
 				FieldBase: &proto.FieldBase{
@@ -4062,7 +4062,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			36: {
 				FieldBase: &proto.FieldBase{
@@ -4094,7 +4094,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -4179,7 +4179,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -4195,7 +4195,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -4392,7 +4392,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -4408,7 +4408,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -4589,7 +4589,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -4605,7 +4605,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -4642,7 +4642,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -4658,7 +4658,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -4706,7 +4706,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -4770,7 +4770,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			9: {
 				FieldBase: &proto.FieldBase{
@@ -4818,7 +4818,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -4887,7 +4887,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -4903,7 +4903,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -4919,7 +4919,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -5004,7 +5004,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -5020,7 +5020,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -5084,7 +5084,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -5100,7 +5100,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			7: {
 				FieldBase: &proto.FieldBase{
@@ -5471,7 +5471,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			29: {
 				FieldBase: &proto.FieldBase{
@@ -5695,7 +5695,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			44: {
 				FieldBase: &proto.FieldBase{
@@ -5743,7 +5743,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			47: {
 				FieldBase: &proto.FieldBase{
@@ -7520,7 +7520,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -7536,7 +7536,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -7923,7 +7923,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			24: {
 				FieldBase: &proto.FieldBase{
@@ -7939,7 +7939,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			25: {
 				FieldBase: &proto.FieldBase{
@@ -7955,7 +7955,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			26: {
 				FieldBase: &proto.FieldBase{
@@ -8067,7 +8067,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			39: {
 				FieldBase: &proto.FieldBase{
@@ -8083,7 +8083,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			40: {
 				FieldBase: &proto.FieldBase{
@@ -9538,7 +9538,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -9554,7 +9554,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -9650,7 +9650,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			9: {
 				FieldBase: &proto.FieldBase{
@@ -9714,7 +9714,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			18: {
 				FieldBase: &proto.FieldBase{
@@ -10310,7 +10310,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			43: {
 				FieldBase: &proto.FieldBase{
@@ -10422,7 +10422,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			50: {
 				FieldBase: &proto.FieldBase{
@@ -11245,7 +11245,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -11261,7 +11261,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -11592,7 +11592,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			15: {
 				FieldBase: &proto.FieldBase{
@@ -11631,7 +11631,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			22: {
 				FieldBase: &proto.FieldBase{
@@ -11917,7 +11917,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			19: {
 				FieldBase: &proto.FieldBase{
@@ -11981,7 +11981,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			25: {
 				FieldBase: &proto.FieldBase{
@@ -11997,7 +11997,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			27: {
 				FieldBase: &proto.FieldBase{
@@ -12151,7 +12151,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -12268,7 +12268,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -12300,7 +12300,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -12460,7 +12460,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			13: {
 				FieldBase: &proto.FieldBase{
@@ -12577,7 +12577,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -12593,7 +12593,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -12795,7 +12795,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -12827,7 +12827,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -13428,7 +13428,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -13558,7 +13558,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -13751,7 +13751,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -14742,7 +14742,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -15051,7 +15051,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -15312,7 +15312,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -15695,7 +15695,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -15743,7 +15743,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -15844,7 +15844,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -15929,7 +15929,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -16009,7 +16009,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -16025,7 +16025,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -16078,7 +16078,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -16314,7 +16314,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -16330,7 +16330,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -16689,7 +16689,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			24: {
 				FieldBase: &proto.FieldBase{
@@ -16833,7 +16833,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			33: {
 				FieldBase: &proto.FieldBase{
@@ -17255,7 +17255,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			59: {
 				FieldBase: &proto.FieldBase{
@@ -17351,7 +17351,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			65: {
 				FieldBase: &proto.FieldBase{
@@ -17985,7 +17985,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -18049,7 +18049,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			14: {
 				FieldBase: &proto.FieldBase{
@@ -18081,7 +18081,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -18118,7 +18118,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			1: {
 				FieldBase: &proto.FieldBase{
@@ -18134,7 +18134,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -18198,7 +18198,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -18251,7 +18251,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -18336,7 +18336,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -18519,7 +18519,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -18551,7 +18551,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			10: {
 				FieldBase: &proto.FieldBase{
@@ -18631,7 +18631,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			20: {
 				FieldBase: &proto.FieldBase{
@@ -18946,7 +18946,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -19063,7 +19063,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			4: {
 				FieldBase: &proto.FieldBase{
@@ -19505,7 +19505,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -19521,7 +19521,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			9: {
 				FieldBase: &proto.FieldBase{
@@ -19770,7 +19770,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -19786,7 +19786,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			7: {
 				FieldBase: &proto.FieldBase{
@@ -19802,7 +19802,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -19965,7 +19965,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			25: {
 				FieldBase: &proto.FieldBase{
@@ -20247,7 +20247,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -20451,7 +20451,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			6: {
 				FieldBase: &proto.FieldBase{
@@ -20467,7 +20467,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
@@ -20483,7 +20483,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			9: {
 				FieldBase: &proto.FieldBase{
@@ -20515,7 +20515,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			13: {
 				FieldBase: &proto.FieldBase{
@@ -20531,7 +20531,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -21428,7 +21428,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -21566,7 +21566,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -21677,7 +21677,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -21788,7 +21788,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			3: {
 				FieldBase: &proto.FieldBase{
@@ -21844,7 +21844,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -21892,7 +21892,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{
@@ -21948,7 +21948,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.ByteInvalid), /* Default Value: Invalid */
 			},
 			2: {
 				FieldBase: &proto.FieldBase{
@@ -22044,7 +22044,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			9: {
 				FieldBase: &proto.FieldBase{
@@ -22060,7 +22060,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			10: {
 				FieldBase: &proto.FieldBase{
@@ -22076,7 +22076,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			11: {
 				FieldBase: &proto.FieldBase{
@@ -22773,7 +22773,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 		},
 	},
@@ -23095,7 +23095,7 @@ var mesgs = [...]message{
 					Accumulate: false,
 					SubFields:  nil,
 				},
-				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+				Value: proto.Uint8(basetype.EnumInvalid), /* Default Value: Invalid */
 			},
 			5: {
 				FieldBase: &proto.FieldBase{

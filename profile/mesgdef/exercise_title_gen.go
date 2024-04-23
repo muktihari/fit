@@ -14,6 +14,9 @@ import (
 )
 
 // ExerciseTitle is a ExerciseTitle message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ExerciseTitle struct {
 	WktStepName      []string // Array: [N]
 	MessageIndex     typedef.MessageIndex
@@ -42,10 +45,10 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 	}
 
 	return &ExerciseTitle{
-		WktStepName:      vals[2].SliceString(),
 		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
 		ExerciseCategory: typedef.ExerciseCategory(vals[0].Uint16()),
 		ExerciseName:     vals[1].Uint16(),
+		WktStepName:      vals[2].SliceString(),
 
 		DeveloperFields: developerFields,
 	}
@@ -67,11 +70,6 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumExerciseTitle}
 
-	if m.WktStepName != nil {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.SliceString(m.WktStepName)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -87,6 +85,11 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ExerciseName)
 		fields = append(fields, field)
 	}
+	if m.WktStepName != nil {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.SliceString(m.WktStepName)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -94,14 +97,6 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetWktStepName sets ExerciseTitle value.
-//
-// Array: [N]
-func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
-	m.WktStepName = v
-	return m
 }
 
 // SetMessageIndex sets ExerciseTitle value.
@@ -119,6 +114,14 @@ func (m *ExerciseTitle) SetExerciseCategory(v typedef.ExerciseCategory) *Exercis
 // SetExerciseName sets ExerciseTitle value.
 func (m *ExerciseTitle) SetExerciseName(v uint16) *ExerciseTitle {
 	m.ExerciseName = v
+	return m
+}
+
+// SetWktStepName sets ExerciseTitle value.
+//
+// Array: [N]
+func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
+	m.WktStepName = v
 	return m
 }
 

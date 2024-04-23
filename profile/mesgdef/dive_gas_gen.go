@@ -14,6 +14,9 @@ import (
 )
 
 // DiveGas is a DiveGas message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type DiveGas struct {
 	MessageIndex  typedef.MessageIndex
 	HeliumContent uint8 // Units: percent

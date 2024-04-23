@@ -18,6 +18,9 @@ import (
 )
 
 // RespirationRate is a RespirationRate message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type RespirationRate struct {
 	Timestamp       time.Time
 	RespirationRate int16 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist

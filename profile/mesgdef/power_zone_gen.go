@@ -14,6 +14,9 @@ import (
 )
 
 // PowerZone is a PowerZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type PowerZone struct {
 	Name         string
 	MessageIndex typedef.MessageIndex
@@ -41,9 +44,9 @@ func NewPowerZone(mesg *proto.Message) *PowerZone {
 	}
 
 	return &PowerZone{
-		Name:         vals[2].String(),
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[1].Uint16(),
+		Name:         vals[2].String(),
 
 		DeveloperFields: developerFields,
 	}
@@ -65,11 +68,6 @@ func (m *PowerZone) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumPowerZone}
 
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.String(m.Name)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
@@ -80,6 +78,11 @@ func (m *PowerZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.HighValue)
 		fields = append(fields, field)
 	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.String(m.Name)
+		fields = append(fields, field)
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -87,12 +90,6 @@ func (m *PowerZone) ToMesg(options *Options) proto.Message {
 	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
-}
-
-// SetName sets PowerZone value.
-func (m *PowerZone) SetName(v string) *PowerZone {
-	m.Name = v
-	return m
 }
 
 // SetMessageIndex sets PowerZone value.
@@ -106,6 +103,12 @@ func (m *PowerZone) SetMessageIndex(v typedef.MessageIndex) *PowerZone {
 // Units: watts
 func (m *PowerZone) SetHighValue(v uint16) *PowerZone {
 	m.HighValue = v
+	return m
+}
+
+// SetName sets PowerZone value.
+func (m *PowerZone) SetName(v string) *PowerZone {
+	m.Name = v
 	return m
 }
 

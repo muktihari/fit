@@ -16,6 +16,9 @@ import (
 )
 
 // WorkoutStep is a WorkoutStep message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WorkoutStep struct {
 	WktStepName                    string
 	Notes                          string
@@ -59,25 +62,25 @@ func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 	}
 
 	return &WorkoutStep{
+		MessageIndex:                   typedef.MessageIndex(vals[254].Uint16()),
 		WktStepName:                    vals[0].String(),
-		Notes:                          vals[8].String(),
+		DurationType:                   typedef.WktStepDuration(vals[1].Uint8()),
 		DurationValue:                  vals[2].Uint32(),
+		TargetType:                     typedef.WktStepTarget(vals[3].Uint8()),
 		TargetValue:                    vals[4].Uint32(),
 		CustomTargetValueLow:           vals[5].Uint32(),
 		CustomTargetValueHigh:          vals[6].Uint32(),
-		SecondaryTargetValue:           vals[20].Uint32(),
-		SecondaryCustomTargetValueLow:  vals[21].Uint32(),
-		SecondaryCustomTargetValueHigh: vals[22].Uint32(),
-		MessageIndex:                   typedef.MessageIndex(vals[254].Uint16()),
+		Intensity:                      typedef.Intensity(vals[7].Uint8()),
+		Notes:                          vals[8].String(),
+		Equipment:                      typedef.WorkoutEquipment(vals[9].Uint8()),
 		ExerciseCategory:               typedef.ExerciseCategory(vals[10].Uint16()),
 		ExerciseName:                   vals[11].Uint16(),
 		ExerciseWeight:                 vals[12].Uint16(),
 		WeightDisplayUnit:              typedef.FitBaseUnit(vals[13].Uint16()),
-		DurationType:                   typedef.WktStepDuration(vals[1].Uint8()),
-		TargetType:                     typedef.WktStepTarget(vals[3].Uint8()),
-		Intensity:                      typedef.Intensity(vals[7].Uint8()),
-		Equipment:                      typedef.WorkoutEquipment(vals[9].Uint8()),
 		SecondaryTargetType:            typedef.WktStepTarget(vals[19].Uint8()),
+		SecondaryTargetValue:           vals[20].Uint32(),
+		SecondaryCustomTargetValueLow:  vals[21].Uint32(),
+		SecondaryCustomTargetValueHigh: vals[22].Uint32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -99,19 +102,29 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWorkoutStep}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if m.WktStepName != basetype.StringInvalid && m.WktStepName != "" {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.WktStepName)
 		fields = append(fields, field)
 	}
-	if m.Notes != basetype.StringInvalid && m.Notes != "" {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.String(m.Notes)
+	if byte(m.DurationType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.DurationType))
 		fields = append(fields, field)
 	}
 	if m.DurationValue != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.DurationValue)
+		fields = append(fields, field)
+	}
+	if byte(m.TargetType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint8(byte(m.TargetType))
 		fields = append(fields, field)
 	}
 	if m.TargetValue != basetype.Uint32Invalid {
@@ -129,24 +142,19 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.CustomTargetValueHigh)
 		fields = append(fields, field)
 	}
-	if m.SecondaryTargetValue != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 20)
-		field.Value = proto.Uint32(m.SecondaryTargetValue)
+	if byte(m.Intensity) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = proto.Uint8(byte(m.Intensity))
 		fields = append(fields, field)
 	}
-	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 21)
-		field.Value = proto.Uint32(m.SecondaryCustomTargetValueLow)
+	if m.Notes != basetype.StringInvalid && m.Notes != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = proto.String(m.Notes)
 		fields = append(fields, field)
 	}
-	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = proto.Uint32(m.SecondaryCustomTargetValueHigh)
-		fields = append(fields, field)
-	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
+	if byte(m.Equipment) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Uint8(byte(m.Equipment))
 		fields = append(fields, field)
 	}
 	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
@@ -169,29 +177,24 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.WeightDisplayUnit))
 		fields = append(fields, field)
 	}
-	if byte(m.DurationType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.DurationType))
-		fields = append(fields, field)
-	}
-	if byte(m.TargetType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint8(byte(m.TargetType))
-		fields = append(fields, field)
-	}
-	if byte(m.Intensity) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.Uint8(byte(m.Intensity))
-		fields = append(fields, field)
-	}
-	if byte(m.Equipment) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint8(byte(m.Equipment))
-		fields = append(fields, field)
-	}
 	if byte(m.SecondaryTargetType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = proto.Uint8(byte(m.SecondaryTargetType))
+		fields = append(fields, field)
+	}
+	if m.SecondaryTargetValue != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = proto.Uint32(m.SecondaryTargetValue)
+		fields = append(fields, field)
+	}
+	if m.SecondaryCustomTargetValueLow != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = proto.Uint32(m.SecondaryCustomTargetValueLow)
+		fields = append(fields, field)
+	}
+	if m.SecondaryCustomTargetValueHigh != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = proto.Uint32(m.SecondaryCustomTargetValueHigh)
 		fields = append(fields, field)
 	}
 
@@ -206,20 +209,18 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 // GetDurationValue returns Dynamic Field interpretation of DurationValue. Otherwise, returns the original value of DurationValue.
 //
 // Based on m.DurationType:
-//   - name: "duration_reps", value: uint32(m.DurationValue)
 //   - name: "duration_time", units: "s" , value: (float64(m.DurationValue) * 1000) - 0
 //   - name: "duration_distance", units: "m" , value: (float64(m.DurationValue) * 100) - 0
 //   - name: "duration_hr", units: "% or bpm" , value: typedef.WorkoutHr(m.DurationValue)
 //   - name: "duration_calories", units: "calories" , value: uint32(m.DurationValue)
 //   - name: "duration_step", value: uint32(m.DurationValue)
 //   - name: "duration_power", units: "% or watts" , value: typedef.WorkoutPower(m.DurationValue)
+//   - name: "duration_reps", value: uint32(m.DurationValue)
 //
 // Otherwise:
 //   - name: "duration_value", value: m.DurationValue
 func (m *WorkoutStep) GetDurationValue() (name string, value any) {
 	switch m.DurationType {
-	case typedef.WktStepDurationReps:
-		return "duration_reps", uint32(m.DurationValue)
 	case typedef.WktStepDurationTime, typedef.WktStepDurationRepetitionTime:
 		return "duration_time", (float64(m.DurationValue) * 1000) - 0
 	case typedef.WktStepDurationDistance:
@@ -232,35 +233,45 @@ func (m *WorkoutStep) GetDurationValue() (name string, value any) {
 		return "duration_step", uint32(m.DurationValue)
 	case typedef.WktStepDurationPowerLessThan, typedef.WktStepDurationPowerGreaterThan:
 		return "duration_power", typedef.WorkoutPower(m.DurationValue)
+	case typedef.WktStepDurationReps:
+		return "duration_reps", uint32(m.DurationValue)
 	}
 	return "duration_value", m.DurationValue
 }
 
 // GetTargetValue returns Dynamic Field interpretation of TargetValue. Otherwise, returns the original value of TargetValue.
 //
+// Based on m.TargetType:
+//   - name: "target_speed_zone", value: uint32(m.TargetValue)
+//   - name: "target_hr_zone", value: uint32(m.TargetValue)
+//   - name: "target_cadence_zone", value: uint32(m.TargetValue)
+//   - name: "target_power_zone", value: uint32(m.TargetValue)
+//   - name: "target_stroke_type", value: typedef.SwimStroke(m.TargetValue)
+//
 // Based on m.DurationType:
-//   - name: "repeat_hr", units: "% or bpm" , value: typedef.WorkoutHr(m.TargetValue)
-//   - name: "repeat_power", units: "% or watts" , value: typedef.WorkoutPower(m.TargetValue)
 //   - name: "repeat_steps", value: uint32(m.TargetValue)
 //   - name: "repeat_time", units: "s" , value: (float64(m.TargetValue) * 1000) - 0
 //   - name: "repeat_distance", units: "m" , value: (float64(m.TargetValue) * 100) - 0
 //   - name: "repeat_calories", units: "calories" , value: uint32(m.TargetValue)
-//
-// Based on m.TargetType:
-//   - name: "target_cadence_zone", value: uint32(m.TargetValue)
-//   - name: "target_power_zone", value: uint32(m.TargetValue)
-//   - name: "target_stroke_type", value: typedef.SwimStroke(m.TargetValue)
-//   - name: "target_speed_zone", value: uint32(m.TargetValue)
-//   - name: "target_hr_zone", value: uint32(m.TargetValue)
+//   - name: "repeat_hr", units: "% or bpm" , value: typedef.WorkoutHr(m.TargetValue)
+//   - name: "repeat_power", units: "% or watts" , value: typedef.WorkoutPower(m.TargetValue)
 //
 // Otherwise:
 //   - name: "target_value", value: m.TargetValue
 func (m *WorkoutStep) GetTargetValue() (name string, value any) {
+	switch m.TargetType {
+	case typedef.WktStepTargetSpeed:
+		return "target_speed_zone", uint32(m.TargetValue)
+	case typedef.WktStepTargetHeartRate:
+		return "target_hr_zone", uint32(m.TargetValue)
+	case typedef.WktStepTargetCadence:
+		return "target_cadence_zone", uint32(m.TargetValue)
+	case typedef.WktStepTargetPower:
+		return "target_power_zone", uint32(m.TargetValue)
+	case typedef.WktStepTargetSwimStroke:
+		return "target_stroke_type", typedef.SwimStroke(m.TargetValue)
+	}
 	switch m.DurationType {
-	case typedef.WktStepDurationRepeatUntilHrLessThan, typedef.WktStepDurationRepeatUntilHrGreaterThan:
-		return "repeat_hr", typedef.WorkoutHr(m.TargetValue)
-	case typedef.WktStepDurationRepeatUntilPowerLessThan, typedef.WktStepDurationRepeatUntilPowerGreaterThan:
-		return "repeat_power", typedef.WorkoutPower(m.TargetValue)
 	case typedef.WktStepDurationRepeatUntilStepsCmplt:
 		return "repeat_steps", uint32(m.TargetValue)
 	case typedef.WktStepDurationRepeatUntilTime:
@@ -269,18 +280,10 @@ func (m *WorkoutStep) GetTargetValue() (name string, value any) {
 		return "repeat_distance", (float64(m.TargetValue) * 100) - 0
 	case typedef.WktStepDurationRepeatUntilCalories:
 		return "repeat_calories", uint32(m.TargetValue)
-	}
-	switch m.TargetType {
-	case typedef.WktStepTargetCadence:
-		return "target_cadence_zone", uint32(m.TargetValue)
-	case typedef.WktStepTargetPower:
-		return "target_power_zone", uint32(m.TargetValue)
-	case typedef.WktStepTargetSwimStroke:
-		return "target_stroke_type", typedef.SwimStroke(m.TargetValue)
-	case typedef.WktStepTargetSpeed:
-		return "target_speed_zone", uint32(m.TargetValue)
-	case typedef.WktStepTargetHeartRate:
-		return "target_hr_zone", uint32(m.TargetValue)
+	case typedef.WktStepDurationRepeatUntilHrLessThan, typedef.WktStepDurationRepeatUntilHrGreaterThan:
+		return "repeat_hr", typedef.WorkoutHr(m.TargetValue)
+	case typedef.WktStepDurationRepeatUntilPowerLessThan, typedef.WktStepDurationRepeatUntilPowerGreaterThan:
+		return "repeat_power", typedef.WorkoutPower(m.TargetValue)
 	}
 	return "target_value", m.TargetValue
 }
@@ -363,23 +366,23 @@ func (m *WorkoutStep) GetSecondaryTargetValue() (name string, value any) {
 // GetSecondaryCustomTargetValueLow returns Dynamic Field interpretation of SecondaryCustomTargetValueLow. Otherwise, returns the original value of SecondaryCustomTargetValueLow.
 //
 // Based on m.SecondaryTargetType:
-//   - name: "secondary_custom_target_cadence_low", units: "rpm" , value: uint32(m.SecondaryCustomTargetValueLow)
-//   - name: "secondary_custom_target_power_low", units: "% or watts" , value: typedef.WorkoutPower(m.SecondaryCustomTargetValueLow)
 //   - name: "secondary_custom_target_speed_low", units: "m/s" , value: (float64(m.SecondaryCustomTargetValueLow) * 1000) - 0
 //   - name: "secondary_custom_target_heart_rate_low", units: "% or bpm" , value: typedef.WorkoutHr(m.SecondaryCustomTargetValueLow)
+//   - name: "secondary_custom_target_cadence_low", units: "rpm" , value: uint32(m.SecondaryCustomTargetValueLow)
+//   - name: "secondary_custom_target_power_low", units: "% or watts" , value: typedef.WorkoutPower(m.SecondaryCustomTargetValueLow)
 //
 // Otherwise:
 //   - name: "secondary_custom_target_value_low", value: m.SecondaryCustomTargetValueLow
 func (m *WorkoutStep) GetSecondaryCustomTargetValueLow() (name string, value any) {
 	switch m.SecondaryTargetType {
-	case typedef.WktStepTargetCadence:
-		return "secondary_custom_target_cadence_low", uint32(m.SecondaryCustomTargetValueLow)
-	case typedef.WktStepTargetPower:
-		return "secondary_custom_target_power_low", typedef.WorkoutPower(m.SecondaryCustomTargetValueLow)
 	case typedef.WktStepTargetSpeed:
 		return "secondary_custom_target_speed_low", (float64(m.SecondaryCustomTargetValueLow) * 1000) - 0
 	case typedef.WktStepTargetHeartRate:
 		return "secondary_custom_target_heart_rate_low", typedef.WorkoutHr(m.SecondaryCustomTargetValueLow)
+	case typedef.WktStepTargetCadence:
+		return "secondary_custom_target_cadence_low", uint32(m.SecondaryCustomTargetValueLow)
+	case typedef.WktStepTargetPower:
+		return "secondary_custom_target_power_low", typedef.WorkoutPower(m.SecondaryCustomTargetValueLow)
 	}
 	return "secondary_custom_target_value_low", m.SecondaryCustomTargetValueLow
 }
@@ -387,23 +390,23 @@ func (m *WorkoutStep) GetSecondaryCustomTargetValueLow() (name string, value any
 // GetSecondaryCustomTargetValueHigh returns Dynamic Field interpretation of SecondaryCustomTargetValueHigh. Otherwise, returns the original value of SecondaryCustomTargetValueHigh.
 //
 // Based on m.SecondaryTargetType:
+//   - name: "secondary_custom_target_speed_high", units: "m/s" , value: (float64(m.SecondaryCustomTargetValueHigh) * 1000) - 0
 //   - name: "secondary_custom_target_heart_rate_high", units: "% or bpm" , value: typedef.WorkoutHr(m.SecondaryCustomTargetValueHigh)
 //   - name: "secondary_custom_target_cadence_high", units: "rpm" , value: uint32(m.SecondaryCustomTargetValueHigh)
 //   - name: "secondary_custom_target_power_high", units: "% or watts" , value: typedef.WorkoutPower(m.SecondaryCustomTargetValueHigh)
-//   - name: "secondary_custom_target_speed_high", units: "m/s" , value: (float64(m.SecondaryCustomTargetValueHigh) * 1000) - 0
 //
 // Otherwise:
 //   - name: "secondary_custom_target_value_high", value: m.SecondaryCustomTargetValueHigh
 func (m *WorkoutStep) GetSecondaryCustomTargetValueHigh() (name string, value any) {
 	switch m.SecondaryTargetType {
+	case typedef.WktStepTargetSpeed:
+		return "secondary_custom_target_speed_high", (float64(m.SecondaryCustomTargetValueHigh) * 1000) - 0
 	case typedef.WktStepTargetHeartRate:
 		return "secondary_custom_target_heart_rate_high", typedef.WorkoutHr(m.SecondaryCustomTargetValueHigh)
 	case typedef.WktStepTargetCadence:
 		return "secondary_custom_target_cadence_high", uint32(m.SecondaryCustomTargetValueHigh)
 	case typedef.WktStepTargetPower:
 		return "secondary_custom_target_power_high", typedef.WorkoutPower(m.SecondaryCustomTargetValueHigh)
-	case typedef.WktStepTargetSpeed:
-		return "secondary_custom_target_speed_high", (float64(m.SecondaryCustomTargetValueHigh) * 1000) - 0
 	}
 	return "secondary_custom_target_value_high", m.SecondaryCustomTargetValueHigh
 }
@@ -418,21 +421,33 @@ func (m *WorkoutStep) ExerciseWeightScaled() float64 {
 	return scaleoffset.Apply(m.ExerciseWeight, 100, 0)
 }
 
+// SetMessageIndex sets WorkoutStep value.
+func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
+	m.MessageIndex = v
+	return m
+}
+
 // SetWktStepName sets WorkoutStep value.
 func (m *WorkoutStep) SetWktStepName(v string) *WorkoutStep {
 	m.WktStepName = v
 	return m
 }
 
-// SetNotes sets WorkoutStep value.
-func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
-	m.Notes = v
+// SetDurationType sets WorkoutStep value.
+func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
+	m.DurationType = v
 	return m
 }
 
 // SetDurationValue sets WorkoutStep value.
 func (m *WorkoutStep) SetDurationValue(v uint32) *WorkoutStep {
 	m.DurationValue = v
+	return m
+}
+
+// SetTargetType sets WorkoutStep value.
+func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
+	m.TargetType = v
 	return m
 }
 
@@ -454,27 +469,21 @@ func (m *WorkoutStep) SetCustomTargetValueHigh(v uint32) *WorkoutStep {
 	return m
 }
 
-// SetSecondaryTargetValue sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
-	m.SecondaryTargetValue = v
+// SetIntensity sets WorkoutStep value.
+func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
+	m.Intensity = v
 	return m
 }
 
-// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
-	m.SecondaryCustomTargetValueLow = v
+// SetNotes sets WorkoutStep value.
+func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
+	m.Notes = v
 	return m
 }
 
-// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
-func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
-	m.SecondaryCustomTargetValueHigh = v
-	return m
-}
-
-// SetMessageIndex sets WorkoutStep value.
-func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
-	m.MessageIndex = v
+// SetEquipment sets WorkoutStep value.
+func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
+	m.Equipment = v
 	return m
 }
 
@@ -504,33 +513,27 @@ func (m *WorkoutStep) SetWeightDisplayUnit(v typedef.FitBaseUnit) *WorkoutStep {
 	return m
 }
 
-// SetDurationType sets WorkoutStep value.
-func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
-	m.DurationType = v
-	return m
-}
-
-// SetTargetType sets WorkoutStep value.
-func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
-	m.TargetType = v
-	return m
-}
-
-// SetIntensity sets WorkoutStep value.
-func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
-	m.Intensity = v
-	return m
-}
-
-// SetEquipment sets WorkoutStep value.
-func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
-	m.Equipment = v
-	return m
-}
-
 // SetSecondaryTargetType sets WorkoutStep value.
 func (m *WorkoutStep) SetSecondaryTargetType(v typedef.WktStepTarget) *WorkoutStep {
 	m.SecondaryTargetType = v
+	return m
+}
+
+// SetSecondaryTargetValue sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
+	m.SecondaryTargetValue = v
+	return m
+}
+
+// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueLow = v
+	return m
+}
+
+// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
+func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
+	m.SecondaryCustomTargetValueHigh = v
 	return m
 }
 

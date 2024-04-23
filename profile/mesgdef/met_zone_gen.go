@@ -16,6 +16,9 @@ import (
 )
 
 // MetZone is a MetZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MetZone struct {
 	MessageIndex typedef.MessageIndex
 	Calories     uint16 // Scale: 10; Units: kcal / min
@@ -45,8 +48,8 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 
 	return &MetZone{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
-		Calories:     vals[2].Uint16(),
 		HighBpm:      vals[1].Uint8(),
+		Calories:     vals[2].Uint16(),
 		FatCalories:  vals[3].Uint8(),
 
 		DeveloperFields: developerFields,
@@ -74,14 +77,14 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if m.Calories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint16(m.Calories)
-		fields = append(fields, field)
-	}
 	if m.HighBpm != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.HighBpm)
+		fields = append(fields, field)
+	}
+	if m.Calories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint16(m.Calories)
 		fields = append(fields, field)
 	}
 	if m.FatCalories != basetype.Uint8Invalid {
@@ -124,17 +127,17 @@ func (m *MetZone) SetMessageIndex(v typedef.MessageIndex) *MetZone {
 	return m
 }
 
+// SetHighBpm sets MetZone value.
+func (m *MetZone) SetHighBpm(v uint8) *MetZone {
+	m.HighBpm = v
+	return m
+}
+
 // SetCalories sets MetZone value.
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetCalories(v uint16) *MetZone {
 	m.Calories = v
-	return m
-}
-
-// SetHighBpm sets MetZone value.
-func (m *MetZone) SetHighBpm(v uint8) *MetZone {
-	m.HighBpm = v
 	return m
 }
 

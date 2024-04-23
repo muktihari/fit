@@ -18,6 +18,9 @@ import (
 )
 
 // AadAccelFeatures is a AadAccelFeatures message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type AadAccelFeatures struct {
 	Timestamp          time.Time
 	EnergyTotal        uint32 // Total accelerometer energy in the interval
@@ -49,11 +52,11 @@ func NewAadAccelFeatures(mesg *proto.Message) *AadAccelFeatures {
 
 	return &AadAccelFeatures{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
-		EnergyTotal:        vals[1].Uint32(),
 		Time:               vals[0].Uint16(),
+		EnergyTotal:        vals[1].Uint32(),
 		ZeroCrossCnt:       vals[2].Uint16(),
-		TimeAboveThreshold: vals[4].Uint16(),
 		Instance:           vals[3].Uint8(),
+		TimeAboveThreshold: vals[4].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -80,14 +83,14 @@ func (m *AadAccelFeatures) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.EnergyTotal != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint32(m.EnergyTotal)
-		fields = append(fields, field)
-	}
 	if m.Time != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.Time)
+		fields = append(fields, field)
+	}
+	if m.EnergyTotal != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint32(m.EnergyTotal)
 		fields = append(fields, field)
 	}
 	if m.ZeroCrossCnt != basetype.Uint16Invalid {
@@ -95,14 +98,14 @@ func (m *AadAccelFeatures) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ZeroCrossCnt)
 		fields = append(fields, field)
 	}
-	if m.TimeAboveThreshold != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint16(m.TimeAboveThreshold)
-		fields = append(fields, field)
-	}
 	if m.Instance != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.Instance)
+		fields = append(fields, field)
+	}
+	if m.TimeAboveThreshold != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint16(m.TimeAboveThreshold)
 		fields = append(fields, field)
 	}
 
@@ -133,19 +136,19 @@ func (m *AadAccelFeatures) SetTimestamp(v time.Time) *AadAccelFeatures {
 	return m
 }
 
-// SetEnergyTotal sets AadAccelFeatures value.
-//
-// Total accelerometer energy in the interval
-func (m *AadAccelFeatures) SetEnergyTotal(v uint32) *AadAccelFeatures {
-	m.EnergyTotal = v
-	return m
-}
-
 // SetTime sets AadAccelFeatures value.
 //
 // Units: s; Time interval length in seconds
 func (m *AadAccelFeatures) SetTime(v uint16) *AadAccelFeatures {
 	m.Time = v
+	return m
+}
+
+// SetEnergyTotal sets AadAccelFeatures value.
+//
+// Total accelerometer energy in the interval
+func (m *AadAccelFeatures) SetEnergyTotal(v uint32) *AadAccelFeatures {
+	m.EnergyTotal = v
 	return m
 }
 
@@ -157,19 +160,19 @@ func (m *AadAccelFeatures) SetZeroCrossCnt(v uint16) *AadAccelFeatures {
 	return m
 }
 
-// SetTimeAboveThreshold sets AadAccelFeatures value.
-//
-// Scale: 25; Units: s; Total accelerometer time above threshold in the interval
-func (m *AadAccelFeatures) SetTimeAboveThreshold(v uint16) *AadAccelFeatures {
-	m.TimeAboveThreshold = v
-	return m
-}
-
 // SetInstance sets AadAccelFeatures value.
 //
 // Instance ID of zero crossing algorithm
 func (m *AadAccelFeatures) SetInstance(v uint8) *AadAccelFeatures {
 	m.Instance = v
+	return m
+}
+
+// SetTimeAboveThreshold sets AadAccelFeatures value.
+//
+// Scale: 25; Units: s; Total accelerometer time above threshold in the interval
+func (m *AadAccelFeatures) SetTimeAboveThreshold(v uint16) *AadAccelFeatures {
+	m.TimeAboveThreshold = v
 	return m
 }
 

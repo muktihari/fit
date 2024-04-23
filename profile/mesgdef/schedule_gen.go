@@ -16,14 +16,17 @@ import (
 )
 
 // Schedule is a Schedule message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Schedule struct {
 	TimeCreated   time.Time // Corresponds to file_id of scheduled workout / course.
 	ScheduledTime time.Time
 	SerialNumber  uint32               // Corresponds to file_id of scheduled workout / course.
 	Manufacturer  typedef.Manufacturer // Corresponds to file_id of scheduled workout / course.
 	Product       uint16               // Corresponds to file_id of scheduled workout / course.
+	Completed     bool                 // TRUE if this activity has been started
 	Type          typedef.Schedule
-	Completed     bool // TRUE if this activity has been started
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -47,13 +50,13 @@ func NewSchedule(mesg *proto.Message) *Schedule {
 	}
 
 	return &Schedule{
-		TimeCreated:   datetime.ToTime(vals[3].Uint32()),
-		ScheduledTime: datetime.ToTime(vals[6].Uint32()),
-		SerialNumber:  vals[2].Uint32z(),
 		Manufacturer:  typedef.Manufacturer(vals[0].Uint16()),
 		Product:       vals[1].Uint16(),
-		Type:          typedef.Schedule(vals[5].Uint8()),
+		SerialNumber:  vals[2].Uint32z(),
+		TimeCreated:   datetime.ToTime(vals[3].Uint32()),
 		Completed:     vals[4].Bool(),
+		Type:          typedef.Schedule(vals[5].Uint8()),
+		ScheduledTime: datetime.ToTime(vals[6].Uint32()),
 
 		DeveloperFields: developerFields,
 	}
@@ -75,21 +78,6 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSchedule}
 
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
-		fields = append(fields, field)
-	}
-	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(datetime.ToUint32(m.ScheduledTime))
-		fields = append(fields, field)
-	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint32(m.SerialNumber)
-		fields = append(fields, field)
-	}
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
@@ -100,14 +88,29 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint8(byte(m.Type))
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint32(m.SerialNumber)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
 		fields = append(fields, field)
 	}
 	if m.Completed != false {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.Completed)
+		fields = append(fields, field)
+	}
+	if byte(m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint8(byte(m.Type))
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Uint32(datetime.ToUint32(m.ScheduledTime))
 		fields = append(fields, field)
 	}
 
@@ -143,28 +146,6 @@ func (m *Schedule) TimeCreatedUint32() uint32 { return datetime.ToUint32(m.TimeC
 // ScheduledTimeUint32 returns ScheduledTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Schedule) ScheduledTimeUint32() uint32 { return datetime.ToUint32(m.ScheduledTime) }
 
-// SetTimeCreated sets Schedule value.
-//
-// Corresponds to file_id of scheduled workout / course.
-func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
-	m.TimeCreated = v
-	return m
-}
-
-// SetScheduledTime sets Schedule value.
-func (m *Schedule) SetScheduledTime(v time.Time) *Schedule {
-	m.ScheduledTime = v
-	return m
-}
-
-// SetSerialNumber sets Schedule value.
-//
-// Corresponds to file_id of scheduled workout / course.
-func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
-	m.SerialNumber = v
-	return m
-}
-
 // SetManufacturer sets Schedule value.
 //
 // Corresponds to file_id of scheduled workout / course.
@@ -181,9 +162,19 @@ func (m *Schedule) SetProduct(v uint16) *Schedule {
 	return m
 }
 
-// SetType sets Schedule value.
-func (m *Schedule) SetType(v typedef.Schedule) *Schedule {
-	m.Type = v
+// SetSerialNumber sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
+	m.SerialNumber = v
+	return m
+}
+
+// SetTimeCreated sets Schedule value.
+//
+// Corresponds to file_id of scheduled workout / course.
+func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
+	m.TimeCreated = v
 	return m
 }
 
@@ -192,6 +183,18 @@ func (m *Schedule) SetType(v typedef.Schedule) *Schedule {
 // TRUE if this activity has been started
 func (m *Schedule) SetCompleted(v bool) *Schedule {
 	m.Completed = v
+	return m
+}
+
+// SetType sets Schedule value.
+func (m *Schedule) SetType(v typedef.Schedule) *Schedule {
+	m.Type = v
+	return m
+}
+
+// SetScheduledTime sets Schedule value.
+func (m *Schedule) SetScheduledTime(v time.Time) *Schedule {
+	m.ScheduledTime = v
 	return m
 }
 

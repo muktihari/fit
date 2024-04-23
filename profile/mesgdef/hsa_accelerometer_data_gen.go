@@ -17,6 +17,9 @@ import (
 )
 
 // HsaAccelerometerData is a HsaAccelerometerData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaAccelerometerData struct {
 	Timestamp        time.Time // Units: s
 	AccelX           []int16   // Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
@@ -49,12 +52,12 @@ func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 
 	return &HsaAccelerometerData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
+		SamplingInterval: vals[1].Uint16(),
 		AccelX:           vals[2].SliceInt16(),
 		AccelY:           vals[3].SliceInt16(),
 		AccelZ:           vals[4].SliceInt16(),
 		Timestamp32K:     vals[5].Uint32(),
-		TimestampMs:      vals[0].Uint16(),
-		SamplingInterval: vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,6 +84,16 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
+	if m.SamplingInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint16(m.SamplingInterval)
+		fields = append(fields, field)
+	}
 	if m.AccelX != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceInt16(m.AccelX)
@@ -99,16 +112,6 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 	if m.Timestamp32K != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(m.Timestamp32K)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
-	if m.SamplingInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint16(m.SamplingInterval)
 		fields = append(fields, field)
 	}
 
@@ -161,6 +164,22 @@ func (m *HsaAccelerometerData) SetTimestamp(v time.Time) *HsaAccelerometerData {
 	return m
 }
 
+// SetTimestampMs sets HsaAccelerometerData value.
+//
+// Units: ms; Millisecond resolution of the timestamp
+func (m *HsaAccelerometerData) SetTimestampMs(v uint16) *HsaAccelerometerData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSamplingInterval sets HsaAccelerometerData value.
+//
+// Units: ms; Sampling Interval in Milliseconds
+func (m *HsaAccelerometerData) SetSamplingInterval(v uint16) *HsaAccelerometerData {
+	m.SamplingInterval = v
+	return m
+}
+
 // SetAccelX sets HsaAccelerometerData value.
 //
 // Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
@@ -190,22 +209,6 @@ func (m *HsaAccelerometerData) SetAccelZ(v []int16) *HsaAccelerometerData {
 // 32 kHz timestamp
 func (m *HsaAccelerometerData) SetTimestamp32K(v uint32) *HsaAccelerometerData {
 	m.Timestamp32K = v
-	return m
-}
-
-// SetTimestampMs sets HsaAccelerometerData value.
-//
-// Units: ms; Millisecond resolution of the timestamp
-func (m *HsaAccelerometerData) SetTimestampMs(v uint16) *HsaAccelerometerData {
-	m.TimestampMs = v
-	return m
-}
-
-// SetSamplingInterval sets HsaAccelerometerData value.
-//
-// Units: ms; Sampling Interval in Milliseconds
-func (m *HsaAccelerometerData) SetSamplingInterval(v uint16) *HsaAccelerometerData {
-	m.SamplingInterval = v
 	return m
 }
 

@@ -14,6 +14,9 @@ import (
 )
 
 // ExdDataConceptConfiguration is a ExdDataConceptConfiguration message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ExdDataConceptConfiguration struct {
 	ScreenIndex  uint8
 	ConceptField byte

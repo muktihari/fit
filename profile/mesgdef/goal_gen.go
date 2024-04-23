@@ -16,6 +16,9 @@ import (
 )
 
 // Goal is a Goal message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Goal struct {
 	StartDate       time.Time
 	EndDate         time.Time
@@ -26,10 +29,10 @@ type Goal struct {
 	Sport           typedef.Sport
 	SubSport        typedef.SubSport
 	Type            typedef.Goal
-	Recurrence      typedef.GoalRecurrence
-	Source          typedef.GoalSource
 	Repeat          bool
+	Recurrence      typedef.GoalRecurrence
 	Enabled         bool
+	Source          typedef.GoalSource
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -53,19 +56,19 @@ func NewGoal(mesg *proto.Message) *Goal {
 	}
 
 	return &Goal{
-		StartDate:       datetime.ToTime(vals[2].Uint32()),
-		EndDate:         datetime.ToTime(vals[3].Uint32()),
-		Value:           vals[5].Uint32(),
-		TargetValue:     vals[7].Uint32(),
 		MessageIndex:    typedef.MessageIndex(vals[254].Uint16()),
-		RecurrenceValue: vals[9].Uint16(),
 		Sport:           typedef.Sport(vals[0].Uint8()),
 		SubSport:        typedef.SubSport(vals[1].Uint8()),
+		StartDate:       datetime.ToTime(vals[2].Uint32()),
+		EndDate:         datetime.ToTime(vals[3].Uint32()),
 		Type:            typedef.Goal(vals[4].Uint8()),
-		Recurrence:      typedef.GoalRecurrence(vals[8].Uint8()),
-		Source:          typedef.GoalSource(vals[11].Uint8()),
+		Value:           vals[5].Uint32(),
 		Repeat:          vals[6].Bool(),
+		TargetValue:     vals[7].Uint32(),
+		Recurrence:      typedef.GoalRecurrence(vals[8].Uint8()),
+		RecurrenceValue: vals[9].Uint16(),
 		Enabled:         vals[10].Bool(),
+		Source:          typedef.GoalSource(vals[11].Uint8()),
 
 		DeveloperFields: developerFields,
 	}
@@ -87,34 +90,9 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumGoal}
 
-	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartDate))
-		fields = append(fields, field)
-	}
-	if datetime.ToUint32(m.EndDate) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(datetime.ToUint32(m.EndDate))
-		fields = append(fields, field)
-	}
-	if m.Value != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(m.Value)
-		fields = append(fields, field)
-	}
-	if m.TargetValue != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.Uint32(m.TargetValue)
-		fields = append(fields, field)
-	}
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
-	if m.RecurrenceValue != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint16(m.RecurrenceValue)
 		fields = append(fields, field)
 	}
 	if byte(m.Sport) != basetype.EnumInvalid {
@@ -127,19 +105,24 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
+	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint32(datetime.ToUint32(m.StartDate))
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.EndDate) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint32(datetime.ToUint32(m.EndDate))
+		fields = append(fields, field)
+	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
-	if byte(m.Recurrence) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.Uint8(byte(m.Recurrence))
-		fields = append(fields, field)
-	}
-	if byte(m.Source) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Uint8(byte(m.Source))
+	if m.Value != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint32(m.Value)
 		fields = append(fields, field)
 	}
 	if m.Repeat != false {
@@ -147,9 +130,29 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Bool(m.Repeat)
 		fields = append(fields, field)
 	}
+	if m.TargetValue != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = proto.Uint32(m.TargetValue)
+		fields = append(fields, field)
+	}
+	if byte(m.Recurrence) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = proto.Uint8(byte(m.Recurrence))
+		fields = append(fields, field)
+	}
+	if m.RecurrenceValue != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 9)
+		field.Value = proto.Uint16(m.RecurrenceValue)
+		fields = append(fields, field)
+	}
 	if m.Enabled != false {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Enabled)
+		fields = append(fields, field)
+	}
+	if byte(m.Source) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint8(byte(m.Source))
 		fields = append(fields, field)
 	}
 
@@ -167,39 +170,9 @@ func (m *Goal) StartDateUint32() uint32 { return datetime.ToUint32(m.StartDate) 
 // EndDateUint32 returns EndDate in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Goal) EndDateUint32() uint32 { return datetime.ToUint32(m.EndDate) }
 
-// SetStartDate sets Goal value.
-func (m *Goal) SetStartDate(v time.Time) *Goal {
-	m.StartDate = v
-	return m
-}
-
-// SetEndDate sets Goal value.
-func (m *Goal) SetEndDate(v time.Time) *Goal {
-	m.EndDate = v
-	return m
-}
-
-// SetValue sets Goal value.
-func (m *Goal) SetValue(v uint32) *Goal {
-	m.Value = v
-	return m
-}
-
-// SetTargetValue sets Goal value.
-func (m *Goal) SetTargetValue(v uint32) *Goal {
-	m.TargetValue = v
-	return m
-}
-
 // SetMessageIndex sets Goal value.
 func (m *Goal) SetMessageIndex(v typedef.MessageIndex) *Goal {
 	m.MessageIndex = v
-	return m
-}
-
-// SetRecurrenceValue sets Goal value.
-func (m *Goal) SetRecurrenceValue(v uint16) *Goal {
-	m.RecurrenceValue = v
 	return m
 }
 
@@ -215,21 +188,27 @@ func (m *Goal) SetSubSport(v typedef.SubSport) *Goal {
 	return m
 }
 
+// SetStartDate sets Goal value.
+func (m *Goal) SetStartDate(v time.Time) *Goal {
+	m.StartDate = v
+	return m
+}
+
+// SetEndDate sets Goal value.
+func (m *Goal) SetEndDate(v time.Time) *Goal {
+	m.EndDate = v
+	return m
+}
+
 // SetType sets Goal value.
 func (m *Goal) SetType(v typedef.Goal) *Goal {
 	m.Type = v
 	return m
 }
 
-// SetRecurrence sets Goal value.
-func (m *Goal) SetRecurrence(v typedef.GoalRecurrence) *Goal {
-	m.Recurrence = v
-	return m
-}
-
-// SetSource sets Goal value.
-func (m *Goal) SetSource(v typedef.GoalSource) *Goal {
-	m.Source = v
+// SetValue sets Goal value.
+func (m *Goal) SetValue(v uint32) *Goal {
+	m.Value = v
 	return m
 }
 
@@ -239,9 +218,33 @@ func (m *Goal) SetRepeat(v bool) *Goal {
 	return m
 }
 
+// SetTargetValue sets Goal value.
+func (m *Goal) SetTargetValue(v uint32) *Goal {
+	m.TargetValue = v
+	return m
+}
+
+// SetRecurrence sets Goal value.
+func (m *Goal) SetRecurrence(v typedef.GoalRecurrence) *Goal {
+	m.Recurrence = v
+	return m
+}
+
+// SetRecurrenceValue sets Goal value.
+func (m *Goal) SetRecurrenceValue(v uint16) *Goal {
+	m.RecurrenceValue = v
+	return m
+}
+
 // SetEnabled sets Goal value.
 func (m *Goal) SetEnabled(v bool) *Goal {
 	m.Enabled = v
+	return m
+}
+
+// SetSource sets Goal value.
+func (m *Goal) SetSource(v typedef.GoalSource) *Goal {
+	m.Source = v
 	return m
 }
 

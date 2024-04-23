@@ -18,6 +18,9 @@ import (
 )
 
 // MonitoringInfo is a MonitoringInfo message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MonitoringInfo struct {
 	Timestamp            time.Time              // Units: s
 	LocalTimestamp       time.Time              // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.

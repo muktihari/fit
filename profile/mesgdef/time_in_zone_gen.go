@@ -17,6 +17,9 @@ import (
 )
 
 // TimeInZone is a TimeInZone message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type TimeInZone struct {
 	Timestamp                time.Time // Units: s
 	TimeInHrZone             []uint32  // Array: [N]; Scale: 1000; Units: s
@@ -59,6 +62,8 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 
 	return &TimeInZone{
 		Timestamp:                datetime.ToTime(vals[253].Uint32()),
+		ReferenceMesg:            typedef.MesgNum(vals[0].Uint16()),
+		ReferenceIndex:           typedef.MessageIndex(vals[1].Uint16()),
 		TimeInHrZone:             vals[2].SliceUint32(),
 		TimeInSpeedZone:          vals[3].SliceUint32(),
 		TimeInCadenceZone:        vals[4].SliceUint32(),
@@ -67,14 +72,12 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 		SpeedZoneHighBoundary:    vals[7].SliceUint16(),
 		CadenceZoneHighBondary:   vals[8].SliceUint8(),
 		PowerZoneHighBoundary:    vals[9].SliceUint16(),
-		ReferenceMesg:            typedef.MesgNum(vals[0].Uint16()),
-		ReferenceIndex:           typedef.MessageIndex(vals[1].Uint16()),
-		FunctionalThresholdPower: vals[15].Uint16(),
 		HrCalcType:               typedef.HrZoneCalc(vals[10].Uint8()),
 		MaxHeartRate:             vals[11].Uint8(),
 		RestingHeartRate:         vals[12].Uint8(),
 		ThresholdHeartRate:       vals[13].Uint8(),
 		PwrCalcType:              typedef.PwrZoneCalc(vals[14].Uint8()),
+		FunctionalThresholdPower: vals[15].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -99,6 +102,16 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		fields = append(fields, field)
+	}
+	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(uint16(m.ReferenceMesg))
+		fields = append(fields, field)
+	}
+	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint16(uint16(m.ReferenceIndex))
 		fields = append(fields, field)
 	}
 	if m.TimeInHrZone != nil {
@@ -141,21 +154,6 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.PowerZoneHighBoundary)
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(uint16(m.ReferenceMesg))
-		fields = append(fields, field)
-	}
-	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint16(uint16(m.ReferenceIndex))
-		fields = append(fields, field)
-	}
-	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
-		field.Value = proto.Uint16(m.FunctionalThresholdPower)
-		fields = append(fields, field)
-	}
 	if byte(m.HrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint8(byte(m.HrCalcType))
@@ -179,6 +177,11 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 	if byte(m.PwrCalcType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint8(byte(m.PwrCalcType))
+		fields = append(fields, field)
+	}
+	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint16(m.FunctionalThresholdPower)
 		fields = append(fields, field)
 	}
 
@@ -251,6 +254,18 @@ func (m *TimeInZone) SetTimestamp(v time.Time) *TimeInZone {
 	return m
 }
 
+// SetReferenceMesg sets TimeInZone value.
+func (m *TimeInZone) SetReferenceMesg(v typedef.MesgNum) *TimeInZone {
+	m.ReferenceMesg = v
+	return m
+}
+
+// SetReferenceIndex sets TimeInZone value.
+func (m *TimeInZone) SetReferenceIndex(v typedef.MessageIndex) *TimeInZone {
+	m.ReferenceIndex = v
+	return m
+}
+
 // SetTimeInHrZone sets TimeInZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
@@ -315,24 +330,6 @@ func (m *TimeInZone) SetPowerZoneHighBoundary(v []uint16) *TimeInZone {
 	return m
 }
 
-// SetReferenceMesg sets TimeInZone value.
-func (m *TimeInZone) SetReferenceMesg(v typedef.MesgNum) *TimeInZone {
-	m.ReferenceMesg = v
-	return m
-}
-
-// SetReferenceIndex sets TimeInZone value.
-func (m *TimeInZone) SetReferenceIndex(v typedef.MessageIndex) *TimeInZone {
-	m.ReferenceIndex = v
-	return m
-}
-
-// SetFunctionalThresholdPower sets TimeInZone value.
-func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
-	m.FunctionalThresholdPower = v
-	return m
-}
-
 // SetHrCalcType sets TimeInZone value.
 func (m *TimeInZone) SetHrCalcType(v typedef.HrZoneCalc) *TimeInZone {
 	m.HrCalcType = v
@@ -360,6 +357,12 @@ func (m *TimeInZone) SetThresholdHeartRate(v uint8) *TimeInZone {
 // SetPwrCalcType sets TimeInZone value.
 func (m *TimeInZone) SetPwrCalcType(v typedef.PwrZoneCalc) *TimeInZone {
 	m.PwrCalcType = v
+	return m
+}
+
+// SetFunctionalThresholdPower sets TimeInZone value.
+func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
+	m.FunctionalThresholdPower = v
 	return m
 }
 

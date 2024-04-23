@@ -17,6 +17,9 @@ import (
 )
 
 // HsaGyroscopeData is a HsaGyroscopeData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaGyroscopeData struct {
 	Timestamp        time.Time // Units: s
 	GyroX            []int16   // Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
@@ -49,12 +52,12 @@ func NewHsaGyroscopeData(mesg *proto.Message) *HsaGyroscopeData {
 
 	return &HsaGyroscopeData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
+		SamplingInterval: vals[1].Uint16(),
 		GyroX:            vals[2].SliceInt16(),
 		GyroY:            vals[3].SliceInt16(),
 		GyroZ:            vals[4].SliceInt16(),
 		Timestamp32K:     vals[5].Uint32(),
-		TimestampMs:      vals[0].Uint16(),
-		SamplingInterval: vals[1].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -81,6 +84,16 @@ func (m *HsaGyroscopeData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
+		fields = append(fields, field)
+	}
+	if m.SamplingInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint16(m.SamplingInterval)
+		fields = append(fields, field)
+	}
 	if m.GyroX != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceInt16(m.GyroX)
@@ -99,16 +112,6 @@ func (m *HsaGyroscopeData) ToMesg(options *Options) proto.Message {
 	if m.Timestamp32K != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(m.Timestamp32K)
-		fields = append(fields, field)
-	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
-	if m.SamplingInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint16(m.SamplingInterval)
 		fields = append(fields, field)
 	}
 
@@ -161,6 +164,22 @@ func (m *HsaGyroscopeData) SetTimestamp(v time.Time) *HsaGyroscopeData {
 	return m
 }
 
+// SetTimestampMs sets HsaGyroscopeData value.
+//
+// Units: ms; Millisecond resolution of the timestamp
+func (m *HsaGyroscopeData) SetTimestampMs(v uint16) *HsaGyroscopeData {
+	m.TimestampMs = v
+	return m
+}
+
+// SetSamplingInterval sets HsaGyroscopeData value.
+//
+// Units: 1/32768 s; Sampling Interval in 32 kHz timescale
+func (m *HsaGyroscopeData) SetSamplingInterval(v uint16) *HsaGyroscopeData {
+	m.SamplingInterval = v
+	return m
+}
+
 // SetGyroX sets HsaGyroscopeData value.
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
@@ -190,22 +209,6 @@ func (m *HsaGyroscopeData) SetGyroZ(v []int16) *HsaGyroscopeData {
 // Units: 1/32768 s; 32 kHz timestamp
 func (m *HsaGyroscopeData) SetTimestamp32K(v uint32) *HsaGyroscopeData {
 	m.Timestamp32K = v
-	return m
-}
-
-// SetTimestampMs sets HsaGyroscopeData value.
-//
-// Units: ms; Millisecond resolution of the timestamp
-func (m *HsaGyroscopeData) SetTimestampMs(v uint16) *HsaGyroscopeData {
-	m.TimestampMs = v
-	return m
-}
-
-// SetSamplingInterval sets HsaGyroscopeData value.
-//
-// Units: 1/32768 s; Sampling Interval in 32 kHz timescale
-func (m *HsaGyroscopeData) SetSamplingInterval(v uint16) *HsaGyroscopeData {
-	m.SamplingInterval = v
 	return m
 }
 

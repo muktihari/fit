@@ -18,6 +18,9 @@ import (
 )
 
 // Length is a Length message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Length struct {
 	Timestamp                  time.Time
 	StartTime                  time.Time
@@ -70,26 +73,26 @@ func NewLength(mesg *proto.Message) *Length {
 	}
 
 	return &Length{
-		Timestamp:                  datetime.ToTime(vals[253].Uint32()),
-		StartTime:                  datetime.ToTime(vals[2].Uint32()),
-		StrokeCount:                vals[20].SliceUint16(),
-		ZoneCount:                  vals[21].SliceUint16(),
-		TotalElapsedTime:           vals[3].Uint32(),
-		TotalTimerTime:             vals[4].Uint32(),
 		MessageIndex:               typedef.MessageIndex(vals[254].Uint16()),
-		TotalStrokes:               vals[5].Uint16(),
-		AvgSpeed:                   vals[6].Uint16(),
-		TotalCalories:              vals[11].Uint16(),
-		PlayerScore:                vals[18].Uint16(),
-		OpponentScore:              vals[19].Uint16(),
-		EnhancedAvgRespirationRate: vals[22].Uint16(),
-		EnhancedMaxRespirationRate: vals[23].Uint16(),
+		Timestamp:                  datetime.ToTime(vals[253].Uint32()),
 		Event:                      typedef.Event(vals[0].Uint8()),
 		EventType:                  typedef.EventType(vals[1].Uint8()),
+		StartTime:                  datetime.ToTime(vals[2].Uint32()),
+		TotalElapsedTime:           vals[3].Uint32(),
+		TotalTimerTime:             vals[4].Uint32(),
+		TotalStrokes:               vals[5].Uint16(),
+		AvgSpeed:                   vals[6].Uint16(),
 		SwimStroke:                 typedef.SwimStroke(vals[7].Uint8()),
 		AvgSwimmingCadence:         vals[9].Uint8(),
 		EventGroup:                 vals[10].Uint8(),
+		TotalCalories:              vals[11].Uint16(),
 		LengthType:                 typedef.LengthType(vals[12].Uint8()),
+		PlayerScore:                vals[18].Uint16(),
+		OpponentScore:              vals[19].Uint16(),
+		StrokeCount:                vals[20].SliceUint16(),
+		ZoneCount:                  vals[21].SliceUint16(),
+		EnhancedAvgRespirationRate: vals[22].Uint16(),
+		EnhancedMaxRespirationRate: vals[23].Uint16(),
 		AvgRespirationRate:         vals[24].Uint8(),
 		MaxRespirationRate:         vals[25].Uint8(),
 
@@ -115,24 +118,29 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumLength}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if byte(m.Event) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Event))
+		fields = append(fields, field)
+	}
+	if byte(m.EventType) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(byte(m.EventType))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
-		fields = append(fields, field)
-	}
-	if m.StrokeCount != nil {
-		field := fac.CreateField(mesg.Num, 20)
-		field.Value = proto.SliceUint16(m.StrokeCount)
-		fields = append(fields, field)
-	}
-	if m.ZoneCount != nil {
-		field := fac.CreateField(mesg.Num, 21)
-		field.Value = proto.SliceUint16(m.ZoneCount)
 		fields = append(fields, field)
 	}
 	if m.TotalElapsedTime != basetype.Uint32Invalid {
@@ -145,11 +153,6 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TotalTimerTime)
 		fields = append(fields, field)
 	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
 	if m.TotalStrokes != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.TotalStrokes)
@@ -158,43 +161,6 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 	if m.AvgSpeed != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint16(m.AvgSpeed)
-		fields = append(fields, field)
-	}
-	if m.TotalCalories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 11)
-		field.Value = proto.Uint16(m.TotalCalories)
-		fields = append(fields, field)
-	}
-	if m.PlayerScore != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 18)
-		field.Value = proto.Uint16(m.PlayerScore)
-		fields = append(fields, field)
-	}
-	if m.OpponentScore != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 19)
-		field.Value = proto.Uint16(m.OpponentScore)
-		fields = append(fields, field)
-	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[22] && options.IncludeExpandedFields) || !m.IsExpandedFields[22]) {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[22]
-		fields = append(fields, field)
-	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[23] && options.IncludeExpandedFields) || !m.IsExpandedFields[23]) {
-		field := fac.CreateField(mesg.Num, 23)
-		field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[23]
-		fields = append(fields, field)
-	}
-	if byte(m.Event) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Event))
-		fields = append(fields, field)
-	}
-	if byte(m.EventType) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
 	}
 	if byte(m.SwimStroke) != basetype.EnumInvalid {
@@ -212,9 +178,46 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.EventGroup)
 		fields = append(fields, field)
 	}
+	if m.TotalCalories != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint16(m.TotalCalories)
+		fields = append(fields, field)
+	}
 	if byte(m.LengthType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.LengthType))
+		fields = append(fields, field)
+	}
+	if m.PlayerScore != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 18)
+		field.Value = proto.Uint16(m.PlayerScore)
+		fields = append(fields, field)
+	}
+	if m.OpponentScore != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 19)
+		field.Value = proto.Uint16(m.OpponentScore)
+		fields = append(fields, field)
+	}
+	if m.StrokeCount != nil {
+		field := fac.CreateField(mesg.Num, 20)
+		field.Value = proto.SliceUint16(m.StrokeCount)
+		fields = append(fields, field)
+	}
+	if m.ZoneCount != nil {
+		field := fac.CreateField(mesg.Num, 21)
+		field.Value = proto.SliceUint16(m.ZoneCount)
+		fields = append(fields, field)
+	}
+	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[22] && options.IncludeExpandedFields) || !m.IsExpandedFields[22]) {
+		field := fac.CreateField(mesg.Num, 22)
+		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
+		field.IsExpandedField = m.IsExpandedFields[22]
+		fields = append(fields, field)
+	}
+	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[23] && options.IncludeExpandedFields) || !m.IsExpandedFields[23]) {
+		field := fac.CreateField(mesg.Num, 23)
+		field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
+		field.IsExpandedField = m.IsExpandedFields[23]
 		fields = append(fields, field)
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {
@@ -292,31 +295,33 @@ func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }
 
+// SetMessageIndex sets Length value.
+func (m *Length) SetMessageIndex(v typedef.MessageIndex) *Length {
+	m.MessageIndex = v
+	return m
+}
+
 // SetTimestamp sets Length value.
 func (m *Length) SetTimestamp(v time.Time) *Length {
 	m.Timestamp = v
 	return m
 }
 
+// SetEvent sets Length value.
+func (m *Length) SetEvent(v typedef.Event) *Length {
+	m.Event = v
+	return m
+}
+
+// SetEventType sets Length value.
+func (m *Length) SetEventType(v typedef.EventType) *Length {
+	m.EventType = v
+	return m
+}
+
 // SetStartTime sets Length value.
 func (m *Length) SetStartTime(v time.Time) *Length {
 	m.StartTime = v
-	return m
-}
-
-// SetStrokeCount sets Length value.
-//
-// Array: [N]; Units: counts; stroke_type enum used as the index
-func (m *Length) SetStrokeCount(v []uint16) *Length {
-	m.StrokeCount = v
-	return m
-}
-
-// SetZoneCount sets Length value.
-//
-// Array: [N]; Units: counts; zone number used as the index
-func (m *Length) SetZoneCount(v []uint16) *Length {
-	m.ZoneCount = v
 	return m
 }
 
@@ -336,12 +341,6 @@ func (m *Length) SetTotalTimerTime(v uint32) *Length {
 	return m
 }
 
-// SetMessageIndex sets Length value.
-func (m *Length) SetMessageIndex(v typedef.MessageIndex) *Length {
-	m.MessageIndex = v
-	return m
-}
-
 // SetTotalStrokes sets Length value.
 //
 // Units: strokes
@@ -355,54 +354,6 @@ func (m *Length) SetTotalStrokes(v uint16) *Length {
 // Scale: 1000; Units: m/s
 func (m *Length) SetAvgSpeed(v uint16) *Length {
 	m.AvgSpeed = v
-	return m
-}
-
-// SetTotalCalories sets Length value.
-//
-// Units: kcal
-func (m *Length) SetTotalCalories(v uint16) *Length {
-	m.TotalCalories = v
-	return m
-}
-
-// SetPlayerScore sets Length value.
-func (m *Length) SetPlayerScore(v uint16) *Length {
-	m.PlayerScore = v
-	return m
-}
-
-// SetOpponentScore sets Length value.
-func (m *Length) SetOpponentScore(v uint16) *Length {
-	m.OpponentScore = v
-	return m
-}
-
-// SetEnhancedAvgRespirationRate sets Length value.
-//
-// Scale: 100; Units: Breaths/min
-func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
-	m.EnhancedAvgRespirationRate = v
-	return m
-}
-
-// SetEnhancedMaxRespirationRate sets Length value.
-//
-// Scale: 100; Units: Breaths/min
-func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
-	m.EnhancedMaxRespirationRate = v
-	return m
-}
-
-// SetEvent sets Length value.
-func (m *Length) SetEvent(v typedef.Event) *Length {
-	m.Event = v
-	return m
-}
-
-// SetEventType sets Length value.
-func (m *Length) SetEventType(v typedef.EventType) *Length {
-	m.EventType = v
 	return m
 }
 
@@ -428,9 +379,61 @@ func (m *Length) SetEventGroup(v uint8) *Length {
 	return m
 }
 
+// SetTotalCalories sets Length value.
+//
+// Units: kcal
+func (m *Length) SetTotalCalories(v uint16) *Length {
+	m.TotalCalories = v
+	return m
+}
+
 // SetLengthType sets Length value.
 func (m *Length) SetLengthType(v typedef.LengthType) *Length {
 	m.LengthType = v
+	return m
+}
+
+// SetPlayerScore sets Length value.
+func (m *Length) SetPlayerScore(v uint16) *Length {
+	m.PlayerScore = v
+	return m
+}
+
+// SetOpponentScore sets Length value.
+func (m *Length) SetOpponentScore(v uint16) *Length {
+	m.OpponentScore = v
+	return m
+}
+
+// SetStrokeCount sets Length value.
+//
+// Array: [N]; Units: counts; stroke_type enum used as the index
+func (m *Length) SetStrokeCount(v []uint16) *Length {
+	m.StrokeCount = v
+	return m
+}
+
+// SetZoneCount sets Length value.
+//
+// Array: [N]; Units: counts; zone number used as the index
+func (m *Length) SetZoneCount(v []uint16) *Length {
+	m.ZoneCount = v
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets Length value.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
+	m.EnhancedAvgRespirationRate = v
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets Length value.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
+	m.EnhancedMaxRespirationRate = v
 	return m
 }
 

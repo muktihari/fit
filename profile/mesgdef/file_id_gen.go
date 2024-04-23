@@ -16,6 +16,9 @@ import (
 )
 
 // FileId is a FileId message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type FileId struct {
 	TimeCreated  time.Time // Only set for files that are can be created/erased.
 	ProductName  string    // Optional free form string to indicate the devices name or model
@@ -41,13 +44,13 @@ func NewFileId(mesg *proto.Message) *FileId {
 	}
 
 	return &FileId{
-		TimeCreated:  datetime.ToTime(vals[4].Uint32()),
-		ProductName:  vals[8].String(),
-		SerialNumber: vals[3].Uint32z(),
+		Type:         typedef.File(vals[0].Uint8()),
 		Manufacturer: typedef.Manufacturer(vals[1].Uint16()),
 		Product:      vals[2].Uint16(),
+		SerialNumber: vals[3].Uint32z(),
+		TimeCreated:  datetime.ToTime(vals[4].Uint32()),
 		Number:       vals[5].Uint16(),
-		Type:         typedef.File(vals[0].Uint8()),
+		ProductName:  vals[8].String(),
 	}
 }
 
@@ -67,19 +70,9 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumFileId}
 
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
-		fields = append(fields, field)
-	}
-	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.String(m.ProductName)
-		fields = append(fields, field)
-	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(m.SerialNumber)
+	if byte(m.Type) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
@@ -92,14 +85,24 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
+	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint32(m.SerialNumber)
+		fields = append(fields, field)
+	}
+	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
+		fields = append(fields, field)
+	}
 	if m.Number != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.Number)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.Type))
+	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
+		field := fac.CreateField(mesg.Num, 8)
+		field.Value = proto.String(m.ProductName)
 		fields = append(fields, field)
 	}
 
@@ -130,25 +133,9 @@ func (m *FileId) GetProduct() (name string, value any) {
 // TimeCreatedUint32 returns TimeCreated in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *FileId) TimeCreatedUint32() uint32 { return datetime.ToUint32(m.TimeCreated) }
 
-// SetTimeCreated sets FileId value.
-//
-// Only set for files that are can be created/erased.
-func (m *FileId) SetTimeCreated(v time.Time) *FileId {
-	m.TimeCreated = v
-	return m
-}
-
-// SetProductName sets FileId value.
-//
-// Optional free form string to indicate the devices name or model
-func (m *FileId) SetProductName(v string) *FileId {
-	m.ProductName = v
-	return m
-}
-
-// SetSerialNumber sets FileId value.
-func (m *FileId) SetSerialNumber(v uint32) *FileId {
-	m.SerialNumber = v
+// SetType sets FileId value.
+func (m *FileId) SetType(v typedef.File) *FileId {
+	m.Type = v
 	return m
 }
 
@@ -164,6 +151,20 @@ func (m *FileId) SetProduct(v uint16) *FileId {
 	return m
 }
 
+// SetSerialNumber sets FileId value.
+func (m *FileId) SetSerialNumber(v uint32) *FileId {
+	m.SerialNumber = v
+	return m
+}
+
+// SetTimeCreated sets FileId value.
+//
+// Only set for files that are can be created/erased.
+func (m *FileId) SetTimeCreated(v time.Time) *FileId {
+	m.TimeCreated = v
+	return m
+}
+
 // SetNumber sets FileId value.
 //
 // Only set for files that are not created/erased.
@@ -172,8 +173,10 @@ func (m *FileId) SetNumber(v uint16) *FileId {
 	return m
 }
 
-// SetType sets FileId value.
-func (m *FileId) SetType(v typedef.File) *FileId {
-	m.Type = v
+// SetProductName sets FileId value.
+//
+// Optional free form string to indicate the devices name or model
+func (m *FileId) SetProductName(v string) *FileId {
+	m.ProductName = v
 	return m
 }

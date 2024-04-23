@@ -16,6 +16,9 @@ import (
 )
 
 // HsaBodyBatteryData is a HsaBodyBatteryData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaBodyBatteryData struct {
 	Timestamp          time.Time // Units: s
 	Level              []int8    // Array: [N]; Units: percent; Body battery level
@@ -46,10 +49,10 @@ func NewHsaBodyBatteryData(mesg *proto.Message) *HsaBodyBatteryData {
 
 	return &HsaBodyBatteryData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		ProcessingInterval: vals[0].Uint16(),
 		Level:              vals[1].SliceInt8(),
 		Charged:            vals[2].SliceInt16(),
 		Uncharged:          vals[3].SliceInt16(),
-		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -76,6 +79,11 @@ func (m *HsaBodyBatteryData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.ProcessingInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
 	if m.Level != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceInt8(m.Level)
@@ -89,11 +97,6 @@ func (m *HsaBodyBatteryData) ToMesg(options *Options) proto.Message {
 	if m.Uncharged != nil {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.SliceInt16(m.Uncharged)
-		fields = append(fields, field)
-	}
-	if m.ProcessingInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 
@@ -113,6 +116,14 @@ func (m *HsaBodyBatteryData) TimestampUint32() uint32 { return datetime.ToUint32
 // Units: s
 func (m *HsaBodyBatteryData) SetTimestamp(v time.Time) *HsaBodyBatteryData {
 	m.Timestamp = v
+	return m
+}
+
+// SetProcessingInterval sets HsaBodyBatteryData value.
+//
+// Units: s; Processing interval length in seconds
+func (m *HsaBodyBatteryData) SetProcessingInterval(v uint16) *HsaBodyBatteryData {
+	m.ProcessingInterval = v
 	return m
 }
 
@@ -137,14 +148,6 @@ func (m *HsaBodyBatteryData) SetCharged(v []int16) *HsaBodyBatteryData {
 // Array: [N]; Body battery uncharged value
 func (m *HsaBodyBatteryData) SetUncharged(v []int16) *HsaBodyBatteryData {
 	m.Uncharged = v
-	return m
-}
-
-// SetProcessingInterval sets HsaBodyBatteryData value.
-//
-// Units: s; Processing interval length in seconds
-func (m *HsaBodyBatteryData) SetProcessingInterval(v uint16) *HsaBodyBatteryData {
-	m.ProcessingInterval = v
 	return m
 }
 

@@ -16,6 +16,9 @@ import (
 )
 
 // MagnetometerData is a MagnetometerData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MagnetometerData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
@@ -50,6 +53,7 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 
 	return &MagnetometerData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
 		SampleTimeOffset: vals[1].SliceUint16(),
 		MagX:             vals[2].SliceUint16(),
 		MagY:             vals[3].SliceUint16(),
@@ -57,7 +61,6 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 		CalibratedMagX:   vals[5].SliceFloat32(),
 		CalibratedMagY:   vals[6].SliceFloat32(),
 		CalibratedMagZ:   vals[7].SliceFloat32(),
-		TimestampMs:      vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,6 +85,11 @@ func (m *MagnetometerData) ToMesg(options *Options) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
@@ -119,11 +127,6 @@ func (m *MagnetometerData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceFloat32(m.CalibratedMagZ)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -141,6 +144,14 @@ func (m *MagnetometerData) TimestampUint32() uint32 { return datetime.ToUint32(m
 // Units: s; Whole second part of the timestamp
 func (m *MagnetometerData) SetTimestamp(v time.Time) *MagnetometerData {
 	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets MagnetometerData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
+	m.TimestampMs = v
 	return m
 }
 
@@ -197,14 +208,6 @@ func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagZ(v []float32) *MagnetometerData {
 	m.CalibratedMagZ = v
-	return m
-}
-
-// SetTimestampMs sets MagnetometerData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
-	m.TimestampMs = v
 	return m
 }
 

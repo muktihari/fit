@@ -18,6 +18,9 @@ import (
 )
 
 // ChronoShotData is a ChronoShotData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ChronoShotData struct {
 	Timestamp time.Time
 	ShotSpeed uint32 // Scale: 1000; Units: m/s

@@ -16,6 +16,9 @@ import (
 )
 
 // HsaEvent is a HsaEvent message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaEvent struct {
 	Timestamp time.Time // Units: s
 	EventId   uint8     // Event ID

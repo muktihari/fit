@@ -14,6 +14,9 @@ import (
 )
 
 // WatchfaceSettings is a WatchfaceSettings message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WatchfaceSettings struct {
 	MessageIndex typedef.MessageIndex
 	Mode         typedef.WatchfaceMode

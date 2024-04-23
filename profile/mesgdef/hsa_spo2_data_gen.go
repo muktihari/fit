@@ -16,6 +16,9 @@ import (
 )
 
 // HsaSpo2Data is a HsaSpo2Data message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaSpo2Data struct {
 	Timestamp          time.Time // Units: s
 	ReadingSpo2        []uint8   // Array: [N]; Units: percent; SpO2 Reading
@@ -45,9 +48,9 @@ func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 
 	return &HsaSpo2Data{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
+		ProcessingInterval: vals[0].Uint16(),
 		ReadingSpo2:        vals[1].SliceUint8(),
 		Confidence:         vals[2].SliceUint8(),
-		ProcessingInterval: vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,6 +77,11 @@ func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.ProcessingInterval != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.ProcessingInterval)
+		fields = append(fields, field)
+	}
 	if m.ReadingSpo2 != nil {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint8(m.ReadingSpo2)
@@ -82,11 +90,6 @@ func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 	if m.Confidence != nil {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint8(m.Confidence)
-		fields = append(fields, field)
-	}
-	if m.ProcessingInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 
@@ -109,6 +112,14 @@ func (m *HsaSpo2Data) SetTimestamp(v time.Time) *HsaSpo2Data {
 	return m
 }
 
+// SetProcessingInterval sets HsaSpo2Data value.
+//
+// Units: s; Processing interval length in seconds
+func (m *HsaSpo2Data) SetProcessingInterval(v uint16) *HsaSpo2Data {
+	m.ProcessingInterval = v
+	return m
+}
+
 // SetReadingSpo2 sets HsaSpo2Data value.
 //
 // Array: [N]; Units: percent; SpO2 Reading
@@ -122,14 +133,6 @@ func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
 // Array: [N]; SpO2 Confidence
 func (m *HsaSpo2Data) SetConfidence(v []uint8) *HsaSpo2Data {
 	m.Confidence = v
-	return m
-}
-
-// SetProcessingInterval sets HsaSpo2Data value.
-//
-// Units: s; Processing interval length in seconds
-func (m *HsaSpo2Data) SetProcessingInterval(v uint16) *HsaSpo2Data {
-	m.ProcessingInterval = v
 	return m
 }
 

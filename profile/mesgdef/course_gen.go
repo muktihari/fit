@@ -14,6 +14,9 @@ import (
 )
 
 // Course is a Course message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Course struct {
 	Name         string
 	Capabilities typedef.CourseCapabilities
@@ -42,9 +45,9 @@ func NewCourse(mesg *proto.Message) *Course {
 	}
 
 	return &Course{
+		Sport:        typedef.Sport(vals[4].Uint8()),
 		Name:         vals[5].String(),
 		Capabilities: typedef.CourseCapabilities(vals[6].Uint32z()),
-		Sport:        typedef.Sport(vals[4].Uint8()),
 		SubSport:     typedef.SubSport(vals[7].Uint8()),
 
 		DeveloperFields: developerFields,
@@ -67,6 +70,11 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumCourse}
 
+	if byte(m.Sport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint8(byte(m.Sport))
+		fields = append(fields, field)
+	}
 	if m.Name != basetype.StringInvalid && m.Name != "" {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.Name)
@@ -75,11 +83,6 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint32(uint32(m.Capabilities))
-		fields = append(fields, field)
-	}
-	if byte(m.Sport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if byte(m.SubSport) != basetype.EnumInvalid {
@@ -96,6 +99,12 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
+// SetSport sets Course value.
+func (m *Course) SetSport(v typedef.Sport) *Course {
+	m.Sport = v
+	return m
+}
+
 // SetName sets Course value.
 func (m *Course) SetName(v string) *Course {
 	m.Name = v
@@ -105,12 +114,6 @@ func (m *Course) SetName(v string) *Course {
 // SetCapabilities sets Course value.
 func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
 	m.Capabilities = v
-	return m
-}
-
-// SetSport sets Course value.
-func (m *Course) SetSport(v typedef.Sport) *Course {
-	m.Sport = v
 	return m
 }
 

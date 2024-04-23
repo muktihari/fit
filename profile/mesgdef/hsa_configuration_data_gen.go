@@ -16,6 +16,9 @@ import (
 )
 
 // HsaConfigurationData is a HsaConfigurationData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HsaConfigurationData struct {
 	Timestamp time.Time // Units: s; Encoded configuration data
 	Data      []byte    // Array: [N]

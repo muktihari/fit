@@ -14,6 +14,9 @@ import (
 )
 
 // Video is a Video message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Video struct {
 	Url             string
 	HostingProvider string

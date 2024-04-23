@@ -14,6 +14,9 @@ import (
 )
 
 // MesgCapabilities is a MesgCapabilities message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type MesgCapabilities struct {
 	MessageIndex typedef.MessageIndex
 	MesgNum      typedef.MesgNum
@@ -44,10 +47,10 @@ func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 
 	return &MesgCapabilities{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
-		MesgNum:      typedef.MesgNum(vals[1].Uint16()),
-		Count:        vals[3].Uint16(),
 		File:         typedef.File(vals[0].Uint8()),
+		MesgNum:      typedef.MesgNum(vals[1].Uint16()),
 		CountType:    typedef.MesgCount(vals[2].Uint8()),
+		Count:        vals[3].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -74,24 +77,24 @@ func (m *MesgCapabilities) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if uint16(m.MesgNum) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint16(uint16(m.MesgNum))
-		fields = append(fields, field)
-	}
-	if m.Count != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint16(m.Count)
-		fields = append(fields, field)
-	}
 	if byte(m.File) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.File))
 		fields = append(fields, field)
 	}
+	if uint16(m.MesgNum) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint16(uint16(m.MesgNum))
+		fields = append(fields, field)
+	}
 	if byte(m.CountType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.CountType))
+		fields = append(fields, field)
+	}
+	if m.Count != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint16(m.Count)
 		fields = append(fields, field)
 	}
 
@@ -130,27 +133,27 @@ func (m *MesgCapabilities) SetMessageIndex(v typedef.MessageIndex) *MesgCapabili
 	return m
 }
 
-// SetMesgNum sets MesgCapabilities value.
-func (m *MesgCapabilities) SetMesgNum(v typedef.MesgNum) *MesgCapabilities {
-	m.MesgNum = v
-	return m
-}
-
-// SetCount sets MesgCapabilities value.
-func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
-	m.Count = v
-	return m
-}
-
 // SetFile sets MesgCapabilities value.
 func (m *MesgCapabilities) SetFile(v typedef.File) *MesgCapabilities {
 	m.File = v
 	return m
 }
 
+// SetMesgNum sets MesgCapabilities value.
+func (m *MesgCapabilities) SetMesgNum(v typedef.MesgNum) *MesgCapabilities {
+	m.MesgNum = v
+	return m
+}
+
 // SetCountType sets MesgCapabilities value.
 func (m *MesgCapabilities) SetCountType(v typedef.MesgCount) *MesgCapabilities {
 	m.CountType = v
+	return m
+}
+
+// SetCount sets MesgCapabilities value.
+func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
+	m.Count = v
 	return m
 }
 

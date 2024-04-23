@@ -16,6 +16,9 @@ import (
 )
 
 // GyroscopeData is a GyroscopeData message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type GyroscopeData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
@@ -50,6 +53,7 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 
 	return &GyroscopeData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
+		TimestampMs:      vals[0].Uint16(),
 		SampleTimeOffset: vals[1].SliceUint16(),
 		GyroX:            vals[2].SliceUint16(),
 		GyroY:            vals[3].SliceUint16(),
@@ -57,7 +61,6 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 		CalibratedGyroX:  vals[5].SliceFloat32(),
 		CalibratedGyroY:  vals[6].SliceFloat32(),
 		CalibratedGyroZ:  vals[7].SliceFloat32(),
-		TimestampMs:      vals[0].Uint16(),
 
 		DeveloperFields: developerFields,
 	}
@@ -82,6 +85,11 @@ func (m *GyroscopeData) ToMesg(options *Options) proto.Message {
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		fields = append(fields, field)
+	}
+	if m.TimestampMs != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
@@ -119,11 +127,6 @@ func (m *GyroscopeData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceFloat32(m.CalibratedGyroZ)
 		fields = append(fields, field)
 	}
-	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.TimestampMs)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -141,6 +144,14 @@ func (m *GyroscopeData) TimestampUint32() uint32 { return datetime.ToUint32(m.Ti
 // Units: s; Whole second part of the timestamp
 func (m *GyroscopeData) SetTimestamp(v time.Time) *GyroscopeData {
 	m.Timestamp = v
+	return m
+}
+
+// SetTimestampMs sets GyroscopeData value.
+//
+// Units: ms; Millisecond part of the timestamp.
+func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
+	m.TimestampMs = v
 	return m
 }
 
@@ -197,14 +208,6 @@ func (m *GyroscopeData) SetCalibratedGyroY(v []float32) *GyroscopeData {
 // Array: [N]; Units: deg/s; Calibrated gyro reading
 func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {
 	m.CalibratedGyroZ = v
-	return m
-}
-
-// SetTimestampMs sets GyroscopeData value.
-//
-// Units: ms; Millisecond part of the timestamp.
-func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
-	m.TimestampMs = v
 	return m
 }
 

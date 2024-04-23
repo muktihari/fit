@@ -18,6 +18,9 @@ import (
 )
 
 // ChronoShotSession is a ChronoShotSession message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type ChronoShotSession struct {
 	Timestamp      time.Time
 	MinSpeed       uint32 // Scale: 1000; Units: m/s
@@ -53,9 +56,9 @@ func NewChronoShotSession(mesg *proto.Message) *ChronoShotSession {
 		MinSpeed:       vals[0].Uint32(),
 		MaxSpeed:       vals[1].Uint32(),
 		AvgSpeed:       vals[2].Uint32(),
-		GrainWeight:    vals[5].Uint32(),
 		ShotCount:      vals[3].Uint16(),
 		ProjectileType: typedef.ProjectileType(vals[4].Uint8()),
+		GrainWeight:    vals[5].Uint32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -97,11 +100,6 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.AvgSpeed)
 		fields = append(fields, field)
 	}
-	if m.GrainWeight != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(m.GrainWeight)
-		fields = append(fields, field)
-	}
 	if m.ShotCount != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint16(m.ShotCount)
@@ -110,6 +108,11 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 	if byte(m.ProjectileType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.ProjectileType))
+		fields = append(fields, field)
+	}
+	if m.GrainWeight != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint32(m.GrainWeight)
 		fields = append(fields, field)
 	}
 
@@ -194,14 +197,6 @@ func (m *ChronoShotSession) SetAvgSpeed(v uint32) *ChronoShotSession {
 	return m
 }
 
-// SetGrainWeight sets ChronoShotSession value.
-//
-// Scale: 10; Units: gr
-func (m *ChronoShotSession) SetGrainWeight(v uint32) *ChronoShotSession {
-	m.GrainWeight = v
-	return m
-}
-
 // SetShotCount sets ChronoShotSession value.
 func (m *ChronoShotSession) SetShotCount(v uint16) *ChronoShotSession {
 	m.ShotCount = v
@@ -211,6 +206,14 @@ func (m *ChronoShotSession) SetShotCount(v uint16) *ChronoShotSession {
 // SetProjectileType sets ChronoShotSession value.
 func (m *ChronoShotSession) SetProjectileType(v typedef.ProjectileType) *ChronoShotSession {
 	m.ProjectileType = v
+	return m
+}
+
+// SetGrainWeight sets ChronoShotSession value.
+//
+// Scale: 10; Units: gr
+func (m *ChronoShotSession) SetGrainWeight(v uint32) *ChronoShotSession {
+	m.GrainWeight = v
 	return m
 }
 

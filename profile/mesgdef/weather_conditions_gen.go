@@ -19,6 +19,9 @@ import (
 )
 
 // WeatherConditions is a WeatherConditions message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type WeatherConditions struct {
 	Timestamp                time.Time // time of update for current conditions, else forecast time
 	Location                 string    // string corresponding to GCS response location string
@@ -60,18 +63,18 @@ func NewWeatherConditions(mesg *proto.Message) *WeatherConditions {
 
 	return &WeatherConditions{
 		Timestamp:                datetime.ToTime(vals[253].Uint32()),
+		WeatherReport:            typedef.WeatherReport(vals[0].Uint8()),
+		Temperature:              vals[1].Int8(),
+		Condition:                typedef.WeatherStatus(vals[2].Uint8()),
+		WindDirection:            vals[3].Uint16(),
+		WindSpeed:                vals[4].Uint16(),
+		PrecipitationProbability: vals[5].Uint8(),
+		TemperatureFeelsLike:     vals[6].Int8(),
+		RelativeHumidity:         vals[7].Uint8(),
 		Location:                 vals[8].String(),
 		ObservedAtTime:           datetime.ToTime(vals[9].Uint32()),
 		ObservedLocationLat:      vals[10].Int32(),
 		ObservedLocationLong:     vals[11].Int32(),
-		WindDirection:            vals[3].Uint16(),
-		WindSpeed:                vals[4].Uint16(),
-		WeatherReport:            typedef.WeatherReport(vals[0].Uint8()),
-		Temperature:              vals[1].Int8(),
-		Condition:                typedef.WeatherStatus(vals[2].Uint8()),
-		PrecipitationProbability: vals[5].Uint8(),
-		TemperatureFeelsLike:     vals[6].Int8(),
-		RelativeHumidity:         vals[7].Uint8(),
 		DayOfWeek:                typedef.DayOfWeek(vals[12].Uint8()),
 		HighTemperature:          vals[13].Int8(),
 		LowTemperature:           vals[14].Int8(),
@@ -101,6 +104,46 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if byte(m.WeatherReport) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint8(byte(m.WeatherReport))
+		fields = append(fields, field)
+	}
+	if m.Temperature != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Int8(m.Temperature)
+		fields = append(fields, field)
+	}
+	if byte(m.Condition) != basetype.EnumInvalid {
+		field := fac.CreateField(mesg.Num, 2)
+		field.Value = proto.Uint8(byte(m.Condition))
+		fields = append(fields, field)
+	}
+	if m.WindDirection != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 3)
+		field.Value = proto.Uint16(m.WindDirection)
+		fields = append(fields, field)
+	}
+	if m.WindSpeed != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 4)
+		field.Value = proto.Uint16(m.WindSpeed)
+		fields = append(fields, field)
+	}
+	if m.PrecipitationProbability != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 5)
+		field.Value = proto.Uint8(m.PrecipitationProbability)
+		fields = append(fields, field)
+	}
+	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Int8(m.TemperatureFeelsLike)
+		fields = append(fields, field)
+	}
+	if m.RelativeHumidity != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 7)
+		field.Value = proto.Uint8(m.RelativeHumidity)
+		fields = append(fields, field)
+	}
 	if m.Location != basetype.StringInvalid && m.Location != "" {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.Location)
@@ -119,46 +162,6 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 	if m.ObservedLocationLong != basetype.Sint32Invalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Int32(m.ObservedLocationLong)
-		fields = append(fields, field)
-	}
-	if m.WindDirection != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint16(m.WindDirection)
-		fields = append(fields, field)
-	}
-	if m.WindSpeed != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint16(m.WindSpeed)
-		fields = append(fields, field)
-	}
-	if byte(m.WeatherReport) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint8(byte(m.WeatherReport))
-		fields = append(fields, field)
-	}
-	if m.Temperature != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Int8(m.Temperature)
-		fields = append(fields, field)
-	}
-	if byte(m.Condition) != basetype.EnumInvalid {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint8(byte(m.Condition))
-		fields = append(fields, field)
-	}
-	if m.PrecipitationProbability != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint8(m.PrecipitationProbability)
-		fields = append(fields, field)
-	}
-	if m.TemperatureFeelsLike != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Int8(m.TemperatureFeelsLike)
-		fields = append(fields, field)
-	}
-	if m.RelativeHumidity != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.Uint8(m.RelativeHumidity)
 		fields = append(fields, field)
 	}
 	if byte(m.DayOfWeek) != basetype.EnumInvalid {
@@ -219,6 +222,68 @@ func (m *WeatherConditions) SetTimestamp(v time.Time) *WeatherConditions {
 	return m
 }
 
+// SetWeatherReport sets WeatherConditions value.
+//
+// Current or forecast
+func (m *WeatherConditions) SetWeatherReport(v typedef.WeatherReport) *WeatherConditions {
+	m.WeatherReport = v
+	return m
+}
+
+// SetTemperature sets WeatherConditions value.
+//
+// Units: C
+func (m *WeatherConditions) SetTemperature(v int8) *WeatherConditions {
+	m.Temperature = v
+	return m
+}
+
+// SetCondition sets WeatherConditions value.
+//
+// Corresponds to GSC Response weatherIcon field
+func (m *WeatherConditions) SetCondition(v typedef.WeatherStatus) *WeatherConditions {
+	m.Condition = v
+	return m
+}
+
+// SetWindDirection sets WeatherConditions value.
+//
+// Units: degrees
+func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
+	m.WindDirection = v
+	return m
+}
+
+// SetWindSpeed sets WeatherConditions value.
+//
+// Scale: 1000; Units: m/s
+func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
+	m.WindSpeed = v
+	return m
+}
+
+// SetPrecipitationProbability sets WeatherConditions value.
+//
+// range 0-100
+func (m *WeatherConditions) SetPrecipitationProbability(v uint8) *WeatherConditions {
+	m.PrecipitationProbability = v
+	return m
+}
+
+// SetTemperatureFeelsLike sets WeatherConditions value.
+//
+// Units: C; Heat Index if GCS heatIdx above or equal to 90F or wind chill if GCS windChill below or equal to 32F
+func (m *WeatherConditions) SetTemperatureFeelsLike(v int8) *WeatherConditions {
+	m.TemperatureFeelsLike = v
+	return m
+}
+
+// SetRelativeHumidity sets WeatherConditions value.
+func (m *WeatherConditions) SetRelativeHumidity(v uint8) *WeatherConditions {
+	m.RelativeHumidity = v
+	return m
+}
+
 // SetLocation sets WeatherConditions value.
 //
 // string corresponding to GCS response location string
@@ -246,68 +311,6 @@ func (m *WeatherConditions) SetObservedLocationLat(v int32) *WeatherConditions {
 // Units: semicircles
 func (m *WeatherConditions) SetObservedLocationLong(v int32) *WeatherConditions {
 	m.ObservedLocationLong = v
-	return m
-}
-
-// SetWindDirection sets WeatherConditions value.
-//
-// Units: degrees
-func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
-	m.WindDirection = v
-	return m
-}
-
-// SetWindSpeed sets WeatherConditions value.
-//
-// Scale: 1000; Units: m/s
-func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
-	m.WindSpeed = v
-	return m
-}
-
-// SetWeatherReport sets WeatherConditions value.
-//
-// Current or forecast
-func (m *WeatherConditions) SetWeatherReport(v typedef.WeatherReport) *WeatherConditions {
-	m.WeatherReport = v
-	return m
-}
-
-// SetTemperature sets WeatherConditions value.
-//
-// Units: C
-func (m *WeatherConditions) SetTemperature(v int8) *WeatherConditions {
-	m.Temperature = v
-	return m
-}
-
-// SetCondition sets WeatherConditions value.
-//
-// Corresponds to GSC Response weatherIcon field
-func (m *WeatherConditions) SetCondition(v typedef.WeatherStatus) *WeatherConditions {
-	m.Condition = v
-	return m
-}
-
-// SetPrecipitationProbability sets WeatherConditions value.
-//
-// range 0-100
-func (m *WeatherConditions) SetPrecipitationProbability(v uint8) *WeatherConditions {
-	m.PrecipitationProbability = v
-	return m
-}
-
-// SetTemperatureFeelsLike sets WeatherConditions value.
-//
-// Units: C; Heat Index if GCS heatIdx above or equal to 90F or wind chill if GCS windChill below or equal to 32F
-func (m *WeatherConditions) SetTemperatureFeelsLike(v int8) *WeatherConditions {
-	m.TemperatureFeelsLike = v
-	return m
-}
-
-// SetRelativeHumidity sets WeatherConditions value.
-func (m *WeatherConditions) SetRelativeHumidity(v uint8) *WeatherConditions {
-	m.RelativeHumidity = v
 	return m
 }
 

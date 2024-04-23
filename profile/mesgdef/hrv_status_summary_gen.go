@@ -18,6 +18,9 @@ import (
 )
 
 // HrvStatusSummary is a HrvStatusSummary message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type HrvStatusSummary struct {
 	Timestamp             time.Time
 	WeeklyAverage         uint16 // Scale: 128; Units: ms; 7 day RMSSD average over sleep

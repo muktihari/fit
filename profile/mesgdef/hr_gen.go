@@ -18,6 +18,9 @@ import (
 )
 
 // Hr is a Hr message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type Hr struct {
 	Timestamp           time.Time
 	FilteredBpm         []uint8  // Array: [N]; Units: bpm
@@ -55,11 +58,11 @@ func NewHr(mesg *proto.Message) *Hr {
 
 	return &Hr{
 		Timestamp:           datetime.ToTime(vals[253].Uint32()),
+		FractionalTimestamp: vals[0].Uint16(),
+		Time256:             vals[1].Uint8(),
 		FilteredBpm:         vals[6].SliceUint8(),
 		EventTimestamp:      vals[9].SliceUint32(),
 		EventTimestamp12:    vals[10].SliceUint8(),
-		FractionalTimestamp: vals[0].Uint16(),
-		Time256:             vals[1].Uint8(),
 
 		IsExpandedFields: isExpandedFields,
 
@@ -88,6 +91,17 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
+	if m.FractionalTimestamp != basetype.Uint16Invalid && ((m.IsExpandedFields[0] && options.IncludeExpandedFields) || !m.IsExpandedFields[0]) {
+		field := fac.CreateField(mesg.Num, 0)
+		field.Value = proto.Uint16(m.FractionalTimestamp)
+		field.IsExpandedField = m.IsExpandedFields[0]
+		fields = append(fields, field)
+	}
+	if m.Time256 != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 1)
+		field.Value = proto.Uint8(m.Time256)
+		fields = append(fields, field)
+	}
 	if m.FilteredBpm != nil {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.SliceUint8(m.FilteredBpm)
@@ -104,17 +118,6 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.EventTimestamp12)
 		fields = append(fields, field)
 	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid && ((m.IsExpandedFields[0] && options.IncludeExpandedFields) || !m.IsExpandedFields[0]) {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.FractionalTimestamp)
-		field.IsExpandedField = m.IsExpandedFields[0]
-		fields = append(fields, field)
-	}
-	if m.Time256 != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint8(m.Time256)
-		fields = append(fields, field)
-	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -126,16 +129,6 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Hr) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
-
-// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
-//
-// If EventTimestamp value is invalid, nil will be returned.
-func (m *Hr) EventTimestampScaled() []float64 {
-	if m.EventTimestamp == nil {
-		return nil
-	}
-	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
-}
 
 // FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
 //
@@ -157,9 +150,35 @@ func (m *Hr) Time256Scaled() float64 {
 	return scaleoffset.Apply(m.Time256, 256, 0)
 }
 
+// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
+//
+// If EventTimestamp value is invalid, nil will be returned.
+func (m *Hr) EventTimestampScaled() []float64 {
+	if m.EventTimestamp == nil {
+		return nil
+	}
+	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
+}
+
 // SetTimestamp sets Hr value.
 func (m *Hr) SetTimestamp(v time.Time) *Hr {
 	m.Timestamp = v
+	return m
+}
+
+// SetFractionalTimestamp sets Hr value.
+//
+// Scale: 32768; Units: s
+func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
+	m.FractionalTimestamp = v
+	return m
+}
+
+// SetTime256 sets Hr value.
+//
+// Scale: 256; Units: s
+func (m *Hr) SetTime256(v uint8) *Hr {
+	m.Time256 = v
 	return m
 }
 
@@ -184,22 +203,6 @@ func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 // Array: [N]; Units: s
 func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	m.EventTimestamp12 = v
-	return m
-}
-
-// SetFractionalTimestamp sets Hr value.
-//
-// Scale: 32768; Units: s
-func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
-	m.FractionalTimestamp = v
-	return m
-}
-
-// SetTime256 sets Hr value.
-//
-// Scale: 256; Units: s
-func (m *Hr) SetTime256(v uint8) *Hr {
-	m.Time256 = v
 	return m
 }
 

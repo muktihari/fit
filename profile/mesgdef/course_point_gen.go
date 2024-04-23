@@ -19,6 +19,9 @@ import (
 )
 
 // CoursePoint is a CoursePoint message.
+//
+// Note: The order of the fields is optimized using a memory alignment algorithm.
+// Do not rely on field indices, such as when using reflection.
 type CoursePoint struct {
 	Timestamp    time.Time
 	Name         string
@@ -51,13 +54,13 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 	}
 
 	return &CoursePoint{
+		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:    datetime.ToTime(vals[1].Uint32()),
-		Name:         vals[6].String(),
 		PositionLat:  vals[2].Int32(),
 		PositionLong: vals[3].Int32(),
 		Distance:     vals[4].Uint32(),
-		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		Type:         typedef.CoursePoint(vals[5].Uint8()),
+		Name:         vals[6].String(),
 		Favorite:     vals[8].Bool(),
 
 		DeveloperFields: developerFields,
@@ -80,14 +83,14 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumCoursePoint}
 
+	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+		field := fac.CreateField(mesg.Num, 254)
+		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
 	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
-		fields = append(fields, field)
-	}
-	if m.Name != basetype.StringInvalid && m.Name != "" {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
@@ -105,14 +108,14 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 254)
-		field.Value = proto.Uint16(uint16(m.MessageIndex))
-		fields = append(fields, field)
-	}
 	if byte(m.Type) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.Type))
+		fields = append(fields, field)
+	}
+	if m.Name != basetype.StringInvalid && m.Name != "" {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.Favorite != false {
@@ -148,15 +151,15 @@ func (m *CoursePoint) PositionLatDegrees() float64 { return semicircles.ToDegree
 // PositionLongDegrees returns PositionLong in degrees instead of semicircles.
 func (m *CoursePoint) PositionLongDegrees() float64 { return semicircles.ToDegrees(m.PositionLong) }
 
-// SetTimestamp sets CoursePoint value.
-func (m *CoursePoint) SetTimestamp(v time.Time) *CoursePoint {
-	m.Timestamp = v
+// SetMessageIndex sets CoursePoint value.
+func (m *CoursePoint) SetMessageIndex(v typedef.MessageIndex) *CoursePoint {
+	m.MessageIndex = v
 	return m
 }
 
-// SetName sets CoursePoint value.
-func (m *CoursePoint) SetName(v string) *CoursePoint {
-	m.Name = v
+// SetTimestamp sets CoursePoint value.
+func (m *CoursePoint) SetTimestamp(v time.Time) *CoursePoint {
+	m.Timestamp = v
 	return m
 }
 
@@ -184,15 +187,15 @@ func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
 	return m
 }
 
-// SetMessageIndex sets CoursePoint value.
-func (m *CoursePoint) SetMessageIndex(v typedef.MessageIndex) *CoursePoint {
-	m.MessageIndex = v
-	return m
-}
-
 // SetType sets CoursePoint value.
 func (m *CoursePoint) SetType(v typedef.CoursePoint) *CoursePoint {
 	m.Type = v
+	return m
+}
+
+// SetName sets CoursePoint value.
+func (m *CoursePoint) SetName(v string) *CoursePoint {
+	m.Name = v
 	return m
 }
 
