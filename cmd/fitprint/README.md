@@ -10,7 +10,7 @@ A program to generate comprehensive human-readable `*.txt` file containing detai
 go run main.go DeveloperData.fit
 
 # Output:
-📄 "DeveloperData.fit" -> "DeveloperData.txt"
+📄 "DeveloperData.fit" -> "DeveloperData-fitprint.txt"
 ```
 
 ### Build or Install
@@ -33,7 +33,7 @@ go install .
 fitprint DeveloperData.fit
 
 # Output:
-📄 "DeveloperData.fit" -> "DeveloperData.txt"
+📄 "DeveloperData.fit" -> "DeveloperData-fitprint.txt"
 ```
 
 ## Sample Output
