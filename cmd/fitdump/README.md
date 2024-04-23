@@ -1,4 +1,4 @@
-# Fitdump
+# FIT Dump CLI
 
 Fitdump dumps the FIT file(s) into segmented bytes.
 
@@ -14,8 +14,33 @@ message_data        | 1|  00000001  [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6
 
 ## Usage
 
+### Run
+
 ```sh
 go run main.go triathlon_summary_last.fit
 
-# dumped: "triathlon_summary_last.fit" -> "triathlon_summary_last.txt"
+# FIT dumped: "triathlon_summary_last.fit" -> "triathlon_summary_last-fitdump.txt"
+```
+
+### Build or Install
+
+#### Build
+
+```sh
+go build -o fitdump main.go
+```
+
+#### Install
+
+```sh
+go install .
+```
+
+#### Run the resulting Binary
+
+```sh
+fitdump triathlon_summary_last.fit
+
+# Output:
+# FIT dumped: "triathlon_summary_last.fit" -> "triathlon_summary_last-fitdump.txt"
 ```

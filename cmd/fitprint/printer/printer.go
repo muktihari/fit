@@ -56,7 +56,7 @@ func Print(path string) error {
 	if len(ext) < len(base) {
 		name = base[:len(base)-len(ext)]
 	}
-	name = name + ".txt"
+	name = name + "-fitprint.txt"
 
 	resultPath := filepath.Join(dir, name)
 	out, err := os.OpenFile(resultPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
