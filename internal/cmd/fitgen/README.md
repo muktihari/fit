@@ -1,6 +1,6 @@
 # FIT SDK for Go Generator
 
-The FIT SDK Generator in Go, also known as "fitgen", is a program designed to create several \*.go files using `Profile.xlsx`, file retrieved from the Official FIT SDK release. The generated files enable this FIT SDK for Go to carry out the decoding and encoding process of FIT files.
+The FIT SDK for Go Generator, also known as "fitgen", is a program designed to create several \*.go files using `Profile.xlsx`, file retrieved from the Official FIT SDK release. The generated files enable this FIT SDK for Go to carry out the decoding and encoding process of FIT files.
 
 The files are organized into distinct packages:
 
@@ -14,4 +14,4 @@ Example:
 - "./fitgen --profile-file Profile-copy.xlsx --path ../../../../ --builders all --profile-version 21.115 -v -y"
 - "./fitgen -f Profile-copy.xlsx -p ../../ -b all --profile-version 21.115 -v -y"
 
-Note: The existing Garmin SDK specifications must not be altered, since it might result in data that does not align with the terms and conditions of the FIT Protocol.
+Note: The existing Garmin SDK specifications must not be altered, as such modifications could lead to data that does not align with the terms and conditions of the FIT Protocol.

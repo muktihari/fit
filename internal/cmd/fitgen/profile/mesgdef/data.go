@@ -9,6 +9,7 @@ type Data struct {
 	Imports           []string
 	Name              string
 	Fields            []Field
+	OptimizedFields   []Field
 	DynamicFields     []DynamicField
 	MaxFieldNum       byte
 	MaxFieldExpandNum byte
@@ -20,7 +21,7 @@ type Field struct {
 	String          string
 	ProfileType     string
 	BaseType        string
-	Size            int
+	Size            byte
 	Type            string
 	TypedValue      string
 	PrimitiveValue  string
@@ -43,11 +44,11 @@ type DynamicField struct {
 
 type SwitchCase struct {
 	Name       string
-	CondsValue []CondValue
+	CondValues []CondValue
 }
 
 type CondValue struct {
-	Conds       string
+	Conds       []string
 	ReturnValue ReturnValue
 }
 

@@ -17,10 +17,6 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 )
 
-const (
-	MesgNum string = "mesg_num"
-)
-
 type mesgnumbuilder struct {
 	template     *template.Template
 	templateExec string
@@ -47,33 +43,26 @@ func NewBuilder(path string, types []parser.Type) builder.Builder {
 func (b *mesgnumbuilder) Build() ([]builder.Data, error) {
 	dataBuilders := make([]builder.Data, 0, len(b.types))
 	for _, t := range b.types {
-		if t.Name != MesgNum {
+		if t.Name != "mesg_num" {
 			continue
 		}
 
-		data := shared.ConstantData{
-			Package: "mesgnum",
-			Imports: []string{"strconv"},
-			Type:    strutil.ToTitle(t.Name),
-			Base:    basetype.FromString(t.BaseType).GoType(),
-		}
-
-		data.Constants = make([]shared.Constant, 0, len(t.Values))
+		typeName := strutil.ToTitle(t.Name)
+		constants := make([]shared.Constant, 0, len(t.Values)+1) // +Invalid
 		for _, v := range t.Values {
-			c := shared.Constant{
+			constants = append(constants, shared.Constant{
 				Name:    strutil.ToLetterPrefix(strutil.ToTitle(v.Name)),
-				Type:    data.Type,
+				Type:    typeName,
 				Op:      "=",
 				Value:   v.Value,
 				String:  v.Name,
 				Comment: v.Comment,
-			}
-			data.Constants = append(data.Constants, c)
+			})
 		}
 
-		data.Constants = append(data.Constants, shared.Constant{
+		constants = append(constants, shared.Constant{
 			Name:    strutil.ToLetterPrefix("Invalid"),
-			Type:    data.Type,
+			Type:    typeName,
 			Op:      "=",
 			Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
 			String:  "invalid",
@@ -85,7 +74,10 @@ func (b *mesgnumbuilder) Build() ([]builder.Data, error) {
 			TemplateExec: b.templateExec,
 			Path:         b.path,
 			Filename:     "mesgnum_gen.go",
-			Data:         data,
+			Data: shared.ConstantData{
+				Package:   "mesgnum",
+				Constants: constants,
+			},
 		})
 
 		break

@@ -49,68 +49,50 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 	dataBuilders := make([]builder.Data, 0, len(b.types))
 	for _, t := range b.types {
 		if t.Name == FitBaseType {
-			continue // ignore, manual creation, see [typedefs/basetype] package.
-		}
-		var hasMfgRangeMin, hashasMfgRangeMax bool
-		data := shared.ConstantData{
-			Package: "typedef",
-			Imports: []string{"strconv"},
-			Type:    strutil.ToTitle(t.Name),
-			Base:    basetype.FromString(t.BaseType).GoType(),
+			continue // ignore, manual creation, see [profile/basetype] package.
 		}
 
-		data.Invalid = shared.Constant{
-			Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
-			Type:    data.Type,
-			Op:      "=",
-			Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
-			String:  fmt.Sprintf("%sInvalid(%d)", data.Type, basetype.FromString(t.BaseType).Invalid()),
-			Comment: "INVALID",
-		}
+		var (
+			hasMfgRangeMin bool
+			hasMfgRangeMax bool
+		)
 
-		duplicates := make(map[string][]shared.Constant)
-		data.Constants = make([]shared.Constant, 0, len(t.Values))
+		typeName := strutil.ToTitle(t.Name)
+
+		duplicates := make(map[string]int)
+		constants := make([]shared.Constant, 0, len(t.Values))
 		for _, v := range t.Values {
-			c := shared.Constant{
+			if v.Name == "mfg_range_min" {
+				hasMfgRangeMin = true
+			}
+			if v.Name == "mfg_range_max" {
+				hasMfgRangeMax = true
+			}
+
+			duplicates[v.Value]++
+			constants = append(constants, shared.Constant{
 				Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + strutil.ToTitle(v.Name)),
-				Type:    data.Type,
+				Type:    typeName,
 				Op:      "=",
 				Value:   v.Value,
 				String:  v.Name,
 				Comment: v.Comment,
-			}
-
-			if v.Name == "mfg_range_min" {
-				hasMfgRangeMin = true
-			}
-
-			if v.Name == "mfg_range_max" {
-				hashasMfgRangeMax = true
-			}
-
-			duplicates[c.Value] = append(duplicates[c.Value], c)
-			data.Constants = append(data.Constants, c)
-
-			if hasMfgRangeMin && hashasMfgRangeMax {
-				data.AllowRegister = true
-			}
+			})
 		}
 
 		// handling duplicate values caused by deprecated
-		for cvalue, constant := range duplicates {
-			if len(constant) == 1 {
+		for value, count := range duplicates {
+			if count == 1 {
 				continue
 			}
-
-			for i := range data.Constants {
-				if data.Constants[i].Value != cvalue {
+			for i := range constants {
+				if constants[i].Value != value {
 					continue
 				}
-
-				comment := strings.ToLower(data.Constants[i].Comment)
+				comment := strings.ToLower(constants[i].Comment)
 				if strings.Contains(comment, "deprecated") {
-					data.Constants[i].Name = "// " + data.Constants[i].Name
-					data.Constants[i].Comment = "[DUPLICATE!] " + data.Constants[i].Comment
+					constants[i].Name = "// " + constants[i].Name
+					constants[i].Comment = "[DUPLICATE!] " + constants[i].Comment
 				}
 			}
 		}
@@ -120,7 +102,22 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 			TemplateExec: b.templateExec,
 			Path:         b.path,
 			Filename:     strutil.ToSnake(t.Name) + "_gen.go",
-			Data:         data,
+			Data: shared.ConstantData{
+				Package:       "typedef",
+				Imports:       []string{"strconv"},
+				Type:          typeName,
+				Base:          basetype.FromString(t.BaseType).GoType(),
+				Constants:     constants,
+				AllowRegister: hasMfgRangeMin && hasMfgRangeMax,
+				Invalid: shared.Constant{
+					Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
+					Type:    typeName,
+					Op:      "=",
+					Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
+					String:  fmt.Sprintf("%sInvalid(%d)", typeName, basetype.FromString(t.BaseType).Invalid()),
+					Comment: "INVALID",
+				},
+			},
 		})
 	}
 

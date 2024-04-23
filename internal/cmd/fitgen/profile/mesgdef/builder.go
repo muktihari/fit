@@ -8,27 +8,16 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
-	"sync"
 	"text/template"
 
 	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
+	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
 	"github.com/muktihari/fit/profile/basetype"
 	"golang.org/x/exp/slices"
-)
-
-type ( // type aliasing for better code reading.
-	// types
-	BaseType = string
-
-	// messages
-	MessageName = string
-	FieldName   = string
-
-	// profile
-	ProfileType = string
 )
 
 type mesgdefBuilder struct {
@@ -37,265 +26,102 @@ type mesgdefBuilder struct {
 
 	path string // path to generate the file
 
-	once sync.Once
-
+	lookup   *lookup.Lookup
 	messages []parser.Message
 	types    []parser.Type
-
-	goTypesByBaseTypes       map[BaseType]string      // (k -> v) enum -> byte
-	goTypesByProfileTypes    map[ProfileType]string   // (k -> v) typedef.DateTime -> uint32
-	baseTypeMapByProfileType map[ProfileType]BaseType // (k -> v) enum -> enum, typedef.DateTime -> uint32
-
-	fieldMapByMessageNameByFieldName map[MessageName]map[FieldName]parser.Field // e.g. map[file_createor][software_version] -> Field{}
 }
 
-func NewBuilder(path string, message []parser.Message, types []parser.Type) builder.Builder {
+func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) builder.Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
 	return &mesgdefBuilder{
 		template: template.Must(template.New("main").
+			Funcs(template.FuncMap{
+				"stringsJoin": strings.Join,
+			}).
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
-		templateExec:                     "mesgdef",
-		path:                             filepath.Join(path, "profile", "mesgdef"),
-		messages:                         message,
-		types:                            types,
-		goTypesByBaseTypes:               make(map[string]string),
-		goTypesByProfileTypes:            make(map[string]string),
-		baseTypeMapByProfileType:         make(map[string]string),
-		fieldMapByMessageNameByFieldName: make(map[string]map[string]parser.Field),
-	}
-}
-
-func (b *mesgdefBuilder) populateLookupData() {
-	b.goTypesByBaseTypes["bool"] = "bool"
-	b.goTypesByBaseTypes["fit_base_type"] = "basetype.BaseType"
-	for _, v := range basetype.List() {
-		b.goTypesByBaseTypes[v.String()] = v.GoType()
-		b.goTypesByProfileTypes[v.String()] = v.GoType()
-		b.baseTypeMapByProfileType[v.String()] = v.String()
-	}
-
-	// additional profile type which is not defined in basetype.
-	b.types = append(b.types, parser.Type{Name: "bool", BaseType: "bool"})
-
-	for _, _type := range b.types {
-		b.goTypesByProfileTypes[_type.Name] = b.goTypesByBaseTypes[_type.BaseType]
-		b.baseTypeMapByProfileType[_type.Name] = _type.BaseType
-	}
-
-	for _, mesg := range b.messages {
-		b.fieldMapByMessageNameByFieldName[mesg.Name] = make(map[string]parser.Field)
-		for _, field := range mesg.Fields {
-			b.fieldMapByMessageNameByFieldName[mesg.Name][field.Name] = field
-		}
+		templateExec: "mesgdef",
+		path:         filepath.Join(path, "profile", "mesgdef"),
+		lookup:       lookup,
+		messages:     message,
+		types:        types,
 	}
 }
 
 func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
-	b.once.Do(func() { b.populateLookupData() })
-
 	dataBuilders := make([]builder.Data, 0, len(b.messages))
 	for _, mesg := range b.messages {
-		canExpandMap := map[string]byte{}
-		var maxFieldExpandNum byte
-		for _, field := range mesg.Fields {
-			for _, component := range field.Components {
-				ref := b.fieldMapByMessageNameByFieldName[mesg.Name][component]
-				canExpandMap[ref.Name] = ref.Num
-				if ref.Num > maxFieldExpandNum {
-					maxFieldExpandNum = ref.Num
-				}
-			}
-			for _, subfield := range field.SubFields {
-				for _, component := range subfield.Components {
-					ref := b.fieldMapByMessageNameByFieldName[mesg.Name][component]
-					canExpandMap[ref.Name] = ref.Num
-					if ref.Num > maxFieldExpandNum {
-						maxFieldExpandNum = ref.Num
-					}
-				}
-			}
-		}
+		canExpand, maxFieldExpandNum := b.componentExpansionAbility(&mesg)
 
-		dataBuilder := builder.Data{
-			Template:     b.template,
-			TemplateExec: b.templateExec,
-			Path:         b.path,
-			Filename:     strutil.ToSnake(mesg.Name) + "_gen.go",
-		}
-
-		imports := map[string]struct{}{}
-		var maxFieldNum byte
-		var dynamicFields []DynamicField
-		fields := make([]Field, 0, len(mesg.Fields))
-		for _, field := range mesg.Fields {
-			if field.Num > maxFieldNum {
-				maxFieldNum = field.Num
+		var (
+			maxFieldNum   byte
+			dynamicFields []DynamicField
+			fields        = make([]Field, 0, len(mesg.Fields))
+			imports       = make(map[string]struct{})
+		)
+		for _, parserField := range mesg.Fields {
+			if parserField.Num > maxFieldNum {
+				maxFieldNum = parserField.Num
 			}
 
-			f := Field{
-				Num:            field.Num,
-				Name:           strutil.ToTitle(field.Name),
-				String:         field.Name,
-				ProfileType:    field.Type,
-				BaseType:       b.baseTypeMapByProfileType[field.Type],
-				Type:           b.transformType(field.Type, field.Array),
-				TypedValue:     b.transformTypedValue(field.Num, field.Type, field.Array),
-				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(field.Name), field.Type, field.Array),
-				ProtoValue:     b.transformToProtoValue(strutil.ToTitle(field.Name), field.Type, field.Array),
-				InvalidValue:   b.invalidValueOf(field.Type, field.Array),
-				Comment:        field.Comment,
-				Array:          field.Array != "",
-				Units:          field.Units,
+			field := Field{
+				Num:            parserField.Num,
+				Name:           strutil.ToTitle(parserField.Name),
+				String:         parserField.Name,
+				ProfileType:    parserField.Type,
+				BaseType:       b.lookup.BaseType(parserField.Type).String(),
+				Type:           b.transformType(parserField.Type, parserField.Array),
+				TypedValue:     b.transformTypedValue(parserField.Num, parserField.Type, parserField.Array),
+				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
+				ProtoValue:     b.transformToProtoValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
+				InvalidValue:   b.invalidValueOf(parserField.Type, parserField.Array),
+				Comment:        parserField.Comment,
+				Scale:          1,
+				Offset:         0,
+				Array:          parserField.Array != "",
+				Units:          parserField.Units,
+			}
+			field.ComparableValue = b.transformComparableValue(parserField.Type, parserField.Array, field.PrimitiveValue)
+
+			if _, ok := canExpand[parserField.Name]; ok {
+				field.CanExpand = true
 			}
 
-			if _, ok := canExpandMap[field.Name]; ok {
-				f.CanExpand = true
+			if parserField.Array == "" && field.BaseType == "string" {
+				field.InvalidValue += fmt.Sprintf("&& %s != \"\"", field.ComparableValue)
 			}
 
-			f.ComparableValue = b.transformComparableValue(field.Type, field.Array, f.PrimitiveValue)
-
-			if field.Array == "" && b.baseTypeMapByProfileType[field.Type] == "string" {
-				f.InvalidValue += fmt.Sprintf("&& %s != \"\"", f.ComparableValue)
+			if len(parserField.Scales) <= 1 { // Multiple scales only for components
+				field.Scale = scaleOrDefault(parserField.Scales, 0)
 			}
 
-			if field.Units != "" {
-				f.Comment = fmt.Sprintf("Units: %s; %s", field.Units, field.Comment)
+			if len(parserField.Offsets) <= 1 { // Multiple offsets only for components
+				field.Offset = offsetOrDefault(parserField.Offsets, 0)
 			}
 
-			if len(field.Offsets) > 1 { // Multiple offsets only for components
-				f.Offset = 0
-			} else {
-				f.Offset = offsetOrDefault(field.Offsets, 0)
-				if f.Offset != 0 {
-					f.Comment = fmt.Sprintf("Offset: %g; %s", f.Offset, f.Comment)
-				}
+			field.Comment = createComment(&field, parserField.Array)
+
+			fields = append(fields, field)
+
+			imports = appendImports(imports, &field, parserField.Type)
+
+			if len(parserField.SubFields) == 0 {
+				continue
 			}
 
-			if len(field.Scales) > 1 { // Multiple scales only for components
-				f.Scale = 1
-			} else {
-				f.Scale = scaleOrDefault(field.Scales, 0)
-				if f.Scale != 1 {
-					f.Comment = fmt.Sprintf("Scale: %g; %s", f.Scale, f.Comment)
-				}
-			}
-
-			if f.Scale != 1 || f.Offset != 0 {
-				imports["github.com/muktihari/fit/kit/scaleoffset"] = struct{}{}
-			}
-
-			if strings.HasPrefix(f.Type, "[]") {
-				f.Comment = fmt.Sprintf("Array: %s; %s", field.Array, f.Comment)
-			}
-
-			f.Comment = strings.Trim(f.Comment, "; ")
-
-			fields = append(fields, f)
-			if strings.HasPrefix(f.Type, "basetype") || strings.HasPrefix(f.InvalidValue, "basetype") {
-				imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
-			}
-			if isTypeTime(field.Type) {
-				imports["time"] = struct{}{}
-				imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
-			}
-
-			if (f.Scale != 1 || f.Offset != 0) && !f.Array {
-				imports["math"] = struct{}{}
-			}
-
-			if strings.HasPrefix(f.ComparableValue, "math") {
-				imports["math"] = struct{}{}
-			}
-			if strings.Contains(f.ProtoValue, "unsafe") ||
-				strings.Contains(f.TypedValue, "unsafe") ||
-				strings.Contains(f.ComparableValue, "unsafe") {
-				imports["unsafe"] = struct{}{}
-			}
-			if f.Units == "semicircles" {
-				imports["github.com/muktihari/fit/kit/semicircles"] = struct{}{}
-			}
-
-			if len(field.SubFields) != 0 {
-				dynamicField := DynamicField{
-					Name: f.Name,
-					Default: ReturnValue{
-						Name:  field.Name,
-						Units: field.Units,
-						Value: fmt.Sprintf("m.%s", f.Name),
-					},
-				}
-
-				maps := map[string]map[string][]string{}
-				for _, subField := range field.SubFields {
-					var nameValueUnits string
-					scale := scaleOrDefault(subField.Scales, 0)
-					offset := offsetOrDefault(subField.Offsets, 0)
-					if scale != 1 || offset != 0 {
-						nameValueUnits = fmt.Sprintf("%s|%s|(float64(m.%s) * %g) - %g",
-							subField.Name, subField.Units, f.Name, scale, offset)
-					} else {
-						nameValueUnits = fmt.Sprintf("%s|%s|%s(m.%s)",
-							subField.Name, subField.Units, b.transformType(subField.Type, ""), f.Name)
-					}
-
-					for i, refValueName := range subField.RefFieldNames {
-						fieldRef := b.fieldMapByMessageNameByFieldName[mesg.Name][refValueName]
-
-						m := maps[fieldRef.Name]
-						if m == nil {
-							m = map[string][]string{}
-						}
-
-						m[nameValueUnits] = append(m[nameValueUnits],
-							fmt.Sprintf("%s%s",
-								b.transformType(fieldRef.Type, fieldRef.Array), strutil.ToTitle(subField.RefFieldValue[i])))
-
-						maps[fieldRef.Name] = m
-					}
-
-					scs := make([]SwitchCase, 0, len(maps))
-					for fieldRefName, rawSwitchCases := range maps {
-						sc := SwitchCase{Name: fmt.Sprintf("m.%s", strutil.ToTitle(fieldRefName))}
-
-						for nameUnitsValue, conditions := range rawSwitchCases {
-							parts := strings.Split(nameUnitsValue, "|")
-
-							sc.CondsValue = append(sc.CondsValue, CondValue{
-								Conds: strings.Join(conditions, ","),
-								ReturnValue: ReturnValue{
-									Name:  parts[0],
-									Units: parts[1],
-									Value: parts[2],
-								},
-							})
-						}
-						scs = append(scs, sc)
-					}
-
-					slices.SortStableFunc(scs, func(a, b SwitchCase) int {
-						if a.Name < b.Name {
-							return -1
-						} else if a.Name > b.Name {
-							return 1
-						}
-						return 0
-					})
-
-					dynamicField.SwitchCases = scs
-				}
-				dynamicFields = append(dynamicFields, dynamicField)
-			}
+			dynamicFields = append(dynamicFields, b.createDynamicField(mesg.Name, &field, &parserField))
 		}
 
 		// Optimize memory usage by aligning the memory in the struct.
-		b.simpleMemoryAlignment(fields)
+		optimizedFields := slices.Clone(fields)
+		b.simpleMemoryAlignment(optimizedFields)
 
 		data := Data{
 			Package:           "mesgdef",
 			Imports:           []string{},
 			Name:              strutil.ToTitle(mesg.Name),
 			Fields:            fields,
+			OptimizedFields:   optimizedFields,
 			DynamicFields:     dynamicFields,
 			MaxFieldNum:       maxFieldNum + 1,
 			MaxFieldExpandNum: maxFieldExpandNum + 1,
@@ -305,11 +131,172 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			data.Imports = append(data.Imports, k)
 		}
 
-		dataBuilder.Data = data
+		dataBuilder := builder.Data{
+			Template:     b.template,
+			TemplateExec: b.templateExec,
+			Path:         b.path,
+			Filename:     strutil.ToSnake(mesg.Name) + "_gen.go",
+			Data:         data,
+		}
+
 		dataBuilders = append(dataBuilders, dataBuilder)
 	}
 
 	return dataBuilders, nil
+}
+
+// componentExpansionAbility checks whether fields or subfields have components that can be expanded.
+// If they do, retrieve the largest field's number.
+func (b *mesgdefBuilder) componentExpansionAbility(mesg *parser.Message) (canExpand map[string]byte, maxFieldExpandNum byte) {
+	canExpand = make(map[string]byte)
+	for _, field := range mesg.Fields {
+		for _, component := range field.Components {
+			ref := b.lookup.FieldByName(mesg.Name, component)
+			canExpand[ref.Name] = ref.Num
+			if ref.Num > maxFieldExpandNum {
+				maxFieldExpandNum = ref.Num
+			}
+		}
+		for _, subfield := range field.SubFields {
+			for _, component := range subfield.Components {
+				ref := b.lookup.FieldByName(mesg.Name, component)
+				canExpand[ref.Name] = ref.Num
+				if ref.Num > maxFieldExpandNum {
+					maxFieldExpandNum = ref.Num
+				}
+			}
+		}
+	}
+	return
+}
+
+func createComment(field *Field, array string) string {
+	buf := new(strings.Builder)
+
+	if strings.HasPrefix(field.Type, "[]") {
+		buf.WriteString("Array: ")
+		buf.WriteString(array)
+		buf.WriteString("; ")
+	}
+
+	if field.Scale != 1 {
+		buf.WriteString("Scale: ")
+		buf.WriteString(strconv.FormatFloat(field.Scale, 'g', -1, 64))
+		buf.WriteString("; ")
+	}
+
+	if field.Offset != 0 {
+		buf.WriteString("Offset: ")
+		buf.WriteString(strconv.FormatFloat(field.Offset, 'g', -1, 64))
+		buf.WriteString("; ")
+	}
+
+	if field.Units != "" {
+		buf.WriteString("Units: ")
+		buf.WriteString(field.Units)
+		buf.WriteString("; ")
+	}
+
+	buf.WriteString(field.Comment)
+
+	return strings.TrimSuffix(buf.String(), "; ")
+}
+
+func appendImports(imports map[string]struct{}, field *Field, profileType string) map[string]struct{} {
+	if field.Scale != 1 || field.Offset != 0 {
+		imports["github.com/muktihari/fit/kit/scaleoffset"] = struct{}{}
+	}
+
+	if strings.HasPrefix(field.Type, "basetype") || strings.HasPrefix(field.InvalidValue, "basetype") {
+		imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
+	}
+	if isTypeTime(profileType) {
+		imports["time"] = struct{}{}
+		imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
+	}
+
+	if (field.Scale != 1 || field.Offset != 0) && !field.Array {
+		imports["math"] = struct{}{}
+	}
+
+	if strings.HasPrefix(field.ComparableValue, "math") {
+		imports["math"] = struct{}{}
+	}
+	if strings.Contains(field.ProtoValue, "unsafe") ||
+		strings.Contains(field.TypedValue, "unsafe") ||
+		strings.Contains(field.ComparableValue, "unsafe") {
+		imports["unsafe"] = struct{}{}
+	}
+	if field.Units == "semicircles" {
+		imports["github.com/muktihari/fit/kit/semicircles"] = struct{}{}
+	}
+	return imports
+}
+
+func (b *mesgdefBuilder) createDynamicField(mesgName string, field *Field, parserField *parser.Field) DynamicField {
+	var (
+		rawSwitchCases      = make(map[string][]CondValue)
+		rawSwitchCasesOrder = make(map[string]int)
+		valuesOrder         = make(map[string]map[ReturnValue]int)
+	)
+	for _, subField := range parserField.SubFields {
+		condValue := CondValue{
+			ReturnValue: ReturnValue{
+				Name:  subField.Name,
+				Units: subField.Units,
+			},
+		}
+
+		scale := scaleOrDefault(subField.Scales, 0)
+		offset := offsetOrDefault(subField.Offsets, 0)
+		if scale != 1 || offset != 0 {
+			condValue.ReturnValue.Value = fmt.Sprintf("(float64(m.%s) * %g) - %g", field.Name, scale, offset)
+		} else {
+			condValue.ReturnValue.Value = fmt.Sprintf("%s(m.%s)", b.transformType(subField.Type, ""), field.Name)
+		}
+
+		for i, refValueName := range subField.RefFieldNames {
+			fieldRef := b.lookup.FieldByName(mesgName, refValueName)
+
+			_, ok := rawSwitchCases[fieldRef.Name]
+			if !ok {
+				rawSwitchCasesOrder[fieldRef.Name] = len(rawSwitchCasesOrder)
+				valuesOrder[fieldRef.Name] = make(map[ReturnValue]int)
+			}
+
+			valOrder, ok := valuesOrder[fieldRef.Name][condValue.ReturnValue]
+			if !ok {
+				valOrder = len(rawSwitchCases[fieldRef.Name])
+				valuesOrder[fieldRef.Name][condValue.ReturnValue] = valOrder
+				rawSwitchCases[fieldRef.Name] = append(rawSwitchCases[fieldRef.Name], condValue)
+			}
+
+			condValue = rawSwitchCases[fieldRef.Name][valOrder]
+			condValue.Conds = append(condValue.Conds,
+				fmt.Sprintf("%s%s",
+					b.transformType(fieldRef.Type, fieldRef.Array), strutil.ToTitle(subField.RefFieldValue[i])))
+
+			rawSwitchCases[fieldRef.Name][valOrder] = condValue
+		}
+	}
+
+	switchCases := make([]SwitchCase, len(rawSwitchCases))
+	for fieldNameRef, i := range rawSwitchCasesOrder {
+		switchCases[i] = SwitchCase{
+			Name:       fmt.Sprintf("m.%s", strutil.ToTitle(fieldNameRef)),
+			CondValues: rawSwitchCases[fieldNameRef],
+		}
+	}
+
+	return DynamicField{
+		Name:        field.Name,
+		SwitchCases: switchCases,
+		Default: ReturnValue{
+			Name:  parserField.Name,
+			Units: parserField.Units,
+			Value: fmt.Sprintf("m.%s", field.Name),
+		},
+	}
 }
 
 func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
@@ -323,7 +310,7 @@ func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
 		} else if fields[i].BaseType == "string" {
 			fields[i].Size = 8 // 16 bytes (pointer to array (8 bytes) + len (8 bytes))
 		} else { // Everything else, 8 bytes or lower.
-			fields[i].Size = int(basetype.FromString(fields[i].BaseType).Size())
+			fields[i].Size = basetype.FromString(fields[i].BaseType).Size()
 		}
 	}
 	// Order by the size desc.
@@ -342,18 +329,22 @@ func (b *mesgdefBuilder) transformType(fieldType, fieldArray string) string {
 		return "time.Time"
 	}
 
-	var _type string
-	if v, ok := b.goTypesByBaseTypes[fieldType]; ok {
-		_type = v
+	if fieldType == "fit_base_type" {
+		return "basetype.BaseType"
+	}
+
+	var typ string
+	if v := b.lookup.BaseType(fieldType).String(); v == fieldType || fieldType == "bool" {
+		typ = b.lookup.GoType(fieldType)
 	} else {
-		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
+		typ = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
 	}
 
 	if fieldArray == "" {
-		return _type
+		return typ
 	}
 
-	return fmt.Sprintf("[]%s", _type)
+	return fmt.Sprintf("[]%s", typ)
 }
 
 func isTypeTime(fieldType string) bool {
@@ -365,31 +356,35 @@ func isTypeTime(fieldType string) bool {
 	return false
 }
 
+var baseTypeReplacer = strings.NewReplacer(
+	"Enum", "Uint8",
+	"Sint", "Int",
+	"Byte", "Uint8",
+)
+
 func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("proto.Uint32(datetime.ToUint32(m.%s))", fieldName)
 	}
 
-	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
-	baseType = baseTypeReplacer.Replace(baseType)
+	baseType := b.lookup.BaseType(fieldType).String()
+	goType := b.lookup.GoType(fieldType)
 
-	baseType = strings.TrimSuffix(baseType, "z")
+	typ := strutil.ToTitle(goType)
+	typ = baseTypeReplacer.Replace(typ)
+	typ = strings.TrimSuffix(typ, "z")
 
-	goType := b.goTypesByProfileTypes[fieldType]
+	if array != "" {
+		return fmt.Sprintf("proto.Slice%s(%s)", typ, fmt.Sprintf("m.%s", fieldName))
+	}
 
 	val := fmt.Sprintf("m.%s", fieldName)
-	if b.baseTypeMapByProfileType[fieldType] != fieldType {
-		if array == "" {
-			val = fmt.Sprintf("%s(%s)", goType, val)
-		}
+
+	if fieldType != "bool" && baseType != fieldType {
+		val = fmt.Sprintf("%s(%s)", b.lookup.GoType(fieldType), val)
 	}
 
-	slicePrefix := ""
-	if array != "" {
-		slicePrefix = "Slice"
-	}
-
-	return fmt.Sprintf("proto.%s%s(%s)", slicePrefix, baseType, val)
+	return fmt.Sprintf("proto.%s(%s)", typ, val)
 }
 
 func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array string) string {
@@ -397,77 +392,77 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
 	}
 
-	if !strings.HasSuffix(fieldType, "z") && b.baseTypeMapByProfileType[fieldType] == fieldType {
+	if !strings.HasSuffix(fieldType, "z") &&
+		b.lookup.BaseType(fieldType).String() == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
 
-	goType := b.goTypesByProfileTypes[fieldType]
-	if array == "" && goType != "" {
-		return fmt.Sprintf("%s(m.%s)", goType, fieldName)
-	}
-
-	if array != "" {
+	goType := b.lookup.GoType(fieldType)
+	if goType == "bool" {
 		return fmt.Sprintf("m.%s", fieldName)
 	}
 
-	return fmt.Sprintf("%s(m.%s)", goType, fieldName)
+	if array == "" {
+		return fmt.Sprintf("%s(m.%s)", goType, fieldName)
+	}
+
+	return fmt.Sprintf("m.%s", fieldName)
+
 }
 
-var baseTypeReplacer = strings.NewReplacer(
-	"Enum", "Uint8",
-	"Sint", "Int",
-	"Byte", "Uint8",
-)
-
 func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) string {
-	baseType := strutil.ToTitle(b.baseTypeMapByProfileType[fieldType])
-	baseType = baseTypeReplacer.Replace(baseType)
-	if array != "" && strings.HasSuffix(baseType, "z") {
-		baseType = strings.TrimSuffix(baseType, "z")
-	}
-
-	if fieldType == "fit_base_type" {
-		return fmt.Sprintf("basetype.BaseType((vals[%d]).%s())", num, baseType)
-	}
-
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToTime(vals[%d].Uint32())", num)
 	}
 
-	var _type string
-	if _, ok := b.goTypesByBaseTypes[fieldType]; !ok {
-		_type = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
+	if fieldType == "fit_base_type" {
+		baseType := b.lookup.BaseType(fieldType).String()
+		typ := strutil.ToTitle(baseType)
+		typ = baseTypeReplacer.Replace(typ)
+
+		return fmt.Sprintf("basetype.BaseType((vals[%d]).%s())", num, typ)
 	}
 
-	slicePrefix := ""
-	if array != "" {
-		slicePrefix = "Slice"
+	baseType := b.lookup.BaseType(fieldType).String()
+	typ := strutil.ToTitle(baseType)
+	typ = baseTypeReplacer.Replace(typ)
+
+	if array != "" && strings.HasSuffix(typ, "z") {
+		typ = strings.TrimSuffix(typ, "z")
 	}
 
-	res := fmt.Sprintf("vals[%d].%s%s()",
-		num,
-		slicePrefix,
-		baseType,
-	)
-
-	if _type != "" {
-		if array != "" {
-			res = fmt.Sprintf(`func() []%s {
-				sliceValue := %s
-				ptr := unsafe.SliceData(sliceValue)
-				return unsafe.Slice((*%s)(ptr), len(sliceValue))
-			}()`, _type, res, _type)
-		} else {
-			res = fmt.Sprintf("%s(%s)", _type, res)
-		}
+	if fieldType == "bool" {
+		typ = "Bool"
 	}
 
-	return res
+	var value string
+	if array == "" {
+		value = fmt.Sprintf("vals[%d].%s()", num, typ)
+	} else {
+		value = fmt.Sprintf("vals[%d].Slice%s()", num, typ)
+	}
+
+	if baseType == fieldType || fieldType == "bool" { // primitive-types
+		return value
+	}
+
+	typdef := fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
+
+	if array == "" {
+		return fmt.Sprintf("%s(%s)", typdef, value)
+	}
+
+	return fmt.Sprintf(`func() []%s {
+			sliceValue := %s
+			ptr := unsafe.SliceData(sliceValue)
+			return unsafe.Slice((*%s)(ptr), len(sliceValue))
+		}()`, typdef, value, typdef)
+
 }
 
 func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveValue string) string {
 	if array == "" {
-		switch b.baseTypeMapByProfileType[fieldType] {
+		switch b.lookup.BaseType(fieldType).String() {
 		case "float32":
 			return fmt.Sprintf("math.Float32bits(%s)", primitiveValue)
 		case "float64":
@@ -487,8 +482,8 @@ func (b *mesgdefBuilder) invalidValueOf(fieldType, array string) string {
 		return "nil"
 	}
 
-	bt := basetype.FromString(b.baseTypeMapByProfileType[fieldType]).String()
-	return fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(bt))
+	return fmt.Sprintf("basetype.%sInvalid",
+		strutil.ToTitle(b.lookup.BaseType(fieldType).String()))
 }
 
 // Profile.xlsx says unless otherwise specified, scale of 1 is assumed.

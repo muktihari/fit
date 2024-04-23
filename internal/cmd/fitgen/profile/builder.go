@@ -6,6 +6,7 @@ package profile
 
 import (
 	"fmt"
+	"math"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -114,6 +115,9 @@ func (b *profilebuilder) buildProfile() builder.Data {
 
 	data.Invalid = shared.Constant{
 		Name:    "Invalid",
+		Op:      "=",
+		Type:    ProfileType,
+		Value:   strconv.Itoa(math.MaxUint16),
 		String:  fmt.Sprintf("%sInvalid(%d)", ProfileType, basetype.FromString(data.Base).Invalid()),
 		Comment: "INVALID",
 	}
