@@ -10,12 +10,12 @@
 
 The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices.
 When recording an activity using devices such as cycling computer, smartwatch, and similar devices, chances are the resulting file is often in FIT file format (\*.fit).
-The FIT file is a binary file format known for its compact size, making it the preferred choice for manufacturers to use in their embedded devices.
-However, despite having gained widespread adoption, Garmin has not yet released an official SDK for Go, this is where this SDK comes in to bridge the gap, enabling Go developers to be able to interact with FIT file format.
 
 More about FIT: [developer.garmin.com/fit](https://developer.garmin.com/fit)
 
-This SDK is designed with efficiency in mind, but it places a higher priority on clarity, simplicity and extensibility. While other Go implementations for decoding or encoding FIT files may exist, we offer greater correctness, completeness, and similar semantics to the Official SDK.
+## Motivation
+
+The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK, especially in supporting FIT Protocol V2. This is where this SDK comes in to bridge the gap, enabling Go developers to interact seamlessly with the FIT protocol.
 
 ## Usage
 
@@ -316,7 +316,7 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
 We do not aim to compete with anyone; rather, we have created this FIT SDK with the intention of providing an alternative. However, having a benchmark can show us how relevant we are to the world.
 
-Here is a benchmark for decoding and encoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding FIT files. See [./internal/cmd/benchfit/benchfit_test.go](./internal/cmd/benchfit/benchfit_test.go)
+Here is a benchmark for decoding and encoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding and encoding FIT files. See [internal/cmd/benchfit/benchfit_test.go](./internal/cmd/benchfit/benchfit_test.go)
 
 ```sh
 cd internal/cmd/benchfit
