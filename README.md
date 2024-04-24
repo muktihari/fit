@@ -8,14 +8,13 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8731/badge)](https://www.bestpractices.dev/projects/8731)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
-The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices.
-When recording an activity using devices such as cycling computer, smartwatch, and similar devices, chances are the resulting file is often in FIT file format (\*.fit).
+The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. When recording an activity using devices such as cycling computer, smartwatch, and similar devices, chances are the resulting file is often in FIT file format (\*.fit).
 
 More about FIT: [developer.garmin.com/fit](https://developer.garmin.com/fit)
 
 ## Motivation
 
-The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK, especially in supporting FIT Protocol V2. This is where this SDK comes in to bridge the gap, enabling Go developers to interact seamlessly with the FIT protocol.
+The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK. One of the key semantics they are missing is the ability for users to retrieve raw protocol messages; instead, they decode directly into predefined message structs grouped by [common file types](https://developer.garmin.com/fit/file-types). Furthermore, existing third-party libraries do not seem to fully support FIT Protocol V2, and their ability to produce variant options of the FIT protocol is limited, such as creating FIT files with compressed timestamps or FIT files with multiple local message types, which significantly reduces the resulting FIT files' size. This is where this SDK comes in to bridge the gap, enabling Go developers to interact seamlessly with the FIT protocol.
 
 ## Usage
 
