@@ -8,6 +8,7 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // SegmentList files maintain a list of available segments on the device.
@@ -50,6 +51,8 @@ func (f *SegmentList) Add(mesg proto.Message) {
 	case mesgnum.SegmentFile:
 		f.SegmentFiles = append(f.SegmentFiles, mesgdef.NewSegmentFile(&mesg))
 	default:
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
