@@ -123,11 +123,12 @@ func main() {
 
         i := 100
         fmt.Printf("\nSample value of record[%d]:\n", i)
-        fmt.Printf("  Lat: %v semicircles\n", activity.Records[i].PositionLat)
-        fmt.Printf("  Long: %v semicircles\n", activity.Records[i].PositionLong)
-        fmt.Printf("  Speed: %g m/s\n", float64(activity.Records[i].Speed)/1000)
-        fmt.Printf("  HeartRate: %v bpm\n", activity.Records[i].HeartRate)
-        fmt.Printf("  Cadence: %v rpm\n", activity.Records[i].Cadence)
+        fmt.Printf("  Distance: %g m\n", activity.Records[i].DistanceScaled())
+        fmt.Printf("  Lat: %d semicircles\n", activity.Records[i].PositionLat)
+        fmt.Printf("  Long: %d semicircles\n", activity.Records[i].PositionLong)
+        fmt.Printf("  Speed: %g m/s\n", activity.Records[i].SpeedScaled())
+        fmt.Printf("  HeartRate: %d bpm\n", activity.Records[i].HeartRate)
+        fmt.Printf("  Cadence: %d rpm\n", activity.Records[i].Cadence)
 
         // Output:
         // File Type: activity
@@ -136,6 +137,7 @@ func main() {
         // Records count: 3601
         //
         // Sample value of record[100]:
+        //   Distance: 100 m
         //   Lat: 0 semicircles
         //   Long: 10717 semicircles
         //   Speed: 1 m/s
@@ -167,11 +169,11 @@ func main() {
 
     // The listener will receive every decoded message from the decoder as soon as it is decoded
     // and transform it into an filedef's File.
-    al := filedef.NewListener()
-    defer al.Close() // release channel used by listener
+    lis := filedef.NewListener()
+    defer lis.Close() // release channel used by listener
 
     dec := decoder.New(f,
-        decoder.WithMesgListener(al), // Add activity listener to the decoder
+        decoder.WithMesgListener(lis), // Add activity listener to the decoder
         decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
     )
 
@@ -182,7 +184,7 @@ func main() {
         }
 
         // The resulting File can be retrieved after decoding process completed.
-        switch file := al.File().(type) {
+        switch file := lis.File().(type) {
         case *filedef.Course:
             // do something if it's a course file
         case *filedef.Workout:
@@ -195,11 +197,12 @@ func main() {
 
             i := 100
             fmt.Printf("\nSample value of record[%d]:\n", i)
-            fmt.Printf("  Lat: %v semicircles\n", file.Records[i].PositionLat)
-            fmt.Printf("  Long: %v semicircles\n", file.Records[i].PositionLong)
-            fmt.Printf("  Speed: %g m/s\n", float64(file.Records[i].Speed)/1000)
-            fmt.Printf("  HeartRate: %v bpm\n", file.Records[i].HeartRate)
-            fmt.Printf("  Cadence: %v rpm\n", file.Records[i].Cadence)
+            fmt.Printf("  Distance: %g m\n", file.Records[i].DistanceScaled())
+            fmt.Printf("  Lat: %g degrees\n", file.Records[i].PositionLatDegrees())
+            fmt.Printf("  Long: %g degrees\n", file.Records[i].PositionLongDegrees())
+            fmt.Printf("  Speed: %g m/s\n", file.Records[i].SpeedScaled())
+            fmt.Printf("  HeartRate: %d bpm\n", file.Records[i].HeartRate)
+            fmt.Printf("  Cadence: %d rpm\n", file.Records[i].Cadence)
 
             // Output:
             // File Type: activity
@@ -208,8 +211,9 @@ func main() {
             // Records count: 3601
             //
             // Sample value of record[100]:
-            //   Lat: 0 semicircles
-            //   Long: 10717 semicircles
+            //   Distance: 100 m
+            //   Lat: 0 degrees
+            //   Long: 0.0008982885628938675 degrees
             //   Speed: 1 m/s
             //   HeartRate: 126 bpm
             //   Cadence: 100 rpm
@@ -277,11 +281,11 @@ func main() {
     }
     defer f.Close()
 
-    al := filedef.NewListener()
-    defer al.Close() // release channel used by listener
+    lis := filedef.NewListener()
+    defer lis.Close() // release channel used by listener
 
     dec := decoder.New(f,
-        decoder.WithMesgListener(al),
+        decoder.WithMesgListener(lis),
         decoder.WithBroadcastOnly(),
     )
 
@@ -305,7 +309,7 @@ func main() {
         panic(err)
     }
 
-    activity := al.File().(*filedef.Activity)
+    activity := lis.File().(*filedef.Activity)
 
     fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
     fmt.Printf("Laps count: %d\n", len(activity.Laps))
@@ -793,11 +797,11 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     }
     defer fin.Close()
 
-    al := filedef.NewListener()
-    defer al.Close()
+    lis := filedef.NewListener()
+    defer lis.Close()
 
     dec := decoder.New(fin),
-        decoder.WithMesgListener(al),
+        decoder.WithMesgListener(lis),
         decoder.WithBroadcastOnly(),
     )
 
@@ -806,7 +810,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
         panic(err)
     }
 
-    activity := al.File().(*filedef.Activity)
+    activity := lis.File().(*filedef.Activity)
 
     /* Do something with the Activity File, for example changing manufacturer and product like this */
     activity.FileId.Manufacturer = typedef.ManufacturerGarmin
