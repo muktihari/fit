@@ -59,8 +59,6 @@ type RawDecoder struct {
 	// This is exported to allow the unused space to be utilized in a tight RAM, for instance, an embedded device.
 	// Using Index >= len(b) is safe on each Decode's callback function call.
 	BytesArray [1 + (255 * 255 * 2)]byte
-
-	lenMesgs [proto.LocalMesgNumMask + 1]uint32
 }
 
 // NewRaw creates new RawDecoder which provides low-level building block to work with FIT bytes for the
@@ -68,7 +66,7 @@ type RawDecoder struct {
 // MessageDefinition, MessageData and CRC) for scoping the operation.
 //
 // However, this is still considered unsafe operation since we work with bytes directly and the responsibility
-// for validation now placed on the user-space.  The only thing that this validates is the reader should be a FIT
+// for validation now placed on the user-space. The only thing that this validates is the reader should be a FIT
 // (FileHeader: has valid Size and bytes 8-12 is ".FIT").
 //
 // The idea is to allow us to use a minimal viable decoder for performance and memory-critical situations,
@@ -93,10 +91,10 @@ func NewRaw() *RawDecoder {
 // byte by byte reading and having frequent read on non-buffered reader might impact performance, especially
 // if it involves syscall such as reading a file.
 func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) (n int64, err error) {
-	defer d.reset() // Must reset before return, so we can invoke Decode again for the next reader.
-
 	var seq int
 	for {
+		lenMesgs := [proto.LocalMesgNumMask + 1]uint32{}
+
 		// 1. Decode File Header
 		nr, err := io.ReadFull(r, d.BytesArray[:1])
 		n += int64(nr)
@@ -185,7 +183,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 				}
 
 				localMesgNum := d.BytesArray[0] & proto.LocalMesgNumMask
-				d.lenMesgs[localMesgNum] = lenMesg
+				lenMesgs[localMesgNum] = lenMesg
 
 				if err := fn(RawFlagMesgDef, d.BytesArray[:lenMesgDef]); err != nil {
 					return n, err
@@ -196,7 +194,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 
 			// 2. b. Decode Message Data
 			localMesgNum := proto.LocalMesgNum(d.BytesArray[0])
-			lenMesg := d.lenMesgs[localMesgNum]
+			lenMesg := lenMesgs[localMesgNum]
 			if lenMesg == 0 {
 				return n, fmt.Errorf("localMesgNum: %d: %w", localMesgNum, ErrMesgDefMissing)
 			}
@@ -224,13 +222,5 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 		}
 
 		seq++
-
-		d.reset() // reset for next FIT sequence.
-	}
-}
-
-func (d *RawDecoder) reset() {
-	for i := range d.lenMesgs {
-		d.lenMesgs[i] = 0
 	}
 }

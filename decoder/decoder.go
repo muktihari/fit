@@ -209,14 +209,14 @@ func New(r io.Reader, opts ...Option) *Decoder {
 		developerDataIds:        make([]*mesgdef.DeveloperDataId, 0),
 		fieldDescriptions:       make([]*mesgdef.FieldDescription, 0),
 	}
-	d.initDecodeHeaderOnce()
+	d.initDecodeFileHeaderOnce()
 
 	return d
 }
 
-// initDecodeHeaderOnce initializes decodeHeaderOnce() to decode the header exactly once, if error occur
+// initDecodeFileHeaderOnce initializes decodeFileHeaderOnce() to decode the header exactly once, if error occur
 // during the first invocation, the error will be returned everytime decodeHeaderOnce() is invoked.
-func (d *Decoder) initDecodeHeaderOnce() {
+func (d *Decoder) initDecodeFileHeaderOnce() {
 	var once = sync.Once{}
 	d.decodeFileHeaderOnce = func() error {
 		once.Do(func() { d.err = d.decodeFileHeader() })
@@ -300,7 +300,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 			err = ErrCRCChecksumMismatch
 			break
 		}
-		d.initDecodeHeaderOnce()
+		d.initDecodeFileHeaderOnce()
 		d.crc16.Reset()
 		d.cur = 0
 		seq++
@@ -410,7 +410,7 @@ func (d *Decoder) reset() {
 	d.lastTimeOffset = 0
 	d.sequenceCompleted = false
 
-	d.initDecodeHeaderOnce() // reset to enable invocation.
+	d.initDecodeFileHeaderOnce() // reset to enable invocation.
 }
 
 // Reset resets the Decoder to read its input from r, clear any error and
@@ -515,6 +515,7 @@ func (d *Decoder) decodeFileHeader() error {
 	}
 
 	if d.fileHeader.CRC == 0x0000 || !d.options.shouldChecksum { // do not need to check header's crc integrity.
+		d.crc16.Reset()
 		return nil
 	}
 
