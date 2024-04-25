@@ -8,6 +8,7 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // Segment files contain data defining a route and timing information to gauge progress against previous performances or other users
@@ -56,6 +57,8 @@ func (f *Segment) Add(mesg proto.Message) {
 	case mesgnum.SegmentPoint:
 		f.SegmentPoints = append(f.SegmentPoints, mesgdef.NewSegmentPoint(&mesg))
 	default:
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

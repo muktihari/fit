@@ -89,6 +89,12 @@ func TestMonitoringABCorrectness(t *testing.T) {
 		t.Fatal(diff)
 	}
 
+	// Edit unrelated message, should not change the resulting messages.
+	mesgsA[len(mesgsA)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
+	if diff := cmp.Diff(mesgsA, fit.Messages, valueTransformer()); diff == "" {
+		t.Fatalf("the modification reflect on the resulting messages")
+	}
+
 	mesgsB := newMonitoringBMessageForTest(time.Now())
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
 	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
@@ -112,5 +118,11 @@ func TestMonitoringABCorrectness(t *testing.T) {
 		}
 		fmt.Println("")
 		t.Fatal(diff)
+	}
+
+	// Edit unrelated message, should not change the resulting messages.
+	mesgsB[len(mesgsB)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
+	if diff := cmp.Diff(mesgsB, fit.Messages, valueTransformer()); diff == "" {
+		t.Fatalf("the modification reflect on the resulting messages")
 	}
 }

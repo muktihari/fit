@@ -8,6 +8,7 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // Schedules files are used to schedule a user’s workouts and may contain multiple schedule messages each representing the start time of a workout.
@@ -47,6 +48,8 @@ func (f *Schedules) Add(mesg proto.Message) {
 	case mesgnum.Schedule:
 		f.Schedules = append(f.Schedules, mesgdef.NewSchedule(&mesg))
 	default:
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

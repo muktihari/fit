@@ -8,6 +8,7 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // Settings files contain user and device information in the form of profiles.
@@ -59,6 +60,8 @@ func (f *Settings) Add(mesg proto.Message) {
 	case mesgnum.DeviceSettings:
 		f.DeviceSettings = append(f.DeviceSettings, mesgdef.NewDeviceSettings(&mesg))
 	default:
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

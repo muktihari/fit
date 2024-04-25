@@ -91,4 +91,10 @@ func TestCourseCorrectness(t *testing.T) {
 		fmt.Println("")
 		t.Fatal(diff)
 	}
+
+	// Edit unrelated message, should not change the resulting messages.
+	mesgs[len(mesgs)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff == "" {
+		t.Fatalf("the modification reflect on the resulting messages")
+	}
 }

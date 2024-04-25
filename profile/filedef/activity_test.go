@@ -140,7 +140,6 @@ func newActivityMessageForTest(now time.Time) []proto.Message {
 
 func TestActivityCorrectness(t *testing.T) {
 	mesgs := newActivityMessageForTest(time.Now())
-
 	activity := filedef.NewActivity(mesgs...)
 	if activity.FileId.Type != typedef.FileActivity {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, activity.FileId.Type)
@@ -158,5 +157,11 @@ func TestActivityCorrectness(t *testing.T) {
 
 	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
 		t.Fatal(diff)
+	}
+
+	// Edit unrelated message, should not change the resulting messages.
+	mesgs[len(mesgs)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
+	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff == "" {
+		t.Fatalf("the modification reflect on the resulting messages")
 	}
 }

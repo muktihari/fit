@@ -8,6 +8,7 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // MonitoringAB (Monitoring A and Monitoring B) files are used to store data that is logged over varying time intervals.
@@ -57,6 +58,8 @@ func (f *MonitoringAB) Add(mesg proto.Message) {
 	case mesgnum.DeviceInfo:
 		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(&mesg))
 	default:
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
