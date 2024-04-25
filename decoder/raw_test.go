@@ -474,7 +474,6 @@ func TestRawDecoderDecode(t *testing.T) {
 			}
 
 			result.Reset()
-			dec.reset()
 			hash16.Reset()
 		})
 	}

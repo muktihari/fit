@@ -223,7 +223,7 @@ var (
 	fnReaderErr = fnReader(func(b []byte) (n int, err error) { return 0, io.EOF })
 )
 
-func TestDecodeHeaderOnce(t *testing.T) {
+func TestDecodeFileHeaderOnce(t *testing.T) {
 	var r io.Reader = func() io.Reader {
 		fnInstances := []io.Reader{
 			fnReader(func(b []byte) (n int, err error) {
@@ -1045,14 +1045,15 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-func TestDecodeHeader(t *testing.T) {
+func TestDecodeFileHeader(t *testing.T) {
 	fit, buf := createFitForTest()
 
 	tt := []struct {
-		name   string
-		r      io.Reader
-		header proto.FileHeader
-		err    error
+		name       string
+		r          io.Reader
+		header     proto.FileHeader
+		err        error
+		validateFn func(d *Decoder) error // multi-purpose extra validation func
 	}{
 		{
 			name: "decode header happy flow",
@@ -1177,6 +1178,12 @@ func TestDecodeHeader(t *testing.T) {
 				header.CRC = 0
 				return header
 			}(),
+			validateFn: func(d *Decoder) error {
+				if crc := d.crc16.Sum16(); crc != 0 {
+					return fmt.Errorf("expected zero, got: %d", crc)
+				}
+				return nil
+			},
 		},
 		{
 			name: "decode crc mismatch",
@@ -1213,6 +1220,12 @@ func TestDecodeHeader(t *testing.T) {
 			}
 			if diff := cmp.Diff(dec.fileHeader, tc.header); diff != "" {
 				t.Fatal(diff)
+			}
+			if tc.validateFn == nil {
+				return
+			}
+			if err := tc.validateFn(dec); err != nil {
+				t.Fatalf("expected validateFn is nil, got: %v", err)
 			}
 		})
 	}
