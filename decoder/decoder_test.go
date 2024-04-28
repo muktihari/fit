@@ -1073,6 +1073,12 @@ func TestDecodeFileHeader(t *testing.T) {
 				})
 			}(),
 			header: fit.FileHeader,
+			validateFn: func(d *Decoder) error {
+				if d.n != 14 {
+					return fmt.Errorf("expected n bytes is 14, got: %d", d.n)
+				}
+				return nil
+			},
 		},
 		{
 			name: "decode header invalid size",
