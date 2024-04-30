@@ -25,13 +25,12 @@ type StreamEncoder struct {
 //   - This method is called right after SequenceCompleted method has been called.
 func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 	if !e.fileHeaderWritten {
-		e.fileHeader = e.enc.defaultFileHeader
-		if err := e.enc.encodeHeader(&e.fileHeader); err != nil {
+		if err := e.enc.encodeFileHeader(&e.fileHeader); err != nil {
 			return fmt.Errorf("could not encode file header: %w", err)
 		}
 		e.fileHeaderWritten = true
 	}
-	if err := e.enc.encodeMessage(e.enc.w, mesg); err != nil {
+	if err := e.enc.encodeMessage(mesg); err != nil {
 		return fmt.Errorf("could not encode mesg: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
 	}
 	return nil
@@ -43,7 +42,7 @@ func (e *StreamEncoder) SequenceCompleted() error {
 	if err := e.enc.encodeCRC(); err != nil {
 		return fmt.Errorf("could not encode crc: %w", err)
 	}
-	if err := e.enc.updateHeader(&e.fileHeader); err != nil {
+	if err := e.enc.updateFileHeader(&e.fileHeader); err != nil {
 		return fmt.Errorf("could not update header: %w", err)
 	}
 	e.fileHeaderWritten = false
@@ -59,6 +58,7 @@ func (e *StreamEncoder) Reset(w io.Writer, opts ...Option) error {
 	switch w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		e.enc.Reset(w, opts...)
+		e.fileHeader = proto.FileHeader{}
 		e.fileHeaderWritten = false
 		return nil
 	}
