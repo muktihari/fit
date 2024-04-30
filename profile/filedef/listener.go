@@ -40,22 +40,23 @@ func defaultOptions() *options {
 // PredefinedFileSet is a list of default filesets used in listener, it's exported so user can append their own types and register it as an option.
 func PredefinedFileSet() FileSets {
 	return FileSets{
-		typedef.FileDevice:          func() File { return NewDevice() },
-		typedef.FileSettings:        func() File { return NewSettings() },
-		typedef.FileSport:           func() File { return NewSport() },
-		typedef.FileBloodPressure:   func() File { return NewBloodPressure() },
-		typedef.FileWeight:          func() File { return NewWeight() },
-		typedef.FileWorkout:         func() File { return NewWorkout() },
 		typedef.FileActivity:        func() File { return NewActivity() },
+		typedef.FileActivitySummary: func() File { return NewActivitySummary() },
+		typedef.FileBloodPressure:   func() File { return NewBloodPressure() },
 		typedef.FileCourse:          func() File { return NewCourse() },
+		typedef.FileDevice:          func() File { return NewDevice() },
 		typedef.FileGoals:           func() File { return NewGoals() },
-		typedef.FileTotals:          func() File { return NewTotals() },
-		typedef.FileSchedules:       func() File { return NewSchedules() },
 		typedef.FileMonitoringA:     func() File { return NewMonitoringAB() },
 		typedef.FileMonitoringB:     func() File { return NewMonitoringAB() },
 		typedef.FileMonitoringDaily: func() File { return NewMonitoringDaily() },
+		typedef.FileSchedules:       func() File { return NewSchedules() },
 		typedef.FileSegment:         func() File { return NewSegment() },
 		typedef.FileSegmentList:     func() File { return NewSegmentList() },
+		typedef.FileSettings:        func() File { return NewSettings() },
+		typedef.FileSport:           func() File { return NewSport() },
+		typedef.FileTotals:          func() File { return NewTotals() },
+		typedef.FileWeight:          func() File { return NewWeight() },
+		typedef.FileWorkout:         func() File { return NewWorkout() },
 	}
 }
 
