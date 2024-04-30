@@ -297,7 +297,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 		}
 		// Check crc checksum of messages should match with file's crc.
 		if d.crc16.Sum16() != d.crc {
-			err = ErrCRCChecksumMismatch
+			err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 			break
 		}
 		d.initDecodeFileHeaderOnce()
@@ -476,18 +476,19 @@ func (d *Decoder) decodeFileHeader() error {
 		return err
 	}
 	d.n += 1
+	size := b[0]
 
-	if b[0] != 12 && b[0] != 14 { // current spec is either 12 or 14
-		return fmt.Errorf("header size [%d] is invalid: %w", b[0], ErrNotAFitFile)
+	if size != 12 && size != 14 { // current spec is either 12 or 14
+		return fmt.Errorf("header size [%d] is invalid: %w", size, ErrNotAFitFile)
 	}
 	_, _ = d.crc16.Write(b)
 
-	size := b[0]
-	b, err = d.readBuffer.ReadN(int(size - 1))
+	rem := int(size - 1)
+	b, err = d.readBuffer.ReadN(rem)
 	if err != nil {
 		return err
 	}
-	d.n += int64(size)
+	d.n += int64(rem)
 
 	d.fileHeader = proto.FileHeader{
 		Size:            size,
