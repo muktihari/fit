@@ -5,7 +5,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"math"
@@ -176,9 +175,7 @@ func openAndConcealPosition(path string, opts *options) error {
 	defer f.Close()
 
 	var fits []*proto.FIT
-	dec := decoder.New(bufio.NewReader(f),
-		decoder.WithNoComponentExpansion(),
-	)
+	dec := decoder.New(f, decoder.WithNoComponentExpansion())
 
 	for dec.Next() {
 		fit, err := dec.Decode()

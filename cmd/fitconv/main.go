@@ -162,7 +162,7 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 	if noExpandComponents {
 		options = append(options, decoder.WithNoComponentExpansion())
 	}
-	dec := decoder.New(bufio.NewReaderSize(ff, blockSize), options...)
+	dec := decoder.New(ff, options...)
 
 	var sequenceCounter int
 	defer func() {
