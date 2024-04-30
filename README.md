@@ -14,7 +14,11 @@ More about FIT: [developer.garmin.com/fit](https://developer.garmin.com/fit)
 
 ## Motivation
 
-The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK. One of the key semantics they are missing is the ability for users to retrieve raw protocol messages; instead, they decode directly into predefined message structs grouped by [common file types](https://developer.garmin.com/fit/file-types). Furthermore, existing third-party libraries do not seem to fully support FIT Protocol V2, and their ability to produce variant options of the FIT protocol is limited, such as creating FIT files with compressed timestamps or FIT files with multiple local message types, which significantly reduces the resulting FIT files' size. This is where this SDK comes in to bridge the gap, enabling Go developers to interact seamlessly with the FIT protocol.
+The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK.
+
+One of the key semantics they are missing is the ability for users to retrieve raw protocol messages; instead, they decode directly into predefined message structs grouped by [common file types](https://developer.garmin.com/fit/file-types). Furthermore, existing third-party libraries do not seem to fully support FIT Protocol V2, and their ability to produce variant options of the FIT protocol is limited. For instance, creating FIT files with compressed timestamps or FIT files with multiple local message types, which significantly reduces the resulting FIT files' size, is missing.
+
+Without diminishing respect for the existing libraries created nearly a decade ago, at a time when the capabilities of Go were limited, we believe a new approach is necessary. This is where this SDK comes in, bridging the gap and enabling Go developers to seamlessly interact with the FIT protocol.
 
 ## Usage
 
