@@ -45,19 +45,14 @@ func TestListenerForSingleFitFile(t *testing.T) {
 	now := time.Now()
 	tt := []table{
 		{
-			name:   "default listener for device",
-			mesgs:  newDeviceMessageForTest(now),
-			result: filedef.NewDevice(newDeviceMessageForTest(now)...),
+			name:   "default listener for activity",
+			mesgs:  newActivityMessageForTest(now),
+			result: filedef.NewActivity(newActivityMessageForTest(now)...),
 		},
 		{
-			name:   "default listener for settings",
-			mesgs:  newSettingsMessageForTest(now),
-			result: filedef.NewSettings(newSettingsMessageForTest(now)...),
-		},
-		{
-			name:   "default listener for sport",
-			mesgs:  newSportMessageForTest(now),
-			result: filedef.NewSport(newSportMessageForTest(now)...),
+			name:   "default listener for activity summary",
+			mesgs:  newActivitySummaryMessageForTest(now),
+			result: filedef.NewActivitySummary(newActivitySummaryMessageForTest(now)...),
 		},
 		{
 			name:   "default listener for blood pressure",
@@ -65,39 +60,19 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			result: filedef.NewBloodPressure(newBloodPressureMessageForTest(now)...),
 		},
 		{
-			name:   "default listener for weight",
-			mesgs:  newWeightMessageForTest(now),
-			result: filedef.NewWeight(newWeightMessageForTest(now)...),
-		},
-		{
-			name:   "default listener for workout",
-			mesgs:  newWorkoutMessageForTest(now),
-			result: filedef.NewWorkout(newWorkoutMessageForTest(now)...),
-		},
-		{
-			name:   "default listener for activity",
-			mesgs:  newActivityMessageForTest(now),
-			result: filedef.NewActivity(newActivityMessageForTest(now)...),
-		},
-		{
 			name:   "default listener for course",
 			mesgs:  newCourseMessageForTest(now),
 			result: filedef.NewCourse(newCourseMessageForTest(now)...),
 		},
 		{
+			name:   "default listener for device",
+			mesgs:  newDeviceMessageForTest(now),
+			result: filedef.NewDevice(newDeviceMessageForTest(now)...),
+		},
+		{
 			name:   "default listener for goals",
 			mesgs:  newGoalsMessageForTest(now),
 			result: filedef.NewGoals(newGoalsMessageForTest(now)...),
-		},
-		{
-			name:   "default listener for totals",
-			mesgs:  newTotalsMessageForTest(now),
-			result: filedef.NewTotals(newTotalsMessageForTest(now)...),
-		},
-		{
-			name:   "default listener for schedules",
-			mesgs:  newSchedulesMessageForTest(now),
-			result: filedef.NewSchedules(newSchedulesMessageForTest(now)...),
 		},
 		{
 			name:   "default listener for monitoring A",
@@ -115,6 +90,11 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			result: filedef.NewMonitoringDaily(newMonitoringDailyMessageForTest(now)...),
 		},
 		{
+			name:   "default listener for schedules",
+			mesgs:  newSchedulesMessageForTest(now),
+			result: filedef.NewSchedules(newSchedulesMessageForTest(now)...),
+		},
+		{
 			name:   "default listener for segment",
 			mesgs:  newSegmentMessageForTest(now),
 			result: filedef.NewSegment(newSegmentMessageForTest(now)...),
@@ -123,6 +103,31 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			name:   "default listener for segment list",
 			mesgs:  newSegmentListMessageForTest(now),
 			result: filedef.NewSegmentList(newSegmentListMessageForTest(now)...),
+		},
+		{
+			name:   "default listener for settings",
+			mesgs:  newSettingsMessageForTest(now),
+			result: filedef.NewSettings(newSettingsMessageForTest(now)...),
+		},
+		{
+			name:   "default listener for sport",
+			mesgs:  newSportMessageForTest(now),
+			result: filedef.NewSport(newSportMessageForTest(now)...),
+		},
+		{
+			name:   "default listener for totals",
+			mesgs:  newTotalsMessageForTest(now),
+			result: filedef.NewTotals(newTotalsMessageForTest(now)...),
+		},
+		{
+			name:   "default listener for weight",
+			mesgs:  newWeightMessageForTest(now),
+			result: filedef.NewWeight(newWeightMessageForTest(now)...),
+		},
+		{
+			name:   "default listener for workout",
+			mesgs:  newWorkoutMessageForTest(now),
+			result: filedef.NewWorkout(newWorkoutMessageForTest(now)...),
 		},
 		{
 			name: "listener for not specified fileset, course",
