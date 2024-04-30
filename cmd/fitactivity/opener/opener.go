@@ -5,7 +5,6 @@
 package opener
 
 import (
-	"bufio"
 	"context"
 	"os"
 	"sync"
@@ -60,9 +59,7 @@ func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.Wa
 	}
 	defer f.Close()
 
-	dec := decoder.New(bufio.NewReader(f),
-		decoder.WithNoComponentExpansion(),
-	)
+	dec := decoder.New(f, decoder.WithNoComponentExpansion())
 
 	for dec.Next() {
 		fileId, err := dec.PeekFileId()
