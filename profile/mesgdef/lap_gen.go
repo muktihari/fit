@@ -1647,16 +1647,40 @@ func (m *Lap) MaxCoreTemperatureScaled() float64 {
 }
 
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
-func (m *Lap) StartPositionLatDegrees() float64 { return semicircles.ToDegrees(m.StartPositionLat) }
+// If StartPositionLat value is invalid, float64 invalid value will be returned.
+func (m *Lap) StartPositionLatDegrees() float64 {
+	if m.StartPositionLat == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return semicircles.ToDegrees(m.StartPositionLat)
+}
 
 // StartPositionLongDegrees returns StartPositionLong in degrees instead of semicircles.
-func (m *Lap) StartPositionLongDegrees() float64 { return semicircles.ToDegrees(m.StartPositionLong) }
+// If StartPositionLong value is invalid, float64 invalid value will be returned.
+func (m *Lap) StartPositionLongDegrees() float64 {
+	if m.StartPositionLong == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return semicircles.ToDegrees(m.StartPositionLong)
+}
 
 // EndPositionLatDegrees returns EndPositionLat in degrees instead of semicircles.
-func (m *Lap) EndPositionLatDegrees() float64 { return semicircles.ToDegrees(m.EndPositionLat) }
+// If EndPositionLat value is invalid, float64 invalid value will be returned.
+func (m *Lap) EndPositionLatDegrees() float64 {
+	if m.EndPositionLat == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return semicircles.ToDegrees(m.EndPositionLat)
+}
 
 // EndPositionLongDegrees returns EndPositionLong in degrees instead of semicircles.
-func (m *Lap) EndPositionLongDegrees() float64 { return semicircles.ToDegrees(m.EndPositionLong) }
+// If EndPositionLong value is invalid, float64 invalid value will be returned.
+func (m *Lap) EndPositionLongDegrees() float64 {
+	if m.EndPositionLong == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return semicircles.ToDegrees(m.EndPositionLong)
+}
 
 // SetMessageIndex sets Lap value.
 func (m *Lap) SetMessageIndex(v typedef.MessageIndex) *Lap {

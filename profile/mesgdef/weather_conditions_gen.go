@@ -205,12 +205,20 @@ func (m *WeatherConditions) WindSpeedScaled() float64 {
 }
 
 // ObservedLocationLatDegrees returns ObservedLocationLat in degrees instead of semicircles.
+// If ObservedLocationLat value is invalid, float64 invalid value will be returned.
 func (m *WeatherConditions) ObservedLocationLatDegrees() float64 {
+	if m.ObservedLocationLat == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
 	return semicircles.ToDegrees(m.ObservedLocationLat)
 }
 
 // ObservedLocationLongDegrees returns ObservedLocationLong in degrees instead of semicircles.
+// If ObservedLocationLong value is invalid, float64 invalid value will be returned.
 func (m *WeatherConditions) ObservedLocationLongDegrees() float64 {
+	if m.ObservedLocationLong == basetype.Sint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
 	return semicircles.ToDegrees(m.ObservedLocationLong)
 }
 
