@@ -450,7 +450,7 @@ func TestUpdateHeader(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.updateHeader(&tc.header)
+			_ = enc.updateFileHeader(&tc.header)
 		})
 	}
 }
@@ -552,7 +552,7 @@ func TestEncodeHeader(t *testing.T) {
 			if tc.protocolVersion != 0 {
 				enc.options.protocolVersion = tc.protocolVersion
 			}
-			_ = enc.encodeHeader(&tc.header)
+			_ = enc.encodeFileHeader(&tc.header)
 
 			if diff := cmp.Diff(bytebuf.Bytes(), tc.b); diff != "" {
 				t.Fatal(diff)
@@ -692,7 +692,7 @@ func TestEncodeMessage(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w, tc.opts...)
-			err := enc.encodeMessage(tc.w, &tc.mesg)
+			err := enc.encodeMessage(&tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -732,15 +732,16 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 			mesgs[i] = mesgs[i].Clone()
 		}
 
-		enc := New(nil, WithNormalHeader(2))
+		buf := new(bytes.Buffer)
+		enc := New(buf, WithNormalHeader(2))
 		for i, mesg := range mesgs {
-			w := new(bytes.Buffer)
-			err := enc.encodeMessage(w, &mesg)
+			buf.Reset()
+			err := enc.encodeMessage(&mesg)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			mesgDefHeader := w.Bytes()
+			mesgDefHeader := buf.Bytes()
 			expectedHeader := (mesgDefHeader[0] &^ proto.LocalMesgNumMask) | byte(i)
 			if mesgDefHeader[0] != expectedHeader {
 				t.Fatalf("[%d] expected 0b%08b, got: 0b%08b", i, expectedHeader, mesgDefHeader[0])
@@ -751,11 +752,11 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 		mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
 			fieldnum.RecordTimestamp: datetime.ToUint32(now),
 		})
-		w := new(bytes.Buffer)
-		if err := enc.encodeMessage(w, &mesg); err != nil {
+		buf.Reset()
+		if err := enc.encodeMessage(&mesg); err != nil {
 			t.Fatal(err)
 		}
-		mesgDefHeader := w.Bytes()
+		mesgDefHeader := buf.Bytes()
 		expectedHeader := byte(0)
 		if mesgDefHeader[0] != expectedHeader {
 			t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, mesgDefHeader[0])
@@ -806,8 +807,8 @@ func TestEncodeMessages(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(nil)
-			err := enc.encodeMessages(io.Discard, tc.mesgs)
+			enc := New(io.Discard)
+			err := enc.encodeMessages(tc.mesgs)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -819,8 +820,8 @@ func TestEncodeMessages(t *testing.T) {
 
 	for _, tc := range tt2 {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(nil)
-			err := enc.encodeMessagesWithContext(context.Background(), io.Discard, tc.mesgs)
+			enc := New(io.Discard)
+			err := enc.encodeMessagesWithContext(context.Background(), tc.mesgs)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -940,7 +941,7 @@ func TestEncodeMessagesWithContext(t *testing.T) {
 		),
 	}
 	enc := New(nil)
-	err := enc.encodeMessagesWithContext(ctx, nil, mesgs)
+	err := enc.encodeMessagesWithContext(ctx, mesgs)
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected: %v, got: %v", context.Canceled, err)
 	}

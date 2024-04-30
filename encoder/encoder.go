@@ -28,24 +28,25 @@ var (
 )
 
 const (
-	RolloverEvent = 32 // The 5-bit time offset rolls over every 32 seconds. When an incoming time offset is less than previous time offset, rollover event has occurred.
+	// The 5-bit time offset rolls over every 32 seconds.
+	// When an incoming time offset is less than previous time offset, rollover event has occurred.
+	RolloverEvent = 32
 )
 
 // headerOption is header option.
 type headerOption byte
 
 const (
-	littleEndian      = 0
-	bigEndian         = 1
-	defaultEndianness = littleEndian
+	littleEndian = 0
+	bigEndian    = 1
 
 	// headerOptionNormal is the default header option.
 	// This option has two sub-option to select from:
 	//   1. LocalMessageTypeZero [Default]
 	// 		Optimized for all devices. It only use LocalMesgNum 0.
-	//   2. MultipleLocalMessageType
-	//      Using multiple local message types optimizes file size by avoiding the need to interleave different message typedef.
-	//      The number of multiple local message type can be specified between 0-15.
+	//   2. MultipleLocalMessageTypes
+	//      Using multiple local message types optimizes file size by avoiding the need to interleave different
+	//      message definition. The number of multiple local message type can be specified between 0-15.
 	headerOptionNormal headerOption = 0
 
 	// Optimized to reduce file size way further by compressing timestamp's field in a message into its message header.
@@ -55,10 +56,10 @@ const (
 
 // Encoder is FIT file encoder. See New() for details.
 type Encoder struct {
-	w             io.Writer   // A writer to write the encoded FIT bytes.
-	n             int64       // Total bytes written to w, will keep counting for every Encode invocation.
-	lastHeaderPos int64       // The byte position of the last header.
-	crc16         hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
+	w                 io.Writer   // A writer to write the encoded FIT bytes.
+	n                 int64       // Total bytes written to w, will keep counting for every Encode invocation.
+	lastFileHeaderPos int64       // The byte position of the last header.
+	crc16             hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
 
 	options           *options         // Encoder's options.
 	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
@@ -73,13 +74,11 @@ type Encoder struct {
 
 	mesgDef    *proto.MessageDefinition       // Temporary message definition to reduce alloc.
 	bytesArray [proto.MaxBytesPerMessage]byte // General purpose array for encoding process.
-
-	defaultFileHeader proto.FileHeader // Default header to encode when not specified.
 }
 
 type options struct {
-	protocolVersion          proto.Version
 	messageValidator         MessageValidator
+	protocolVersion          proto.Version
 	endianness               byte
 	headerOption             headerOption
 	multipleLocalMessageType byte
@@ -87,9 +86,9 @@ type options struct {
 
 func defaultOptions() *options {
 	return &options{
-		endianness:       defaultEndianness,
-		protocolVersion:  proto.V1,
 		messageValidator: NewMessageValidator(),
+		protocolVersion:  proto.V1,
+		endianness:       littleEndian,
 		headerOption:     headerOptionNormal,
 	}
 }
@@ -133,21 +132,22 @@ func WithCompressedTimestampHeader() Option {
 	return fnApply(func(o *options) { o.headerOption = headerOptionCompressedTimestamp })
 }
 
-// WithNormalHeader directs the Encoder to use NormalHeader for encoding the message using specified multiple local message typedef.
-// By default, the Encoder uses local message type 0. This option allows users to specify values between 0-15 (while entering zero
-// is equivalent to using the default option, nothing is changed). Using multiple local message types optimizes file size by avoiding
-// the need to interleave different message typedef.
+// WithNormalHeader directs the Encoder to use NormalHeader for encoding the message using multiple local message types.
+// By default, the Encoder uses local message type 0. This option allows users to specify values between 0-15 (while
+// entering zero is equivalent to using the default option, nothing is changed). Using multiple local message types
+// optimizes file size by avoiding the need to interleave different message definition.
 //
-// Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message types in a file.
-// For instance, embedded devices may only support decoding data from local message type 0. Additionally, multiple local message types
-// should be avoided in file types like settings, where messages of the same type can be grouped together.
+// Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message types.
+// For instance, embedded devices may only support decoding data from local message type 0. Additionally,
+// multiple local message types should be avoided in file types like settings, where messages of the same type
+// can be grouped together.
 func WithNormalHeader(multipleLocalMessageType byte) Option {
 	if multipleLocalMessageType > proto.LocalMesgNumMask {
 		multipleLocalMessageType = proto.LocalMesgNumMask
 	}
 	return fnApply(func(o *options) {
-		o.multipleLocalMessageType = multipleLocalMessageType
 		o.headerOption = headerOptionNormal
+		o.multipleLocalMessageType = multipleLocalMessageType
 	})
 }
 
@@ -155,23 +155,28 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 //
 // # Encoding Strategy
 //
-// Since an invalid file header means an invalid FIT file, we need to ensure that the header is correct,
-// specifically the header's DataSize (size of messages in bytes) and header's CRC checksum should be correct after everything is written.
+// Since an invalid FileHeader means an invalid FIT file, we need to ensure that the FileHeader is correct,
+// specifically the FileHeader's DataSize (size of messages in bytes) and FileHeader's CRC checksum should
+// be correct after everything is written.
 //
 // There are two strategies to achieve that and it depends on what kind of [io.Writer] is provided:
-//   - [io.WriterAt] or [io.WriteSeeker]: Encoder can update the header's DataSize after
-//     the encoding process is completed since we can write at a specific byte position, making it more ideal and efficient.
+//   - [io.WriterAt] or [io.WriteSeeker]: Encoder can update the FileHeader's DataSize and CRC after
+//     the encoding process is completed since we can write at a specific byte position, making it more
+//     ideal and efficient.
 //   - [io.Writer]: Encoder needs to iterate through the messages once to calculate
-//     the correct header's DataSize (calculating discarded bytes to [io.Discard]), then re-iterate through the messages again for the actual writing.
+//     the FileHeader's DataSize and CRC by writting to [io.Discard], then re-iterate through the messages
+//     again for the actual writing.
 //
-// Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file is commonly small-sized, but by design, it can
-// hold up to approximately 4GB. This is because the DataSize is of type uint32, and its maximum value is around that number.
-// And also The FIT protocol allows for multiple FIT files to be chained together in a single FIT file. Each FIT file in the chain must be a properly
-// formatted FIT file (header, data records, CRC), making it more dynamic in size.
+// Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file
+// is commonly small-sized, but by design, it can hold up to approximately 4GB. This is because the DataSize
+// is of type uint32, and its maximum value is around that number. And also The FIT protocol allows for
+// multiple FIT files to be chained together in a single FIT file. Each FIT file in the chain must be a properly
+// formatted FIT file (FileHeader, Messages, CRC), making it more dynamic in size.
 //
-// Note: We encourage wrapping w into a buffered writer such as bufferedwriter.New(w) that maintain io.WriteAt or io.WriteSeeker method (bufio.Writer does not).
-// Encode process requires small bytes writing and having frequent write on non-buffered writer might impact performance,
-// especially if it involves syscall such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
+// Note: We encourage wrapping w into a buffered writer such as bufferedwriter.New(w) that maintain
+// io.WriteAt or io.WriteSeeker method (bufio.Writer does not). Encode process requires small bytes writing
+// and having frequent write on non-buffered writer might impact performance, especially if it involves syscall
+// such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
 func New(w io.Writer, opts ...Option) *Encoder {
 	options := defaultOptions()
 	for i := range opts {
@@ -183,30 +188,54 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		lruCapacity = options.multipleLocalMessageType + 1
 	}
 
-	crc16 := crc16.New(nil)
 	e := &Encoder{
 		w:                 w,
 		options:           options,
-		crc16:             crc16,
+		crc16:             crc16.New(nil),
 		protocolValidator: proto.NewValidator(options.protocolVersion),
 		localMesgNumLRU:   newLRU(lruCapacity),
-		defaultFileHeader: proto.FileHeader{
-			Size:            proto.DefaultFileHeaderSize,
-			ProtocolVersion: byte(options.protocolVersion),
-			ProfileVersion:  profile.Version,
-			DataSize:        0, // calculated during encoding
-			DataType:        proto.DataTypeFIT,
-			CRC:             0, // calculated during encoding
-		},
-		mesgDef: &proto.MessageDefinition{},
+		mesgDef:           &proto.MessageDefinition{},
 	}
 
 	return e
 }
 
-// Encode encodes FIT into the dest writer. Encoder will do the following validations:
-//  1. Calculating Header's CRC & DataSize and FIT's CRC: any mismatch calculation will be corrected and updated to the given FIT structure.
-//  2. Checking if fit.Messages are having all of its mesg definitions, return error if it's missing any mesg definition.
+// reset resets the encoder's data that is being used for encoding,
+// allowing the encoder to be reused for writing the subsequent chained FIT file.
+func (e *Encoder) reset() {
+	e.dataSize = 0
+	e.crc16.Reset()
+	e.localMesgNumLRU.Reset()
+	e.options.messageValidator.Reset()
+	e.timestampReference = 0
+}
+
+// Reset resets the Encoder to write its output to w and reset previous options to
+// default options so any options needs to be inputed again. It is similar to New()
+// but it retains the underlying storage for use by future encode to reduce memory allocs.
+func (e *Encoder) Reset(w io.Writer, opts ...Option) {
+	e.reset()
+	e.n = 0
+	e.lastFileHeaderPos = 0
+
+	e.options = defaultOptions()
+	for i := range opts {
+		opts[i].apply(e.options)
+	}
+
+	var lruCapacity byte = 1
+	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
+		lruCapacity = e.options.multipleLocalMessageType + 1
+	}
+	e.localMesgNumLRU.ResetWithNewSize(lruCapacity)
+
+	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
+}
+
+// Encode encodes FIT into the dest writer. Only FIT's Messages is required, while FileHeader and CRC will be
+// filled automatically by the Encoder. However, we allow for custom FileHeader, such as when a user intentionally
+// specifies a FileHeader's Size as 12 (legacy) or a custom FileHeader's ProfileVersion.
+// In these cases, those two values will be encoded as-is, irrespective of the current SDK profile version.
 //
 // Multiple FIT files can be chained together into a single FIT file by calling Encode for each FIT data.
 //
@@ -214,7 +243,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 //	   err := enc.Encode(fit)
 //	}
 //
-// Encode chooses which strategy to use for encoding the data based on given writer and let the chosen strategy do the work.
+// Encode chooses which strategy to use for encoding the data based on given writer.
 func (e *Encoder) Encode(fit *proto.FIT) error {
 	defer e.reset()
 
@@ -229,33 +258,35 @@ func (e *Encoder) Encode(fit *proto.FIT) error {
 	return ErrNilWriter
 }
 
-// encodeWithDirectUpdateStrategy encodes all data to file, after completing, it updates the actual size of the messages that being written to the proto.
+// encodeWithDirectUpdateStrategy encodes all data to file, after completing,
+// it updates the actual size of the messages that being written to the proto.
 func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.FIT) error {
-	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+	if err := e.encodeFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
+	if err := e.encodeMessages(fit.Messages); err != nil {
 		return err
 	}
 	fit.CRC = e.crc16.Sum16()
 	if err := e.encodeCRC(); err != nil {
 		return err
 	}
-	if err := e.updateHeader(&fit.FileHeader); err != nil {
+	if err := e.updateFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
 	return nil
 }
 
-// encodeWithEarlyCheckStrategy does early calculation of the size of the messages that will be written and then do the encoding process.
+// encodeWithEarlyCheckStrategy does early calculation of the size of the messages
+// that will be written and then do the encoding process.
 func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	if err := e.calculateDataSize(fit); err != nil {
 		return err
 	}
-	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+	if err := e.encodeFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessages(e.w, fit.Messages); err != nil {
+	if err := e.encodeMessages(fit.Messages); err != nil {
 		return err
 	}
 	fit.CRC = e.crc16.Sum16()
@@ -266,9 +297,43 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	return nil
 }
 
-// updateHeader updates the header since its content is changed, the header's CRC is recalculated before updating.
+func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
+	e.lastFileHeaderPos = e.n
+
+	if header.Size != 12 { // allow legacy
+		header.Size = 14
+	}
+	if header.ProfileVersion == 0 { // only change when zero to allow custom profile version
+		header.ProfileVersion = profile.Version
+	}
+
+	header.ProtocolVersion = byte(e.options.protocolVersion)
+	header.DataType = proto.DataTypeFIT
+	header.CRC = 0 // recalculated
+
+	b, _ := header.MarshalAppend(e.bytesArray[:0])
+
+	if header.Size != 14 {
+		n, err := e.w.Write(b[:header.Size])
+		e.n += int64(n)
+		return err
+	}
+
+	_, _ = e.crc16.Write(b[:12])
+	binary.LittleEndian.PutUint16(b[12:14], e.crc16.Sum16())
+	header.CRC = e.crc16.Sum16()
+
+	e.crc16.Reset() // this hash will be re-used for calculating data integrity.
+
+	n, err := e.w.Write(b)
+	e.n += int64(n)
+
+	return err
+}
+
+// updateFileHeader updates the FileHeader if the DataSize is changed.
 // The caller MUST ensure that e.w is either an io.WriterAt or an io.WriteSeeker.
-func (e *Encoder) updateHeader(header *proto.FileHeader) error {
+func (e *Encoder) updateFileHeader(header *proto.FileHeader) error {
 	if header.DataSize == e.dataSize {
 		return nil
 	}
@@ -277,19 +342,19 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 
 	b, _ := header.MarshalAppend(e.bytesArray[:0])
 
-	if header.Size >= 14 {
-		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since header is changed.
-		header.CRC = e.crc16.Sum16() // update crc in header
+	if header.Size == 14 {
+		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since FileHeader is changed.
+		header.CRC = e.crc16.Sum16() // update crc in FileHeader
 		binary.LittleEndian.PutUint16(b[12:14], e.crc16.Sum16())
 		e.crc16.Reset()
 	}
 
 	switch w := e.w.(type) {
 	case io.WriterAt:
-		_, err := w.WriteAt(b, e.lastHeaderPos)
+		_, err := w.WriteAt(b, e.lastFileHeaderPos)
 		return err
 	case io.WriteSeeker:
-		_, err := w.Seek(e.lastHeaderPos, io.SeekStart)
+		_, err := w.Seek(e.lastFileHeaderPos, io.SeekStart)
 		if err != nil {
 			return err
 		}
@@ -311,50 +376,24 @@ func (e *Encoder) updateHeader(header *proto.FileHeader) error {
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.
 func (e *Encoder) calculateDataSize(fit *proto.FIT) error {
 	n := e.n
+	w := e.w
 
-	if err := e.encodeMessages(io.Discard, fit.Messages); err != nil {
+	e.w = io.Discard
+
+	if err := e.encodeMessages(fit.Messages); err != nil {
 		return fmt.Errorf("calculate data size: %w", err)
 	}
 
-	if fit.FileHeader.Size == 0 {
-		fit.FileHeader = e.defaultFileHeader
-	}
-	fit.FileHeader.DataSize = e.dataSize // update Header's DataSize of the actual messages size
+	fit.FileHeader.DataSize = e.dataSize // update FileHeader's DataSize of the actual messages size
 	e.reset()
+
 	e.n = n
+	e.w = w
 
 	return nil
 }
 
-func (e *Encoder) encodeHeader(header *proto.FileHeader) error {
-	e.lastHeaderPos = e.n
-
-	if header.Size < 12 {
-		*header = e.defaultFileHeader
-	}
-	header.ProtocolVersion = byte(e.options.protocolVersion)
-
-	b, _ := header.MarshalAppend(e.bytesArray[:0])
-
-	if header.Size < 14 {
-		n, err := e.w.Write(b[:header.Size])
-		e.n += int64(n)
-		return err
-	}
-
-	_, _ = e.crc16.Write(b[:12])
-	binary.LittleEndian.PutUint16(b[12:14], e.crc16.Sum16())
-	header.CRC = e.crc16.Sum16()
-
-	e.crc16.Reset() // this hash will be re-used for calculating data integrity.
-
-	n, err := e.w.Write(b)
-	e.n += int64(n)
-
-	return err
-}
-
-func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
+func (e *Encoder) encodeMessages(messages []proto.Message) error {
 	if len(messages) == 0 {
 		return ErrEmptyMessages
 	}
@@ -365,7 +404,7 @@ func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
 
 	for i := range messages {
 		mesg := &messages[i]
-		if err := e.encodeMessage(w, mesg); err != nil {
+		if err := e.encodeMessage(mesg); err != nil {
 			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
@@ -375,7 +414,7 @@ func (e *Encoder) encodeMessages(w io.Writer, messages []proto.Message) error {
 }
 
 // encodeMessage marshals and encodes message definition and its message into w.
-func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
+func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask
 	mesg.Architecture = e.options.endianness
 
@@ -398,7 +437,7 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 	mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
 
 	if isNewMesgDef {
-		n, err := w.Write(b)
+		n, err := e.w.Write(b)
 		e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 		if err != nil {
 			return fmt.Errorf("write message definition failed: %w", err)
@@ -411,7 +450,7 @@ func (e *Encoder) encodeMessage(w io.Writer, mesg *proto.Message) error {
 		return fmt.Errorf("marshal mesg failed: %w", err)
 	}
 
-	n, err := w.Write(b)
+	n, err := e.w.Write(b)
 	e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 	if err != nil {
 		return fmt.Errorf("write message failed: %w", err)
@@ -436,7 +475,7 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 		return
 	}
 
-	if e.timestampReference == 0 || (timestamp-e.timestampReference) > RolloverEvent {
+	if (timestamp - e.timestampReference) > RolloverEvent {
 		// There should be at least one valid timestamp reference in a field prior to the use of
 		// the compressed timestamp header. If the gap beetween new timestamp and last reference is more
 		// than allowed Rollover Event (32 seconds), the new timestamp become new reference.
@@ -466,38 +505,6 @@ func (e *Encoder) encodeCRC() error {
 	return nil
 }
 
-// reset resets the encoder's data that is being used for encoding, allowing the encoder to be reused for writing the subsequent chained FIT file.
-func (e *Encoder) reset() {
-	e.dataSize = 0
-	e.crc16.Reset()
-	e.localMesgNumLRU.Reset()
-	e.options.messageValidator.Reset()
-	e.timestampReference = 0
-}
-
-// Reset resets the Encoder to write its output to w and reset previous options to
-// default options so any options needs to be inputed again. It is similar to New()
-// but it retains the underlying storage for use by future encode to reduce memory allocs.
-func (e *Encoder) Reset(w io.Writer, opts ...Option) {
-	e.reset()
-	e.n = 0
-	e.lastHeaderPos = 0
-
-	e.options = defaultOptions()
-	for i := range opts {
-		opts[i].apply(e.options)
-	}
-
-	var lruCapacity byte = 1
-	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
-		lruCapacity = e.options.multipleLocalMessageType + 1
-	}
-	e.localMesgNumLRU.ResetWithNewSize(lruCapacity)
-
-	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
-	e.defaultFileHeader.ProtocolVersion = byte(e.options.protocolVersion)
-}
-
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
 	defer e.reset()
@@ -514,17 +521,17 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err er
 }
 
 func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.FIT) error {
-	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+	if err := e.encodeFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
+	if err := e.encodeMessagesWithContext(ctx, fit.Messages); err != nil {
 		return err
 	}
 	fit.CRC = e.crc16.Sum16()
 	if err := e.encodeCRC(); err != nil {
 		return err
 	}
-	if err := e.updateHeader(&fit.FileHeader); err != nil {
+	if err := e.updateFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
 	return nil
@@ -532,17 +539,19 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 
 func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.FIT) error {
 	n := e.n
+	w := e.w
 
-	if err := e.encodeMessagesWithContext(ctx, io.Discard, fit.Messages); err != nil {
+	e.w = io.Discard
+
+	if err := e.encodeMessagesWithContext(ctx, fit.Messages); err != nil {
 		return fmt.Errorf("calculate data size: %w", err)
 	}
 
-	if fit.FileHeader.Size == 0 {
-		fit.FileHeader = e.defaultFileHeader
-	}
-	fit.FileHeader.DataSize = e.dataSize // update Header's DataSize of the actual messages size
+	fit.FileHeader.DataSize = e.dataSize // update FileHeader's DataSize of the actual messages size
 	e.reset()
+
 	e.n = n
+	e.w = w
 
 	return nil
 }
@@ -551,10 +560,10 @@ func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, f
 	if err := e.calculateDataSizeWithContext(ctx, fit); err != nil {
 		return err
 	}
-	if err := e.encodeHeader(&fit.FileHeader); err != nil {
+	if err := e.encodeFileHeader(&fit.FileHeader); err != nil {
 		return err
 	}
-	if err := e.encodeMessagesWithContext(ctx, e.w, fit.Messages); err != nil {
+	if err := e.encodeMessagesWithContext(ctx, fit.Messages); err != nil {
 		return err
 	}
 	fit.CRC = e.crc16.Sum16()
@@ -564,7 +573,7 @@ func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, f
 	return nil
 }
 
-func (e *Encoder) encodeMessagesWithContext(ctx context.Context, w io.Writer, messages []proto.Message) error {
+func (e *Encoder) encodeMessagesWithContext(ctx context.Context, messages []proto.Message) error {
 	if len(messages) == 0 {
 		return ErrEmptyMessages
 	}
@@ -580,7 +589,7 @@ func (e *Encoder) encodeMessagesWithContext(ctx context.Context, w io.Writer, me
 		default:
 		}
 		mesg := &messages[i]
-		if err := e.encodeMessage(w, mesg); err != nil {
+		if err := e.encodeMessage(mesg); err != nil {
 			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
