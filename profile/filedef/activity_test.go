@@ -95,10 +95,12 @@ func newActivityMessageForTest(now time.Time) []proto.Message {
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
 		factory.CreateMesgOnly(mesgnum.Event).WithFields(
-			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+			// Intentionally using same timestamp as last message.
+			// Record's Num is 20 and Event's Num is 21, when there are identical timestamp, smaller num ordered first.
+			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
 		),
 		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
-			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)), // intentionally using same timestamp as last messag)e
+			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
 		factory.CreateMesgOnly(mesgnum.Session).WithFields(
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),

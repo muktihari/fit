@@ -45,9 +45,12 @@ func SortMessagesByTimestamp(messages []proto.Message) {
 		if timestamp2 == basetype.Uint32Invalid {
 			return 0
 		}
-		if timestamp1 <= timestamp2 {
+		if timestamp1 < timestamp2 {
 			return -1
 		}
-		return 1
+		if timestamp1 > timestamp2 {
+			return 1
+		}
+		return 0
 	})
 }
