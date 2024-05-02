@@ -98,7 +98,7 @@ func newActivityMessageForTest(now time.Time) []proto.Message {
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
 		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
-			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)), // intentionally using same timestamp as last messag)e
+			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))), // intentionally using same timestamp as last messag)e
 		),
 		factory.CreateMesgOnly(mesgnum.Session).WithFields(
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
