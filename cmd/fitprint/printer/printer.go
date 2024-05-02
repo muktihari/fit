@@ -193,18 +193,16 @@ func (p *printer) prep(mesg proto.Message) proto.Message {
 	if cap(m.Fields) < len(mesg.Fields) {
 		m.Fields = make([]proto.Field, len(mesg.Fields))
 	}
+	m.Fields = m.Fields[:len(mesg.Fields)]
 	copy(m.Fields, mesg.Fields)
-	mesg.Fields = m.Fields[:len(mesg.Fields)]
-
-	if mesg.DeveloperFields == nil {
-		return mesg
-	}
+	mesg.Fields = m.Fields
 
 	if cap(m.DeveloperFields) < len(mesg.DeveloperFields) {
 		m.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
 	}
+	m.DeveloperFields = m.DeveloperFields[:len(mesg.DeveloperFields)]
 	copy(m.DeveloperFields, mesg.DeveloperFields)
-	mesg.DeveloperFields = m.DeveloperFields[:len(mesg.DeveloperFields)]
+	mesg.DeveloperFields = m.DeveloperFields
 
 	return mesg
 }

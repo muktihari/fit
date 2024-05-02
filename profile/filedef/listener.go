@@ -9,6 +9,7 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 // Listener is Message Listener.
@@ -140,18 +141,12 @@ func (l *Listener) prep(mesg proto.Message) proto.Message {
 	if cap(m.Fields) < len(mesg.Fields) {
 		m.Fields = make([]proto.Field, len(mesg.Fields))
 	}
+	m.Fields = m.Fields[:len(mesg.Fields)]
 	copy(m.Fields, mesg.Fields)
-	mesg.Fields = m.Fields[:len(mesg.Fields)]
+	mesg.Fields = m.Fields
 
-	if mesg.DeveloperFields == nil {
-		return mesg
-	}
-
-	if cap(m.DeveloperFields) < len(mesg.DeveloperFields) {
-		m.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
-	}
-	copy(m.DeveloperFields, mesg.DeveloperFields)
-	mesg.DeveloperFields = m.DeveloperFields[:len(mesg.DeveloperFields)]
+	// Must clone DeveloperFields since it is being referenced in mesgdef's structs.
+	mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 
 	return mesg
 }
