@@ -197,10 +197,6 @@ func (p *printer) prep(mesg proto.Message) proto.Message {
 	copy(m.Fields, mesg.Fields)
 	mesg.Fields = m.Fields
 
-	if mesg.DeveloperFields == nil {
-		return mesg
-	}
-
 	if cap(m.DeveloperFields) < len(mesg.DeveloperFields) {
 		m.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
 	}
