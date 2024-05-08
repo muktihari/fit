@@ -8,9 +8,7 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8731/badge)](https://www.bestpractices.dev/projects/8731)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
-The Flexible and Interoperable Data Transfer (FIT) protocol is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. When recording an activity using devices such as cycling computer, smartwatch, and similar devices, chances are the resulting file is often in FIT file format (\*.fit).
-
-More about FIT: [developer.garmin.com/fit](https://developer.garmin.com/fit)
+This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) protocol](developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).
 
 ## Motivation
 
