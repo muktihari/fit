@@ -109,7 +109,7 @@ func TestSize(t *testing.T) {
 		{baseType: basetype.Uint64, size: 8},
 		{baseType: basetype.Uint64z, size: 8},
 		{baseType: basetype.Float64, size: 8},
-		{baseType: 255, size: 0},
+		{baseType: 255, size: 255},
 	}
 	for _, tc := range tt {
 		t.Run(tc.baseType.String(), func(t *testing.T) {
