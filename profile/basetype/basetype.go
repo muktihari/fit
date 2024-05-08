@@ -160,7 +160,7 @@ func (t BaseType) String() string {
 	return "invalid"
 }
 
-// Size returns how many bytes the value need in binary form.
+// Size returns how many bytes the value need in binary form. If BaseType is invalid, 255 will be returned.
 func (t BaseType) Size() byte {
 	switch t {
 	case Enum, Byte, Sint8, Uint8, Uint8z:
@@ -178,7 +178,7 @@ func (t BaseType) Size() byte {
 	case Sint64, Uint64, Uint64z:
 		return 8
 	}
-	return 0
+	return 255
 }
 
 // GoType returns go equivalent type in string.
