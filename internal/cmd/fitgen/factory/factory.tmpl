@@ -84,10 +84,10 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 		}
 	})
 
-    var mesg proto.Message
-    if num < typedef.MesgNum(len(protoMesgs)) {
-        mesg = protoMesgs[num]
-    }
+	var mesg proto.Message
+	if num < typedef.MesgNum(len(protoMesgs)) {
+		mesg = protoMesgs[num]
+	}
 	if mesg.Num != num {
 		mesg = f.registeredMesgs[num]
 	}
