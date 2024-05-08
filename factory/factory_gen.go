@@ -43,7 +43,7 @@ func New() *Factory { return &Factory{} }
 
 var ( // cache for CreateMesg method
 	once       sync.Once
-	protoMesgs [len(mesgs)]proto.Message // data is populated on CreateMesg first invocation.
+	protoMesgs []proto.Message // data is populated on CreateMesg first invocation.
 )
 
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns proto.Message{Num: num}.
@@ -53,7 +53,8 @@ var ( // cache for CreateMesg method
 //
 // NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	once.Do(func() { // populate data fields in the cache.
+	once.Do(func() { // populate data for the firt invocation.
+		protoMesgs = make([]proto.Message, len(mesgs))
 		for i := range mesgs {
 			rawmesg := &mesgs[i]
 			if rawmesg.Num != typedef.MesgNum(i) {
@@ -80,11 +81,13 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 		}
 	})
 
-	mesg := protoMesgs[num]
+	var mesg proto.Message
+	if num < typedef.MesgNum(len(protoMesgs)) {
+		mesg = protoMesgs[num]
+	}
 	if mesg.Num != num {
 		mesg = f.registeredMesgs[num]
 	}
-
 	mesg.Num = num // In case of unknown field
 
 	if len(mesg.Fields) != 0 {
@@ -158,7 +161,7 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 
 type message struct {
 	Num    typedef.MesgNum
-	Fields [256]proto.Field // Use array to ensure O(1) lookup, use pointer to reduce memory usage.
+	Fields [256]proto.Field // Use array to ensure O(1) lookup
 }
 
 // Use array to ensure O(1) lookup
