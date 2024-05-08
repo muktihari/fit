@@ -164,7 +164,7 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 //     the encoding process is completed since we can write at a specific byte position, making it more
 //     ideal and efficient.
 //   - [io.Writer]: Encoder needs to iterate through the messages once to calculate
-//     the FileHeader's DataSize and CRC by writting to [io.Discard], then re-iterate through the messages
+//     the FileHeader's DataSize and CRC by writing to [io.Discard], then re-iterate through the messages
 //     again for the actual writing.
 //
 // Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file
