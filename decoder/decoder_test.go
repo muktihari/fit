@@ -115,6 +115,36 @@ func TestDecodeRealFiles(t *testing.T) {
 	})
 }
 
+func TestIntegration(t *testing.T) {
+	t.Run("scenario: check integrity then decode real files", func(t *testing.T) {
+		f, err := os.Open(filepath.Join(fromGarminForums, "triathlon_summary_last.fit"))
+		if err != nil {
+			t.Fatalf("open file return with error: %v", err)
+		}
+		defer f.Close()
+
+		dec := New(f)
+
+		seq, err := dec.CheckIntegrity()
+		if err != nil {
+			t.Fatalf("check integrity return with error: %v", err)
+		}
+		if seq != 1 {
+			t.Fatalf("expected sequence completed: 1, got: %d", seq)
+		}
+
+		_, err = f.Seek(0, io.SeekStart)
+		if err != nil {
+			t.Fatalf("seek return with error: %v", err)
+		}
+
+		_, err = dec.Decode()
+		if err != nil {
+			t.Fatalf("seek return with error: %v", err)
+		}
+	})
+}
+
 type fnMesgListener func(mesg proto.Message)
 
 func (f fnMesgListener) OnMesg(mesg proto.Message) { f(mesg) }
@@ -2429,24 +2459,33 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	if err != nil {
 		b.Fatalf("marshal binary: %v", err)
 	}
-	buf := bytes.NewBuffer(mesgb)
-	dec := New(buf, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
+
+	cur := 0
+	r := fnReader(func(b []byte) (n int, err error) {
+		if cur == len(mesgb) {
+			return 0, io.EOF
+		}
+		n = copy(b, mesgb[cur:])
+		cur += n
+		return
+	})
+
+	dec := New(r, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
 	dec.localMessageDefinitions[0] = &mesgDef
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		buf.Write(mesgb)
 		err := dec.decodeMessageData(0)
 		if err != nil {
 			b.Fatal(err)
 		}
+		cur = 0 // reset reader
 	}
 }
 
 func BenchmarkDecode(b *testing.B) {
 	b.StopTimer()
-	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// This is not a typical FIT in term of file size (2.3M) and the messages size.
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
 	// f, err := os.Open("../testdata/from_official_sdk/activity_lowbattery.fit")
@@ -2460,24 +2499,32 @@ func BenchmarkDecode(b *testing.B) {
 		panic(err)
 	}
 
-	buf := bytes.NewBuffer(all)
-	dec := New(buf)
+	cur := 0
+	r := fnReader(func(b []byte) (n int, err error) {
+		if cur == len(all) {
+			return 0, io.EOF
+		}
+		n = copy(b, all[cur:])
+		cur += n
+		return
+	})
+
+	dec := New(r)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		buf.Write(all)
 		_, err = dec.Decode()
 		if err != nil {
 			b.Fatal(err)
 		}
 		dec.reset()
+		cur = 0 // reset reader
 	}
 }
 
 func BenchmarkDecodeWithFiledef(b *testing.B) {
 	b.StopTimer()
-	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// This is not a typical FIT in term of file size (2.3M) and the messages size.
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
 	// f, err := os.Open("../testdata/from_official_sdk/activity_lowbattery.fit")
@@ -2494,28 +2541,36 @@ func BenchmarkDecodeWithFiledef(b *testing.B) {
 	lis := filedef.NewListener()
 	defer lis.Close()
 
-	buf := bytes.NewBuffer(all)
-	dec := New(buf,
+	cur := 0
+	r := fnReader(func(b []byte) (n int, err error) {
+		if cur == len(all) {
+			return 0, io.EOF
+		}
+		n = copy(b, all[cur:])
+		cur += n
+		return
+	})
+
+	dec := New(r,
 		WithMesgListener(lis),
 		WithBroadcastOnly(),
 	)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		buf.Write(all)
 		_, err = dec.Decode()
 		if err != nil {
 			b.Fatal(err)
 		}
 		_ = lis.File()
 		dec.reset()
+		cur = 0 // reset reader
 	}
 }
 
 func BenchmarkCheckIntegrity(b *testing.B) {
 	b.StopTimer()
-	// This is not a typical FIT in term of file size (2.3M) and the messages it contains (200.000 messages)
+	// This is not a typical FIT in term of file size (2.3M) and the messages size.
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
 	if err != nil {
@@ -2527,17 +2582,27 @@ func BenchmarkCheckIntegrity(b *testing.B) {
 	if err != nil {
 		panic(err)
 	}
+
+	cur := 0
+	r := fnReader(func(b []byte) (n int, err error) {
+		if cur == len(all) {
+			return 0, io.EOF
+		}
+		n = copy(b, all[cur:])
+		cur += n
+		return
+	})
+
+	dec := New(r)
+
 	b.StartTimer()
 
-	buf := bytes.NewBuffer(all)
-	dec := New(buf)
 	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		buf.Write(all)
 		_, err = dec.CheckIntegrity()
 		if err != nil {
 			b.Fatal(err)
 		}
+		cur = 0 // reset reader
 	}
 }
 

@@ -59,16 +59,17 @@ func newReadBuffer(rd io.Reader, size int) *readBuffer {
 func (b *readBuffer) ReadN(n int) ([]byte, error) {
 	remaining := b.last - b.cur
 	if n > remaining { // fill buf
-		b.cur = reservedbuf
+		cur := reservedbuf
 		if remaining != 0 {
-			b.cur = reservedbuf - remaining               // cursor is now pointing at index on 'reserved section'
-			copy(b.buf[b.cur:], b.buf[b.last-remaining:]) // memmove remaining bytes to 'reserved section'.
+			cur = reservedbuf - remaining               // cursor is now pointing at index on 'reserved section'
+			copy(b.buf[cur:], b.buf[b.last-remaining:]) // memmove remaining bytes to 'reserved section'.
 		}
 
 		nr, err := io.ReadAtLeast(b.r, b.buf[reservedbuf:], n-remaining)
 		if err != nil {
 			return nil, err
 		}
+		b.cur = cur
 		b.last = reservedbuf + nr
 	}
 

@@ -5,6 +5,8 @@
 package decoder
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -117,7 +119,7 @@ func TestReadBufferReadN(t *testing.T) {
 			},
 		},
 		{
-			name: "when remaining is zero, cur and last should reset",
+			name: "when remaining is zero, cur and last should same",
 			r: func() io.Reader {
 				buf := make([]byte, 4096)
 				cur := 0
@@ -131,13 +133,32 @@ func TestReadBufferReadN(t *testing.T) {
 				})
 			}(),
 			testFn: func(buf *readBuffer) error {
-				_, _ = buf.ReadN(4096)
-				// try read when remaining is now zero to triger reset
-				_, _ = buf.ReadN(1)
-				if buf.cur != reservedbuf && buf.last != reservedbuf {
-					return fmt.Errorf("expected cur: %d, last: %d, got: cur: %d, last: %d",
-						reservedbuf, reservedbuf, buf.cur, buf.last)
+				_, err := buf.ReadN(4096)
+				if !errors.Is(err, nil) {
+					return fmt.Errorf("expected nil, got: %v", err)
 				}
+
+				// try read when remaining is now zero and reader should return EOF.
+				_, err = buf.ReadN(1)
+				if !errors.Is(err, io.EOF) {
+					return fmt.Errorf("expected EOF, got: %v", err)
+				}
+				if buf.cur != buf.last {
+					return fmt.Errorf("expected cur (%d) == last (%d), got: false",
+						buf.cur, buf.last)
+				}
+
+				// reset r to simulate changing r or if r is an io.ReadSeeker that has been seeked to the beginning.
+				buf.r = bytes.NewBuffer(make([]byte, 4096))
+				_, err = buf.ReadN(4096)
+				if !errors.Is(err, nil) {
+					return fmt.Errorf("expected nil, got: %v", err)
+				}
+				_, err = buf.ReadN(1)
+				if !errors.Is(err, io.EOF) {
+					return fmt.Errorf("expected EOF, got: %v", err)
+				}
+
 				return nil
 			},
 		},
