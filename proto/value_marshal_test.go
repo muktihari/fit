@@ -54,6 +54,7 @@ func TestValueMarshalAppend(t *testing.T) {
 		{b: kit.Ptr([]byte{}), value: SliceInt32([]int32{-8979123})},
 		{b: kit.Ptr([]byte{}), value: SliceUint32([]uint32{9929})},
 		{b: kit.Ptr([]byte{}), value: SliceString([]string{"supported"})},
+		{b: kit.Ptr([]byte{}), value: SliceString([]string{})},
 		{b: kit.Ptr([]byte{}), value: SliceString([]string{""})},
 		{b: kit.Ptr([]byte{}), value: SliceString([]string{"\x00"})},
 		{b: kit.Ptr([]byte{}), value: SliceString([]string{"\x00", "\x00"})},
@@ -128,6 +129,9 @@ func marshalValueWithReflectionForTest(w io.Writer, value Value, arch byte) erro
 			if err := marshalValueWithReflectionForTest(w, val, arch); err != nil {
 				return err
 			}
+		}
+		if rv.Len() == 0 && rv.Type() == reflect.TypeOf([]string{}) {
+			w.Write([]byte{0})
 		}
 		return nil
 	}
