@@ -34,7 +34,7 @@ var (
 	// Message-field related errors
 	ErrMesgDefMissing         = errors.New("message definition missing")
 	ErrFieldValueTypeMismatch = errors.New("field value type mismatch")
-	ErrByteSizeMismatch       = errors.New("byte size mismath")
+	ErrInvalidBaseType        = errors.New("invalid basetype")
 )
 
 const littleEndian = 0
@@ -586,12 +586,18 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
 	}
 
-	for i := 0; i < len(b); i += 3 {
-		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, proto.FieldDefinition{
-			Num:      b[i],
-			Size:     b[i+1],
-			BaseType: basetype.BaseType(b[i+2]),
-		})
+	for len(b) >= 3 {
+		fieldDef := proto.FieldDefinition{
+			Num:      b[0],
+			Size:     b[1],
+			BaseType: basetype.BaseType(b[2]),
+		}
+		if !fieldDef.BaseType.Valid() {
+			return fmt.Errorf("message definition number: %s(%d): fields[%d].BaseType: %s: %w",
+				mesgDef.MesgNum, mesgDef.MesgNum, len(mesgDef.FieldDefinitions), fieldDef.BaseType, ErrInvalidBaseType)
+		}
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, fieldDef)
+		b = b[3:]
 	}
 
 	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
@@ -611,12 +617,14 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
 		}
 
-		for i := 0; i < len(b); i += 3 {
-			mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
-				Num:                b[i],
-				Size:               b[i+1],
-				DeveloperDataIndex: b[i+2],
-			})
+		for len(b) >= 3 {
+			mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions,
+				proto.DeveloperFieldDefinition{
+					Num:                b[0],
+					Size:               b[1],
+					DeveloperDataIndex: b[2],
+				})
+			b = b[3:]
 		}
 	}
 
@@ -710,14 +718,14 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field := d.factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 		if field.Name == factory.NameUnknown {
 			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
-			field.Type = profile.ProfileTypeFromBaseType(fieldDef.BaseType)
 			field.BaseType = fieldDef.BaseType
+			field.Type = profile.ProfileTypeFromBaseType(field.BaseType)
 			// Check if the size corresponds to an array.
-			field.Array = fieldDef.Size > fieldDef.BaseType.Size() && fieldDef.Size%fieldDef.BaseType.Size() == 0
+			field.Array = fieldDef.Size > field.BaseType.Size() && fieldDef.Size%field.BaseType.Size() == 0
 		}
 
 		var (
-			baseType = fieldDef.BaseType
+			baseType = field.BaseType
 			array    = field.Array
 		)
 
@@ -725,11 +733,11 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		if fieldDef.Size == 0 {
 			d.logField(mesg, fieldDef, "Size is zero. Skip")
 			continue
-		} else if fieldDef.Size < fieldDef.BaseType.Size() {
+		} else if fieldDef.Size < baseType.Size() {
 			baseType = basetype.Byte
 			array = fieldDef.Size > baseType.Size() && fieldDef.Size&baseType.Size() == 0
 			d.logField(mesg, fieldDef, "Size is less than expected. Fallback: decode as byte(s) and convert the value")
-		} else if fieldDef.Size > fieldDef.BaseType.Size() && !field.Array && fieldDef.BaseType != basetype.String {
+		} else if fieldDef.Size > baseType.Size() && !field.Array && baseType != basetype.String {
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
@@ -738,9 +746,9 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			return err
 		}
 
-		if baseType != fieldDef.BaseType { // Convert value
+		if baseType != field.BaseType { // Convert value
 			bitVal, _ := bitsFromValue(val)
-			val = valueFromBits(bitVal, fieldDef.BaseType)
+			val = valueFromBits(bitVal, field.BaseType)
 		}
 
 		if field.Num == proto.FieldNumTimestamp {

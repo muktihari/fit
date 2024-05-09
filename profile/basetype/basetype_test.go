@@ -5,6 +5,7 @@
 package basetype_test
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -34,7 +35,7 @@ func TestFromStringAndString(t *testing.T) {
 		{s: "sint64", baseType: basetype.Sint64},
 		{s: "uint64", baseType: basetype.Uint64},
 		{s: "uint64z", baseType: basetype.Uint64z},
-		{s: "invalid", baseType: basetype.BaseType(255)},
+		{s: "invalid(255)", baseType: basetype.BaseType(255)},
 	}
 
 	t.Run("FromString", func(t *testing.T) {
@@ -143,7 +144,7 @@ func TestGoType(t *testing.T) {
 		{baseType: basetype.Uint64, goType: "uint64"},
 		{baseType: basetype.Uint64z, goType: "uint64"},
 		{baseType: basetype.Float64, goType: "float64"},
-		{baseType: 255, goType: "invalid"},
+		{baseType: 255, goType: "invalid(255)"},
 	}
 	for _, tc := range tt {
 		t.Run(tc.baseType.String(), func(t *testing.T) {
@@ -265,6 +266,41 @@ func TestInvalid(t *testing.T) {
 				if invalid != tc.invalid {
 					t.Fatalf("expected: %t, got: %t", tc.invalid, invalid)
 				}
+			}
+		})
+	}
+}
+
+func TestValid(t *testing.T) {
+	tt := []struct {
+		baseType basetype.BaseType
+		valid    bool
+	}{
+		{baseType: basetype.Enum, valid: true},
+		{baseType: basetype.Sint8, valid: true},
+		{baseType: basetype.Uint8, valid: true},
+		{baseType: basetype.Sint16, valid: true},
+		{baseType: basetype.Uint16, valid: true},
+		{baseType: basetype.Sint32, valid: true},
+		{baseType: basetype.Uint32, valid: true},
+		{baseType: basetype.String, valid: true},
+		{baseType: basetype.Float32, valid: true},
+		{baseType: basetype.Float64, valid: true},
+		{baseType: basetype.Uint8z, valid: true},
+		{baseType: basetype.Uint16z, valid: true},
+		{baseType: basetype.Uint32z, valid: true},
+		{baseType: basetype.Byte, valid: true},
+		{baseType: basetype.Sint64, valid: true},
+		{baseType: basetype.Uint64, valid: true},
+		{baseType: basetype.Uint64z, valid: true},
+		{baseType: basetype.BaseType(48), valid: false},
+		{baseType: basetype.BaseType(255), valid: false},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.baseType.String()), func(t *testing.T) {
+			if tc.baseType.Valid() != tc.valid {
+				t.Fatalf("expected: %v, got: %v", tc.valid, tc.baseType.Valid())
 			}
 		})
 	}
