@@ -11,13 +11,12 @@ import (
 	"math"
 )
 
-var (
-	ErrTypeNotSupported = errors.New("type is not supported")
-)
+var ErrTypeNotSupported = errors.New("type is not supported")
 
 // MarshalAppend appends the FIT format encoding of Value to b. Returning the result.
 // If arch is 0, marshal in Little-Endian, otherwise marshal in Big-Endian.
 func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
+	// NOTE: The size of the resulting bytes should align with lenof.
 	switch v.Type() {
 	case TypeBool:
 		if v.Bool() {
@@ -211,6 +210,9 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			if vals[i][len(vals[i])-1] != '\x00' {
 				b = append(b, '\x00')
 			}
+		}
+		if len(vals) == 0 {
+			b = append(b, '\x00')
 		}
 		return b, nil
 	default:
