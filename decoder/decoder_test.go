@@ -1367,10 +1367,38 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			header: proto.MesgDefinitionMask | proto.DevDataMask,
 			err:    io.EOF,
 		},
+		{
+			name: "field definition's basetype invalid",
+			r: func() io.Reader {
+				mesgDef := proto.MessageDefinition{
+					Header: proto.MesgDefinitionMask,
+					FieldDefinitions: []proto.FieldDefinition{
+						{Num: 48, Size: 10, BaseType: basetype.BaseType(48)},
+					},
+				}
+				buf, _ := mesgDef.MarshalAppend(nil)
+				buf = buf[1:]
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					m := len(buf)
+					if cur == m {
+						return 0, io.EOF
+					}
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
+				})
+			}(),
+			header: proto.MesgDefinitionMask,
+			err:    ErrInvalidBaseType,
+		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r, tc.opts...)
 			err := dec.decodeMessageDefinition(tc.header)
 			if !errors.Is(err, tc.err) {

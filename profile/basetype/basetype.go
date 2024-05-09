@@ -6,6 +6,7 @@ package basetype
 
 import (
 	"math"
+	"strconv"
 )
 
 // BaseTypeNumMask used to get the index/order of the constants (start from 0, Enum).
@@ -157,7 +158,7 @@ func (t BaseType) String() string {
 	case Uint64z:
 		return "uint64z"
 	}
-	return "invalid"
+	return "invalid(" + strconv.Itoa(int(t)) + ")"
 }
 
 // Size returns how many bytes the value need in binary form. If BaseType is invalid, 255 will be returned.
@@ -211,7 +212,7 @@ func (t BaseType) GoType() string {
 	case Uint64, Uint64z:
 		return "uint64"
 	}
-	return "invalid"
+	return "invalid(" + strconv.Itoa(int(t)) + ")"
 }
 
 // EndianAbility return whether t have endianness.
@@ -310,4 +311,28 @@ func (t BaseType) Invalid() any {
 		return Uint64zInvalid
 	}
 	return "invalid"
+}
+
+func (t BaseType) Valid() bool {
+	switch t {
+	case Enum,
+		Sint8,
+		Uint8,
+		Sint16,
+		Uint16,
+		Sint32,
+		Uint32,
+		String,
+		Float32,
+		Float64,
+		Uint8z,
+		Uint16z,
+		Uint32z,
+		Byte,
+		Sint64,
+		Uint64,
+		Uint64z:
+		return true
+	}
+	return false
 }
