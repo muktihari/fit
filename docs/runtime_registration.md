@@ -10,7 +10,7 @@ Note: The data presented here is only for demonstration, we don't known any spec
 
 Note: If you don't need stringer for your constants or you have your own custom stringer, you can skip this.
 
-To track your own **MesgNum** constants and its string represantative, you can add your types in typedef. However, unlike `factory` that you can have different Factory instances for different manufacturers, `typedef` is shared globally, so you can only work with one manufacturer for this (this is one of our current limitation that we mention earlier). Other than **MesgNum**, you can register **File** type as well.
+To track your own **MesgNum** constants and its string representative, you can add your types in typedef. However, unlike `factory` that you can have different Factory instances for different manufacturers, `typedef` is shared globally, so you can only work with one manufacturer for this (this is one of our current limitation that we mention earlier). Other than **MesgNum**, you can register **File** type as well.
 
 ```go
 
@@ -34,7 +34,7 @@ func main() {
 
 Let's say you will work with FIT files from two different manufacturers, or maybe you are the manufacturer itself that want to use this SDK to build a service in Go. You can define messages that only your company use in the FIT you are created.
 
-The available range is between `0xFF00 - 0xFFFE (65280 - 65534)`, but we found some company are using lower number such as `68`, so we accomodate that as long as the number is not already defined in original `Profile.xlsx`.
+The available range is between `0xFF00 - 0xFFFE (65280 - 65534)`, but we found some company are using lower number such as `68`, so we accommodate that as long as the number is not already defined in original `Profile.xlsx`.
 
 ```go
 package main

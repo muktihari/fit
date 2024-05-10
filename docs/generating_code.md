@@ -27,7 +27,7 @@ After generating code we make sure all existing tests are passes locally and on 
 
 FIT is designed to have the ability to include a `Product Profile`, which contains manufacturer-specific specifications not defined in the `Global Profile`. The `Product Profile` declares manufacturer-specific types and messages used in their FIT-generated files.
 
-To work with these files perfectly, we must include the specification in `Profile.xlsx` and then generate the code. Otherwise, if we encounter a manufactuer specific message, it will be an unknown message.
+To work with these files perfectly, we must include the specification in `Profile.xlsx` and then generate the code. Otherwise, if we encounter a manufacturer specific message, it will be an unknown message.
 
 Here are the steps to follow:
 
