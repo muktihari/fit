@@ -10,14 +10,14 @@ import (
 )
 
 const (
-	minReadBufferSize     = 16
-	maxReadBufferSize     = math.MaxUint32
-	defaultReadBufferSize = 4096
-
 	// reservedbuf is the maximum bytes that will be requested by the Decoder in one read.
 	// The value is obtained from the maximum n field definition in a mesg is 255 and
 	// we need 3 byte per field. So 255 * 3 = 765.
 	reservedbuf = 765
+
+	minReadBufferSize     = reservedbuf // should not less than this
+	maxReadBufferSize     = math.MaxUint32
+	defaultReadBufferSize = 4096
 )
 
 // readBuffer is a custom buffered reader. See newReadBuffer() for details.
@@ -81,7 +81,7 @@ func (b *readBuffer) ReadN(n int) ([]byte, error) {
 // Reset resets buf reader.
 func (b *readBuffer) Reset(rd io.Reader, size int) {
 	oldsize := cap(b.buf) - reservedbuf
-	if size != oldsize {
+	if size > oldsize {
 		b.buf = make([]byte, reservedbuf+size)
 	}
 	b.buf = b.buf[:reservedbuf+size]
