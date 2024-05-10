@@ -8,6 +8,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
+	"sync"
+	"unicode/utf8"
 
 	"github.com/muktihari/fit/profile/basetype"
 )
@@ -37,11 +39,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 2
 			vs := make([]int16, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, int16(binary.LittleEndian.Uint16(b[i:i+n])))
+					vs = append(vs, int16(binary.LittleEndian.Uint16(b[:n])))
 				} else {
-					vs = append(vs, int16(binary.BigEndian.Uint16(b[i:i+n])))
+					vs = append(vs, int16(binary.BigEndian.Uint16(b[:n])))
 				}
 			}
 			return SliceInt16(vs), nil
@@ -54,11 +56,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 2
 			vs := make([]uint16, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, binary.LittleEndian.Uint16(b[i:i+n]))
+					vs = append(vs, binary.LittleEndian.Uint16(b[:n]))
 				} else {
-					vs = append(vs, binary.BigEndian.Uint16(b[i:i+n]))
+					vs = append(vs, binary.BigEndian.Uint16(b[:n]))
 				}
 			}
 			return SliceUint16(vs), nil
@@ -71,11 +73,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 4
 			vs := make([]int32, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, int32(binary.LittleEndian.Uint32(b[i:i+n])))
+					vs = append(vs, int32(binary.LittleEndian.Uint32(b[:n])))
 				} else {
-					vs = append(vs, int32(binary.BigEndian.Uint32(b[i:i+n])))
+					vs = append(vs, int32(binary.BigEndian.Uint32(b[:n])))
 				}
 			}
 			return SliceInt32(vs), nil
@@ -88,11 +90,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 4
 			vs := make([]uint32, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, binary.LittleEndian.Uint32(b[i:i+n]))
+					vs = append(vs, binary.LittleEndian.Uint32(b[:n]))
 				} else {
-					vs = append(vs, binary.BigEndian.Uint32(b[i:i+n]))
+					vs = append(vs, binary.BigEndian.Uint32(b[:n]))
 				}
 			}
 			return SliceUint32(vs), nil
@@ -105,11 +107,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 8
 			vs := make([]int64, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, int64(binary.LittleEndian.Uint64(b[i:i+n])))
+					vs = append(vs, int64(binary.LittleEndian.Uint64(b[:n])))
 				} else {
-					vs = append(vs, int64(binary.BigEndian.Uint64(b[i:i+n])))
+					vs = append(vs, int64(binary.BigEndian.Uint64(b[:n])))
 				}
 			}
 			return SliceInt64(vs), nil
@@ -122,11 +124,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 8
 			vs := make([]uint64, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, binary.LittleEndian.Uint64(b[i:i+n]))
+					vs = append(vs, binary.LittleEndian.Uint64(b[:n]))
 				} else {
-					vs = append(vs, binary.BigEndian.Uint64(b[i:i+n]))
+					vs = append(vs, binary.BigEndian.Uint64(b[:n]))
 				}
 			}
 			return SliceUint64(vs), nil
@@ -139,11 +141,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 4
 			vs := make([]float32, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, math.Float32frombits(binary.LittleEndian.Uint32(b[i:i+n])))
+					vs = append(vs, math.Float32frombits(binary.LittleEndian.Uint32(b[:n])))
 				} else {
-					vs = append(vs, math.Float32frombits(binary.BigEndian.Uint32(b[i:i+n])))
+					vs = append(vs, math.Float32frombits(binary.BigEndian.Uint32(b[:n])))
 				}
 			}
 			return SliceFloat32(vs), nil
@@ -156,11 +158,11 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		if isArray {
 			const n = 8
 			vs := make([]float64, 0, size(len(b), n))
-			for i := 0; i < len(b); i += n {
+			for ; len(b) >= n; b = b[n:] {
 				if arch == littleEndian {
-					vs = append(vs, math.Float64frombits(binary.LittleEndian.Uint64(b[i:i+n])))
+					vs = append(vs, math.Float64frombits(binary.LittleEndian.Uint64(b[:n])))
 				} else {
-					vs = append(vs, math.Float64frombits(binary.BigEndian.Uint64(b[i:i+n])))
+					vs = append(vs, math.Float64frombits(binary.BigEndian.Uint64(b[:n])))
 				}
 			}
 			return SliceFloat64(vs), nil
@@ -186,7 +188,7 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 			for i := range b {
 				if b[i] == '\x00' {
 					if last != i { // only if not an invalid string
-						vs = append(vs, string(b[last:i]))
+						vs = append(vs, utf8String(b[last:i]))
 					}
 					last = i + 1
 				}
@@ -194,7 +196,7 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 			return SliceString(vs), nil
 		}
 		b = trimUTF8NullTerminatedString(b)
-		return String(string(b)), nil
+		return String(utf8String(b)), nil
 	}
 
 	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", ref, ref, ErrTypeNotSupported)
@@ -205,16 +207,34 @@ func size(lenbytes int, typesize byte) byte {
 	return byte(lenbytes % int(typesize))
 }
 
+// trimUTF8NullTerminatedString trims all utf8 null-terminated string including the paddings.
 func trimUTF8NullTerminatedString(b []byte) []byte {
-	pos := -1
-	for i := len(b); i > 0; i-- {
-		if b[i-1] != '\x00' {
-			break
+	pos := len(b)
+	for i := pos - 1; i >= 0; i-- {
+		if b[i] != '\x00' {
+			return b[:i+1]
 		}
-		pos = i - 1
-	}
-	if pos < 0 {
-		return b
+		pos = i
 	}
 	return b[:pos]
+}
+
+// smallpool is an [256]byte array pool.
+var smallpool = sync.Pool{New: func() any { return new([256]byte) }}
+
+// utf8String converts b into a valid utf8 string.
+// Any invalid utf8 character will be converted into utf8.RuneError.
+func utf8String(b []byte) string {
+	if utf8.Valid(b) { // Fast path
+		return string(b)
+	}
+	arr := smallpool.Get().(*[256]byte)
+	defer smallpool.Put(arr)
+	buf := arr[:0]
+	for len(b) > 0 {
+		r, size := utf8.DecodeRune(b)
+		buf = utf8.AppendRune(buf, r)
+		b = b[size:]
+	}
+	return string(buf)
 }
