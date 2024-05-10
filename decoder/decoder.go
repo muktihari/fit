@@ -479,7 +479,7 @@ func (d *Decoder) decodeFileHeader() error {
 	size := b[0]
 
 	if size != 12 && size != 14 { // current spec is either 12 or 14
-		return fmt.Errorf("header size [%d] is invalid: %w", size, ErrNotAFitFile)
+		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotAFitFile)
 	}
 	_, _ = d.crc16.Write(b)
 
@@ -515,14 +515,14 @@ func (d *Decoder) decodeFileHeader() error {
 		d.fileHeader.CRC = binary.LittleEndian.Uint16(b[11:13])
 	}
 
-	if d.fileHeader.CRC == 0x0000 || !d.options.shouldChecksum { // do not need to check header's crc integrity.
+	if d.fileHeader.CRC == 0x0000 || !d.options.shouldChecksum { // do not need to check file header's crc integrity.
 		d.crc16.Reset()
 		return nil
 	}
 
 	_, _ = d.crc16.Write(b[:len(b)-2])
-	if d.crc16.Sum16() != d.fileHeader.CRC { // check header integrity
-		return fmt.Errorf("expected header's crc: %d, got: %d: %w", d.fileHeader.CRC, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+	if d.crc16.Sum16() != d.fileHeader.CRC { // check file header integrity
+		return fmt.Errorf("expected file header's crc: %d, got: %d: %w", d.fileHeader.CRC, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
 
 	d.crc16.Reset() // this hash will be re-used for calculating data integrity.
@@ -586,7 +586,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
 	}
 
-	for len(b) >= 3 {
+	for ; len(b) >= 3; b = b[3:] {
 		fieldDef := proto.FieldDefinition{
 			Num:      b[0],
 			Size:     b[1],
@@ -597,7 +597,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 				mesgDef.MesgNum, mesgDef.MesgNum, len(mesgDef.FieldDefinitions), fieldDef.BaseType, ErrInvalidBaseType)
 		}
 		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, fieldDef)
-		b = b[3:]
 	}
 
 	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
@@ -617,14 +616,13 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
 		}
 
-		for len(b) >= 3 {
+		for ; len(b) >= 3; b = b[3:] {
 			mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions,
 				proto.DeveloperFieldDefinition{
 					Num:                b[0],
 					Size:               b[1],
 					DeveloperDataIndex: b[2],
 				})
-			b = b[3:]
 		}
 	}
 
@@ -719,6 +717,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	for i := range mesgDef.FieldDefinitions {
 		fieldDef := &mesgDef.FieldDefinitions[i]
 
+		// We enforce field.Array for string type to match the value defined in factory for all non-unknown fields.
+		var overrideStringArray bool
 		field := d.factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 		if field.Name == factory.NameUnknown {
 			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
@@ -726,6 +726,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			field.Type = profile.ProfileTypeFromBaseType(field.BaseType)
 			// Check if the size corresponds to an array.
 			field.Array = fieldDef.Size > field.BaseType.Size() && fieldDef.Size%field.BaseType.Size() == 0
+			// Fallback to FIT Protocol's string rule: decoder will determine it by counting the utf8 null-terminated string.
+			overrideStringArray = field.BaseType == basetype.String
 		}
 
 		var (
@@ -745,7 +747,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
-		val, err := d.readValue(fieldDef.Size, baseType, array, mesgDef.Architecture)
+		val, err := d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, array, overrideStringArray)
 		if err != nil {
 			return err
 		}
@@ -855,24 +857,30 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		// The combination of the Developer Data Index and Field Definition Number
 		// create a unique id for each Field Description.
 		var fieldDescription *mesgdef.FieldDescription
-		for i := range d.fieldDescriptions {
-			if d.fieldDescriptions[i].DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
+		for _, fieldDesc := range d.fieldDescriptions {
+			if fieldDesc.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
 				continue
 			}
-			if d.fieldDescriptions[i].FieldDefinitionNumber != devFieldDef.Num {
+			if fieldDesc.FieldDefinitionNumber != devFieldDef.Num {
 				continue
 			}
-			fieldDescription = d.fieldDescriptions[i]
+			fieldDescription = fieldDesc
 			break
 		}
 
 		if fieldDescription == nil {
-			d.log("mesg.Num: %d, developerField.Num: %d. Can't interpret developer field, no field description mesg found. "+
-				"Just read acquired bytes (%d) and move forward. [byte pos: %d]\n", mesg.Num, devFieldDef.Num, devFieldDef.Size, d.n)
+			d.log("mesg.Num: %d, developerFields[%d].Num: %d: Can't interpret developer field, "+
+				"no field description mesg found. Just read acquired bytes (%d) and move forward. [byte pos: %d]\n",
+				mesg.Num, i, devFieldDef.Num, devFieldDef.Size, d.n)
 			if _, err := d.readN(int(devFieldDef.Size)); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
 			continue
+		}
+
+		if !fieldDescription.FitBaseTypeId.Valid() {
+			return fmt.Errorf("fieldDescription.FitBaseTypeId: %s: %w",
+				fieldDescription.FitBaseTypeId, ErrInvalidBaseType)
 		}
 
 		developerField := proto.DeveloperField{
@@ -887,22 +895,13 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		developerField.Name = strings.Join(fieldDescription.FieldName, "|")
 		developerField.Units = strings.Join(fieldDescription.Units, "|")
 
-		// TODO: We still don't know how []string should be handled in the developer field.
-		// For the Field, we have "Array" (bool) for determining if the value is an array.
-		// However, we could not find any reference on how to use the DeveloperField's Array (uint8).
-		//
-		// For example:
-		// - "suuntoplus_plugin_owner_id" is []string, 1 - 10 strings, 1 - 64 characters each.
-		//   But still it does not specify DeveloperField's Array. (ref: https://apizone.suunto.com/fit-description).
-		//
-		// Until we discover a better implementation, let's determine it by using multiplication of the size.
-		// Consequently, all strings will be treated as arrays since its size is 1.
-		var isArray bool
+		var (
+			baseType = developerField.BaseType
+			isArray  bool
+		)
 		if devFieldDef.Size > developerField.BaseType.Size() && devFieldDef.Size%developerField.BaseType.Size() == 0 {
 			isArray = true
 		}
-
-		baseType := developerField.BaseType
 
 		// Gracefully handle poorly encoded FIT file.
 		if devFieldDef.Size == 0 {
@@ -915,7 +914,10 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
 		}
 
-		val, err := d.readValue(developerField.Size, baseType, isArray, mesgDef.Architecture)
+		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
+		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/355554/how-to-determine-developer-field-s-value-type-is-a-string-or-string
+		const overrideStringArray = true
+		val, err := d.readValue(developerField.Size, mesgDef.Architecture, baseType, isArray, overrideStringArray)
 		if err != nil {
 			return err
 		}
@@ -955,10 +957,13 @@ func (d *Decoder) readN(n int) ([]byte, error) {
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type. Size should not be zero.
-func (d *Decoder) readValue(size byte, baseType basetype.BaseType, isArray bool, arch byte) (val proto.Value, err error) {
+func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, isArray, overrideStringArray bool) (val proto.Value, err error) {
 	b, err := d.readN(int(size))
 	if err != nil {
 		return val, err
+	}
+	if overrideStringArray {
+		isArray = strlen(b) > 1
 	}
 	return proto.UnmarshalValue(b, arch, baseType, isArray)
 }
@@ -1040,4 +1045,19 @@ func (d *Decoder) decodeMessagesWithContext(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+// strlen counts how many valid string in b.
+// This should align with the logic in proto.UnmarshalValue.
+func strlen(b []byte) (size byte) {
+	last := 0
+	for i := range b {
+		if b[i] == '\x00' {
+			if last != i { // only if not an invalid string
+				size++
+			}
+			last = i + 1
+		}
+	}
+	return size
 }

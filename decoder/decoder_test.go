@@ -2227,6 +2227,33 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				return nil
 			},
 		},
+		{
+			name: "decode developer fields field description has invalid basetype",
+			r:    fnReaderOK,
+			fieldDescription: mesgdef.NewFieldDescription(
+				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(255)),
+				)),
+			),
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.Record,
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num:                0,
+						DeveloperDataIndex: 0,
+						Size:               1,
+					},
+				},
+			},
+			mesg: &proto.Message{},
+			err:  ErrInvalidBaseType,
+		},
 	}
 
 	for i, tc := range tt {
@@ -2249,36 +2276,119 @@ func TestDecodeDeveloperFields(t *testing.T) {
 
 func TestReadValue(t *testing.T) {
 	tt := []struct {
-		name     string
-		r        io.Reader
-		size     byte
-		baseType basetype.BaseType
-		arch     byte
-		result   proto.Value
-		err      error
+		name                string
+		r                   io.Reader
+		size                byte
+		arch                byte
+		baseType            basetype.BaseType
+		isArray             bool
+		overrideStringArray bool
+		result              proto.Value
+		err                 error
 	}{
 		{
 			name:     "readValue happy flow",
 			r:        fnReaderOK, // will produce 0
 			size:     1,
-			baseType: basetype.Sint8,
 			arch:     0,
+			baseType: basetype.Sint8,
 			result:   proto.Int8(0),
+		},
+		{
+			name: "readValue happy flow: string",
+			r: func() io.Reader {
+				buf := []byte("fit sdk\x00")
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(b) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return cur, nil
+				})
+			}(),
+			size:     byte(len("fit sdk\x00")),
+			arch:     0,
+			baseType: basetype.String,
+			result:   proto.String("fit sdk"),
+		},
+		{
+			name: "readValue happy flow: []string",
+			r: func() io.Reader {
+				buf := []byte("fit\x00sdk\x00")
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(b) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return cur, nil
+				})
+			}(),
+			size:     byte(len("fit\x00sdk\x00")),
+			arch:     0,
+			baseType: basetype.String,
+			isArray:  true,
+			result:   proto.SliceString([]string{"fit", "sdk"}),
+		},
+		{
+			name: "readValue happy flow: must []string",
+			r: func() io.Reader {
+				buf := []byte("fit\x00sdk\x00")
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(b) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return cur, nil
+				})
+			}(),
+			size:                byte(len("fit\x00sdk\x00")),
+			arch:                0,
+			baseType:            basetype.String,
+			isArray:             false,
+			overrideStringArray: true,
+			result:              proto.SliceString([]string{"fit", "sdk"}),
+		},
+		{
+			name: "readValue happy flow: must []string contains null-terminated string padding",
+			r: func() io.Reader {
+				buf := []byte("fit\x00\x00\x00sdk\x00\x00\x00")
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					if cur == len(b) {
+						return 0, io.EOF
+					}
+					n = copy(b, buf[cur:])
+					cur += n
+					return cur, nil
+				})
+			}(),
+			size:                byte(len("fit\x00\x00\x00sdk\x00\x00\x00")),
+			arch:                0,
+			baseType:            basetype.String,
+			isArray:             false,
+			overrideStringArray: true,
+			result:              proto.SliceString([]string{"fit", "sdk"}),
 		},
 		{
 			name:     "readValue happy flow",
 			r:        fnReaderOK, // will produce 0
 			size:     1,
-			baseType: basetype.BaseType(100), // invalid basetype.
 			arch:     0,
+			baseType: basetype.BaseType(100), // invalid basetype.
 			err:      proto.ErrTypeNotSupported,
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
-			res, err := dec.readValue(tc.size, tc.baseType, false, tc.arch)
+			res, err := dec.readValue(tc.size, tc.arch, tc.baseType, tc.isArray, tc.overrideStringArray)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
