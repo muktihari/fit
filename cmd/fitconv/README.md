@@ -34,6 +34,7 @@ ls
 | -deg       | FIT to CSV only | Print GPS Positions in degrees instead of semicircles. |
 | -trim      | FIT to CSV only | Trim trailing commas in every line (save storage)      |
 | -no-expand | FIT to CSV only | [Decode Option] Do not expand components               |
+| -checksum  | FIT to CSV only | [Decode Option] Do CRC checksum to ensure integrity    |
 
 ```sh
 go run main.go -deg activity.fit activity2.fit

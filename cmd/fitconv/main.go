@@ -53,6 +53,9 @@ func main() {
 	var flagNoExpandComponents bool
 	flag.BoolVar(&flagNoExpandComponents, "no-expand", false, "[Decode Option] Do not expand components")
 
+	var flagShouldChecksum bool
+	flag.BoolVar(&flagShouldChecksum, "checksum", false, "[Decode Option] should do crc checksum")
+
 	flag.Parse()
 
 	if flagVersion {
@@ -102,6 +105,14 @@ func main() {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithTrimTrailingCommas())
 	}
 
+	var decoderOptions []decoder.Option
+	if flagNoExpandComponents {
+		decoderOptions = append(decoderOptions, decoder.WithNoComponentExpansion())
+	}
+	if !flagShouldChecksum {
+		decoderOptions = append(decoderOptions, decoder.WithIgnoreChecksum())
+	}
+
 	paths := flag.Args()
 
 	if len(paths) == 0 {
@@ -112,7 +123,7 @@ func main() {
 		ext := filepath.Ext(path)
 		switch ext {
 		case ".fit":
-			if err := fitToCsv(path, flagNoExpandComponents, fitToCsvOptions...); err != nil {
+			if err := fitToCsv(path, decoderOptions, fitToCsvOptions...); err != nil {
 				fmt.Fprintf(os.Stderr, "could not convert %q to csv: %v\n", path, err)
 			}
 		case ".csv":
@@ -125,7 +136,7 @@ func main() {
 	}
 }
 
-func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error {
+func fitToCsv(path string, decoderOptions []decoder.Option, opts ...fitcsv.Option) error {
 	ff, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("could not open file: %s: %w", path, err)
@@ -151,6 +162,8 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 	defer cf.Close()
 
 	bw := bufio.NewWriterSize(cf, blockSize)
+	defer bw.Flush()
+
 	conv := fitcsv.NewFITToCSVConv(bw, opts...)
 
 	options := []decoder.Option{
@@ -159,34 +172,24 @@ func fitToCsv(path string, noExpandComponents bool, opts ...fitcsv.Option) error
 		decoder.WithBroadcastOnly(),
 		decoder.WithBroadcastMesgCopy(),
 	}
-	if noExpandComponents {
-		options = append(options, decoder.WithNoComponentExpansion())
-	}
+	options = append(options, decoderOptions...)
 	dec := decoder.New(ff, options...)
-
-	var sequenceCounter int
-	defer func() {
-		if sequenceCounter == 0 {
-			_ = os.Remove(pathcsv)
-		}
-	}()
 
 	for dec.Next() {
 		_, err = dec.Decode()
 		if err != nil {
-			return fmt.Errorf("decode failed: %w", err)
+			break
 		}
-		sequenceCounter++
 	}
 
 	conv.Wait()
 
-	if err := conv.Err(); err != nil {
-		return fmt.Errorf("convert done with error: %v", err)
+	if err != nil {
+		return fmt.Errorf("decode failed: %w", err)
 	}
 
-	if err := bw.Flush(); err != nil {
-		return fmt.Errorf("could not flush buffered data: %w", err)
+	if err := conv.Err(); err != nil {
+		return fmt.Errorf("convert done with error: %v", err)
 	}
 
 	fmt.Printf("📄 %q -> %q\n", filepath.Join(dir, path), filepath.Join(dir, namecsv))
