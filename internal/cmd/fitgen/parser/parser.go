@@ -50,7 +50,8 @@ func (p *Parser) ParseTypes() ([]Type, error) {
 			)
 			name, diff = p.misspellReplacer.Replace(name)
 			if len(diff) > 0 {
-				fmt.Printf("parser: misspell: type: type name: %v\n", formatMisspellDiff(diff))
+				fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: type name: %v\n",
+					"Types", row.Index(), formatMisspellDiff(diff))
 			}
 			ts = append(ts, Type{
 				Name:     name,
@@ -65,14 +66,15 @@ func (p *Parser) ParseTypes() ([]Type, error) {
 			value   = row.Cell("D")
 			comment = row.Cell("E")
 		)
-
 		name, diff = p.misspellReplacer.Replace(name)
 		if len(diff) > 0 {
-			fmt.Printf("parser: misspell: type: value name: %v\n", formatMisspellDiff(diff))
+			fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: value name: %v\n",
+				"Types", row.Index(), formatMisspellDiff(diff))
 		}
 		comment, diff = p.misspellReplacer.Replace(comment)
 		if len(diff) > 0 {
-			fmt.Printf("parser: misspell: type: comment: %v\n", formatMisspellDiff(diff))
+			fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: comment: %v\n",
+				"Types", row.Index(), formatMisspellDiff(diff))
 		}
 
 		ts[cur].Values = append(ts[cur].Values, Value{
@@ -108,11 +110,13 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 			)
 			name, misspellDiff = p.misspellReplacer.Replace(name)
 			if len(misspellDiff) > 0 {
-				fmt.Printf("parser: misspell: mesg.Name: %v\n", formatMisspellDiff(misspellDiff))
+				fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %v\n",
+					"Messages", row.Index(), formatMisspellDiff(misspellDiff))
 			}
 			comment, misspellDiff = p.misspellReplacer.Replace(comment)
 			if len(misspellDiff) > 0 {
-				fmt.Printf("parser: misspell: mesg.Comment: %v\n", formatMisspellDiff(misspellDiff))
+				fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Comment: %v\n",
+					"Messages", row.Index(), formatMisspellDiff(misspellDiff))
 			}
 			ms = append(ms, Message{
 				Name:    name,
@@ -129,8 +133,8 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 		fieldName := row.Cell("C")
 		fieldName, misspellDiff = p.misspellReplacer.Replace(fieldName)
 		if len(misspellDiff) > 0 {
-			fmt.Printf("parser: misspell: mesg.Name: %s: field.Name: %v\n",
-				ms[cur].Name, formatMisspellDiff(misspellDiff))
+			fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %s: field.Name: %v\n",
+				"Messages", row.Index(), ms[cur].Name, formatMisspellDiff(misspellDiff))
 		}
 		fieldType := row.Cell("D")
 		array := row.Cell("E")
@@ -161,8 +165,8 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 		comment := row.Cell("N")
 		comment, misspellDiff = p.misspellReplacer.Replace(comment)
 		if len(misspellDiff) > 0 {
-			fmt.Printf("parser: misspell: mesg.Name: %s: field.Comment: %v\n",
-				ms[cur].Name, formatMisspellDiff(misspellDiff))
+			fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %s: field.Comment: %v\n",
+				"Messages", row.Index(), ms[cur].Name, formatMisspellDiff(misspellDiff))
 		}
 
 		product := row.Cell("O")
@@ -297,7 +301,11 @@ func formatMisspellDiff(diff []misspell.Diff) string {
 	strbuf := new(strings.Builder)
 	fmt.Fprintf(strbuf, "[\n")
 	for i := range diff {
-		fmt.Fprintf(strbuf, "%q is a misspelling of %q\n", diff[i].Original, diff[i].Corrected)
+		fullLine := "full text: <ommited: too long> -> "
+		if len(diff[i].FullLine) <= 50 {
+			fullLine = fmt.Sprintf("full text: %q -> ", diff[i].FullLine)
+		}
+		fmt.Fprintf(strbuf, "- %s%q is a misspelling of %q\n", fullLine, diff[i].Original, diff[i].Corrected)
 	}
 	fmt.Fprintf(strbuf, "]")
 	return strbuf.String()
