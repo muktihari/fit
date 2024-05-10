@@ -13,6 +13,8 @@ func TestTrimUTF8NullTerminatedString(t *testing.T) {
 		str      string
 		expected string
 	}{
+		{str: "", expected: ""},
+		{str: "\x00", expected: ""},
 		{str: "Open Water", expected: "Open Water"},
 		{str: "Open Water\x00", expected: "Open Water"},
 		{str: "Open Water\x00\x00", expected: "Open Water"},
@@ -26,5 +28,44 @@ func TestTrimUTF8NullTerminatedString(t *testing.T) {
 			}
 		})
 	}
+}
 
+func BenchmarkTrimUTF8NullTerminatedString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = trimUTF8NullTerminatedString([]byte(""))
+		_ = trimUTF8NullTerminatedString([]byte("\x00"))
+		_ = trimUTF8NullTerminatedString([]byte("Open Water"))
+		_ = trimUTF8NullTerminatedString([]byte("Open Water\x00"))
+		_ = trimUTF8NullTerminatedString([]byte("Open Water\x00\x00"))
+	}
+}
+
+func TestUTF8String(t *testing.T) {
+	tt := []struct {
+		in  []byte
+		out string
+	}{
+		{in: []byte("0000000000000�0000000"), out: "0000000000000�0000000"},
+		{in: []byte("0000000000000\xe80000000"), out: "0000000000000�0000000"},
+	}
+
+	for _, tc := range tt {
+		out := utf8String([]byte(tc.in))
+		if out != tc.out {
+			t.Fatalf("expected: %q, got: %q", tc.out, out)
+		}
+	}
+}
+
+func BenchmarkUTF8String(b *testing.B) {
+	b.Run("valid utf8 string", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_ = utf8String([]byte("0000000000000�0000000"))
+		}
+	})
+	b.Run("invalid utf8 string", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			_ = utf8String([]byte("0000000000000\xe80000000"))
+		}
+	})
 }
