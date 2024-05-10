@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	bit    = 8
-	maxBit = 32
-	size   = maxBit / bit
+	bit     = 8
+	maxBit  = 32
+	bitSize = maxBit / bit
 )
 
 // bitsFromValue convert value into 32-bits unsigned integer.
@@ -42,7 +42,7 @@ func bitsFromValue(value proto.Value) (bits uint32, ok bool) {
 		return uint32(value.Float64()), true
 	case proto.TypeSliceUint8:
 		val := value.SliceUint8()
-		if len(val) > size {
+		if len(val) > bitSize {
 			return 0, false
 		}
 		for i := range val {

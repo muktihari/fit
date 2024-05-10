@@ -47,13 +47,13 @@ func TestNewReadBuffer(t *testing.T) {
 func TestReadBufferReadN(t *testing.T) {
 	tt := []struct {
 		name   string
+		size   int
 		r      io.Reader
-		cur    int
-		last   int
 		testFn func(buf *readBuffer) error
 	}{
 		{
 			name: "reader has exactly 4096 bytes",
+			size: defaultReadBufferSize,
 			r: func() io.Reader {
 				buf := make([]byte, 4096)
 				cur := 0
@@ -84,6 +84,7 @@ func TestReadBufferReadN(t *testing.T) {
 		},
 		{
 			name: "reader has 14_096 bytes",
+			size: defaultReadBufferSize,
 			r: func() io.Reader {
 				buf := make([]byte, 14_096)
 				cur := 0
@@ -120,6 +121,7 @@ func TestReadBufferReadN(t *testing.T) {
 		},
 		{
 			name: "when remaining is zero, cur and last should same",
+			size: defaultReadBufferSize,
 			r: func() io.Reader {
 				buf := make([]byte, 4096)
 				cur := 0
@@ -162,11 +164,20 @@ func TestReadBufferReadN(t *testing.T) {
 				return nil
 			},
 		},
+		{
+			name: "test read 765 when buffer is set to minimum",
+			size: 16, // 16 was the previous minBufSize, it now will be changed to 765
+			r:    fnReaderOK,
+			testFn: func(buf *readBuffer) error {
+				_, err := buf.ReadN(reservedbuf)
+				return err
+			},
+		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			b := newReadBuffer(tc.r, 4096)
+			b := newReadBuffer(tc.r, tc.size)
 			if err := tc.testFn(b); err != nil {
 				t.Fatalf("expected nil, got: %v", err)
 			}
