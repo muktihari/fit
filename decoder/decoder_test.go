@@ -1476,6 +1476,22 @@ func TestDecodeMessageData(t *testing.T) {
 			},
 		},
 		{
+			name:   "decode message data compressed header unknown field",
+			r:      fnReaderOK,
+			header: proto.MesgCompressedHeaderMask,
+			mesgdef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: typedef.MesgNumInvalid,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      proto.FieldNumTimestamp,
+						Size:     4,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+		},
+		{
 			name:    "decode message data normal header missing mesg definition",
 			r:       fnReaderOK,
 			header:  0,

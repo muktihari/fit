@@ -659,6 +659,10 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		d.lastTimeOffset = timeOffset
 
 		timestampField := d.factory.CreateField(mesgDef.MesgNum, proto.FieldNumTimestamp)
+		if timestampField.Name == factory.NameUnknown {
+			timestampField.BaseType = basetype.Uint32
+			timestampField.Type = profile.ProfileTypeFromBaseType(timestampField.BaseType)
+		}
 		timestampField.Value = proto.Uint32(d.timestamp)
 
 		mesg.Fields = append(mesg.Fields, timestampField) // add timestamp field
