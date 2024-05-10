@@ -20,7 +20,7 @@ const (
 	ExdDataUnitsFeetPerHour                    ExdDataUnits = 4
 	ExdDataUnitsMetersPerHour                  ExdDataUnits = 5
 	ExdDataUnitsDegreesCelsius                 ExdDataUnits = 6
-	ExdDataUnitsDegreesFarenheit               ExdDataUnits = 7
+	ExdDataUnitsDegreesFahrenheit              ExdDataUnits = 7
 	ExdDataUnitsZone                           ExdDataUnits = 8
 	ExdDataUnitsGear                           ExdDataUnits = 9
 	ExdDataUnitsRpm                            ExdDataUnits = 10
@@ -84,8 +84,8 @@ func (e ExdDataUnits) String() string {
 		return "meters_per_hour"
 	case ExdDataUnitsDegreesCelsius:
 		return "degrees_celsius"
-	case ExdDataUnitsDegreesFarenheit:
-		return "degrees_farenheit"
+	case ExdDataUnitsDegreesFahrenheit:
+		return "degrees_fahrenheit"
 	case ExdDataUnitsZone:
 		return "zone"
 	case ExdDataUnitsGear:
@@ -192,8 +192,8 @@ func ExdDataUnitsFromString(s string) ExdDataUnits {
 		return ExdDataUnitsMetersPerHour
 	case "degrees_celsius":
 		return ExdDataUnitsDegreesCelsius
-	case "degrees_farenheit":
-		return ExdDataUnitsDegreesFarenheit
+	case "degrees_fahrenheit":
+		return ExdDataUnitsDegreesFahrenheit
 	case "zone":
 		return ExdDataUnitsZone
 	case "gear":
@@ -293,7 +293,7 @@ func ListExdDataUnits() []ExdDataUnits {
 		ExdDataUnitsFeetPerHour,
 		ExdDataUnitsMetersPerHour,
 		ExdDataUnitsDegreesCelsius,
-		ExdDataUnitsDegreesFarenheit,
+		ExdDataUnitsDegreesFahrenheit,
 		ExdDataUnitsZone,
 		ExdDataUnitsGear,
 		ExdDataUnitsRpm,

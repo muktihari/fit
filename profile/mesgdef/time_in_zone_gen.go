@@ -28,7 +28,7 @@ type TimeInZone struct {
 	TimeInPowerZone          []uint32  // Array: [N]; Scale: 1000; Units: s
 	HrZoneHighBoundary       []uint8   // Array: [N]; Units: bpm
 	SpeedZoneHighBoundary    []uint16  // Array: [N]; Scale: 1000; Units: m/s
-	CadenceZoneHighBondary   []uint8   // Array: [N]; Units: rpm
+	CadenceZoneHighBoundary  []uint8   // Array: [N]; Units: rpm
 	PowerZoneHighBoundary    []uint16  // Array: [N]; Units: watts
 	ReferenceMesg            typedef.MesgNum
 	ReferenceIndex           typedef.MessageIndex
@@ -70,7 +70,7 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 		TimeInPowerZone:          vals[5].SliceUint32(),
 		HrZoneHighBoundary:       vals[6].SliceUint8(),
 		SpeedZoneHighBoundary:    vals[7].SliceUint16(),
-		CadenceZoneHighBondary:   vals[8].SliceUint8(),
+		CadenceZoneHighBoundary:  vals[8].SliceUint8(),
 		PowerZoneHighBoundary:    vals[9].SliceUint16(),
 		HrCalcType:               typedef.HrZoneCalc(vals[10].Uint8()),
 		MaxHeartRate:             vals[11].Uint8(),
@@ -144,9 +144,9 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.SpeedZoneHighBoundary)
 		fields = append(fields, field)
 	}
-	if m.CadenceZoneHighBondary != nil {
+	if m.CadenceZoneHighBoundary != nil {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.SliceUint8(m.CadenceZoneHighBondary)
+		field.Value = proto.SliceUint8(m.CadenceZoneHighBoundary)
 		fields = append(fields, field)
 	}
 	if m.PowerZoneHighBoundary != nil {
@@ -314,11 +314,11 @@ func (m *TimeInZone) SetSpeedZoneHighBoundary(v []uint16) *TimeInZone {
 	return m
 }
 
-// SetCadenceZoneHighBondary sets TimeInZone value.
+// SetCadenceZoneHighBoundary sets TimeInZone value.
 //
 // Array: [N]; Units: rpm
-func (m *TimeInZone) SetCadenceZoneHighBondary(v []uint8) *TimeInZone {
-	m.CadenceZoneHighBondary = v
+func (m *TimeInZone) SetCadenceZoneHighBoundary(v []uint8) *TimeInZone {
+	m.CadenceZoneHighBoundary = v
 	return m
 }
 

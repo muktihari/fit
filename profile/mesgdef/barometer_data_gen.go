@@ -21,7 +21,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type BarometerData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
@@ -122,7 +122,7 @@ func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
 
 // SetSampleTimeOffset sets BarometerData value.
 //
-// Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+// Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
 	m.SampleTimeOffset = v
 	return m

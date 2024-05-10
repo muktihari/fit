@@ -21,7 +21,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type ObdiiData struct {
 	Timestamp        time.Time // Units: s; Timestamp message was output
-	TimeOffset       []uint16  // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
+	TimeOffset       []uint16  // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span across seconds.
 	RawData          []byte    // Array: [N]; Raw parameter data
 	PidDataSize      []uint8   // Array: [N]; Optional, data size of PID[i]. If not specified refer to SAE J1979.
 	SystemTime       []uint32  // Array: [N]; System time associated with sample expressed in ms, can be used instead of time_offset. There will be a system_time value for each raw_data element. For multibyte pids the system_time is repeated.
@@ -160,7 +160,7 @@ func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
 
 // SetTimeOffset sets ObdiiData value.
 //
-// Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
+// Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span across seconds.
 func (m *ObdiiData) SetTimeOffset(v []uint16) *ObdiiData {
 	m.TimeOffset = v
 	return m

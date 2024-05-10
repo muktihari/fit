@@ -1384,7 +1384,7 @@ var fieldNumLookup = [...]map[string]byte{
 		"time_in_power_zone":         5,
 		"hr_zone_high_boundary":      6,
 		"speed_zone_high_boundary":   7,
-		"cadence_zone_high_bondary":  8,
+		"cadence_zone_high_boundary": 8,
 		"power_zone_high_boundary":   9,
 		"hr_calc_type":               10,
 		"max_heart_rate":             11,
