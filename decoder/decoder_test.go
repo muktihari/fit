@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit"
 	"github.com/muktihari/fit/kit/datetime"
@@ -2568,8 +2569,8 @@ func TestReset(t *testing.T) {
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
 				cmp.AllowUnexported(readBuffer{}),
-				cmp.AllowUnexported(sync.Once{}),
-				cmp.AllowUnexported(sync.Mutex{}), // added due to sync.Once
+				cmp.AllowUnexported(sync.Once{}), // only check done field, ignore Mutex.
+				cmpopts.IgnoreTypes(sync.Mutex{}),
 				cmp.FilterValues(func(x, y io.Reader) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y func() error) bool { return true }, cmp.Ignore()),
