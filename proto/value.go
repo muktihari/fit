@@ -103,10 +103,9 @@ type Value struct {
 
 // Return the underlying type the Value holds.
 func (v Value) Type() Type {
-	if typ, ok := v.any.(Type); ok {
+	switch typ := v.any.(type) {
+	case Type:
 		return typ
-	}
-	switch v.any.(type) {
 	case stringptr:
 		return TypeString
 	case *bool:
@@ -501,9 +500,9 @@ func (v Value) Valid(t basetype.BaseType) bool {
 	case TypeBool, TypeSliceBool:
 		return true // Mark as valid
 	case TypeInt8:
-		return v.Int8() != basetype.Sint8Invalid
+		return int8(v.num) != basetype.Sint8Invalid
 	case TypeUint8:
-		val := v.Uint8()
+		val := uint8(v.num)
 		switch t {
 		case basetype.Enum:
 			return val != basetype.EnumInvalid
@@ -516,32 +515,32 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		}
 		return false
 	case TypeInt16:
-		return v.Int16() != basetype.Sint16Invalid
+		return int16(v.num) != basetype.Sint16Invalid
 	case TypeUint16:
 		if t == basetype.Uint16z {
-			return v.Uint16() != basetype.Uint16zInvalid
+			return uint16(v.num) != basetype.Uint16zInvalid
 		}
-		return v.Uint16() != basetype.Uint16Invalid
+		return uint16(v.num) != basetype.Uint16Invalid
 	case TypeInt32:
-		return v.Int32() != basetype.Sint32Invalid
+		return int32(v.num) != basetype.Sint32Invalid
 	case TypeUint32:
 		if t == basetype.Uint32z {
-			return v.Uint32() != basetype.Uint32zInvalid
+			return uint32(v.num) != basetype.Uint32zInvalid
 		}
-		return v.Uint32() != basetype.Uint32Invalid
+		return uint32(v.num) != basetype.Uint32Invalid
 	case TypeFloat32:
-		return math.Float32bits(v.Float32()) != basetype.Float32Invalid
+		return uint32(v.num) != basetype.Float32Invalid
 	case TypeFloat64:
-		return math.Float64bits(v.Float64()) != basetype.Float64Invalid
+		return v.num != basetype.Float64Invalid
 	case TypeInt64:
-		return v.Int64() != basetype.Sint64Invalid
+		return int64(v.num) != basetype.Sint64Invalid
 	case TypeUint64:
 		if t == basetype.Uint64z {
-			return v.Uint64() != basetype.Uint64zInvalid
+			return v.num != basetype.Uint64zInvalid
 		}
-		return v.Uint64() != basetype.Uint64Invalid
+		return v.num != basetype.Uint64Invalid
 	case TypeString:
-		s := v.String()
+		s := unsafe.String(v.any.(stringptr), v.num)
 		return s != basetype.StringInvalid && s != "\x00"
 	case TypeSliceInt8:
 		vals := v.SliceInt8()
