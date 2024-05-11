@@ -18,6 +18,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -2569,8 +2570,9 @@ func TestReset(t *testing.T) {
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
 				cmp.AllowUnexported(readBuffer{}),
-				cmp.AllowUnexported(sync.Once{}), // only check done field, ignore Mutex.
-				cmpopts.IgnoreTypes(sync.Mutex{}),
+				cmp.AllowUnexported(sync.Once{}),
+				cmpopts.IgnoreTypes(sync.Mutex{}),         // ignore Mutex used by sync.Once{}
+				cmpopts.EquateComparable(atomic.Uint32{}), // go >= v1.22.0 replace sync.Once{done uint32} to sync.Once{done atomic.Uint32}
 				cmp.FilterValues(func(x, y io.Reader) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y func() error) bool { return true }, cmp.Ignore()),
