@@ -21,7 +21,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type AccelerometerData struct {
 	Timestamp                  time.Time // Units: s; Whole second part of the timestamp
-	SampleTimeOffset           []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
+	SampleTimeOffset           []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
 	AccelX                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	AccelY                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	AccelZ                     []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
@@ -178,7 +178,7 @@ func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
 
 // SetSampleTimeOffset sets AccelerometerData value.
 //
-// Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
+// Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
 func (m *AccelerometerData) SetSampleTimeOffset(v []uint16) *AccelerometerData {
 	m.SampleTimeOffset = v
 	return m

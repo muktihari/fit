@@ -59,7 +59,7 @@ type Record struct {
 	StanceTimePercent             uint16    // Scale: 100; Units: percent
 	StanceTime                    uint16    // Scale: 10; Units: ms
 	BallSpeed                     uint16    // Scale: 100; Units: m/s
-	Cadence256                    uint16    // Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability
+	Cadence256                    uint16    // Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
 	TotalHemoglobinConc           uint16    // Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
 	TotalHemoglobinConcMin        uint16    // Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 	TotalHemoglobinConcMax        uint16    // Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
@@ -862,7 +862,7 @@ func (m *Record) BallSpeedScaled() float64 {
 	return scaleoffset.Apply(m.BallSpeed, 100, 0)
 }
 
-// Cadence256Scaled return Cadence256 in its scaled value [Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability].
+// Cadence256Scaled return Cadence256 in its scaled value [Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility].
 //
 // If Cadence256 value is invalid, float64 invalid value will be returned.
 func (m *Record) Cadence256Scaled() float64 {
@@ -1460,7 +1460,7 @@ func (m *Record) SetBallSpeed(v uint16) *Record {
 
 // SetCadence256 sets Record value.
 //
-// Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatability
+// Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
 func (m *Record) SetCadence256(v uint16) *Record {
 	m.Cadence256 = v
 	return m

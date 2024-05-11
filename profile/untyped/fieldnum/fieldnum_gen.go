@@ -29,7 +29,7 @@ const (
 	AccelerometerDataCompressedCalibratedAccelX       = 8   // [ AccelerometerData ] [Type: Sint16, Base: sint16, Array: [N], Units: mG]; Calibrated accel reading
 	AccelerometerDataCompressedCalibratedAccelY       = 9   // [ AccelerometerData ] [Type: Sint16, Base: sint16, Array: [N], Units: mG]; Calibrated accel reading
 	AccelerometerDataCompressedCalibratedAccelZ       = 10  // [ AccelerometerData ] [Type: Sint16, Base: sint16, Array: [N], Units: mG]; Calibrated accel reading
-	AccelerometerDataSampleTimeOffset                 = 1   // [ AccelerometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the accelerometer sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
+	AccelerometerDataSampleTimeOffset                 = 1   // [ AccelerometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the accelerometer sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
 	AccelerometerDataTimestamp                        = 253 // [ AccelerometerData ] [Type: DateTime, Base: uint32, Units: s]; Whole second part of the timestamp
 	AccelerometerDataTimestampMs                      = 0   // [ AccelerometerData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond part of the timestamp.
 	ActivityEvent                                     = 3   // [ Activity ] [Type: Event, Base: enum];
@@ -70,7 +70,7 @@ const (
 	AviationAttitudeTurnRate                          = 6   // [ AviationAttitude ] [Type: Sint16, Base: sint16, Array: [N], Scale: 1024, Offset: 0, Units: radians/second]; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
 	AviationAttitudeValidity                          = 10  // [ AviationAttitude ] [Type: AttitudeValidity, Base: uint16, Array: [N]];
 	BarometerDataBaroPres                             = 2   // [ BarometerData ] [Type: Uint32, Base: uint32, Array: [N], Units: Pa]; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
-	BarometerDataSampleTimeOffset                     = 1   // [ BarometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the barometer sample with the corrosponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+	BarometerDataSampleTimeOffset                     = 1   // [ BarometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 	BarometerDataTimestamp                            = 253 // [ BarometerData ] [Type: DateTime, Base: uint32, Units: s]; Whole second part of the timestamp
 	BarometerDataTimestampMs                          = 0   // [ BarometerData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond part of the timestamp.
 	BeatIntervalsTime                                 = 1   // [ BeatIntervals ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Array of millisecond times between beats
@@ -421,7 +421,7 @@ const (
 	GyroscopeDataGyroX                                = 2   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	GyroscopeDataGyroY                                = 3   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	GyroscopeDataGyroZ                                = 4   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	GyroscopeDataSampleTimeOffset                     = 1   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the gyro sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
+	GyroscopeDataSampleTimeOffset                     = 1   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the gyro sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
 	GyroscopeDataTimestamp                            = 253 // [ GyroscopeData ] [Type: DateTime, Base: uint32, Units: s]; Whole second part of the timestamp
 	GyroscopeDataTimestampMs                          = 0   // [ GyroscopeData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond part of the timestamp.
 	HrEventTimestamp                                  = 9   // [ Hr ] [Type: Uint32, Base: uint32, Array: [N], Scale: 1024, Offset: 0, Units: s];
@@ -654,7 +654,7 @@ const (
 	MagnetometerDataMagX                              = 2   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	MagnetometerDataMagY                              = 3   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	MagnetometerDataMagZ                              = 4   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
-	MagnetometerDataSampleTimeOffset                  = 1   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
+	MagnetometerDataSampleTimeOffset                  = 1   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Each time in the array describes the time at which the compass sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
 	MagnetometerDataTimestamp                         = 253 // [ MagnetometerData ] [Type: DateTime, Base: uint32, Units: s]; Whole second part of the timestamp
 	MagnetometerDataTimestampMs                       = 0   // [ MagnetometerData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond part of the timestamp.
 	MaxMetDataCalibratedData                          = 9   // [ MaxMetData ] [Type: Bool, Base: bool | enum]; Indicates if calibrated data was used in the calculation
@@ -727,7 +727,7 @@ const (
 	ObdiiDataStartTimestamp                           = 6   // [ ObdiiData ] [Type: DateTime, Base: uint32]; Timestamp of first sample recorded in the message. Used with time_offset to generate time of each sample
 	ObdiiDataStartTimestampMs                         = 7   // [ ObdiiData ] [Type: Uint16, Base: uint16, Units: ms]; Fractional part of start_timestamp
 	ObdiiDataSystemTime                               = 5   // [ ObdiiData ] [Type: Uint32, Base: uint32, Array: [N]]; System time associated with sample expressed in ms, can be used instead of time_offset. There will be a system_time value for each raw_data element. For multibyte pids the system_time is repeated.
-	ObdiiDataTimeOffset                               = 1   // [ ObdiiData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span accross seconds.
+	ObdiiDataTimeOffset                               = 1   // [ ObdiiData ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span across seconds.
 	ObdiiDataTimestamp                                = 253 // [ ObdiiData ] [Type: DateTime, Base: uint32, Units: s]; Timestamp message was output
 	ObdiiDataTimestampMs                              = 0   // [ ObdiiData ] [Type: Uint16, Base: uint16, Units: ms]; Fractional part of timestamp, added to timestamp
 	OhrSettingsEnabled                                = 0   // [ OhrSettings ] [Type: Switch, Base: enum];
@@ -756,7 +756,7 @@ const (
 	RecordBallSpeed                                   = 51  // [ Record ] [Type: Uint16, Base: uint16, Scale: 100, Offset: 0, Units: m/s];
 	RecordBatterySoc                                  = 81  // [ Record ] [Type: Uint8, Base: uint8, Scale: 2, Offset: 0, Units: percent]; lev battery state of charge
 	RecordCadence                                     = 4   // [ Record ] [Type: Uint8, Base: uint8, Units: rpm];
-	RecordCadence256                                  = 52  // [ Record ] [Type: Uint16, Base: uint16, Scale: 256, Offset: 0, Units: rpm]; Log cadence and fractional cadence for backwards compatability
+	RecordCadence256                                  = 52  // [ Record ] [Type: Uint16, Base: uint16, Scale: 256, Offset: 0, Units: rpm]; Log cadence and fractional cadence for backwards compatibility
 	RecordCalories                                    = 33  // [ Record ] [Type: Uint16, Base: uint16, Units: kcal];
 	RecordCnsLoad                                     = 97  // [ Record ] [Type: Uint8, Base: uint8, Units: percent];
 	RecordCombinedPedalSmoothness                     = 47  // [ Record ] [Type: Uint8, Base: uint8, Scale: 2, Offset: 0, Units: percent];
@@ -1221,7 +1221,7 @@ const (
 	ThreeDSensorCalibrationOrientationMatrix          = 5   // [ ThreeDSensorCalibration ] [Type: Sint32, Base: sint32, Array: [9], Scale: 65535, Offset: 0]; 3 x 3 rotation matrix (row major)
 	ThreeDSensorCalibrationSensorType                 = 0   // [ ThreeDSensorCalibration ] [Type: SensorType, Base: enum]; Indicates which sensor the calibration is for
 	ThreeDSensorCalibrationTimestamp                  = 253 // [ ThreeDSensorCalibration ] [Type: DateTime, Base: uint32, Units: s]; Whole second part of the timestamp
-	TimeInZoneCadenceZoneHighBondary                  = 8   // [ TimeInZone ] [Type: Uint8, Base: uint8, Array: [N], Units: rpm];
+	TimeInZoneCadenceZoneHighBoundary                 = 8   // [ TimeInZone ] [Type: Uint8, Base: uint8, Array: [N], Units: rpm];
 	TimeInZoneFunctionalThresholdPower                = 15  // [ TimeInZone ] [Type: Uint16, Base: uint16];
 	TimeInZoneHrCalcType                              = 10  // [ TimeInZone ] [Type: HrZoneCalc, Base: enum];
 	TimeInZoneHrZoneHighBoundary                      = 6   // [ TimeInZone ] [Type: Uint8, Base: uint8, Array: [N], Units: bpm];

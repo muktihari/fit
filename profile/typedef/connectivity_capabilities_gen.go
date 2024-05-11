@@ -33,7 +33,7 @@ const (
 	ConnectivityCapabilitiesConnectIqWidgetDownload         ConnectivityCapabilities = 0x00020000
 	ConnectivityCapabilitiesConnectIqWatchFaceDownload      ConnectivityCapabilities = 0x00040000
 	ConnectivityCapabilitiesConnectIqDataFieldDownload      ConnectivityCapabilities = 0x00080000
-	ConnectivityCapabilitiesConnectIqAppManagment           ConnectivityCapabilities = 0x00100000 // Device supports delete and reorder of apps via GCM
+	ConnectivityCapabilitiesConnectIqAppManagement          ConnectivityCapabilities = 0x00100000 // Device supports delete and reorder of apps via GCM
 	ConnectivityCapabilitiesSwingSensor                     ConnectivityCapabilities = 0x00200000
 	ConnectivityCapabilitiesSwingSensorRemote               ConnectivityCapabilities = 0x00400000
 	ConnectivityCapabilitiesIncidentDetection               ConnectivityCapabilities = 0x00800000 // Device supports incident detection
@@ -92,8 +92,8 @@ func (c ConnectivityCapabilities) String() string {
 		return "connect_iq_watch_face_download"
 	case ConnectivityCapabilitiesConnectIqDataFieldDownload:
 		return "connect_iq_data_field_download"
-	case ConnectivityCapabilitiesConnectIqAppManagment:
-		return "connect_iq_app_managment"
+	case ConnectivityCapabilitiesConnectIqAppManagement:
+		return "connect_iq_app_management"
 	case ConnectivityCapabilitiesSwingSensor:
 		return "swing_sensor"
 	case ConnectivityCapabilitiesSwingSensorRemote:
@@ -164,8 +164,8 @@ func ConnectivityCapabilitiesFromString(s string) ConnectivityCapabilities {
 		return ConnectivityCapabilitiesConnectIqWatchFaceDownload
 	case "connect_iq_data_field_download":
 		return ConnectivityCapabilitiesConnectIqDataFieldDownload
-	case "connect_iq_app_managment":
-		return ConnectivityCapabilitiesConnectIqAppManagment
+	case "connect_iq_app_management":
+		return ConnectivityCapabilitiesConnectIqAppManagement
 	case "swing_sensor":
 		return ConnectivityCapabilitiesSwingSensor
 	case "swing_sensor_remote":
@@ -216,7 +216,7 @@ func ListConnectivityCapabilities() []ConnectivityCapabilities {
 		ConnectivityCapabilitiesConnectIqWidgetDownload,
 		ConnectivityCapabilitiesConnectIqWatchFaceDownload,
 		ConnectivityCapabilitiesConnectIqDataFieldDownload,
-		ConnectivityCapabilitiesConnectIqAppManagment,
+		ConnectivityCapabilitiesConnectIqAppManagement,
 		ConnectivityCapabilitiesSwingSensor,
 		ConnectivityCapabilitiesSwingSensorRemote,
 		ConnectivityCapabilitiesIncidentDetection,

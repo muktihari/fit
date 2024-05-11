@@ -9,4 +9,7 @@ require (
 	golang.org/x/text v0.15.0
 )
 
-require github.com/stretchr/testify v1.8.0 // indirect
+require (
+	github.com/client9/misspell v0.3.4 // indirect
+	github.com/stretchr/testify v1.8.0 // indirect
+)

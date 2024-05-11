@@ -21,7 +21,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type MagnetometerData struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
 	MagX             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	MagY             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	MagZ             []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
@@ -157,7 +157,7 @@ func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
 
 // SetSampleTimeOffset sets MagnetometerData value.
 //
-// Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corrosponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
+// Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
 func (m *MagnetometerData) SetSampleTimeOffset(v []uint16) *MagnetometerData {
 	m.SampleTimeOffset = v
 	return m

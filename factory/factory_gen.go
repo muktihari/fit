@@ -2976,7 +2976,7 @@ var mesgs = [...]message{
 			},
 			8: {
 				FieldBase: &proto.FieldBase{
-					Name:       "cadence_zone_high_bondary",
+					Name:       "cadence_zone_high_boundary",
 					Num:        8,
 					Type:       profile.Uint8,
 					BaseType:   basetype.Uint8, /* (size: 1) */
