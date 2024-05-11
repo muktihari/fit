@@ -439,6 +439,50 @@ func TestMessageValidatorValidate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "valid message with developer fields has invalid value",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
+				}),
+				{
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "Heart Rate",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     fieldnum.RecordHeartRate,
+							BaseType:           basetype.Uint8,
+							Value:              proto.Value{}, // invalid value
+						},
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Size:               1,
+							Name:               "Heart Rate",
+							NativeMesgNum:      mesgnum.Record,
+							NativeFieldNum:     fieldnum.RecordHeartRate,
+							BaseType:           basetype.Uint8,
+							Value:              proto.Uint8(60),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for i, tc := range tt {

@@ -301,7 +301,7 @@ func formatMisspellDiff(diff []misspell.Diff) string {
 	strbuf := new(strings.Builder)
 	fmt.Fprintf(strbuf, "[\n")
 	for i := range diff {
-		fullLine := "full text: <ommited: too long> -> "
+		fullLine := "full text: <omitted: too long> -> "
 		if len(diff[i].FullLine) <= 50 {
 			fullLine = fmt.Sprintf("full text: %q -> ", diff[i].FullLine)
 		}

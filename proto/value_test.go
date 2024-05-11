@@ -904,3 +904,11 @@ func BenchmarkSliceBool(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkValid(b *testing.B) {
+	v := Uint32(10)
+
+	for i := 0; i < b.N; i++ {
+		_ = v.Valid(basetype.Uint32)
+	}
+}

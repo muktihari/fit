@@ -100,7 +100,7 @@ type messageValidator struct {
 func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
-	var valid byte
+	var valid int
 	for i := 0; i < len(mesg.Fields); i++ {
 		field := &mesg.Fields[i]
 
@@ -126,7 +126,9 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			return fmt.Errorf("field index: %d, num: %d, name: %s: %w", i, field.Num, field.Name, err)
 		}
 
-		mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
+		if i != valid {
+			mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
+		}
 		if valid == 255 {
 			return fmt.Errorf("max n fields is 255: %w", ErrExceedMaxAllowed)
 		}
@@ -169,7 +171,9 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 				i, developerField.Num, developerField.Name, err)
 		}
 
-		mesg.DeveloperFields[i], mesg.DeveloperFields[valid] = mesg.DeveloperFields[valid], mesg.DeveloperFields[i]
+		if i != valid {
+			mesg.DeveloperFields[i], mesg.DeveloperFields[valid] = mesg.DeveloperFields[valid], mesg.DeveloperFields[i]
+		}
 		if valid == 255 {
 			return fmt.Errorf("max n developer fields is 255: %w", ErrExceedMaxAllowed)
 		}
