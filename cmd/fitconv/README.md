@@ -24,17 +24,17 @@ ls
 
 ### Options
 
-| Options    | Valid For       | Description                                            |
-| ---------- | --------------- | ------------------------------------------------------ |
-| -v         | All             | Show version                                           |
-| -disk      | FIT to CSV only | Use disk instead of load everything in memory          |
-| -unknown   | FIT to CSV only | Print 'unknown(68)' instead of 'unknown'               |
-| -valid     | FIT to CSV only | Print only valid value and omit invalid value          |
-| -raw       | FIT to CSV only | Use raw value instead of scaled value                  |
-| -deg       | FIT to CSV only | Print GPS Positions in degrees instead of semicircles. |
-| -trim      | FIT to CSV only | Trim trailing commas in every line (save storage)      |
-| -no-expand | FIT to CSV only | [Decode Option] Do not expand components               |
-| -checksum  | FIT to CSV only | [Decode Option] Do CRC checksum to ensure integrity    |
+| Options      | Valid For       | Description                                              |
+| ------------ | --------------- | -------------------------------------------------------- |
+| -v           | All             | Show version                                             |
+| -disk        | FIT to CSV only | Use disk instead of load everything in memory            |
+| -unknown     | FIT to CSV only | Print 'unknown(68)' instead of 'unknown'                 |
+| -valid       | FIT to CSV only | Print only valid value and omit invalid value            |
+| -raw         | FIT to CSV only | Use raw value instead of scaled value                    |
+| -deg         | FIT to CSV only | Print GPS Positions in degrees instead of semicircles.   |
+| -trim        | FIT to CSV only | Trim trailing commas in every line (save storage)        |
+| -no-expand   | FIT to CSV only | [Decode Option] Do not expand components                 |
+| -no-checksum | FIT to CSV only | [Decode Option] Do not check integrity (no CRC checksum) |
 
 ```sh
 go run main.go -deg activity.fit activity2.fit
