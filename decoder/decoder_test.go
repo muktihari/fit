@@ -17,6 +17,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -2567,6 +2568,8 @@ func TestReset(t *testing.T) {
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
 				cmp.AllowUnexported(readBuffer{}),
+				cmp.AllowUnexported(sync.Once{}),
+				cmp.AllowUnexported(sync.Mutex{}), // added due to sync.Once
 				cmp.FilterValues(func(x, y io.Reader) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y func() error) bool { return true }, cmp.Ignore()),
