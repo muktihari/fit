@@ -296,13 +296,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 		if err = d.decodeCRC(); err != nil {
 			break
 		}
-		// Check crc checksum of messages should match with file's crc.
-		if d.crc16.Sum16() != d.crc {
-			err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
-			break
-		}
 		d.initDecodeFileHeaderOnce()
-		d.crc16.Reset()
 		d.cur = 0
 		seq++
 	}
@@ -457,10 +451,6 @@ func (d *Decoder) Decode() (fit *proto.FIT, err error) {
 		return nil, err
 	}
 	if err = d.decodeCRC(); err != nil {
-		return nil, err
-	}
-	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 		return nil, err
 	}
 	d.sequenceCompleted = true
@@ -942,6 +932,11 @@ func (d *Decoder) decodeCRC() error {
 	}
 	d.n += 2
 	d.crc = binary.LittleEndian.Uint16(b)
+	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
+		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
+		return err
+	}
+	d.crc16.Reset()
 	return nil
 }
 
@@ -1011,10 +1006,6 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.FIT, err er
 		return nil, err
 	}
 	if err = d.decodeCRC(); err != nil {
-		return nil, err
-	}
-	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 		return nil, err
 	}
 	d.sequenceCompleted = true
