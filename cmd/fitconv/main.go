@@ -53,8 +53,8 @@ func main() {
 	var flagNoExpandComponents bool
 	flag.BoolVar(&flagNoExpandComponents, "no-expand", false, "[Decode Option] Do not expand components")
 
-	var flagShouldChecksum bool
-	flag.BoolVar(&flagShouldChecksum, "checksum", false, "[Decode Option] should do crc checksum")
+	var flagNoChecksum bool
+	flag.BoolVar(&flagNoChecksum, "no-checksum", false, "[Decode Option] should not do crc checksum")
 
 	flag.Parse()
 
@@ -109,7 +109,7 @@ func main() {
 	if flagNoExpandComponents {
 		decoderOptions = append(decoderOptions, decoder.WithNoComponentExpansion())
 	}
-	if !flagShouldChecksum {
+	if flagNoChecksum {
 		decoderOptions = append(decoderOptions, decoder.WithIgnoreChecksum())
 	}
 
