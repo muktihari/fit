@@ -161,25 +161,29 @@ func (t BaseType) String() string {
 	return "invalid(" + strconv.Itoa(int(t)) + ")"
 }
 
-// Size returns how many bytes the value need in binary form. If BaseType is invalid, 255 will be returned.
+var sizes = [256]byte{
+	Enum:    1,
+	Sint8:   1,
+	Uint8:   1,
+	Sint16:  2,
+	Uint16:  2,
+	Sint32:  4,
+	Uint32:  4,
+	String:  1,
+	Float32: 4,
+	Float64: 8,
+	Uint8z:  1,
+	Uint16z: 2,
+	Uint32z: 4,
+	Byte:    1,
+	Sint64:  8,
+	Uint64:  8,
+	Uint64z: 8,
+}
+
+// Size returns how many bytes it needs in binary form. If BaseType is invalid, zero will be returned.
 func (t BaseType) Size() byte {
-	switch t {
-	case Enum, Byte, Sint8, Uint8, Uint8z:
-		return 1
-	case Sint16, Uint16, Uint16z:
-		return 2
-	case Sint32, Uint32, Uint32z:
-		return 4
-	case String:
-		return 1
-	case Float32:
-		return 4
-	case Float64:
-		return 8
-	case Sint64, Uint64, Uint64z:
-		return 8
-	}
-	return 255
+	return sizes[t] // PERF: use array to optimize speed since this method is frequently used.
 }
 
 // GoType returns go equivalent type in string.
@@ -313,6 +317,7 @@ func (t BaseType) Invalid() any {
 	return "invalid"
 }
 
+// Valid checks whether BaseType is valid or not.
 func (t BaseType) Valid() bool {
 	switch t {
 	case Enum,
