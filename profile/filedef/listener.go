@@ -16,7 +16,7 @@ import (
 type Listener struct {
 	options *options
 	file    File
-	poolc   chan proto.Message // pool of reusable objects to minimalize slice allocations. do not close this channel.
+	poolc   chan []proto.Field // pool of reusable objects to minimalize slice allocations. do not close this channel.
 	mesgc   chan proto.Message // queue messages to be processed concurrently.
 	done    chan struct{}
 	active  bool
@@ -33,7 +33,7 @@ type options struct {
 
 func defaultOptions() *options {
 	return &options{
-		channelBuffer: 1000,
+		channelBuffer: 128,
 		fileSets:      PredefinedFileSet(),
 	}
 }
@@ -67,7 +67,7 @@ type fnApply func(o *options)
 
 func (f fnApply) apply(o *options) { f(o) }
 
-// WithChannelBuffer sets the size of buffered channel, default is 1000.
+// WithChannelBuffer sets the size of buffered channel, default is 128.
 func WithChannelBuffer(size uint) Option {
 	return fnApply(func(o *options) { o.channelBuffer = size })
 }
@@ -93,9 +93,9 @@ func NewListener(opts ...Option) *Listener {
 	l := &Listener{options: options, active: true}
 	l.reset()
 
-	l.poolc = make(chan proto.Message, options.channelBuffer)
+	l.poolc = make(chan []proto.Field, options.channelBuffer)
 	for i := 0; i < int(options.channelBuffer); i++ {
-		l.poolc <- proto.Message{} // fill pool with empty message and alloc its slices as needed.
+		l.poolc <- nil // fill pool with nil slice, alloc as needed.
 	}
 
 	go l.loop()
@@ -106,7 +106,7 @@ func NewListener(opts ...Option) *Listener {
 func (l *Listener) loop() {
 	for mesg := range l.mesgc {
 		l.processMesg(mesg)
-		l.poolc <- mesg // put the message back to the pool to be recycled.
+		l.poolc <- mesg.Fields // put the slice back to the pool to be recycled.
 	}
 	close(l.done)
 }
@@ -136,14 +136,14 @@ func (l *Listener) OnMesg(mesg proto.Message) {
 }
 
 func (l *Listener) prep(mesg proto.Message) proto.Message {
-	m := <-l.poolc
+	fields := <-l.poolc
 
-	if cap(m.Fields) < len(mesg.Fields) {
-		m.Fields = make([]proto.Field, len(mesg.Fields))
+	if cap(fields) < len(mesg.Fields) {
+		fields = make([]proto.Field, len(mesg.Fields))
 	}
-	m.Fields = m.Fields[:len(mesg.Fields)]
-	copy(m.Fields, mesg.Fields)
-	mesg.Fields = m.Fields
+	fields = fields[:len(mesg.Fields)]
+	copy(fields, mesg.Fields)
+	mesg.Fields = fields
 
 	// Must clone DeveloperFields since it is being referenced in mesgdef's structs.
 	mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
