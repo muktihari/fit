@@ -51,7 +51,7 @@ type Decoder struct {
 
 	options *options
 
-	once                 sync.Once    // This should be replaced before reuse.
+	once                 sync.Once    // It is used by decodeFileHeaderOnce below. Must be reassigned on init/reset.
 	decodeFileHeaderOnce func() error // The func to decode file header exactly once, return the error of the first invocation if any. Initialized on New().
 	n                    int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
 	cur                  uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
