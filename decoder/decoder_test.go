@@ -2023,6 +2023,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 	tt := []struct {
 		name             string
 		r                io.Reader
+		developerDataIds []*mesgdef.DeveloperDataId
 		fieldDescription *mesgdef.FieldDescription
 		mesgDef          *proto.MessageDefinition
 		mesg             *proto.Message
@@ -2032,6 +2033,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 		{
 			name: "decode developer fields happy flow",
 			r:    fnReaderOK,
+			developerDataIds: []*mesgdef.DeveloperDataId{
+				mesgdef.NewDeveloperDataId(nil).
+					SetApplicationId([]byte{0, 0, 0, 1}).
+					SetDeveloperDataIndex(1), // not used, just to pass code logic
+				mesgdef.NewDeveloperDataId(nil).
+					SetApplicationId([]byte{0, 0, 0, 1}).
+					SetDeveloperDataIndex(0),
+			},
 			fieldDescription: mesgdef.NewFieldDescription(
 				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
@@ -2056,7 +2065,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			mesg: &proto.Message{},
 		},
 		{
-			name: "decode developer fields missing developer data index 1",
+			name: "decode developer fields missing fieldDescription with developer data index 1",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
 				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
@@ -2262,6 +2271,9 @@ func TestDecodeDeveloperFields(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
+			if tc.developerDataIds != nil {
+				dec.developerDataIds = append(dec.developerDataIds, tc.developerDataIds...)
+			}
 			dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
 			err := dec.decodeDeveloperFields(tc.mesgDef, tc.mesg)
 			if !errors.Is(err, tc.err) {
