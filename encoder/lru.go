@@ -88,10 +88,10 @@ func (l *lru) replaceLeastRecentlyUsed(item []byte) (itemIndex byte) {
 }
 
 func (l *lru) bucketIndex(item []byte) int {
-	for i := len(l.bucket); i > 0; i-- {
-		cur := l.bucket[i-1]
+	for i := len(l.bucket) - 1; i >= 0; i-- {
+		cur := l.bucket[i]
 		if bytes.Equal(l.items[cur], item) {
-			return i - 1
+			return i
 		}
 	}
 	return -1

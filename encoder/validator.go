@@ -101,7 +101,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.Header = proto.MesgNormalHeaderMask // reset default
 
 	var valid int
-	for i := 0; i < len(mesg.Fields); i++ {
+	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
 
 		if field.FieldBase == nil || field.IsExpandedField {
