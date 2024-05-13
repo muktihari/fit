@@ -154,3 +154,14 @@ func marshalValueWithReflectionForTest(w io.Writer, value Value, arch byte) erro
 	}
 	return binary.Write(w, binary.BigEndian, rv.Interface())
 }
+
+func BenchmarkValueMarshalAppend(b *testing.B) {
+	b.StopTimer()
+	value := SliceUint16(make([]uint16, 256/2))
+	buf := make([]byte, 0, 256)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, _ = value.MarshalAppend(buf, littleEndian)
+	}
+}
