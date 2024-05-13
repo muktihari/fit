@@ -23,6 +23,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -51,14 +52,13 @@ type Decoder struct {
 
 	options *options
 
-	once                 sync.Once    // It is used by decodeFileHeaderOnce below. Must be reassigned on init/reset.
-	decodeFileHeaderOnce func() error // The func to decode file header exactly once, return the error of the first invocation if any. Initialized on New().
-	n                    int64        // The n read bytes counter, always moving forward, do not reset (except on full reset).
-	cur                  uint32       // The current byte position relative to bytes of the messages, reset on next chained FIT file.
-	timestamp            uint32       // Active timestamp
-	lastTimeOffset       byte         // Last time offset
-	sequenceCompleted    bool         // True after a decode is completed. Reset to false on Next().
-	err                  error        // Any error occurs during process.
+	once              sync.Once // It is used to invoke decodeFileHeader exactly once. Must be reassigned on init/reset.
+	n                 int64     // The n read bytes counter, always moving forward, do not reset (except on full reset).
+	cur               uint32    // The current byte position relative to bytes of the messages, reset on next chained FIT file.
+	timestamp         uint32    // Active timestamp
+	lastTimeOffset    byte      // Last time offset
+	sequenceCompleted bool      // True after a decode is completed. Reset to false on Next().
+	err               error     // Any error occurs during process.
 
 	// FIT File Representation
 	fileHeader proto.FileHeader
@@ -210,19 +210,124 @@ func New(r io.Reader, opts ...Option) *Decoder {
 		developerDataIds:        make([]*mesgdef.DeveloperDataId, 0),
 		fieldDescriptions:       make([]*mesgdef.FieldDescription, 0),
 	}
-	d.initDecodeFileHeaderOnce()
 
 	return d
 }
 
-// initDecodeFileHeaderOnce initializes decodeFileHeaderOnce() to decode the header exactly once, if error occur
-// during the first invocation, the error will be returned everytime decodeHeaderOnce() is invoked.
-func (d *Decoder) initDecodeFileHeaderOnce() {
-	d.once = sync.Once{}
-	d.decodeFileHeaderOnce = func() error {
-		d.once.Do(func() { d.err = d.decodeFileHeader() })
-		return d.err
+// Reset resets the Decoder to read its input from r, clear any error and
+// reset previous options to default options so any options needs to be inputed again.
+// It is similar to New() but it retains the underlying storage for use by
+// future decode to reduce memory allocs (except messages need to be re-allocated).
+func (d *Decoder) Reset(r io.Reader, opts ...Option) {
+	d.reset()
+	d.n = 0 // Must reset bytes counter since it's a full reset.
+	d.err = nil
+
+	d.options = defaultOptions()
+	for i := range opts {
+		opts[i].apply(d.options)
 	}
+
+	d.readBuffer.Reset(r, d.options.readBufferSize)
+	d.factory = d.options.factory
+	d.mesgListeners = d.options.mesgListeners
+	d.mesgDefListeners = d.options.mesgDefListeners
+}
+
+func (d *Decoder) reset() {
+	for i := range d.localMessageDefinitions {
+		d.localMessageDefinitions[i] = nil
+	}
+
+	d.once = sync.Once{}
+	d.accumulator.Reset()
+	d.crc16.Reset()
+	d.fileHeader = proto.FileHeader{}
+	d.messages = nil
+	d.fileId = nil
+	d.crc = 0
+	d.cur = 0
+	d.timestamp = 0
+	d.lastTimeOffset = 0
+	d.sequenceCompleted = false
+
+	for i := range d.developerDataIds {
+		d.developerDataIds[i] = nil // avoid memory leaks
+	}
+	d.developerDataIds = d.developerDataIds[:0]
+
+	for i := range d.fieldDescriptions {
+		d.fieldDescriptions[i] = nil // avoid memory leaks
+	}
+	d.fieldDescriptions = d.fieldDescriptions[:0]
+}
+
+// CheckIntegrity checks all FIT sequences of given reader are valid determined by these following checks:
+//  1. Has valid FileHeader's size and bytes 8–11 of the FileHeader is “.FIT”
+//  2. FileHeader's DataSize > 0
+//  3. CRC checksum of messages should match with File's CRC value.
+//
+// It returns the number of sequences completed and any error encountered. The number of sequences completed can help recovering
+// valid FIT sequences in a chained FIT that contains invalid or corrupted data.
+//
+// After invoking this method, the underlying reader should be reset afterward as the reader has been fully read.
+// If the underlying reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
+func (d *Decoder) CheckIntegrity() (seq int, err error) {
+	if d.err != nil {
+		return 0, d.err
+	}
+
+	shouldChecksum := d.options.shouldChecksum
+	d.options.shouldChecksum = true // Must checksum
+
+	for {
+		// Check File Header Integrity
+		pos := d.n
+		if err = d.decodeFileHeaderOnce(); err != nil {
+			if pos != 0 && pos == d.n && err == io.EOF {
+				// When EOF error occurs exactly after a sequence has been completed,
+				// make the error as nil, it means we have reached the desirable EOF.
+				err = nil
+			}
+			break
+		}
+		// Read bytes acquired by messages to calculate crc checksum of its contents
+		if err = d.discardMessages(); err != nil {
+			break
+		}
+		if err = d.decodeCRC(); err != nil {
+			break
+		}
+		d.once = sync.Once{}
+		d.cur = 0
+		seq++
+	}
+
+	if err != nil { // When there is an error, wrap it with informative message before return.
+		err = fmt.Errorf("byte pos: %d: %w", d.n, err)
+	}
+
+	// Reset used variables so that the decoder can be reused by the same reader.
+	d.reset()
+	d.n = 0 // Must reset bytes counter
+	d.err = err
+	d.options.shouldChecksum = shouldChecksum
+
+	return seq, err
+}
+
+// discardMessages efficiently discards bytes used by messages.
+func (d *Decoder) discardMessages() (err error) {
+	for d.cur < d.fileHeader.DataSize {
+		size := int(d.fileHeader.DataSize - d.cur)
+		if size > reservedbuf {
+			size = reservedbuf
+		}
+		if _, err = d.readN(size); err != nil { // Discard bytes
+			return err
+		}
+	}
+	return nil
 }
 
 // PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader.
@@ -260,72 +365,52 @@ func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
 	return d.fileId, nil
 }
 
-// CheckIntegrity checks all FIT sequences of given reader are valid determined by these following checks:
-//  1. Has valid FileHeader's size and bytes 8–11 of the FileHeader is “.FIT”
-//  2. FileHeader's DataSize > 0
-//  3. CRC checksum of messages should match with File's CRC value.
-//
-// It returns the number of sequences completed and any error encountered. The number of sequences completed can help recovering
-// valid FIT sequences in a chained FIT that contains invalid or corrupted data.
-//
-// After invoking this method, the underlying reader should be reset afterward as the reader has been fully read.
-// If the underlying reader implements io.Seeker, we can do reader.Seek(0, io.SeekStart).
-func (d *Decoder) CheckIntegrity() (seq int, err error) {
+// Next checks whether next bytes are still a valid FIT File sequence. Return false when invalid or reach EOF.
+func (d *Decoder) Next() bool {
 	if d.err != nil {
-		return 0, d.err
+		return false
 	}
 
-	shouldChecksum := d.options.shouldChecksum
-	d.options.shouldChecksum = true // Must checksum
-
-	for {
-		// Check Header Integrity
-		pos := d.n
-		if err = d.decodeFileHeaderOnce(); err != nil {
-			if pos != 0 && pos == d.n && err == io.EOF {
-				// When EOF error occurs exactly after a sequence has been completed,
-				// make the error as nil, it means we have reached the desirable EOF.
-				err = nil
-			}
-			break
-		}
-		// Read bytes acquired by messages to calculate crc checksum of its contents
-		if err = d.discardMessages(); err != nil {
-			break
-		}
-		if err = d.decodeCRC(); err != nil {
-			break
-		}
-		d.initDecodeFileHeaderOnce()
-		d.cur = 0
-		seq++
+	if !d.sequenceCompleted {
+		return true
 	}
 
-	if err != nil { // When there is an error, wrap it with informative message before return.
-		err = fmt.Errorf("byte pos: %d: %w", d.n, err)
-	}
+	d.reset() // reset values for the next chained FIT file
 
-	// Reset used variables so that the decoder can be reused by the same reader.
-	d.reset()
-	d.n = 0 // Must reset bytes counter
-	d.err = err
-	d.options.shouldChecksum = shouldChecksum
-
-	return seq, err
+	// err is saved in the func, any exported will call this func anyway.
+	return d.decodeFileHeaderOnce() == nil
 }
 
-// discardMessages efficiently discards bytes used by messages.
-func (d *Decoder) discardMessages() (err error) {
-	for d.cur < d.fileHeader.DataSize {
-		size := int(d.fileHeader.DataSize - d.cur)
-		if size > reservedbuf {
-			size = reservedbuf
-		}
-		if _, err = d.readN(size); err != nil { // Discard bytes
-			return err
-		}
+// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or an error if it occurs.
+// To decode a chained FIT file that contains more than one FIT data, this decode method should be invoked
+// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained FIT file.
+//
+//	for dec.Next() {
+//	     fit, err := dec.Decode()
+//	     if err != nil {
+//	         return err
+//	     }
+//	}
+func (d *Decoder) Decode() (fit *proto.FIT, err error) {
+	if d.err != nil {
+		return nil, d.err
 	}
-	return nil
+	defer func() { d.err = err }()
+	if err = d.decodeFileHeaderOnce(); err != nil {
+		return nil, err
+	}
+	if err = d.decodeMessages(); err != nil {
+		return nil, err
+	}
+	if err = d.decodeCRC(); err != nil {
+		return nil, err
+	}
+	d.sequenceCompleted = true
+	return &proto.FIT{
+		FileHeader: d.fileHeader,
+		Messages:   d.messages,
+		CRC:        d.crc,
+	}, nil
 }
 
 // Discard discards a single FIT file sequence and returns any error encountered. This method directs the Decoder to
@@ -371,96 +456,13 @@ func (d *Decoder) Discard() error {
 	return d.err
 }
 
-// Next checks whether next bytes are still a valid FIT File sequence. Return false when invalid or reach EOF.
-func (d *Decoder) Next() bool {
-	if d.err != nil {
-		return false
-	}
-
-	if !d.sequenceCompleted {
-		return true
-	}
-
-	d.reset() // reset values for the next chained FIT file
-
-	// err is saved in the func, any exported will call this func anyway.
-	return d.decodeFileHeaderOnce() == nil
+// decodeFileHeaderOnce invokes decodeFileHeader exactly once.
+func (d *Decoder) decodeFileHeaderOnce() error {
+	d.once.Do(func() { d.err = d.decodeFileHeader() })
+	return d.err
 }
 
-func (d *Decoder) reset() {
-	for i := range d.localMessageDefinitions {
-		d.localMessageDefinitions[i] = nil
-	}
-
-	d.accumulator.Reset()
-	d.crc16.Reset()
-	d.fileHeader = proto.FileHeader{}
-	d.messages = nil
-	d.fileId = nil
-	d.developerDataIds = d.developerDataIds[:0]
-	d.fieldDescriptions = d.fieldDescriptions[:0]
-	d.crc = 0
-	d.cur = 0
-	d.timestamp = 0
-	d.lastTimeOffset = 0
-	d.sequenceCompleted = false
-
-	d.initDecodeFileHeaderOnce() // reset to enable invocation.
-}
-
-// Reset resets the Decoder to read its input from r, clear any error and
-// reset previous options to default options so any options needs to be inputed again.
-// It is similar to New() but it retains the underlying storage for use by
-// future decode to reduce memory allocs (except messages need to be re-allocated).
-func (d *Decoder) Reset(r io.Reader, opts ...Option) {
-	d.reset()
-	d.n = 0 // Must reset bytes counter since it's a full reset.
-	d.err = nil
-
-	d.options = defaultOptions()
-	for i := range opts {
-		opts[i].apply(d.options)
-	}
-
-	d.readBuffer.Reset(r, d.options.readBufferSize)
-
-	d.factory = d.options.factory
-	d.mesgListeners = d.options.mesgListeners
-	d.mesgDefListeners = d.options.mesgDefListeners
-}
-
-// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or an error if it occurs.
-// To decode a chained FIT file that contains more than one FIT data, this decode method should be invoked
-// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained FIT file.
-//
-//	for dec.Next() {
-//	     fit, err := dec.Decode()
-//	     if err != nil {
-//	         return err
-//	     }
-//	}
-func (d *Decoder) Decode() (fit *proto.FIT, err error) {
-	if d.err != nil {
-		return nil, d.err
-	}
-	defer func() { d.err = err }()
-	if err = d.decodeFileHeaderOnce(); err != nil {
-		return nil, err
-	}
-	if err = d.decodeMessages(); err != nil {
-		return nil, err
-	}
-	if err = d.decodeCRC(); err != nil {
-		return nil, err
-	}
-	d.sequenceCompleted = true
-	return &proto.FIT{
-		FileHeader: d.fileHeader,
-		Messages:   d.messages,
-		CRC:        d.crc,
-	}, nil
-}
-
+// decodeFileHeader is only invoked through decodeFileHeaderOnce.
 func (d *Decoder) decodeFileHeader() error {
 	b, err := d.readBuffer.ReadN(1)
 	if err != nil {
@@ -630,8 +632,11 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 }
 
 func (d *Decoder) decodeMessageData(header byte) error {
-	localMesgNum := proto.LocalMesgNum(header)
-	mesgDef := d.localMessageDefinitions[localMesgNum]
+	localMesgNum := header
+	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
+		localMesgNum = (header & proto.CompressedLocalMesgNumMask) >> proto.CompressedBitShift
+	}
+	mesgDef := d.localMessageDefinitions[localMesgNum&proto.LocalMesgNumMask] // bounds check eliminated due to the mask
 	if mesgDef == nil {
 		return ErrMesgDefMissing
 	}
@@ -684,13 +689,8 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	}
 
 	if !d.options.broadcastOnly || d.options.broadcastMesgCopy {
-		mesg.Fields = make([]proto.Field, len(mesg.Fields))
-		copy(mesg.Fields, d.fieldsArray[:len(mesg.Fields)])
-
-		if mesg.DeveloperFields != nil {
-			mesg.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
-			copy(mesg.DeveloperFields, d.developersFieldsArray[:len(mesg.DeveloperFields)])
-		}
+		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 	}
 
 	if !d.options.broadcastOnly {
@@ -780,7 +780,6 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	// Now that all fields has been decoded, we need to expand all components and accumulate the accumulable values.
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
-
 		if subField := field.SubFieldSubtitution(mesg); subField != nil {
 			// Expand sub-field components as the main field components
 			d.expandComponents(mesg, field, subField.Components)
@@ -845,6 +844,21 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *proto.Message) error {
 	for i := range mesgDef.DeveloperFieldDefinitions {
 		devFieldDef := &mesgDef.DeveloperFieldDefinitions[i]
+
+		var developerDataId *mesgdef.DeveloperDataId
+		for _, devDataId := range d.developerDataIds {
+			if devDataId.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
+				continue
+			}
+			developerDataId = devDataId
+		}
+
+		if developerDataId == nil {
+			// NOTE: Currently, we allow missing DeveloperDataId message,
+			// we only use FieldDescription messages to decode developer data.
+			d.log("mesg.Num: %d, developerFields[%d].Num: %d: missing developer data id with developer data index '%d'",
+				mesg.Num, i, devFieldDef.Num, devFieldDef.DeveloperDataIndex)
+		}
 
 		// Find the FieldDescription that refers to this DeveloperField.
 		// The combination of the Developer Data Index and Field Definition Number
