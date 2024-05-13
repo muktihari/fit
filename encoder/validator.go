@@ -47,6 +47,7 @@ type validatorOptions struct {
 	factory           Factory
 }
 
+// ValidatorOptions is message validator's option.
 type ValidatorOption interface{ apply(o *validatorOptions) }
 
 type fnApplyValidatorOption func(o *validatorOptions)
@@ -66,12 +67,15 @@ type Factory interface {
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 
+// ValidatorWithPreserveInvalidValues directs the message validator to preserve invalid value instead of omit it.
 func ValidatorWithPreserveInvalidValues() ValidatorOption {
 	return fnApplyValidatorOption(func(o *validatorOptions) {
 		o.omitInvalidValues = false
 	})
 }
 
+// ValidatorWithFactory directs the message validator to use this factory instead of standard factory.
+// The factory is only used for validating developer fields that have valid native data.
 func ValidatorWithFactory(factory Factory) ValidatorOption {
 	return fnApplyValidatorOption(func(o *validatorOptions) {
 		if o.factory != nil {
@@ -80,6 +84,8 @@ func ValidatorWithFactory(factory Factory) ValidatorOption {
 	})
 }
 
+// NewMessageValidator creates new message validator. The validator is mainly used to validate message before encoding.
+// This receives options that direct the message validator how it should behave in certain way.
 func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
 	options := defaultValidatorOptions()
 	for _, opt := range opts {
