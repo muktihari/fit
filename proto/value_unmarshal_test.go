@@ -10,72 +10,76 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/proto"
 )
 
 func TestUnmarshal(t *testing.T) {
 	tt := []struct {
-		value    proto.Value
-		ref      basetype.BaseType
-		isArray  bool
-		expected proto.Value // if nil, expected = value
-		err      error
+		value       proto.Value
+		baseType    basetype.BaseType
+		profileType profile.ProfileType
+		isArray     bool
+		expected    proto.Value // if nil, expected = value
+		err         error
 	}{
-		{value: proto.Uint8(1), ref: basetype.Enum},
-		{value: proto.Uint8(2), ref: basetype.Byte},
-		{value: proto.Int8(3), ref: basetype.Sint8},
-		{value: proto.Int8(-3), ref: basetype.Sint8},
-		{value: proto.Uint8(4), ref: basetype.Uint8},
-		{value: proto.Uint8(5), ref: basetype.Uint8z},
-		{value: proto.Int16(6), ref: basetype.Sint16},
-		{value: proto.Int16(-6), ref: basetype.Sint16},
-		{value: proto.Uint16(7), ref: basetype.Uint16},
-		{value: proto.Uint16(8), ref: basetype.Uint16z},
-		{value: proto.Int32(9), ref: basetype.Sint32},
-		{value: proto.Int32(-9), ref: basetype.Sint32},
-		{value: proto.Uint32(10), ref: basetype.Uint32},
-		{value: proto.Uint32(11), ref: basetype.Uint32z},
-		{value: proto.Int64(12), ref: basetype.Sint64},
-		{value: proto.Int64(-12), ref: basetype.Sint64},
-		{value: proto.Uint64(13), ref: basetype.Uint64},
-		{value: proto.Uint64(14), ref: basetype.Uint64z},
-		{value: proto.Float32(15.1), ref: basetype.Float32},
-		{value: proto.Float32(-15.1), ref: basetype.Float32},
-		{value: proto.Float64(15.1), ref: basetype.Float64},
-		{value: proto.Float64(-15.1), ref: basetype.Float64},
-		{value: proto.String("FIT SDK"), ref: basetype.String},
-		{value: proto.String(""), ref: basetype.String},
-		{value: proto.SliceUint8([]byte{1, 1}), ref: basetype.Enum, isArray: true},
-		{value: proto.SliceUint8([]byte{1, 2}), ref: basetype.Byte, isArray: true},
-		{value: proto.SliceInt8([]int8{1, 3}), ref: basetype.Sint8, isArray: true},
-		{value: proto.SliceInt8([]int8{1, -3}), ref: basetype.Sint8, isArray: true},
-		{value: proto.SliceUint8([]uint8{1, 4}), ref: basetype.Uint8, isArray: true},
-		{value: proto.SliceUint8([]uint8{1, 5}), ref: basetype.Uint8z, isArray: true},
-		{value: proto.SliceInt16([]int16{1, 6}), ref: basetype.Sint16, isArray: true},
-		{value: proto.SliceInt16([]int16{1, -6}), ref: basetype.Sint16, isArray: true},
-		{value: proto.SliceUint16([]uint16{1, 7}), ref: basetype.Uint16, isArray: true},
-		{value: proto.SliceUint16([]uint16{1, 8}), ref: basetype.Uint16z, isArray: true},
-		{value: proto.SliceInt32([]int32{1, 9}), ref: basetype.Sint32, isArray: true},
-		{value: proto.SliceInt32([]int32{1, -9}), ref: basetype.Sint32, isArray: true},
-		{value: proto.SliceUint32([]uint32{1, 1}), ref: basetype.Uint32, isArray: true},
-		{value: proto.SliceUint32([]uint32{1, 1}), ref: basetype.Uint32z, isArray: true},
-		{value: proto.SliceInt64([]int64{1, 1}), ref: basetype.Sint64, isArray: true},
-		{value: proto.SliceInt64([]int64{1, -2}), ref: basetype.Sint64, isArray: true},
-		{value: proto.SliceUint64([]uint64{1, 1}), ref: basetype.Uint64, isArray: true},
-		{value: proto.SliceUint64([]uint64{1, 1}), ref: basetype.Uint64z, isArray: true},
-		{value: proto.SliceFloat32([]float32{1, 1.1}), ref: basetype.Float32, isArray: true},
-		{value: proto.SliceFloat32([]float32{1, -5.1}), ref: basetype.Float32, isArray: true},
-		{value: proto.SliceFloat64([]float64{1, 1.1}), ref: basetype.Float64, isArray: true},
-		{value: proto.SliceFloat64([]float64{1, -5.1}), ref: basetype.Float64, isArray: true},
-		{value: proto.SliceString([]string{"a", "b"}), ref: basetype.String, isArray: true},
+		{value: proto.Uint8(1), baseType: basetype.Enum, profileType: profile.Enum},
+		{value: proto.Uint8(2), baseType: basetype.Byte, profileType: profile.Byte},
+		{value: proto.Int8(3), baseType: basetype.Sint8, profileType: profile.Sint8},
+		{value: proto.Int8(-3), baseType: basetype.Sint8, profileType: profile.Sint8},
+		{value: proto.Uint8(4), baseType: basetype.Uint8, profileType: profile.Uint8},
+		{value: proto.Uint8(5), baseType: basetype.Uint8z, profileType: profile.Uint8z},
+		{value: proto.Int16(6), baseType: basetype.Sint16, profileType: profile.Sint16},
+		{value: proto.Int16(-6), baseType: basetype.Sint16, profileType: profile.Sint16},
+		{value: proto.Uint16(7), baseType: basetype.Uint16, profileType: profile.Uint16},
+		{value: proto.Uint16(8), baseType: basetype.Uint16z, profileType: profile.Uint16z},
+		{value: proto.Int32(9), baseType: basetype.Sint32, profileType: profile.Sint32},
+		{value: proto.Int32(-9), baseType: basetype.Sint32, profileType: profile.Sint32},
+		{value: proto.Uint32(10), baseType: basetype.Uint32, profileType: profile.Uint32},
+		{value: proto.Uint32(11), baseType: basetype.Uint32z, profileType: profile.Uint32z},
+		{value: proto.Int64(12), baseType: basetype.Sint64, profileType: profile.Sint64},
+		{value: proto.Int64(-12), baseType: basetype.Sint64, profileType: profile.Sint64},
+		{value: proto.Uint64(13), baseType: basetype.Uint64, profileType: profile.Uint64},
+		{value: proto.Uint64(14), baseType: basetype.Uint64z, profileType: profile.Uint64z},
+		{value: proto.Float32(15.1), baseType: basetype.Float32, profileType: profile.Float32},
+		{value: proto.Float32(-15.1), baseType: basetype.Float32, profileType: profile.Float32},
+		{value: proto.Float64(15.1), baseType: basetype.Float64, profileType: profile.Float64},
+		{value: proto.Float64(-15.1), baseType: basetype.Float64, profileType: profile.Float64},
+		{value: proto.String("FIT SDK"), baseType: basetype.String, profileType: profile.String},
+		{value: proto.String(""), baseType: basetype.String, profileType: profile.String},
+		{value: proto.SliceUint8([]byte{1, 1}), baseType: basetype.Enum, profileType: profile.Enum, isArray: true},
+		{value: proto.SliceUint8([]byte{1, 2}), baseType: basetype.Byte, profileType: profile.Byte, isArray: true},
+		{value: proto.SliceInt8([]int8{1, 3}), baseType: basetype.Sint8, profileType: profile.Sint8, isArray: true},
+		{value: proto.SliceInt8([]int8{1, -3}), baseType: basetype.Sint8, profileType: profile.Sint8, isArray: true},
+		{value: proto.SliceUint8([]uint8{1, 4}), baseType: basetype.Uint8, profileType: profile.Uint8, isArray: true},
+		{value: proto.SliceUint8([]uint8{1, 5}), baseType: basetype.Uint8z, profileType: profile.Uint8z, isArray: true},
+		{value: proto.SliceInt16([]int16{1, 6}), baseType: basetype.Sint16, profileType: profile.Sint16, isArray: true},
+		{value: proto.SliceInt16([]int16{1, -6}), baseType: basetype.Sint16, profileType: profile.Sint16, isArray: true},
+		{value: proto.SliceUint16([]uint16{1, 7}), baseType: basetype.Uint16, profileType: profile.Uint16, isArray: true},
+		{value: proto.SliceUint16([]uint16{1, 8}), baseType: basetype.Uint16z, profileType: profile.Uint16z, isArray: true},
+		{value: proto.SliceInt32([]int32{1, 9}), baseType: basetype.Sint32, profileType: profile.Sint32, isArray: true},
+		{value: proto.SliceInt32([]int32{1, -9}), baseType: basetype.Sint32, profileType: profile.Sint32, isArray: true},
+		{value: proto.SliceUint32([]uint32{1, 1}), baseType: basetype.Uint32, profileType: profile.Uint32, isArray: true},
+		{value: proto.SliceUint32([]uint32{1, 1}), baseType: basetype.Uint32z, profileType: profile.Uint32z, isArray: true},
+		{value: proto.SliceInt64([]int64{1, 1}), baseType: basetype.Sint64, profileType: profile.Sint64, isArray: true},
+		{value: proto.SliceInt64([]int64{1, -2}), baseType: basetype.Sint64, profileType: profile.Sint64, isArray: true},
+		{value: proto.SliceUint64([]uint64{1, 1}), baseType: basetype.Uint64, profileType: profile.Uint64, isArray: true},
+		{value: proto.SliceUint64([]uint64{1, 1}), baseType: basetype.Uint64z, profileType: profile.Uint64z, isArray: true},
+		{value: proto.SliceFloat32([]float32{1, 1.1}), baseType: basetype.Float32, profileType: profile.Float32, isArray: true},
+		{value: proto.SliceFloat32([]float32{1, -5.1}), baseType: basetype.Float32, profileType: profile.Float32, isArray: true},
+		{value: proto.SliceFloat64([]float64{1, 1.1}), baseType: basetype.Float64, profileType: profile.Float64, isArray: true},
+		{value: proto.SliceFloat64([]float64{1, -5.1}), baseType: basetype.Float64, profileType: profile.Float64, isArray: true},
+		{value: proto.SliceString([]string{"a", "b"}), baseType: basetype.String, profileType: profile.String, isArray: true},
 		{
 			value:    proto.SliceUint8(stringsToBytes([]string{"mobile_app_version", "\x00", "\x00"}...)),
 			expected: proto.SliceString([]string{"mobile_app_version"}),
-			ref:      basetype.String,
+			baseType: basetype.String,
 			isArray:  true,
 		},
-		{value: proto.Int8(0), ref: basetype.FromString("invalid"), err: proto.ErrTypeNotSupported},
+		{value: proto.Int8(0), baseType: basetype.FromString("invalid"), err: proto.ErrTypeNotSupported},
+		{value: proto.Bool(true), baseType: basetype.Enum, profileType: profile.Bool},
+		{value: proto.SliceBool([]bool{false, true, false}), baseType: basetype.Enum, profileType: profile.Bool, isArray: true},
 	}
 
 	for i, tc := range tt {
@@ -86,7 +90,7 @@ func TestUnmarshal(t *testing.T) {
 					t.Fatalf("marshal failed: %v", err)
 				}
 
-				v, err := proto.UnmarshalValue(b, arch, tc.ref, tc.isArray)
+				v, err := proto.UnmarshalValue(b, arch, tc.baseType, tc.profileType, tc.isArray)
 				if err != nil {
 					if !errors.Is(err, tc.err) {
 						t.Fatalf("expected err: %v, got: %v", tc.err, err)
@@ -139,6 +143,6 @@ func BenchmarkUnmarshalValue(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = proto.UnmarshalValue(buf, 0, basetype.Uint32, false)
+		_, _ = proto.UnmarshalValue(buf, 0, basetype.Uint32, profile.Uint32, false)
 	}
 }

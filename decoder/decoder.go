@@ -722,8 +722,9 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		var (
-			baseType = field.BaseType
-			array    = field.Array
+			baseType   = field.BaseType
+			profilType = field.Type
+			array      = field.Array
 		)
 
 		// Gracefully handle poorly encoded FIT file.
@@ -732,13 +733,14 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			continue
 		} else if fieldDef.Size < baseType.Size() {
 			baseType = basetype.Byte
+			profilType = profile.Byte
 			array = fieldDef.Size > baseType.Size() && fieldDef.Size&baseType.Size() == 0
 			d.logField(mesg, fieldDef, "Size is less than expected. Fallback: decode as byte(s) and convert the value")
 		} else if fieldDef.Size > baseType.Size() && !field.Array && baseType != basetype.String {
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
-		val, err := d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, array, overrideStringArray)
+		val, err := d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, profilType, array, overrideStringArray)
 		if err != nil {
 			return err
 		}
@@ -874,6 +876,8 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 				fieldDescription.FitBaseTypeId, ErrInvalidBaseType)
 		}
 
+		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
+		// Users need to handle this themselves due to the limited context available.
 		developerField := proto.DeveloperField{
 			Num:                devFieldDef.Num,
 			DeveloperDataIndex: devFieldDef.DeveloperDataIndex,
@@ -887,9 +891,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		developerField.Units = strings.Join(fieldDescription.Units, "|")
 
 		var (
-			baseType = developerField.BaseType
-			isArray  bool
+			baseType    = developerField.BaseType
+			profileType = profile.ProfileTypeFromBaseType(baseType)
+			isArray     bool
 		)
+
 		if devFieldDef.Size > developerField.BaseType.Size() && devFieldDef.Size%developerField.BaseType.Size() == 0 {
 			isArray = true
 		}
@@ -900,6 +906,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 			continue
 		} else if devFieldDef.Size < developerField.BaseType.Size() {
 			baseType = basetype.Byte
+			profileType = profile.Byte
 			isArray = devFieldDef.Size > baseType.Size() && devFieldDef.Size&baseType.Size() == 0
 			d.logDeveloperField(mesg, devFieldDef, developerField.BaseType,
 				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
@@ -908,7 +915,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
 		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/355554/how-to-determine-developer-field-s-value-type-is-a-string-or-string
 		const overrideStringArray = true
-		val, err := d.readValue(developerField.Size, mesgDef.Architecture, baseType, isArray, overrideStringArray)
+		val, err := d.readValue(developerField.Size, mesgDef.Architecture, baseType, profileType, isArray, overrideStringArray)
 		if err != nil {
 			return err
 		}
@@ -953,7 +960,7 @@ func (d *Decoder) readN(n int) ([]byte, error) {
 }
 
 // readValue reads message value bytes from reader and convert it into its corresponding type. Size should not be zero.
-func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, isArray, overrideStringArray bool) (val proto.Value, err error) {
+func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, profileType profile.ProfileType, isArray, overrideStringArray bool) (val proto.Value, err error) {
 	b, err := d.readN(int(size))
 	if err != nil {
 		return val, err
@@ -961,7 +968,7 @@ func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, is
 	if overrideStringArray {
 		isArray = strlen(b) > 1
 	}
-	return proto.UnmarshalValue(b, arch, baseType, isArray)
+	return proto.UnmarshalValue(b, arch, baseType, profileType, isArray)
 }
 
 // log logs only if logWriter is not nil.

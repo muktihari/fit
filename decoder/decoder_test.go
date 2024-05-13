@@ -2284,18 +2284,20 @@ func TestReadValue(t *testing.T) {
 		size                byte
 		arch                byte
 		baseType            basetype.BaseType
+		profileType         profile.ProfileType
 		isArray             bool
 		overrideStringArray bool
 		result              proto.Value
 		err                 error
 	}{
 		{
-			name:     "readValue happy flow",
-			r:        fnReaderOK, // will produce 0
-			size:     1,
-			arch:     0,
-			baseType: basetype.Sint8,
-			result:   proto.Int8(0),
+			name:        "readValue happy flow",
+			r:           fnReaderOK, // will produce 0
+			size:        1,
+			arch:        0,
+			baseType:    basetype.Sint8,
+			profileType: profile.Sint8,
+			result:      proto.Int8(0),
 		},
 		{
 			name: "readValue happy flow: string",
@@ -2311,10 +2313,11 @@ func TestReadValue(t *testing.T) {
 					return cur, nil
 				})
 			}(),
-			size:     byte(len("fit sdk\x00")),
-			arch:     0,
-			baseType: basetype.String,
-			result:   proto.String("fit sdk"),
+			size:        byte(len("fit sdk\x00")),
+			arch:        0,
+			baseType:    basetype.String,
+			profileType: profile.String,
+			result:      proto.String("fit sdk"),
 		},
 		{
 			name: "readValue happy flow: []string",
@@ -2330,11 +2333,12 @@ func TestReadValue(t *testing.T) {
 					return cur, nil
 				})
 			}(),
-			size:     byte(len("fit\x00sdk\x00")),
-			arch:     0,
-			baseType: basetype.String,
-			isArray:  true,
-			result:   proto.SliceString([]string{"fit", "sdk"}),
+			size:        byte(len("fit\x00sdk\x00")),
+			arch:        0,
+			baseType:    basetype.String,
+			profileType: profile.String,
+			isArray:     true,
+			result:      proto.SliceString([]string{"fit", "sdk"}),
 		},
 		{
 			name: "readValue happy flow: must []string",
@@ -2353,6 +2357,7 @@ func TestReadValue(t *testing.T) {
 			size:                byte(len("fit\x00sdk\x00")),
 			arch:                0,
 			baseType:            basetype.String,
+			profileType:         profile.String,
 			isArray:             false,
 			overrideStringArray: true,
 			result:              proto.SliceString([]string{"fit", "sdk"}),
@@ -2379,19 +2384,20 @@ func TestReadValue(t *testing.T) {
 			result:              proto.SliceString([]string{"fit", "sdk"}),
 		},
 		{
-			name:     "readValue happy flow",
-			r:        fnReaderOK, // will produce 0
-			size:     1,
-			arch:     0,
-			baseType: basetype.BaseType(100), // invalid basetype.
-			err:      proto.ErrTypeNotSupported,
+			name:        "readValue happy flow",
+			r:           fnReaderOK, // will produce 0
+			size:        1,
+			arch:        0,
+			baseType:    basetype.BaseType(100),                                  // invalid basetype.
+			profileType: profile.ProfileTypeFromBaseType(basetype.BaseType(100)), // invalid basetype.
+			err:         proto.ErrTypeNotSupported,
 		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
-			res, err := dec.readValue(tc.size, tc.arch, tc.baseType, tc.isArray, tc.overrideStringArray)
+			res, err := dec.readValue(tc.size, tc.arch, tc.baseType, tc.profileType, tc.isArray, tc.overrideStringArray)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}

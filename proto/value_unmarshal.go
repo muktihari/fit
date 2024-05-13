@@ -11,13 +11,14 @@ import (
 	"sync"
 	"unicode/utf8"
 
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 )
 
 // UnmarshalValue unmarshals b into a proto.Value.
 // The caller should ensure that the len(b) matches its corresponding base type's size, otherwise it might panic.
-func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (Value, error) {
-	switch ref {
+func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType profile.ProfileType, isArray bool) (Value, error) {
+	switch baseType {
 	case basetype.Sint8:
 		if isArray {
 			vs := make([]int8, 0, len(b))
@@ -29,6 +30,16 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		return Int8(int8(b[0])), nil
 	case basetype.Enum, basetype.Byte,
 		basetype.Uint8, basetype.Uint8z:
+		if profileType == profile.Bool { // Special Case
+			if isArray {
+				vs := make([]bool, 0, len(b))
+				for i := 0; i < len(b); i++ {
+					vs = append(vs, b[i] == 1)
+				}
+				return SliceBool(vs), nil
+			}
+			return Bool(b[0] == 1), nil
+		}
 		if isArray {
 			vals := make([]byte, len(b))
 			copy(vals, b)
@@ -199,7 +210,7 @@ func UnmarshalValue(b []byte, arch byte, ref basetype.BaseType, isArray bool) (V
 		return String(utf8String(b)), nil
 	}
 
-	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", ref, ref, ErrTypeNotSupported)
+	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", baseType, baseType, ErrTypeNotSupported)
 }
 
 // Note: The size may be a multiple of the underlying FIT Base Type size indicating the field contains multiple elements represented as an array.
