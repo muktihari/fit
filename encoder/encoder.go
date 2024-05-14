@@ -7,7 +7,6 @@ package encoder
 import (
 	"context"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 
@@ -19,12 +18,16 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-var (
-	ErrNilWriter     = errors.New("nil writer")
-	ErrEmptyMessages = errors.New("empty messages")
-	ErrMissingFileId = errors.New("missing file_id mesg")
+type errorString string
 
-	ErrWriterAtOrWriteSeekerIsExpected = errors.New("io.WriterAt or io.WriteSeeker is expected")
+func (e errorString) Error() string { return string(e) }
+
+const (
+	ErrNilWriter     = errorString("nil writer")
+	ErrEmptyMessages = errorString("empty messages")
+	ErrMissingFileId = errorString("missing file_id mesg")
+
+	ErrWriterAtOrWriteSeekerIsExpected = errorString("io.WriterAt or io.WriteSeeker is expected")
 )
 
 const (

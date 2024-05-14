@@ -5,13 +5,12 @@
 package proto
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/muktihari/fit/profile/basetype"
 )
 
-var ErrProtocolViolation = errors.New("protocol violation")
+const ErrProtocolViolation = errorString("protocol violation")
 
 // NewValidator creates protocol validator base on given version.
 func NewValidator(version Version) *Validator {

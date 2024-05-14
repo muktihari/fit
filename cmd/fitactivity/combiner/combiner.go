@@ -5,7 +5,6 @@
 package combiner
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/muktihari/fit/factory"
@@ -18,10 +17,14 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
-	ErrMinimalCombine = errors.New("minimal combine")
-	ErrNoSessionFound = errors.New("no session found")
-	ErrSportMismatch  = errors.New("sport mismatch")
+type errorString string
+
+func (e errorString) Error() string { return string(e) }
+
+const (
+	ErrMinimalCombine = errorString("minimal combine")
+	ErrNoSessionFound = errorString("no session found")
+	ErrSportMismatch  = errorString("sport mismatch")
 )
 
 func Combine(fits ...proto.FIT) (*proto.FIT, error) {

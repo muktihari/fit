@@ -7,7 +7,6 @@ package decoder
 import (
 	"context"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -26,16 +25,20 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
+type errorString string
+
+func (e errorString) Error() string { return string(e) }
+
+const (
 	// Integrity errors
-	ErrNotAFitFile         = errors.New("not a FIT file")
-	ErrDataSizeZero        = errors.New("data size zero")
-	ErrCRCChecksumMismatch = errors.New("crc checksum mismatch")
+	ErrNotAFitFile         = errorString("not a FIT file")
+	ErrDataSizeZero        = errorString("data size zero")
+	ErrCRCChecksumMismatch = errorString("crc checksum mismatch")
 
 	// Message-field related errors
-	ErrMesgDefMissing         = errors.New("message definition missing")
-	ErrFieldValueTypeMismatch = errors.New("field value type mismatch")
-	ErrInvalidBaseType        = errors.New("invalid basetype")
+	ErrMesgDefMissing         = errorString("message definition missing")
+	ErrFieldValueTypeMismatch = errorString("field value type mismatch")
+	ErrInvalidBaseType        = errorString("invalid basetype")
 )
 
 const littleEndian = 0
