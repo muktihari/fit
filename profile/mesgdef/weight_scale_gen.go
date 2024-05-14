@@ -176,9 +176,10 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *WeightScale) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// WeightScaled return Weight in its scaled value [Scale: 100; Units: kg].
-//
+// WeightScaled return Weight in its scaled value.
 // If Weight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: kg
 func (m *WeightScale) WeightScaled() float64 {
 	if uint16(m.Weight) == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -186,9 +187,10 @@ func (m *WeightScale) WeightScaled() float64 {
 	return scaleoffset.Apply(m.Weight, 100, 0)
 }
 
-// PercentFatScaled return PercentFat in its scaled value [Scale: 100; Units: %].
-//
+// PercentFatScaled return PercentFat in its scaled value.
 // If PercentFat value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *WeightScale) PercentFatScaled() float64 {
 	if m.PercentFat == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -196,9 +198,10 @@ func (m *WeightScale) PercentFatScaled() float64 {
 	return scaleoffset.Apply(m.PercentFat, 100, 0)
 }
 
-// PercentHydrationScaled return PercentHydration in its scaled value [Scale: 100; Units: %].
-//
+// PercentHydrationScaled return PercentHydration in its scaled value.
 // If PercentHydration value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *WeightScale) PercentHydrationScaled() float64 {
 	if m.PercentHydration == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -206,9 +209,10 @@ func (m *WeightScale) PercentHydrationScaled() float64 {
 	return scaleoffset.Apply(m.PercentHydration, 100, 0)
 }
 
-// VisceralFatMassScaled return VisceralFatMass in its scaled value [Scale: 100; Units: kg].
-//
+// VisceralFatMassScaled return VisceralFatMass in its scaled value.
 // If VisceralFatMass value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: kg
 func (m *WeightScale) VisceralFatMassScaled() float64 {
 	if m.VisceralFatMass == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -216,9 +220,10 @@ func (m *WeightScale) VisceralFatMassScaled() float64 {
 	return scaleoffset.Apply(m.VisceralFatMass, 100, 0)
 }
 
-// BoneMassScaled return BoneMass in its scaled value [Scale: 100; Units: kg].
-//
+// BoneMassScaled return BoneMass in its scaled value.
 // If BoneMass value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: kg
 func (m *WeightScale) BoneMassScaled() float64 {
 	if m.BoneMass == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -226,9 +231,10 @@ func (m *WeightScale) BoneMassScaled() float64 {
 	return scaleoffset.Apply(m.BoneMass, 100, 0)
 }
 
-// MuscleMassScaled return MuscleMass in its scaled value [Scale: 100; Units: kg].
-//
+// MuscleMassScaled return MuscleMass in its scaled value.
 // If MuscleMass value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: kg
 func (m *WeightScale) MuscleMassScaled() float64 {
 	if m.MuscleMass == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -236,9 +242,10 @@ func (m *WeightScale) MuscleMassScaled() float64 {
 	return scaleoffset.Apply(m.MuscleMass, 100, 0)
 }
 
-// BasalMetScaled return BasalMet in its scaled value [Scale: 4; Units: kcal/day].
-//
+// BasalMetScaled return BasalMet in its scaled value.
 // If BasalMet value is invalid, float64 invalid value will be returned.
+//
+// Scale: 4; Units: kcal/day
 func (m *WeightScale) BasalMetScaled() float64 {
 	if m.BasalMet == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -246,9 +253,10 @@ func (m *WeightScale) BasalMetScaled() float64 {
 	return scaleoffset.Apply(m.BasalMet, 4, 0)
 }
 
-// ActiveMetScaled return ActiveMet in its scaled value [Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal].
-//
+// ActiveMetScaled return ActiveMet in its scaled value.
 // If ActiveMet value is invalid, float64 invalid value will be returned.
+//
+// Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 func (m *WeightScale) ActiveMetScaled() float64 {
 	if m.ActiveMet == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -256,9 +264,10 @@ func (m *WeightScale) ActiveMetScaled() float64 {
 	return scaleoffset.Apply(m.ActiveMet, 4, 0)
 }
 
-// BmiScaled return Bmi in its scaled value [Scale: 10; Units: kg/m^2].
-//
+// BmiScaled return Bmi in its scaled value.
 // If Bmi value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: kg/m^2
 func (m *WeightScale) BmiScaled() float64 {
 	if m.Bmi == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -266,7 +275,7 @@ func (m *WeightScale) BmiScaled() float64 {
 	return scaleoffset.Apply(m.Bmi, 10, 0)
 }
 
-// SetTimestamp sets WeightScale value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *WeightScale) SetTimestamp(v time.Time) *WeightScale {
@@ -274,7 +283,7 @@ func (m *WeightScale) SetTimestamp(v time.Time) *WeightScale {
 	return m
 }
 
-// SetWeight sets WeightScale value.
+// SetWeight sets Weight value.
 //
 // Scale: 100; Units: kg
 func (m *WeightScale) SetWeight(v typedef.Weight) *WeightScale {
@@ -282,7 +291,16 @@ func (m *WeightScale) SetWeight(v typedef.Weight) *WeightScale {
 	return m
 }
 
-// SetPercentFat sets WeightScale value.
+// SetWeightScaled is similar to SetWeight except it accepts a scaled value.
+// This method automatically converts the given value to its typedef.Weight form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: kg
+func (m *WeightScale) SetWeightScaled(v float64) *WeightScale {
+	m.Weight = typedef.Weight(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPercentFat sets PercentFat value.
 //
 // Scale: 100; Units: %
 func (m *WeightScale) SetPercentFat(v uint16) *WeightScale {
@@ -290,7 +308,16 @@ func (m *WeightScale) SetPercentFat(v uint16) *WeightScale {
 	return m
 }
 
-// SetPercentHydration sets WeightScale value.
+// SetPercentFatScaled is similar to SetPercentFat except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *WeightScale) SetPercentFatScaled(v float64) *WeightScale {
+	m.PercentFat = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPercentHydration sets PercentHydration value.
 //
 // Scale: 100; Units: %
 func (m *WeightScale) SetPercentHydration(v uint16) *WeightScale {
@@ -298,7 +325,16 @@ func (m *WeightScale) SetPercentHydration(v uint16) *WeightScale {
 	return m
 }
 
-// SetVisceralFatMass sets WeightScale value.
+// SetPercentHydrationScaled is similar to SetPercentHydration except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *WeightScale) SetPercentHydrationScaled(v float64) *WeightScale {
+	m.PercentHydration = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetVisceralFatMass sets VisceralFatMass value.
 //
 // Scale: 100; Units: kg
 func (m *WeightScale) SetVisceralFatMass(v uint16) *WeightScale {
@@ -306,7 +342,16 @@ func (m *WeightScale) SetVisceralFatMass(v uint16) *WeightScale {
 	return m
 }
 
-// SetBoneMass sets WeightScale value.
+// SetVisceralFatMassScaled is similar to SetVisceralFatMass except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: kg
+func (m *WeightScale) SetVisceralFatMassScaled(v float64) *WeightScale {
+	m.VisceralFatMass = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetBoneMass sets BoneMass value.
 //
 // Scale: 100; Units: kg
 func (m *WeightScale) SetBoneMass(v uint16) *WeightScale {
@@ -314,7 +359,16 @@ func (m *WeightScale) SetBoneMass(v uint16) *WeightScale {
 	return m
 }
 
-// SetMuscleMass sets WeightScale value.
+// SetBoneMassScaled is similar to SetBoneMass except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: kg
+func (m *WeightScale) SetBoneMassScaled(v float64) *WeightScale {
+	m.BoneMass = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMuscleMass sets MuscleMass value.
 //
 // Scale: 100; Units: kg
 func (m *WeightScale) SetMuscleMass(v uint16) *WeightScale {
@@ -322,7 +376,16 @@ func (m *WeightScale) SetMuscleMass(v uint16) *WeightScale {
 	return m
 }
 
-// SetBasalMet sets WeightScale value.
+// SetMuscleMassScaled is similar to SetMuscleMass except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: kg
+func (m *WeightScale) SetMuscleMassScaled(v float64) *WeightScale {
+	m.MuscleMass = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetBasalMet sets BasalMet value.
 //
 // Scale: 4; Units: kcal/day
 func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
@@ -330,13 +393,22 @@ func (m *WeightScale) SetBasalMet(v uint16) *WeightScale {
 	return m
 }
 
-// SetPhysiqueRating sets WeightScale value.
+// SetBasalMetScaled is similar to SetBasalMet except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 4; Units: kcal/day
+func (m *WeightScale) SetBasalMetScaled(v float64) *WeightScale {
+	m.BasalMet = uint16(scaleoffset.Discard(v, 4, 0))
+	return m
+}
+
+// SetPhysiqueRating sets PhysiqueRating value.
 func (m *WeightScale) SetPhysiqueRating(v uint8) *WeightScale {
 	m.PhysiqueRating = v
 	return m
 }
 
-// SetActiveMet sets WeightScale value.
+// SetActiveMet sets ActiveMet value.
 //
 // Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
 func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
@@ -344,7 +416,16 @@ func (m *WeightScale) SetActiveMet(v uint16) *WeightScale {
 	return m
 }
 
-// SetMetabolicAge sets WeightScale value.
+// SetActiveMetScaled is similar to SetActiveMet except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 4; Units: kcal/day; ~4kJ per kcal, 0.25 allows max 16384 kcal
+func (m *WeightScale) SetActiveMetScaled(v float64) *WeightScale {
+	m.ActiveMet = uint16(scaleoffset.Discard(v, 4, 0))
+	return m
+}
+
+// SetMetabolicAge sets MetabolicAge value.
 //
 // Units: years
 func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
@@ -352,13 +433,13 @@ func (m *WeightScale) SetMetabolicAge(v uint8) *WeightScale {
 	return m
 }
 
-// SetVisceralFatRating sets WeightScale value.
+// SetVisceralFatRating sets VisceralFatRating value.
 func (m *WeightScale) SetVisceralFatRating(v uint8) *WeightScale {
 	m.VisceralFatRating = v
 	return m
 }
 
-// SetUserProfileIndex sets WeightScale value.
+// SetUserProfileIndex sets UserProfileIndex value.
 //
 // Associates this weight scale message to a user. This corresponds to the index of the user profile message in the weight scale file.
 func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
@@ -366,11 +447,20 @@ func (m *WeightScale) SetUserProfileIndex(v typedef.MessageIndex) *WeightScale {
 	return m
 }
 
-// SetBmi sets WeightScale value.
+// SetBmi sets Bmi value.
 //
 // Scale: 10; Units: kg/m^2
 func (m *WeightScale) SetBmi(v uint16) *WeightScale {
 	m.Bmi = v
+	return m
+}
+
+// SetBmiScaled is similar to SetBmi except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: kg/m^2
+func (m *WeightScale) SetBmiScaled(v float64) *WeightScale {
+	m.Bmi = uint16(scaleoffset.Discard(v, 10, 0))
 	return m
 }
 

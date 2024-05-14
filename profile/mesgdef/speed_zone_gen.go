@@ -94,9 +94,10 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// HighValueScaled return HighValue in its scaled value [Scale: 1000; Units: m/s].
-//
+// HighValueScaled return HighValue in its scaled value.
 // If HighValue value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SpeedZone) HighValueScaled() float64 {
 	if m.HighValue == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -104,13 +105,13 @@ func (m *SpeedZone) HighValueScaled() float64 {
 	return scaleoffset.Apply(m.HighValue, 1000, 0)
 }
 
-// SetMessageIndex sets SpeedZone value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SpeedZone) SetMessageIndex(v typedef.MessageIndex) *SpeedZone {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHighValue sets SpeedZone value.
+// SetHighValue sets HighValue value.
 //
 // Scale: 1000; Units: m/s
 func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
@@ -118,7 +119,16 @@ func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
 	return m
 }
 
-// SetName sets SpeedZone value.
+// SetHighValueScaled is similar to SetHighValue except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SpeedZone) SetHighValueScaled(v float64) *SpeedZone {
+	m.HighValue = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetName sets Name value.
 func (m *SpeedZone) SetName(v string) *SpeedZone {
 	m.Name = v
 	return m

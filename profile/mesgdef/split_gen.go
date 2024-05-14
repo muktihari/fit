@@ -215,9 +215,10 @@ func (m *Split) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime)
 // EndTimeUint32 returns EndTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Split) EndTimeUint32() uint32 { return datetime.ToUint32(m.EndTime) }
 
-// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value.
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Split) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -225,9 +226,10 @@ func (m *Split) TotalElapsedTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Split) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -235,9 +237,10 @@ func (m *Split) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
-//
+// TotalDistanceScaled return TotalDistance in its scaled value.
 // If TotalDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Split) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -245,9 +248,10 @@ func (m *Split) TotalDistanceScaled() float64 {
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Split) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -255,9 +259,10 @@ func (m *Split) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxSpeedScaled return MaxSpeed in its scaled value.
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Split) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -265,9 +270,10 @@ func (m *Split) MaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
 
-// AvgVertSpeedScaled return AvgVertSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgVertSpeedScaled return AvgVertSpeed in its scaled value.
 // If AvgVertSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Split) AvgVertSpeedScaled() float64 {
 	if m.AvgVertSpeed == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -275,9 +281,10 @@ func (m *Split) AvgVertSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
 }
 
-// StartElevationScaled return StartElevation in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// StartElevationScaled return StartElevation in its scaled value.
 // If StartElevation value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Split) StartElevationScaled() float64 {
 	if m.StartElevation == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -285,9 +292,10 @@ func (m *Split) StartElevationScaled() float64 {
 	return scaleoffset.Apply(m.StartElevation, 5, 500)
 }
 
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value.
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Split) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -331,19 +339,19 @@ func (m *Split) EndPositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.EndPositionLong)
 }
 
-// SetMessageIndex sets Split value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
 	m.MessageIndex = v
 	return m
 }
 
-// SetSplitType sets Split value.
+// SetSplitType sets SplitType value.
 func (m *Split) SetSplitType(v typedef.SplitType) *Split {
 	m.SplitType = v
 	return m
 }
 
-// SetTotalElapsedTime sets Split value.
+// SetTotalElapsedTime sets TotalElapsedTime value.
 //
 // Scale: 1000; Units: s
 func (m *Split) SetTotalElapsedTime(v uint32) *Split {
@@ -351,7 +359,16 @@ func (m *Split) SetTotalElapsedTime(v uint32) *Split {
 	return m
 }
 
-// SetTotalTimerTime sets Split value.
+// SetTotalElapsedTimeScaled is similar to SetTotalElapsedTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalElapsedTimeScaled(v float64) *Split {
+	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s
 func (m *Split) SetTotalTimerTime(v uint32) *Split {
@@ -359,7 +376,16 @@ func (m *Split) SetTotalTimerTime(v uint32) *Split {
 	return m
 }
 
-// SetTotalDistance sets Split value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalTimerTimeScaled(v float64) *Split {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalDistance sets TotalDistance value.
 //
 // Scale: 100; Units: m
 func (m *Split) SetTotalDistance(v uint32) *Split {
@@ -367,7 +393,16 @@ func (m *Split) SetTotalDistance(v uint32) *Split {
 	return m
 }
 
-// SetAvgSpeed sets Split value.
+// SetTotalDistanceScaled is similar to SetTotalDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Split) SetTotalDistanceScaled(v float64) *Split {
+	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Split) SetAvgSpeed(v uint32) *Split {
@@ -375,13 +410,22 @@ func (m *Split) SetAvgSpeed(v uint32) *Split {
 	return m
 }
 
-// SetStartTime sets Split value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgSpeedScaled(v float64) *Split {
+	m.AvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetStartTime sets StartTime value.
 func (m *Split) SetStartTime(v time.Time) *Split {
 	m.StartTime = v
 	return m
 }
 
-// SetTotalAscent sets Split value.
+// SetTotalAscent sets TotalAscent value.
 //
 // Units: m
 func (m *Split) SetTotalAscent(v uint16) *Split {
@@ -389,7 +433,7 @@ func (m *Split) SetTotalAscent(v uint16) *Split {
 	return m
 }
 
-// SetTotalDescent sets Split value.
+// SetTotalDescent sets TotalDescent value.
 //
 // Units: m
 func (m *Split) SetTotalDescent(v uint16) *Split {
@@ -397,7 +441,7 @@ func (m *Split) SetTotalDescent(v uint16) *Split {
 	return m
 }
 
-// SetStartPositionLat sets Split value.
+// SetStartPositionLat sets StartPositionLat value.
 //
 // Units: semicircles
 func (m *Split) SetStartPositionLat(v int32) *Split {
@@ -405,7 +449,14 @@ func (m *Split) SetStartPositionLat(v int32) *Split {
 	return m
 }
 
-// SetStartPositionLong sets Split value.
+// SetStartPositionLatDegrees is similar to SetStartPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetStartPositionLatDegrees(degrees float64) *Split {
+	m.StartPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetStartPositionLong sets StartPositionLong value.
 //
 // Units: semicircles
 func (m *Split) SetStartPositionLong(v int32) *Split {
@@ -413,7 +464,14 @@ func (m *Split) SetStartPositionLong(v int32) *Split {
 	return m
 }
 
-// SetEndPositionLat sets Split value.
+// SetStartPositionLongDegrees is similar to SetStartPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetStartPositionLongDegrees(degrees float64) *Split {
+	m.StartPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEndPositionLat sets EndPositionLat value.
 //
 // Units: semicircles
 func (m *Split) SetEndPositionLat(v int32) *Split {
@@ -421,7 +479,14 @@ func (m *Split) SetEndPositionLat(v int32) *Split {
 	return m
 }
 
-// SetEndPositionLong sets Split value.
+// SetEndPositionLatDegrees is similar to SetEndPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetEndPositionLatDegrees(degrees float64) *Split {
+	m.EndPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEndPositionLong sets EndPositionLong value.
 //
 // Units: semicircles
 func (m *Split) SetEndPositionLong(v int32) *Split {
@@ -429,7 +494,14 @@ func (m *Split) SetEndPositionLong(v int32) *Split {
 	return m
 }
 
-// SetMaxSpeed sets Split value.
+// SetEndPositionLongDegrees is similar to SetEndPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetEndPositionLongDegrees(degrees float64) *Split {
+	m.EndPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetMaxSpeed sets MaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Split) SetMaxSpeed(v uint32) *Split {
@@ -437,7 +509,16 @@ func (m *Split) SetMaxSpeed(v uint32) *Split {
 	return m
 }
 
-// SetAvgVertSpeed sets Split value.
+// SetMaxSpeedScaled is similar to SetMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetMaxSpeedScaled(v float64) *Split {
+	m.MaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgVertSpeed sets AvgVertSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Split) SetAvgVertSpeed(v int32) *Split {
@@ -445,13 +526,22 @@ func (m *Split) SetAvgVertSpeed(v int32) *Split {
 	return m
 }
 
-// SetEndTime sets Split value.
+// SetAvgVertSpeedScaled is similar to SetAvgVertSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgVertSpeedScaled(v float64) *Split {
+	m.AvgVertSpeed = int32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetEndTime sets EndTime value.
 func (m *Split) SetEndTime(v time.Time) *Split {
 	m.EndTime = v
 	return m
 }
 
-// SetTotalCalories sets Split value.
+// SetTotalCalories sets TotalCalories value.
 //
 // Units: kcal
 func (m *Split) SetTotalCalories(v uint32) *Split {
@@ -459,7 +549,7 @@ func (m *Split) SetTotalCalories(v uint32) *Split {
 	return m
 }
 
-// SetStartElevation sets Split value.
+// SetStartElevation sets StartElevation value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Split) SetStartElevation(v uint32) *Split {
@@ -467,11 +557,29 @@ func (m *Split) SetStartElevation(v uint32) *Split {
 	return m
 }
 
-// SetTotalMovingTime sets Split value.
+// SetStartElevationScaled is similar to SetStartElevation except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Split) SetStartElevationScaled(v float64) *Split {
+	m.StartElevation = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetTotalMovingTime sets TotalMovingTime value.
 //
 // Scale: 1000; Units: s
 func (m *Split) SetTotalMovingTime(v uint32) *Split {
 	m.TotalMovingTime = v
+	return m
+}
+
+// SetTotalMovingTimeScaled is similar to SetTotalMovingTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalMovingTimeScaled(v float64) *Split {
+	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
 	return m
 }
 

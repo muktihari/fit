@@ -129,13 +129,13 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *RawBbi) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets RawBbi value.
+// SetTimestamp sets Timestamp value.
 func (m *RawBbi) SetTimestamp(v time.Time) *RawBbi {
 	m.Timestamp = v
 	return m
 }
 
-// SetTimestampMs sets RawBbi value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; ms since last overnight_raw_bbi message
 func (m *RawBbi) SetTimestampMs(v uint16) *RawBbi {
@@ -143,7 +143,7 @@ func (m *RawBbi) SetTimestampMs(v uint16) *RawBbi {
 	return m
 }
 
-// SetData sets RawBbi value.
+// SetData sets Data value.
 //
 // Array: [N]; 1 bit for gap indicator, 1 bit for quality indicator, and 14 bits for Beat-to-Beat interval values in whole-integer millisecond resolution
 func (m *RawBbi) SetData(v []uint16) *RawBbi {
@@ -151,7 +151,7 @@ func (m *RawBbi) SetData(v []uint16) *RawBbi {
 	return m
 }
 
-// SetTime sets RawBbi value.
+// SetTime sets Time value.
 //
 // Array: [N]; Units: ms; Array of millisecond times between beats
 func (m *RawBbi) SetTime(v []uint16) *RawBbi {
@@ -159,7 +159,7 @@ func (m *RawBbi) SetTime(v []uint16) *RawBbi {
 	return m
 }
 
-// SetQuality sets RawBbi value.
+// SetQuality sets Quality value.
 //
 // Array: [N]
 func (m *RawBbi) SetQuality(v []uint8) *RawBbi {
@@ -167,7 +167,7 @@ func (m *RawBbi) SetQuality(v []uint8) *RawBbi {
 	return m
 }
 
-// SetGap sets RawBbi value.
+// SetGap sets Gap value.
 //
 // Array: [N]
 func (m *RawBbi) SetGap(v []uint8) *RawBbi {

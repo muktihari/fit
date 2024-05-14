@@ -113,9 +113,10 @@ func (m *TankSummary) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *TankSummary) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// StartPressureScaled return StartPressure in its scaled value [Scale: 100; Units: bar].
-//
+// StartPressureScaled return StartPressure in its scaled value.
 // If StartPressure value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: bar
 func (m *TankSummary) StartPressureScaled() float64 {
 	if m.StartPressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -123,9 +124,10 @@ func (m *TankSummary) StartPressureScaled() float64 {
 	return scaleoffset.Apply(m.StartPressure, 100, 0)
 }
 
-// EndPressureScaled return EndPressure in its scaled value [Scale: 100; Units: bar].
-//
+// EndPressureScaled return EndPressure in its scaled value.
 // If EndPressure value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: bar
 func (m *TankSummary) EndPressureScaled() float64 {
 	if m.EndPressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -133,9 +135,10 @@ func (m *TankSummary) EndPressureScaled() float64 {
 	return scaleoffset.Apply(m.EndPressure, 100, 0)
 }
 
-// VolumeUsedScaled return VolumeUsed in its scaled value [Scale: 100; Units: L].
-//
+// VolumeUsedScaled return VolumeUsed in its scaled value.
 // If VolumeUsed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: L
 func (m *TankSummary) VolumeUsedScaled() float64 {
 	if m.VolumeUsed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -143,7 +146,7 @@ func (m *TankSummary) VolumeUsedScaled() float64 {
 	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
 }
 
-// SetTimestamp sets TankSummary value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *TankSummary) SetTimestamp(v time.Time) *TankSummary {
@@ -151,13 +154,13 @@ func (m *TankSummary) SetTimestamp(v time.Time) *TankSummary {
 	return m
 }
 
-// SetSensor sets TankSummary value.
+// SetSensor sets Sensor value.
 func (m *TankSummary) SetSensor(v typedef.AntChannelId) *TankSummary {
 	m.Sensor = v
 	return m
 }
 
-// SetStartPressure sets TankSummary value.
+// SetStartPressure sets StartPressure value.
 //
 // Scale: 100; Units: bar
 func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
@@ -165,7 +168,16 @@ func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
 	return m
 }
 
-// SetEndPressure sets TankSummary value.
+// SetStartPressureScaled is similar to SetStartPressure except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: bar
+func (m *TankSummary) SetStartPressureScaled(v float64) *TankSummary {
+	m.StartPressure = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEndPressure sets EndPressure value.
 //
 // Scale: 100; Units: bar
 func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
@@ -173,11 +185,29 @@ func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
 	return m
 }
 
-// SetVolumeUsed sets TankSummary value.
+// SetEndPressureScaled is similar to SetEndPressure except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: bar
+func (m *TankSummary) SetEndPressureScaled(v float64) *TankSummary {
+	m.EndPressure = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetVolumeUsed sets VolumeUsed value.
 //
 // Scale: 100; Units: L
 func (m *TankSummary) SetVolumeUsed(v uint32) *TankSummary {
 	m.VolumeUsed = v
+	return m
+}
+
+// SetVolumeUsedScaled is similar to SetVolumeUsed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: L
+func (m *TankSummary) SetVolumeUsedScaled(v float64) *TankSummary {
+	m.VolumeUsed = uint32(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 

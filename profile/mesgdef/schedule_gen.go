@@ -146,7 +146,7 @@ func (m *Schedule) TimeCreatedUint32() uint32 { return datetime.ToUint32(m.TimeC
 // ScheduledTimeUint32 returns ScheduledTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Schedule) ScheduledTimeUint32() uint32 { return datetime.ToUint32(m.ScheduledTime) }
 
-// SetManufacturer sets Schedule value.
+// SetManufacturer sets Manufacturer value.
 //
 // Corresponds to file_id of scheduled workout / course.
 func (m *Schedule) SetManufacturer(v typedef.Manufacturer) *Schedule {
@@ -154,7 +154,7 @@ func (m *Schedule) SetManufacturer(v typedef.Manufacturer) *Schedule {
 	return m
 }
 
-// SetProduct sets Schedule value.
+// SetProduct sets Product value.
 //
 // Corresponds to file_id of scheduled workout / course.
 func (m *Schedule) SetProduct(v uint16) *Schedule {
@@ -162,7 +162,7 @@ func (m *Schedule) SetProduct(v uint16) *Schedule {
 	return m
 }
 
-// SetSerialNumber sets Schedule value.
+// SetSerialNumber sets SerialNumber value.
 //
 // Corresponds to file_id of scheduled workout / course.
 func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
@@ -170,7 +170,7 @@ func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
 	return m
 }
 
-// SetTimeCreated sets Schedule value.
+// SetTimeCreated sets TimeCreated value.
 //
 // Corresponds to file_id of scheduled workout / course.
 func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
@@ -178,7 +178,7 @@ func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
 	return m
 }
 
-// SetCompleted sets Schedule value.
+// SetCompleted sets Completed value.
 //
 // TRUE if this activity has been started
 func (m *Schedule) SetCompleted(v bool) *Schedule {
@@ -186,13 +186,13 @@ func (m *Schedule) SetCompleted(v bool) *Schedule {
 	return m
 }
 
-// SetType sets Schedule value.
+// SetType sets Type value.
 func (m *Schedule) SetType(v typedef.Schedule) *Schedule {
 	m.Type = v
 	return m
 }
 
-// SetScheduledTime sets Schedule value.
+// SetScheduledTime sets ScheduledTime value.
 func (m *Schedule) SetScheduledTime(v time.Time) *Schedule {
 	m.ScheduledTime = v
 	return m

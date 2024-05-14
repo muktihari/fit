@@ -85,13 +85,13 @@ func (m *FileCreator) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetSoftwareVersion sets FileCreator value.
+// SetSoftwareVersion sets SoftwareVersion value.
 func (m *FileCreator) SetSoftwareVersion(v uint16) *FileCreator {
 	m.SoftwareVersion = v
 	return m
 }
 
-// SetHardwareVersion sets FileCreator value.
+// SetHardwareVersion sets HardwareVersion value.
 func (m *FileCreator) SetHardwareVersion(v uint8) *FileCreator {
 	m.HardwareVersion = v
 	return m

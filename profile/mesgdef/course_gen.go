@@ -99,25 +99,25 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetSport sets Course value.
+// SetSport sets Sport value.
 func (m *Course) SetSport(v typedef.Sport) *Course {
 	m.Sport = v
 	return m
 }
 
-// SetName sets Course value.
+// SetName sets Name value.
 func (m *Course) SetName(v string) *Course {
 	m.Name = v
 	return m
 }
 
-// SetCapabilities sets Course value.
+// SetCapabilities sets Capabilities value.
 func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
 	m.Capabilities = v
 	return m
 }
 
-// SetSubSport sets Course value.
+// SetSubSport sets SubSport value.
 func (m *Course) SetSubSport(v typedef.SubSport) *Course {
 	m.SubSport = v
 	return m

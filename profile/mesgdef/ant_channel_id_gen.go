@@ -106,31 +106,31 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetChannelNumber sets AntChannelId value.
+// SetChannelNumber sets ChannelNumber value.
 func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 	m.ChannelNumber = v
 	return m
 }
 
-// SetDeviceType sets AntChannelId value.
+// SetDeviceType sets DeviceType value.
 func (m *AntChannelId) SetDeviceType(v uint8) *AntChannelId {
 	m.DeviceType = v
 	return m
 }
 
-// SetDeviceNumber sets AntChannelId value.
+// SetDeviceNumber sets DeviceNumber value.
 func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
 	m.DeviceNumber = v
 	return m
 }
 
-// SetTransmissionType sets AntChannelId value.
+// SetTransmissionType sets TransmissionType value.
 func (m *AntChannelId) SetTransmissionType(v uint8) *AntChannelId {
 	m.TransmissionType = v
 	return m
 }
 
-// SetDeviceIndex sets AntChannelId value.
+// SetDeviceIndex sets DeviceIndex value.
 func (m *AntChannelId) SetDeviceIndex(v typedef.DeviceIndex) *AntChannelId {
 	m.DeviceIndex = v
 	return m

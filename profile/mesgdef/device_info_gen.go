@@ -253,9 +253,10 @@ func (m *DeviceInfo) GetProduct() (name string, value any) {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DeviceInfo) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SoftwareVersionScaled return SoftwareVersion in its scaled value [Scale: 100].
-//
+// SoftwareVersionScaled return SoftwareVersion in its scaled value.
 // If SoftwareVersion value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100
 func (m *DeviceInfo) SoftwareVersionScaled() float64 {
 	if m.SoftwareVersion == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -263,9 +264,10 @@ func (m *DeviceInfo) SoftwareVersionScaled() float64 {
 	return scaleoffset.Apply(m.SoftwareVersion, 100, 0)
 }
 
-// BatteryVoltageScaled return BatteryVoltage in its scaled value [Scale: 256; Units: V].
-//
+// BatteryVoltageScaled return BatteryVoltage in its scaled value.
 // If BatteryVoltage value is invalid, float64 invalid value will be returned.
+//
+// Scale: 256; Units: V
 func (m *DeviceInfo) BatteryVoltageScaled() float64 {
 	if m.BatteryVoltage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -273,7 +275,7 @@ func (m *DeviceInfo) BatteryVoltageScaled() float64 {
 	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
 }
 
-// SetTimestamp sets DeviceInfo value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *DeviceInfo) SetTimestamp(v time.Time) *DeviceInfo {
@@ -281,37 +283,37 @@ func (m *DeviceInfo) SetTimestamp(v time.Time) *DeviceInfo {
 	return m
 }
 
-// SetDeviceIndex sets DeviceInfo value.
+// SetDeviceIndex sets DeviceIndex value.
 func (m *DeviceInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceInfo {
 	m.DeviceIndex = v
 	return m
 }
 
-// SetDeviceType sets DeviceInfo value.
+// SetDeviceType sets DeviceType value.
 func (m *DeviceInfo) SetDeviceType(v uint8) *DeviceInfo {
 	m.DeviceType = v
 	return m
 }
 
-// SetManufacturer sets DeviceInfo value.
+// SetManufacturer sets Manufacturer value.
 func (m *DeviceInfo) SetManufacturer(v typedef.Manufacturer) *DeviceInfo {
 	m.Manufacturer = v
 	return m
 }
 
-// SetSerialNumber sets DeviceInfo value.
+// SetSerialNumber sets SerialNumber value.
 func (m *DeviceInfo) SetSerialNumber(v uint32) *DeviceInfo {
 	m.SerialNumber = v
 	return m
 }
 
-// SetProduct sets DeviceInfo value.
+// SetProduct sets Product value.
 func (m *DeviceInfo) SetProduct(v uint16) *DeviceInfo {
 	m.Product = v
 	return m
 }
 
-// SetSoftwareVersion sets DeviceInfo value.
+// SetSoftwareVersion sets SoftwareVersion value.
 //
 // Scale: 100
 func (m *DeviceInfo) SetSoftwareVersion(v uint16) *DeviceInfo {
@@ -319,13 +321,22 @@ func (m *DeviceInfo) SetSoftwareVersion(v uint16) *DeviceInfo {
 	return m
 }
 
-// SetHardwareVersion sets DeviceInfo value.
+// SetSoftwareVersionScaled is similar to SetSoftwareVersion except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100
+func (m *DeviceInfo) SetSoftwareVersionScaled(v float64) *DeviceInfo {
+	m.SoftwareVersion = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetHardwareVersion sets HardwareVersion value.
 func (m *DeviceInfo) SetHardwareVersion(v uint8) *DeviceInfo {
 	m.HardwareVersion = v
 	return m
 }
 
-// SetCumOperatingTime sets DeviceInfo value.
+// SetCumOperatingTime sets CumOperatingTime value.
 //
 // Units: s; Reset by new battery or charge.
 func (m *DeviceInfo) SetCumOperatingTime(v uint32) *DeviceInfo {
@@ -333,7 +344,7 @@ func (m *DeviceInfo) SetCumOperatingTime(v uint32) *DeviceInfo {
 	return m
 }
 
-// SetBatteryVoltage sets DeviceInfo value.
+// SetBatteryVoltage sets BatteryVoltage value.
 //
 // Scale: 256; Units: V
 func (m *DeviceInfo) SetBatteryVoltage(v uint16) *DeviceInfo {
@@ -341,13 +352,22 @@ func (m *DeviceInfo) SetBatteryVoltage(v uint16) *DeviceInfo {
 	return m
 }
 
-// SetBatteryStatus sets DeviceInfo value.
+// SetBatteryVoltageScaled is similar to SetBatteryVoltage except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 256; Units: V
+func (m *DeviceInfo) SetBatteryVoltageScaled(v float64) *DeviceInfo {
+	m.BatteryVoltage = uint16(scaleoffset.Discard(v, 256, 0))
+	return m
+}
+
+// SetBatteryStatus sets BatteryStatus value.
 func (m *DeviceInfo) SetBatteryStatus(v typedef.BatteryStatus) *DeviceInfo {
 	m.BatteryStatus = v
 	return m
 }
 
-// SetSensorPosition sets DeviceInfo value.
+// SetSensorPosition sets SensorPosition value.
 //
 // Indicates the location of the sensor
 func (m *DeviceInfo) SetSensorPosition(v typedef.BodyLocation) *DeviceInfo {
@@ -355,7 +375,7 @@ func (m *DeviceInfo) SetSensorPosition(v typedef.BodyLocation) *DeviceInfo {
 	return m
 }
 
-// SetDescriptor sets DeviceInfo value.
+// SetDescriptor sets Descriptor value.
 //
 // Used to describe the sensor or location
 func (m *DeviceInfo) SetDescriptor(v string) *DeviceInfo {
@@ -363,31 +383,31 @@ func (m *DeviceInfo) SetDescriptor(v string) *DeviceInfo {
 	return m
 }
 
-// SetAntTransmissionType sets DeviceInfo value.
+// SetAntTransmissionType sets AntTransmissionType value.
 func (m *DeviceInfo) SetAntTransmissionType(v uint8) *DeviceInfo {
 	m.AntTransmissionType = v
 	return m
 }
 
-// SetAntDeviceNumber sets DeviceInfo value.
+// SetAntDeviceNumber sets AntDeviceNumber value.
 func (m *DeviceInfo) SetAntDeviceNumber(v uint16) *DeviceInfo {
 	m.AntDeviceNumber = v
 	return m
 }
 
-// SetAntNetwork sets DeviceInfo value.
+// SetAntNetwork sets AntNetwork value.
 func (m *DeviceInfo) SetAntNetwork(v typedef.AntNetwork) *DeviceInfo {
 	m.AntNetwork = v
 	return m
 }
 
-// SetSourceType sets DeviceInfo value.
+// SetSourceType sets SourceType value.
 func (m *DeviceInfo) SetSourceType(v typedef.SourceType) *DeviceInfo {
 	m.SourceType = v
 	return m
 }
 
-// SetProductName sets DeviceInfo value.
+// SetProductName sets ProductName value.
 //
 // Optional free form string to indicate the devices name or model
 func (m *DeviceInfo) SetProductName(v string) *DeviceInfo {
@@ -395,7 +415,7 @@ func (m *DeviceInfo) SetProductName(v string) *DeviceInfo {
 	return m
 }
 
-// SetBatteryLevel sets DeviceInfo value.
+// SetBatteryLevel sets BatteryLevel value.
 //
 // Units: %
 func (m *DeviceInfo) SetBatteryLevel(v uint8) *DeviceInfo {

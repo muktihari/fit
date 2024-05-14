@@ -239,9 +239,10 @@ func (m *DiveSummary) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DiveSummary) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// AvgDepthScaled return AvgDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// AvgDepthScaled return AvgDepth in its scaled value.
 // If AvgDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *DiveSummary) AvgDepthScaled() float64 {
 	if m.AvgDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -249,9 +250,10 @@ func (m *DiveSummary) AvgDepthScaled() float64 {
 	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
 }
 
-// MaxDepthScaled return MaxDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// MaxDepthScaled return MaxDepth in its scaled value.
 // If MaxDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *DiveSummary) MaxDepthScaled() float64 {
 	if m.MaxDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -259,9 +261,10 @@ func (m *DiveSummary) MaxDepthScaled() float64 {
 	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
 }
 
-// BottomTimeScaled return BottomTime in its scaled value [Scale: 1000; Units: s].
-//
+// BottomTimeScaled return BottomTime in its scaled value.
 // If BottomTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *DiveSummary) BottomTimeScaled() float64 {
 	if m.BottomTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -269,9 +272,10 @@ func (m *DiveSummary) BottomTimeScaled() float64 {
 	return scaleoffset.Apply(m.BottomTime, 1000, 0)
 }
 
-// AvgPressureSacScaled return AvgPressureSac in its scaled value [Scale: 100; Units: bar/min; Average pressure-based surface air consumption].
-//
+// AvgPressureSacScaled return AvgPressureSac in its scaled value.
 // If AvgPressureSac value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: bar/min; Average pressure-based surface air consumption
 func (m *DiveSummary) AvgPressureSacScaled() float64 {
 	if m.AvgPressureSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -279,9 +283,10 @@ func (m *DiveSummary) AvgPressureSacScaled() float64 {
 	return scaleoffset.Apply(m.AvgPressureSac, 100, 0)
 }
 
-// AvgVolumeSacScaled return AvgVolumeSac in its scaled value [Scale: 100; Units: L/min; Average volumetric surface air consumption].
-//
+// AvgVolumeSacScaled return AvgVolumeSac in its scaled value.
 // If AvgVolumeSac value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: L/min; Average volumetric surface air consumption
 func (m *DiveSummary) AvgVolumeSacScaled() float64 {
 	if m.AvgVolumeSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -289,9 +294,10 @@ func (m *DiveSummary) AvgVolumeSacScaled() float64 {
 	return scaleoffset.Apply(m.AvgVolumeSac, 100, 0)
 }
 
-// AvgRmvScaled return AvgRmv in its scaled value [Scale: 100; Units: L/min; Average respiratory minute volume].
-//
+// AvgRmvScaled return AvgRmv in its scaled value.
 // If AvgRmv value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: L/min; Average respiratory minute volume
 func (m *DiveSummary) AvgRmvScaled() float64 {
 	if m.AvgRmv == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -299,9 +305,10 @@ func (m *DiveSummary) AvgRmvScaled() float64 {
 	return scaleoffset.Apply(m.AvgRmv, 100, 0)
 }
 
-// DescentTimeScaled return DescentTime in its scaled value [Scale: 1000; Units: s; Time to reach deepest level stop].
-//
+// DescentTimeScaled return DescentTime in its scaled value.
 // If DescentTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Time to reach deepest level stop
 func (m *DiveSummary) DescentTimeScaled() float64 {
 	if m.DescentTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -309,9 +316,10 @@ func (m *DiveSummary) DescentTimeScaled() float64 {
 	return scaleoffset.Apply(m.DescentTime, 1000, 0)
 }
 
-// AscentTimeScaled return AscentTime in its scaled value [Scale: 1000; Units: s; Time after leaving bottom until reaching surface].
-//
+// AscentTimeScaled return AscentTime in its scaled value.
 // If AscentTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Time after leaving bottom until reaching surface
 func (m *DiveSummary) AscentTimeScaled() float64 {
 	if m.AscentTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -319,9 +327,10 @@ func (m *DiveSummary) AscentTimeScaled() float64 {
 	return scaleoffset.Apply(m.AscentTime, 1000, 0)
 }
 
-// AvgAscentRateScaled return AvgAscentRate in its scaled value [Scale: 1000; Units: m/s; Average ascent rate, not including descents or stops].
-//
+// AvgAscentRateScaled return AvgAscentRate in its scaled value.
 // If AvgAscentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; Average ascent rate, not including descents or stops
 func (m *DiveSummary) AvgAscentRateScaled() float64 {
 	if m.AvgAscentRate == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -329,9 +338,10 @@ func (m *DiveSummary) AvgAscentRateScaled() float64 {
 	return scaleoffset.Apply(m.AvgAscentRate, 1000, 0)
 }
 
-// AvgDescentRateScaled return AvgDescentRate in its scaled value [Scale: 1000; Units: m/s; Average descent rate, not including ascents or stops].
-//
+// AvgDescentRateScaled return AvgDescentRate in its scaled value.
 // If AvgDescentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; Average descent rate, not including ascents or stops
 func (m *DiveSummary) AvgDescentRateScaled() float64 {
 	if m.AvgDescentRate == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -339,9 +349,10 @@ func (m *DiveSummary) AvgDescentRateScaled() float64 {
 	return scaleoffset.Apply(m.AvgDescentRate, 1000, 0)
 }
 
-// MaxAscentRateScaled return MaxAscentRate in its scaled value [Scale: 1000; Units: m/s; Maximum ascent rate].
-//
+// MaxAscentRateScaled return MaxAscentRate in its scaled value.
 // If MaxAscentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; Maximum ascent rate
 func (m *DiveSummary) MaxAscentRateScaled() float64 {
 	if m.MaxAscentRate == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -349,9 +360,10 @@ func (m *DiveSummary) MaxAscentRateScaled() float64 {
 	return scaleoffset.Apply(m.MaxAscentRate, 1000, 0)
 }
 
-// MaxDescentRateScaled return MaxDescentRate in its scaled value [Scale: 1000; Units: m/s; Maximum descent rate].
-//
+// MaxDescentRateScaled return MaxDescentRate in its scaled value.
 // If MaxDescentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; Maximum descent rate
 func (m *DiveSummary) MaxDescentRateScaled() float64 {
 	if m.MaxDescentRate == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -359,9 +371,10 @@ func (m *DiveSummary) MaxDescentRateScaled() float64 {
 	return scaleoffset.Apply(m.MaxDescentRate, 1000, 0)
 }
 
-// HangTimeScaled return HangTime in its scaled value [Scale: 1000; Units: s; Time spent neither ascending nor descending].
-//
+// HangTimeScaled return HangTime in its scaled value.
 // If HangTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Time spent neither ascending nor descending
 func (m *DiveSummary) HangTimeScaled() float64 {
 	if m.HangTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -369,7 +382,7 @@ func (m *DiveSummary) HangTimeScaled() float64 {
 	return scaleoffset.Apply(m.HangTime, 1000, 0)
 }
 
-// SetTimestamp sets DiveSummary value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *DiveSummary) SetTimestamp(v time.Time) *DiveSummary {
@@ -377,19 +390,19 @@ func (m *DiveSummary) SetTimestamp(v time.Time) *DiveSummary {
 	return m
 }
 
-// SetReferenceMesg sets DiveSummary value.
+// SetReferenceMesg sets ReferenceMesg value.
 func (m *DiveSummary) SetReferenceMesg(v typedef.MesgNum) *DiveSummary {
 	m.ReferenceMesg = v
 	return m
 }
 
-// SetReferenceIndex sets DiveSummary value.
+// SetReferenceIndex sets ReferenceIndex value.
 func (m *DiveSummary) SetReferenceIndex(v typedef.MessageIndex) *DiveSummary {
 	m.ReferenceIndex = v
 	return m
 }
 
-// SetAvgDepth sets DiveSummary value.
+// SetAvgDepth sets AvgDepth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *DiveSummary) SetAvgDepth(v uint32) *DiveSummary {
@@ -397,7 +410,16 @@ func (m *DiveSummary) SetAvgDepth(v uint32) *DiveSummary {
 	return m
 }
 
-// SetMaxDepth sets DiveSummary value.
+// SetAvgDepthScaled is similar to SetAvgDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *DiveSummary) SetAvgDepthScaled(v float64) *DiveSummary {
+	m.AvgDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxDepth sets MaxDepth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *DiveSummary) SetMaxDepth(v uint32) *DiveSummary {
@@ -405,7 +427,16 @@ func (m *DiveSummary) SetMaxDepth(v uint32) *DiveSummary {
 	return m
 }
 
-// SetSurfaceInterval sets DiveSummary value.
+// SetMaxDepthScaled is similar to SetMaxDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *DiveSummary) SetMaxDepthScaled(v float64) *DiveSummary {
+	m.MaxDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetSurfaceInterval sets SurfaceInterval value.
 //
 // Units: s; Time since end of last dive
 func (m *DiveSummary) SetSurfaceInterval(v uint32) *DiveSummary {
@@ -413,7 +444,7 @@ func (m *DiveSummary) SetSurfaceInterval(v uint32) *DiveSummary {
 	return m
 }
 
-// SetStartCns sets DiveSummary value.
+// SetStartCns sets StartCns value.
 //
 // Units: percent
 func (m *DiveSummary) SetStartCns(v uint8) *DiveSummary {
@@ -421,7 +452,7 @@ func (m *DiveSummary) SetStartCns(v uint8) *DiveSummary {
 	return m
 }
 
-// SetEndCns sets DiveSummary value.
+// SetEndCns sets EndCns value.
 //
 // Units: percent
 func (m *DiveSummary) SetEndCns(v uint8) *DiveSummary {
@@ -429,7 +460,7 @@ func (m *DiveSummary) SetEndCns(v uint8) *DiveSummary {
 	return m
 }
 
-// SetStartN2 sets DiveSummary value.
+// SetStartN2 sets StartN2 value.
 //
 // Units: percent
 func (m *DiveSummary) SetStartN2(v uint16) *DiveSummary {
@@ -437,7 +468,7 @@ func (m *DiveSummary) SetStartN2(v uint16) *DiveSummary {
 	return m
 }
 
-// SetEndN2 sets DiveSummary value.
+// SetEndN2 sets EndN2 value.
 //
 // Units: percent
 func (m *DiveSummary) SetEndN2(v uint16) *DiveSummary {
@@ -445,7 +476,7 @@ func (m *DiveSummary) SetEndN2(v uint16) *DiveSummary {
 	return m
 }
 
-// SetO2Toxicity sets DiveSummary value.
+// SetO2Toxicity sets O2Toxicity value.
 //
 // Units: OTUs
 func (m *DiveSummary) SetO2Toxicity(v uint16) *DiveSummary {
@@ -453,13 +484,13 @@ func (m *DiveSummary) SetO2Toxicity(v uint16) *DiveSummary {
 	return m
 }
 
-// SetDiveNumber sets DiveSummary value.
+// SetDiveNumber sets DiveNumber value.
 func (m *DiveSummary) SetDiveNumber(v uint32) *DiveSummary {
 	m.DiveNumber = v
 	return m
 }
 
-// SetBottomTime sets DiveSummary value.
+// SetBottomTime sets BottomTime value.
 //
 // Scale: 1000; Units: s
 func (m *DiveSummary) SetBottomTime(v uint32) *DiveSummary {
@@ -467,7 +498,16 @@ func (m *DiveSummary) SetBottomTime(v uint32) *DiveSummary {
 	return m
 }
 
-// SetAvgPressureSac sets DiveSummary value.
+// SetBottomTimeScaled is similar to SetBottomTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *DiveSummary) SetBottomTimeScaled(v float64) *DiveSummary {
+	m.BottomTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgPressureSac sets AvgPressureSac value.
 //
 // Scale: 100; Units: bar/min; Average pressure-based surface air consumption
 func (m *DiveSummary) SetAvgPressureSac(v uint16) *DiveSummary {
@@ -475,7 +515,16 @@ func (m *DiveSummary) SetAvgPressureSac(v uint16) *DiveSummary {
 	return m
 }
 
-// SetAvgVolumeSac sets DiveSummary value.
+// SetAvgPressureSacScaled is similar to SetAvgPressureSac except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: bar/min; Average pressure-based surface air consumption
+func (m *DiveSummary) SetAvgPressureSacScaled(v float64) *DiveSummary {
+	m.AvgPressureSac = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgVolumeSac sets AvgVolumeSac value.
 //
 // Scale: 100; Units: L/min; Average volumetric surface air consumption
 func (m *DiveSummary) SetAvgVolumeSac(v uint16) *DiveSummary {
@@ -483,7 +532,16 @@ func (m *DiveSummary) SetAvgVolumeSac(v uint16) *DiveSummary {
 	return m
 }
 
-// SetAvgRmv sets DiveSummary value.
+// SetAvgVolumeSacScaled is similar to SetAvgVolumeSac except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: L/min; Average volumetric surface air consumption
+func (m *DiveSummary) SetAvgVolumeSacScaled(v float64) *DiveSummary {
+	m.AvgVolumeSac = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgRmv sets AvgRmv value.
 //
 // Scale: 100; Units: L/min; Average respiratory minute volume
 func (m *DiveSummary) SetAvgRmv(v uint16) *DiveSummary {
@@ -491,7 +549,16 @@ func (m *DiveSummary) SetAvgRmv(v uint16) *DiveSummary {
 	return m
 }
 
-// SetDescentTime sets DiveSummary value.
+// SetAvgRmvScaled is similar to SetAvgRmv except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: L/min; Average respiratory minute volume
+func (m *DiveSummary) SetAvgRmvScaled(v float64) *DiveSummary {
+	m.AvgRmv = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetDescentTime sets DescentTime value.
 //
 // Scale: 1000; Units: s; Time to reach deepest level stop
 func (m *DiveSummary) SetDescentTime(v uint32) *DiveSummary {
@@ -499,7 +566,16 @@ func (m *DiveSummary) SetDescentTime(v uint32) *DiveSummary {
 	return m
 }
 
-// SetAscentTime sets DiveSummary value.
+// SetDescentTimeScaled is similar to SetDescentTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Time to reach deepest level stop
+func (m *DiveSummary) SetDescentTimeScaled(v float64) *DiveSummary {
+	m.DescentTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAscentTime sets AscentTime value.
 //
 // Scale: 1000; Units: s; Time after leaving bottom until reaching surface
 func (m *DiveSummary) SetAscentTime(v uint32) *DiveSummary {
@@ -507,7 +583,16 @@ func (m *DiveSummary) SetAscentTime(v uint32) *DiveSummary {
 	return m
 }
 
-// SetAvgAscentRate sets DiveSummary value.
+// SetAscentTimeScaled is similar to SetAscentTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Time after leaving bottom until reaching surface
+func (m *DiveSummary) SetAscentTimeScaled(v float64) *DiveSummary {
+	m.AscentTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgAscentRate sets AvgAscentRate value.
 //
 // Scale: 1000; Units: m/s; Average ascent rate, not including descents or stops
 func (m *DiveSummary) SetAvgAscentRate(v int32) *DiveSummary {
@@ -515,7 +600,16 @@ func (m *DiveSummary) SetAvgAscentRate(v int32) *DiveSummary {
 	return m
 }
 
-// SetAvgDescentRate sets DiveSummary value.
+// SetAvgAscentRateScaled is similar to SetAvgAscentRate except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; Average ascent rate, not including descents or stops
+func (m *DiveSummary) SetAvgAscentRateScaled(v float64) *DiveSummary {
+	m.AvgAscentRate = int32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgDescentRate sets AvgDescentRate value.
 //
 // Scale: 1000; Units: m/s; Average descent rate, not including ascents or stops
 func (m *DiveSummary) SetAvgDescentRate(v uint32) *DiveSummary {
@@ -523,7 +617,16 @@ func (m *DiveSummary) SetAvgDescentRate(v uint32) *DiveSummary {
 	return m
 }
 
-// SetMaxAscentRate sets DiveSummary value.
+// SetAvgDescentRateScaled is similar to SetAvgDescentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; Average descent rate, not including ascents or stops
+func (m *DiveSummary) SetAvgDescentRateScaled(v float64) *DiveSummary {
+	m.AvgDescentRate = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxAscentRate sets MaxAscentRate value.
 //
 // Scale: 1000; Units: m/s; Maximum ascent rate
 func (m *DiveSummary) SetMaxAscentRate(v uint32) *DiveSummary {
@@ -531,7 +634,16 @@ func (m *DiveSummary) SetMaxAscentRate(v uint32) *DiveSummary {
 	return m
 }
 
-// SetMaxDescentRate sets DiveSummary value.
+// SetMaxAscentRateScaled is similar to SetMaxAscentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; Maximum ascent rate
+func (m *DiveSummary) SetMaxAscentRateScaled(v float64) *DiveSummary {
+	m.MaxAscentRate = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxDescentRate sets MaxDescentRate value.
 //
 // Scale: 1000; Units: m/s; Maximum descent rate
 func (m *DiveSummary) SetMaxDescentRate(v uint32) *DiveSummary {
@@ -539,11 +651,29 @@ func (m *DiveSummary) SetMaxDescentRate(v uint32) *DiveSummary {
 	return m
 }
 
-// SetHangTime sets DiveSummary value.
+// SetMaxDescentRateScaled is similar to SetMaxDescentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; Maximum descent rate
+func (m *DiveSummary) SetMaxDescentRateScaled(v float64) *DiveSummary {
+	m.MaxDescentRate = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetHangTime sets HangTime value.
 //
 // Scale: 1000; Units: s; Time spent neither ascending nor descending
 func (m *DiveSummary) SetHangTime(v uint32) *DiveSummary {
 	m.HangTime = v
+	return m
+}
+
+// SetHangTimeScaled is similar to SetHangTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Time spent neither ascending nor descending
+func (m *DiveSummary) SetHangTimeScaled(v float64) *DiveSummary {
+	m.HangTime = uint32(scaleoffset.Discard(v, 1000, 0))
 	return m
 }
 

@@ -97,13 +97,13 @@ func (m *HsaStressData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaStressData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaStressData value.
+// SetTimestamp sets Timestamp value.
 func (m *HsaStressData) SetTimestamp(v time.Time) *HsaStressData {
 	m.Timestamp = v
 	return m
 }
 
-// SetProcessingInterval sets HsaStressData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaStressData) SetProcessingInterval(v uint16) *HsaStressData {
@@ -111,7 +111,7 @@ func (m *HsaStressData) SetProcessingInterval(v uint16) *HsaStressData {
 	return m
 }
 
-// SetStressLevel sets HsaStressData value.
+// SetStressLevel sets StressLevel value.
 //
 // Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
 func (m *HsaStressData) SetStressLevel(v []int8) *HsaStressData {

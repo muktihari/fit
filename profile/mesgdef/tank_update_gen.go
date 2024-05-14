@@ -99,9 +99,10 @@ func (m *TankUpdate) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *TankUpdate) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// PressureScaled return Pressure in its scaled value [Scale: 100; Units: bar].
-//
+// PressureScaled return Pressure in its scaled value.
 // If Pressure value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: bar
 func (m *TankUpdate) PressureScaled() float64 {
 	if m.Pressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -109,7 +110,7 @@ func (m *TankUpdate) PressureScaled() float64 {
 	return scaleoffset.Apply(m.Pressure, 100, 0)
 }
 
-// SetTimestamp sets TankUpdate value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *TankUpdate) SetTimestamp(v time.Time) *TankUpdate {
@@ -117,17 +118,26 @@ func (m *TankUpdate) SetTimestamp(v time.Time) *TankUpdate {
 	return m
 }
 
-// SetSensor sets TankUpdate value.
+// SetSensor sets Sensor value.
 func (m *TankUpdate) SetSensor(v typedef.AntChannelId) *TankUpdate {
 	m.Sensor = v
 	return m
 }
 
-// SetPressure sets TankUpdate value.
+// SetPressure sets Pressure value.
 //
 // Scale: 100; Units: bar
 func (m *TankUpdate) SetPressure(v uint16) *TankUpdate {
 	m.Pressure = v
+	return m
+}
+
+// SetPressureScaled is similar to SetPressure except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: bar
+func (m *TankUpdate) SetPressureScaled(v float64) *TankUpdate {
+	m.Pressure = uint16(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 

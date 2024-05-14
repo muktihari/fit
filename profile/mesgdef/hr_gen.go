@@ -130,9 +130,10 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Hr) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
-//
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value.
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+//
+// Scale: 32768; Units: s
 func (m *Hr) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -140,9 +141,10 @@ func (m *Hr) FractionalTimestampScaled() float64 {
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }
 
-// Time256Scaled return Time256 in its scaled value [Scale: 256; Units: s].
-//
+// Time256Scaled return Time256 in its scaled value.
 // If Time256 value is invalid, float64 invalid value will be returned.
+//
+// Scale: 256; Units: s
 func (m *Hr) Time256Scaled() float64 {
 	if m.Time256 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -150,9 +152,10 @@ func (m *Hr) Time256Scaled() float64 {
 	return scaleoffset.Apply(m.Time256, 256, 0)
 }
 
-// EventTimestampScaled return EventTimestamp in its scaled value [Array: [N]; Scale: 1024; Units: s].
-//
+// EventTimestampScaled return EventTimestamp in its scaled value.
 // If EventTimestamp value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1024; Units: s
 func (m *Hr) EventTimestampScaled() []float64 {
 	if m.EventTimestamp == nil {
 		return nil
@@ -160,13 +163,13 @@ func (m *Hr) EventTimestampScaled() []float64 {
 	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
 }
 
-// SetTimestamp sets Hr value.
+// SetTimestamp sets Timestamp value.
 func (m *Hr) SetTimestamp(v time.Time) *Hr {
 	m.Timestamp = v
 	return m
 }
 
-// SetFractionalTimestamp sets Hr value.
+// SetFractionalTimestamp sets FractionalTimestamp value.
 //
 // Scale: 32768; Units: s
 func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
@@ -174,7 +177,16 @@ func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
 	return m
 }
 
-// SetTime256 sets Hr value.
+// SetFractionalTimestampScaled is similar to SetFractionalTimestamp except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 32768; Units: s
+func (m *Hr) SetFractionalTimestampScaled(v float64) *Hr {
+	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	return m
+}
+
+// SetTime256 sets Time256 value.
 //
 // Scale: 256; Units: s
 func (m *Hr) SetTime256(v uint8) *Hr {
@@ -182,7 +194,16 @@ func (m *Hr) SetTime256(v uint8) *Hr {
 	return m
 }
 
-// SetFilteredBpm sets Hr value.
+// SetTime256Scaled is similar to SetTime256 except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 256; Units: s
+func (m *Hr) SetTime256Scaled(v float64) *Hr {
+	m.Time256 = uint8(scaleoffset.Discard(v, 256, 0))
+	return m
+}
+
+// SetFilteredBpm sets FilteredBpm value.
 //
 // Array: [N]; Units: bpm
 func (m *Hr) SetFilteredBpm(v []uint8) *Hr {
@@ -190,7 +211,7 @@ func (m *Hr) SetFilteredBpm(v []uint8) *Hr {
 	return m
 }
 
-// SetEventTimestamp sets Hr value.
+// SetEventTimestamp sets EventTimestamp value.
 //
 // Array: [N]; Scale: 1024; Units: s
 func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
@@ -198,7 +219,16 @@ func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 	return m
 }
 
-// SetEventTimestamp12 sets Hr value.
+// SetEventTimestampScaled is similar to SetEventTimestamp except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1024; Units: s
+func (m *Hr) SetEventTimestampScaled(vs []float64) *Hr {
+	m.EventTimestamp = scaleoffset.DiscardSlice[uint32](vs, 1024, 0)
+	return m
+}
+
+// SetEventTimestamp12 sets EventTimestamp12 value.
 //
 // Array: [N]; Units: s
 func (m *Hr) SetEventTimestamp12(v []byte) *Hr {

@@ -132,9 +132,10 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance along the segment at the described point].
-//
+// DistanceScaled return Distance in its scaled value.
 // If Distance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; Accumulated distance along the segment at the described point
 func (m *SegmentPoint) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -142,9 +143,10 @@ func (m *SegmentPoint) DistanceScaled() float64 {
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
 
-// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
-//
+// AltitudeScaled return Altitude in its scaled value.
 // If Altitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -152,9 +154,10 @@ func (m *SegmentPoint) AltitudeScaled() float64 {
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
 
-// LeaderTimeScaled return LeaderTime in its scaled value [Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.].
-//
+// LeaderTimeScaled return LeaderTime in its scaled value.
 // If LeaderTime value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 func (m *SegmentPoint) LeaderTimeScaled() []float64 {
 	if m.LeaderTime == nil {
 		return nil
@@ -162,9 +165,10 @@ func (m *SegmentPoint) LeaderTimeScaled() []float64 {
 	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
 }
 
-// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point].
-//
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -190,13 +194,13 @@ func (m *SegmentPoint) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetMessageIndex sets SegmentPoint value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SegmentPoint) SetMessageIndex(v typedef.MessageIndex) *SegmentPoint {
 	m.MessageIndex = v
 	return m
 }
 
-// SetPositionLat sets SegmentPoint value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *SegmentPoint) SetPositionLat(v int32) *SegmentPoint {
@@ -204,7 +208,14 @@ func (m *SegmentPoint) SetPositionLat(v int32) *SegmentPoint {
 	return m
 }
 
-// SetPositionLong sets SegmentPoint value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentPoint) SetPositionLatDegrees(degrees float64) *SegmentPoint {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *SegmentPoint) SetPositionLong(v int32) *SegmentPoint {
@@ -212,7 +223,14 @@ func (m *SegmentPoint) SetPositionLong(v int32) *SegmentPoint {
 	return m
 }
 
-// SetDistance sets SegmentPoint value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentPoint) SetPositionLongDegrees(degrees float64) *SegmentPoint {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetDistance sets Distance value.
 //
 // Scale: 100; Units: m; Accumulated distance along the segment at the described point
 func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
@@ -220,7 +238,16 @@ func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
 	return m
 }
 
-// SetAltitude sets SegmentPoint value.
+// SetDistanceScaled is similar to SetDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; Accumulated distance along the segment at the described point
+func (m *SegmentPoint) SetDistanceScaled(v float64) *SegmentPoint {
+	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAltitude sets Altitude value.
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
@@ -228,7 +255,16 @@ func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
 	return m
 }
 
-// SetLeaderTime sets SegmentPoint value.
+// SetAltitudeScaled is similar to SetAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetAltitudeScaled(v float64) *SegmentPoint {
+	m.Altitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetLeaderTime sets LeaderTime value.
 //
 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
@@ -236,11 +272,29 @@ func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
 	return m
 }
 
-// SetEnhancedAltitude sets SegmentPoint value.
+// SetLeaderTimeScaled is similar to SetLeaderTime except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
+func (m *SegmentPoint) SetLeaderTimeScaled(vs []float64) *SegmentPoint {
+	m.LeaderTime = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetEnhancedAltitude sets EnhancedAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
 	m.EnhancedAltitude = v
+	return m
+}
+
+// SetEnhancedAltitudeScaled is similar to SetEnhancedAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
+func (m *SegmentPoint) SetEnhancedAltitudeScaled(v float64) *SegmentPoint {
+	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
 	return m
 }
 

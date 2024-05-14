@@ -171,9 +171,10 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *SplitSummary) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -181,9 +182,10 @@ func (m *SplitSummary) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
-//
+// TotalDistanceScaled return TotalDistance in its scaled value.
 // If TotalDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *SplitSummary) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -191,9 +193,10 @@ func (m *SplitSummary) TotalDistanceScaled() float64 {
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -201,9 +204,10 @@ func (m *SplitSummary) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxSpeedScaled return MaxSpeed in its scaled value.
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -211,9 +215,10 @@ func (m *SplitSummary) MaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
 
-// AvgVertSpeedScaled return AvgVertSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgVertSpeedScaled return AvgVertSpeed in its scaled value.
 // If AvgVertSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 	if m.AvgVertSpeed == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -221,9 +226,10 @@ func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
 }
 
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value.
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *SplitSummary) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -231,25 +237,25 @@ func (m *SplitSummary) TotalMovingTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
 
-// SetMessageIndex sets SplitSummary value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SplitSummary) SetMessageIndex(v typedef.MessageIndex) *SplitSummary {
 	m.MessageIndex = v
 	return m
 }
 
-// SetSplitType sets SplitSummary value.
+// SetSplitType sets SplitType value.
 func (m *SplitSummary) SetSplitType(v typedef.SplitType) *SplitSummary {
 	m.SplitType = v
 	return m
 }
 
-// SetNumSplits sets SplitSummary value.
+// SetNumSplits sets NumSplits value.
 func (m *SplitSummary) SetNumSplits(v uint16) *SplitSummary {
 	m.NumSplits = v
 	return m
 }
 
-// SetTotalTimerTime sets SplitSummary value.
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
@@ -257,7 +263,16 @@ func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
 	return m
 }
 
-// SetTotalDistance sets SplitSummary value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *SplitSummary) SetTotalTimerTimeScaled(v float64) *SplitSummary {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalDistance sets TotalDistance value.
 //
 // Scale: 100; Units: m
 func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
@@ -265,7 +280,16 @@ func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
 	return m
 }
 
-// SetAvgSpeed sets SplitSummary value.
+// SetTotalDistanceScaled is similar to SetTotalDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *SplitSummary) SetTotalDistanceScaled(v float64) *SplitSummary {
+	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
@@ -273,7 +297,16 @@ func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
 	return m
 }
 
-// SetMaxSpeed sets SplitSummary value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SplitSummary) SetAvgSpeedScaled(v float64) *SplitSummary {
+	m.AvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxSpeed sets MaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
@@ -281,7 +314,16 @@ func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
 	return m
 }
 
-// SetTotalAscent sets SplitSummary value.
+// SetMaxSpeedScaled is similar to SetMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SplitSummary) SetMaxSpeedScaled(v float64) *SplitSummary {
+	m.MaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalAscent sets TotalAscent value.
 //
 // Units: m
 func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
@@ -289,7 +331,7 @@ func (m *SplitSummary) SetTotalAscent(v uint16) *SplitSummary {
 	return m
 }
 
-// SetTotalDescent sets SplitSummary value.
+// SetTotalDescent sets TotalDescent value.
 //
 // Units: m
 func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
@@ -297,7 +339,7 @@ func (m *SplitSummary) SetTotalDescent(v uint16) *SplitSummary {
 	return m
 }
 
-// SetAvgHeartRate sets SplitSummary value.
+// SetAvgHeartRate sets AvgHeartRate value.
 //
 // Units: bpm
 func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
@@ -305,7 +347,7 @@ func (m *SplitSummary) SetAvgHeartRate(v uint8) *SplitSummary {
 	return m
 }
 
-// SetMaxHeartRate sets SplitSummary value.
+// SetMaxHeartRate sets MaxHeartRate value.
 //
 // Units: bpm
 func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
@@ -313,7 +355,7 @@ func (m *SplitSummary) SetMaxHeartRate(v uint8) *SplitSummary {
 	return m
 }
 
-// SetAvgVertSpeed sets SplitSummary value.
+// SetAvgVertSpeed sets AvgVertSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
@@ -321,7 +363,16 @@ func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
 	return m
 }
 
-// SetTotalCalories sets SplitSummary value.
+// SetAvgVertSpeedScaled is similar to SetAvgVertSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SplitSummary) SetAvgVertSpeedScaled(v float64) *SplitSummary {
+	m.AvgVertSpeed = int32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalCalories sets TotalCalories value.
 //
 // Units: kcal
 func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
@@ -329,11 +380,20 @@ func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
 	return m
 }
 
-// SetTotalMovingTime sets SplitSummary value.
+// SetTotalMovingTime sets TotalMovingTime value.
 //
 // Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalMovingTime(v uint32) *SplitSummary {
 	m.TotalMovingTime = v
+	return m
+}
+
+// SetTotalMovingTimeScaled is similar to SetTotalMovingTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *SplitSummary) SetTotalMovingTimeScaled(v float64) *SplitSummary {
+	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
 	return m
 }
 

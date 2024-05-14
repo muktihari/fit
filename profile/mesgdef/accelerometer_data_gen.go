@@ -160,7 +160,7 @@ func (m *AccelerometerData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *AccelerometerData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets AccelerometerData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *AccelerometerData) SetTimestamp(v time.Time) *AccelerometerData {
@@ -168,7 +168,7 @@ func (m *AccelerometerData) SetTimestamp(v time.Time) *AccelerometerData {
 	return m
 }
 
-// SetTimestampMs sets AccelerometerData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
@@ -176,7 +176,7 @@ func (m *AccelerometerData) SetTimestampMs(v uint16) *AccelerometerData {
 	return m
 }
 
-// SetSampleTimeOffset sets AccelerometerData value.
+// SetSampleTimeOffset sets SampleTimeOffset value.
 //
 // Array: [N]; Units: ms; Each time in the array describes the time at which the accelerometer sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in accel_x and accel_y and accel_z
 func (m *AccelerometerData) SetSampleTimeOffset(v []uint16) *AccelerometerData {
@@ -184,7 +184,7 @@ func (m *AccelerometerData) SetSampleTimeOffset(v []uint16) *AccelerometerData {
 	return m
 }
 
-// SetAccelX sets AccelerometerData value.
+// SetAccelX sets AccelX value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *AccelerometerData) SetAccelX(v []uint16) *AccelerometerData {
@@ -192,7 +192,7 @@ func (m *AccelerometerData) SetAccelX(v []uint16) *AccelerometerData {
 	return m
 }
 
-// SetAccelY sets AccelerometerData value.
+// SetAccelY sets AccelY value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *AccelerometerData) SetAccelY(v []uint16) *AccelerometerData {
@@ -200,7 +200,7 @@ func (m *AccelerometerData) SetAccelY(v []uint16) *AccelerometerData {
 	return m
 }
 
-// SetAccelZ sets AccelerometerData value.
+// SetAccelZ sets AccelZ value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *AccelerometerData) SetAccelZ(v []uint16) *AccelerometerData {
@@ -208,7 +208,7 @@ func (m *AccelerometerData) SetAccelZ(v []uint16) *AccelerometerData {
 	return m
 }
 
-// SetCalibratedAccelX sets AccelerometerData value.
+// SetCalibratedAccelX sets CalibratedAccelX value.
 //
 // Array: [N]; Units: g; Calibrated accel reading
 func (m *AccelerometerData) SetCalibratedAccelX(v []float32) *AccelerometerData {
@@ -216,7 +216,7 @@ func (m *AccelerometerData) SetCalibratedAccelX(v []float32) *AccelerometerData 
 	return m
 }
 
-// SetCalibratedAccelY sets AccelerometerData value.
+// SetCalibratedAccelY sets CalibratedAccelY value.
 //
 // Array: [N]; Units: g; Calibrated accel reading
 func (m *AccelerometerData) SetCalibratedAccelY(v []float32) *AccelerometerData {
@@ -224,7 +224,7 @@ func (m *AccelerometerData) SetCalibratedAccelY(v []float32) *AccelerometerData 
 	return m
 }
 
-// SetCalibratedAccelZ sets AccelerometerData value.
+// SetCalibratedAccelZ sets CalibratedAccelZ value.
 //
 // Array: [N]; Units: g; Calibrated accel reading
 func (m *AccelerometerData) SetCalibratedAccelZ(v []float32) *AccelerometerData {
@@ -232,7 +232,7 @@ func (m *AccelerometerData) SetCalibratedAccelZ(v []float32) *AccelerometerData 
 	return m
 }
 
-// SetCompressedCalibratedAccelX sets AccelerometerData value.
+// SetCompressedCalibratedAccelX sets CompressedCalibratedAccelX value.
 //
 // Array: [N]; Units: mG; Calibrated accel reading
 func (m *AccelerometerData) SetCompressedCalibratedAccelX(v []int16) *AccelerometerData {
@@ -240,7 +240,7 @@ func (m *AccelerometerData) SetCompressedCalibratedAccelX(v []int16) *Accelerome
 	return m
 }
 
-// SetCompressedCalibratedAccelY sets AccelerometerData value.
+// SetCompressedCalibratedAccelY sets CompressedCalibratedAccelY value.
 //
 // Array: [N]; Units: mG; Calibrated accel reading
 func (m *AccelerometerData) SetCompressedCalibratedAccelY(v []int16) *AccelerometerData {
@@ -248,7 +248,7 @@ func (m *AccelerometerData) SetCompressedCalibratedAccelY(v []int16) *Accelerome
 	return m
 }
 
-// SetCompressedCalibratedAccelZ sets AccelerometerData value.
+// SetCompressedCalibratedAccelZ sets CompressedCalibratedAccelZ value.
 //
 // Array: [N]; Units: mG; Calibrated accel reading
 func (m *AccelerometerData) SetCompressedCalibratedAccelZ(v []int16) *AccelerometerData {

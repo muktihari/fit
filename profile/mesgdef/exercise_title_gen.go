@@ -99,25 +99,25 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets ExerciseTitle value.
+// SetMessageIndex sets MessageIndex value.
 func (m *ExerciseTitle) SetMessageIndex(v typedef.MessageIndex) *ExerciseTitle {
 	m.MessageIndex = v
 	return m
 }
 
-// SetExerciseCategory sets ExerciseTitle value.
+// SetExerciseCategory sets ExerciseCategory value.
 func (m *ExerciseTitle) SetExerciseCategory(v typedef.ExerciseCategory) *ExerciseTitle {
 	m.ExerciseCategory = v
 	return m
 }
 
-// SetExerciseName sets ExerciseTitle value.
+// SetExerciseName sets ExerciseName value.
 func (m *ExerciseTitle) SetExerciseName(v uint16) *ExerciseTitle {
 	m.ExerciseName = v
 	return m
 }
 
-// SetWktStepName sets ExerciseTitle value.
+// SetWktStepName sets WktStepName value.
 //
 // Array: [N]
 func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {

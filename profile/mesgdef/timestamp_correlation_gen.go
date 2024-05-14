@@ -137,9 +137,10 @@ func (m *TimestampCorrelation) LocalTimestampUint32() uint32 {
 	return datetime.ToUint32(m.LocalTimestamp)
 }
 
-// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.].
-//
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value.
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+//
+// Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
 func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -147,9 +148,10 @@ func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }
 
-// FractionalSystemTimestampScaled return FractionalSystemTimestamp in its scaled value [Scale: 32768; Units: s; Fractional part of the system timestamp].
-//
+// FractionalSystemTimestampScaled return FractionalSystemTimestamp in its scaled value.
 // If FractionalSystemTimestamp value is invalid, float64 invalid value will be returned.
+//
+// Scale: 32768; Units: s; Fractional part of the system timestamp
 func (m *TimestampCorrelation) FractionalSystemTimestampScaled() float64 {
 	if m.FractionalSystemTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -157,7 +159,7 @@ func (m *TimestampCorrelation) FractionalSystemTimestampScaled() float64 {
 	return scaleoffset.Apply(m.FractionalSystemTimestamp, 32768, 0)
 }
 
-// SetTimestamp sets TimestampCorrelation value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of UTC timestamp at the time the system timestamp was recorded.
 func (m *TimestampCorrelation) SetTimestamp(v time.Time) *TimestampCorrelation {
@@ -165,7 +167,7 @@ func (m *TimestampCorrelation) SetTimestamp(v time.Time) *TimestampCorrelation {
 	return m
 }
 
-// SetFractionalTimestamp sets TimestampCorrelation value.
+// SetFractionalTimestamp sets FractionalTimestamp value.
 //
 // Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
 func (m *TimestampCorrelation) SetFractionalTimestamp(v uint16) *TimestampCorrelation {
@@ -173,7 +175,16 @@ func (m *TimestampCorrelation) SetFractionalTimestamp(v uint16) *TimestampCorrel
 	return m
 }
 
-// SetSystemTimestamp sets TimestampCorrelation value.
+// SetFractionalTimestampScaled is similar to SetFractionalTimestamp except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
+func (m *TimestampCorrelation) SetFractionalTimestampScaled(v float64) *TimestampCorrelation {
+	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	return m
+}
+
+// SetSystemTimestamp sets SystemTimestamp value.
 //
 // Units: s; Whole second part of the system timestamp
 func (m *TimestampCorrelation) SetSystemTimestamp(v time.Time) *TimestampCorrelation {
@@ -181,7 +192,7 @@ func (m *TimestampCorrelation) SetSystemTimestamp(v time.Time) *TimestampCorrela
 	return m
 }
 
-// SetFractionalSystemTimestamp sets TimestampCorrelation value.
+// SetFractionalSystemTimestamp sets FractionalSystemTimestamp value.
 //
 // Scale: 32768; Units: s; Fractional part of the system timestamp
 func (m *TimestampCorrelation) SetFractionalSystemTimestamp(v uint16) *TimestampCorrelation {
@@ -189,7 +200,16 @@ func (m *TimestampCorrelation) SetFractionalSystemTimestamp(v uint16) *Timestamp
 	return m
 }
 
-// SetLocalTimestamp sets TimestampCorrelation value.
+// SetFractionalSystemTimestampScaled is similar to SetFractionalSystemTimestamp except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 32768; Units: s; Fractional part of the system timestamp
+func (m *TimestampCorrelation) SetFractionalSystemTimestampScaled(v float64) *TimestampCorrelation {
+	m.FractionalSystemTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	return m
+}
+
+// SetLocalTimestamp sets LocalTimestamp value.
 //
 // Units: s; timestamp epoch expressed in local time used to convert timestamps to local time
 func (m *TimestampCorrelation) SetLocalTimestamp(v time.Time) *TimestampCorrelation {
@@ -197,7 +217,7 @@ func (m *TimestampCorrelation) SetLocalTimestamp(v time.Time) *TimestampCorrelat
 	return m
 }
 
-// SetTimestampMs sets TimestampCorrelation value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the UTC timestamp at the time the system timestamp was recorded.
 func (m *TimestampCorrelation) SetTimestampMs(v uint16) *TimestampCorrelation {
@@ -205,7 +225,7 @@ func (m *TimestampCorrelation) SetTimestampMs(v uint16) *TimestampCorrelation {
 	return m
 }
 
-// SetSystemTimestampMs sets TimestampCorrelation value.
+// SetSystemTimestampMs sets SystemTimestampMs value.
 //
 // Units: ms; Millisecond part of the system timestamp
 func (m *TimestampCorrelation) SetSystemTimestampMs(v uint16) *TimestampCorrelation {

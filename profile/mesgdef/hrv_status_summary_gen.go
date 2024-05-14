@@ -134,9 +134,10 @@ func (m *HrvStatusSummary) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HrvStatusSummary) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// WeeklyAverageScaled return WeeklyAverage in its scaled value [Scale: 128; Units: ms; 7 day RMSSD average over sleep].
-//
+// WeeklyAverageScaled return WeeklyAverage in its scaled value.
 // If WeeklyAverage value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 7 day RMSSD average over sleep
 func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
 	if m.WeeklyAverage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -144,9 +145,10 @@ func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
 	return scaleoffset.Apply(m.WeeklyAverage, 128, 0)
 }
 
-// LastNightAverageScaled return LastNightAverage in its scaled value [Scale: 128; Units: ms; Last night RMSSD average over sleep].
-//
+// LastNightAverageScaled return LastNightAverage in its scaled value.
 // If LastNightAverage value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; Last night RMSSD average over sleep
 func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
 	if m.LastNightAverage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -154,9 +156,10 @@ func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
 	return scaleoffset.Apply(m.LastNightAverage, 128, 0)
 }
 
-// LastNight5MinHighScaled return LastNight5MinHigh in its scaled value [Scale: 128; Units: ms; 5 minute high RMSSD value over sleep].
-//
+// LastNight5MinHighScaled return LastNight5MinHigh in its scaled value.
 // If LastNight5MinHigh value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
 func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
 	if m.LastNight5MinHigh == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -164,9 +167,10 @@ func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
 	return scaleoffset.Apply(m.LastNight5MinHigh, 128, 0)
 }
 
-// BaselineLowUpperScaled return BaselineLowUpper in its scaled value [Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status].
-//
+// BaselineLowUpperScaled return BaselineLowUpper in its scaled value.
 // If BaselineLowUpper value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status
 func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
 	if m.BaselineLowUpper == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -174,9 +178,10 @@ func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
 	return scaleoffset.Apply(m.BaselineLowUpper, 128, 0)
 }
 
-// BaselineBalancedLowerScaled return BaselineBalancedLower in its scaled value [Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status].
-//
+// BaselineBalancedLowerScaled return BaselineBalancedLower in its scaled value.
 // If BaselineBalancedLower value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
 func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
 	if m.BaselineBalancedLower == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -184,9 +189,10 @@ func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
 	return scaleoffset.Apply(m.BaselineBalancedLower, 128, 0)
 }
 
-// BaselineBalancedUpperScaled return BaselineBalancedUpper in its scaled value [Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status].
-//
+// BaselineBalancedUpperScaled return BaselineBalancedUpper in its scaled value.
 // If BaselineBalancedUpper value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
 func (m *HrvStatusSummary) BaselineBalancedUpperScaled() float64 {
 	if m.BaselineBalancedUpper == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -194,13 +200,13 @@ func (m *HrvStatusSummary) BaselineBalancedUpperScaled() float64 {
 	return scaleoffset.Apply(m.BaselineBalancedUpper, 128, 0)
 }
 
-// SetTimestamp sets HrvStatusSummary value.
+// SetTimestamp sets Timestamp value.
 func (m *HrvStatusSummary) SetTimestamp(v time.Time) *HrvStatusSummary {
 	m.Timestamp = v
 	return m
 }
 
-// SetWeeklyAverage sets HrvStatusSummary value.
+// SetWeeklyAverage sets WeeklyAverage value.
 //
 // Scale: 128; Units: ms; 7 day RMSSD average over sleep
 func (m *HrvStatusSummary) SetWeeklyAverage(v uint16) *HrvStatusSummary {
@@ -208,7 +214,16 @@ func (m *HrvStatusSummary) SetWeeklyAverage(v uint16) *HrvStatusSummary {
 	return m
 }
 
-// SetLastNightAverage sets HrvStatusSummary value.
+// SetWeeklyAverageScaled is similar to SetWeeklyAverage except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 7 day RMSSD average over sleep
+func (m *HrvStatusSummary) SetWeeklyAverageScaled(v float64) *HrvStatusSummary {
+	m.WeeklyAverage = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetLastNightAverage sets LastNightAverage value.
 //
 // Scale: 128; Units: ms; Last night RMSSD average over sleep
 func (m *HrvStatusSummary) SetLastNightAverage(v uint16) *HrvStatusSummary {
@@ -216,7 +231,16 @@ func (m *HrvStatusSummary) SetLastNightAverage(v uint16) *HrvStatusSummary {
 	return m
 }
 
-// SetLastNight5MinHigh sets HrvStatusSummary value.
+// SetLastNightAverageScaled is similar to SetLastNightAverage except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; Last night RMSSD average over sleep
+func (m *HrvStatusSummary) SetLastNightAverageScaled(v float64) *HrvStatusSummary {
+	m.LastNightAverage = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetLastNight5MinHigh sets LastNight5MinHigh value.
 //
 // Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
 func (m *HrvStatusSummary) SetLastNight5MinHigh(v uint16) *HrvStatusSummary {
@@ -224,7 +248,16 @@ func (m *HrvStatusSummary) SetLastNight5MinHigh(v uint16) *HrvStatusSummary {
 	return m
 }
 
-// SetBaselineLowUpper sets HrvStatusSummary value.
+// SetLastNight5MinHighScaled is similar to SetLastNight5MinHigh except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
+func (m *HrvStatusSummary) SetLastNight5MinHighScaled(v float64) *HrvStatusSummary {
+	m.LastNight5MinHigh = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetBaselineLowUpper sets BaselineLowUpper value.
 //
 // Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status
 func (m *HrvStatusSummary) SetBaselineLowUpper(v uint16) *HrvStatusSummary {
@@ -232,7 +265,16 @@ func (m *HrvStatusSummary) SetBaselineLowUpper(v uint16) *HrvStatusSummary {
 	return m
 }
 
-// SetBaselineBalancedLower sets HrvStatusSummary value.
+// SetBaselineLowUpperScaled is similar to SetBaselineLowUpper except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status
+func (m *HrvStatusSummary) SetBaselineLowUpperScaled(v float64) *HrvStatusSummary {
+	m.BaselineLowUpper = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetBaselineBalancedLower sets BaselineBalancedLower value.
 //
 // Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
 func (m *HrvStatusSummary) SetBaselineBalancedLower(v uint16) *HrvStatusSummary {
@@ -240,7 +282,16 @@ func (m *HrvStatusSummary) SetBaselineBalancedLower(v uint16) *HrvStatusSummary 
 	return m
 }
 
-// SetBaselineBalancedUpper sets HrvStatusSummary value.
+// SetBaselineBalancedLowerScaled is similar to SetBaselineBalancedLower except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
+func (m *HrvStatusSummary) SetBaselineBalancedLowerScaled(v float64) *HrvStatusSummary {
+	m.BaselineBalancedLower = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetBaselineBalancedUpper sets BaselineBalancedUpper value.
 //
 // Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
 func (m *HrvStatusSummary) SetBaselineBalancedUpper(v uint16) *HrvStatusSummary {
@@ -248,7 +299,16 @@ func (m *HrvStatusSummary) SetBaselineBalancedUpper(v uint16) *HrvStatusSummary 
 	return m
 }
 
-// SetStatus sets HrvStatusSummary value.
+// SetBaselineBalancedUpperScaled is similar to SetBaselineBalancedUpper except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
+func (m *HrvStatusSummary) SetBaselineBalancedUpperScaled(v float64) *HrvStatusSummary {
+	m.BaselineBalancedUpper = uint16(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetStatus sets Status value.
 func (m *HrvStatusSummary) SetStatus(v typedef.HrvStatus) *HrvStatusSummary {
 	m.Status = v
 	return m

@@ -163,9 +163,10 @@ func (m *Set) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Set) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// DurationScaled return Duration in its scaled value [Scale: 1000; Units: s].
-//
+// DurationScaled return Duration in its scaled value.
 // If Duration value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Set) DurationScaled() float64 {
 	if m.Duration == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -173,9 +174,10 @@ func (m *Set) DurationScaled() float64 {
 	return scaleoffset.Apply(m.Duration, 1000, 0)
 }
 
-// WeightScaled return Weight in its scaled value [Scale: 16; Units: kg; Amount of weight applied for the set].
-//
+// WeightScaled return Weight in its scaled value.
 // If Weight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 16; Units: kg; Amount of weight applied for the set
 func (m *Set) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -183,7 +185,7 @@ func (m *Set) WeightScaled() float64 {
 	return scaleoffset.Apply(m.Weight, 16, 0)
 }
 
-// SetTimestamp sets Set value.
+// SetTimestamp sets Timestamp value.
 //
 // Timestamp of the set
 func (m *Set) SetTimestamp(v time.Time) *Set {
@@ -191,7 +193,7 @@ func (m *Set) SetTimestamp(v time.Time) *Set {
 	return m
 }
 
-// SetDuration sets Set value.
+// SetDuration sets Duration value.
 //
 // Scale: 1000; Units: s
 func (m *Set) SetDuration(v uint32) *Set {
@@ -199,7 +201,16 @@ func (m *Set) SetDuration(v uint32) *Set {
 	return m
 }
 
-// SetRepetitions sets Set value.
+// SetDurationScaled is similar to SetDuration except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Set) SetDurationScaled(v float64) *Set {
+	m.Duration = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetRepetitions sets Repetitions value.
 //
 // # of repitions of the movement
 func (m *Set) SetRepetitions(v uint16) *Set {
@@ -207,7 +218,7 @@ func (m *Set) SetRepetitions(v uint16) *Set {
 	return m
 }
 
-// SetWeight sets Set value.
+// SetWeight sets Weight value.
 //
 // Scale: 16; Units: kg; Amount of weight applied for the set
 func (m *Set) SetWeight(v uint16) *Set {
@@ -215,13 +226,22 @@ func (m *Set) SetWeight(v uint16) *Set {
 	return m
 }
 
-// SetSetType sets Set value.
+// SetWeightScaled is similar to SetWeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 16; Units: kg; Amount of weight applied for the set
+func (m *Set) SetWeightScaled(v float64) *Set {
+	m.Weight = uint16(scaleoffset.Discard(v, 16, 0))
+	return m
+}
+
+// SetSetType sets SetType value.
 func (m *Set) SetSetType(v typedef.SetType) *Set {
 	m.SetType = v
 	return m
 }
 
-// SetStartTime sets Set value.
+// SetStartTime sets StartTime value.
 //
 // Start time of the set
 func (m *Set) SetStartTime(v time.Time) *Set {
@@ -229,7 +249,7 @@ func (m *Set) SetStartTime(v time.Time) *Set {
 	return m
 }
 
-// SetCategory sets Set value.
+// SetCategory sets Category value.
 //
 // Array: [N]
 func (m *Set) SetCategory(v []typedef.ExerciseCategory) *Set {
@@ -237,7 +257,7 @@ func (m *Set) SetCategory(v []typedef.ExerciseCategory) *Set {
 	return m
 }
 
-// SetCategorySubtype sets Set value.
+// SetCategorySubtype sets CategorySubtype value.
 //
 // Array: [N]; Based on the associated category, see [category]_exercise_names
 func (m *Set) SetCategorySubtype(v []uint16) *Set {
@@ -245,19 +265,19 @@ func (m *Set) SetCategorySubtype(v []uint16) *Set {
 	return m
 }
 
-// SetWeightDisplayUnit sets Set value.
+// SetWeightDisplayUnit sets WeightDisplayUnit value.
 func (m *Set) SetWeightDisplayUnit(v typedef.FitBaseUnit) *Set {
 	m.WeightDisplayUnit = v
 	return m
 }
 
-// SetMessageIndex sets Set value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Set) SetMessageIndex(v typedef.MessageIndex) *Set {
 	m.MessageIndex = v
 	return m
 }
 
-// SetWktStepIndex sets Set value.
+// SetWktStepIndex sets WktStepIndex value.
 func (m *Set) SetWktStepIndex(v typedef.MessageIndex) *Set {
 	m.WktStepIndex = v
 	return m

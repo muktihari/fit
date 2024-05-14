@@ -142,7 +142,7 @@ func (m *ObdiiData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timest
 // StartTimestampUint32 returns StartTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *ObdiiData) StartTimestampUint32() uint32 { return datetime.ToUint32(m.StartTimestamp) }
 
-// SetTimestamp sets ObdiiData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Timestamp message was output
 func (m *ObdiiData) SetTimestamp(v time.Time) *ObdiiData {
@@ -150,7 +150,7 @@ func (m *ObdiiData) SetTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
-// SetTimestampMs sets ObdiiData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Fractional part of timestamp, added to timestamp
 func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
@@ -158,7 +158,7 @@ func (m *ObdiiData) SetTimestampMs(v uint16) *ObdiiData {
 	return m
 }
 
-// SetTimeOffset sets ObdiiData value.
+// SetTimeOffset sets TimeOffset value.
 //
 // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span across seconds.
 func (m *ObdiiData) SetTimeOffset(v []uint16) *ObdiiData {
@@ -166,7 +166,7 @@ func (m *ObdiiData) SetTimeOffset(v []uint16) *ObdiiData {
 	return m
 }
 
-// SetPid sets ObdiiData value.
+// SetPid sets Pid value.
 //
 // Parameter ID
 func (m *ObdiiData) SetPid(v byte) *ObdiiData {
@@ -174,7 +174,7 @@ func (m *ObdiiData) SetPid(v byte) *ObdiiData {
 	return m
 }
 
-// SetRawData sets ObdiiData value.
+// SetRawData sets RawData value.
 //
 // Array: [N]; Raw parameter data
 func (m *ObdiiData) SetRawData(v []byte) *ObdiiData {
@@ -182,7 +182,7 @@ func (m *ObdiiData) SetRawData(v []byte) *ObdiiData {
 	return m
 }
 
-// SetPidDataSize sets ObdiiData value.
+// SetPidDataSize sets PidDataSize value.
 //
 // Array: [N]; Optional, data size of PID[i]. If not specified refer to SAE J1979.
 func (m *ObdiiData) SetPidDataSize(v []uint8) *ObdiiData {
@@ -190,7 +190,7 @@ func (m *ObdiiData) SetPidDataSize(v []uint8) *ObdiiData {
 	return m
 }
 
-// SetSystemTime sets ObdiiData value.
+// SetSystemTime sets SystemTime value.
 //
 // Array: [N]; System time associated with sample expressed in ms, can be used instead of time_offset. There will be a system_time value for each raw_data element. For multibyte pids the system_time is repeated.
 func (m *ObdiiData) SetSystemTime(v []uint32) *ObdiiData {
@@ -198,7 +198,7 @@ func (m *ObdiiData) SetSystemTime(v []uint32) *ObdiiData {
 	return m
 }
 
-// SetStartTimestamp sets ObdiiData value.
+// SetStartTimestamp sets StartTimestamp value.
 //
 // Timestamp of first sample recorded in the message. Used with time_offset to generate time of each sample
 func (m *ObdiiData) SetStartTimestamp(v time.Time) *ObdiiData {
@@ -206,7 +206,7 @@ func (m *ObdiiData) SetStartTimestamp(v time.Time) *ObdiiData {
 	return m
 }
 
-// SetStartTimestampMs sets ObdiiData value.
+// SetStartTimestampMs sets StartTimestampMs value.
 //
 // Units: ms; Fractional part of start_timestamp
 func (m *ObdiiData) SetStartTimestampMs(v uint16) *ObdiiData {

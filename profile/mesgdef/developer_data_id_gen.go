@@ -96,7 +96,7 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetDeveloperId sets DeveloperDataId value.
+// SetDeveloperId sets DeveloperId value.
 //
 // Array: [N]
 func (m *DeveloperDataId) SetDeveloperId(v []byte) *DeveloperDataId {
@@ -104,7 +104,7 @@ func (m *DeveloperDataId) SetDeveloperId(v []byte) *DeveloperDataId {
 	return m
 }
 
-// SetApplicationId sets DeveloperDataId value.
+// SetApplicationId sets ApplicationId value.
 //
 // Array: [N]
 func (m *DeveloperDataId) SetApplicationId(v []byte) *DeveloperDataId {
@@ -112,19 +112,19 @@ func (m *DeveloperDataId) SetApplicationId(v []byte) *DeveloperDataId {
 	return m
 }
 
-// SetManufacturerId sets DeveloperDataId value.
+// SetManufacturerId sets ManufacturerId value.
 func (m *DeveloperDataId) SetManufacturerId(v typedef.Manufacturer) *DeveloperDataId {
 	m.ManufacturerId = v
 	return m
 }
 
-// SetDeveloperDataIndex sets DeveloperDataId value.
+// SetDeveloperDataIndex sets DeveloperDataIndex value.
 func (m *DeveloperDataId) SetDeveloperDataIndex(v uint8) *DeveloperDataId {
 	m.DeveloperDataIndex = v
 	return m
 }
 
-// SetApplicationVersion sets DeveloperDataId value.
+// SetApplicationVersion sets ApplicationVersion value.
 func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
 	m.ApplicationVersion = v
 	return m

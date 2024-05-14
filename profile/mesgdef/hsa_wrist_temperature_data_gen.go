@@ -98,9 +98,10 @@ func (m *HsaWristTemperatureData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaWristTemperatureData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// ValueScaled return Value in its scaled value [Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading].
-//
+// ValueScaled return Value in its scaled value.
 // If Value value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
 func (m *HsaWristTemperatureData) ValueScaled() []float64 {
 	if m.Value == nil {
 		return nil
@@ -108,7 +109,7 @@ func (m *HsaWristTemperatureData) ValueScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Value, 1000, 0)
 }
 
-// SetTimestamp sets HsaWristTemperatureData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaWristTemperatureData) SetTimestamp(v time.Time) *HsaWristTemperatureData {
@@ -116,7 +117,7 @@ func (m *HsaWristTemperatureData) SetTimestamp(v time.Time) *HsaWristTemperature
 	return m
 }
 
-// SetProcessingInterval sets HsaWristTemperatureData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaWristTemperatureData) SetProcessingInterval(v uint16) *HsaWristTemperatureData {
@@ -124,11 +125,20 @@ func (m *HsaWristTemperatureData) SetProcessingInterval(v uint16) *HsaWristTempe
 	return m
 }
 
-// SetValue sets HsaWristTemperatureData value.
+// SetValue sets Value value.
 //
 // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
 func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData {
 	m.Value = v
+	return m
+}
+
+// SetValueScaled is similar to SetValue except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+func (m *HsaWristTemperatureData) SetValueScaled(vs []float64) *HsaWristTemperatureData {
+	m.Value = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
 	return m
 }
 

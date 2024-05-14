@@ -106,31 +106,31 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMaxHeartRate sets ZonesTarget value.
+// SetMaxHeartRate sets MaxHeartRate value.
 func (m *ZonesTarget) SetMaxHeartRate(v uint8) *ZonesTarget {
 	m.MaxHeartRate = v
 	return m
 }
 
-// SetThresholdHeartRate sets ZonesTarget value.
+// SetThresholdHeartRate sets ThresholdHeartRate value.
 func (m *ZonesTarget) SetThresholdHeartRate(v uint8) *ZonesTarget {
 	m.ThresholdHeartRate = v
 	return m
 }
 
-// SetFunctionalThresholdPower sets ZonesTarget value.
+// SetFunctionalThresholdPower sets FunctionalThresholdPower value.
 func (m *ZonesTarget) SetFunctionalThresholdPower(v uint16) *ZonesTarget {
 	m.FunctionalThresholdPower = v
 	return m
 }
 
-// SetHrCalcType sets ZonesTarget value.
+// SetHrCalcType sets HrCalcType value.
 func (m *ZonesTarget) SetHrCalcType(v typedef.HrZoneCalc) *ZonesTarget {
 	m.HrCalcType = v
 	return m
 }
 
-// SetPwrCalcType sets ZonesTarget value.
+// SetPwrCalcType sets PwrCalcType value.
 func (m *ZonesTarget) SetPwrCalcType(v typedef.PwrZoneCalc) *ZonesTarget {
 	m.PwrCalcType = v
 	return m

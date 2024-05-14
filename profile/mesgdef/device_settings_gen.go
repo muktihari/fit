@@ -250,9 +250,10 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 // ClockTimeUint32 returns ClockTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DeviceSettings) ClockTimeUint32() uint32 { return datetime.ToUint32(m.ClockTime) }
 
-// TimeZoneOffsetScaled return TimeZoneOffset in its scaled value [Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments].
-//
+// TimeZoneOffsetScaled return TimeZoneOffset in its scaled value.
 // If TimeZoneOffset value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
 func (m *DeviceSettings) TimeZoneOffsetScaled() []float64 {
 	if m.TimeZoneOffset == nil {
 		return nil
@@ -260,7 +261,7 @@ func (m *DeviceSettings) TimeZoneOffsetScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeZoneOffset, 4, 0)
 }
 
-// SetActiveTimeZone sets DeviceSettings value.
+// SetActiveTimeZone sets ActiveTimeZone value.
 //
 // Index into time zone arrays.
 func (m *DeviceSettings) SetActiveTimeZone(v uint8) *DeviceSettings {
@@ -268,7 +269,7 @@ func (m *DeviceSettings) SetActiveTimeZone(v uint8) *DeviceSettings {
 	return m
 }
 
-// SetUtcOffset sets DeviceSettings value.
+// SetUtcOffset sets UtcOffset value.
 //
 // Offset from system time. Required to convert timestamp from system time to UTC.
 func (m *DeviceSettings) SetUtcOffset(v uint32) *DeviceSettings {
@@ -276,7 +277,7 @@ func (m *DeviceSettings) SetUtcOffset(v uint32) *DeviceSettings {
 	return m
 }
 
-// SetTimeOffset sets DeviceSettings value.
+// SetTimeOffset sets TimeOffset value.
 //
 // Array: [N]; Units: s; Offset from system time.
 func (m *DeviceSettings) SetTimeOffset(v []uint32) *DeviceSettings {
@@ -284,7 +285,7 @@ func (m *DeviceSettings) SetTimeOffset(v []uint32) *DeviceSettings {
 	return m
 }
 
-// SetTimeMode sets DeviceSettings value.
+// SetTimeMode sets TimeMode value.
 //
 // Array: [N]; Display mode for the time
 func (m *DeviceSettings) SetTimeMode(v []typedef.TimeMode) *DeviceSettings {
@@ -292,7 +293,7 @@ func (m *DeviceSettings) SetTimeMode(v []typedef.TimeMode) *DeviceSettings {
 	return m
 }
 
-// SetTimeZoneOffset sets DeviceSettings value.
+// SetTimeZoneOffset sets TimeZoneOffset value.
 //
 // Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
 func (m *DeviceSettings) SetTimeZoneOffset(v []int8) *DeviceSettings {
@@ -300,7 +301,16 @@ func (m *DeviceSettings) SetTimeZoneOffset(v []int8) *DeviceSettings {
 	return m
 }
 
-// SetBacklightMode sets DeviceSettings value.
+// SetTimeZoneOffsetScaled is similar to SetTimeZoneOffset except it accepts a scaled value.
+// This method automatically converts the given value to its []int8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
+func (m *DeviceSettings) SetTimeZoneOffsetScaled(vs []float64) *DeviceSettings {
+	m.TimeZoneOffset = scaleoffset.DiscardSlice[int8](vs, 4, 0)
+	return m
+}
+
+// SetBacklightMode sets BacklightMode value.
 //
 // Mode for backlight
 func (m *DeviceSettings) SetBacklightMode(v typedef.BacklightMode) *DeviceSettings {
@@ -308,7 +318,7 @@ func (m *DeviceSettings) SetBacklightMode(v typedef.BacklightMode) *DeviceSettin
 	return m
 }
 
-// SetActivityTrackerEnabled sets DeviceSettings value.
+// SetActivityTrackerEnabled sets ActivityTrackerEnabled value.
 //
 // Enabled state of the activity tracker functionality
 func (m *DeviceSettings) SetActivityTrackerEnabled(v bool) *DeviceSettings {
@@ -316,7 +326,7 @@ func (m *DeviceSettings) SetActivityTrackerEnabled(v bool) *DeviceSettings {
 	return m
 }
 
-// SetClockTime sets DeviceSettings value.
+// SetClockTime sets ClockTime value.
 //
 // UTC timestamp used to set the devices clock and date
 func (m *DeviceSettings) SetClockTime(v time.Time) *DeviceSettings {
@@ -324,7 +334,7 @@ func (m *DeviceSettings) SetClockTime(v time.Time) *DeviceSettings {
 	return m
 }
 
-// SetPagesEnabled sets DeviceSettings value.
+// SetPagesEnabled sets PagesEnabled value.
 //
 // Array: [N]; Bitfield to configure enabled screens for each supported loop
 func (m *DeviceSettings) SetPagesEnabled(v []uint16) *DeviceSettings {
@@ -332,7 +342,7 @@ func (m *DeviceSettings) SetPagesEnabled(v []uint16) *DeviceSettings {
 	return m
 }
 
-// SetMoveAlertEnabled sets DeviceSettings value.
+// SetMoveAlertEnabled sets MoveAlertEnabled value.
 //
 // Enabled state of the move alert
 func (m *DeviceSettings) SetMoveAlertEnabled(v bool) *DeviceSettings {
@@ -340,7 +350,7 @@ func (m *DeviceSettings) SetMoveAlertEnabled(v bool) *DeviceSettings {
 	return m
 }
 
-// SetDateMode sets DeviceSettings value.
+// SetDateMode sets DateMode value.
 //
 // Display mode for the date
 func (m *DeviceSettings) SetDateMode(v typedef.DateMode) *DeviceSettings {
@@ -348,19 +358,19 @@ func (m *DeviceSettings) SetDateMode(v typedef.DateMode) *DeviceSettings {
 	return m
 }
 
-// SetDisplayOrientation sets DeviceSettings value.
+// SetDisplayOrientation sets DisplayOrientation value.
 func (m *DeviceSettings) SetDisplayOrientation(v typedef.DisplayOrientation) *DeviceSettings {
 	m.DisplayOrientation = v
 	return m
 }
 
-// SetMountingSide sets DeviceSettings value.
+// SetMountingSide sets MountingSide value.
 func (m *DeviceSettings) SetMountingSide(v typedef.Side) *DeviceSettings {
 	m.MountingSide = v
 	return m
 }
 
-// SetDefaultPage sets DeviceSettings value.
+// SetDefaultPage sets DefaultPage value.
 //
 // Array: [N]; Bitfield to indicate one page as default for each supported loop
 func (m *DeviceSettings) SetDefaultPage(v []uint16) *DeviceSettings {
@@ -368,7 +378,7 @@ func (m *DeviceSettings) SetDefaultPage(v []uint16) *DeviceSettings {
 	return m
 }
 
-// SetAutosyncMinSteps sets DeviceSettings value.
+// SetAutosyncMinSteps sets AutosyncMinSteps value.
 //
 // Units: steps; Minimum steps before an autosync can occur
 func (m *DeviceSettings) SetAutosyncMinSteps(v uint16) *DeviceSettings {
@@ -376,7 +386,7 @@ func (m *DeviceSettings) SetAutosyncMinSteps(v uint16) *DeviceSettings {
 	return m
 }
 
-// SetAutosyncMinTime sets DeviceSettings value.
+// SetAutosyncMinTime sets AutosyncMinTime value.
 //
 // Units: minutes; Minimum minutes before an autosync can occur
 func (m *DeviceSettings) SetAutosyncMinTime(v uint16) *DeviceSettings {
@@ -384,7 +394,7 @@ func (m *DeviceSettings) SetAutosyncMinTime(v uint16) *DeviceSettings {
 	return m
 }
 
-// SetLactateThresholdAutodetectEnabled sets DeviceSettings value.
+// SetLactateThresholdAutodetectEnabled sets LactateThresholdAutodetectEnabled value.
 //
 // Enable auto-detect setting for the lactate threshold feature.
 func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v bool) *DeviceSettings {
@@ -392,7 +402,7 @@ func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v bool) *DeviceSet
 	return m
 }
 
-// SetBleAutoUploadEnabled sets DeviceSettings value.
+// SetBleAutoUploadEnabled sets BleAutoUploadEnabled value.
 //
 // Automatically upload using BLE
 func (m *DeviceSettings) SetBleAutoUploadEnabled(v bool) *DeviceSettings {
@@ -400,7 +410,7 @@ func (m *DeviceSettings) SetBleAutoUploadEnabled(v bool) *DeviceSettings {
 	return m
 }
 
-// SetAutoSyncFrequency sets DeviceSettings value.
+// SetAutoSyncFrequency sets AutoSyncFrequency value.
 //
 // Helps to conserve battery by changing modes
 func (m *DeviceSettings) SetAutoSyncFrequency(v typedef.AutoSyncFrequency) *DeviceSettings {
@@ -408,7 +418,7 @@ func (m *DeviceSettings) SetAutoSyncFrequency(v typedef.AutoSyncFrequency) *Devi
 	return m
 }
 
-// SetAutoActivityDetect sets DeviceSettings value.
+// SetAutoActivityDetect sets AutoActivityDetect value.
 //
 // Allows setting specific activities auto-activity detect enabled/disabled settings
 func (m *DeviceSettings) SetAutoActivityDetect(v typedef.AutoActivityDetect) *DeviceSettings {
@@ -416,7 +426,7 @@ func (m *DeviceSettings) SetAutoActivityDetect(v typedef.AutoActivityDetect) *De
 	return m
 }
 
-// SetNumberOfScreens sets DeviceSettings value.
+// SetNumberOfScreens sets NumberOfScreens value.
 //
 // Number of screens configured to display
 func (m *DeviceSettings) SetNumberOfScreens(v uint8) *DeviceSettings {
@@ -424,7 +434,7 @@ func (m *DeviceSettings) SetNumberOfScreens(v uint8) *DeviceSettings {
 	return m
 }
 
-// SetSmartNotificationDisplayOrientation sets DeviceSettings value.
+// SetSmartNotificationDisplayOrientation sets SmartNotificationDisplayOrientation value.
 //
 // Smart Notification display orientation
 func (m *DeviceSettings) SetSmartNotificationDisplayOrientation(v typedef.DisplayOrientation) *DeviceSettings {
@@ -432,13 +442,13 @@ func (m *DeviceSettings) SetSmartNotificationDisplayOrientation(v typedef.Displa
 	return m
 }
 
-// SetTapInterface sets DeviceSettings value.
+// SetTapInterface sets TapInterface value.
 func (m *DeviceSettings) SetTapInterface(v typedef.Switch) *DeviceSettings {
 	m.TapInterface = v
 	return m
 }
 
-// SetTapSensitivity sets DeviceSettings value.
+// SetTapSensitivity sets TapSensitivity value.
 //
 // Used to hold the tap threshold setting
 func (m *DeviceSettings) SetTapSensitivity(v typedef.TapSensitivity) *DeviceSettings {

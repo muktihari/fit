@@ -159,25 +159,25 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetDeveloperDataIndex sets FieldDescription value.
+// SetDeveloperDataIndex sets DeveloperDataIndex value.
 func (m *FieldDescription) SetDeveloperDataIndex(v uint8) *FieldDescription {
 	m.DeveloperDataIndex = v
 	return m
 }
 
-// SetFieldDefinitionNumber sets FieldDescription value.
+// SetFieldDefinitionNumber sets FieldDefinitionNumber value.
 func (m *FieldDescription) SetFieldDefinitionNumber(v uint8) *FieldDescription {
 	m.FieldDefinitionNumber = v
 	return m
 }
 
-// SetFitBaseTypeId sets FieldDescription value.
+// SetFitBaseTypeId sets FitBaseTypeId value.
 func (m *FieldDescription) SetFitBaseTypeId(v basetype.BaseType) *FieldDescription {
 	m.FitBaseTypeId = v
 	return m
 }
 
-// SetFieldName sets FieldDescription value.
+// SetFieldName sets FieldName value.
 //
 // Array: [N]
 func (m *FieldDescription) SetFieldName(v []string) *FieldDescription {
@@ -185,31 +185,31 @@ func (m *FieldDescription) SetFieldName(v []string) *FieldDescription {
 	return m
 }
 
-// SetArray sets FieldDescription value.
+// SetArray sets Array value.
 func (m *FieldDescription) SetArray(v uint8) *FieldDescription {
 	m.Array = v
 	return m
 }
 
-// SetComponents sets FieldDescription value.
+// SetComponents sets Components value.
 func (m *FieldDescription) SetComponents(v string) *FieldDescription {
 	m.Components = v
 	return m
 }
 
-// SetScale sets FieldDescription value.
+// SetScale sets Scale value.
 func (m *FieldDescription) SetScale(v uint8) *FieldDescription {
 	m.Scale = v
 	return m
 }
 
-// SetOffset sets FieldDescription value.
+// SetOffset sets Offset value.
 func (m *FieldDescription) SetOffset(v int8) *FieldDescription {
 	m.Offset = v
 	return m
 }
 
-// SetUnits sets FieldDescription value.
+// SetUnits sets Units value.
 //
 // Array: [N]
 func (m *FieldDescription) SetUnits(v []string) *FieldDescription {
@@ -217,31 +217,31 @@ func (m *FieldDescription) SetUnits(v []string) *FieldDescription {
 	return m
 }
 
-// SetBits sets FieldDescription value.
+// SetBits sets Bits value.
 func (m *FieldDescription) SetBits(v string) *FieldDescription {
 	m.Bits = v
 	return m
 }
 
-// SetAccumulate sets FieldDescription value.
+// SetAccumulate sets Accumulate value.
 func (m *FieldDescription) SetAccumulate(v string) *FieldDescription {
 	m.Accumulate = v
 	return m
 }
 
-// SetFitBaseUnitId sets FieldDescription value.
+// SetFitBaseUnitId sets FitBaseUnitId value.
 func (m *FieldDescription) SetFitBaseUnitId(v typedef.FitBaseUnit) *FieldDescription {
 	m.FitBaseUnitId = v
 	return m
 }
 
-// SetNativeMesgNum sets FieldDescription value.
+// SetNativeMesgNum sets NativeMesgNum value.
 func (m *FieldDescription) SetNativeMesgNum(v typedef.MesgNum) *FieldDescription {
 	m.NativeMesgNum = v
 	return m
 }
 
-// SetNativeFieldNum sets FieldDescription value.
+// SetNativeFieldNum sets NativeFieldNum value.
 func (m *FieldDescription) SetNativeFieldNum(v uint8) *FieldDescription {
 	m.NativeFieldNum = v
 	return m

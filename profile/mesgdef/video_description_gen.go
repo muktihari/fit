@@ -92,7 +92,7 @@ func (m *VideoDescription) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets VideoDescription value.
+// SetMessageIndex sets MessageIndex value.
 //
 // Long descriptions will be split into multiple parts
 func (m *VideoDescription) SetMessageIndex(v typedef.MessageIndex) *VideoDescription {
@@ -100,7 +100,7 @@ func (m *VideoDescription) SetMessageIndex(v typedef.MessageIndex) *VideoDescrip
 	return m
 }
 
-// SetMessageCount sets VideoDescription value.
+// SetMessageCount sets MessageCount value.
 //
 // Total number of description parts
 func (m *VideoDescription) SetMessageCount(v uint16) *VideoDescription {
@@ -108,7 +108,7 @@ func (m *VideoDescription) SetMessageCount(v uint16) *VideoDescription {
 	return m
 }
 
-// SetText sets VideoDescription value.
+// SetText sets Text value.
 func (m *VideoDescription) SetText(v string) *VideoDescription {
 	m.Text = v
 	return m

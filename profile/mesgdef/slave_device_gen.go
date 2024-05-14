@@ -103,13 +103,13 @@ func (m *SlaveDevice) GetProduct() (name string, value any) {
 	return "product", m.Product
 }
 
-// SetManufacturer sets SlaveDevice value.
+// SetManufacturer sets Manufacturer value.
 func (m *SlaveDevice) SetManufacturer(v typedef.Manufacturer) *SlaveDevice {
 	m.Manufacturer = v
 	return m
 }
 
-// SetProduct sets SlaveDevice value.
+// SetProduct sets Product value.
 func (m *SlaveDevice) SetProduct(v uint16) *SlaveDevice {
 	m.Product = v
 	return m

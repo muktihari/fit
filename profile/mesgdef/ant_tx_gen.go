@@ -130,9 +130,10 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *AntTx) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// FractionalTimestampScaled return FractionalTimestamp in its scaled value [Scale: 32768; Units: s].
-//
+// FractionalTimestampScaled return FractionalTimestamp in its scaled value.
 // If FractionalTimestamp value is invalid, float64 invalid value will be returned.
+//
+// Scale: 32768; Units: s
 func (m *AntTx) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -140,7 +141,7 @@ func (m *AntTx) FractionalTimestampScaled() float64 {
 	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
 }
 
-// SetTimestamp sets AntTx value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *AntTx) SetTimestamp(v time.Time) *AntTx {
@@ -148,7 +149,7 @@ func (m *AntTx) SetTimestamp(v time.Time) *AntTx {
 	return m
 }
 
-// SetFractionalTimestamp sets AntTx value.
+// SetFractionalTimestamp sets FractionalTimestamp value.
 //
 // Scale: 32768; Units: s
 func (m *AntTx) SetFractionalTimestamp(v uint16) *AntTx {
@@ -156,13 +157,22 @@ func (m *AntTx) SetFractionalTimestamp(v uint16) *AntTx {
 	return m
 }
 
-// SetMesgId sets AntTx value.
+// SetFractionalTimestampScaled is similar to SetFractionalTimestamp except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 32768; Units: s
+func (m *AntTx) SetFractionalTimestampScaled(v float64) *AntTx {
+	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	return m
+}
+
+// SetMesgId sets MesgId value.
 func (m *AntTx) SetMesgId(v byte) *AntTx {
 	m.MesgId = v
 	return m
 }
 
-// SetMesgData sets AntTx value.
+// SetMesgData sets MesgData value.
 //
 // Array: [N]
 func (m *AntTx) SetMesgData(v []byte) *AntTx {
@@ -170,13 +180,13 @@ func (m *AntTx) SetMesgData(v []byte) *AntTx {
 	return m
 }
 
-// SetChannelNumber sets AntTx value.
+// SetChannelNumber sets ChannelNumber value.
 func (m *AntTx) SetChannelNumber(v uint8) *AntTx {
 	m.ChannelNumber = v
 	return m
 }
 
-// SetData sets AntTx value.
+// SetData sets Data value.
 //
 // Array: [N]
 func (m *AntTx) SetData(v []byte) *AntTx {

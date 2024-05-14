@@ -78,9 +78,10 @@ func (m *Hrv) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// TimeScaled return Time in its scaled value [Array: [N]; Scale: 1000; Units: s; Time between beats].
-//
+// TimeScaled return Time in its scaled value.
 // If Time value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s; Time between beats
 func (m *Hrv) TimeScaled() []float64 {
 	if m.Time == nil {
 		return nil
@@ -88,11 +89,20 @@ func (m *Hrv) TimeScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Time, 1000, 0)
 }
 
-// SetTime sets Hrv value.
+// SetTime sets Time value.
 //
 // Array: [N]; Scale: 1000; Units: s; Time between beats
 func (m *Hrv) SetTime(v []uint16) *Hrv {
 	m.Time = v
+	return m
+}
+
+// SetTimeScaled is similar to SetTime except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s; Time between beats
+func (m *Hrv) SetTimeScaled(vs []float64) *Hrv {
+	m.Time = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
 	return m
 }
 

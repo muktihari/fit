@@ -133,7 +133,7 @@ func (m *OneDSensorCalibration) GetCalibrationFactor() (name string, value any) 
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *OneDSensorCalibration) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets OneDSensorCalibration value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *OneDSensorCalibration) SetTimestamp(v time.Time) *OneDSensorCalibration {
@@ -141,7 +141,7 @@ func (m *OneDSensorCalibration) SetTimestamp(v time.Time) *OneDSensorCalibration
 	return m
 }
 
-// SetSensorType sets OneDSensorCalibration value.
+// SetSensorType sets SensorType value.
 //
 // Indicates which sensor the calibration is for
 func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorCalibration {
@@ -149,7 +149,7 @@ func (m *OneDSensorCalibration) SetSensorType(v typedef.SensorType) *OneDSensorC
 	return m
 }
 
-// SetCalibrationFactor sets OneDSensorCalibration value.
+// SetCalibrationFactor sets CalibrationFactor value.
 //
 // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 func (m *OneDSensorCalibration) SetCalibrationFactor(v uint32) *OneDSensorCalibration {
@@ -157,7 +157,7 @@ func (m *OneDSensorCalibration) SetCalibrationFactor(v uint32) *OneDSensorCalibr
 	return m
 }
 
-// SetCalibrationDivisor sets OneDSensorCalibration value.
+// SetCalibrationDivisor sets CalibrationDivisor value.
 //
 // Units: counts; Calibration factor divisor
 func (m *OneDSensorCalibration) SetCalibrationDivisor(v uint32) *OneDSensorCalibration {
@@ -165,7 +165,7 @@ func (m *OneDSensorCalibration) SetCalibrationDivisor(v uint32) *OneDSensorCalib
 	return m
 }
 
-// SetLevelShift sets OneDSensorCalibration value.
+// SetLevelShift sets LevelShift value.
 //
 // Level shift value used to shift the ADC value back into range
 func (m *OneDSensorCalibration) SetLevelShift(v uint32) *OneDSensorCalibration {
@@ -173,7 +173,7 @@ func (m *OneDSensorCalibration) SetLevelShift(v uint32) *OneDSensorCalibration {
 	return m
 }
 
-// SetOffsetCal sets OneDSensorCalibration value.
+// SetOffsetCal sets OffsetCal value.
 //
 // Internal Calibration factor
 func (m *OneDSensorCalibration) SetOffsetCal(v int32) *OneDSensorCalibration {

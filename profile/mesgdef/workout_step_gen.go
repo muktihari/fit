@@ -411,9 +411,10 @@ func (m *WorkoutStep) GetSecondaryCustomTargetValueHigh() (name string, value an
 	return "secondary_custom_target_value_high", m.SecondaryCustomTargetValueHigh
 }
 
-// ExerciseWeightScaled return ExerciseWeight in its scaled value [Scale: 100; Units: kg].
-//
+// ExerciseWeightScaled return ExerciseWeight in its scaled value.
 // If ExerciseWeight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: kg
 func (m *WorkoutStep) ExerciseWeightScaled() float64 {
 	if m.ExerciseWeight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -421,85 +422,85 @@ func (m *WorkoutStep) ExerciseWeightScaled() float64 {
 	return scaleoffset.Apply(m.ExerciseWeight, 100, 0)
 }
 
-// SetMessageIndex sets WorkoutStep value.
+// SetMessageIndex sets MessageIndex value.
 func (m *WorkoutStep) SetMessageIndex(v typedef.MessageIndex) *WorkoutStep {
 	m.MessageIndex = v
 	return m
 }
 
-// SetWktStepName sets WorkoutStep value.
+// SetWktStepName sets WktStepName value.
 func (m *WorkoutStep) SetWktStepName(v string) *WorkoutStep {
 	m.WktStepName = v
 	return m
 }
 
-// SetDurationType sets WorkoutStep value.
+// SetDurationType sets DurationType value.
 func (m *WorkoutStep) SetDurationType(v typedef.WktStepDuration) *WorkoutStep {
 	m.DurationType = v
 	return m
 }
 
-// SetDurationValue sets WorkoutStep value.
+// SetDurationValue sets DurationValue value.
 func (m *WorkoutStep) SetDurationValue(v uint32) *WorkoutStep {
 	m.DurationValue = v
 	return m
 }
 
-// SetTargetType sets WorkoutStep value.
+// SetTargetType sets TargetType value.
 func (m *WorkoutStep) SetTargetType(v typedef.WktStepTarget) *WorkoutStep {
 	m.TargetType = v
 	return m
 }
 
-// SetTargetValue sets WorkoutStep value.
+// SetTargetValue sets TargetValue value.
 func (m *WorkoutStep) SetTargetValue(v uint32) *WorkoutStep {
 	m.TargetValue = v
 	return m
 }
 
-// SetCustomTargetValueLow sets WorkoutStep value.
+// SetCustomTargetValueLow sets CustomTargetValueLow value.
 func (m *WorkoutStep) SetCustomTargetValueLow(v uint32) *WorkoutStep {
 	m.CustomTargetValueLow = v
 	return m
 }
 
-// SetCustomTargetValueHigh sets WorkoutStep value.
+// SetCustomTargetValueHigh sets CustomTargetValueHigh value.
 func (m *WorkoutStep) SetCustomTargetValueHigh(v uint32) *WorkoutStep {
 	m.CustomTargetValueHigh = v
 	return m
 }
 
-// SetIntensity sets WorkoutStep value.
+// SetIntensity sets Intensity value.
 func (m *WorkoutStep) SetIntensity(v typedef.Intensity) *WorkoutStep {
 	m.Intensity = v
 	return m
 }
 
-// SetNotes sets WorkoutStep value.
+// SetNotes sets Notes value.
 func (m *WorkoutStep) SetNotes(v string) *WorkoutStep {
 	m.Notes = v
 	return m
 }
 
-// SetEquipment sets WorkoutStep value.
+// SetEquipment sets Equipment value.
 func (m *WorkoutStep) SetEquipment(v typedef.WorkoutEquipment) *WorkoutStep {
 	m.Equipment = v
 	return m
 }
 
-// SetExerciseCategory sets WorkoutStep value.
+// SetExerciseCategory sets ExerciseCategory value.
 func (m *WorkoutStep) SetExerciseCategory(v typedef.ExerciseCategory) *WorkoutStep {
 	m.ExerciseCategory = v
 	return m
 }
 
-// SetExerciseName sets WorkoutStep value.
+// SetExerciseName sets ExerciseName value.
 func (m *WorkoutStep) SetExerciseName(v uint16) *WorkoutStep {
 	m.ExerciseName = v
 	return m
 }
 
-// SetExerciseWeight sets WorkoutStep value.
+// SetExerciseWeight sets ExerciseWeight value.
 //
 // Scale: 100; Units: kg
 func (m *WorkoutStep) SetExerciseWeight(v uint16) *WorkoutStep {
@@ -507,31 +508,40 @@ func (m *WorkoutStep) SetExerciseWeight(v uint16) *WorkoutStep {
 	return m
 }
 
-// SetWeightDisplayUnit sets WorkoutStep value.
+// SetExerciseWeightScaled is similar to SetExerciseWeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: kg
+func (m *WorkoutStep) SetExerciseWeightScaled(v float64) *WorkoutStep {
+	m.ExerciseWeight = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetWeightDisplayUnit sets WeightDisplayUnit value.
 func (m *WorkoutStep) SetWeightDisplayUnit(v typedef.FitBaseUnit) *WorkoutStep {
 	m.WeightDisplayUnit = v
 	return m
 }
 
-// SetSecondaryTargetType sets WorkoutStep value.
+// SetSecondaryTargetType sets SecondaryTargetType value.
 func (m *WorkoutStep) SetSecondaryTargetType(v typedef.WktStepTarget) *WorkoutStep {
 	m.SecondaryTargetType = v
 	return m
 }
 
-// SetSecondaryTargetValue sets WorkoutStep value.
+// SetSecondaryTargetValue sets SecondaryTargetValue value.
 func (m *WorkoutStep) SetSecondaryTargetValue(v uint32) *WorkoutStep {
 	m.SecondaryTargetValue = v
 	return m
 }
 
-// SetSecondaryCustomTargetValueLow sets WorkoutStep value.
+// SetSecondaryCustomTargetValueLow sets SecondaryCustomTargetValueLow value.
 func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
 	m.SecondaryCustomTargetValueLow = v
 	return m
 }
 
-// SetSecondaryCustomTargetValueHigh sets WorkoutStep value.
+// SetSecondaryCustomTargetValueHigh sets SecondaryCustomTargetValueHigh value.
 func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
 	m.SecondaryCustomTargetValueHigh = v
 	return m

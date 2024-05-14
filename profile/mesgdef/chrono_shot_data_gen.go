@@ -99,9 +99,10 @@ func (m *ChronoShotData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *ChronoShotData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// ShotSpeedScaled return ShotSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// ShotSpeedScaled return ShotSpeed in its scaled value.
 // If ShotSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *ChronoShotData) ShotSpeedScaled() float64 {
 	if m.ShotSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -109,13 +110,13 @@ func (m *ChronoShotData) ShotSpeedScaled() float64 {
 	return scaleoffset.Apply(m.ShotSpeed, 1000, 0)
 }
 
-// SetTimestamp sets ChronoShotData value.
+// SetTimestamp sets Timestamp value.
 func (m *ChronoShotData) SetTimestamp(v time.Time) *ChronoShotData {
 	m.Timestamp = v
 	return m
 }
 
-// SetShotSpeed sets ChronoShotData value.
+// SetShotSpeed sets ShotSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotData) SetShotSpeed(v uint32) *ChronoShotData {
@@ -123,7 +124,16 @@ func (m *ChronoShotData) SetShotSpeed(v uint32) *ChronoShotData {
 	return m
 }
 
-// SetShotNum sets ChronoShotData value.
+// SetShotSpeedScaled is similar to SetShotSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotData) SetShotSpeedScaled(v float64) *ChronoShotData {
+	m.ShotSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetShotNum sets ShotNum value.
 func (m *ChronoShotData) SetShotNum(v uint16) *ChronoShotData {
 	m.ShotNum = v
 	return m

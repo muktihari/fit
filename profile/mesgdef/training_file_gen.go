@@ -139,37 +139,37 @@ func (m *TrainingFile) TimestampUint32() uint32 { return datetime.ToUint32(m.Tim
 // TimeCreatedUint32 returns TimeCreated in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *TrainingFile) TimeCreatedUint32() uint32 { return datetime.ToUint32(m.TimeCreated) }
 
-// SetTimestamp sets TrainingFile value.
+// SetTimestamp sets Timestamp value.
 func (m *TrainingFile) SetTimestamp(v time.Time) *TrainingFile {
 	m.Timestamp = v
 	return m
 }
 
-// SetType sets TrainingFile value.
+// SetType sets Type value.
 func (m *TrainingFile) SetType(v typedef.File) *TrainingFile {
 	m.Type = v
 	return m
 }
 
-// SetManufacturer sets TrainingFile value.
+// SetManufacturer sets Manufacturer value.
 func (m *TrainingFile) SetManufacturer(v typedef.Manufacturer) *TrainingFile {
 	m.Manufacturer = v
 	return m
 }
 
-// SetProduct sets TrainingFile value.
+// SetProduct sets Product value.
 func (m *TrainingFile) SetProduct(v uint16) *TrainingFile {
 	m.Product = v
 	return m
 }
 
-// SetSerialNumber sets TrainingFile value.
+// SetSerialNumber sets SerialNumber value.
 func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
 	m.SerialNumber = v
 	return m
 }
 
-// SetTimeCreated sets TrainingFile value.
+// SetTimeCreated sets TimeCreated value.
 func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
 	m.TimeCreated = v
 	return m

@@ -122,9 +122,10 @@ func (m *SegmentLeaderboardEntry) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SegmentTimeScaled return SegmentTime in its scaled value [Scale: 1000; Units: s; Segment Time (includes pauses)].
-//
+// SegmentTimeScaled return SegmentTime in its scaled value.
 // If SegmentTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Segment Time (includes pauses)
 func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
 	if m.SegmentTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -132,13 +133,13 @@ func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
 	return scaleoffset.Apply(m.SegmentTime, 1000, 0)
 }
 
-// SetMessageIndex sets SegmentLeaderboardEntry value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SegmentLeaderboardEntry) SetMessageIndex(v typedef.MessageIndex) *SegmentLeaderboardEntry {
 	m.MessageIndex = v
 	return m
 }
 
-// SetName sets SegmentLeaderboardEntry value.
+// SetName sets Name value.
 //
 // Friendly name assigned to leader
 func (m *SegmentLeaderboardEntry) SetName(v string) *SegmentLeaderboardEntry {
@@ -146,7 +147,7 @@ func (m *SegmentLeaderboardEntry) SetName(v string) *SegmentLeaderboardEntry {
 	return m
 }
 
-// SetType sets SegmentLeaderboardEntry value.
+// SetType sets Type value.
 //
 // Leader classification
 func (m *SegmentLeaderboardEntry) SetType(v typedef.SegmentLeaderboardType) *SegmentLeaderboardEntry {
@@ -154,7 +155,7 @@ func (m *SegmentLeaderboardEntry) SetType(v typedef.SegmentLeaderboardType) *Seg
 	return m
 }
 
-// SetGroupPrimaryKey sets SegmentLeaderboardEntry value.
+// SetGroupPrimaryKey sets GroupPrimaryKey value.
 //
 // Primary user ID of this leader
 func (m *SegmentLeaderboardEntry) SetGroupPrimaryKey(v uint32) *SegmentLeaderboardEntry {
@@ -162,7 +163,7 @@ func (m *SegmentLeaderboardEntry) SetGroupPrimaryKey(v uint32) *SegmentLeaderboa
 	return m
 }
 
-// SetActivityId sets SegmentLeaderboardEntry value.
+// SetActivityId sets ActivityId value.
 //
 // ID of the activity associated with this leader time
 func (m *SegmentLeaderboardEntry) SetActivityId(v uint32) *SegmentLeaderboardEntry {
@@ -170,7 +171,7 @@ func (m *SegmentLeaderboardEntry) SetActivityId(v uint32) *SegmentLeaderboardEnt
 	return m
 }
 
-// SetSegmentTime sets SegmentLeaderboardEntry value.
+// SetSegmentTime sets SegmentTime value.
 //
 // Scale: 1000; Units: s; Segment Time (includes pauses)
 func (m *SegmentLeaderboardEntry) SetSegmentTime(v uint32) *SegmentLeaderboardEntry {
@@ -178,7 +179,16 @@ func (m *SegmentLeaderboardEntry) SetSegmentTime(v uint32) *SegmentLeaderboardEn
 	return m
 }
 
-// SetActivityIdString sets SegmentLeaderboardEntry value.
+// SetSegmentTimeScaled is similar to SetSegmentTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Segment Time (includes pauses)
+func (m *SegmentLeaderboardEntry) SetSegmentTimeScaled(v float64) *SegmentLeaderboardEntry {
+	m.SegmentTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetActivityIdString sets ActivityIdString value.
 //
 // String version of the activity_id. 21 characters long, express in decimal
 func (m *SegmentLeaderboardEntry) SetActivityIdString(v string) *SegmentLeaderboardEntry {

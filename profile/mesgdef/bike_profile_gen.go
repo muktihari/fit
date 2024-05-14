@@ -297,9 +297,10 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// OdometerScaled return Odometer in its scaled value [Scale: 100; Units: m].
-//
+// OdometerScaled return Odometer in its scaled value.
 // If Odometer value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *BikeProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -307,9 +308,10 @@ func (m *BikeProfile) OdometerScaled() float64 {
 	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
 
-// CustomWheelsizeScaled return CustomWheelsize in its scaled value [Scale: 1000; Units: m].
-//
+// CustomWheelsizeScaled return CustomWheelsize in its scaled value.
 // If CustomWheelsize value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m
 func (m *BikeProfile) CustomWheelsizeScaled() float64 {
 	if m.CustomWheelsize == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -317,9 +319,10 @@ func (m *BikeProfile) CustomWheelsizeScaled() float64 {
 	return scaleoffset.Apply(m.CustomWheelsize, 1000, 0)
 }
 
-// AutoWheelsizeScaled return AutoWheelsize in its scaled value [Scale: 1000; Units: m].
-//
+// AutoWheelsizeScaled return AutoWheelsize in its scaled value.
 // If AutoWheelsize value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m
 func (m *BikeProfile) AutoWheelsizeScaled() float64 {
 	if m.AutoWheelsize == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -327,9 +330,10 @@ func (m *BikeProfile) AutoWheelsizeScaled() float64 {
 	return scaleoffset.Apply(m.AutoWheelsize, 1000, 0)
 }
 
-// BikeWeightScaled return BikeWeight in its scaled value [Scale: 10; Units: kg].
-//
+// BikeWeightScaled return BikeWeight in its scaled value.
 // If BikeWeight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: kg
 func (m *BikeProfile) BikeWeightScaled() float64 {
 	if m.BikeWeight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -337,9 +341,10 @@ func (m *BikeProfile) BikeWeightScaled() float64 {
 	return scaleoffset.Apply(m.BikeWeight, 10, 0)
 }
 
-// PowerCalFactorScaled return PowerCalFactor in its scaled value [Scale: 10; Units: %].
-//
+// PowerCalFactorScaled return PowerCalFactor in its scaled value.
 // If PowerCalFactor value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: %
 func (m *BikeProfile) PowerCalFactorScaled() float64 {
 	if m.PowerCalFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -347,9 +352,10 @@ func (m *BikeProfile) PowerCalFactorScaled() float64 {
 	return scaleoffset.Apply(m.PowerCalFactor, 10, 0)
 }
 
-// CrankLengthScaled return CrankLength in its scaled value [Scale: 2; Offset: -110; Units: mm].
-//
+// CrankLengthScaled return CrankLength in its scaled value.
 // If CrankLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Offset: -110; Units: mm
 func (m *BikeProfile) CrankLengthScaled() float64 {
 	if m.CrankLength == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -357,31 +363,31 @@ func (m *BikeProfile) CrankLengthScaled() float64 {
 	return scaleoffset.Apply(m.CrankLength, 2, -110)
 }
 
-// SetMessageIndex sets BikeProfile value.
+// SetMessageIndex sets MessageIndex value.
 func (m *BikeProfile) SetMessageIndex(v typedef.MessageIndex) *BikeProfile {
 	m.MessageIndex = v
 	return m
 }
 
-// SetName sets BikeProfile value.
+// SetName sets Name value.
 func (m *BikeProfile) SetName(v string) *BikeProfile {
 	m.Name = v
 	return m
 }
 
-// SetSport sets BikeProfile value.
+// SetSport sets Sport value.
 func (m *BikeProfile) SetSport(v typedef.Sport) *BikeProfile {
 	m.Sport = v
 	return m
 }
 
-// SetSubSport sets BikeProfile value.
+// SetSubSport sets SubSport value.
 func (m *BikeProfile) SetSubSport(v typedef.SubSport) *BikeProfile {
 	m.SubSport = v
 	return m
 }
 
-// SetOdometer sets BikeProfile value.
+// SetOdometer sets Odometer value.
 //
 // Scale: 100; Units: m
 func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
@@ -389,31 +395,40 @@ func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
 	return m
 }
 
-// SetBikeSpdAntId sets BikeProfile value.
+// SetOdometerScaled is similar to SetOdometer except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *BikeProfile) SetOdometerScaled(v float64) *BikeProfile {
+	m.Odometer = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetBikeSpdAntId sets BikeSpdAntId value.
 func (m *BikeProfile) SetBikeSpdAntId(v uint16) *BikeProfile {
 	m.BikeSpdAntId = v
 	return m
 }
 
-// SetBikeCadAntId sets BikeProfile value.
+// SetBikeCadAntId sets BikeCadAntId value.
 func (m *BikeProfile) SetBikeCadAntId(v uint16) *BikeProfile {
 	m.BikeCadAntId = v
 	return m
 }
 
-// SetBikeSpdcadAntId sets BikeProfile value.
+// SetBikeSpdcadAntId sets BikeSpdcadAntId value.
 func (m *BikeProfile) SetBikeSpdcadAntId(v uint16) *BikeProfile {
 	m.BikeSpdcadAntId = v
 	return m
 }
 
-// SetBikePowerAntId sets BikeProfile value.
+// SetBikePowerAntId sets BikePowerAntId value.
 func (m *BikeProfile) SetBikePowerAntId(v uint16) *BikeProfile {
 	m.BikePowerAntId = v
 	return m
 }
 
-// SetCustomWheelsize sets BikeProfile value.
+// SetCustomWheelsize sets CustomWheelsize value.
 //
 // Scale: 1000; Units: m
 func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
@@ -421,7 +436,16 @@ func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
 	return m
 }
 
-// SetAutoWheelsize sets BikeProfile value.
+// SetCustomWheelsizeScaled is similar to SetCustomWheelsize except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m
+func (m *BikeProfile) SetCustomWheelsizeScaled(v float64) *BikeProfile {
+	m.CustomWheelsize = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAutoWheelsize sets AutoWheelsize value.
 //
 // Scale: 1000; Units: m
 func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
@@ -429,7 +453,16 @@ func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
 	return m
 }
 
-// SetBikeWeight sets BikeProfile value.
+// SetAutoWheelsizeScaled is similar to SetAutoWheelsize except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m
+func (m *BikeProfile) SetAutoWheelsizeScaled(v float64) *BikeProfile {
+	m.AutoWheelsize = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetBikeWeight sets BikeWeight value.
 //
 // Scale: 10; Units: kg
 func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
@@ -437,7 +470,16 @@ func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
 	return m
 }
 
-// SetPowerCalFactor sets BikeProfile value.
+// SetBikeWeightScaled is similar to SetBikeWeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: kg
+func (m *BikeProfile) SetBikeWeightScaled(v float64) *BikeProfile {
+	m.BikeWeight = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetPowerCalFactor sets PowerCalFactor value.
 //
 // Scale: 10; Units: %
 func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
@@ -445,49 +487,58 @@ func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
 	return m
 }
 
-// SetAutoWheelCal sets BikeProfile value.
+// SetPowerCalFactorScaled is similar to SetPowerCalFactor except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: %
+func (m *BikeProfile) SetPowerCalFactorScaled(v float64) *BikeProfile {
+	m.PowerCalFactor = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetAutoWheelCal sets AutoWheelCal value.
 func (m *BikeProfile) SetAutoWheelCal(v bool) *BikeProfile {
 	m.AutoWheelCal = v
 	return m
 }
 
-// SetAutoPowerZero sets BikeProfile value.
+// SetAutoPowerZero sets AutoPowerZero value.
 func (m *BikeProfile) SetAutoPowerZero(v bool) *BikeProfile {
 	m.AutoPowerZero = v
 	return m
 }
 
-// SetId sets BikeProfile value.
+// SetId sets Id value.
 func (m *BikeProfile) SetId(v uint8) *BikeProfile {
 	m.Id = v
 	return m
 }
 
-// SetSpdEnabled sets BikeProfile value.
+// SetSpdEnabled sets SpdEnabled value.
 func (m *BikeProfile) SetSpdEnabled(v bool) *BikeProfile {
 	m.SpdEnabled = v
 	return m
 }
 
-// SetCadEnabled sets BikeProfile value.
+// SetCadEnabled sets CadEnabled value.
 func (m *BikeProfile) SetCadEnabled(v bool) *BikeProfile {
 	m.CadEnabled = v
 	return m
 }
 
-// SetSpdcadEnabled sets BikeProfile value.
+// SetSpdcadEnabled sets SpdcadEnabled value.
 func (m *BikeProfile) SetSpdcadEnabled(v bool) *BikeProfile {
 	m.SpdcadEnabled = v
 	return m
 }
 
-// SetPowerEnabled sets BikeProfile value.
+// SetPowerEnabled sets PowerEnabled value.
 func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
 	m.PowerEnabled = v
 	return m
 }
 
-// SetCrankLength sets BikeProfile value.
+// SetCrankLength sets CrankLength value.
 //
 // Scale: 2; Offset: -110; Units: mm
 func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
@@ -495,37 +546,46 @@ func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
 	return m
 }
 
-// SetEnabled sets BikeProfile value.
+// SetCrankLengthScaled is similar to SetCrankLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Offset: -110; Units: mm
+func (m *BikeProfile) SetCrankLengthScaled(v float64) *BikeProfile {
+	m.CrankLength = uint8(scaleoffset.Discard(v, 2, -110))
+	return m
+}
+
+// SetEnabled sets Enabled value.
 func (m *BikeProfile) SetEnabled(v bool) *BikeProfile {
 	m.Enabled = v
 	return m
 }
 
-// SetBikeSpdAntIdTransType sets BikeProfile value.
+// SetBikeSpdAntIdTransType sets BikeSpdAntIdTransType value.
 func (m *BikeProfile) SetBikeSpdAntIdTransType(v uint8) *BikeProfile {
 	m.BikeSpdAntIdTransType = v
 	return m
 }
 
-// SetBikeCadAntIdTransType sets BikeProfile value.
+// SetBikeCadAntIdTransType sets BikeCadAntIdTransType value.
 func (m *BikeProfile) SetBikeCadAntIdTransType(v uint8) *BikeProfile {
 	m.BikeCadAntIdTransType = v
 	return m
 }
 
-// SetBikeSpdcadAntIdTransType sets BikeProfile value.
+// SetBikeSpdcadAntIdTransType sets BikeSpdcadAntIdTransType value.
 func (m *BikeProfile) SetBikeSpdcadAntIdTransType(v uint8) *BikeProfile {
 	m.BikeSpdcadAntIdTransType = v
 	return m
 }
 
-// SetBikePowerAntIdTransType sets BikeProfile value.
+// SetBikePowerAntIdTransType sets BikePowerAntIdTransType value.
 func (m *BikeProfile) SetBikePowerAntIdTransType(v uint8) *BikeProfile {
 	m.BikePowerAntIdTransType = v
 	return m
 }
 
-// SetOdometerRollover sets BikeProfile value.
+// SetOdometerRollover sets OdometerRollover value.
 //
 // Rollover counter that can be used to extend the odometer
 func (m *BikeProfile) SetOdometerRollover(v uint8) *BikeProfile {
@@ -533,7 +593,7 @@ func (m *BikeProfile) SetOdometerRollover(v uint8) *BikeProfile {
 	return m
 }
 
-// SetFrontGearNum sets BikeProfile value.
+// SetFrontGearNum sets FrontGearNum value.
 //
 // Number of front gears
 func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
@@ -541,7 +601,7 @@ func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
 	return m
 }
 
-// SetFrontGear sets BikeProfile value.
+// SetFrontGear sets FrontGear value.
 //
 // Array: [N]; Number of teeth on each gear 0 is innermost
 func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
@@ -549,7 +609,7 @@ func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
 	return m
 }
 
-// SetRearGearNum sets BikeProfile value.
+// SetRearGearNum sets RearGearNum value.
 //
 // Number of rear gears
 func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
@@ -557,7 +617,7 @@ func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
 	return m
 }
 
-// SetRearGear sets BikeProfile value.
+// SetRearGear sets RearGear value.
 //
 // Array: [N]; Number of teeth on each gear 0 is innermost
 func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
@@ -565,7 +625,7 @@ func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
 	return m
 }
 
-// SetShimanoDi2Enabled sets BikeProfile value.
+// SetShimanoDi2Enabled sets ShimanoDi2Enabled value.
 func (m *BikeProfile) SetShimanoDi2Enabled(v bool) *BikeProfile {
 	m.ShimanoDi2Enabled = v
 	return m

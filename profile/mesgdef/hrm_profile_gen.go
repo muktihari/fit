@@ -106,31 +106,31 @@ func (m *HrmProfile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets HrmProfile value.
+// SetMessageIndex sets MessageIndex value.
 func (m *HrmProfile) SetMessageIndex(v typedef.MessageIndex) *HrmProfile {
 	m.MessageIndex = v
 	return m
 }
 
-// SetEnabled sets HrmProfile value.
+// SetEnabled sets Enabled value.
 func (m *HrmProfile) SetEnabled(v bool) *HrmProfile {
 	m.Enabled = v
 	return m
 }
 
-// SetHrmAntId sets HrmProfile value.
+// SetHrmAntId sets HrmAntId value.
 func (m *HrmProfile) SetHrmAntId(v uint16) *HrmProfile {
 	m.HrmAntId = v
 	return m
 }
 
-// SetLogHrv sets HrmProfile value.
+// SetLogHrv sets LogHrv value.
 func (m *HrmProfile) SetLogHrv(v bool) *HrmProfile {
 	m.LogHrv = v
 	return m
 }
 
-// SetHrmAntIdTransType sets HrmProfile value.
+// SetHrmAntIdTransType sets HrmAntIdTransType value.
 func (m *HrmProfile) SetHrmAntIdTransType(v uint8) *HrmProfile {
 	m.HrmAntIdTransType = v
 	return m

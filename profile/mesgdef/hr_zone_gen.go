@@ -92,13 +92,13 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets HrZone value.
+// SetMessageIndex sets MessageIndex value.
 func (m *HrZone) SetMessageIndex(v typedef.MessageIndex) *HrZone {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHighBpm sets HrZone value.
+// SetHighBpm sets HighBpm value.
 //
 // Units: bpm
 func (m *HrZone) SetHighBpm(v uint8) *HrZone {
@@ -106,7 +106,7 @@ func (m *HrZone) SetHighBpm(v uint8) *HrZone {
 	return m
 }
 
-// SetName sets HrZone value.
+// SetName sets Name value.
 func (m *HrZone) SetName(v string) *HrZone {
 	m.Name = v
 	return m

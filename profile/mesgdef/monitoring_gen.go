@@ -312,9 +312,10 @@ func (m *Monitoring) TimestampUint32() uint32 { return datetime.ToUint32(m.Times
 // LocalTimestampUint32 returns LocalTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Monitoring) LocalTimestampUint32() uint32 { return datetime.ToUint32(m.LocalTimestamp) }
 
-// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.].
-//
+// DistanceScaled return Distance in its scaled value.
 // If Distance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -322,9 +323,10 @@ func (m *Monitoring) DistanceScaled() float64 {
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
 
-// CyclesScaled return Cycles in its scaled value [Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.].
-//
+// CyclesScaled return Cycles in its scaled value.
 // If Cycles value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) CyclesScaled() float64 {
 	if m.Cycles == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -332,9 +334,10 @@ func (m *Monitoring) CyclesScaled() float64 {
 	return scaleoffset.Apply(m.Cycles, 2, 0)
 }
 
-// ActiveTimeScaled return ActiveTime in its scaled value [Scale: 1000; Units: s].
-//
+// ActiveTimeScaled return ActiveTime in its scaled value.
 // If ActiveTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Monitoring) ActiveTimeScaled() float64 {
 	if m.ActiveTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -342,9 +345,10 @@ func (m *Monitoring) ActiveTimeScaled() float64 {
 	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
 }
 
-// TemperatureScaled return Temperature in its scaled value [Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp].
-//
+// TemperatureScaled return Temperature in its scaled value.
 // If Temperature value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
 func (m *Monitoring) TemperatureScaled() float64 {
 	if m.Temperature == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -352,9 +356,10 @@ func (m *Monitoring) TemperatureScaled() float64 {
 	return scaleoffset.Apply(m.Temperature, 100, 0)
 }
 
-// TemperatureMinScaled return TemperatureMin in its scaled value [Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp].
-//
+// TemperatureMinScaled return TemperatureMin in its scaled value.
 // If TemperatureMin value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
 func (m *Monitoring) TemperatureMinScaled() float64 {
 	if m.TemperatureMin == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -362,9 +367,10 @@ func (m *Monitoring) TemperatureMinScaled() float64 {
 	return scaleoffset.Apply(m.TemperatureMin, 100, 0)
 }
 
-// TemperatureMaxScaled return TemperatureMax in its scaled value [Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp].
-//
+// TemperatureMaxScaled return TemperatureMax in its scaled value.
 // If TemperatureMax value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
 func (m *Monitoring) TemperatureMaxScaled() float64 {
 	if m.TemperatureMax == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -372,9 +378,10 @@ func (m *Monitoring) TemperatureMaxScaled() float64 {
 	return scaleoffset.Apply(m.TemperatureMax, 100, 0)
 }
 
-// IntensityScaled return Intensity in its scaled value [Scale: 10].
-//
+// IntensityScaled return Intensity in its scaled value.
 // If Intensity value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10
 func (m *Monitoring) IntensityScaled() float64 {
 	if m.Intensity == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -382,9 +389,10 @@ func (m *Monitoring) IntensityScaled() float64 {
 	return scaleoffset.Apply(m.Intensity, 10, 0)
 }
 
-// AscentScaled return Ascent in its scaled value [Scale: 1000; Units: m].
-//
+// AscentScaled return Ascent in its scaled value.
 // If Ascent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m
 func (m *Monitoring) AscentScaled() float64 {
 	if m.Ascent == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -392,9 +400,10 @@ func (m *Monitoring) AscentScaled() float64 {
 	return scaleoffset.Apply(m.Ascent, 1000, 0)
 }
 
-// DescentScaled return Descent in its scaled value [Scale: 1000; Units: m].
-//
+// DescentScaled return Descent in its scaled value.
 // If Descent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m
 func (m *Monitoring) DescentScaled() float64 {
 	if m.Descent == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -402,7 +411,7 @@ func (m *Monitoring) DescentScaled() float64 {
 	return scaleoffset.Apply(m.Descent, 1000, 0)
 }
 
-// SetTimestamp sets Monitoring value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 func (m *Monitoring) SetTimestamp(v time.Time) *Monitoring {
@@ -410,7 +419,7 @@ func (m *Monitoring) SetTimestamp(v time.Time) *Monitoring {
 	return m
 }
 
-// SetDeviceIndex sets Monitoring value.
+// SetDeviceIndex sets DeviceIndex value.
 //
 // Associates this data to device_info message. Not required for file with single device (sensor).
 func (m *Monitoring) SetDeviceIndex(v typedef.DeviceIndex) *Monitoring {
@@ -418,7 +427,7 @@ func (m *Monitoring) SetDeviceIndex(v typedef.DeviceIndex) *Monitoring {
 	return m
 }
 
-// SetCalories sets Monitoring value.
+// SetCalories sets Calories value.
 //
 // Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
 func (m *Monitoring) SetCalories(v uint16) *Monitoring {
@@ -426,7 +435,7 @@ func (m *Monitoring) SetCalories(v uint16) *Monitoring {
 	return m
 }
 
-// SetDistance sets Monitoring value.
+// SetDistance sets Distance value.
 //
 // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) SetDistance(v uint32) *Monitoring {
@@ -434,7 +443,16 @@ func (m *Monitoring) SetDistance(v uint32) *Monitoring {
 	return m
 }
 
-// SetCycles sets Monitoring value.
+// SetDistanceScaled is similar to SetDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
+func (m *Monitoring) SetDistanceScaled(v float64) *Monitoring {
+	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetCycles sets Cycles value.
 //
 // Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) SetCycles(v uint32) *Monitoring {
@@ -442,7 +460,16 @@ func (m *Monitoring) SetCycles(v uint32) *Monitoring {
 	return m
 }
 
-// SetActiveTime sets Monitoring value.
+// SetCyclesScaled is similar to SetCycles except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
+func (m *Monitoring) SetCyclesScaled(v float64) *Monitoring {
+	m.Cycles = uint32(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetActiveTime sets ActiveTime value.
 //
 // Scale: 1000; Units: s
 func (m *Monitoring) SetActiveTime(v uint32) *Monitoring {
@@ -450,25 +477,34 @@ func (m *Monitoring) SetActiveTime(v uint32) *Monitoring {
 	return m
 }
 
-// SetActivityType sets Monitoring value.
+// SetActiveTimeScaled is similar to SetActiveTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Monitoring) SetActiveTimeScaled(v float64) *Monitoring {
+	m.ActiveTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetActivityType sets ActivityType value.
 func (m *Monitoring) SetActivityType(v typedef.ActivityType) *Monitoring {
 	m.ActivityType = v
 	return m
 }
 
-// SetActivitySubtype sets Monitoring value.
+// SetActivitySubtype sets ActivitySubtype value.
 func (m *Monitoring) SetActivitySubtype(v typedef.ActivitySubtype) *Monitoring {
 	m.ActivitySubtype = v
 	return m
 }
 
-// SetActivityLevel sets Monitoring value.
+// SetActivityLevel sets ActivityLevel value.
 func (m *Monitoring) SetActivityLevel(v typedef.ActivityLevel) *Monitoring {
 	m.ActivityLevel = v
 	return m
 }
 
-// SetDistance16 sets Monitoring value.
+// SetDistance16 sets Distance16 value.
 //
 // Units: 100 * m
 func (m *Monitoring) SetDistance16(v uint16) *Monitoring {
@@ -476,7 +512,7 @@ func (m *Monitoring) SetDistance16(v uint16) *Monitoring {
 	return m
 }
 
-// SetCycles16 sets Monitoring value.
+// SetCycles16 sets Cycles16 value.
 //
 // Units: 2 * cycles (steps)
 func (m *Monitoring) SetCycles16(v uint16) *Monitoring {
@@ -484,7 +520,7 @@ func (m *Monitoring) SetCycles16(v uint16) *Monitoring {
 	return m
 }
 
-// SetActiveTime16 sets Monitoring value.
+// SetActiveTime16 sets ActiveTime16 value.
 //
 // Units: s
 func (m *Monitoring) SetActiveTime16(v uint16) *Monitoring {
@@ -492,7 +528,7 @@ func (m *Monitoring) SetActiveTime16(v uint16) *Monitoring {
 	return m
 }
 
-// SetLocalTimestamp sets Monitoring value.
+// SetLocalTimestamp sets LocalTimestamp value.
 //
 // Must align to logging interval, for example, time must be 00:00:00 for daily log.
 func (m *Monitoring) SetLocalTimestamp(v time.Time) *Monitoring {
@@ -500,7 +536,7 @@ func (m *Monitoring) SetLocalTimestamp(v time.Time) *Monitoring {
 	return m
 }
 
-// SetTemperature sets Monitoring value.
+// SetTemperature sets Temperature value.
 //
 // Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperature(v int16) *Monitoring {
@@ -508,7 +544,16 @@ func (m *Monitoring) SetTemperature(v int16) *Monitoring {
 	return m
 }
 
-// SetTemperatureMin sets Monitoring value.
+// SetTemperatureScaled is similar to SetTemperature except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperatureScaled(v float64) *Monitoring {
+	m.Temperature = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTemperatureMin sets TemperatureMin value.
 //
 // Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperatureMin(v int16) *Monitoring {
@@ -516,7 +561,16 @@ func (m *Monitoring) SetTemperatureMin(v int16) *Monitoring {
 	return m
 }
 
-// SetTemperatureMax sets Monitoring value.
+// SetTemperatureMinScaled is similar to SetTemperatureMin except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperatureMinScaled(v float64) *Monitoring {
+	m.TemperatureMin = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTemperatureMax sets TemperatureMax value.
 //
 // Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperatureMax(v int16) *Monitoring {
@@ -524,7 +578,16 @@ func (m *Monitoring) SetTemperatureMax(v int16) *Monitoring {
 	return m
 }
 
-// SetActivityTime sets Monitoring value.
+// SetTemperatureMaxScaled is similar to SetTemperatureMax except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
+func (m *Monitoring) SetTemperatureMaxScaled(v float64) *Monitoring {
+	m.TemperatureMax = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetActivityTime sets ActivityTime value.
 //
 // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
@@ -532,7 +595,7 @@ func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
 	return m
 }
 
-// SetActiveCalories sets Monitoring value.
+// SetActiveCalories sets ActiveCalories value.
 //
 // Units: kcal
 func (m *Monitoring) SetActiveCalories(v uint16) *Monitoring {
@@ -540,7 +603,7 @@ func (m *Monitoring) SetActiveCalories(v uint16) *Monitoring {
 	return m
 }
 
-// SetCurrentActivityTypeIntensity sets Monitoring value.
+// SetCurrentActivityTypeIntensity sets CurrentActivityTypeIntensity value.
 //
 // Indicates single type / intensity for duration since last monitoring message.
 func (m *Monitoring) SetCurrentActivityTypeIntensity(v byte) *Monitoring {
@@ -548,7 +611,7 @@ func (m *Monitoring) SetCurrentActivityTypeIntensity(v byte) *Monitoring {
 	return m
 }
 
-// SetTimestampMin8 sets Monitoring value.
+// SetTimestampMin8 sets TimestampMin8 value.
 //
 // Units: min
 func (m *Monitoring) SetTimestampMin8(v uint8) *Monitoring {
@@ -556,7 +619,7 @@ func (m *Monitoring) SetTimestampMin8(v uint8) *Monitoring {
 	return m
 }
 
-// SetTimestamp16 sets Monitoring value.
+// SetTimestamp16 sets Timestamp16 value.
 //
 // Units: s
 func (m *Monitoring) SetTimestamp16(v uint16) *Monitoring {
@@ -564,7 +627,7 @@ func (m *Monitoring) SetTimestamp16(v uint16) *Monitoring {
 	return m
 }
 
-// SetHeartRate sets Monitoring value.
+// SetHeartRate sets HeartRate value.
 //
 // Units: bpm
 func (m *Monitoring) SetHeartRate(v uint8) *Monitoring {
@@ -572,7 +635,7 @@ func (m *Monitoring) SetHeartRate(v uint8) *Monitoring {
 	return m
 }
 
-// SetIntensity sets Monitoring value.
+// SetIntensity sets Intensity value.
 //
 // Scale: 10
 func (m *Monitoring) SetIntensity(v uint8) *Monitoring {
@@ -580,7 +643,16 @@ func (m *Monitoring) SetIntensity(v uint8) *Monitoring {
 	return m
 }
 
-// SetDurationMin sets Monitoring value.
+// SetIntensityScaled is similar to SetIntensity except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10
+func (m *Monitoring) SetIntensityScaled(v float64) *Monitoring {
+	m.Intensity = uint8(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetDurationMin sets DurationMin value.
 //
 // Units: min
 func (m *Monitoring) SetDurationMin(v uint16) *Monitoring {
@@ -588,7 +660,7 @@ func (m *Monitoring) SetDurationMin(v uint16) *Monitoring {
 	return m
 }
 
-// SetDuration sets Monitoring value.
+// SetDuration sets Duration value.
 //
 // Units: s
 func (m *Monitoring) SetDuration(v uint32) *Monitoring {
@@ -596,7 +668,7 @@ func (m *Monitoring) SetDuration(v uint32) *Monitoring {
 	return m
 }
 
-// SetAscent sets Monitoring value.
+// SetAscent sets Ascent value.
 //
 // Scale: 1000; Units: m
 func (m *Monitoring) SetAscent(v uint32) *Monitoring {
@@ -604,7 +676,16 @@ func (m *Monitoring) SetAscent(v uint32) *Monitoring {
 	return m
 }
 
-// SetDescent sets Monitoring value.
+// SetAscentScaled is similar to SetAscent except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m
+func (m *Monitoring) SetAscentScaled(v float64) *Monitoring {
+	m.Ascent = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetDescent sets Descent value.
 //
 // Scale: 1000; Units: m
 func (m *Monitoring) SetDescent(v uint32) *Monitoring {
@@ -612,7 +693,16 @@ func (m *Monitoring) SetDescent(v uint32) *Monitoring {
 	return m
 }
 
-// SetModerateActivityMinutes sets Monitoring value.
+// SetDescentScaled is similar to SetDescent except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m
+func (m *Monitoring) SetDescentScaled(v float64) *Monitoring {
+	m.Descent = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetModerateActivityMinutes sets ModerateActivityMinutes value.
 //
 // Units: minutes
 func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
@@ -620,7 +710,7 @@ func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
 	return m
 }
 
-// SetVigorousActivityMinutes sets Monitoring value.
+// SetVigorousActivityMinutes sets VigorousActivityMinutes value.
 //
 // Units: minutes
 func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {

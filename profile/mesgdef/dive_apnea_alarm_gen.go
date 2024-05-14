@@ -169,9 +169,10 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// DepthScaled return Depth in its scaled value [Scale: 1000; Units: m; Depth setting (m) for depth type alarms].
-//
+// DepthScaled return Depth in its scaled value.
 // If Depth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; Depth setting (m) for depth type alarms
 func (m *DiveApneaAlarm) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -179,9 +180,10 @@ func (m *DiveApneaAlarm) DepthScaled() float64 {
 	return scaleoffset.Apply(m.Depth, 1000, 0)
 }
 
-// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms].
-//
+// SpeedScaled return Speed in its scaled value.
 // If Speed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
 func (m *DiveApneaAlarm) SpeedScaled() float64 {
 	if m.Speed == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -189,7 +191,7 @@ func (m *DiveApneaAlarm) SpeedScaled() float64 {
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
-// SetMessageIndex sets DiveApneaAlarm value.
+// SetMessageIndex sets MessageIndex value.
 //
 // Index of the alarm
 func (m *DiveApneaAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveApneaAlarm {
@@ -197,7 +199,7 @@ func (m *DiveApneaAlarm) SetMessageIndex(v typedef.MessageIndex) *DiveApneaAlarm
 	return m
 }
 
-// SetDepth sets DiveApneaAlarm value.
+// SetDepth sets Depth value.
 //
 // Scale: 1000; Units: m; Depth setting (m) for depth type alarms
 func (m *DiveApneaAlarm) SetDepth(v uint32) *DiveApneaAlarm {
@@ -205,7 +207,16 @@ func (m *DiveApneaAlarm) SetDepth(v uint32) *DiveApneaAlarm {
 	return m
 }
 
-// SetTime sets DiveApneaAlarm value.
+// SetDepthScaled is similar to SetDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; Depth setting (m) for depth type alarms
+func (m *DiveApneaAlarm) SetDepthScaled(v float64) *DiveApneaAlarm {
+	m.Depth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTime sets Time value.
 //
 // Units: s; Time setting (s) for time type alarms
 func (m *DiveApneaAlarm) SetTime(v int32) *DiveApneaAlarm {
@@ -213,7 +224,7 @@ func (m *DiveApneaAlarm) SetTime(v int32) *DiveApneaAlarm {
 	return m
 }
 
-// SetEnabled sets DiveApneaAlarm value.
+// SetEnabled sets Enabled value.
 //
 // Enablement flag
 func (m *DiveApneaAlarm) SetEnabled(v bool) *DiveApneaAlarm {
@@ -221,7 +232,7 @@ func (m *DiveApneaAlarm) SetEnabled(v bool) *DiveApneaAlarm {
 	return m
 }
 
-// SetAlarmType sets DiveApneaAlarm value.
+// SetAlarmType sets AlarmType value.
 //
 // Alarm type setting
 func (m *DiveApneaAlarm) SetAlarmType(v typedef.DiveAlarmType) *DiveApneaAlarm {
@@ -229,7 +240,7 @@ func (m *DiveApneaAlarm) SetAlarmType(v typedef.DiveAlarmType) *DiveApneaAlarm {
 	return m
 }
 
-// SetSound sets DiveApneaAlarm value.
+// SetSound sets Sound value.
 //
 // Tone and Vibe setting for the alarm.
 func (m *DiveApneaAlarm) SetSound(v typedef.Tone) *DiveApneaAlarm {
@@ -237,7 +248,7 @@ func (m *DiveApneaAlarm) SetSound(v typedef.Tone) *DiveApneaAlarm {
 	return m
 }
 
-// SetDiveTypes sets DiveApneaAlarm value.
+// SetDiveTypes sets DiveTypes value.
 //
 // Array: [N]; Dive types the alarm will trigger on
 func (m *DiveApneaAlarm) SetDiveTypes(v []typedef.SubSport) *DiveApneaAlarm {
@@ -245,7 +256,7 @@ func (m *DiveApneaAlarm) SetDiveTypes(v []typedef.SubSport) *DiveApneaAlarm {
 	return m
 }
 
-// SetId sets DiveApneaAlarm value.
+// SetId sets Id value.
 //
 // Alarm ID
 func (m *DiveApneaAlarm) SetId(v uint32) *DiveApneaAlarm {
@@ -253,7 +264,7 @@ func (m *DiveApneaAlarm) SetId(v uint32) *DiveApneaAlarm {
 	return m
 }
 
-// SetPopupEnabled sets DiveApneaAlarm value.
+// SetPopupEnabled sets PopupEnabled value.
 //
 // Show a visible pop-up for this alarm
 func (m *DiveApneaAlarm) SetPopupEnabled(v bool) *DiveApneaAlarm {
@@ -261,7 +272,7 @@ func (m *DiveApneaAlarm) SetPopupEnabled(v bool) *DiveApneaAlarm {
 	return m
 }
 
-// SetTriggerOnDescent sets DiveApneaAlarm value.
+// SetTriggerOnDescent sets TriggerOnDescent value.
 //
 // Trigger the alarm on descent
 func (m *DiveApneaAlarm) SetTriggerOnDescent(v bool) *DiveApneaAlarm {
@@ -269,7 +280,7 @@ func (m *DiveApneaAlarm) SetTriggerOnDescent(v bool) *DiveApneaAlarm {
 	return m
 }
 
-// SetTriggerOnAscent sets DiveApneaAlarm value.
+// SetTriggerOnAscent sets TriggerOnAscent value.
 //
 // Trigger the alarm on ascent
 func (m *DiveApneaAlarm) SetTriggerOnAscent(v bool) *DiveApneaAlarm {
@@ -277,7 +288,7 @@ func (m *DiveApneaAlarm) SetTriggerOnAscent(v bool) *DiveApneaAlarm {
 	return m
 }
 
-// SetRepeating sets DiveApneaAlarm value.
+// SetRepeating sets Repeating value.
 //
 // Repeat alarm each time threshold is crossed?
 func (m *DiveApneaAlarm) SetRepeating(v bool) *DiveApneaAlarm {
@@ -285,11 +296,20 @@ func (m *DiveApneaAlarm) SetRepeating(v bool) *DiveApneaAlarm {
 	return m
 }
 
-// SetSpeed sets DiveApneaAlarm value.
+// SetSpeed sets Speed value.
 //
 // Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
 func (m *DiveApneaAlarm) SetSpeed(v int32) *DiveApneaAlarm {
 	m.Speed = v
+	return m
+}
+
+// SetSpeedScaled is similar to SetSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
+func (m *DiveApneaAlarm) SetSpeedScaled(v float64) *DiveApneaAlarm {
+	m.Speed = int32(scaleoffset.Discard(v, 1000, 0))
 	return m
 }
 

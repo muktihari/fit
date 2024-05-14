@@ -92,13 +92,13 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets CadenceZone value.
+// SetMessageIndex sets MessageIndex value.
 func (m *CadenceZone) SetMessageIndex(v typedef.MessageIndex) *CadenceZone {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHighValue sets CadenceZone value.
+// SetHighValue sets HighValue value.
 //
 // Units: rpm
 func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
@@ -106,7 +106,7 @@ func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
 	return m
 }
 
-// SetName sets CadenceZone value.
+// SetName sets Name value.
 func (m *CadenceZone) SetName(v string) *CadenceZone {
 	m.Name = v
 	return m

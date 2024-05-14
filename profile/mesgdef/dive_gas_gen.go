@@ -106,13 +106,13 @@ func (m *DiveGas) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets DiveGas value.
+// SetMessageIndex sets MessageIndex value.
 func (m *DiveGas) SetMessageIndex(v typedef.MessageIndex) *DiveGas {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHeliumContent sets DiveGas value.
+// SetHeliumContent sets HeliumContent value.
 //
 // Units: percent
 func (m *DiveGas) SetHeliumContent(v uint8) *DiveGas {
@@ -120,7 +120,7 @@ func (m *DiveGas) SetHeliumContent(v uint8) *DiveGas {
 	return m
 }
 
-// SetOxygenContent sets DiveGas value.
+// SetOxygenContent sets OxygenContent value.
 //
 // Units: percent
 func (m *DiveGas) SetOxygenContent(v uint8) *DiveGas {
@@ -128,13 +128,13 @@ func (m *DiveGas) SetOxygenContent(v uint8) *DiveGas {
 	return m
 }
 
-// SetStatus sets DiveGas value.
+// SetStatus sets Status value.
 func (m *DiveGas) SetStatus(v typedef.DiveGasStatus) *DiveGas {
 	m.Status = v
 	return m
 }
 
-// SetMode sets DiveGas value.
+// SetMode sets Mode value.
 func (m *DiveGas) SetMode(v typedef.DiveGasMode) *DiveGas {
 	m.Mode = v
 	return m

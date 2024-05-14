@@ -139,7 +139,7 @@ func (m *GyroscopeData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *GyroscopeData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets GyroscopeData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *GyroscopeData) SetTimestamp(v time.Time) *GyroscopeData {
@@ -147,7 +147,7 @@ func (m *GyroscopeData) SetTimestamp(v time.Time) *GyroscopeData {
 	return m
 }
 
-// SetTimestampMs sets GyroscopeData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
@@ -155,7 +155,7 @@ func (m *GyroscopeData) SetTimestampMs(v uint16) *GyroscopeData {
 	return m
 }
 
-// SetSampleTimeOffset sets GyroscopeData value.
+// SetSampleTimeOffset sets SampleTimeOffset value.
 //
 // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
 func (m *GyroscopeData) SetSampleTimeOffset(v []uint16) *GyroscopeData {
@@ -163,7 +163,7 @@ func (m *GyroscopeData) SetSampleTimeOffset(v []uint16) *GyroscopeData {
 	return m
 }
 
-// SetGyroX sets GyroscopeData value.
+// SetGyroX sets GyroX value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *GyroscopeData) SetGyroX(v []uint16) *GyroscopeData {
@@ -171,7 +171,7 @@ func (m *GyroscopeData) SetGyroX(v []uint16) *GyroscopeData {
 	return m
 }
 
-// SetGyroY sets GyroscopeData value.
+// SetGyroY sets GyroY value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *GyroscopeData) SetGyroY(v []uint16) *GyroscopeData {
@@ -179,7 +179,7 @@ func (m *GyroscopeData) SetGyroY(v []uint16) *GyroscopeData {
 	return m
 }
 
-// SetGyroZ sets GyroscopeData value.
+// SetGyroZ sets GyroZ value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *GyroscopeData) SetGyroZ(v []uint16) *GyroscopeData {
@@ -187,7 +187,7 @@ func (m *GyroscopeData) SetGyroZ(v []uint16) *GyroscopeData {
 	return m
 }
 
-// SetCalibratedGyroX sets GyroscopeData value.
+// SetCalibratedGyroX sets CalibratedGyroX value.
 //
 // Array: [N]; Units: deg/s; Calibrated gyro reading
 func (m *GyroscopeData) SetCalibratedGyroX(v []float32) *GyroscopeData {
@@ -195,7 +195,7 @@ func (m *GyroscopeData) SetCalibratedGyroX(v []float32) *GyroscopeData {
 	return m
 }
 
-// SetCalibratedGyroY sets GyroscopeData value.
+// SetCalibratedGyroY sets CalibratedGyroY value.
 //
 // Array: [N]; Units: deg/s; Calibrated gyro reading
 func (m *GyroscopeData) SetCalibratedGyroY(v []float32) *GyroscopeData {
@@ -203,7 +203,7 @@ func (m *GyroscopeData) SetCalibratedGyroY(v []float32) *GyroscopeData {
 	return m
 }
 
-// SetCalibratedGyroZ sets GyroscopeData value.
+// SetCalibratedGyroZ sets CalibratedGyroZ value.
 //
 // Array: [N]; Units: deg/s; Calibrated gyro reading
 func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {

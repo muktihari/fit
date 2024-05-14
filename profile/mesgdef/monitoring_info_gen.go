@@ -127,9 +127,10 @@ func (m *MonitoringInfo) TimestampUint32() uint32 { return datetime.ToUint32(m.T
 // LocalTimestampUint32 returns LocalTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *MonitoringInfo) LocalTimestampUint32() uint32 { return datetime.ToUint32(m.LocalTimestamp) }
 
-// CyclesToDistanceScaled return CyclesToDistance in its scaled value [Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type].
-//
+// CyclesToDistanceScaled return CyclesToDistance in its scaled value.
 // If CyclesToDistance value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
 func (m *MonitoringInfo) CyclesToDistanceScaled() []float64 {
 	if m.CyclesToDistance == nil {
 		return nil
@@ -137,9 +138,10 @@ func (m *MonitoringInfo) CyclesToDistanceScaled() []float64 {
 	return scaleoffset.ApplySlice(m.CyclesToDistance, 5000, 0)
 }
 
-// CyclesToCaloriesScaled return CyclesToCalories in its scaled value [Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type].
-//
+// CyclesToCaloriesScaled return CyclesToCalories in its scaled value.
 // If CyclesToCalories value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
 func (m *MonitoringInfo) CyclesToCaloriesScaled() []float64 {
 	if m.CyclesToCalories == nil {
 		return nil
@@ -147,7 +149,7 @@ func (m *MonitoringInfo) CyclesToCaloriesScaled() []float64 {
 	return scaleoffset.ApplySlice(m.CyclesToCalories, 5000, 0)
 }
 
-// SetTimestamp sets MonitoringInfo value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *MonitoringInfo) SetTimestamp(v time.Time) *MonitoringInfo {
@@ -155,7 +157,7 @@ func (m *MonitoringInfo) SetTimestamp(v time.Time) *MonitoringInfo {
 	return m
 }
 
-// SetLocalTimestamp sets MonitoringInfo value.
+// SetLocalTimestamp sets LocalTimestamp value.
 //
 // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
 func (m *MonitoringInfo) SetLocalTimestamp(v time.Time) *MonitoringInfo {
@@ -163,7 +165,7 @@ func (m *MonitoringInfo) SetLocalTimestamp(v time.Time) *MonitoringInfo {
 	return m
 }
 
-// SetActivityType sets MonitoringInfo value.
+// SetActivityType sets ActivityType value.
 //
 // Array: [N]
 func (m *MonitoringInfo) SetActivityType(v []typedef.ActivityType) *MonitoringInfo {
@@ -171,7 +173,7 @@ func (m *MonitoringInfo) SetActivityType(v []typedef.ActivityType) *MonitoringIn
 	return m
 }
 
-// SetCyclesToDistance sets MonitoringInfo value.
+// SetCyclesToDistance sets CyclesToDistance value.
 //
 // Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
 func (m *MonitoringInfo) SetCyclesToDistance(v []uint16) *MonitoringInfo {
@@ -179,7 +181,16 @@ func (m *MonitoringInfo) SetCyclesToDistance(v []uint16) *MonitoringInfo {
 	return m
 }
 
-// SetCyclesToCalories sets MonitoringInfo value.
+// SetCyclesToDistanceScaled is similar to SetCyclesToDistance except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
+func (m *MonitoringInfo) SetCyclesToDistanceScaled(vs []float64) *MonitoringInfo {
+	m.CyclesToDistance = scaleoffset.DiscardSlice[uint16](vs, 5000, 0)
+	return m
+}
+
+// SetCyclesToCalories sets CyclesToCalories value.
 //
 // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
 func (m *MonitoringInfo) SetCyclesToCalories(v []uint16) *MonitoringInfo {
@@ -187,7 +198,16 @@ func (m *MonitoringInfo) SetCyclesToCalories(v []uint16) *MonitoringInfo {
 	return m
 }
 
-// SetRestingMetabolicRate sets MonitoringInfo value.
+// SetCyclesToCaloriesScaled is similar to SetCyclesToCalories except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
+func (m *MonitoringInfo) SetCyclesToCaloriesScaled(vs []float64) *MonitoringInfo {
+	m.CyclesToCalories = scaleoffset.DiscardSlice[uint16](vs, 5000, 0)
+	return m
+}
+
+// SetRestingMetabolicRate sets RestingMetabolicRate value.
 //
 // Units: kcal / day
 func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {

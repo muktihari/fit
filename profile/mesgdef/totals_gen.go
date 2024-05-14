@@ -146,13 +146,13 @@ func (m *Totals) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Totals) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetMessageIndex sets Totals value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Totals) SetMessageIndex(v typedef.MessageIndex) *Totals {
 	m.MessageIndex = v
 	return m
 }
 
-// SetTimestamp sets Totals value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *Totals) SetTimestamp(v time.Time) *Totals {
@@ -160,7 +160,7 @@ func (m *Totals) SetTimestamp(v time.Time) *Totals {
 	return m
 }
 
-// SetTimerTime sets Totals value.
+// SetTimerTime sets TimerTime value.
 //
 // Units: s; Excludes pauses
 func (m *Totals) SetTimerTime(v uint32) *Totals {
@@ -168,7 +168,7 @@ func (m *Totals) SetTimerTime(v uint32) *Totals {
 	return m
 }
 
-// SetDistance sets Totals value.
+// SetDistance sets Distance value.
 //
 // Units: m
 func (m *Totals) SetDistance(v uint32) *Totals {
@@ -176,7 +176,7 @@ func (m *Totals) SetDistance(v uint32) *Totals {
 	return m
 }
 
-// SetCalories sets Totals value.
+// SetCalories sets Calories value.
 //
 // Units: kcal
 func (m *Totals) SetCalories(v uint32) *Totals {
@@ -184,13 +184,13 @@ func (m *Totals) SetCalories(v uint32) *Totals {
 	return m
 }
 
-// SetSport sets Totals value.
+// SetSport sets Sport value.
 func (m *Totals) SetSport(v typedef.Sport) *Totals {
 	m.Sport = v
 	return m
 }
 
-// SetElapsedTime sets Totals value.
+// SetElapsedTime sets ElapsedTime value.
 //
 // Units: s; Includes pauses
 func (m *Totals) SetElapsedTime(v uint32) *Totals {
@@ -198,13 +198,13 @@ func (m *Totals) SetElapsedTime(v uint32) *Totals {
 	return m
 }
 
-// SetSessions sets Totals value.
+// SetSessions sets Sessions value.
 func (m *Totals) SetSessions(v uint16) *Totals {
 	m.Sessions = v
 	return m
 }
 
-// SetActiveTime sets Totals value.
+// SetActiveTime sets ActiveTime value.
 //
 // Units: s
 func (m *Totals) SetActiveTime(v uint32) *Totals {
@@ -212,7 +212,7 @@ func (m *Totals) SetActiveTime(v uint32) *Totals {
 	return m
 }
 
-// SetSportIndex sets Totals value.
+// SetSportIndex sets SportIndex value.
 func (m *Totals) SetSportIndex(v uint8) *Totals {
 	m.SportIndex = v
 	return m

@@ -137,9 +137,10 @@ func (m *Activity) TimestampUint32() uint32 { return datetime.ToUint32(m.Timesta
 // LocalTimestampUint32 returns LocalTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Activity) LocalTimestampUint32() uint32 { return datetime.ToUint32(m.LocalTimestamp) }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s; Exclude pauses].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Exclude pauses
 func (m *Activity) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -147,13 +148,13 @@ func (m *Activity) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// SetTimestamp sets Activity value.
+// SetTimestamp sets Timestamp value.
 func (m *Activity) SetTimestamp(v time.Time) *Activity {
 	m.Timestamp = v
 	return m
 }
 
-// SetTotalTimerTime sets Activity value.
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s; Exclude pauses
 func (m *Activity) SetTotalTimerTime(v uint32) *Activity {
@@ -161,31 +162,40 @@ func (m *Activity) SetTotalTimerTime(v uint32) *Activity {
 	return m
 }
 
-// SetNumSessions sets Activity value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Exclude pauses
+func (m *Activity) SetTotalTimerTimeScaled(v float64) *Activity {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetNumSessions sets NumSessions value.
 func (m *Activity) SetNumSessions(v uint16) *Activity {
 	m.NumSessions = v
 	return m
 }
 
-// SetType sets Activity value.
+// SetType sets Type value.
 func (m *Activity) SetType(v typedef.Activity) *Activity {
 	m.Type = v
 	return m
 }
 
-// SetEvent sets Activity value.
+// SetEvent sets Event value.
 func (m *Activity) SetEvent(v typedef.Event) *Activity {
 	m.Event = v
 	return m
 }
 
-// SetEventType sets Activity value.
+// SetEventType sets EventType value.
 func (m *Activity) SetEventType(v typedef.EventType) *Activity {
 	m.EventType = v
 	return m
 }
 
-// SetLocalTimestamp sets Activity value.
+// SetLocalTimestamp sets LocalTimestamp value.
 //
 // timestamp epoch expressed in local time, used to convert activity timestamps to local time
 func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
@@ -193,7 +203,7 @@ func (m *Activity) SetLocalTimestamp(v time.Time) *Activity {
 	return m
 }
 
-// SetEventGroup sets Activity value.
+// SetEventGroup sets EventGroup value.
 func (m *Activity) SetEventGroup(v uint8) *Activity {
 	m.EventGroup = v
 	return m

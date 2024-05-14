@@ -196,9 +196,10 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *TimeInZone) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInHrZoneScaled return TimeInHrZone in its scaled value.
 // If TimeInHrZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) TimeInHrZoneScaled() []float64 {
 	if m.TimeInHrZone == nil {
 		return nil
@@ -206,9 +207,10 @@ func (m *TimeInZone) TimeInHrZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
 }
 
-// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value.
 // If TimeInSpeedZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) TimeInSpeedZoneScaled() []float64 {
 	if m.TimeInSpeedZone == nil {
 		return nil
@@ -216,9 +218,10 @@ func (m *TimeInZone) TimeInSpeedZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
 }
 
-// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value.
 // If TimeInCadenceZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) TimeInCadenceZoneScaled() []float64 {
 	if m.TimeInCadenceZone == nil {
 		return nil
@@ -226,9 +229,10 @@ func (m *TimeInZone) TimeInCadenceZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
 }
 
-// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value.
 // If TimeInPowerZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) TimeInPowerZoneScaled() []float64 {
 	if m.TimeInPowerZone == nil {
 		return nil
@@ -236,9 +240,10 @@ func (m *TimeInZone) TimeInPowerZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
 }
 
-// SpeedZoneHighBoundaryScaled return SpeedZoneHighBoundary in its scaled value [Array: [N]; Scale: 1000; Units: m/s].
-//
+// SpeedZoneHighBoundaryScaled return SpeedZoneHighBoundary in its scaled value.
 // If SpeedZoneHighBoundary value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: m/s
 func (m *TimeInZone) SpeedZoneHighBoundaryScaled() []float64 {
 	if m.SpeedZoneHighBoundary == nil {
 		return nil
@@ -246,7 +251,7 @@ func (m *TimeInZone) SpeedZoneHighBoundaryScaled() []float64 {
 	return scaleoffset.ApplySlice(m.SpeedZoneHighBoundary, 1000, 0)
 }
 
-// SetTimestamp sets TimeInZone value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *TimeInZone) SetTimestamp(v time.Time) *TimeInZone {
@@ -254,19 +259,19 @@ func (m *TimeInZone) SetTimestamp(v time.Time) *TimeInZone {
 	return m
 }
 
-// SetReferenceMesg sets TimeInZone value.
+// SetReferenceMesg sets ReferenceMesg value.
 func (m *TimeInZone) SetReferenceMesg(v typedef.MesgNum) *TimeInZone {
 	m.ReferenceMesg = v
 	return m
 }
 
-// SetReferenceIndex sets TimeInZone value.
+// SetReferenceIndex sets ReferenceIndex value.
 func (m *TimeInZone) SetReferenceIndex(v typedef.MessageIndex) *TimeInZone {
 	m.ReferenceIndex = v
 	return m
 }
 
-// SetTimeInHrZone sets TimeInZone value.
+// SetTimeInHrZone sets TimeInHrZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInHrZone(v []uint32) *TimeInZone {
@@ -274,7 +279,16 @@ func (m *TimeInZone) SetTimeInHrZone(v []uint32) *TimeInZone {
 	return m
 }
 
-// SetTimeInSpeedZone sets TimeInZone value.
+// SetTimeInHrZoneScaled is similar to SetTimeInHrZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *TimeInZone) SetTimeInHrZoneScaled(vs []float64) *TimeInZone {
+	m.TimeInHrZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInSpeedZone sets TimeInSpeedZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInSpeedZone(v []uint32) *TimeInZone {
@@ -282,7 +296,16 @@ func (m *TimeInZone) SetTimeInSpeedZone(v []uint32) *TimeInZone {
 	return m
 }
 
-// SetTimeInCadenceZone sets TimeInZone value.
+// SetTimeInSpeedZoneScaled is similar to SetTimeInSpeedZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *TimeInZone) SetTimeInSpeedZoneScaled(vs []float64) *TimeInZone {
+	m.TimeInSpeedZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInCadenceZone sets TimeInCadenceZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInCadenceZone(v []uint32) *TimeInZone {
@@ -290,7 +313,16 @@ func (m *TimeInZone) SetTimeInCadenceZone(v []uint32) *TimeInZone {
 	return m
 }
 
-// SetTimeInPowerZone sets TimeInZone value.
+// SetTimeInCadenceZoneScaled is similar to SetTimeInCadenceZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *TimeInZone) SetTimeInCadenceZoneScaled(vs []float64) *TimeInZone {
+	m.TimeInCadenceZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInPowerZone sets TimeInPowerZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInPowerZone(v []uint32) *TimeInZone {
@@ -298,7 +330,16 @@ func (m *TimeInZone) SetTimeInPowerZone(v []uint32) *TimeInZone {
 	return m
 }
 
-// SetHrZoneHighBoundary sets TimeInZone value.
+// SetTimeInPowerZoneScaled is similar to SetTimeInPowerZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *TimeInZone) SetTimeInPowerZoneScaled(vs []float64) *TimeInZone {
+	m.TimeInPowerZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetHrZoneHighBoundary sets HrZoneHighBoundary value.
 //
 // Array: [N]; Units: bpm
 func (m *TimeInZone) SetHrZoneHighBoundary(v []uint8) *TimeInZone {
@@ -306,7 +347,7 @@ func (m *TimeInZone) SetHrZoneHighBoundary(v []uint8) *TimeInZone {
 	return m
 }
 
-// SetSpeedZoneHighBoundary sets TimeInZone value.
+// SetSpeedZoneHighBoundary sets SpeedZoneHighBoundary value.
 //
 // Array: [N]; Scale: 1000; Units: m/s
 func (m *TimeInZone) SetSpeedZoneHighBoundary(v []uint16) *TimeInZone {
@@ -314,7 +355,16 @@ func (m *TimeInZone) SetSpeedZoneHighBoundary(v []uint16) *TimeInZone {
 	return m
 }
 
-// SetCadenceZoneHighBoundary sets TimeInZone value.
+// SetSpeedZoneHighBoundaryScaled is similar to SetSpeedZoneHighBoundary except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: m/s
+func (m *TimeInZone) SetSpeedZoneHighBoundaryScaled(vs []float64) *TimeInZone {
+	m.SpeedZoneHighBoundary = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
+	return m
+}
+
+// SetCadenceZoneHighBoundary sets CadenceZoneHighBoundary value.
 //
 // Array: [N]; Units: rpm
 func (m *TimeInZone) SetCadenceZoneHighBoundary(v []uint8) *TimeInZone {
@@ -322,7 +372,7 @@ func (m *TimeInZone) SetCadenceZoneHighBoundary(v []uint8) *TimeInZone {
 	return m
 }
 
-// SetPowerZoneHighBoundary sets TimeInZone value.
+// SetPowerZoneHighBoundary sets PowerZoneHighBoundary value.
 //
 // Array: [N]; Units: watts
 func (m *TimeInZone) SetPowerZoneHighBoundary(v []uint16) *TimeInZone {
@@ -330,37 +380,37 @@ func (m *TimeInZone) SetPowerZoneHighBoundary(v []uint16) *TimeInZone {
 	return m
 }
 
-// SetHrCalcType sets TimeInZone value.
+// SetHrCalcType sets HrCalcType value.
 func (m *TimeInZone) SetHrCalcType(v typedef.HrZoneCalc) *TimeInZone {
 	m.HrCalcType = v
 	return m
 }
 
-// SetMaxHeartRate sets TimeInZone value.
+// SetMaxHeartRate sets MaxHeartRate value.
 func (m *TimeInZone) SetMaxHeartRate(v uint8) *TimeInZone {
 	m.MaxHeartRate = v
 	return m
 }
 
-// SetRestingHeartRate sets TimeInZone value.
+// SetRestingHeartRate sets RestingHeartRate value.
 func (m *TimeInZone) SetRestingHeartRate(v uint8) *TimeInZone {
 	m.RestingHeartRate = v
 	return m
 }
 
-// SetThresholdHeartRate sets TimeInZone value.
+// SetThresholdHeartRate sets ThresholdHeartRate value.
 func (m *TimeInZone) SetThresholdHeartRate(v uint8) *TimeInZone {
 	m.ThresholdHeartRate = v
 	return m
 }
 
-// SetPwrCalcType sets TimeInZone value.
+// SetPwrCalcType sets PwrCalcType value.
 func (m *TimeInZone) SetPwrCalcType(v typedef.PwrZoneCalc) *TimeInZone {
 	m.PwrCalcType = v
 	return m
 }
 
-// SetFunctionalThresholdPower sets TimeInZone value.
+// SetFunctionalThresholdPower sets FunctionalThresholdPower value.
 func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
 	m.FunctionalThresholdPower = v
 	return m

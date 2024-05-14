@@ -104,7 +104,7 @@ func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaSpo2Data) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaSpo2Data value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaSpo2Data) SetTimestamp(v time.Time) *HsaSpo2Data {
@@ -112,7 +112,7 @@ func (m *HsaSpo2Data) SetTimestamp(v time.Time) *HsaSpo2Data {
 	return m
 }
 
-// SetProcessingInterval sets HsaSpo2Data value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaSpo2Data) SetProcessingInterval(v uint16) *HsaSpo2Data {
@@ -120,7 +120,7 @@ func (m *HsaSpo2Data) SetProcessingInterval(v uint16) *HsaSpo2Data {
 	return m
 }
 
-// SetReadingSpo2 sets HsaSpo2Data value.
+// SetReadingSpo2 sets ReadingSpo2 value.
 //
 // Array: [N]; Units: percent; SpO2 Reading
 func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
@@ -128,7 +128,7 @@ func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
 	return m
 }
 
-// SetConfidence sets HsaSpo2Data value.
+// SetConfidence sets Confidence value.
 //
 // Array: [N]; SpO2 Confidence
 func (m *HsaSpo2Data) SetConfidence(v []uint8) *HsaSpo2Data {

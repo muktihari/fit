@@ -145,9 +145,10 @@ func (m *GpsMetadata) TimestampUint32() uint32 { return datetime.ToUint32(m.Time
 // UtcTimestampUint32 returns UtcTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *GpsMetadata) UtcTimestampUint32() uint32 { return datetime.ToUint32(m.UtcTimestamp) }
 
-// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -155,9 +156,10 @@ func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
 
-// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -165,9 +167,10 @@ func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
 }
 
-// HeadingScaled return Heading in its scaled value [Scale: 100; Units: degrees].
-//
+// HeadingScaled return Heading in its scaled value.
 // If Heading value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: degrees
 func (m *GpsMetadata) HeadingScaled() float64 {
 	if m.Heading == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -175,9 +178,10 @@ func (m *GpsMetadata) HeadingScaled() float64 {
 	return scaleoffset.Apply(m.Heading, 100, 0)
 }
 
-// VelocityScaled return Velocity in its scaled value [Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.].
-//
+// VelocityScaled return Velocity in its scaled value.
 // If Velocity value is invalid, nil will be returned.
+//
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 func (m *GpsMetadata) VelocityScaled() []float64 {
 	if m.Velocity == nil {
 		return nil
@@ -203,7 +207,7 @@ func (m *GpsMetadata) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetTimestamp sets GpsMetadata value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp.
 func (m *GpsMetadata) SetTimestamp(v time.Time) *GpsMetadata {
@@ -211,7 +215,7 @@ func (m *GpsMetadata) SetTimestamp(v time.Time) *GpsMetadata {
 	return m
 }
 
-// SetTimestampMs sets GpsMetadata value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
@@ -219,7 +223,7 @@ func (m *GpsMetadata) SetTimestampMs(v uint16) *GpsMetadata {
 	return m
 }
 
-// SetPositionLat sets GpsMetadata value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *GpsMetadata) SetPositionLat(v int32) *GpsMetadata {
@@ -227,7 +231,14 @@ func (m *GpsMetadata) SetPositionLat(v int32) *GpsMetadata {
 	return m
 }
 
-// SetPositionLong sets GpsMetadata value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *GpsMetadata) SetPositionLatDegrees(degrees float64) *GpsMetadata {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *GpsMetadata) SetPositionLong(v int32) *GpsMetadata {
@@ -235,7 +246,14 @@ func (m *GpsMetadata) SetPositionLong(v int32) *GpsMetadata {
 	return m
 }
 
-// SetEnhancedAltitude sets GpsMetadata value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *GpsMetadata) SetPositionLongDegrees(degrees float64) *GpsMetadata {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEnhancedAltitude sets EnhancedAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
@@ -243,7 +261,16 @@ func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
 	return m
 }
 
-// SetEnhancedSpeed sets GpsMetadata value.
+// SetEnhancedAltitudeScaled is similar to SetEnhancedAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *GpsMetadata) SetEnhancedAltitudeScaled(v float64) *GpsMetadata {
+	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetEnhancedSpeed sets EnhancedSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
@@ -251,7 +278,16 @@ func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
 	return m
 }
 
-// SetHeading sets GpsMetadata value.
+// SetEnhancedSpeedScaled is similar to SetEnhancedSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *GpsMetadata) SetEnhancedSpeedScaled(v float64) *GpsMetadata {
+	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetHeading sets Heading value.
 //
 // Scale: 100; Units: degrees
 func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
@@ -259,7 +295,16 @@ func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
 	return m
 }
 
-// SetUtcTimestamp sets GpsMetadata value.
+// SetHeadingScaled is similar to SetHeading except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: degrees
+func (m *GpsMetadata) SetHeadingScaled(v float64) *GpsMetadata {
+	m.Heading = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetUtcTimestamp sets UtcTimestamp value.
 //
 // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
 func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
@@ -267,11 +312,20 @@ func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
 	return m
 }
 
-// SetVelocity sets GpsMetadata value.
+// SetVelocity sets Velocity value.
 //
 // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 func (m *GpsMetadata) SetVelocity(v []int16) *GpsMetadata {
 	m.Velocity = v
+	return m
+}
+
+// SetVelocityScaled is similar to SetVelocity except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) SetVelocityScaled(vs []float64) *GpsMetadata {
+	m.Velocity = scaleoffset.DiscardSlice[int16](vs, 100, 0)
 	return m
 }
 

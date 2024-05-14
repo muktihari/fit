@@ -127,31 +127,31 @@ func (m *MesgCapabilities) GetCount() (name string, value any) {
 	return "count", m.Count
 }
 
-// SetMessageIndex sets MesgCapabilities value.
+// SetMessageIndex sets MessageIndex value.
 func (m *MesgCapabilities) SetMessageIndex(v typedef.MessageIndex) *MesgCapabilities {
 	m.MessageIndex = v
 	return m
 }
 
-// SetFile sets MesgCapabilities value.
+// SetFile sets File value.
 func (m *MesgCapabilities) SetFile(v typedef.File) *MesgCapabilities {
 	m.File = v
 	return m
 }
 
-// SetMesgNum sets MesgCapabilities value.
+// SetMesgNum sets MesgNum value.
 func (m *MesgCapabilities) SetMesgNum(v typedef.MesgNum) *MesgCapabilities {
 	m.MesgNum = v
 	return m
 }
 
-// SetCountType sets MesgCapabilities value.
+// SetCountType sets CountType value.
 func (m *MesgCapabilities) SetCountType(v typedef.MesgCount) *MesgCapabilities {
 	m.CountType = v
 	return m
 }
 
-// SetCount sets MesgCapabilities value.
+// SetCount sets Count value.
 func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
 	m.Count = v
 	return m

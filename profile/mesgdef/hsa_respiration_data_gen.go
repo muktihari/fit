@@ -98,9 +98,10 @@ func (m *HsaRespirationData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaRespirationData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// RespirationRateScaled return RespirationRate in its scaled value [Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist].
-//
+// RespirationRateScaled return RespirationRate in its scaled value.
 // If RespirationRate value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
 func (m *HsaRespirationData) RespirationRateScaled() []float64 {
 	if m.RespirationRate == nil {
 		return nil
@@ -108,7 +109,7 @@ func (m *HsaRespirationData) RespirationRateScaled() []float64 {
 	return scaleoffset.ApplySlice(m.RespirationRate, 100, 0)
 }
 
-// SetTimestamp sets HsaRespirationData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaRespirationData) SetTimestamp(v time.Time) *HsaRespirationData {
@@ -116,7 +117,7 @@ func (m *HsaRespirationData) SetTimestamp(v time.Time) *HsaRespirationData {
 	return m
 }
 
-// SetProcessingInterval sets HsaRespirationData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaRespirationData) SetProcessingInterval(v uint16) *HsaRespirationData {
@@ -124,11 +125,20 @@ func (m *HsaRespirationData) SetProcessingInterval(v uint16) *HsaRespirationData
 	return m
 }
 
-// SetRespirationRate sets HsaRespirationData value.
+// SetRespirationRate sets RespirationRate value.
 //
 // Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
 func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
 	m.RespirationRate = v
+	return m
+}
+
+// SetRespirationRateScaled is similar to SetRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+func (m *HsaRespirationData) SetRespirationRateScaled(vs []float64) *HsaRespirationData {
+	m.RespirationRate = scaleoffset.DiscardSlice[int16](vs, 100, 0)
 	return m
 }
 

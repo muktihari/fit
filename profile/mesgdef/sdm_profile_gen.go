@@ -129,9 +129,10 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SdmCalFactorScaled return SdmCalFactor in its scaled value [Scale: 10; Units: %].
-//
+// SdmCalFactorScaled return SdmCalFactor in its scaled value.
 // If SdmCalFactor value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: %
 func (m *SdmProfile) SdmCalFactorScaled() float64 {
 	if m.SdmCalFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -139,9 +140,10 @@ func (m *SdmProfile) SdmCalFactorScaled() float64 {
 	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
 }
 
-// OdometerScaled return Odometer in its scaled value [Scale: 100; Units: m].
-//
+// OdometerScaled return Odometer in its scaled value.
 // If Odometer value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *SdmProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -149,25 +151,25 @@ func (m *SdmProfile) OdometerScaled() float64 {
 	return scaleoffset.Apply(m.Odometer, 100, 0)
 }
 
-// SetMessageIndex sets SdmProfile value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SdmProfile) SetMessageIndex(v typedef.MessageIndex) *SdmProfile {
 	m.MessageIndex = v
 	return m
 }
 
-// SetEnabled sets SdmProfile value.
+// SetEnabled sets Enabled value.
 func (m *SdmProfile) SetEnabled(v bool) *SdmProfile {
 	m.Enabled = v
 	return m
 }
 
-// SetSdmAntId sets SdmProfile value.
+// SetSdmAntId sets SdmAntId value.
 func (m *SdmProfile) SetSdmAntId(v uint16) *SdmProfile {
 	m.SdmAntId = v
 	return m
 }
 
-// SetSdmCalFactor sets SdmProfile value.
+// SetSdmCalFactor sets SdmCalFactor value.
 //
 // Scale: 10; Units: %
 func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
@@ -175,7 +177,16 @@ func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
 	return m
 }
 
-// SetOdometer sets SdmProfile value.
+// SetSdmCalFactorScaled is similar to SetSdmCalFactor except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: %
+func (m *SdmProfile) SetSdmCalFactorScaled(v float64) *SdmProfile {
+	m.SdmCalFactor = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetOdometer sets Odometer value.
 //
 // Scale: 100; Units: m
 func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
@@ -183,7 +194,16 @@ func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
 	return m
 }
 
-// SetSpeedSource sets SdmProfile value.
+// SetOdometerScaled is similar to SetOdometer except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *SdmProfile) SetOdometerScaled(v float64) *SdmProfile {
+	m.Odometer = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetSpeedSource sets SpeedSource value.
 //
 // Use footpod for speed source instead of GPS
 func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
@@ -191,13 +211,13 @@ func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
 	return m
 }
 
-// SetSdmAntIdTransType sets SdmProfile value.
+// SetSdmAntIdTransType sets SdmAntIdTransType value.
 func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
 	m.SdmAntIdTransType = v
 	return m
 }
 
-// SetOdometerRollover sets SdmProfile value.
+// SetOdometerRollover sets OdometerRollover value.
 //
 // Rollover counter that can be used to extend the odometer
 func (m *SdmProfile) SetOdometerRollover(v uint8) *SdmProfile {

@@ -90,7 +90,7 @@ func (m *SleepLevel) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *SleepLevel) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets SleepLevel value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *SleepLevel) SetTimestamp(v time.Time) *SleepLevel {

@@ -158,67 +158,67 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetScreenIndex sets ExdDataConceptConfiguration value.
+// SetScreenIndex sets ScreenIndex value.
 func (m *ExdDataConceptConfiguration) SetScreenIndex(v uint8) *ExdDataConceptConfiguration {
 	m.ScreenIndex = v
 	return m
 }
 
-// SetConceptField sets ExdDataConceptConfiguration value.
+// SetConceptField sets ConceptField value.
 func (m *ExdDataConceptConfiguration) SetConceptField(v byte) *ExdDataConceptConfiguration {
 	m.ConceptField = v
 	return m
 }
 
-// SetFieldId sets ExdDataConceptConfiguration value.
+// SetFieldId sets FieldId value.
 func (m *ExdDataConceptConfiguration) SetFieldId(v uint8) *ExdDataConceptConfiguration {
 	m.FieldId = v
 	return m
 }
 
-// SetConceptIndex sets ExdDataConceptConfiguration value.
+// SetConceptIndex sets ConceptIndex value.
 func (m *ExdDataConceptConfiguration) SetConceptIndex(v uint8) *ExdDataConceptConfiguration {
 	m.ConceptIndex = v
 	return m
 }
 
-// SetDataPage sets ExdDataConceptConfiguration value.
+// SetDataPage sets DataPage value.
 func (m *ExdDataConceptConfiguration) SetDataPage(v uint8) *ExdDataConceptConfiguration {
 	m.DataPage = v
 	return m
 }
 
-// SetConceptKey sets ExdDataConceptConfiguration value.
+// SetConceptKey sets ConceptKey value.
 func (m *ExdDataConceptConfiguration) SetConceptKey(v uint8) *ExdDataConceptConfiguration {
 	m.ConceptKey = v
 	return m
 }
 
-// SetScaling sets ExdDataConceptConfiguration value.
+// SetScaling sets Scaling value.
 func (m *ExdDataConceptConfiguration) SetScaling(v uint8) *ExdDataConceptConfiguration {
 	m.Scaling = v
 	return m
 }
 
-// SetDataUnits sets ExdDataConceptConfiguration value.
+// SetDataUnits sets DataUnits value.
 func (m *ExdDataConceptConfiguration) SetDataUnits(v typedef.ExdDataUnits) *ExdDataConceptConfiguration {
 	m.DataUnits = v
 	return m
 }
 
-// SetQualifier sets ExdDataConceptConfiguration value.
+// SetQualifier sets Qualifier value.
 func (m *ExdDataConceptConfiguration) SetQualifier(v typedef.ExdQualifiers) *ExdDataConceptConfiguration {
 	m.Qualifier = v
 	return m
 }
 
-// SetDescriptor sets ExdDataConceptConfiguration value.
+// SetDescriptor sets Descriptor value.
 func (m *ExdDataConceptConfiguration) SetDescriptor(v typedef.ExdDescriptors) *ExdDataConceptConfiguration {
 	m.Descriptor = v
 	return m
 }
 
-// SetIsSigned sets ExdDataConceptConfiguration value.
+// SetIsSigned sets IsSigned value.
 func (m *ExdDataConceptConfiguration) SetIsSigned(v bool) *ExdDataConceptConfiguration {
 	m.IsSigned = v
 	return m

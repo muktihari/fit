@@ -158,9 +158,10 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Jump) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
-//
+// SpeedScaled return Speed in its scaled value.
 // If Speed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Jump) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -168,9 +169,10 @@ func (m *Jump) SpeedScaled() float64 {
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
-// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Jump) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -196,7 +198,7 @@ func (m *Jump) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetTimestamp sets Jump value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *Jump) SetTimestamp(v time.Time) *Jump {
@@ -204,7 +206,7 @@ func (m *Jump) SetTimestamp(v time.Time) *Jump {
 	return m
 }
 
-// SetDistance sets Jump value.
+// SetDistance sets Distance value.
 //
 // Units: m
 func (m *Jump) SetDistance(v float32) *Jump {
@@ -212,7 +214,7 @@ func (m *Jump) SetDistance(v float32) *Jump {
 	return m
 }
 
-// SetHeight sets Jump value.
+// SetHeight sets Height value.
 //
 // Units: m
 func (m *Jump) SetHeight(v float32) *Jump {
@@ -220,13 +222,13 @@ func (m *Jump) SetHeight(v float32) *Jump {
 	return m
 }
 
-// SetRotations sets Jump value.
+// SetRotations sets Rotations value.
 func (m *Jump) SetRotations(v uint8) *Jump {
 	m.Rotations = v
 	return m
 }
 
-// SetHangTime sets Jump value.
+// SetHangTime sets HangTime value.
 //
 // Units: s
 func (m *Jump) SetHangTime(v float32) *Jump {
@@ -234,7 +236,7 @@ func (m *Jump) SetHangTime(v float32) *Jump {
 	return m
 }
 
-// SetScore sets Jump value.
+// SetScore sets Score value.
 //
 // A score for a jump calculated based on hang time, rotations, and distance.
 func (m *Jump) SetScore(v float32) *Jump {
@@ -242,7 +244,7 @@ func (m *Jump) SetScore(v float32) *Jump {
 	return m
 }
 
-// SetPositionLat sets Jump value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *Jump) SetPositionLat(v int32) *Jump {
@@ -250,7 +252,14 @@ func (m *Jump) SetPositionLat(v int32) *Jump {
 	return m
 }
 
-// SetPositionLong sets Jump value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Jump) SetPositionLatDegrees(degrees float64) *Jump {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *Jump) SetPositionLong(v int32) *Jump {
@@ -258,7 +267,14 @@ func (m *Jump) SetPositionLong(v int32) *Jump {
 	return m
 }
 
-// SetSpeed sets Jump value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Jump) SetPositionLongDegrees(degrees float64) *Jump {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSpeed sets Speed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Jump) SetSpeed(v uint16) *Jump {
@@ -266,11 +282,29 @@ func (m *Jump) SetSpeed(v uint16) *Jump {
 	return m
 }
 
-// SetEnhancedSpeed sets Jump value.
+// SetSpeedScaled is similar to SetSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Jump) SetSpeedScaled(v float64) *Jump {
+	m.Speed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetEnhancedSpeed sets EnhancedSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
 	m.EnhancedSpeed = v
+	return m
+}
+
+// SetEnhancedSpeedScaled is similar to SetEnhancedSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Jump) SetEnhancedSpeedScaled(v float64) *Jump {
+	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
 	return m
 }
 

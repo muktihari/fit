@@ -153,7 +153,7 @@ func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *BloodPressure) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets BloodPressure value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *BloodPressure) SetTimestamp(v time.Time) *BloodPressure {
@@ -161,7 +161,7 @@ func (m *BloodPressure) SetTimestamp(v time.Time) *BloodPressure {
 	return m
 }
 
-// SetSystolicPressure sets BloodPressure value.
+// SetSystolicPressure sets SystolicPressure value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetSystolicPressure(v uint16) *BloodPressure {
@@ -169,7 +169,7 @@ func (m *BloodPressure) SetSystolicPressure(v uint16) *BloodPressure {
 	return m
 }
 
-// SetDiastolicPressure sets BloodPressure value.
+// SetDiastolicPressure sets DiastolicPressure value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetDiastolicPressure(v uint16) *BloodPressure {
@@ -177,7 +177,7 @@ func (m *BloodPressure) SetDiastolicPressure(v uint16) *BloodPressure {
 	return m
 }
 
-// SetMeanArterialPressure sets BloodPressure value.
+// SetMeanArterialPressure sets MeanArterialPressure value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetMeanArterialPressure(v uint16) *BloodPressure {
@@ -185,7 +185,7 @@ func (m *BloodPressure) SetMeanArterialPressure(v uint16) *BloodPressure {
 	return m
 }
 
-// SetMap3SampleMean sets BloodPressure value.
+// SetMap3SampleMean sets Map3SampleMean value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetMap3SampleMean(v uint16) *BloodPressure {
@@ -193,7 +193,7 @@ func (m *BloodPressure) SetMap3SampleMean(v uint16) *BloodPressure {
 	return m
 }
 
-// SetMapMorningValues sets BloodPressure value.
+// SetMapMorningValues sets MapMorningValues value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetMapMorningValues(v uint16) *BloodPressure {
@@ -201,7 +201,7 @@ func (m *BloodPressure) SetMapMorningValues(v uint16) *BloodPressure {
 	return m
 }
 
-// SetMapEveningValues sets BloodPressure value.
+// SetMapEveningValues sets MapEveningValues value.
 //
 // Units: mmHg
 func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
@@ -209,7 +209,7 @@ func (m *BloodPressure) SetMapEveningValues(v uint16) *BloodPressure {
 	return m
 }
 
-// SetHeartRate sets BloodPressure value.
+// SetHeartRate sets HeartRate value.
 //
 // Units: bpm
 func (m *BloodPressure) SetHeartRate(v uint8) *BloodPressure {
@@ -217,19 +217,19 @@ func (m *BloodPressure) SetHeartRate(v uint8) *BloodPressure {
 	return m
 }
 
-// SetHeartRateType sets BloodPressure value.
+// SetHeartRateType sets HeartRateType value.
 func (m *BloodPressure) SetHeartRateType(v typedef.HrType) *BloodPressure {
 	m.HeartRateType = v
 	return m
 }
 
-// SetStatus sets BloodPressure value.
+// SetStatus sets Status value.
 func (m *BloodPressure) SetStatus(v typedef.BpStatus) *BloodPressure {
 	m.Status = v
 	return m
 }
 
-// SetUserProfileIndex sets BloodPressure value.
+// SetUserProfileIndex sets UserProfileIndex value.
 //
 // Associates this blood pressure message to a user. This corresponds to the index of the user profile message in the blood pressure file.
 func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressure {

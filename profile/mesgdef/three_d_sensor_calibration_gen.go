@@ -144,9 +144,10 @@ func (m *ThreeDSensorCalibration) GetCalibrationFactor() (name string, value any
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *ThreeDSensorCalibration) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// OrientationMatrixScaled return OrientationMatrix in its scaled value [Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)].
-//
+// OrientationMatrixScaled return OrientationMatrix in its scaled value.
 // If OrientationMatrix value is invalid, nil will be returned.
+//
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 func (m *ThreeDSensorCalibration) OrientationMatrixScaled() []float64 {
 	if m.OrientationMatrix == nil {
 		return nil
@@ -154,7 +155,7 @@ func (m *ThreeDSensorCalibration) OrientationMatrixScaled() []float64 {
 	return scaleoffset.ApplySlice(m.OrientationMatrix, 65535, 0)
 }
 
-// SetTimestamp sets ThreeDSensorCalibration value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *ThreeDSensorCalibration) SetTimestamp(v time.Time) *ThreeDSensorCalibration {
@@ -162,7 +163,7 @@ func (m *ThreeDSensorCalibration) SetTimestamp(v time.Time) *ThreeDSensorCalibra
 	return m
 }
 
-// SetSensorType sets ThreeDSensorCalibration value.
+// SetSensorType sets SensorType value.
 //
 // Indicates which sensor the calibration is for
 func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSensorCalibration {
@@ -170,7 +171,7 @@ func (m *ThreeDSensorCalibration) SetSensorType(v typedef.SensorType) *ThreeDSen
 	return m
 }
 
-// SetCalibrationFactor sets ThreeDSensorCalibration value.
+// SetCalibrationFactor sets CalibrationFactor value.
 //
 // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 func (m *ThreeDSensorCalibration) SetCalibrationFactor(v uint32) *ThreeDSensorCalibration {
@@ -178,7 +179,7 @@ func (m *ThreeDSensorCalibration) SetCalibrationFactor(v uint32) *ThreeDSensorCa
 	return m
 }
 
-// SetCalibrationDivisor sets ThreeDSensorCalibration value.
+// SetCalibrationDivisor sets CalibrationDivisor value.
 //
 // Units: counts; Calibration factor divisor
 func (m *ThreeDSensorCalibration) SetCalibrationDivisor(v uint32) *ThreeDSensorCalibration {
@@ -186,7 +187,7 @@ func (m *ThreeDSensorCalibration) SetCalibrationDivisor(v uint32) *ThreeDSensorC
 	return m
 }
 
-// SetLevelShift sets ThreeDSensorCalibration value.
+// SetLevelShift sets LevelShift value.
 //
 // Level shift value used to shift the ADC value back into range
 func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibration {
@@ -194,7 +195,7 @@ func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibrati
 	return m
 }
 
-// SetOffsetCal sets ThreeDSensorCalibration value.
+// SetOffsetCal sets OffsetCal value.
 //
 // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
 func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
@@ -202,11 +203,20 @@ func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibrati
 	return m
 }
 
-// SetOrientationMatrix sets ThreeDSensorCalibration value.
+// SetOrientationMatrix sets OrientationMatrix value.
 //
 // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
 	m.OrientationMatrix = v
+	return m
+}
+
+// SetOrientationMatrixScaled is similar to SetOrientationMatrix except it accepts a scaled value.
+// This method automatically converts the given value to its []int32 form, discarding any applied scale and offset.
+//
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs []float64) *ThreeDSensorCalibration {
+	m.OrientationMatrix = scaleoffset.DiscardSlice[int32](vs, 65535, 0)
 	return m
 }
 

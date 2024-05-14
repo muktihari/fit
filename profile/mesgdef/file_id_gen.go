@@ -133,31 +133,31 @@ func (m *FileId) GetProduct() (name string, value any) {
 // TimeCreatedUint32 returns TimeCreated in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *FileId) TimeCreatedUint32() uint32 { return datetime.ToUint32(m.TimeCreated) }
 
-// SetType sets FileId value.
+// SetType sets Type value.
 func (m *FileId) SetType(v typedef.File) *FileId {
 	m.Type = v
 	return m
 }
 
-// SetManufacturer sets FileId value.
+// SetManufacturer sets Manufacturer value.
 func (m *FileId) SetManufacturer(v typedef.Manufacturer) *FileId {
 	m.Manufacturer = v
 	return m
 }
 
-// SetProduct sets FileId value.
+// SetProduct sets Product value.
 func (m *FileId) SetProduct(v uint16) *FileId {
 	m.Product = v
 	return m
 }
 
-// SetSerialNumber sets FileId value.
+// SetSerialNumber sets SerialNumber value.
 func (m *FileId) SetSerialNumber(v uint32) *FileId {
 	m.SerialNumber = v
 	return m
 }
 
-// SetTimeCreated sets FileId value.
+// SetTimeCreated sets TimeCreated value.
 //
 // Only set for files that are can be created/erased.
 func (m *FileId) SetTimeCreated(v time.Time) *FileId {
@@ -165,7 +165,7 @@ func (m *FileId) SetTimeCreated(v time.Time) *FileId {
 	return m
 }
 
-// SetNumber sets FileId value.
+// SetNumber sets Number value.
 //
 // Only set for files that are not created/erased.
 func (m *FileId) SetNumber(v uint16) *FileId {
@@ -173,7 +173,7 @@ func (m *FileId) SetNumber(v uint16) *FileId {
 	return m
 }
 
-// SetProductName sets FileId value.
+// SetProductName sets ProductName value.
 //
 // Optional free form string to indicate the devices name or model
 func (m *FileId) SetProductName(v string) *FileId {

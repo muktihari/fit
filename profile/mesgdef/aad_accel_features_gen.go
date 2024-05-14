@@ -120,9 +120,10 @@ func (m *AadAccelFeatures) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *AadAccelFeatures) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// TimeAboveThresholdScaled return TimeAboveThreshold in its scaled value [Scale: 25; Units: s; Total accelerometer time above threshold in the interval].
-//
+// TimeAboveThresholdScaled return TimeAboveThreshold in its scaled value.
 // If TimeAboveThreshold value is invalid, float64 invalid value will be returned.
+//
+// Scale: 25; Units: s; Total accelerometer time above threshold in the interval
 func (m *AadAccelFeatures) TimeAboveThresholdScaled() float64 {
 	if m.TimeAboveThreshold == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -130,13 +131,13 @@ func (m *AadAccelFeatures) TimeAboveThresholdScaled() float64 {
 	return scaleoffset.Apply(m.TimeAboveThreshold, 25, 0)
 }
 
-// SetTimestamp sets AadAccelFeatures value.
+// SetTimestamp sets Timestamp value.
 func (m *AadAccelFeatures) SetTimestamp(v time.Time) *AadAccelFeatures {
 	m.Timestamp = v
 	return m
 }
 
-// SetTime sets AadAccelFeatures value.
+// SetTime sets Time value.
 //
 // Units: s; Time interval length in seconds
 func (m *AadAccelFeatures) SetTime(v uint16) *AadAccelFeatures {
@@ -144,7 +145,7 @@ func (m *AadAccelFeatures) SetTime(v uint16) *AadAccelFeatures {
 	return m
 }
 
-// SetEnergyTotal sets AadAccelFeatures value.
+// SetEnergyTotal sets EnergyTotal value.
 //
 // Total accelerometer energy in the interval
 func (m *AadAccelFeatures) SetEnergyTotal(v uint32) *AadAccelFeatures {
@@ -152,7 +153,7 @@ func (m *AadAccelFeatures) SetEnergyTotal(v uint32) *AadAccelFeatures {
 	return m
 }
 
-// SetZeroCrossCnt sets AadAccelFeatures value.
+// SetZeroCrossCnt sets ZeroCrossCnt value.
 //
 // Count of zero crossings
 func (m *AadAccelFeatures) SetZeroCrossCnt(v uint16) *AadAccelFeatures {
@@ -160,7 +161,7 @@ func (m *AadAccelFeatures) SetZeroCrossCnt(v uint16) *AadAccelFeatures {
 	return m
 }
 
-// SetInstance sets AadAccelFeatures value.
+// SetInstance sets Instance value.
 //
 // Instance ID of zero crossing algorithm
 func (m *AadAccelFeatures) SetInstance(v uint8) *AadAccelFeatures {
@@ -168,11 +169,20 @@ func (m *AadAccelFeatures) SetInstance(v uint8) *AadAccelFeatures {
 	return m
 }
 
-// SetTimeAboveThreshold sets AadAccelFeatures value.
+// SetTimeAboveThreshold sets TimeAboveThreshold value.
 //
 // Scale: 25; Units: s; Total accelerometer time above threshold in the interval
 func (m *AadAccelFeatures) SetTimeAboveThreshold(v uint16) *AadAccelFeatures {
 	m.TimeAboveThreshold = v
+	return m
+}
+
+// SetTimeAboveThresholdScaled is similar to SetTimeAboveThreshold except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 25; Units: s; Total accelerometer time above threshold in the interval
+func (m *AadAccelFeatures) SetTimeAboveThresholdScaled(v float64) *AadAccelFeatures {
+	m.TimeAboveThreshold = uint16(scaleoffset.Discard(v, 25, 0))
 	return m
 }
 

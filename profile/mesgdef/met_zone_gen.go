@@ -101,9 +101,10 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// CaloriesScaled return Calories in its scaled value [Scale: 10; Units: kcal / min].
-//
+// CaloriesScaled return Calories in its scaled value.
 // If Calories value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: kcal / min
 func (m *MetZone) CaloriesScaled() float64 {
 	if m.Calories == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -111,9 +112,10 @@ func (m *MetZone) CaloriesScaled() float64 {
 	return scaleoffset.Apply(m.Calories, 10, 0)
 }
 
-// FatCaloriesScaled return FatCalories in its scaled value [Scale: 10; Units: kcal / min].
-//
+// FatCaloriesScaled return FatCalories in its scaled value.
 // If FatCalories value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: kcal / min
 func (m *MetZone) FatCaloriesScaled() float64 {
 	if m.FatCalories == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -121,19 +123,19 @@ func (m *MetZone) FatCaloriesScaled() float64 {
 	return scaleoffset.Apply(m.FatCalories, 10, 0)
 }
 
-// SetMessageIndex sets MetZone value.
+// SetMessageIndex sets MessageIndex value.
 func (m *MetZone) SetMessageIndex(v typedef.MessageIndex) *MetZone {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHighBpm sets MetZone value.
+// SetHighBpm sets HighBpm value.
 func (m *MetZone) SetHighBpm(v uint8) *MetZone {
 	m.HighBpm = v
 	return m
 }
 
-// SetCalories sets MetZone value.
+// SetCalories sets Calories value.
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetCalories(v uint16) *MetZone {
@@ -141,11 +143,29 @@ func (m *MetZone) SetCalories(v uint16) *MetZone {
 	return m
 }
 
-// SetFatCalories sets MetZone value.
+// SetCaloriesScaled is similar to SetCalories except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: kcal / min
+func (m *MetZone) SetCaloriesScaled(v float64) *MetZone {
+	m.Calories = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetFatCalories sets FatCalories value.
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetFatCalories(v uint8) *MetZone {
 	m.FatCalories = v
+	return m
+}
+
+// SetFatCaloriesScaled is similar to SetFatCalories except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: kcal / min
+func (m *MetZone) SetFatCaloriesScaled(v float64) *MetZone {
+	m.FatCalories = uint8(scaleoffset.Discard(v, 10, 0))
 	return m
 }
 
