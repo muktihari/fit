@@ -150,9 +150,10 @@ func (m *{{ $.Name }}) {{ .Name }}Uint32() uint32 { return datetime.ToUint32(m.{
 
 {{ range .Fields -}}
 {{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) }}
-// {{ .Name }}Scaled return {{ .Name }} in its scaled value [{{ .Comment }}].
-// 
+// {{ .Name }}Scaled return {{ .Name }} in its scaled value.
 // If {{ .Name }} value is invalid,{{ if eq .Array true }} nil {{ else }} float64 invalid value {{ end -}} will be returned.
+// 
+// {{ .Comment }}
 func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ else }} float64 {{ end -}} {
 	if {{ .ComparableValue }} == {{ .InvalidValue }} {
 		return {{ if eq .Array true }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
@@ -179,15 +180,39 @@ func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 {
 {{ end }}
 
 {{ range .Fields -}}
-// Set{{ .Name }} sets {{ $.Name }} value.
+// Set{{ .Name }} sets {{ .Name }} value.
 //
 // {{ .Comment }}
 func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
     m.{{ .Name }} = v
     return m
 }
-{{ end }}
 
+{{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) -}}
+// Set{{ .Name }}Scaled is similar to Set{{ .Name }} except it accepts a scaled value.
+// This method automatically converts the given value to its {{ .Type }} form, discarding any applied scale and offset.
+// 
+// {{ .Comment }}
+func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if .Array }} vs []float64 {{ else }} v float64 {{ end }}) *{{ $.Name }} {
+    {{ if .Array -}}
+    m.{{ .Name }} = scaleoffset.DiscardSlice[{{ printf "%s" (slice .Type 2) }}](vs, {{ .Scale }}, {{ .Offset }})
+    {{ else -}}
+    m.{{ .Name }} = {{ .Type }}(scaleoffset.Discard(v, {{ .Scale }}, {{ .Offset }}))
+    {{ end -}}
+    return m
+}
+{{ end -}}
+
+{{ if eq .Units "semicircles" -}}
+// Set{{ .Name }}Degrees is similar to Set{{ .Name }} except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles ({{ .Type }}) form.
+func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
+    m.{{ .Name }} = semicircles.ToSemicircles(degrees)
+    return m
+}
+{{ end -}}
+
+{{ end }}
 
 {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 // SetDeveloperFields {{ $.Name }}'s DeveloperFields.
