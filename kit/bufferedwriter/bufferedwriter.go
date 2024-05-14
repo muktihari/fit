@@ -39,9 +39,6 @@ func New(w io.Writer) BufferedWriter {
 // Just like any other buffered writer, the Flush() method should be called after the process is
 // completed to write the unwritten buffered data.
 func NewSize(w io.Writer, size int) BufferedWriter {
-	if size <= 0 {
-		size = defaultBufferSize
-	}
 	bw := bufio.NewWriterSize(w, size)
 	switch wr := w.(type) {
 	case io.WriterAt:
