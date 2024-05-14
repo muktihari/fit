@@ -773,9 +773,10 @@ func (m *SegmentLap) TimestampUint32() uint32 { return datetime.ToUint32(m.Times
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *SegmentLap) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s; Time (includes pauses)].
-//
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value.
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
 func (m *SegmentLap) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -783,9 +784,10 @@ func (m *SegmentLap) TotalElapsedTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s; Timer Time (excludes pauses)].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
 func (m *SegmentLap) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -793,9 +795,10 @@ func (m *SegmentLap) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
-//
+// TotalDistanceScaled return TotalDistance in its scaled value.
 // If TotalDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *SegmentLap) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -803,9 +806,10 @@ func (m *SegmentLap) TotalDistanceScaled() float64 {
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -813,9 +817,10 @@ func (m *SegmentLap) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxSpeedScaled return MaxSpeed in its scaled value.
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -823,9 +828,10 @@ func (m *SegmentLap) MaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
 
-// AvgAltitudeScaled return AvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// AvgAltitudeScaled return AvgAltitude in its scaled value.
 // If AvgAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) AvgAltitudeScaled() float64 {
 	if m.AvgAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -833,9 +839,10 @@ func (m *SegmentLap) AvgAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.AvgAltitude, 5, 500)
 }
 
-// MaxAltitudeScaled return MaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// MaxAltitudeScaled return MaxAltitude in its scaled value.
 // If MaxAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) MaxAltitudeScaled() float64 {
 	if m.MaxAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -843,9 +850,10 @@ func (m *SegmentLap) MaxAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.MaxAltitude, 5, 500)
 }
 
-// AvgGradeScaled return AvgGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgGradeScaled return AvgGrade in its scaled value.
 // If AvgGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *SegmentLap) AvgGradeScaled() float64 {
 	if m.AvgGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -853,9 +861,10 @@ func (m *SegmentLap) AvgGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgGrade, 100, 0)
 }
 
-// AvgPosGradeScaled return AvgPosGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgPosGradeScaled return AvgPosGrade in its scaled value.
 // If AvgPosGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *SegmentLap) AvgPosGradeScaled() float64 {
 	if m.AvgPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -863,9 +872,10 @@ func (m *SegmentLap) AvgPosGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgPosGrade, 100, 0)
 }
 
-// AvgNegGradeScaled return AvgNegGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgNegGradeScaled return AvgNegGrade in its scaled value.
 // If AvgNegGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *SegmentLap) AvgNegGradeScaled() float64 {
 	if m.AvgNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -873,9 +883,10 @@ func (m *SegmentLap) AvgNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgNegGrade, 100, 0)
 }
 
-// MaxPosGradeScaled return MaxPosGrade in its scaled value [Scale: 100; Units: %].
-//
+// MaxPosGradeScaled return MaxPosGrade in its scaled value.
 // If MaxPosGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *SegmentLap) MaxPosGradeScaled() float64 {
 	if m.MaxPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -883,9 +894,10 @@ func (m *SegmentLap) MaxPosGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxPosGrade, 100, 0)
 }
 
-// MaxNegGradeScaled return MaxNegGrade in its scaled value [Scale: 100; Units: %].
-//
+// MaxNegGradeScaled return MaxNegGrade in its scaled value.
 // If MaxNegGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *SegmentLap) MaxNegGradeScaled() float64 {
 	if m.MaxNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -893,9 +905,10 @@ func (m *SegmentLap) MaxNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
 
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value.
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *SegmentLap) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -903,9 +916,10 @@ func (m *SegmentLap) TotalMovingTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
 
-// AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value.
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) AvgPosVerticalSpeedScaled() float64 {
 	if m.AvgPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -913,9 +927,10 @@ func (m *SegmentLap) AvgPosVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgPosVerticalSpeed, 1000, 0)
 }
 
-// AvgNegVerticalSpeedScaled return AvgNegVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgNegVerticalSpeedScaled return AvgNegVerticalSpeed in its scaled value.
 // If AvgNegVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) AvgNegVerticalSpeedScaled() float64 {
 	if m.AvgNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -923,9 +938,10 @@ func (m *SegmentLap) AvgNegVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgNegVerticalSpeed, 1000, 0)
 }
 
-// MaxPosVerticalSpeedScaled return MaxPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxPosVerticalSpeedScaled return MaxPosVerticalSpeed in its scaled value.
 // If MaxPosVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) MaxPosVerticalSpeedScaled() float64 {
 	if m.MaxPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -933,9 +949,10 @@ func (m *SegmentLap) MaxPosVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxPosVerticalSpeed, 1000, 0)
 }
 
-// MaxNegVerticalSpeedScaled return MaxNegVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxNegVerticalSpeedScaled return MaxNegVerticalSpeed in its scaled value.
 // If MaxNegVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *SegmentLap) MaxNegVerticalSpeedScaled() float64 {
 	if m.MaxNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -943,9 +960,10 @@ func (m *SegmentLap) MaxNegVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
 }
 
-// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInHrZoneScaled return TimeInHrZone in its scaled value.
 // If TimeInHrZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) TimeInHrZoneScaled() []float64 {
 	if m.TimeInHrZone == nil {
 		return nil
@@ -953,9 +971,10 @@ func (m *SegmentLap) TimeInHrZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
 }
 
-// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value.
 // If TimeInSpeedZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) TimeInSpeedZoneScaled() []float64 {
 	if m.TimeInSpeedZone == nil {
 		return nil
@@ -963,9 +982,10 @@ func (m *SegmentLap) TimeInSpeedZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
 }
 
-// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value.
 // If TimeInCadenceZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) TimeInCadenceZoneScaled() []float64 {
 	if m.TimeInCadenceZone == nil {
 		return nil
@@ -973,9 +993,10 @@ func (m *SegmentLap) TimeInCadenceZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
 }
 
-// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value.
 // If TimeInPowerZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) TimeInPowerZoneScaled() []float64 {
 	if m.TimeInPowerZone == nil {
 		return nil
@@ -983,9 +1004,10 @@ func (m *SegmentLap) TimeInPowerZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
 }
 
-// MinAltitudeScaled return MinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// MinAltitudeScaled return MinAltitude in its scaled value.
 // If MinAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) MinAltitudeScaled() float64 {
 	if m.MinAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -993,9 +1015,10 @@ func (m *SegmentLap) MinAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.MinAltitude, 5, 500)
 }
 
-// ActiveTimeScaled return ActiveTime in its scaled value [Scale: 1000; Units: s].
-//
+// ActiveTimeScaled return ActiveTime in its scaled value.
 // If ActiveTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *SegmentLap) ActiveTimeScaled() float64 {
 	if m.ActiveTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1003,9 +1026,10 @@ func (m *SegmentLap) ActiveTimeScaled() float64 {
 	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
 }
 
-// AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value.
 // If AvgLeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *SegmentLap) AvgLeftTorqueEffectivenessScaled() float64 {
 	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1013,9 +1037,10 @@ func (m *SegmentLap) AvgLeftTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.AvgLeftTorqueEffectiveness, 2, 0)
 }
 
-// AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value.
 // If AvgRightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *SegmentLap) AvgRightTorqueEffectivenessScaled() float64 {
 	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1023,9 +1048,10 @@ func (m *SegmentLap) AvgRightTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.AvgRightTorqueEffectiveness, 2, 0)
 }
 
-// AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value.
 // If AvgLeftPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *SegmentLap) AvgLeftPedalSmoothnessScaled() float64 {
 	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1033,9 +1059,10 @@ func (m *SegmentLap) AvgLeftPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgLeftPedalSmoothness, 2, 0)
 }
 
-// AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value.
 // If AvgRightPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *SegmentLap) AvgRightPedalSmoothnessScaled() float64 {
 	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1043,9 +1070,10 @@ func (m *SegmentLap) AvgRightPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgRightPedalSmoothness, 2, 0)
 }
 
-// AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value.
 // If AvgCombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *SegmentLap) AvgCombinedPedalSmoothnessScaled() float64 {
 	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1053,9 +1081,10 @@ func (m *SegmentLap) AvgCombinedPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
 }
 
-// AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value [Scale: 128; Units: rpm; fractional part of the avg_cadence].
-//
+// AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value.
 // If AvgFractionalCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
 func (m *SegmentLap) AvgFractionalCadenceScaled() float64 {
 	if m.AvgFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1063,9 +1092,10 @@ func (m *SegmentLap) AvgFractionalCadenceScaled() float64 {
 	return scaleoffset.Apply(m.AvgFractionalCadence, 128, 0)
 }
 
-// MaxFractionalCadenceScaled return MaxFractionalCadence in its scaled value [Scale: 128; Units: rpm; fractional part of the max_cadence].
-//
+// MaxFractionalCadenceScaled return MaxFractionalCadence in its scaled value.
 // If MaxFractionalCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
 func (m *SegmentLap) MaxFractionalCadenceScaled() float64 {
 	if m.MaxFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1073,9 +1103,10 @@ func (m *SegmentLap) MaxFractionalCadenceScaled() float64 {
 	return scaleoffset.Apply(m.MaxFractionalCadence, 128, 0)
 }
 
-// TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value [Scale: 128; Units: cycles; fractional part of the total_cycles].
-//
+// TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value.
 // If TotalFractionalCycles value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *SegmentLap) TotalFractionalCyclesScaled() float64 {
 	if m.TotalFractionalCycles == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1083,9 +1114,10 @@ func (m *SegmentLap) TotalFractionalCyclesScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
 }
 
-// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spent in the standing position].
-//
+// TimeStandingScaled return TimeStanding in its scaled value.
 // If TimeStanding value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
 func (m *SegmentLap) TimeStandingScaled() float64 {
 	if m.TimeStanding == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1093,9 +1125,10 @@ func (m *SegmentLap) TimeStandingScaled() float64 {
 	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
 }
 
-// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.].
-//
+// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value.
 // If AvgLeftPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) AvgLeftPowerPhaseScaled() []float64 {
 	if m.AvgLeftPowerPhase == nil {
 		return nil
@@ -1103,9 +1136,10 @@ func (m *SegmentLap) AvgLeftPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
 }
 
-// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
-//
+// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value.
 // If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) AvgLeftPowerPhasePeakScaled() []float64 {
 	if m.AvgLeftPowerPhasePeak == nil {
 		return nil
@@ -1113,9 +1147,10 @@ func (m *SegmentLap) AvgLeftPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
 }
 
-// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
-//
+// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value.
 // If AvgRightPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) AvgRightPowerPhaseScaled() []float64 {
 	if m.AvgRightPowerPhase == nil {
 		return nil
@@ -1123,9 +1158,10 @@ func (m *SegmentLap) AvgRightPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
 }
 
-// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.].
-//
+// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value.
 // If AvgRightPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) AvgRightPowerPhasePeakScaled() []float64 {
 	if m.AvgRightPowerPhasePeak == nil {
 		return nil
@@ -1133,9 +1169,10 @@ func (m *SegmentLap) AvgRightPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
 }
 
-// TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value [Scale: 100; Units: m; fractional part of total_ascent].
-//
+// TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value.
 // If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
 func (m *SegmentLap) TotalFractionalAscentScaled() float64 {
 	if m.TotalFractionalAscent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1143,9 +1180,10 @@ func (m *SegmentLap) TotalFractionalAscentScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalAscent, 100, 0)
 }
 
-// TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value [Scale: 100; Units: m; fractional part of total_descent].
-//
+// TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value.
 // If TotalFractionalDescent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_descent
 func (m *SegmentLap) TotalFractionalDescentScaled() float64 {
 	if m.TotalFractionalDescent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1153,9 +1191,10 @@ func (m *SegmentLap) TotalFractionalDescentScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
 }
 
-// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value.
 // If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
 	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1163,9 +1202,10 @@ func (m *SegmentLap) EnhancedAvgAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
 }
 
-// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value.
 // If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
 	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1173,9 +1213,10 @@ func (m *SegmentLap) EnhancedMaxAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
 }
 
-// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value.
 // If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
 	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1255,13 +1296,13 @@ func (m *SegmentLap) SwcLongDegrees() float64 {
 	return semicircles.ToDegrees(m.SwcLong)
 }
 
-// SetMessageIndex sets SegmentLap value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SegmentLap) SetMessageIndex(v typedef.MessageIndex) *SegmentLap {
 	m.MessageIndex = v
 	return m
 }
 
-// SetTimestamp sets SegmentLap value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Lap end time.
 func (m *SegmentLap) SetTimestamp(v time.Time) *SegmentLap {
@@ -1269,25 +1310,25 @@ func (m *SegmentLap) SetTimestamp(v time.Time) *SegmentLap {
 	return m
 }
 
-// SetEvent sets SegmentLap value.
+// SetEvent sets Event value.
 func (m *SegmentLap) SetEvent(v typedef.Event) *SegmentLap {
 	m.Event = v
 	return m
 }
 
-// SetEventType sets SegmentLap value.
+// SetEventType sets EventType value.
 func (m *SegmentLap) SetEventType(v typedef.EventType) *SegmentLap {
 	m.EventType = v
 	return m
 }
 
-// SetStartTime sets SegmentLap value.
+// SetStartTime sets StartTime value.
 func (m *SegmentLap) SetStartTime(v time.Time) *SegmentLap {
 	m.StartTime = v
 	return m
 }
 
-// SetStartPositionLat sets SegmentLap value.
+// SetStartPositionLat sets StartPositionLat value.
 //
 // Units: semicircles
 func (m *SegmentLap) SetStartPositionLat(v int32) *SegmentLap {
@@ -1295,7 +1336,14 @@ func (m *SegmentLap) SetStartPositionLat(v int32) *SegmentLap {
 	return m
 }
 
-// SetStartPositionLong sets SegmentLap value.
+// SetStartPositionLatDegrees is similar to SetStartPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetStartPositionLatDegrees(degrees float64) *SegmentLap {
+	m.StartPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetStartPositionLong sets StartPositionLong value.
 //
 // Units: semicircles
 func (m *SegmentLap) SetStartPositionLong(v int32) *SegmentLap {
@@ -1303,7 +1351,14 @@ func (m *SegmentLap) SetStartPositionLong(v int32) *SegmentLap {
 	return m
 }
 
-// SetEndPositionLat sets SegmentLap value.
+// SetStartPositionLongDegrees is similar to SetStartPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetStartPositionLongDegrees(degrees float64) *SegmentLap {
+	m.StartPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEndPositionLat sets EndPositionLat value.
 //
 // Units: semicircles
 func (m *SegmentLap) SetEndPositionLat(v int32) *SegmentLap {
@@ -1311,7 +1366,14 @@ func (m *SegmentLap) SetEndPositionLat(v int32) *SegmentLap {
 	return m
 }
 
-// SetEndPositionLong sets SegmentLap value.
+// SetEndPositionLatDegrees is similar to SetEndPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetEndPositionLatDegrees(degrees float64) *SegmentLap {
+	m.EndPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEndPositionLong sets EndPositionLong value.
 //
 // Units: semicircles
 func (m *SegmentLap) SetEndPositionLong(v int32) *SegmentLap {
@@ -1319,7 +1381,14 @@ func (m *SegmentLap) SetEndPositionLong(v int32) *SegmentLap {
 	return m
 }
 
-// SetTotalElapsedTime sets SegmentLap value.
+// SetEndPositionLongDegrees is similar to SetEndPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetEndPositionLongDegrees(degrees float64) *SegmentLap {
+	m.EndPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetTotalElapsedTime sets TotalElapsedTime value.
 //
 // Scale: 1000; Units: s; Time (includes pauses)
 func (m *SegmentLap) SetTotalElapsedTime(v uint32) *SegmentLap {
@@ -1327,7 +1396,16 @@ func (m *SegmentLap) SetTotalElapsedTime(v uint32) *SegmentLap {
 	return m
 }
 
-// SetTotalTimerTime sets SegmentLap value.
+// SetTotalElapsedTimeScaled is similar to SetTotalElapsedTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
+func (m *SegmentLap) SetTotalElapsedTimeScaled(v float64) *SegmentLap {
+	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s; Timer Time (excludes pauses)
 func (m *SegmentLap) SetTotalTimerTime(v uint32) *SegmentLap {
@@ -1335,7 +1413,16 @@ func (m *SegmentLap) SetTotalTimerTime(v uint32) *SegmentLap {
 	return m
 }
 
-// SetTotalDistance sets SegmentLap value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
+func (m *SegmentLap) SetTotalTimerTimeScaled(v float64) *SegmentLap {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalDistance sets TotalDistance value.
 //
 // Scale: 100; Units: m
 func (m *SegmentLap) SetTotalDistance(v uint32) *SegmentLap {
@@ -1343,7 +1430,16 @@ func (m *SegmentLap) SetTotalDistance(v uint32) *SegmentLap {
 	return m
 }
 
-// SetTotalCycles sets SegmentLap value.
+// SetTotalDistanceScaled is similar to SetTotalDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *SegmentLap) SetTotalDistanceScaled(v float64) *SegmentLap {
+	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalCycles sets TotalCycles value.
 //
 // Units: cycles
 func (m *SegmentLap) SetTotalCycles(v uint32) *SegmentLap {
@@ -1351,7 +1447,7 @@ func (m *SegmentLap) SetTotalCycles(v uint32) *SegmentLap {
 	return m
 }
 
-// SetTotalCalories sets SegmentLap value.
+// SetTotalCalories sets TotalCalories value.
 //
 // Units: kcal
 func (m *SegmentLap) SetTotalCalories(v uint16) *SegmentLap {
@@ -1359,7 +1455,7 @@ func (m *SegmentLap) SetTotalCalories(v uint16) *SegmentLap {
 	return m
 }
 
-// SetTotalFatCalories sets SegmentLap value.
+// SetTotalFatCalories sets TotalFatCalories value.
 //
 // Units: kcal; If New Leaf
 func (m *SegmentLap) SetTotalFatCalories(v uint16) *SegmentLap {
@@ -1367,7 +1463,7 @@ func (m *SegmentLap) SetTotalFatCalories(v uint16) *SegmentLap {
 	return m
 }
 
-// SetAvgSpeed sets SegmentLap value.
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetAvgSpeed(v uint16) *SegmentLap {
@@ -1375,7 +1471,16 @@ func (m *SegmentLap) SetAvgSpeed(v uint16) *SegmentLap {
 	return m
 }
 
-// SetMaxSpeed sets SegmentLap value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetAvgSpeedScaled(v float64) *SegmentLap {
+	m.AvgSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxSpeed sets MaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetMaxSpeed(v uint16) *SegmentLap {
@@ -1383,7 +1488,16 @@ func (m *SegmentLap) SetMaxSpeed(v uint16) *SegmentLap {
 	return m
 }
 
-// SetAvgHeartRate sets SegmentLap value.
+// SetMaxSpeedScaled is similar to SetMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetMaxSpeedScaled(v float64) *SegmentLap {
+	m.MaxSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgHeartRate sets AvgHeartRate value.
 //
 // Units: bpm
 func (m *SegmentLap) SetAvgHeartRate(v uint8) *SegmentLap {
@@ -1391,7 +1505,7 @@ func (m *SegmentLap) SetAvgHeartRate(v uint8) *SegmentLap {
 	return m
 }
 
-// SetMaxHeartRate sets SegmentLap value.
+// SetMaxHeartRate sets MaxHeartRate value.
 //
 // Units: bpm
 func (m *SegmentLap) SetMaxHeartRate(v uint8) *SegmentLap {
@@ -1399,7 +1513,7 @@ func (m *SegmentLap) SetMaxHeartRate(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgCadence sets SegmentLap value.
+// SetAvgCadence sets AvgCadence value.
 //
 // Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
 func (m *SegmentLap) SetAvgCadence(v uint8) *SegmentLap {
@@ -1407,7 +1521,7 @@ func (m *SegmentLap) SetAvgCadence(v uint8) *SegmentLap {
 	return m
 }
 
-// SetMaxCadence sets SegmentLap value.
+// SetMaxCadence sets MaxCadence value.
 //
 // Units: rpm
 func (m *SegmentLap) SetMaxCadence(v uint8) *SegmentLap {
@@ -1415,7 +1529,7 @@ func (m *SegmentLap) SetMaxCadence(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgPower sets SegmentLap value.
+// SetAvgPower sets AvgPower value.
 //
 // Units: watts; total_power / total_timer_time if non_zero_avg_power otherwise total_power / total_elapsed_time
 func (m *SegmentLap) SetAvgPower(v uint16) *SegmentLap {
@@ -1423,7 +1537,7 @@ func (m *SegmentLap) SetAvgPower(v uint16) *SegmentLap {
 	return m
 }
 
-// SetMaxPower sets SegmentLap value.
+// SetMaxPower sets MaxPower value.
 //
 // Units: watts
 func (m *SegmentLap) SetMaxPower(v uint16) *SegmentLap {
@@ -1431,7 +1545,7 @@ func (m *SegmentLap) SetMaxPower(v uint16) *SegmentLap {
 	return m
 }
 
-// SetTotalAscent sets SegmentLap value.
+// SetTotalAscent sets TotalAscent value.
 //
 // Units: m
 func (m *SegmentLap) SetTotalAscent(v uint16) *SegmentLap {
@@ -1439,7 +1553,7 @@ func (m *SegmentLap) SetTotalAscent(v uint16) *SegmentLap {
 	return m
 }
 
-// SetTotalDescent sets SegmentLap value.
+// SetTotalDescent sets TotalDescent value.
 //
 // Units: m
 func (m *SegmentLap) SetTotalDescent(v uint16) *SegmentLap {
@@ -1447,19 +1561,19 @@ func (m *SegmentLap) SetTotalDescent(v uint16) *SegmentLap {
 	return m
 }
 
-// SetSport sets SegmentLap value.
+// SetSport sets Sport value.
 func (m *SegmentLap) SetSport(v typedef.Sport) *SegmentLap {
 	m.Sport = v
 	return m
 }
 
-// SetEventGroup sets SegmentLap value.
+// SetEventGroup sets EventGroup value.
 func (m *SegmentLap) SetEventGroup(v uint8) *SegmentLap {
 	m.EventGroup = v
 	return m
 }
 
-// SetNecLat sets SegmentLap value.
+// SetNecLat sets NecLat value.
 //
 // Units: semicircles; North east corner latitude.
 func (m *SegmentLap) SetNecLat(v int32) *SegmentLap {
@@ -1467,7 +1581,14 @@ func (m *SegmentLap) SetNecLat(v int32) *SegmentLap {
 	return m
 }
 
-// SetNecLong sets SegmentLap value.
+// SetNecLatDegrees is similar to SetNecLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetNecLatDegrees(degrees float64) *SegmentLap {
+	m.NecLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetNecLong sets NecLong value.
 //
 // Units: semicircles; North east corner longitude.
 func (m *SegmentLap) SetNecLong(v int32) *SegmentLap {
@@ -1475,7 +1596,14 @@ func (m *SegmentLap) SetNecLong(v int32) *SegmentLap {
 	return m
 }
 
-// SetSwcLat sets SegmentLap value.
+// SetNecLongDegrees is similar to SetNecLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetNecLongDegrees(degrees float64) *SegmentLap {
+	m.NecLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLat sets SwcLat value.
 //
 // Units: semicircles; South west corner latitude.
 func (m *SegmentLap) SetSwcLat(v int32) *SegmentLap {
@@ -1483,7 +1611,14 @@ func (m *SegmentLap) SetSwcLat(v int32) *SegmentLap {
 	return m
 }
 
-// SetSwcLong sets SegmentLap value.
+// SetSwcLatDegrees is similar to SetSwcLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetSwcLatDegrees(degrees float64) *SegmentLap {
+	m.SwcLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLong sets SwcLong value.
 //
 // Units: semicircles; South west corner latitude.
 func (m *SegmentLap) SetSwcLong(v int32) *SegmentLap {
@@ -1491,13 +1626,20 @@ func (m *SegmentLap) SetSwcLong(v int32) *SegmentLap {
 	return m
 }
 
-// SetName sets SegmentLap value.
+// SetSwcLongDegrees is similar to SetSwcLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *SegmentLap) SetSwcLongDegrees(degrees float64) *SegmentLap {
+	m.SwcLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetName sets Name value.
 func (m *SegmentLap) SetName(v string) *SegmentLap {
 	m.Name = v
 	return m
 }
 
-// SetNormalizedPower sets SegmentLap value.
+// SetNormalizedPower sets NormalizedPower value.
 //
 // Units: watts
 func (m *SegmentLap) SetNormalizedPower(v uint16) *SegmentLap {
@@ -1505,19 +1647,19 @@ func (m *SegmentLap) SetNormalizedPower(v uint16) *SegmentLap {
 	return m
 }
 
-// SetLeftRightBalance sets SegmentLap value.
+// SetLeftRightBalance sets LeftRightBalance value.
 func (m *SegmentLap) SetLeftRightBalance(v typedef.LeftRightBalance100) *SegmentLap {
 	m.LeftRightBalance = v
 	return m
 }
 
-// SetSubSport sets SegmentLap value.
+// SetSubSport sets SubSport value.
 func (m *SegmentLap) SetSubSport(v typedef.SubSport) *SegmentLap {
 	m.SubSport = v
 	return m
 }
 
-// SetTotalWork sets SegmentLap value.
+// SetTotalWork sets TotalWork value.
 //
 // Units: J
 func (m *SegmentLap) SetTotalWork(v uint32) *SegmentLap {
@@ -1525,7 +1667,7 @@ func (m *SegmentLap) SetTotalWork(v uint32) *SegmentLap {
 	return m
 }
 
-// SetAvgAltitude sets SegmentLap value.
+// SetAvgAltitude sets AvgAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetAvgAltitude(v uint16) *SegmentLap {
@@ -1533,7 +1675,16 @@ func (m *SegmentLap) SetAvgAltitude(v uint16) *SegmentLap {
 	return m
 }
 
-// SetMaxAltitude sets SegmentLap value.
+// SetAvgAltitudeScaled is similar to SetAvgAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetAvgAltitudeScaled(v float64) *SegmentLap {
+	m.AvgAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetMaxAltitude sets MaxAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetMaxAltitude(v uint16) *SegmentLap {
@@ -1541,7 +1692,16 @@ func (m *SegmentLap) SetMaxAltitude(v uint16) *SegmentLap {
 	return m
 }
 
-// SetGpsAccuracy sets SegmentLap value.
+// SetMaxAltitudeScaled is similar to SetMaxAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetMaxAltitudeScaled(v float64) *SegmentLap {
+	m.MaxAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetGpsAccuracy sets GpsAccuracy value.
 //
 // Units: m
 func (m *SegmentLap) SetGpsAccuracy(v uint8) *SegmentLap {
@@ -1549,7 +1709,7 @@ func (m *SegmentLap) SetGpsAccuracy(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgGrade sets SegmentLap value.
+// SetAvgGrade sets AvgGrade value.
 //
 // Scale: 100; Units: %
 func (m *SegmentLap) SetAvgGrade(v int16) *SegmentLap {
@@ -1557,7 +1717,16 @@ func (m *SegmentLap) SetAvgGrade(v int16) *SegmentLap {
 	return m
 }
 
-// SetAvgPosGrade sets SegmentLap value.
+// SetAvgGradeScaled is similar to SetAvgGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *SegmentLap) SetAvgGradeScaled(v float64) *SegmentLap {
+	m.AvgGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgPosGrade sets AvgPosGrade value.
 //
 // Scale: 100; Units: %
 func (m *SegmentLap) SetAvgPosGrade(v int16) *SegmentLap {
@@ -1565,7 +1734,16 @@ func (m *SegmentLap) SetAvgPosGrade(v int16) *SegmentLap {
 	return m
 }
 
-// SetAvgNegGrade sets SegmentLap value.
+// SetAvgPosGradeScaled is similar to SetAvgPosGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *SegmentLap) SetAvgPosGradeScaled(v float64) *SegmentLap {
+	m.AvgPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgNegGrade sets AvgNegGrade value.
 //
 // Scale: 100; Units: %
 func (m *SegmentLap) SetAvgNegGrade(v int16) *SegmentLap {
@@ -1573,7 +1751,16 @@ func (m *SegmentLap) SetAvgNegGrade(v int16) *SegmentLap {
 	return m
 }
 
-// SetMaxPosGrade sets SegmentLap value.
+// SetAvgNegGradeScaled is similar to SetAvgNegGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *SegmentLap) SetAvgNegGradeScaled(v float64) *SegmentLap {
+	m.AvgNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMaxPosGrade sets MaxPosGrade value.
 //
 // Scale: 100; Units: %
 func (m *SegmentLap) SetMaxPosGrade(v int16) *SegmentLap {
@@ -1581,7 +1768,16 @@ func (m *SegmentLap) SetMaxPosGrade(v int16) *SegmentLap {
 	return m
 }
 
-// SetMaxNegGrade sets SegmentLap value.
+// SetMaxPosGradeScaled is similar to SetMaxPosGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *SegmentLap) SetMaxPosGradeScaled(v float64) *SegmentLap {
+	m.MaxPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMaxNegGrade sets MaxNegGrade value.
 //
 // Scale: 100; Units: %
 func (m *SegmentLap) SetMaxNegGrade(v int16) *SegmentLap {
@@ -1589,7 +1785,16 @@ func (m *SegmentLap) SetMaxNegGrade(v int16) *SegmentLap {
 	return m
 }
 
-// SetAvgTemperature sets SegmentLap value.
+// SetMaxNegGradeScaled is similar to SetMaxNegGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *SegmentLap) SetMaxNegGradeScaled(v float64) *SegmentLap {
+	m.MaxNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgTemperature sets AvgTemperature value.
 //
 // Units: C
 func (m *SegmentLap) SetAvgTemperature(v int8) *SegmentLap {
@@ -1597,7 +1802,7 @@ func (m *SegmentLap) SetAvgTemperature(v int8) *SegmentLap {
 	return m
 }
 
-// SetMaxTemperature sets SegmentLap value.
+// SetMaxTemperature sets MaxTemperature value.
 //
 // Units: C
 func (m *SegmentLap) SetMaxTemperature(v int8) *SegmentLap {
@@ -1605,7 +1810,7 @@ func (m *SegmentLap) SetMaxTemperature(v int8) *SegmentLap {
 	return m
 }
 
-// SetTotalMovingTime sets SegmentLap value.
+// SetTotalMovingTime sets TotalMovingTime value.
 //
 // Scale: 1000; Units: s
 func (m *SegmentLap) SetTotalMovingTime(v uint32) *SegmentLap {
@@ -1613,7 +1818,16 @@ func (m *SegmentLap) SetTotalMovingTime(v uint32) *SegmentLap {
 	return m
 }
 
-// SetAvgPosVerticalSpeed sets SegmentLap value.
+// SetTotalMovingTimeScaled is similar to SetTotalMovingTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *SegmentLap) SetTotalMovingTimeScaled(v float64) *SegmentLap {
+	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgPosVerticalSpeed sets AvgPosVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetAvgPosVerticalSpeed(v int16) *SegmentLap {
@@ -1621,7 +1835,16 @@ func (m *SegmentLap) SetAvgPosVerticalSpeed(v int16) *SegmentLap {
 	return m
 }
 
-// SetAvgNegVerticalSpeed sets SegmentLap value.
+// SetAvgPosVerticalSpeedScaled is similar to SetAvgPosVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetAvgPosVerticalSpeedScaled(v float64) *SegmentLap {
+	m.AvgPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgNegVerticalSpeed sets AvgNegVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetAvgNegVerticalSpeed(v int16) *SegmentLap {
@@ -1629,7 +1852,16 @@ func (m *SegmentLap) SetAvgNegVerticalSpeed(v int16) *SegmentLap {
 	return m
 }
 
-// SetMaxPosVerticalSpeed sets SegmentLap value.
+// SetAvgNegVerticalSpeedScaled is similar to SetAvgNegVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetAvgNegVerticalSpeedScaled(v float64) *SegmentLap {
+	m.AvgNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxPosVerticalSpeed sets MaxPosVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetMaxPosVerticalSpeed(v int16) *SegmentLap {
@@ -1637,7 +1869,16 @@ func (m *SegmentLap) SetMaxPosVerticalSpeed(v int16) *SegmentLap {
 	return m
 }
 
-// SetMaxNegVerticalSpeed sets SegmentLap value.
+// SetMaxPosVerticalSpeedScaled is similar to SetMaxPosVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetMaxPosVerticalSpeedScaled(v float64) *SegmentLap {
+	m.MaxPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxNegVerticalSpeed sets MaxNegVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *SegmentLap) SetMaxNegVerticalSpeed(v int16) *SegmentLap {
@@ -1645,7 +1886,16 @@ func (m *SegmentLap) SetMaxNegVerticalSpeed(v int16) *SegmentLap {
 	return m
 }
 
-// SetTimeInHrZone sets SegmentLap value.
+// SetMaxNegVerticalSpeedScaled is similar to SetMaxNegVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *SegmentLap) SetMaxNegVerticalSpeedScaled(v float64) *SegmentLap {
+	m.MaxNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTimeInHrZone sets TimeInHrZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) SetTimeInHrZone(v []uint32) *SegmentLap {
@@ -1653,7 +1903,16 @@ func (m *SegmentLap) SetTimeInHrZone(v []uint32) *SegmentLap {
 	return m
 }
 
-// SetTimeInSpeedZone sets SegmentLap value.
+// SetTimeInHrZoneScaled is similar to SetTimeInHrZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInHrZoneScaled(vs []float64) *SegmentLap {
+	m.TimeInHrZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInSpeedZone sets TimeInSpeedZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) SetTimeInSpeedZone(v []uint32) *SegmentLap {
@@ -1661,7 +1920,16 @@ func (m *SegmentLap) SetTimeInSpeedZone(v []uint32) *SegmentLap {
 	return m
 }
 
-// SetTimeInCadenceZone sets SegmentLap value.
+// SetTimeInSpeedZoneScaled is similar to SetTimeInSpeedZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInSpeedZoneScaled(vs []float64) *SegmentLap {
+	m.TimeInSpeedZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInCadenceZone sets TimeInCadenceZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) SetTimeInCadenceZone(v []uint32) *SegmentLap {
@@ -1669,7 +1937,16 @@ func (m *SegmentLap) SetTimeInCadenceZone(v []uint32) *SegmentLap {
 	return m
 }
 
-// SetTimeInPowerZone sets SegmentLap value.
+// SetTimeInCadenceZoneScaled is similar to SetTimeInCadenceZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInCadenceZoneScaled(vs []float64) *SegmentLap {
+	m.TimeInCadenceZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInPowerZone sets TimeInPowerZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *SegmentLap) SetTimeInPowerZone(v []uint32) *SegmentLap {
@@ -1677,13 +1954,22 @@ func (m *SegmentLap) SetTimeInPowerZone(v []uint32) *SegmentLap {
 	return m
 }
 
-// SetRepetitionNum sets SegmentLap value.
+// SetTimeInPowerZoneScaled is similar to SetTimeInPowerZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *SegmentLap) SetTimeInPowerZoneScaled(vs []float64) *SegmentLap {
+	m.TimeInPowerZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetRepetitionNum sets RepetitionNum value.
 func (m *SegmentLap) SetRepetitionNum(v uint16) *SegmentLap {
 	m.RepetitionNum = v
 	return m
 }
 
-// SetMinAltitude sets SegmentLap value.
+// SetMinAltitude sets MinAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetMinAltitude(v uint16) *SegmentLap {
@@ -1691,7 +1977,16 @@ func (m *SegmentLap) SetMinAltitude(v uint16) *SegmentLap {
 	return m
 }
 
-// SetMinHeartRate sets SegmentLap value.
+// SetMinAltitudeScaled is similar to SetMinAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetMinAltitudeScaled(v float64) *SegmentLap {
+	m.MinAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetMinHeartRate sets MinHeartRate value.
 //
 // Units: bpm
 func (m *SegmentLap) SetMinHeartRate(v uint8) *SegmentLap {
@@ -1699,7 +1994,7 @@ func (m *SegmentLap) SetMinHeartRate(v uint8) *SegmentLap {
 	return m
 }
 
-// SetActiveTime sets SegmentLap value.
+// SetActiveTime sets ActiveTime value.
 //
 // Scale: 1000; Units: s
 func (m *SegmentLap) SetActiveTime(v uint32) *SegmentLap {
@@ -1707,19 +2002,28 @@ func (m *SegmentLap) SetActiveTime(v uint32) *SegmentLap {
 	return m
 }
 
-// SetWktStepIndex sets SegmentLap value.
+// SetActiveTimeScaled is similar to SetActiveTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *SegmentLap) SetActiveTimeScaled(v float64) *SegmentLap {
+	m.ActiveTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetWktStepIndex sets WktStepIndex value.
 func (m *SegmentLap) SetWktStepIndex(v typedef.MessageIndex) *SegmentLap {
 	m.WktStepIndex = v
 	return m
 }
 
-// SetSportEvent sets SegmentLap value.
+// SetSportEvent sets SportEvent value.
 func (m *SegmentLap) SetSportEvent(v typedef.SportEvent) *SegmentLap {
 	m.SportEvent = v
 	return m
 }
 
-// SetAvgLeftTorqueEffectiveness sets SegmentLap value.
+// SetAvgLeftTorqueEffectiveness sets AvgLeftTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *SegmentLap) SetAvgLeftTorqueEffectiveness(v uint8) *SegmentLap {
@@ -1727,7 +2031,16 @@ func (m *SegmentLap) SetAvgLeftTorqueEffectiveness(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgRightTorqueEffectiveness sets SegmentLap value.
+// SetAvgLeftTorqueEffectivenessScaled is similar to SetAvgLeftTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *SegmentLap) SetAvgLeftTorqueEffectivenessScaled(v float64) *SegmentLap {
+	m.AvgLeftTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgRightTorqueEffectiveness sets AvgRightTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *SegmentLap) SetAvgRightTorqueEffectiveness(v uint8) *SegmentLap {
@@ -1735,7 +2048,16 @@ func (m *SegmentLap) SetAvgRightTorqueEffectiveness(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgLeftPedalSmoothness sets SegmentLap value.
+// SetAvgRightTorqueEffectivenessScaled is similar to SetAvgRightTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *SegmentLap) SetAvgRightTorqueEffectivenessScaled(v float64) *SegmentLap {
+	m.AvgRightTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgLeftPedalSmoothness sets AvgLeftPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *SegmentLap) SetAvgLeftPedalSmoothness(v uint8) *SegmentLap {
@@ -1743,7 +2065,16 @@ func (m *SegmentLap) SetAvgLeftPedalSmoothness(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgRightPedalSmoothness sets SegmentLap value.
+// SetAvgLeftPedalSmoothnessScaled is similar to SetAvgLeftPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *SegmentLap) SetAvgLeftPedalSmoothnessScaled(v float64) *SegmentLap {
+	m.AvgLeftPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgRightPedalSmoothness sets AvgRightPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *SegmentLap) SetAvgRightPedalSmoothness(v uint8) *SegmentLap {
@@ -1751,7 +2082,16 @@ func (m *SegmentLap) SetAvgRightPedalSmoothness(v uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgCombinedPedalSmoothness sets SegmentLap value.
+// SetAvgRightPedalSmoothnessScaled is similar to SetAvgRightPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *SegmentLap) SetAvgRightPedalSmoothnessScaled(v float64) *SegmentLap {
+	m.AvgRightPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgCombinedPedalSmoothness sets AvgCombinedPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *SegmentLap) SetAvgCombinedPedalSmoothness(v uint8) *SegmentLap {
@@ -1759,19 +2099,28 @@ func (m *SegmentLap) SetAvgCombinedPedalSmoothness(v uint8) *SegmentLap {
 	return m
 }
 
-// SetStatus sets SegmentLap value.
+// SetAvgCombinedPedalSmoothnessScaled is similar to SetAvgCombinedPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *SegmentLap) SetAvgCombinedPedalSmoothnessScaled(v float64) *SegmentLap {
+	m.AvgCombinedPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetStatus sets Status value.
 func (m *SegmentLap) SetStatus(v typedef.SegmentLapStatus) *SegmentLap {
 	m.Status = v
 	return m
 }
 
-// SetUuid sets SegmentLap value.
+// SetUuid sets Uuid value.
 func (m *SegmentLap) SetUuid(v string) *SegmentLap {
 	m.Uuid = v
 	return m
 }
 
-// SetAvgFractionalCadence sets SegmentLap value.
+// SetAvgFractionalCadence sets AvgFractionalCadence value.
 //
 // Scale: 128; Units: rpm; fractional part of the avg_cadence
 func (m *SegmentLap) SetAvgFractionalCadence(v uint8) *SegmentLap {
@@ -1779,7 +2128,16 @@ func (m *SegmentLap) SetAvgFractionalCadence(v uint8) *SegmentLap {
 	return m
 }
 
-// SetMaxFractionalCadence sets SegmentLap value.
+// SetAvgFractionalCadenceScaled is similar to SetAvgFractionalCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
+func (m *SegmentLap) SetAvgFractionalCadenceScaled(v float64) *SegmentLap {
+	m.AvgFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetMaxFractionalCadence sets MaxFractionalCadence value.
 //
 // Scale: 128; Units: rpm; fractional part of the max_cadence
 func (m *SegmentLap) SetMaxFractionalCadence(v uint8) *SegmentLap {
@@ -1787,7 +2145,16 @@ func (m *SegmentLap) SetMaxFractionalCadence(v uint8) *SegmentLap {
 	return m
 }
 
-// SetTotalFractionalCycles sets SegmentLap value.
+// SetMaxFractionalCadenceScaled is similar to SetMaxFractionalCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
+func (m *SegmentLap) SetMaxFractionalCadenceScaled(v float64) *SegmentLap {
+	m.MaxFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetTotalFractionalCycles sets TotalFractionalCycles value.
 //
 // Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *SegmentLap) SetTotalFractionalCycles(v uint8) *SegmentLap {
@@ -1795,19 +2162,28 @@ func (m *SegmentLap) SetTotalFractionalCycles(v uint8) *SegmentLap {
 	return m
 }
 
-// SetFrontGearShiftCount sets SegmentLap value.
+// SetTotalFractionalCyclesScaled is similar to SetTotalFractionalCycles except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
+func (m *SegmentLap) SetTotalFractionalCyclesScaled(v float64) *SegmentLap {
+	m.TotalFractionalCycles = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetFrontGearShiftCount sets FrontGearShiftCount value.
 func (m *SegmentLap) SetFrontGearShiftCount(v uint16) *SegmentLap {
 	m.FrontGearShiftCount = v
 	return m
 }
 
-// SetRearGearShiftCount sets SegmentLap value.
+// SetRearGearShiftCount sets RearGearShiftCount value.
 func (m *SegmentLap) SetRearGearShiftCount(v uint16) *SegmentLap {
 	m.RearGearShiftCount = v
 	return m
 }
 
-// SetTimeStanding sets SegmentLap value.
+// SetTimeStanding sets TimeStanding value.
 //
 // Scale: 1000; Units: s; Total time spent in the standing position
 func (m *SegmentLap) SetTimeStanding(v uint32) *SegmentLap {
@@ -1815,7 +2191,16 @@ func (m *SegmentLap) SetTimeStanding(v uint32) *SegmentLap {
 	return m
 }
 
-// SetStandCount sets SegmentLap value.
+// SetTimeStandingScaled is similar to SetTimeStanding except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *SegmentLap) SetTimeStandingScaled(v float64) *SegmentLap {
+	m.TimeStanding = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetStandCount sets StandCount value.
 //
 // Number of transitions to the standing state
 func (m *SegmentLap) SetStandCount(v uint16) *SegmentLap {
@@ -1823,7 +2208,7 @@ func (m *SegmentLap) SetStandCount(v uint16) *SegmentLap {
 	return m
 }
 
-// SetAvgLeftPco sets SegmentLap value.
+// SetAvgLeftPco sets AvgLeftPco value.
 //
 // Units: mm; Average left platform center offset
 func (m *SegmentLap) SetAvgLeftPco(v int8) *SegmentLap {
@@ -1831,7 +2216,7 @@ func (m *SegmentLap) SetAvgLeftPco(v int8) *SegmentLap {
 	return m
 }
 
-// SetAvgRightPco sets SegmentLap value.
+// SetAvgRightPco sets AvgRightPco value.
 //
 // Units: mm; Average right platform center offset
 func (m *SegmentLap) SetAvgRightPco(v int8) *SegmentLap {
@@ -1839,7 +2224,7 @@ func (m *SegmentLap) SetAvgRightPco(v int8) *SegmentLap {
 	return m
 }
 
-// SetAvgLeftPowerPhase sets SegmentLap value.
+// SetAvgLeftPowerPhase sets AvgLeftPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) SetAvgLeftPowerPhase(v []uint8) *SegmentLap {
@@ -1847,7 +2232,16 @@ func (m *SegmentLap) SetAvgLeftPowerPhase(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgLeftPowerPhasePeak sets SegmentLap value.
+// SetAvgLeftPowerPhaseScaled is similar to SetAvgLeftPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgLeftPowerPhaseScaled(vs []float64) *SegmentLap {
+	m.AvgLeftPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets AvgLeftPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) SetAvgLeftPowerPhasePeak(v []uint8) *SegmentLap {
@@ -1855,7 +2249,16 @@ func (m *SegmentLap) SetAvgLeftPowerPhasePeak(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgRightPowerPhase sets SegmentLap value.
+// SetAvgLeftPowerPhasePeakScaled is similar to SetAvgLeftPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgLeftPowerPhasePeakScaled(vs []float64) *SegmentLap {
+	m.AvgLeftPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgRightPowerPhase sets AvgRightPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) SetAvgRightPowerPhase(v []uint8) *SegmentLap {
@@ -1863,7 +2266,16 @@ func (m *SegmentLap) SetAvgRightPowerPhase(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgRightPowerPhasePeak sets SegmentLap value.
+// SetAvgRightPowerPhaseScaled is similar to SetAvgRightPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgRightPowerPhaseScaled(vs []float64) *SegmentLap {
+	m.AvgRightPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets AvgRightPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *SegmentLap) SetAvgRightPowerPhasePeak(v []uint8) *SegmentLap {
@@ -1871,7 +2283,16 @@ func (m *SegmentLap) SetAvgRightPowerPhasePeak(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetAvgPowerPosition sets SegmentLap value.
+// SetAvgRightPowerPhasePeakScaled is similar to SetAvgRightPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *SegmentLap) SetAvgRightPowerPhasePeakScaled(vs []float64) *SegmentLap {
+	m.AvgRightPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgPowerPosition sets AvgPowerPosition value.
 //
 // Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
 func (m *SegmentLap) SetAvgPowerPosition(v []uint16) *SegmentLap {
@@ -1879,7 +2300,7 @@ func (m *SegmentLap) SetAvgPowerPosition(v []uint16) *SegmentLap {
 	return m
 }
 
-// SetMaxPowerPosition sets SegmentLap value.
+// SetMaxPowerPosition sets MaxPowerPosition value.
 //
 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 func (m *SegmentLap) SetMaxPowerPosition(v []uint16) *SegmentLap {
@@ -1887,7 +2308,7 @@ func (m *SegmentLap) SetMaxPowerPosition(v []uint16) *SegmentLap {
 	return m
 }
 
-// SetAvgCadencePosition sets SegmentLap value.
+// SetAvgCadencePosition sets AvgCadencePosition value.
 //
 // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
 func (m *SegmentLap) SetAvgCadencePosition(v []uint8) *SegmentLap {
@@ -1895,7 +2316,7 @@ func (m *SegmentLap) SetAvgCadencePosition(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetMaxCadencePosition sets SegmentLap value.
+// SetMaxCadencePosition sets MaxCadencePosition value.
 //
 // Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
 func (m *SegmentLap) SetMaxCadencePosition(v []uint8) *SegmentLap {
@@ -1903,7 +2324,7 @@ func (m *SegmentLap) SetMaxCadencePosition(v []uint8) *SegmentLap {
 	return m
 }
 
-// SetManufacturer sets SegmentLap value.
+// SetManufacturer sets Manufacturer value.
 //
 // Manufacturer that produced the segment
 func (m *SegmentLap) SetManufacturer(v typedef.Manufacturer) *SegmentLap {
@@ -1911,7 +2332,7 @@ func (m *SegmentLap) SetManufacturer(v typedef.Manufacturer) *SegmentLap {
 	return m
 }
 
-// SetTotalGrit sets SegmentLap value.
+// SetTotalGrit sets TotalGrit value.
 //
 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 func (m *SegmentLap) SetTotalGrit(v float32) *SegmentLap {
@@ -1919,7 +2340,7 @@ func (m *SegmentLap) SetTotalGrit(v float32) *SegmentLap {
 	return m
 }
 
-// SetTotalFlow sets SegmentLap value.
+// SetTotalFlow sets TotalFlow value.
 //
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *SegmentLap) SetTotalFlow(v float32) *SegmentLap {
@@ -1927,7 +2348,7 @@ func (m *SegmentLap) SetTotalFlow(v float32) *SegmentLap {
 	return m
 }
 
-// SetAvgGrit sets SegmentLap value.
+// SetAvgGrit sets AvgGrit value.
 //
 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 func (m *SegmentLap) SetAvgGrit(v float32) *SegmentLap {
@@ -1935,7 +2356,7 @@ func (m *SegmentLap) SetAvgGrit(v float32) *SegmentLap {
 	return m
 }
 
-// SetAvgFlow sets SegmentLap value.
+// SetAvgFlow sets AvgFlow value.
 //
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *SegmentLap) SetAvgFlow(v float32) *SegmentLap {
@@ -1943,7 +2364,7 @@ func (m *SegmentLap) SetAvgFlow(v float32) *SegmentLap {
 	return m
 }
 
-// SetTotalFractionalAscent sets SegmentLap value.
+// SetTotalFractionalAscent sets TotalFractionalAscent value.
 //
 // Scale: 100; Units: m; fractional part of total_ascent
 func (m *SegmentLap) SetTotalFractionalAscent(v uint8) *SegmentLap {
@@ -1951,7 +2372,16 @@ func (m *SegmentLap) SetTotalFractionalAscent(v uint8) *SegmentLap {
 	return m
 }
 
-// SetTotalFractionalDescent sets SegmentLap value.
+// SetTotalFractionalAscentScaled is similar to SetTotalFractionalAscent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *SegmentLap) SetTotalFractionalAscentScaled(v float64) *SegmentLap {
+	m.TotalFractionalAscent = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalFractionalDescent sets TotalFractionalDescent value.
 //
 // Scale: 100; Units: m; fractional part of total_descent
 func (m *SegmentLap) SetTotalFractionalDescent(v uint8) *SegmentLap {
@@ -1959,7 +2389,16 @@ func (m *SegmentLap) SetTotalFractionalDescent(v uint8) *SegmentLap {
 	return m
 }
 
-// SetEnhancedAvgAltitude sets SegmentLap value.
+// SetTotalFractionalDescentScaled is similar to SetTotalFractionalDescent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *SegmentLap) SetTotalFractionalDescentScaled(v float64) *SegmentLap {
+	m.TotalFractionalDescent = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEnhancedAvgAltitude sets EnhancedAvgAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetEnhancedAvgAltitude(v uint32) *SegmentLap {
@@ -1967,7 +2406,16 @@ func (m *SegmentLap) SetEnhancedAvgAltitude(v uint32) *SegmentLap {
 	return m
 }
 
-// SetEnhancedMaxAltitude sets SegmentLap value.
+// SetEnhancedAvgAltitudeScaled is similar to SetEnhancedAvgAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedAvgAltitudeScaled(v float64) *SegmentLap {
+	m.EnhancedAvgAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetEnhancedMaxAltitude sets EnhancedMaxAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetEnhancedMaxAltitude(v uint32) *SegmentLap {
@@ -1975,11 +2423,29 @@ func (m *SegmentLap) SetEnhancedMaxAltitude(v uint32) *SegmentLap {
 	return m
 }
 
-// SetEnhancedMinAltitude sets SegmentLap value.
+// SetEnhancedMaxAltitudeScaled is similar to SetEnhancedMaxAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedMaxAltitudeScaled(v float64) *SegmentLap {
+	m.EnhancedMaxAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetEnhancedMinAltitude sets EnhancedMinAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *SegmentLap) SetEnhancedMinAltitude(v uint32) *SegmentLap {
 	m.EnhancedMinAltitude = v
+	return m
+}
+
+// SetEnhancedMinAltitudeScaled is similar to SetEnhancedMinAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *SegmentLap) SetEnhancedMinAltitudeScaled(v float64) *SegmentLap {
+	m.EnhancedMinAltitude = uint32(scaleoffset.Discard(v, 5, 500))
 	return m
 }
 

@@ -94,9 +94,10 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// VersionScaled return Version in its scaled value [Scale: 100].
-//
+// VersionScaled return Version in its scaled value.
 // If Version value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100
 func (m *Software) VersionScaled() float64 {
 	if m.Version == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -104,13 +105,13 @@ func (m *Software) VersionScaled() float64 {
 	return scaleoffset.Apply(m.Version, 100, 0)
 }
 
-// SetMessageIndex sets Software value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Software) SetMessageIndex(v typedef.MessageIndex) *Software {
 	m.MessageIndex = v
 	return m
 }
 
-// SetVersion sets Software value.
+// SetVersion sets Version value.
 //
 // Scale: 100
 func (m *Software) SetVersion(v uint16) *Software {
@@ -118,7 +119,16 @@ func (m *Software) SetVersion(v uint16) *Software {
 	return m
 }
 
-// SetPartNumber sets Software value.
+// SetVersionScaled is similar to SetVersion except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100
+func (m *Software) SetVersionScaled(v float64) *Software {
+	m.Version = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPartNumber sets PartNumber value.
 func (m *Software) SetPartNumber(v string) *Software {
 	m.PartNumber = v
 	return m

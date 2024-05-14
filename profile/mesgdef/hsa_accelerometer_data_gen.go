@@ -126,9 +126,10 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaAccelerometerData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// AccelXScaled return AccelX in its scaled value [Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement].
-//
+// AccelXScaled return AccelX in its scaled value.
 // If AccelX value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
 func (m *HsaAccelerometerData) AccelXScaled() []float64 {
 	if m.AccelX == nil {
 		return nil
@@ -136,9 +137,10 @@ func (m *HsaAccelerometerData) AccelXScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AccelX, 1.024, 0)
 }
 
-// AccelYScaled return AccelY in its scaled value [Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement].
-//
+// AccelYScaled return AccelY in its scaled value.
 // If AccelY value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement
 func (m *HsaAccelerometerData) AccelYScaled() []float64 {
 	if m.AccelY == nil {
 		return nil
@@ -146,9 +148,10 @@ func (m *HsaAccelerometerData) AccelYScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AccelY, 1.024, 0)
 }
 
-// AccelZScaled return AccelZ in its scaled value [Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement].
-//
+// AccelZScaled return AccelZ in its scaled value.
 // If AccelZ value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement
 func (m *HsaAccelerometerData) AccelZScaled() []float64 {
 	if m.AccelZ == nil {
 		return nil
@@ -156,7 +159,7 @@ func (m *HsaAccelerometerData) AccelZScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AccelZ, 1.024, 0)
 }
 
-// SetTimestamp sets HsaAccelerometerData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaAccelerometerData) SetTimestamp(v time.Time) *HsaAccelerometerData {
@@ -164,7 +167,7 @@ func (m *HsaAccelerometerData) SetTimestamp(v time.Time) *HsaAccelerometerData {
 	return m
 }
 
-// SetTimestampMs sets HsaAccelerometerData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond resolution of the timestamp
 func (m *HsaAccelerometerData) SetTimestampMs(v uint16) *HsaAccelerometerData {
@@ -172,7 +175,7 @@ func (m *HsaAccelerometerData) SetTimestampMs(v uint16) *HsaAccelerometerData {
 	return m
 }
 
-// SetSamplingInterval sets HsaAccelerometerData value.
+// SetSamplingInterval sets SamplingInterval value.
 //
 // Units: ms; Sampling Interval in Milliseconds
 func (m *HsaAccelerometerData) SetSamplingInterval(v uint16) *HsaAccelerometerData {
@@ -180,7 +183,7 @@ func (m *HsaAccelerometerData) SetSamplingInterval(v uint16) *HsaAccelerometerDa
 	return m
 }
 
-// SetAccelX sets HsaAccelerometerData value.
+// SetAccelX sets AccelX value.
 //
 // Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelX(v []int16) *HsaAccelerometerData {
@@ -188,7 +191,16 @@ func (m *HsaAccelerometerData) SetAccelX(v []int16) *HsaAccelerometerData {
 	return m
 }
 
-// SetAccelY sets HsaAccelerometerData value.
+// SetAccelXScaled is similar to SetAccelX except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
+func (m *HsaAccelerometerData) SetAccelXScaled(vs []float64) *HsaAccelerometerData {
+	m.AccelX = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	return m
+}
+
+// SetAccelY sets AccelY value.
 //
 // Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelY(v []int16) *HsaAccelerometerData {
@@ -196,7 +208,16 @@ func (m *HsaAccelerometerData) SetAccelY(v []int16) *HsaAccelerometerData {
 	return m
 }
 
-// SetAccelZ sets HsaAccelerometerData value.
+// SetAccelYScaled is similar to SetAccelY except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement
+func (m *HsaAccelerometerData) SetAccelYScaled(vs []float64) *HsaAccelerometerData {
+	m.AccelY = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	return m
+}
+
+// SetAccelZ sets AccelZ value.
 //
 // Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelZ(v []int16) *HsaAccelerometerData {
@@ -204,7 +225,16 @@ func (m *HsaAccelerometerData) SetAccelZ(v []int16) *HsaAccelerometerData {
 	return m
 }
 
-// SetTimestamp32K sets HsaAccelerometerData value.
+// SetAccelZScaled is similar to SetAccelZ except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement
+func (m *HsaAccelerometerData) SetAccelZScaled(vs []float64) *HsaAccelerometerData {
+	m.AccelZ = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	return m
+}
+
+// SetTimestamp32K sets Timestamp32K value.
 //
 // 32 kHz timestamp
 func (m *HsaAccelerometerData) SetTimestamp32K(v uint32) *HsaAccelerometerData {

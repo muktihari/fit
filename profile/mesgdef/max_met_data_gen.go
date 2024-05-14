@@ -134,9 +134,10 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 // UpdateTimeUint32 returns UpdateTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *MaxMetData) UpdateTimeUint32() uint32 { return datetime.ToUint32(m.UpdateTime) }
 
-// Vo2MaxScaled return Vo2Max in its scaled value [Scale: 10; Units: mL/kg/min].
-//
+// Vo2MaxScaled return Vo2Max in its scaled value.
 // If Vo2Max value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mL/kg/min
 func (m *MaxMetData) Vo2MaxScaled() float64 {
 	if m.Vo2Max == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -144,7 +145,7 @@ func (m *MaxMetData) Vo2MaxScaled() float64 {
 	return scaleoffset.Apply(m.Vo2Max, 10, 0)
 }
 
-// SetUpdateTime sets MaxMetData value.
+// SetUpdateTime sets UpdateTime value.
 //
 // Time maxMET and vo2 were calculated
 func (m *MaxMetData) SetUpdateTime(v time.Time) *MaxMetData {
@@ -152,7 +153,7 @@ func (m *MaxMetData) SetUpdateTime(v time.Time) *MaxMetData {
 	return m
 }
 
-// SetVo2Max sets MaxMetData value.
+// SetVo2Max sets Vo2Max value.
 //
 // Scale: 10; Units: mL/kg/min
 func (m *MaxMetData) SetVo2Max(v uint16) *MaxMetData {
@@ -160,25 +161,34 @@ func (m *MaxMetData) SetVo2Max(v uint16) *MaxMetData {
 	return m
 }
 
-// SetSport sets MaxMetData value.
+// SetVo2MaxScaled is similar to SetVo2Max except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mL/kg/min
+func (m *MaxMetData) SetVo2MaxScaled(v float64) *MaxMetData {
+	m.Vo2Max = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetSport sets Sport value.
 func (m *MaxMetData) SetSport(v typedef.Sport) *MaxMetData {
 	m.Sport = v
 	return m
 }
 
-// SetSubSport sets MaxMetData value.
+// SetSubSport sets SubSport value.
 func (m *MaxMetData) SetSubSport(v typedef.SubSport) *MaxMetData {
 	m.SubSport = v
 	return m
 }
 
-// SetMaxMetCategory sets MaxMetData value.
+// SetMaxMetCategory sets MaxMetCategory value.
 func (m *MaxMetData) SetMaxMetCategory(v typedef.MaxMetCategory) *MaxMetData {
 	m.MaxMetCategory = v
 	return m
 }
 
-// SetCalibratedData sets MaxMetData value.
+// SetCalibratedData sets CalibratedData value.
 //
 // Indicates if calibrated data was used in the calculation
 func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
@@ -186,7 +196,7 @@ func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
 	return m
 }
 
-// SetHrSource sets MaxMetData value.
+// SetHrSource sets HrSource value.
 //
 // Indicates if the estimate was obtained using a chest strap or wrist heart rate
 func (m *MaxMetData) SetHrSource(v typedef.MaxMetHeartRateSource) *MaxMetData {
@@ -194,7 +204,7 @@ func (m *MaxMetData) SetHrSource(v typedef.MaxMetHeartRateSource) *MaxMetData {
 	return m
 }
 
-// SetSpeedSource sets MaxMetData value.
+// SetSpeedSource sets SpeedSource value.
 //
 // Indidcates if the estimate was obtained using onboard GPS or connected GPS
 func (m *MaxMetData) SetSpeedSource(v typedef.MaxMetSpeedSource) *MaxMetData {

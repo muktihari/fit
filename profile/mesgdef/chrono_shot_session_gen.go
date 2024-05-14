@@ -127,9 +127,10 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *ChronoShotSession) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// MinSpeedScaled return MinSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MinSpeedScaled return MinSpeed in its scaled value.
 // If MinSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *ChronoShotSession) MinSpeedScaled() float64 {
 	if m.MinSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -137,9 +138,10 @@ func (m *ChronoShotSession) MinSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MinSpeed, 1000, 0)
 }
 
-// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxSpeedScaled return MaxSpeed in its scaled value.
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *ChronoShotSession) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -147,9 +149,10 @@ func (m *ChronoShotSession) MaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *ChronoShotSession) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -157,9 +160,10 @@ func (m *ChronoShotSession) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// GrainWeightScaled return GrainWeight in its scaled value [Scale: 10; Units: gr].
-//
+// GrainWeightScaled return GrainWeight in its scaled value.
 // If GrainWeight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: gr
 func (m *ChronoShotSession) GrainWeightScaled() float64 {
 	if m.GrainWeight == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -167,13 +171,13 @@ func (m *ChronoShotSession) GrainWeightScaled() float64 {
 	return scaleoffset.Apply(m.GrainWeight, 10, 0)
 }
 
-// SetTimestamp sets ChronoShotSession value.
+// SetTimestamp sets Timestamp value.
 func (m *ChronoShotSession) SetTimestamp(v time.Time) *ChronoShotSession {
 	m.Timestamp = v
 	return m
 }
 
-// SetMinSpeed sets ChronoShotSession value.
+// SetMinSpeed sets MinSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetMinSpeed(v uint32) *ChronoShotSession {
@@ -181,7 +185,16 @@ func (m *ChronoShotSession) SetMinSpeed(v uint32) *ChronoShotSession {
 	return m
 }
 
-// SetMaxSpeed sets ChronoShotSession value.
+// SetMinSpeedScaled is similar to SetMinSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) SetMinSpeedScaled(v float64) *ChronoShotSession {
+	m.MinSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxSpeed sets MaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetMaxSpeed(v uint32) *ChronoShotSession {
@@ -189,7 +202,16 @@ func (m *ChronoShotSession) SetMaxSpeed(v uint32) *ChronoShotSession {
 	return m
 }
 
-// SetAvgSpeed sets ChronoShotSession value.
+// SetMaxSpeedScaled is similar to SetMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) SetMaxSpeedScaled(v float64) *ChronoShotSession {
+	m.MaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetAvgSpeed(v uint32) *ChronoShotSession {
@@ -197,23 +219,41 @@ func (m *ChronoShotSession) SetAvgSpeed(v uint32) *ChronoShotSession {
 	return m
 }
 
-// SetShotCount sets ChronoShotSession value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) SetAvgSpeedScaled(v float64) *ChronoShotSession {
+	m.AvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetShotCount sets ShotCount value.
 func (m *ChronoShotSession) SetShotCount(v uint16) *ChronoShotSession {
 	m.ShotCount = v
 	return m
 }
 
-// SetProjectileType sets ChronoShotSession value.
+// SetProjectileType sets ProjectileType value.
 func (m *ChronoShotSession) SetProjectileType(v typedef.ProjectileType) *ChronoShotSession {
 	m.ProjectileType = v
 	return m
 }
 
-// SetGrainWeight sets ChronoShotSession value.
+// SetGrainWeight sets GrainWeight value.
 //
 // Scale: 10; Units: gr
 func (m *ChronoShotSession) SetGrainWeight(v uint32) *ChronoShotSession {
 	m.GrainWeight = v
+	return m
+}
+
+// SetGrainWeightScaled is similar to SetGrainWeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: gr
+func (m *ChronoShotSession) SetGrainWeightScaled(v float64) *ChronoShotSession {
+	m.GrainWeight = uint32(scaleoffset.Discard(v, 10, 0))
 	return m
 }
 

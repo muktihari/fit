@@ -128,37 +128,37 @@ func (m *VideoClip) StartTimestampUint32() uint32 { return datetime.ToUint32(m.S
 // EndTimestampUint32 returns EndTimestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *VideoClip) EndTimestampUint32() uint32 { return datetime.ToUint32(m.EndTimestamp) }
 
-// SetClipNumber sets VideoClip value.
+// SetClipNumber sets ClipNumber value.
 func (m *VideoClip) SetClipNumber(v uint16) *VideoClip {
 	m.ClipNumber = v
 	return m
 }
 
-// SetStartTimestamp sets VideoClip value.
+// SetStartTimestamp sets StartTimestamp value.
 func (m *VideoClip) SetStartTimestamp(v time.Time) *VideoClip {
 	m.StartTimestamp = v
 	return m
 }
 
-// SetStartTimestampMs sets VideoClip value.
+// SetStartTimestampMs sets StartTimestampMs value.
 func (m *VideoClip) SetStartTimestampMs(v uint16) *VideoClip {
 	m.StartTimestampMs = v
 	return m
 }
 
-// SetEndTimestamp sets VideoClip value.
+// SetEndTimestamp sets EndTimestamp value.
 func (m *VideoClip) SetEndTimestamp(v time.Time) *VideoClip {
 	m.EndTimestamp = v
 	return m
 }
 
-// SetEndTimestampMs sets VideoClip value.
+// SetEndTimestampMs sets EndTimestampMs value.
 func (m *VideoClip) SetEndTimestampMs(v uint16) *VideoClip {
 	m.EndTimestampMs = v
 	return m
 }
 
-// SetClipStart sets VideoClip value.
+// SetClipStart sets ClipStart value.
 //
 // Units: ms; Start of clip in video time
 func (m *VideoClip) SetClipStart(v uint32) *VideoClip {
@@ -166,7 +166,7 @@ func (m *VideoClip) SetClipStart(v uint32) *VideoClip {
 	return m
 }
 
-// SetClipEnd sets VideoClip value.
+// SetClipEnd sets ClipEnd value.
 //
 // Units: ms; End of clip in video time
 func (m *VideoClip) SetClipEnd(v uint32) *VideoClip {

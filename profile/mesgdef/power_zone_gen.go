@@ -92,13 +92,13 @@ func (m *PowerZone) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets PowerZone value.
+// SetMessageIndex sets MessageIndex value.
 func (m *PowerZone) SetMessageIndex(v typedef.MessageIndex) *PowerZone {
 	m.MessageIndex = v
 	return m
 }
 
-// SetHighValue sets PowerZone value.
+// SetHighValue sets HighValue value.
 //
 // Units: watts
 func (m *PowerZone) SetHighValue(v uint16) *PowerZone {
@@ -106,7 +106,7 @@ func (m *PowerZone) SetHighValue(v uint16) *PowerZone {
 	return m
 }
 
-// SetName sets PowerZone value.
+// SetName sets Name value.
 func (m *PowerZone) SetName(v string) *PowerZone {
 	m.Name = v
 	return m

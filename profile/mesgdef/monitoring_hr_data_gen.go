@@ -97,7 +97,7 @@ func (m *MonitoringHrData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *MonitoringHrData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets MonitoringHrData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 func (m *MonitoringHrData) SetTimestamp(v time.Time) *MonitoringHrData {
@@ -105,7 +105,7 @@ func (m *MonitoringHrData) SetTimestamp(v time.Time) *MonitoringHrData {
 	return m
 }
 
-// SetRestingHeartRate sets MonitoringHrData value.
+// SetRestingHeartRate sets RestingHeartRate value.
 //
 // Units: bpm; 7-day rolling average
 func (m *MonitoringHrData) SetRestingHeartRate(v uint8) *MonitoringHrData {
@@ -113,7 +113,7 @@ func (m *MonitoringHrData) SetRestingHeartRate(v uint8) *MonitoringHrData {
 	return m
 }
 
-// SetCurrentDayRestingHeartRate sets MonitoringHrData value.
+// SetCurrentDayRestingHeartRate sets CurrentDayRestingHeartRate value.
 //
 // Units: bpm; RHR for today only. (Feeds into 7-day average)
 func (m *MonitoringHrData) SetCurrentDayRestingHeartRate(v uint8) *MonitoringHrData {

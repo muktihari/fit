@@ -113,7 +113,7 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetPartIndex sets MemoGlob value.
+// SetPartIndex sets PartIndex value.
 //
 // Sequence number of memo blocks
 func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
@@ -121,7 +121,7 @@ func (m *MemoGlob) SetPartIndex(v uint32) *MemoGlob {
 	return m
 }
 
-// SetMemo sets MemoGlob value.
+// SetMemo sets Memo value.
 //
 // Array: [N]; Deprecated. Use data field.
 func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
@@ -129,7 +129,7 @@ func (m *MemoGlob) SetMemo(v []byte) *MemoGlob {
 	return m
 }
 
-// SetMesgNum sets MemoGlob value.
+// SetMesgNum sets MesgNum value.
 //
 // Message Number of the parent message
 func (m *MemoGlob) SetMesgNum(v typedef.MesgNum) *MemoGlob {
@@ -137,7 +137,7 @@ func (m *MemoGlob) SetMesgNum(v typedef.MesgNum) *MemoGlob {
 	return m
 }
 
-// SetParentIndex sets MemoGlob value.
+// SetParentIndex sets ParentIndex value.
 //
 // Index of mesg that this glob is associated with.
 func (m *MemoGlob) SetParentIndex(v typedef.MessageIndex) *MemoGlob {
@@ -145,7 +145,7 @@ func (m *MemoGlob) SetParentIndex(v typedef.MessageIndex) *MemoGlob {
 	return m
 }
 
-// SetFieldNum sets MemoGlob value.
+// SetFieldNum sets FieldNum value.
 //
 // Field within the parent that this glob is associated with
 func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
@@ -153,7 +153,7 @@ func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
 	return m
 }
 
-// SetData sets MemoGlob value.
+// SetData sets Data value.
 //
 // Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 func (m *MemoGlob) SetData(v []uint8) *MemoGlob {

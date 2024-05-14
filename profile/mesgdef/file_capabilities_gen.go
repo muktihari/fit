@@ -113,37 +113,37 @@ func (m *FileCapabilities) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets FileCapabilities value.
+// SetMessageIndex sets MessageIndex value.
 func (m *FileCapabilities) SetMessageIndex(v typedef.MessageIndex) *FileCapabilities {
 	m.MessageIndex = v
 	return m
 }
 
-// SetType sets FileCapabilities value.
+// SetType sets Type value.
 func (m *FileCapabilities) SetType(v typedef.File) *FileCapabilities {
 	m.Type = v
 	return m
 }
 
-// SetFlags sets FileCapabilities value.
+// SetFlags sets Flags value.
 func (m *FileCapabilities) SetFlags(v typedef.FileFlags) *FileCapabilities {
 	m.Flags = v
 	return m
 }
 
-// SetDirectory sets FileCapabilities value.
+// SetDirectory sets Directory value.
 func (m *FileCapabilities) SetDirectory(v string) *FileCapabilities {
 	m.Directory = v
 	return m
 }
 
-// SetMaxCount sets FileCapabilities value.
+// SetMaxCount sets MaxCount value.
 func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
 	m.MaxCount = v
 	return m
 }
 
-// SetMaxSize sets FileCapabilities value.
+// SetMaxSize sets MaxSize value.
 //
 // Units: bytes
 func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {

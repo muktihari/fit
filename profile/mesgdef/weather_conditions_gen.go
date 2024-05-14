@@ -194,9 +194,10 @@ func (m *WeatherConditions) TimestampUint32() uint32 { return datetime.ToUint32(
 // ObservedAtTimeUint32 returns ObservedAtTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *WeatherConditions) ObservedAtTimeUint32() uint32 { return datetime.ToUint32(m.ObservedAtTime) }
 
-// WindSpeedScaled return WindSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// WindSpeedScaled return WindSpeed in its scaled value.
 // If WindSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *WeatherConditions) WindSpeedScaled() float64 {
 	if m.WindSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -222,7 +223,7 @@ func (m *WeatherConditions) ObservedLocationLongDegrees() float64 {
 	return semicircles.ToDegrees(m.ObservedLocationLong)
 }
 
-// SetTimestamp sets WeatherConditions value.
+// SetTimestamp sets Timestamp value.
 //
 // time of update for current conditions, else forecast time
 func (m *WeatherConditions) SetTimestamp(v time.Time) *WeatherConditions {
@@ -230,7 +231,7 @@ func (m *WeatherConditions) SetTimestamp(v time.Time) *WeatherConditions {
 	return m
 }
 
-// SetWeatherReport sets WeatherConditions value.
+// SetWeatherReport sets WeatherReport value.
 //
 // Current or forecast
 func (m *WeatherConditions) SetWeatherReport(v typedef.WeatherReport) *WeatherConditions {
@@ -238,7 +239,7 @@ func (m *WeatherConditions) SetWeatherReport(v typedef.WeatherReport) *WeatherCo
 	return m
 }
 
-// SetTemperature sets WeatherConditions value.
+// SetTemperature sets Temperature value.
 //
 // Units: C
 func (m *WeatherConditions) SetTemperature(v int8) *WeatherConditions {
@@ -246,7 +247,7 @@ func (m *WeatherConditions) SetTemperature(v int8) *WeatherConditions {
 	return m
 }
 
-// SetCondition sets WeatherConditions value.
+// SetCondition sets Condition value.
 //
 // Corresponds to GSC Response weatherIcon field
 func (m *WeatherConditions) SetCondition(v typedef.WeatherStatus) *WeatherConditions {
@@ -254,7 +255,7 @@ func (m *WeatherConditions) SetCondition(v typedef.WeatherStatus) *WeatherCondit
 	return m
 }
 
-// SetWindDirection sets WeatherConditions value.
+// SetWindDirection sets WindDirection value.
 //
 // Units: degrees
 func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
@@ -262,7 +263,7 @@ func (m *WeatherConditions) SetWindDirection(v uint16) *WeatherConditions {
 	return m
 }
 
-// SetWindSpeed sets WeatherConditions value.
+// SetWindSpeed sets WindSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
@@ -270,7 +271,16 @@ func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
 	return m
 }
 
-// SetPrecipitationProbability sets WeatherConditions value.
+// SetWindSpeedScaled is similar to SetWindSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *WeatherConditions) SetWindSpeedScaled(v float64) *WeatherConditions {
+	m.WindSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetPrecipitationProbability sets PrecipitationProbability value.
 //
 // range 0-100
 func (m *WeatherConditions) SetPrecipitationProbability(v uint8) *WeatherConditions {
@@ -278,7 +288,7 @@ func (m *WeatherConditions) SetPrecipitationProbability(v uint8) *WeatherConditi
 	return m
 }
 
-// SetTemperatureFeelsLike sets WeatherConditions value.
+// SetTemperatureFeelsLike sets TemperatureFeelsLike value.
 //
 // Units: C; Heat Index if GCS heatIdx above or equal to 90F or wind chill if GCS windChill below or equal to 32F
 func (m *WeatherConditions) SetTemperatureFeelsLike(v int8) *WeatherConditions {
@@ -286,13 +296,13 @@ func (m *WeatherConditions) SetTemperatureFeelsLike(v int8) *WeatherConditions {
 	return m
 }
 
-// SetRelativeHumidity sets WeatherConditions value.
+// SetRelativeHumidity sets RelativeHumidity value.
 func (m *WeatherConditions) SetRelativeHumidity(v uint8) *WeatherConditions {
 	m.RelativeHumidity = v
 	return m
 }
 
-// SetLocation sets WeatherConditions value.
+// SetLocation sets Location value.
 //
 // string corresponding to GCS response location string
 func (m *WeatherConditions) SetLocation(v string) *WeatherConditions {
@@ -300,13 +310,13 @@ func (m *WeatherConditions) SetLocation(v string) *WeatherConditions {
 	return m
 }
 
-// SetObservedAtTime sets WeatherConditions value.
+// SetObservedAtTime sets ObservedAtTime value.
 func (m *WeatherConditions) SetObservedAtTime(v time.Time) *WeatherConditions {
 	m.ObservedAtTime = v
 	return m
 }
 
-// SetObservedLocationLat sets WeatherConditions value.
+// SetObservedLocationLat sets ObservedLocationLat value.
 //
 // Units: semicircles
 func (m *WeatherConditions) SetObservedLocationLat(v int32) *WeatherConditions {
@@ -314,7 +324,14 @@ func (m *WeatherConditions) SetObservedLocationLat(v int32) *WeatherConditions {
 	return m
 }
 
-// SetObservedLocationLong sets WeatherConditions value.
+// SetObservedLocationLatDegrees is similar to SetObservedLocationLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *WeatherConditions) SetObservedLocationLatDegrees(degrees float64) *WeatherConditions {
+	m.ObservedLocationLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetObservedLocationLong sets ObservedLocationLong value.
 //
 // Units: semicircles
 func (m *WeatherConditions) SetObservedLocationLong(v int32) *WeatherConditions {
@@ -322,13 +339,20 @@ func (m *WeatherConditions) SetObservedLocationLong(v int32) *WeatherConditions 
 	return m
 }
 
-// SetDayOfWeek sets WeatherConditions value.
+// SetObservedLocationLongDegrees is similar to SetObservedLocationLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *WeatherConditions) SetObservedLocationLongDegrees(degrees float64) *WeatherConditions {
+	m.ObservedLocationLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetDayOfWeek sets DayOfWeek value.
 func (m *WeatherConditions) SetDayOfWeek(v typedef.DayOfWeek) *WeatherConditions {
 	m.DayOfWeek = v
 	return m
 }
 
-// SetHighTemperature sets WeatherConditions value.
+// SetHighTemperature sets HighTemperature value.
 //
 // Units: C
 func (m *WeatherConditions) SetHighTemperature(v int8) *WeatherConditions {
@@ -336,7 +360,7 @@ func (m *WeatherConditions) SetHighTemperature(v int8) *WeatherConditions {
 	return m
 }
 
-// SetLowTemperature sets WeatherConditions value.
+// SetLowTemperature sets LowTemperature value.
 //
 // Units: C
 func (m *WeatherConditions) SetLowTemperature(v int8) *WeatherConditions {

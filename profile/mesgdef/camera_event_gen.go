@@ -111,7 +111,7 @@ func (m *CameraEvent) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *CameraEvent) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets CameraEvent value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp.
 func (m *CameraEvent) SetTimestamp(v time.Time) *CameraEvent {
@@ -119,7 +119,7 @@ func (m *CameraEvent) SetTimestamp(v time.Time) *CameraEvent {
 	return m
 }
 
-// SetTimestampMs sets CameraEvent value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *CameraEvent) SetTimestampMs(v uint16) *CameraEvent {
@@ -127,19 +127,19 @@ func (m *CameraEvent) SetTimestampMs(v uint16) *CameraEvent {
 	return m
 }
 
-// SetCameraEventType sets CameraEvent value.
+// SetCameraEventType sets CameraEventType value.
 func (m *CameraEvent) SetCameraEventType(v typedef.CameraEventType) *CameraEvent {
 	m.CameraEventType = v
 	return m
 }
 
-// SetCameraFileUuid sets CameraEvent value.
+// SetCameraFileUuid sets CameraFileUuid value.
 func (m *CameraEvent) SetCameraFileUuid(v string) *CameraEvent {
 	m.CameraFileUuid = v
 	return m
 }
 
-// SetCameraOrientation sets CameraEvent value.
+// SetCameraOrientation sets CameraOrientation value.
 func (m *CameraEvent) SetCameraOrientation(v typedef.CameraOrientationType) *CameraEvent {
 	m.CameraOrientation = v
 	return m

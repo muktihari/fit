@@ -97,13 +97,13 @@ func (m *BeatIntervals) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *BeatIntervals) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets BeatIntervals value.
+// SetTimestamp sets Timestamp value.
 func (m *BeatIntervals) SetTimestamp(v time.Time) *BeatIntervals {
 	m.Timestamp = v
 	return m
 }
 
-// SetTimestampMs sets BeatIntervals value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Milliseconds past date_time
 func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
@@ -111,7 +111,7 @@ func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
 	return m
 }
 
-// SetTime sets BeatIntervals value.
+// SetTime sets Time value.
 //
 // Array: [N]; Units: ms; Array of millisecond times between beats
 func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {

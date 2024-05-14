@@ -97,7 +97,7 @@ func (m *HsaStepData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaStepData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaStepData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaStepData) SetTimestamp(v time.Time) *HsaStepData {
@@ -105,7 +105,7 @@ func (m *HsaStepData) SetTimestamp(v time.Time) *HsaStepData {
 	return m
 }
 
-// SetProcessingInterval sets HsaStepData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaStepData) SetProcessingInterval(v uint16) *HsaStepData {
@@ -113,7 +113,7 @@ func (m *HsaStepData) SetProcessingInterval(v uint16) *HsaStepData {
 	return m
 }
 
-// SetSteps sets HsaStepData value.
+// SetSteps sets Steps value.
 //
 // Array: [N]; Units: steps; Total step sum
 func (m *HsaStepData) SetSteps(v []uint32) *HsaStepData {

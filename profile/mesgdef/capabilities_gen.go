@@ -104,7 +104,7 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetLanguages sets Capabilities value.
+// SetLanguages sets Languages value.
 //
 // Array: [N]; Use language_bits_x types where x is index of array.
 func (m *Capabilities) SetLanguages(v []uint8) *Capabilities {
@@ -112,7 +112,7 @@ func (m *Capabilities) SetLanguages(v []uint8) *Capabilities {
 	return m
 }
 
-// SetSports sets Capabilities value.
+// SetSports sets Sports value.
 //
 // Array: [N]; Use sport_bits_x types where x is index of array.
 func (m *Capabilities) SetSports(v []typedef.SportBits0) *Capabilities {
@@ -120,13 +120,13 @@ func (m *Capabilities) SetSports(v []typedef.SportBits0) *Capabilities {
 	return m
 }
 
-// SetWorkoutsSupported sets Capabilities value.
+// SetWorkoutsSupported sets WorkoutsSupported value.
 func (m *Capabilities) SetWorkoutsSupported(v typedef.WorkoutCapabilities) *Capabilities {
 	m.WorkoutsSupported = v
 	return m
 }
 
-// SetConnectivitySupported sets Capabilities value.
+// SetConnectivitySupported sets ConnectivitySupported value.
 func (m *Capabilities) SetConnectivitySupported(v typedef.ConnectivityCapabilities) *Capabilities {
 	m.ConnectivitySupported = v
 	return m

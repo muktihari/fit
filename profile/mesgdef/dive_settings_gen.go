@@ -341,9 +341,10 @@ func (m *DiveSettings) GetHeartRateSource() (name string, value any) {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DiveSettings) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// Po2WarnScaled return Po2Warn in its scaled value [Scale: 100; Units: percent; Typically 1.40].
-//
+// Po2WarnScaled return Po2Warn in its scaled value.
 // If Po2Warn value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent; Typically 1.40
 func (m *DiveSettings) Po2WarnScaled() float64 {
 	if m.Po2Warn == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -351,9 +352,10 @@ func (m *DiveSettings) Po2WarnScaled() float64 {
 	return scaleoffset.Apply(m.Po2Warn, 100, 0)
 }
 
-// Po2CriticalScaled return Po2Critical in its scaled value [Scale: 100; Units: percent; Typically 1.60].
-//
+// Po2CriticalScaled return Po2Critical in its scaled value.
 // If Po2Critical value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent; Typically 1.60
 func (m *DiveSettings) Po2CriticalScaled() float64 {
 	if m.Po2Critical == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -361,9 +363,10 @@ func (m *DiveSettings) Po2CriticalScaled() float64 {
 	return scaleoffset.Apply(m.Po2Critical, 100, 0)
 }
 
-// Po2DecoScaled return Po2Deco in its scaled value [Scale: 100; Units: percent].
-//
+// Po2DecoScaled return Po2Deco in its scaled value.
 // If Po2Deco value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *DiveSettings) Po2DecoScaled() float64 {
 	if m.Po2Deco == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -371,9 +374,10 @@ func (m *DiveSettings) Po2DecoScaled() float64 {
 	return scaleoffset.Apply(m.Po2Deco, 100, 0)
 }
 
-// CcrLowSetpointScaled return CcrLowSetpoint in its scaled value [Scale: 100; Units: percent; Target PO2 when using low setpoint].
-//
+// CcrLowSetpointScaled return CcrLowSetpoint in its scaled value.
 // If CcrLowSetpoint value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent; Target PO2 when using low setpoint
 func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 	if m.CcrLowSetpoint == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -381,9 +385,10 @@ func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 	return scaleoffset.Apply(m.CcrLowSetpoint, 100, 0)
 }
 
-// CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode].
-//
+// CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value.
 // If CcrLowSetpointDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
 func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
 	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -391,9 +396,10 @@ func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
 	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
 }
 
-// CcrHighSetpointScaled return CcrHighSetpoint in its scaled value [Scale: 100; Units: percent; Target PO2 when using high setpoint].
-//
+// CcrHighSetpointScaled return CcrHighSetpoint in its scaled value.
 // If CcrHighSetpoint value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent; Target PO2 when using high setpoint
 func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 	if m.CcrHighSetpoint == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -401,9 +407,10 @@ func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 	return scaleoffset.Apply(m.CcrHighSetpoint, 100, 0)
 }
 
-// CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value [Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode].
-//
+// CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value.
 // If CcrHighSetpointDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
 func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
 	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -411,9 +418,10 @@ func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
 	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
 }
 
-// LastStopMultipleScaled return LastStopMultiple in its scaled value [Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft].
-//
+// LastStopMultipleScaled return LastStopMultiple in its scaled value.
 // If LastStopMultiple value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 func (m *DiveSettings) LastStopMultipleScaled() float64 {
 	if m.LastStopMultiple == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -421,31 +429,31 @@ func (m *DiveSettings) LastStopMultipleScaled() float64 {
 	return scaleoffset.Apply(m.LastStopMultiple, 10, 0)
 }
 
-// SetTimestamp sets DiveSettings value.
+// SetTimestamp sets Timestamp value.
 func (m *DiveSettings) SetTimestamp(v time.Time) *DiveSettings {
 	m.Timestamp = v
 	return m
 }
 
-// SetMessageIndex sets DiveSettings value.
+// SetMessageIndex sets MessageIndex value.
 func (m *DiveSettings) SetMessageIndex(v typedef.MessageIndex) *DiveSettings {
 	m.MessageIndex = v
 	return m
 }
 
-// SetName sets DiveSettings value.
+// SetName sets Name value.
 func (m *DiveSettings) SetName(v string) *DiveSettings {
 	m.Name = v
 	return m
 }
 
-// SetModel sets DiveSettings value.
+// SetModel sets Model value.
 func (m *DiveSettings) SetModel(v typedef.TissueModelType) *DiveSettings {
 	m.Model = v
 	return m
 }
 
-// SetGfLow sets DiveSettings value.
+// SetGfLow sets GfLow value.
 //
 // Units: percent
 func (m *DiveSettings) SetGfLow(v uint8) *DiveSettings {
@@ -453,7 +461,7 @@ func (m *DiveSettings) SetGfLow(v uint8) *DiveSettings {
 	return m
 }
 
-// SetGfHigh sets DiveSettings value.
+// SetGfHigh sets GfHigh value.
 //
 // Units: percent
 func (m *DiveSettings) SetGfHigh(v uint8) *DiveSettings {
@@ -461,13 +469,13 @@ func (m *DiveSettings) SetGfHigh(v uint8) *DiveSettings {
 	return m
 }
 
-// SetWaterType sets DiveSettings value.
+// SetWaterType sets WaterType value.
 func (m *DiveSettings) SetWaterType(v typedef.WaterType) *DiveSettings {
 	m.WaterType = v
 	return m
 }
 
-// SetWaterDensity sets DiveSettings value.
+// SetWaterDensity sets WaterDensity value.
 //
 // Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
 func (m *DiveSettings) SetWaterDensity(v float32) *DiveSettings {
@@ -475,7 +483,7 @@ func (m *DiveSettings) SetWaterDensity(v float32) *DiveSettings {
 	return m
 }
 
-// SetPo2Warn sets DiveSettings value.
+// SetPo2Warn sets Po2Warn value.
 //
 // Scale: 100; Units: percent; Typically 1.40
 func (m *DiveSettings) SetPo2Warn(v uint8) *DiveSettings {
@@ -483,7 +491,16 @@ func (m *DiveSettings) SetPo2Warn(v uint8) *DiveSettings {
 	return m
 }
 
-// SetPo2Critical sets DiveSettings value.
+// SetPo2WarnScaled is similar to SetPo2Warn except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent; Typically 1.40
+func (m *DiveSettings) SetPo2WarnScaled(v float64) *DiveSettings {
+	m.Po2Warn = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPo2Critical sets Po2Critical value.
 //
 // Scale: 100; Units: percent; Typically 1.60
 func (m *DiveSettings) SetPo2Critical(v uint8) *DiveSettings {
@@ -491,7 +508,16 @@ func (m *DiveSettings) SetPo2Critical(v uint8) *DiveSettings {
 	return m
 }
 
-// SetPo2Deco sets DiveSettings value.
+// SetPo2CriticalScaled is similar to SetPo2Critical except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent; Typically 1.60
+func (m *DiveSettings) SetPo2CriticalScaled(v float64) *DiveSettings {
+	m.Po2Critical = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPo2Deco sets Po2Deco value.
 //
 // Scale: 100; Units: percent
 func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
@@ -499,55 +525,64 @@ func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
 	return m
 }
 
-// SetSafetyStopEnabled sets DiveSettings value.
+// SetPo2DecoScaled is similar to SetPo2Deco except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *DiveSettings) SetPo2DecoScaled(v float64) *DiveSettings {
+	m.Po2Deco = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetSafetyStopEnabled sets SafetyStopEnabled value.
 func (m *DiveSettings) SetSafetyStopEnabled(v bool) *DiveSettings {
 	m.SafetyStopEnabled = v
 	return m
 }
 
-// SetBottomDepth sets DiveSettings value.
+// SetBottomDepth sets BottomDepth value.
 func (m *DiveSettings) SetBottomDepth(v float32) *DiveSettings {
 	m.BottomDepth = v
 	return m
 }
 
-// SetBottomTime sets DiveSettings value.
+// SetBottomTime sets BottomTime value.
 func (m *DiveSettings) SetBottomTime(v uint32) *DiveSettings {
 	m.BottomTime = v
 	return m
 }
 
-// SetApneaCountdownEnabled sets DiveSettings value.
+// SetApneaCountdownEnabled sets ApneaCountdownEnabled value.
 func (m *DiveSettings) SetApneaCountdownEnabled(v bool) *DiveSettings {
 	m.ApneaCountdownEnabled = v
 	return m
 }
 
-// SetApneaCountdownTime sets DiveSettings value.
+// SetApneaCountdownTime sets ApneaCountdownTime value.
 func (m *DiveSettings) SetApneaCountdownTime(v uint32) *DiveSettings {
 	m.ApneaCountdownTime = v
 	return m
 }
 
-// SetBacklightMode sets DiveSettings value.
+// SetBacklightMode sets BacklightMode value.
 func (m *DiveSettings) SetBacklightMode(v typedef.DiveBacklightMode) *DiveSettings {
 	m.BacklightMode = v
 	return m
 }
 
-// SetBacklightBrightness sets DiveSettings value.
+// SetBacklightBrightness sets BacklightBrightness value.
 func (m *DiveSettings) SetBacklightBrightness(v uint8) *DiveSettings {
 	m.BacklightBrightness = v
 	return m
 }
 
-// SetBacklightTimeout sets DiveSettings value.
+// SetBacklightTimeout sets BacklightTimeout value.
 func (m *DiveSettings) SetBacklightTimeout(v typedef.BacklightTimeout) *DiveSettings {
 	m.BacklightTimeout = v
 	return m
 }
 
-// SetRepeatDiveInterval sets DiveSettings value.
+// SetRepeatDiveInterval sets RepeatDiveInterval value.
 //
 // Units: s; Time between surfacing and ending the activity
 func (m *DiveSettings) SetRepeatDiveInterval(v uint16) *DiveSettings {
@@ -555,7 +590,7 @@ func (m *DiveSettings) SetRepeatDiveInterval(v uint16) *DiveSettings {
 	return m
 }
 
-// SetSafetyStopTime sets DiveSettings value.
+// SetSafetyStopTime sets SafetyStopTime value.
 //
 // Units: s; Time at safety stop (if enabled)
 func (m *DiveSettings) SetSafetyStopTime(v uint16) *DiveSettings {
@@ -563,19 +598,19 @@ func (m *DiveSettings) SetSafetyStopTime(v uint16) *DiveSettings {
 	return m
 }
 
-// SetHeartRateSourceType sets DiveSettings value.
+// SetHeartRateSourceType sets HeartRateSourceType value.
 func (m *DiveSettings) SetHeartRateSourceType(v typedef.SourceType) *DiveSettings {
 	m.HeartRateSourceType = v
 	return m
 }
 
-// SetHeartRateSource sets DiveSettings value.
+// SetHeartRateSource sets HeartRateSource value.
 func (m *DiveSettings) SetHeartRateSource(v uint8) *DiveSettings {
 	m.HeartRateSource = v
 	return m
 }
 
-// SetTravelGas sets DiveSettings value.
+// SetTravelGas sets TravelGas value.
 //
 // Index of travel dive_gas message
 func (m *DiveSettings) SetTravelGas(v typedef.MessageIndex) *DiveSettings {
@@ -583,7 +618,7 @@ func (m *DiveSettings) SetTravelGas(v typedef.MessageIndex) *DiveSettings {
 	return m
 }
 
-// SetCcrLowSetpointSwitchMode sets DiveSettings value.
+// SetCcrLowSetpointSwitchMode sets CcrLowSetpointSwitchMode value.
 //
 // If low PO2 should be switched to automatically
 func (m *DiveSettings) SetCcrLowSetpointSwitchMode(v typedef.CcrSetpointSwitchMode) *DiveSettings {
@@ -591,7 +626,7 @@ func (m *DiveSettings) SetCcrLowSetpointSwitchMode(v typedef.CcrSetpointSwitchMo
 	return m
 }
 
-// SetCcrLowSetpoint sets DiveSettings value.
+// SetCcrLowSetpoint sets CcrLowSetpoint value.
 //
 // Scale: 100; Units: percent; Target PO2 when using low setpoint
 func (m *DiveSettings) SetCcrLowSetpoint(v uint8) *DiveSettings {
@@ -599,7 +634,16 @@ func (m *DiveSettings) SetCcrLowSetpoint(v uint8) *DiveSettings {
 	return m
 }
 
-// SetCcrLowSetpointDepth sets DiveSettings value.
+// SetCcrLowSetpointScaled is similar to SetCcrLowSetpoint except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent; Target PO2 when using low setpoint
+func (m *DiveSettings) SetCcrLowSetpointScaled(v float64) *DiveSettings {
+	m.CcrLowSetpoint = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetCcrLowSetpointDepth sets CcrLowSetpointDepth value.
 //
 // Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
 func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
@@ -607,7 +651,16 @@ func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
 	return m
 }
 
-// SetCcrHighSetpointSwitchMode sets DiveSettings value.
+// SetCcrLowSetpointDepthScaled is similar to SetCcrLowSetpointDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
+func (m *DiveSettings) SetCcrLowSetpointDepthScaled(v float64) *DiveSettings {
+	m.CcrLowSetpointDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetCcrHighSetpointSwitchMode sets CcrHighSetpointSwitchMode value.
 //
 // If high PO2 should be switched to automatically
 func (m *DiveSettings) SetCcrHighSetpointSwitchMode(v typedef.CcrSetpointSwitchMode) *DiveSettings {
@@ -615,7 +668,7 @@ func (m *DiveSettings) SetCcrHighSetpointSwitchMode(v typedef.CcrSetpointSwitchM
 	return m
 }
 
-// SetCcrHighSetpoint sets DiveSettings value.
+// SetCcrHighSetpoint sets CcrHighSetpoint value.
 //
 // Scale: 100; Units: percent; Target PO2 when using high setpoint
 func (m *DiveSettings) SetCcrHighSetpoint(v uint8) *DiveSettings {
@@ -623,7 +676,16 @@ func (m *DiveSettings) SetCcrHighSetpoint(v uint8) *DiveSettings {
 	return m
 }
 
-// SetCcrHighSetpointDepth sets DiveSettings value.
+// SetCcrHighSetpointScaled is similar to SetCcrHighSetpoint except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent; Target PO2 when using high setpoint
+func (m *DiveSettings) SetCcrHighSetpointScaled(v float64) *DiveSettings {
+	m.CcrHighSetpoint = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetCcrHighSetpointDepth sets CcrHighSetpointDepth value.
 //
 // Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
 func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
@@ -631,7 +693,16 @@ func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
 	return m
 }
 
-// SetGasConsumptionDisplay sets DiveSettings value.
+// SetCcrHighSetpointDepthScaled is similar to SetCcrHighSetpointDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
+func (m *DiveSettings) SetCcrHighSetpointDepthScaled(v float64) *DiveSettings {
+	m.CcrHighSetpointDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetGasConsumptionDisplay sets GasConsumptionDisplay value.
 //
 // Type of gas consumption rate to display. Some values are only valid if tank volume is known.
 func (m *DiveSettings) SetGasConsumptionDisplay(v typedef.GasConsumptionRateType) *DiveSettings {
@@ -639,7 +710,7 @@ func (m *DiveSettings) SetGasConsumptionDisplay(v typedef.GasConsumptionRateType
 	return m
 }
 
-// SetUpKeyEnabled sets DiveSettings value.
+// SetUpKeyEnabled sets UpKeyEnabled value.
 //
 // Indicates whether the up key is enabled during dives
 func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
@@ -647,7 +718,7 @@ func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
 	return m
 }
 
-// SetDiveSounds sets DiveSettings value.
+// SetDiveSounds sets DiveSounds value.
 //
 // Sounds and vibration enabled or disabled in-dive
 func (m *DiveSettings) SetDiveSounds(v typedef.Tone) *DiveSettings {
@@ -655,7 +726,7 @@ func (m *DiveSettings) SetDiveSounds(v typedef.Tone) *DiveSettings {
 	return m
 }
 
-// SetLastStopMultiple sets DiveSettings value.
+// SetLastStopMultiple sets LastStopMultiple value.
 //
 // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 func (m *DiveSettings) SetLastStopMultiple(v uint8) *DiveSettings {
@@ -663,7 +734,16 @@ func (m *DiveSettings) SetLastStopMultiple(v uint8) *DiveSettings {
 	return m
 }
 
-// SetNoFlyTimeMode sets DiveSettings value.
+// SetLastStopMultipleScaled is similar to SetLastStopMultiple except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
+func (m *DiveSettings) SetLastStopMultipleScaled(v float64) *DiveSettings {
+	m.LastStopMultiple = uint8(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetNoFlyTimeMode sets NoFlyTimeMode value.
 //
 // Indicates which guidelines to use for no-fly surface interval.
 func (m *DiveSettings) SetNoFlyTimeMode(v typedef.NoFlyTimeMode) *DiveSettings {

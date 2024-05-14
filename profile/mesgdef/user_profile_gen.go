@@ -276,9 +276,10 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// HeightScaled return Height in its scaled value [Scale: 100; Units: m].
-//
+// HeightScaled return Height in its scaled value.
 // If Height value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *UserProfile) HeightScaled() float64 {
 	if m.Height == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -286,9 +287,10 @@ func (m *UserProfile) HeightScaled() float64 {
 	return scaleoffset.Apply(m.Height, 100, 0)
 }
 
-// WeightScaled return Weight in its scaled value [Scale: 10; Units: kg].
-//
+// WeightScaled return Weight in its scaled value.
 // If Weight value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: kg
 func (m *UserProfile) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -296,9 +298,10 @@ func (m *UserProfile) WeightScaled() float64 {
 	return scaleoffset.Apply(m.Weight, 10, 0)
 }
 
-// UserRunningStepLengthScaled return UserRunningStepLength in its scaled value [Scale: 1000; Units: m; User defined running step length set to 0 for auto length].
-//
+// UserRunningStepLengthScaled return UserRunningStepLength in its scaled value.
 // If UserRunningStepLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; User defined running step length set to 0 for auto length
 func (m *UserProfile) UserRunningStepLengthScaled() float64 {
 	if m.UserRunningStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -306,9 +309,10 @@ func (m *UserProfile) UserRunningStepLengthScaled() float64 {
 	return scaleoffset.Apply(m.UserRunningStepLength, 1000, 0)
 }
 
-// UserWalkingStepLengthScaled return UserWalkingStepLength in its scaled value [Scale: 1000; Units: m; User defined walking step length set to 0 for auto length].
-//
+// UserWalkingStepLengthScaled return UserWalkingStepLength in its scaled value.
 // If UserWalkingStepLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
 func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 	if m.UserWalkingStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -316,13 +320,13 @@ func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 	return scaleoffset.Apply(m.UserWalkingStepLength, 1000, 0)
 }
 
-// SetMessageIndex sets UserProfile value.
+// SetMessageIndex sets MessageIndex value.
 func (m *UserProfile) SetMessageIndex(v typedef.MessageIndex) *UserProfile {
 	m.MessageIndex = v
 	return m
 }
 
-// SetFriendlyName sets UserProfile value.
+// SetFriendlyName sets FriendlyName value.
 //
 // Used for Morning Report greeting
 func (m *UserProfile) SetFriendlyName(v string) *UserProfile {
@@ -330,13 +334,13 @@ func (m *UserProfile) SetFriendlyName(v string) *UserProfile {
 	return m
 }
 
-// SetGender sets UserProfile value.
+// SetGender sets Gender value.
 func (m *UserProfile) SetGender(v typedef.Gender) *UserProfile {
 	m.Gender = v
 	return m
 }
 
-// SetAge sets UserProfile value.
+// SetAge sets Age value.
 //
 // Units: years
 func (m *UserProfile) SetAge(v uint8) *UserProfile {
@@ -344,7 +348,7 @@ func (m *UserProfile) SetAge(v uint8) *UserProfile {
 	return m
 }
 
-// SetHeight sets UserProfile value.
+// SetHeight sets Height value.
 //
 // Scale: 100; Units: m
 func (m *UserProfile) SetHeight(v uint8) *UserProfile {
@@ -352,7 +356,16 @@ func (m *UserProfile) SetHeight(v uint8) *UserProfile {
 	return m
 }
 
-// SetWeight sets UserProfile value.
+// SetHeightScaled is similar to SetHeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *UserProfile) SetHeightScaled(v float64) *UserProfile {
+	m.Height = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetWeight sets Weight value.
 //
 // Scale: 10; Units: kg
 func (m *UserProfile) SetWeight(v uint16) *UserProfile {
@@ -360,25 +373,34 @@ func (m *UserProfile) SetWeight(v uint16) *UserProfile {
 	return m
 }
 
-// SetLanguage sets UserProfile value.
+// SetWeightScaled is similar to SetWeight except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: kg
+func (m *UserProfile) SetWeightScaled(v float64) *UserProfile {
+	m.Weight = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetLanguage sets Language value.
 func (m *UserProfile) SetLanguage(v typedef.Language) *UserProfile {
 	m.Language = v
 	return m
 }
 
-// SetElevSetting sets UserProfile value.
+// SetElevSetting sets ElevSetting value.
 func (m *UserProfile) SetElevSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.ElevSetting = v
 	return m
 }
 
-// SetWeightSetting sets UserProfile value.
+// SetWeightSetting sets WeightSetting value.
 func (m *UserProfile) SetWeightSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.WeightSetting = v
 	return m
 }
 
-// SetRestingHeartRate sets UserProfile value.
+// SetRestingHeartRate sets RestingHeartRate value.
 //
 // Units: bpm
 func (m *UserProfile) SetRestingHeartRate(v uint8) *UserProfile {
@@ -386,7 +408,7 @@ func (m *UserProfile) SetRestingHeartRate(v uint8) *UserProfile {
 	return m
 }
 
-// SetDefaultMaxRunningHeartRate sets UserProfile value.
+// SetDefaultMaxRunningHeartRate sets DefaultMaxRunningHeartRate value.
 //
 // Units: bpm
 func (m *UserProfile) SetDefaultMaxRunningHeartRate(v uint8) *UserProfile {
@@ -394,7 +416,7 @@ func (m *UserProfile) SetDefaultMaxRunningHeartRate(v uint8) *UserProfile {
 	return m
 }
 
-// SetDefaultMaxBikingHeartRate sets UserProfile value.
+// SetDefaultMaxBikingHeartRate sets DefaultMaxBikingHeartRate value.
 //
 // Units: bpm
 func (m *UserProfile) SetDefaultMaxBikingHeartRate(v uint8) *UserProfile {
@@ -402,7 +424,7 @@ func (m *UserProfile) SetDefaultMaxBikingHeartRate(v uint8) *UserProfile {
 	return m
 }
 
-// SetDefaultMaxHeartRate sets UserProfile value.
+// SetDefaultMaxHeartRate sets DefaultMaxHeartRate value.
 //
 // Units: bpm
 func (m *UserProfile) SetDefaultMaxHeartRate(v uint8) *UserProfile {
@@ -410,55 +432,55 @@ func (m *UserProfile) SetDefaultMaxHeartRate(v uint8) *UserProfile {
 	return m
 }
 
-// SetHrSetting sets UserProfile value.
+// SetHrSetting sets HrSetting value.
 func (m *UserProfile) SetHrSetting(v typedef.DisplayHeart) *UserProfile {
 	m.HrSetting = v
 	return m
 }
 
-// SetSpeedSetting sets UserProfile value.
+// SetSpeedSetting sets SpeedSetting value.
 func (m *UserProfile) SetSpeedSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.SpeedSetting = v
 	return m
 }
 
-// SetDistSetting sets UserProfile value.
+// SetDistSetting sets DistSetting value.
 func (m *UserProfile) SetDistSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.DistSetting = v
 	return m
 }
 
-// SetPowerSetting sets UserProfile value.
+// SetPowerSetting sets PowerSetting value.
 func (m *UserProfile) SetPowerSetting(v typedef.DisplayPower) *UserProfile {
 	m.PowerSetting = v
 	return m
 }
 
-// SetActivityClass sets UserProfile value.
+// SetActivityClass sets ActivityClass value.
 func (m *UserProfile) SetActivityClass(v typedef.ActivityClass) *UserProfile {
 	m.ActivityClass = v
 	return m
 }
 
-// SetPositionSetting sets UserProfile value.
+// SetPositionSetting sets PositionSetting value.
 func (m *UserProfile) SetPositionSetting(v typedef.DisplayPosition) *UserProfile {
 	m.PositionSetting = v
 	return m
 }
 
-// SetTemperatureSetting sets UserProfile value.
+// SetTemperatureSetting sets TemperatureSetting value.
 func (m *UserProfile) SetTemperatureSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.TemperatureSetting = v
 	return m
 }
 
-// SetLocalId sets UserProfile value.
+// SetLocalId sets LocalId value.
 func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
 	m.LocalId = v
 	return m
 }
 
-// SetGlobalId sets UserProfile value.
+// SetGlobalId sets GlobalId value.
 //
 // Array: [6]
 func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
@@ -466,7 +488,7 @@ func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
 	return m
 }
 
-// SetWakeTime sets UserProfile value.
+// SetWakeTime sets WakeTime value.
 //
 // Typical wake time
 func (m *UserProfile) SetWakeTime(v typedef.LocaltimeIntoDay) *UserProfile {
@@ -474,7 +496,7 @@ func (m *UserProfile) SetWakeTime(v typedef.LocaltimeIntoDay) *UserProfile {
 	return m
 }
 
-// SetSleepTime sets UserProfile value.
+// SetSleepTime sets SleepTime value.
 //
 // Typical bed time
 func (m *UserProfile) SetSleepTime(v typedef.LocaltimeIntoDay) *UserProfile {
@@ -482,13 +504,13 @@ func (m *UserProfile) SetSleepTime(v typedef.LocaltimeIntoDay) *UserProfile {
 	return m
 }
 
-// SetHeightSetting sets UserProfile value.
+// SetHeightSetting sets HeightSetting value.
 func (m *UserProfile) SetHeightSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.HeightSetting = v
 	return m
 }
 
-// SetUserRunningStepLength sets UserProfile value.
+// SetUserRunningStepLength sets UserRunningStepLength value.
 //
 // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
 func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
@@ -496,7 +518,16 @@ func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
 	return m
 }
 
-// SetUserWalkingStepLength sets UserProfile value.
+// SetUserRunningStepLengthScaled is similar to SetUserRunningStepLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; User defined running step length set to 0 for auto length
+func (m *UserProfile) SetUserRunningStepLengthScaled(v float64) *UserProfile {
+	m.UserRunningStepLength = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetUserWalkingStepLength sets UserWalkingStepLength value.
 //
 // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
 func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
@@ -504,13 +535,22 @@ func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
 	return m
 }
 
-// SetDepthSetting sets UserProfile value.
+// SetUserWalkingStepLengthScaled is similar to SetUserWalkingStepLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+func (m *UserProfile) SetUserWalkingStepLengthScaled(v float64) *UserProfile {
+	m.UserWalkingStepLength = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetDepthSetting sets DepthSetting value.
 func (m *UserProfile) SetDepthSetting(v typedef.DisplayMeasure) *UserProfile {
 	m.DepthSetting = v
 	return m
 }
 
-// SetDiveCount sets UserProfile value.
+// SetDiveCount sets DiveCount value.
 func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
 	m.DiveCount = v
 	return m

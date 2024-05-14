@@ -104,7 +104,7 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *BarometerData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets BarometerData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *BarometerData) SetTimestamp(v time.Time) *BarometerData {
@@ -112,7 +112,7 @@ func (m *BarometerData) SetTimestamp(v time.Time) *BarometerData {
 	return m
 }
 
-// SetTimestampMs sets BarometerData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
@@ -120,7 +120,7 @@ func (m *BarometerData) SetTimestampMs(v uint16) *BarometerData {
 	return m
 }
 
-// SetSampleTimeOffset sets BarometerData value.
+// SetSampleTimeOffset sets SampleTimeOffset value.
 //
 // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
@@ -128,7 +128,7 @@ func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
 	return m
 }
 
-// SetBaroPres sets BarometerData value.
+// SetBaroPres sets BaroPres value.
 //
 // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {

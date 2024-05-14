@@ -110,19 +110,19 @@ func (m *WatchfaceSettings) GetLayout() (name string, value any) {
 	return "layout", m.Layout
 }
 
-// SetMessageIndex sets WatchfaceSettings value.
+// SetMessageIndex sets MessageIndex value.
 func (m *WatchfaceSettings) SetMessageIndex(v typedef.MessageIndex) *WatchfaceSettings {
 	m.MessageIndex = v
 	return m
 }
 
-// SetMode sets WatchfaceSettings value.
+// SetMode sets Mode value.
 func (m *WatchfaceSettings) SetMode(v typedef.WatchfaceMode) *WatchfaceSettings {
 	m.Mode = v
 	return m
 }
 
-// SetLayout sets WatchfaceSettings value.
+// SetLayout sets Layout value.
 func (m *WatchfaceSettings) SetLayout(v byte) *WatchfaceSettings {
 	m.Layout = v
 	return m

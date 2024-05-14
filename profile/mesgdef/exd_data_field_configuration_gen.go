@@ -123,37 +123,37 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetScreenIndex sets ExdDataFieldConfiguration value.
+// SetScreenIndex sets ScreenIndex value.
 func (m *ExdDataFieldConfiguration) SetScreenIndex(v uint8) *ExdDataFieldConfiguration {
 	m.ScreenIndex = v
 	return m
 }
 
-// SetConceptField sets ExdDataFieldConfiguration value.
+// SetConceptField sets ConceptField value.
 func (m *ExdDataFieldConfiguration) SetConceptField(v byte) *ExdDataFieldConfiguration {
 	m.ConceptField = v
 	return m
 }
 
-// SetFieldId sets ExdDataFieldConfiguration value.
+// SetFieldId sets FieldId value.
 func (m *ExdDataFieldConfiguration) SetFieldId(v uint8) *ExdDataFieldConfiguration {
 	m.FieldId = v
 	return m
 }
 
-// SetConceptCount sets ExdDataFieldConfiguration value.
+// SetConceptCount sets ConceptCount value.
 func (m *ExdDataFieldConfiguration) SetConceptCount(v uint8) *ExdDataFieldConfiguration {
 	m.ConceptCount = v
 	return m
 }
 
-// SetDisplayType sets ExdDataFieldConfiguration value.
+// SetDisplayType sets DisplayType value.
 func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *ExdDataFieldConfiguration {
 	m.DisplayType = v
 	return m
 }
 
-// SetTitle sets ExdDataFieldConfiguration value.
+// SetTitle sets Title value.
 //
 // Array: [32]
 func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {

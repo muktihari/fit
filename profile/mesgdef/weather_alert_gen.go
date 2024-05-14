@@ -124,13 +124,13 @@ func (m *WeatherAlert) IssueTimeUint32() uint32 { return datetime.ToUint32(m.Iss
 // ExpireTimeUint32 returns ExpireTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *WeatherAlert) ExpireTimeUint32() uint32 { return datetime.ToUint32(m.ExpireTime) }
 
-// SetTimestamp sets WeatherAlert value.
+// SetTimestamp sets Timestamp value.
 func (m *WeatherAlert) SetTimestamp(v time.Time) *WeatherAlert {
 	m.Timestamp = v
 	return m
 }
 
-// SetReportId sets WeatherAlert value.
+// SetReportId sets ReportId value.
 //
 // Unique identifier from GCS report ID string, length is 12
 func (m *WeatherAlert) SetReportId(v string) *WeatherAlert {
@@ -138,7 +138,7 @@ func (m *WeatherAlert) SetReportId(v string) *WeatherAlert {
 	return m
 }
 
-// SetIssueTime sets WeatherAlert value.
+// SetIssueTime sets IssueTime value.
 //
 // Time alert was issued
 func (m *WeatherAlert) SetIssueTime(v time.Time) *WeatherAlert {
@@ -146,7 +146,7 @@ func (m *WeatherAlert) SetIssueTime(v time.Time) *WeatherAlert {
 	return m
 }
 
-// SetExpireTime sets WeatherAlert value.
+// SetExpireTime sets ExpireTime value.
 //
 // Time alert expires
 func (m *WeatherAlert) SetExpireTime(v time.Time) *WeatherAlert {
@@ -154,7 +154,7 @@ func (m *WeatherAlert) SetExpireTime(v time.Time) *WeatherAlert {
 	return m
 }
 
-// SetSeverity sets WeatherAlert value.
+// SetSeverity sets Severity value.
 //
 // Warning, Watch, Advisory, Statement
 func (m *WeatherAlert) SetSeverity(v typedef.WeatherSeverity) *WeatherAlert {
@@ -162,7 +162,7 @@ func (m *WeatherAlert) SetSeverity(v typedef.WeatherSeverity) *WeatherAlert {
 	return m
 }
 
-// SetType sets WeatherAlert value.
+// SetType sets Type value.
 //
 // Tornado, Severe Thunderstorm, etc.
 func (m *WeatherAlert) SetType(v typedef.WeatherSevereType) *WeatherAlert {

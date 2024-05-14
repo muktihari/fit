@@ -170,9 +170,10 @@ func (m *AviationAttitude) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *AviationAttitude) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// PitchScaled return Pitch in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2].
-//
+// PitchScaled return Pitch in its scaled value.
 // If Pitch value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
 func (m *AviationAttitude) PitchScaled() []float64 {
 	if m.Pitch == nil {
 		return nil
@@ -180,9 +181,10 @@ func (m *AviationAttitude) PitchScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Pitch, 10430.38, 0)
 }
 
-// RollScaled return Roll in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI].
-//
+// RollScaled return Roll in its scaled value.
 // If Roll value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
 func (m *AviationAttitude) RollScaled() []float64 {
 	if m.Roll == nil {
 		return nil
@@ -190,9 +192,10 @@ func (m *AviationAttitude) RollScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Roll, 10430.38, 0)
 }
 
-// AccelLateralScaled return AccelLateral in its scaled value [Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)].
-//
+// AccelLateralScaled return AccelLateral in its scaled value.
 // If AccelLateral value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) AccelLateralScaled() []float64 {
 	if m.AccelLateral == nil {
 		return nil
@@ -200,9 +203,10 @@ func (m *AviationAttitude) AccelLateralScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AccelLateral, 100, 0)
 }
 
-// AccelNormalScaled return AccelNormal in its scaled value [Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)].
-//
+// AccelNormalScaled return AccelNormal in its scaled value.
 // If AccelNormal value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) AccelNormalScaled() []float64 {
 	if m.AccelNormal == nil {
 		return nil
@@ -210,9 +214,10 @@ func (m *AviationAttitude) AccelNormalScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AccelNormal, 100, 0)
 }
 
-// TurnRateScaled return TurnRate in its scaled value [Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)].
-//
+// TurnRateScaled return TurnRate in its scaled value.
 // If TurnRate value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
 func (m *AviationAttitude) TurnRateScaled() []float64 {
 	if m.TurnRate == nil {
 		return nil
@@ -220,9 +225,10 @@ func (m *AviationAttitude) TurnRateScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TurnRate, 1024, 0)
 }
 
-// TrackScaled return Track in its scaled value [Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi].
-//
+// TrackScaled return Track in its scaled value.
 // If Track value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 func (m *AviationAttitude) TrackScaled() []float64 {
 	if m.Track == nil {
 		return nil
@@ -230,7 +236,7 @@ func (m *AviationAttitude) TrackScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Track, 10430.38, 0)
 }
 
-// SetTimestamp sets AviationAttitude value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Timestamp message was output
 func (m *AviationAttitude) SetTimestamp(v time.Time) *AviationAttitude {
@@ -238,7 +244,7 @@ func (m *AviationAttitude) SetTimestamp(v time.Time) *AviationAttitude {
 	return m
 }
 
-// SetTimestampMs sets AviationAttitude value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Fractional part of timestamp, added to timestamp
 func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
@@ -246,7 +252,7 @@ func (m *AviationAttitude) SetTimestampMs(v uint16) *AviationAttitude {
 	return m
 }
 
-// SetSystemTime sets AviationAttitude value.
+// SetSystemTime sets SystemTime value.
 //
 // Array: [N]; Units: ms; System time associated with sample expressed in ms.
 func (m *AviationAttitude) SetSystemTime(v []uint32) *AviationAttitude {
@@ -254,7 +260,7 @@ func (m *AviationAttitude) SetSystemTime(v []uint32) *AviationAttitude {
 	return m
 }
 
-// SetPitch sets AviationAttitude value.
+// SetPitch sets Pitch value.
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
 func (m *AviationAttitude) SetPitch(v []int16) *AviationAttitude {
@@ -262,7 +268,16 @@ func (m *AviationAttitude) SetPitch(v []int16) *AviationAttitude {
 	return m
 }
 
-// SetRoll sets AviationAttitude value.
+// SetPitchScaled is similar to SetPitch except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
+func (m *AviationAttitude) SetPitchScaled(vs []float64) *AviationAttitude {
+	m.Pitch = scaleoffset.DiscardSlice[int16](vs, 10430.38, 0)
+	return m
+}
+
+// SetRoll sets Roll value.
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
 func (m *AviationAttitude) SetRoll(v []int16) *AviationAttitude {
@@ -270,7 +285,16 @@ func (m *AviationAttitude) SetRoll(v []int16) *AviationAttitude {
 	return m
 }
 
-// SetAccelLateral sets AviationAttitude value.
+// SetRollScaled is similar to SetRoll except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
+func (m *AviationAttitude) SetRollScaled(vs []float64) *AviationAttitude {
+	m.Roll = scaleoffset.DiscardSlice[int16](vs, 10430.38, 0)
+	return m
+}
+
+// SetAccelLateral sets AccelLateral value.
 //
 // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) SetAccelLateral(v []int16) *AviationAttitude {
@@ -278,7 +302,16 @@ func (m *AviationAttitude) SetAccelLateral(v []int16) *AviationAttitude {
 	return m
 }
 
-// SetAccelNormal sets AviationAttitude value.
+// SetAccelLateralScaled is similar to SetAccelLateral except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+func (m *AviationAttitude) SetAccelLateralScaled(vs []float64) *AviationAttitude {
+	m.AccelLateral = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+	return m
+}
+
+// SetAccelNormal sets AccelNormal value.
 //
 // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) SetAccelNormal(v []int16) *AviationAttitude {
@@ -286,7 +319,16 @@ func (m *AviationAttitude) SetAccelNormal(v []int16) *AviationAttitude {
 	return m
 }
 
-// SetTurnRate sets AviationAttitude value.
+// SetAccelNormalScaled is similar to SetAccelNormal except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
+func (m *AviationAttitude) SetAccelNormalScaled(vs []float64) *AviationAttitude {
+	m.AccelNormal = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+	return m
+}
+
+// SetTurnRate sets TurnRate value.
 //
 // Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
 func (m *AviationAttitude) SetTurnRate(v []int16) *AviationAttitude {
@@ -294,7 +336,16 @@ func (m *AviationAttitude) SetTurnRate(v []int16) *AviationAttitude {
 	return m
 }
 
-// SetStage sets AviationAttitude value.
+// SetTurnRateScaled is similar to SetTurnRate except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
+func (m *AviationAttitude) SetTurnRateScaled(vs []float64) *AviationAttitude {
+	m.TurnRate = scaleoffset.DiscardSlice[int16](vs, 1024, 0)
+	return m
+}
+
+// SetStage sets Stage value.
 //
 // Array: [N]
 func (m *AviationAttitude) SetStage(v []typedef.AttitudeStage) *AviationAttitude {
@@ -302,7 +353,7 @@ func (m *AviationAttitude) SetStage(v []typedef.AttitudeStage) *AviationAttitude
 	return m
 }
 
-// SetAttitudeStageComplete sets AviationAttitude value.
+// SetAttitudeStageComplete sets AttitudeStageComplete value.
 //
 // Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
 func (m *AviationAttitude) SetAttitudeStageComplete(v []uint8) *AviationAttitude {
@@ -310,7 +361,7 @@ func (m *AviationAttitude) SetAttitudeStageComplete(v []uint8) *AviationAttitude
 	return m
 }
 
-// SetTrack sets AviationAttitude value.
+// SetTrack sets Track value.
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
@@ -318,7 +369,16 @@ func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
 	return m
 }
 
-// SetValidity sets AviationAttitude value.
+// SetTrackScaled is similar to SetTrack except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
+func (m *AviationAttitude) SetTrackScaled(vs []float64) *AviationAttitude {
+	m.Track = scaleoffset.DiscardSlice[uint16](vs, 10430.38, 0)
+	return m
+}
+
+// SetValidity sets Validity value.
 //
 // Array: [N]
 func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAttitude {

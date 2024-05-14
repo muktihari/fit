@@ -139,13 +139,13 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets SegmentFile value.
+// SetMessageIndex sets MessageIndex value.
 func (m *SegmentFile) SetMessageIndex(v typedef.MessageIndex) *SegmentFile {
 	m.MessageIndex = v
 	return m
 }
 
-// SetFileUuid sets SegmentFile value.
+// SetFileUuid sets FileUuid value.
 //
 // UUID of the segment file
 func (m *SegmentFile) SetFileUuid(v string) *SegmentFile {
@@ -153,7 +153,7 @@ func (m *SegmentFile) SetFileUuid(v string) *SegmentFile {
 	return m
 }
 
-// SetEnabled sets SegmentFile value.
+// SetEnabled sets Enabled value.
 //
 // Enabled state of the segment file
 func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
@@ -161,7 +161,7 @@ func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
 	return m
 }
 
-// SetUserProfilePrimaryKey sets SegmentFile value.
+// SetUserProfilePrimaryKey sets UserProfilePrimaryKey value.
 //
 // Primary key of the user that created the segment file
 func (m *SegmentFile) SetUserProfilePrimaryKey(v uint32) *SegmentFile {
@@ -169,7 +169,7 @@ func (m *SegmentFile) SetUserProfilePrimaryKey(v uint32) *SegmentFile {
 	return m
 }
 
-// SetLeaderType sets SegmentFile value.
+// SetLeaderType sets LeaderType value.
 //
 // Array: [N]; Leader type of each leader in the segment file
 func (m *SegmentFile) SetLeaderType(v []typedef.SegmentLeaderboardType) *SegmentFile {
@@ -177,7 +177,7 @@ func (m *SegmentFile) SetLeaderType(v []typedef.SegmentLeaderboardType) *Segment
 	return m
 }
 
-// SetLeaderGroupPrimaryKey sets SegmentFile value.
+// SetLeaderGroupPrimaryKey sets LeaderGroupPrimaryKey value.
 //
 // Array: [N]; Group primary key of each leader in the segment file
 func (m *SegmentFile) SetLeaderGroupPrimaryKey(v []uint32) *SegmentFile {
@@ -185,7 +185,7 @@ func (m *SegmentFile) SetLeaderGroupPrimaryKey(v []uint32) *SegmentFile {
 	return m
 }
 
-// SetLeaderActivityId sets SegmentFile value.
+// SetLeaderActivityId sets LeaderActivityId value.
 //
 // Array: [N]; Activity ID of each leader in the segment file
 func (m *SegmentFile) SetLeaderActivityId(v []uint32) *SegmentFile {
@@ -193,7 +193,7 @@ func (m *SegmentFile) SetLeaderActivityId(v []uint32) *SegmentFile {
 	return m
 }
 
-// SetLeaderActivityIdString sets SegmentFile value.
+// SetLeaderActivityIdString sets LeaderActivityIdString value.
 //
 // Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
 func (m *SegmentFile) SetLeaderActivityIdString(v []string) *SegmentFile {
@@ -201,7 +201,7 @@ func (m *SegmentFile) SetLeaderActivityIdString(v []string) *SegmentFile {
 	return m
 }
 
-// SetDefaultRaceLeader sets SegmentFile value.
+// SetDefaultRaceLeader sets DefaultRaceLeader value.
 //
 // Index for the Leader Board entry selected as the default race participant
 func (m *SegmentFile) SetDefaultRaceLeader(v uint8) *SegmentFile {

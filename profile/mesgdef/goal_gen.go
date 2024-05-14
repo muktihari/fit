@@ -170,79 +170,79 @@ func (m *Goal) StartDateUint32() uint32 { return datetime.ToUint32(m.StartDate) 
 // EndDateUint32 returns EndDate in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Goal) EndDateUint32() uint32 { return datetime.ToUint32(m.EndDate) }
 
-// SetMessageIndex sets Goal value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Goal) SetMessageIndex(v typedef.MessageIndex) *Goal {
 	m.MessageIndex = v
 	return m
 }
 
-// SetSport sets Goal value.
+// SetSport sets Sport value.
 func (m *Goal) SetSport(v typedef.Sport) *Goal {
 	m.Sport = v
 	return m
 }
 
-// SetSubSport sets Goal value.
+// SetSubSport sets SubSport value.
 func (m *Goal) SetSubSport(v typedef.SubSport) *Goal {
 	m.SubSport = v
 	return m
 }
 
-// SetStartDate sets Goal value.
+// SetStartDate sets StartDate value.
 func (m *Goal) SetStartDate(v time.Time) *Goal {
 	m.StartDate = v
 	return m
 }
 
-// SetEndDate sets Goal value.
+// SetEndDate sets EndDate value.
 func (m *Goal) SetEndDate(v time.Time) *Goal {
 	m.EndDate = v
 	return m
 }
 
-// SetType sets Goal value.
+// SetType sets Type value.
 func (m *Goal) SetType(v typedef.Goal) *Goal {
 	m.Type = v
 	return m
 }
 
-// SetValue sets Goal value.
+// SetValue sets Value value.
 func (m *Goal) SetValue(v uint32) *Goal {
 	m.Value = v
 	return m
 }
 
-// SetRepeat sets Goal value.
+// SetRepeat sets Repeat value.
 func (m *Goal) SetRepeat(v bool) *Goal {
 	m.Repeat = v
 	return m
 }
 
-// SetTargetValue sets Goal value.
+// SetTargetValue sets TargetValue value.
 func (m *Goal) SetTargetValue(v uint32) *Goal {
 	m.TargetValue = v
 	return m
 }
 
-// SetRecurrence sets Goal value.
+// SetRecurrence sets Recurrence value.
 func (m *Goal) SetRecurrence(v typedef.GoalRecurrence) *Goal {
 	m.Recurrence = v
 	return m
 }
 
-// SetRecurrenceValue sets Goal value.
+// SetRecurrenceValue sets RecurrenceValue value.
 func (m *Goal) SetRecurrenceValue(v uint16) *Goal {
 	m.RecurrenceValue = v
 	return m
 }
 
-// SetEnabled sets Goal value.
+// SetEnabled sets Enabled value.
 func (m *Goal) SetEnabled(v bool) *Goal {
 	m.Enabled = v
 	return m
 }
 
-// SetSource sets Goal value.
+// SetSource sets Source value.
 func (m *Goal) SetSource(v typedef.GoalSource) *Goal {
 	m.Source = v
 	return m

@@ -134,7 +134,7 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetName sets SegmentId value.
+// SetName sets Name value.
 //
 // Friendly name assigned to segment
 func (m *SegmentId) SetName(v string) *SegmentId {
@@ -142,7 +142,7 @@ func (m *SegmentId) SetName(v string) *SegmentId {
 	return m
 }
 
-// SetUuid sets SegmentId value.
+// SetUuid sets Uuid value.
 //
 // UUID of the segment
 func (m *SegmentId) SetUuid(v string) *SegmentId {
@@ -150,7 +150,7 @@ func (m *SegmentId) SetUuid(v string) *SegmentId {
 	return m
 }
 
-// SetSport sets SegmentId value.
+// SetSport sets Sport value.
 //
 // Sport associated with the segment
 func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
@@ -158,7 +158,7 @@ func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
 	return m
 }
 
-// SetEnabled sets SegmentId value.
+// SetEnabled sets Enabled value.
 //
 // Segment enabled for evaluation
 func (m *SegmentId) SetEnabled(v bool) *SegmentId {
@@ -166,7 +166,7 @@ func (m *SegmentId) SetEnabled(v bool) *SegmentId {
 	return m
 }
 
-// SetUserProfilePrimaryKey sets SegmentId value.
+// SetUserProfilePrimaryKey sets UserProfilePrimaryKey value.
 //
 // Primary key of the user that created the segment
 func (m *SegmentId) SetUserProfilePrimaryKey(v uint32) *SegmentId {
@@ -174,7 +174,7 @@ func (m *SegmentId) SetUserProfilePrimaryKey(v uint32) *SegmentId {
 	return m
 }
 
-// SetDeviceId sets SegmentId value.
+// SetDeviceId sets DeviceId value.
 //
 // ID of the device that created the segment
 func (m *SegmentId) SetDeviceId(v uint32) *SegmentId {
@@ -182,7 +182,7 @@ func (m *SegmentId) SetDeviceId(v uint32) *SegmentId {
 	return m
 }
 
-// SetDefaultRaceLeader sets SegmentId value.
+// SetDefaultRaceLeader sets DefaultRaceLeader value.
 //
 // Index for the Leader Board entry selected as the default race participant
 func (m *SegmentId) SetDefaultRaceLeader(v uint8) *SegmentId {
@@ -190,7 +190,7 @@ func (m *SegmentId) SetDefaultRaceLeader(v uint8) *SegmentId {
 	return m
 }
 
-// SetDeleteStatus sets SegmentId value.
+// SetDeleteStatus sets DeleteStatus value.
 //
 // Indicates if any segments should be deleted
 func (m *SegmentId) SetDeleteStatus(v typedef.SegmentDeleteStatus) *SegmentId {
@@ -198,7 +198,7 @@ func (m *SegmentId) SetDeleteStatus(v typedef.SegmentDeleteStatus) *SegmentId {
 	return m
 }
 
-// SetSelectionType sets SegmentId value.
+// SetSelectionType sets SelectionType value.
 //
 // Indicates how the segment was selected to be sent to the device
 func (m *SegmentId) SetSelectionType(v typedef.SegmentSelectionType) *SegmentId {

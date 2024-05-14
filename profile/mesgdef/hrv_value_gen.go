@@ -92,9 +92,10 @@ func (m *HrvValue) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HrvValue) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// ValueScaled return Value in its scaled value [Scale: 128; Units: ms; 5 minute RMSSD].
-//
+// ValueScaled return Value in its scaled value.
 // If Value value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: ms; 5 minute RMSSD
 func (m *HrvValue) ValueScaled() float64 {
 	if m.Value == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -102,17 +103,26 @@ func (m *HrvValue) ValueScaled() float64 {
 	return scaleoffset.Apply(m.Value, 128, 0)
 }
 
-// SetTimestamp sets HrvValue value.
+// SetTimestamp sets Timestamp value.
 func (m *HrvValue) SetTimestamp(v time.Time) *HrvValue {
 	m.Timestamp = v
 	return m
 }
 
-// SetValue sets HrvValue value.
+// SetValue sets Value value.
 //
 // Scale: 128; Units: ms; 5 minute RMSSD
 func (m *HrvValue) SetValue(v uint16) *HrvValue {
 	m.Value = v
+	return m
+}
+
+// SetValueScaled is similar to SetValue except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: ms; 5 minute RMSSD
+func (m *HrvValue) SetValueScaled(v float64) *HrvValue {
+	m.Value = uint16(scaleoffset.Discard(v, 128, 0))
 	return m
 }
 

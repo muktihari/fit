@@ -135,9 +135,10 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *CoursePoint) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m].
-//
+// DistanceScaled return Distance in its scaled value.
 // If Distance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *CoursePoint) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -163,19 +164,19 @@ func (m *CoursePoint) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetMessageIndex sets CoursePoint value.
+// SetMessageIndex sets MessageIndex value.
 func (m *CoursePoint) SetMessageIndex(v typedef.MessageIndex) *CoursePoint {
 	m.MessageIndex = v
 	return m
 }
 
-// SetTimestamp sets CoursePoint value.
+// SetTimestamp sets Timestamp value.
 func (m *CoursePoint) SetTimestamp(v time.Time) *CoursePoint {
 	m.Timestamp = v
 	return m
 }
 
-// SetPositionLat sets CoursePoint value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *CoursePoint) SetPositionLat(v int32) *CoursePoint {
@@ -183,7 +184,14 @@ func (m *CoursePoint) SetPositionLat(v int32) *CoursePoint {
 	return m
 }
 
-// SetPositionLong sets CoursePoint value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *CoursePoint) SetPositionLatDegrees(degrees float64) *CoursePoint {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *CoursePoint) SetPositionLong(v int32) *CoursePoint {
@@ -191,7 +199,14 @@ func (m *CoursePoint) SetPositionLong(v int32) *CoursePoint {
 	return m
 }
 
-// SetDistance sets CoursePoint value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *CoursePoint) SetPositionLongDegrees(degrees float64) *CoursePoint {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetDistance sets Distance value.
 //
 // Scale: 100; Units: m
 func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
@@ -199,19 +214,28 @@ func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
 	return m
 }
 
-// SetType sets CoursePoint value.
+// SetDistanceScaled is similar to SetDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *CoursePoint) SetDistanceScaled(v float64) *CoursePoint {
+	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetType sets Type value.
 func (m *CoursePoint) SetType(v typedef.CoursePoint) *CoursePoint {
 	m.Type = v
 	return m
 }
 
-// SetName sets CoursePoint value.
+// SetName sets Name value.
 func (m *CoursePoint) SetName(v string) *CoursePoint {
 	m.Name = v
 	return m
 }
 
-// SetFavorite sets CoursePoint value.
+// SetFavorite sets Favorite value.
 func (m *CoursePoint) SetFavorite(v bool) *CoursePoint {
 	m.Favorite = v
 	return m

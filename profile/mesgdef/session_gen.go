@@ -1224,9 +1224,10 @@ func (m *Session) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestam
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Session) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s; Time (includes pauses)].
-//
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value.
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
 func (m *Session) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1234,9 +1235,10 @@ func (m *Session) TotalElapsedTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s; Timer Time (excludes pauses)].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
 func (m *Session) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1244,9 +1246,10 @@ func (m *Session) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// TotalDistanceScaled return TotalDistance in its scaled value [Scale: 100; Units: m].
-//
+// TotalDistanceScaled return TotalDistance in its scaled value.
 // If TotalDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Session) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1254,9 +1257,10 @@ func (m *Session) TotalDistanceScaled() float64 {
 	return scaleoffset.Apply(m.TotalDistance, 100, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s; total_distance / total_timer_time].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1264,9 +1268,10 @@ func (m *Session) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// MaxSpeedScaled return MaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxSpeedScaled return MaxSpeed in its scaled value.
 // If MaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1274,9 +1279,10 @@ func (m *Session) MaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
 }
 
-// TotalTrainingEffectScaled return TotalTrainingEffect in its scaled value [Scale: 10].
-//
+// TotalTrainingEffectScaled return TotalTrainingEffect in its scaled value.
 // If TotalTrainingEffect value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10
 func (m *Session) TotalTrainingEffectScaled() float64 {
 	if m.TotalTrainingEffect == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1284,9 +1290,10 @@ func (m *Session) TotalTrainingEffectScaled() float64 {
 	return scaleoffset.Apply(m.TotalTrainingEffect, 10, 0)
 }
 
-// TrainingStressScoreScaled return TrainingStressScore in its scaled value [Scale: 10; Units: tss].
-//
+// TrainingStressScoreScaled return TrainingStressScore in its scaled value.
 // If TrainingStressScore value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: tss
 func (m *Session) TrainingStressScoreScaled() float64 {
 	if m.TrainingStressScore == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1294,9 +1301,10 @@ func (m *Session) TrainingStressScoreScaled() float64 {
 	return scaleoffset.Apply(m.TrainingStressScore, 10, 0)
 }
 
-// IntensityFactorScaled return IntensityFactor in its scaled value [Scale: 1000; Units: if].
-//
+// IntensityFactorScaled return IntensityFactor in its scaled value.
 // If IntensityFactor value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: if
 func (m *Session) IntensityFactorScaled() float64 {
 	if m.IntensityFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1304,9 +1312,10 @@ func (m *Session) IntensityFactorScaled() float64 {
 	return scaleoffset.Apply(m.IntensityFactor, 1000, 0)
 }
 
-// AvgStrokeCountScaled return AvgStrokeCount in its scaled value [Scale: 10; Units: strokes/lap].
-//
+// AvgStrokeCountScaled return AvgStrokeCount in its scaled value.
 // If AvgStrokeCount value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: strokes/lap
 func (m *Session) AvgStrokeCountScaled() float64 {
 	if m.AvgStrokeCount == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1314,9 +1323,10 @@ func (m *Session) AvgStrokeCountScaled() float64 {
 	return scaleoffset.Apply(m.AvgStrokeCount, 10, 0)
 }
 
-// AvgStrokeDistanceScaled return AvgStrokeDistance in its scaled value [Scale: 100; Units: m].
-//
+// AvgStrokeDistanceScaled return AvgStrokeDistance in its scaled value.
 // If AvgStrokeDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Session) AvgStrokeDistanceScaled() float64 {
 	if m.AvgStrokeDistance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1324,9 +1334,10 @@ func (m *Session) AvgStrokeDistanceScaled() float64 {
 	return scaleoffset.Apply(m.AvgStrokeDistance, 100, 0)
 }
 
-// PoolLengthScaled return PoolLength in its scaled value [Scale: 100; Units: m].
-//
+// PoolLengthScaled return PoolLength in its scaled value.
 // If PoolLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Session) PoolLengthScaled() float64 {
 	if m.PoolLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1334,9 +1345,10 @@ func (m *Session) PoolLengthScaled() float64 {
 	return scaleoffset.Apply(m.PoolLength, 100, 0)
 }
 
-// AvgAltitudeScaled return AvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// AvgAltitudeScaled return AvgAltitude in its scaled value.
 // If AvgAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) AvgAltitudeScaled() float64 {
 	if m.AvgAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1344,9 +1356,10 @@ func (m *Session) AvgAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.AvgAltitude, 5, 500)
 }
 
-// MaxAltitudeScaled return MaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// MaxAltitudeScaled return MaxAltitude in its scaled value.
 // If MaxAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) MaxAltitudeScaled() float64 {
 	if m.MaxAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1354,9 +1367,10 @@ func (m *Session) MaxAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.MaxAltitude, 5, 500)
 }
 
-// AvgGradeScaled return AvgGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgGradeScaled return AvgGrade in its scaled value.
 // If AvgGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Session) AvgGradeScaled() float64 {
 	if m.AvgGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1364,9 +1378,10 @@ func (m *Session) AvgGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgGrade, 100, 0)
 }
 
-// AvgPosGradeScaled return AvgPosGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgPosGradeScaled return AvgPosGrade in its scaled value.
 // If AvgPosGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Session) AvgPosGradeScaled() float64 {
 	if m.AvgPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1374,9 +1389,10 @@ func (m *Session) AvgPosGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgPosGrade, 100, 0)
 }
 
-// AvgNegGradeScaled return AvgNegGrade in its scaled value [Scale: 100; Units: %].
-//
+// AvgNegGradeScaled return AvgNegGrade in its scaled value.
 // If AvgNegGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Session) AvgNegGradeScaled() float64 {
 	if m.AvgNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1384,9 +1400,10 @@ func (m *Session) AvgNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.AvgNegGrade, 100, 0)
 }
 
-// MaxPosGradeScaled return MaxPosGrade in its scaled value [Scale: 100; Units: %].
-//
+// MaxPosGradeScaled return MaxPosGrade in its scaled value.
 // If MaxPosGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Session) MaxPosGradeScaled() float64 {
 	if m.MaxPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1394,9 +1411,10 @@ func (m *Session) MaxPosGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxPosGrade, 100, 0)
 }
 
-// MaxNegGradeScaled return MaxNegGrade in its scaled value [Scale: 100; Units: %].
-//
+// MaxNegGradeScaled return MaxNegGrade in its scaled value.
 // If MaxNegGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Session) MaxNegGradeScaled() float64 {
 	if m.MaxNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1404,9 +1422,10 @@ func (m *Session) MaxNegGradeScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
 }
 
-// TotalMovingTimeScaled return TotalMovingTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalMovingTimeScaled return TotalMovingTime in its scaled value.
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Session) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1414,9 +1433,10 @@ func (m *Session) TotalMovingTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
 }
 
-// AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value.
 // If AvgPosVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) AvgPosVerticalSpeedScaled() float64 {
 	if m.AvgPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1424,9 +1444,10 @@ func (m *Session) AvgPosVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgPosVerticalSpeed, 1000, 0)
 }
 
-// AvgNegVerticalSpeedScaled return AvgNegVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgNegVerticalSpeedScaled return AvgNegVerticalSpeed in its scaled value.
 // If AvgNegVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) AvgNegVerticalSpeedScaled() float64 {
 	if m.AvgNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1434,9 +1455,10 @@ func (m *Session) AvgNegVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgNegVerticalSpeed, 1000, 0)
 }
 
-// MaxPosVerticalSpeedScaled return MaxPosVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxPosVerticalSpeedScaled return MaxPosVerticalSpeed in its scaled value.
 // If MaxPosVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) MaxPosVerticalSpeedScaled() float64 {
 	if m.MaxPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1444,9 +1466,10 @@ func (m *Session) MaxPosVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxPosVerticalSpeed, 1000, 0)
 }
 
-// MaxNegVerticalSpeedScaled return MaxNegVerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// MaxNegVerticalSpeedScaled return MaxNegVerticalSpeed in its scaled value.
 // If MaxNegVerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) MaxNegVerticalSpeedScaled() float64 {
 	if m.MaxNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1454,9 +1477,10 @@ func (m *Session) MaxNegVerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
 }
 
-// TimeInHrZoneScaled return TimeInHrZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInHrZoneScaled return TimeInHrZone in its scaled value.
 // If TimeInHrZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *Session) TimeInHrZoneScaled() []float64 {
 	if m.TimeInHrZone == nil {
 		return nil
@@ -1464,9 +1488,10 @@ func (m *Session) TimeInHrZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
 }
 
-// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value.
 // If TimeInSpeedZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *Session) TimeInSpeedZoneScaled() []float64 {
 	if m.TimeInSpeedZone == nil {
 		return nil
@@ -1474,9 +1499,10 @@ func (m *Session) TimeInSpeedZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
 }
 
-// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value.
 // If TimeInCadenceZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *Session) TimeInCadenceZoneScaled() []float64 {
 	if m.TimeInCadenceZone == nil {
 		return nil
@@ -1484,9 +1510,10 @@ func (m *Session) TimeInCadenceZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
 }
 
-// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value [Array: [N]; Scale: 1000; Units: s].
-//
+// TimeInPowerZoneScaled return TimeInPowerZone in its scaled value.
 // If TimeInPowerZone value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 1000; Units: s
 func (m *Session) TimeInPowerZoneScaled() []float64 {
 	if m.TimeInPowerZone == nil {
 		return nil
@@ -1494,9 +1521,10 @@ func (m *Session) TimeInPowerZoneScaled() []float64 {
 	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
 }
 
-// AvgLapTimeScaled return AvgLapTime in its scaled value [Scale: 1000; Units: s].
-//
+// AvgLapTimeScaled return AvgLapTime in its scaled value.
 // If AvgLapTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Session) AvgLapTimeScaled() float64 {
 	if m.AvgLapTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1504,9 +1532,10 @@ func (m *Session) AvgLapTimeScaled() float64 {
 	return scaleoffset.Apply(m.AvgLapTime, 1000, 0)
 }
 
-// MinAltitudeScaled return MinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// MinAltitudeScaled return MinAltitude in its scaled value.
 // If MinAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) MinAltitudeScaled() float64 {
 	if m.MinAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1514,9 +1543,10 @@ func (m *Session) MinAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.MinAltitude, 5, 500)
 }
 
-// MaxBallSpeedScaled return MaxBallSpeed in its scaled value [Scale: 100; Units: m/s].
-//
+// MaxBallSpeedScaled return MaxBallSpeed in its scaled value.
 // If MaxBallSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m/s
 func (m *Session) MaxBallSpeedScaled() float64 {
 	if m.MaxBallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1524,9 +1554,10 @@ func (m *Session) MaxBallSpeedScaled() float64 {
 	return scaleoffset.Apply(m.MaxBallSpeed, 100, 0)
 }
 
-// AvgBallSpeedScaled return AvgBallSpeed in its scaled value [Scale: 100; Units: m/s].
-//
+// AvgBallSpeedScaled return AvgBallSpeed in its scaled value.
 // If AvgBallSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m/s
 func (m *Session) AvgBallSpeedScaled() float64 {
 	if m.AvgBallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1534,9 +1565,10 @@ func (m *Session) AvgBallSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgBallSpeed, 100, 0)
 }
 
-// AvgVerticalOscillationScaled return AvgVerticalOscillation in its scaled value [Scale: 10; Units: mm].
-//
+// AvgVerticalOscillationScaled return AvgVerticalOscillation in its scaled value.
 // If AvgVerticalOscillation value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
 func (m *Session) AvgVerticalOscillationScaled() float64 {
 	if m.AvgVerticalOscillation == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1544,9 +1576,10 @@ func (m *Session) AvgVerticalOscillationScaled() float64 {
 	return scaleoffset.Apply(m.AvgVerticalOscillation, 10, 0)
 }
 
-// AvgStanceTimePercentScaled return AvgStanceTimePercent in its scaled value [Scale: 100; Units: percent].
-//
+// AvgStanceTimePercentScaled return AvgStanceTimePercent in its scaled value.
 // If AvgStanceTimePercent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Session) AvgStanceTimePercentScaled() float64 {
 	if m.AvgStanceTimePercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1554,9 +1587,10 @@ func (m *Session) AvgStanceTimePercentScaled() float64 {
 	return scaleoffset.Apply(m.AvgStanceTimePercent, 100, 0)
 }
 
-// AvgStanceTimeScaled return AvgStanceTime in its scaled value [Scale: 10; Units: ms].
-//
+// AvgStanceTimeScaled return AvgStanceTime in its scaled value.
 // If AvgStanceTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: ms
 func (m *Session) AvgStanceTimeScaled() float64 {
 	if m.AvgStanceTime == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1564,9 +1598,10 @@ func (m *Session) AvgStanceTimeScaled() float64 {
 	return scaleoffset.Apply(m.AvgStanceTime, 10, 0)
 }
 
-// AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value [Scale: 128; Units: rpm; fractional part of the avg_cadence].
-//
+// AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value.
 // If AvgFractionalCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
 func (m *Session) AvgFractionalCadenceScaled() float64 {
 	if m.AvgFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1574,9 +1609,10 @@ func (m *Session) AvgFractionalCadenceScaled() float64 {
 	return scaleoffset.Apply(m.AvgFractionalCadence, 128, 0)
 }
 
-// MaxFractionalCadenceScaled return MaxFractionalCadence in its scaled value [Scale: 128; Units: rpm; fractional part of the max_cadence].
-//
+// MaxFractionalCadenceScaled return MaxFractionalCadence in its scaled value.
 // If MaxFractionalCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
 func (m *Session) MaxFractionalCadenceScaled() float64 {
 	if m.MaxFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1584,9 +1620,10 @@ func (m *Session) MaxFractionalCadenceScaled() float64 {
 	return scaleoffset.Apply(m.MaxFractionalCadence, 128, 0)
 }
 
-// TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value [Scale: 128; Units: cycles; fractional part of the total_cycles].
-//
+// TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value.
 // If TotalFractionalCycles value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *Session) TotalFractionalCyclesScaled() float64 {
 	if m.TotalFractionalCycles == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1594,9 +1631,10 @@ func (m *Session) TotalFractionalCyclesScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
 }
 
-// AvgTotalHemoglobinConcScaled return AvgTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin].
-//
+// AvgTotalHemoglobinConcScaled return AvgTotalHemoglobinConc in its scaled value.
 // If AvgTotalHemoglobinConc value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
 func (m *Session) AvgTotalHemoglobinConcScaled() []float64 {
 	if m.AvgTotalHemoglobinConc == nil {
 		return nil
@@ -1604,9 +1642,10 @@ func (m *Session) AvgTotalHemoglobinConcScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgTotalHemoglobinConc, 100, 0)
 }
 
-// MinTotalHemoglobinConcScaled return MinTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin].
-//
+// MinTotalHemoglobinConcScaled return MinTotalHemoglobinConc in its scaled value.
 // If MinTotalHemoglobinConc value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Session) MinTotalHemoglobinConcScaled() []float64 {
 	if m.MinTotalHemoglobinConc == nil {
 		return nil
@@ -1614,9 +1653,10 @@ func (m *Session) MinTotalHemoglobinConcScaled() []float64 {
 	return scaleoffset.ApplySlice(m.MinTotalHemoglobinConc, 100, 0)
 }
 
-// MaxTotalHemoglobinConcScaled return MaxTotalHemoglobinConc in its scaled value [Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin].
-//
+// MaxTotalHemoglobinConcScaled return MaxTotalHemoglobinConc in its scaled value.
 // If MaxTotalHemoglobinConc value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Session) MaxTotalHemoglobinConcScaled() []float64 {
 	if m.MaxTotalHemoglobinConc == nil {
 		return nil
@@ -1624,9 +1664,10 @@ func (m *Session) MaxTotalHemoglobinConcScaled() []float64 {
 	return scaleoffset.ApplySlice(m.MaxTotalHemoglobinConc, 100, 0)
 }
 
-// AvgSaturatedHemoglobinPercentScaled return AvgSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen].
-//
+// AvgSaturatedHemoglobinPercentScaled return AvgSaturatedHemoglobinPercent in its scaled value.
 // If AvgSaturatedHemoglobinPercent value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
 func (m *Session) AvgSaturatedHemoglobinPercentScaled() []float64 {
 	if m.AvgSaturatedHemoglobinPercent == nil {
 		return nil
@@ -1634,9 +1675,10 @@ func (m *Session) AvgSaturatedHemoglobinPercentScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgSaturatedHemoglobinPercent, 10, 0)
 }
 
-// MinSaturatedHemoglobinPercentScaled return MinSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen].
-//
+// MinSaturatedHemoglobinPercentScaled return MinSaturatedHemoglobinPercent in its scaled value.
 // If MinSaturatedHemoglobinPercent value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Session) MinSaturatedHemoglobinPercentScaled() []float64 {
 	if m.MinSaturatedHemoglobinPercent == nil {
 		return nil
@@ -1644,9 +1686,10 @@ func (m *Session) MinSaturatedHemoglobinPercentScaled() []float64 {
 	return scaleoffset.ApplySlice(m.MinSaturatedHemoglobinPercent, 10, 0)
 }
 
-// MaxSaturatedHemoglobinPercentScaled return MaxSaturatedHemoglobinPercent in its scaled value [Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen].
-//
+// MaxSaturatedHemoglobinPercentScaled return MaxSaturatedHemoglobinPercent in its scaled value.
 // If MaxSaturatedHemoglobinPercent value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Session) MaxSaturatedHemoglobinPercentScaled() []float64 {
 	if m.MaxSaturatedHemoglobinPercent == nil {
 		return nil
@@ -1654,9 +1697,10 @@ func (m *Session) MaxSaturatedHemoglobinPercentScaled() []float64 {
 	return scaleoffset.ApplySlice(m.MaxSaturatedHemoglobinPercent, 10, 0)
 }
 
-// AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value.
 // If AvgLeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Session) AvgLeftTorqueEffectivenessScaled() float64 {
 	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1664,9 +1708,10 @@ func (m *Session) AvgLeftTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.AvgLeftTorqueEffectiveness, 2, 0)
 }
 
-// AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value.
 // If AvgRightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Session) AvgRightTorqueEffectivenessScaled() float64 {
 	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1674,9 +1719,10 @@ func (m *Session) AvgRightTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.AvgRightTorqueEffectiveness, 2, 0)
 }
 
-// AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value.
 // If AvgLeftPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Session) AvgLeftPedalSmoothnessScaled() float64 {
 	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1684,9 +1730,10 @@ func (m *Session) AvgLeftPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgLeftPedalSmoothness, 2, 0)
 }
 
-// AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value.
 // If AvgRightPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Session) AvgRightPedalSmoothnessScaled() float64 {
 	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1694,9 +1741,10 @@ func (m *Session) AvgRightPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgRightPedalSmoothness, 2, 0)
 }
 
-// AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value.
 // If AvgCombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Session) AvgCombinedPedalSmoothnessScaled() float64 {
 	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1704,9 +1752,10 @@ func (m *Session) AvgCombinedPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
 }
 
-// TimeStandingScaled return TimeStanding in its scaled value [Scale: 1000; Units: s; Total time spend in the standing position].
-//
+// TimeStandingScaled return TimeStanding in its scaled value.
 // If TimeStanding value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Total time spend in the standing position
 func (m *Session) TimeStandingScaled() float64 {
 	if m.TimeStanding == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1714,9 +1763,10 @@ func (m *Session) TimeStandingScaled() float64 {
 	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
 }
 
-// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.].
-//
+// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value.
 // If AvgLeftPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
 func (m *Session) AvgLeftPowerPhaseScaled() []float64 {
 	if m.AvgLeftPowerPhase == nil {
 		return nil
@@ -1724,9 +1774,10 @@ func (m *Session) AvgLeftPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
 }
 
-// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.].
-//
+// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value.
 // If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Session) AvgLeftPowerPhasePeakScaled() []float64 {
 	if m.AvgLeftPowerPhasePeak == nil {
 		return nil
@@ -1734,9 +1785,10 @@ func (m *Session) AvgLeftPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
 }
 
-// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.].
-//
+// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value.
 // If AvgRightPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Session) AvgRightPowerPhaseScaled() []float64 {
 	if m.AvgRightPowerPhase == nil {
 		return nil
@@ -1744,9 +1796,10 @@ func (m *Session) AvgRightPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
 }
 
-// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.].
-//
+// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value.
 // If AvgRightPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
 func (m *Session) AvgRightPowerPhasePeakScaled() []float64 {
 	if m.AvgRightPowerPhasePeak == nil {
 		return nil
@@ -1754,9 +1807,10 @@ func (m *Session) AvgRightPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
 }
 
-// EnhancedAvgSpeedScaled return EnhancedAvgSpeed in its scaled value [Scale: 1000; Units: m/s; total_distance / total_timer_time].
-//
+// EnhancedAvgSpeedScaled return EnhancedAvgSpeed in its scaled value.
 // If EnhancedAvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) EnhancedAvgSpeedScaled() float64 {
 	if m.EnhancedAvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1764,9 +1818,10 @@ func (m *Session) EnhancedAvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAvgSpeed, 1000, 0)
 }
 
-// EnhancedMaxSpeedScaled return EnhancedMaxSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// EnhancedMaxSpeedScaled return EnhancedMaxSpeed in its scaled value.
 // If EnhancedMaxSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) EnhancedMaxSpeedScaled() float64 {
 	if m.EnhancedMaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1774,9 +1829,10 @@ func (m *Session) EnhancedMaxSpeedScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxSpeed, 1000, 0)
 }
 
-// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value.
 // If EnhancedAvgAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) EnhancedAvgAltitudeScaled() float64 {
 	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1784,9 +1840,10 @@ func (m *Session) EnhancedAvgAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
 }
 
-// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value.
 // If EnhancedMinAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) EnhancedMinAltitudeScaled() float64 {
 	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1794,9 +1851,10 @@ func (m *Session) EnhancedMinAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
 }
 
-// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value.
 // If EnhancedMaxAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Session) EnhancedMaxAltitudeScaled() float64 {
 	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1804,9 +1862,10 @@ func (m *Session) EnhancedMaxAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
 }
 
-// LevBatteryConsumptionScaled return LevBatteryConsumption in its scaled value [Scale: 2; Units: percent; lev battery consumption during session].
-//
+// LevBatteryConsumptionScaled return LevBatteryConsumption in its scaled value.
 // If LevBatteryConsumption value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent; lev battery consumption during session
 func (m *Session) LevBatteryConsumptionScaled() float64 {
 	if m.LevBatteryConsumption == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1814,9 +1873,10 @@ func (m *Session) LevBatteryConsumptionScaled() float64 {
 	return scaleoffset.Apply(m.LevBatteryConsumption, 2, 0)
 }
 
-// AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value [Scale: 100; Units: percent].
-//
+// AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value.
 // If AvgVerticalRatio value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Session) AvgVerticalRatioScaled() float64 {
 	if m.AvgVerticalRatio == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1824,9 +1884,10 @@ func (m *Session) AvgVerticalRatioScaled() float64 {
 	return scaleoffset.Apply(m.AvgVerticalRatio, 100, 0)
 }
 
-// AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value [Scale: 100; Units: percent].
-//
+// AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value.
 // If AvgStanceTimeBalance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Session) AvgStanceTimeBalanceScaled() float64 {
 	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1834,9 +1895,10 @@ func (m *Session) AvgStanceTimeBalanceScaled() float64 {
 	return scaleoffset.Apply(m.AvgStanceTimeBalance, 100, 0)
 }
 
-// AvgStepLengthScaled return AvgStepLength in its scaled value [Scale: 10; Units: mm].
-//
+// AvgStepLengthScaled return AvgStepLength in its scaled value.
 // If AvgStepLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
 func (m *Session) AvgStepLengthScaled() float64 {
 	if m.AvgStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1844,9 +1906,10 @@ func (m *Session) AvgStepLengthScaled() float64 {
 	return scaleoffset.Apply(m.AvgStepLength, 10, 0)
 }
 
-// TotalAnaerobicTrainingEffectScaled return TotalAnaerobicTrainingEffect in its scaled value [Scale: 10].
-//
+// TotalAnaerobicTrainingEffectScaled return TotalAnaerobicTrainingEffect in its scaled value.
 // If TotalAnaerobicTrainingEffect value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10
 func (m *Session) TotalAnaerobicTrainingEffectScaled() float64 {
 	if m.TotalAnaerobicTrainingEffect == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1854,9 +1917,10 @@ func (m *Session) TotalAnaerobicTrainingEffectScaled() float64 {
 	return scaleoffset.Apply(m.TotalAnaerobicTrainingEffect, 10, 0)
 }
 
-// AvgVamScaled return AvgVam in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgVamScaled return AvgVam in its scaled value.
 // If AvgVam value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Session) AvgVamScaled() float64 {
 	if m.AvgVam == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1864,9 +1928,10 @@ func (m *Session) AvgVamScaled() float64 {
 	return scaleoffset.Apply(m.AvgVam, 1000, 0)
 }
 
-// AvgDepthScaled return AvgDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// AvgDepthScaled return AvgDepth in its scaled value.
 // If AvgDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *Session) AvgDepthScaled() float64 {
 	if m.AvgDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1874,9 +1939,10 @@ func (m *Session) AvgDepthScaled() float64 {
 	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
 }
 
-// MaxDepthScaled return MaxDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// MaxDepthScaled return MaxDepth in its scaled value.
 // If MaxDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *Session) MaxDepthScaled() float64 {
 	if m.MaxDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1884,9 +1950,10 @@ func (m *Session) MaxDepthScaled() float64 {
 	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
 }
 
-// TrainingLoadPeakScaled return TrainingLoadPeak in its scaled value [Scale: 65536].
-//
+// TrainingLoadPeakScaled return TrainingLoadPeak in its scaled value.
 // If TrainingLoadPeak value is invalid, float64 invalid value will be returned.
+//
+// Scale: 65536
 func (m *Session) TrainingLoadPeakScaled() float64 {
 	if m.TrainingLoadPeak == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1894,9 +1961,10 @@ func (m *Session) TrainingLoadPeakScaled() float64 {
 	return scaleoffset.Apply(m.TrainingLoadPeak, 65536, 0)
 }
 
-// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
+// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value.
 // If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: Breaths/min
 func (m *Session) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1904,9 +1972,10 @@ func (m *Session) EnhancedAvgRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
 }
 
-// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
+// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value.
 // If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: Breaths/min
 func (m *Session) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1914,9 +1983,10 @@ func (m *Session) EnhancedMaxRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }
 
-// EnhancedMinRespirationRateScaled return EnhancedMinRespirationRate in its scaled value [Scale: 100].
-//
+// EnhancedMinRespirationRateScaled return EnhancedMinRespirationRate in its scaled value.
 // If EnhancedMinRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100
 func (m *Session) EnhancedMinRespirationRateScaled() float64 {
 	if m.EnhancedMinRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1924,9 +1994,10 @@ func (m *Session) EnhancedMinRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMinRespirationRate, 100, 0)
 }
 
-// TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value [Scale: 100; Units: m; fractional part of total_ascent].
-//
+// TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value.
 // If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
 func (m *Session) TotalFractionalAscentScaled() float64 {
 	if m.TotalFractionalAscent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1934,9 +2005,10 @@ func (m *Session) TotalFractionalAscentScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalAscent, 100, 0)
 }
 
-// TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value [Scale: 100; Units: m; fractional part of total_descent].
-//
+// TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value.
 // If TotalFractionalDescent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_descent
 func (m *Session) TotalFractionalDescentScaled() float64 {
 	if m.TotalFractionalDescent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1944,9 +2016,10 @@ func (m *Session) TotalFractionalDescentScaled() float64 {
 	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
 }
 
-// AvgCoreTemperatureScaled return AvgCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
+// AvgCoreTemperatureScaled return AvgCoreTemperature in its scaled value.
 // If AvgCoreTemperature value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C
 func (m *Session) AvgCoreTemperatureScaled() float64 {
 	if m.AvgCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1954,9 +2027,10 @@ func (m *Session) AvgCoreTemperatureScaled() float64 {
 	return scaleoffset.Apply(m.AvgCoreTemperature, 100, 0)
 }
 
-// MinCoreTemperatureScaled return MinCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
+// MinCoreTemperatureScaled return MinCoreTemperature in its scaled value.
 // If MinCoreTemperature value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C
 func (m *Session) MinCoreTemperatureScaled() float64 {
 	if m.MinCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1964,9 +2038,10 @@ func (m *Session) MinCoreTemperatureScaled() float64 {
 	return scaleoffset.Apply(m.MinCoreTemperature, 100, 0)
 }
 
-// MaxCoreTemperatureScaled return MaxCoreTemperature in its scaled value [Scale: 100; Units: C].
-//
+// MaxCoreTemperatureScaled return MaxCoreTemperature in its scaled value.
 // If MaxCoreTemperature value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C
 func (m *Session) MaxCoreTemperatureScaled() float64 {
 	if m.MaxCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -2046,7 +2121,7 @@ func (m *Session) EndPositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.EndPositionLong)
 }
 
-// SetMessageIndex sets Session value.
+// SetMessageIndex sets MessageIndex value.
 //
 // Selected bit is set for the current session.
 func (m *Session) SetMessageIndex(v typedef.MessageIndex) *Session {
@@ -2054,7 +2129,7 @@ func (m *Session) SetMessageIndex(v typedef.MessageIndex) *Session {
 	return m
 }
 
-// SetTimestamp sets Session value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Sesson end time.
 func (m *Session) SetTimestamp(v time.Time) *Session {
@@ -2062,7 +2137,7 @@ func (m *Session) SetTimestamp(v time.Time) *Session {
 	return m
 }
 
-// SetEvent sets Session value.
+// SetEvent sets Event value.
 //
 // session
 func (m *Session) SetEvent(v typedef.Event) *Session {
@@ -2070,7 +2145,7 @@ func (m *Session) SetEvent(v typedef.Event) *Session {
 	return m
 }
 
-// SetEventType sets Session value.
+// SetEventType sets EventType value.
 //
 // stop
 func (m *Session) SetEventType(v typedef.EventType) *Session {
@@ -2078,13 +2153,13 @@ func (m *Session) SetEventType(v typedef.EventType) *Session {
 	return m
 }
 
-// SetStartTime sets Session value.
+// SetStartTime sets StartTime value.
 func (m *Session) SetStartTime(v time.Time) *Session {
 	m.StartTime = v
 	return m
 }
 
-// SetStartPositionLat sets Session value.
+// SetStartPositionLat sets StartPositionLat value.
 //
 // Units: semicircles
 func (m *Session) SetStartPositionLat(v int32) *Session {
@@ -2092,7 +2167,14 @@ func (m *Session) SetStartPositionLat(v int32) *Session {
 	return m
 }
 
-// SetStartPositionLong sets Session value.
+// SetStartPositionLatDegrees is similar to SetStartPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetStartPositionLatDegrees(degrees float64) *Session {
+	m.StartPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetStartPositionLong sets StartPositionLong value.
 //
 // Units: semicircles
 func (m *Session) SetStartPositionLong(v int32) *Session {
@@ -2100,19 +2182,26 @@ func (m *Session) SetStartPositionLong(v int32) *Session {
 	return m
 }
 
-// SetSport sets Session value.
+// SetStartPositionLongDegrees is similar to SetStartPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetStartPositionLongDegrees(degrees float64) *Session {
+	m.StartPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSport sets Sport value.
 func (m *Session) SetSport(v typedef.Sport) *Session {
 	m.Sport = v
 	return m
 }
 
-// SetSubSport sets Session value.
+// SetSubSport sets SubSport value.
 func (m *Session) SetSubSport(v typedef.SubSport) *Session {
 	m.SubSport = v
 	return m
 }
 
-// SetTotalElapsedTime sets Session value.
+// SetTotalElapsedTime sets TotalElapsedTime value.
 //
 // Scale: 1000; Units: s; Time (includes pauses)
 func (m *Session) SetTotalElapsedTime(v uint32) *Session {
@@ -2120,7 +2209,16 @@ func (m *Session) SetTotalElapsedTime(v uint32) *Session {
 	return m
 }
 
-// SetTotalTimerTime sets Session value.
+// SetTotalElapsedTimeScaled is similar to SetTotalElapsedTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Time (includes pauses)
+func (m *Session) SetTotalElapsedTimeScaled(v float64) *Session {
+	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s; Timer Time (excludes pauses)
 func (m *Session) SetTotalTimerTime(v uint32) *Session {
@@ -2128,7 +2226,16 @@ func (m *Session) SetTotalTimerTime(v uint32) *Session {
 	return m
 }
 
-// SetTotalDistance sets Session value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Timer Time (excludes pauses)
+func (m *Session) SetTotalTimerTimeScaled(v float64) *Session {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalDistance sets TotalDistance value.
 //
 // Scale: 100; Units: m
 func (m *Session) SetTotalDistance(v uint32) *Session {
@@ -2136,7 +2243,16 @@ func (m *Session) SetTotalDistance(v uint32) *Session {
 	return m
 }
 
-// SetTotalCycles sets Session value.
+// SetTotalDistanceScaled is similar to SetTotalDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Session) SetTotalDistanceScaled(v float64) *Session {
+	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalCycles sets TotalCycles value.
 //
 // Units: cycles
 func (m *Session) SetTotalCycles(v uint32) *Session {
@@ -2144,7 +2260,7 @@ func (m *Session) SetTotalCycles(v uint32) *Session {
 	return m
 }
 
-// SetTotalCalories sets Session value.
+// SetTotalCalories sets TotalCalories value.
 //
 // Units: kcal
 func (m *Session) SetTotalCalories(v uint16) *Session {
@@ -2152,7 +2268,7 @@ func (m *Session) SetTotalCalories(v uint16) *Session {
 	return m
 }
 
-// SetTotalFatCalories sets Session value.
+// SetTotalFatCalories sets TotalFatCalories value.
 //
 // Units: kcal
 func (m *Session) SetTotalFatCalories(v uint16) *Session {
@@ -2160,7 +2276,7 @@ func (m *Session) SetTotalFatCalories(v uint16) *Session {
 	return m
 }
 
-// SetAvgSpeed sets Session value.
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) SetAvgSpeed(v uint16) *Session {
@@ -2168,7 +2284,16 @@ func (m *Session) SetAvgSpeed(v uint16) *Session {
 	return m
 }
 
-// SetMaxSpeed sets Session value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
+func (m *Session) SetAvgSpeedScaled(v float64) *Session {
+	m.AvgSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxSpeed sets MaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxSpeed(v uint16) *Session {
@@ -2176,7 +2301,16 @@ func (m *Session) SetMaxSpeed(v uint16) *Session {
 	return m
 }
 
-// SetAvgHeartRate sets Session value.
+// SetMaxSpeedScaled is similar to SetMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetMaxSpeedScaled(v float64) *Session {
+	m.MaxSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgHeartRate sets AvgHeartRate value.
 //
 // Units: bpm; average heart rate (excludes pause time)
 func (m *Session) SetAvgHeartRate(v uint8) *Session {
@@ -2184,7 +2318,7 @@ func (m *Session) SetAvgHeartRate(v uint8) *Session {
 	return m
 }
 
-// SetMaxHeartRate sets Session value.
+// SetMaxHeartRate sets MaxHeartRate value.
 //
 // Units: bpm
 func (m *Session) SetMaxHeartRate(v uint8) *Session {
@@ -2192,7 +2326,7 @@ func (m *Session) SetMaxHeartRate(v uint8) *Session {
 	return m
 }
 
-// SetAvgCadence sets Session value.
+// SetAvgCadence sets AvgCadence value.
 //
 // Units: rpm; total_cycles / total_timer_time if non_zero_avg_cadence otherwise total_cycles / total_elapsed_time
 func (m *Session) SetAvgCadence(v uint8) *Session {
@@ -2200,7 +2334,7 @@ func (m *Session) SetAvgCadence(v uint8) *Session {
 	return m
 }
 
-// SetMaxCadence sets Session value.
+// SetMaxCadence sets MaxCadence value.
 //
 // Units: rpm
 func (m *Session) SetMaxCadence(v uint8) *Session {
@@ -2208,7 +2342,7 @@ func (m *Session) SetMaxCadence(v uint8) *Session {
 	return m
 }
 
-// SetAvgPower sets Session value.
+// SetAvgPower sets AvgPower value.
 //
 // Units: watts; total_power / total_timer_time if non_zero_avg_power otherwise total_power / total_elapsed_time
 func (m *Session) SetAvgPower(v uint16) *Session {
@@ -2216,7 +2350,7 @@ func (m *Session) SetAvgPower(v uint16) *Session {
 	return m
 }
 
-// SetMaxPower sets Session value.
+// SetMaxPower sets MaxPower value.
 //
 // Units: watts
 func (m *Session) SetMaxPower(v uint16) *Session {
@@ -2224,7 +2358,7 @@ func (m *Session) SetMaxPower(v uint16) *Session {
 	return m
 }
 
-// SetTotalAscent sets Session value.
+// SetTotalAscent sets TotalAscent value.
 //
 // Units: m
 func (m *Session) SetTotalAscent(v uint16) *Session {
@@ -2232,7 +2366,7 @@ func (m *Session) SetTotalAscent(v uint16) *Session {
 	return m
 }
 
-// SetTotalDescent sets Session value.
+// SetTotalDescent sets TotalDescent value.
 //
 // Units: m
 func (m *Session) SetTotalDescent(v uint16) *Session {
@@ -2240,7 +2374,7 @@ func (m *Session) SetTotalDescent(v uint16) *Session {
 	return m
 }
 
-// SetTotalTrainingEffect sets Session value.
+// SetTotalTrainingEffect sets TotalTrainingEffect value.
 //
 // Scale: 10
 func (m *Session) SetTotalTrainingEffect(v uint8) *Session {
@@ -2248,31 +2382,40 @@ func (m *Session) SetTotalTrainingEffect(v uint8) *Session {
 	return m
 }
 
-// SetFirstLapIndex sets Session value.
+// SetTotalTrainingEffectScaled is similar to SetTotalTrainingEffect except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10
+func (m *Session) SetTotalTrainingEffectScaled(v float64) *Session {
+	m.TotalTrainingEffect = uint8(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetFirstLapIndex sets FirstLapIndex value.
 func (m *Session) SetFirstLapIndex(v uint16) *Session {
 	m.FirstLapIndex = v
 	return m
 }
 
-// SetNumLaps sets Session value.
+// SetNumLaps sets NumLaps value.
 func (m *Session) SetNumLaps(v uint16) *Session {
 	m.NumLaps = v
 	return m
 }
 
-// SetEventGroup sets Session value.
+// SetEventGroup sets EventGroup value.
 func (m *Session) SetEventGroup(v uint8) *Session {
 	m.EventGroup = v
 	return m
 }
 
-// SetTrigger sets Session value.
+// SetTrigger sets Trigger value.
 func (m *Session) SetTrigger(v typedef.SessionTrigger) *Session {
 	m.Trigger = v
 	return m
 }
 
-// SetNecLat sets Session value.
+// SetNecLat sets NecLat value.
 //
 // Units: semicircles; North east corner latitude
 func (m *Session) SetNecLat(v int32) *Session {
@@ -2280,7 +2423,14 @@ func (m *Session) SetNecLat(v int32) *Session {
 	return m
 }
 
-// SetNecLong sets Session value.
+// SetNecLatDegrees is similar to SetNecLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetNecLatDegrees(degrees float64) *Session {
+	m.NecLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetNecLong sets NecLong value.
 //
 // Units: semicircles; North east corner longitude
 func (m *Session) SetNecLong(v int32) *Session {
@@ -2288,7 +2438,14 @@ func (m *Session) SetNecLong(v int32) *Session {
 	return m
 }
 
-// SetSwcLat sets Session value.
+// SetNecLongDegrees is similar to SetNecLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetNecLongDegrees(degrees float64) *Session {
+	m.NecLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLat sets SwcLat value.
 //
 // Units: semicircles; South west corner latitude
 func (m *Session) SetSwcLat(v int32) *Session {
@@ -2296,7 +2453,14 @@ func (m *Session) SetSwcLat(v int32) *Session {
 	return m
 }
 
-// SetSwcLong sets Session value.
+// SetSwcLatDegrees is similar to SetSwcLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetSwcLatDegrees(degrees float64) *Session {
+	m.SwcLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLong sets SwcLong value.
 //
 // Units: semicircles; South west corner longitude
 func (m *Session) SetSwcLong(v int32) *Session {
@@ -2304,7 +2468,14 @@ func (m *Session) SetSwcLong(v int32) *Session {
 	return m
 }
 
-// SetNumLengths sets Session value.
+// SetSwcLongDegrees is similar to SetSwcLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetSwcLongDegrees(degrees float64) *Session {
+	m.SwcLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetNumLengths sets NumLengths value.
 //
 // Units: lengths; # of lengths of swim pool
 func (m *Session) SetNumLengths(v uint16) *Session {
@@ -2312,7 +2483,7 @@ func (m *Session) SetNumLengths(v uint16) *Session {
 	return m
 }
 
-// SetNormalizedPower sets Session value.
+// SetNormalizedPower sets NormalizedPower value.
 //
 // Units: watts
 func (m *Session) SetNormalizedPower(v uint16) *Session {
@@ -2320,7 +2491,7 @@ func (m *Session) SetNormalizedPower(v uint16) *Session {
 	return m
 }
 
-// SetTrainingStressScore sets Session value.
+// SetTrainingStressScore sets TrainingStressScore value.
 //
 // Scale: 10; Units: tss
 func (m *Session) SetTrainingStressScore(v uint16) *Session {
@@ -2328,7 +2499,16 @@ func (m *Session) SetTrainingStressScore(v uint16) *Session {
 	return m
 }
 
-// SetIntensityFactor sets Session value.
+// SetTrainingStressScoreScaled is similar to SetTrainingStressScore except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: tss
+func (m *Session) SetTrainingStressScoreScaled(v float64) *Session {
+	m.TrainingStressScore = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetIntensityFactor sets IntensityFactor value.
 //
 // Scale: 1000; Units: if
 func (m *Session) SetIntensityFactor(v uint16) *Session {
@@ -2336,13 +2516,22 @@ func (m *Session) SetIntensityFactor(v uint16) *Session {
 	return m
 }
 
-// SetLeftRightBalance sets Session value.
+// SetIntensityFactorScaled is similar to SetIntensityFactor except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: if
+func (m *Session) SetIntensityFactorScaled(v float64) *Session {
+	m.IntensityFactor = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetLeftRightBalance sets LeftRightBalance value.
 func (m *Session) SetLeftRightBalance(v typedef.LeftRightBalance100) *Session {
 	m.LeftRightBalance = v
 	return m
 }
 
-// SetEndPositionLat sets Session value.
+// SetEndPositionLat sets EndPositionLat value.
 //
 // Units: semicircles
 func (m *Session) SetEndPositionLat(v int32) *Session {
@@ -2350,7 +2539,14 @@ func (m *Session) SetEndPositionLat(v int32) *Session {
 	return m
 }
 
-// SetEndPositionLong sets Session value.
+// SetEndPositionLatDegrees is similar to SetEndPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetEndPositionLatDegrees(degrees float64) *Session {
+	m.EndPositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetEndPositionLong sets EndPositionLong value.
 //
 // Units: semicircles
 func (m *Session) SetEndPositionLong(v int32) *Session {
@@ -2358,7 +2554,14 @@ func (m *Session) SetEndPositionLong(v int32) *Session {
 	return m
 }
 
-// SetAvgStrokeCount sets Session value.
+// SetEndPositionLongDegrees is similar to SetEndPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Session) SetEndPositionLongDegrees(degrees float64) *Session {
+	m.EndPositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetAvgStrokeCount sets AvgStrokeCount value.
 //
 // Scale: 10; Units: strokes/lap
 func (m *Session) SetAvgStrokeCount(v uint32) *Session {
@@ -2366,7 +2569,16 @@ func (m *Session) SetAvgStrokeCount(v uint32) *Session {
 	return m
 }
 
-// SetAvgStrokeDistance sets Session value.
+// SetAvgStrokeCountScaled is similar to SetAvgStrokeCount except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: strokes/lap
+func (m *Session) SetAvgStrokeCountScaled(v float64) *Session {
+	m.AvgStrokeCount = uint32(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetAvgStrokeDistance sets AvgStrokeDistance value.
 //
 // Scale: 100; Units: m
 func (m *Session) SetAvgStrokeDistance(v uint16) *Session {
@@ -2374,7 +2586,16 @@ func (m *Session) SetAvgStrokeDistance(v uint16) *Session {
 	return m
 }
 
-// SetSwimStroke sets Session value.
+// SetAvgStrokeDistanceScaled is similar to SetAvgStrokeDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Session) SetAvgStrokeDistanceScaled(v float64) *Session {
+	m.AvgStrokeDistance = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetSwimStroke sets SwimStroke value.
 //
 // Units: swim_stroke
 func (m *Session) SetSwimStroke(v typedef.SwimStroke) *Session {
@@ -2382,7 +2603,7 @@ func (m *Session) SetSwimStroke(v typedef.SwimStroke) *Session {
 	return m
 }
 
-// SetPoolLength sets Session value.
+// SetPoolLength sets PoolLength value.
 //
 // Scale: 100; Units: m
 func (m *Session) SetPoolLength(v uint16) *Session {
@@ -2390,7 +2611,16 @@ func (m *Session) SetPoolLength(v uint16) *Session {
 	return m
 }
 
-// SetThresholdPower sets Session value.
+// SetPoolLengthScaled is similar to SetPoolLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Session) SetPoolLengthScaled(v float64) *Session {
+	m.PoolLength = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetThresholdPower sets ThresholdPower value.
 //
 // Units: watts
 func (m *Session) SetThresholdPower(v uint16) *Session {
@@ -2398,13 +2628,13 @@ func (m *Session) SetThresholdPower(v uint16) *Session {
 	return m
 }
 
-// SetPoolLengthUnit sets Session value.
+// SetPoolLengthUnit sets PoolLengthUnit value.
 func (m *Session) SetPoolLengthUnit(v typedef.DisplayMeasure) *Session {
 	m.PoolLengthUnit = v
 	return m
 }
 
-// SetNumActiveLengths sets Session value.
+// SetNumActiveLengths sets NumActiveLengths value.
 //
 // Units: lengths; # of active lengths of swim pool
 func (m *Session) SetNumActiveLengths(v uint16) *Session {
@@ -2412,7 +2642,7 @@ func (m *Session) SetNumActiveLengths(v uint16) *Session {
 	return m
 }
 
-// SetTotalWork sets Session value.
+// SetTotalWork sets TotalWork value.
 //
 // Units: J
 func (m *Session) SetTotalWork(v uint32) *Session {
@@ -2420,7 +2650,7 @@ func (m *Session) SetTotalWork(v uint32) *Session {
 	return m
 }
 
-// SetAvgAltitude sets Session value.
+// SetAvgAltitude sets AvgAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetAvgAltitude(v uint16) *Session {
@@ -2428,7 +2658,16 @@ func (m *Session) SetAvgAltitude(v uint16) *Session {
 	return m
 }
 
-// SetMaxAltitude sets Session value.
+// SetAvgAltitudeScaled is similar to SetAvgAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetAvgAltitudeScaled(v float64) *Session {
+	m.AvgAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetMaxAltitude sets MaxAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetMaxAltitude(v uint16) *Session {
@@ -2436,7 +2675,16 @@ func (m *Session) SetMaxAltitude(v uint16) *Session {
 	return m
 }
 
-// SetGpsAccuracy sets Session value.
+// SetMaxAltitudeScaled is similar to SetMaxAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetMaxAltitudeScaled(v float64) *Session {
+	m.MaxAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetGpsAccuracy sets GpsAccuracy value.
 //
 // Units: m
 func (m *Session) SetGpsAccuracy(v uint8) *Session {
@@ -2444,7 +2692,7 @@ func (m *Session) SetGpsAccuracy(v uint8) *Session {
 	return m
 }
 
-// SetAvgGrade sets Session value.
+// SetAvgGrade sets AvgGrade value.
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgGrade(v int16) *Session {
@@ -2452,7 +2700,16 @@ func (m *Session) SetAvgGrade(v int16) *Session {
 	return m
 }
 
-// SetAvgPosGrade sets Session value.
+// SetAvgGradeScaled is similar to SetAvgGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Session) SetAvgGradeScaled(v float64) *Session {
+	m.AvgGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgPosGrade sets AvgPosGrade value.
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgPosGrade(v int16) *Session {
@@ -2460,7 +2717,16 @@ func (m *Session) SetAvgPosGrade(v int16) *Session {
 	return m
 }
 
-// SetAvgNegGrade sets Session value.
+// SetAvgPosGradeScaled is similar to SetAvgPosGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Session) SetAvgPosGradeScaled(v float64) *Session {
+	m.AvgPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgNegGrade sets AvgNegGrade value.
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgNegGrade(v int16) *Session {
@@ -2468,7 +2734,16 @@ func (m *Session) SetAvgNegGrade(v int16) *Session {
 	return m
 }
 
-// SetMaxPosGrade sets Session value.
+// SetAvgNegGradeScaled is similar to SetAvgNegGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Session) SetAvgNegGradeScaled(v float64) *Session {
+	m.AvgNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMaxPosGrade sets MaxPosGrade value.
 //
 // Scale: 100; Units: %
 func (m *Session) SetMaxPosGrade(v int16) *Session {
@@ -2476,7 +2751,16 @@ func (m *Session) SetMaxPosGrade(v int16) *Session {
 	return m
 }
 
-// SetMaxNegGrade sets Session value.
+// SetMaxPosGradeScaled is similar to SetMaxPosGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Session) SetMaxPosGradeScaled(v float64) *Session {
+	m.MaxPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMaxNegGrade sets MaxNegGrade value.
 //
 // Scale: 100; Units: %
 func (m *Session) SetMaxNegGrade(v int16) *Session {
@@ -2484,7 +2768,16 @@ func (m *Session) SetMaxNegGrade(v int16) *Session {
 	return m
 }
 
-// SetAvgTemperature sets Session value.
+// SetMaxNegGradeScaled is similar to SetMaxNegGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Session) SetMaxNegGradeScaled(v float64) *Session {
+	m.MaxNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgTemperature sets AvgTemperature value.
 //
 // Units: C
 func (m *Session) SetAvgTemperature(v int8) *Session {
@@ -2492,7 +2785,7 @@ func (m *Session) SetAvgTemperature(v int8) *Session {
 	return m
 }
 
-// SetMaxTemperature sets Session value.
+// SetMaxTemperature sets MaxTemperature value.
 //
 // Units: C
 func (m *Session) SetMaxTemperature(v int8) *Session {
@@ -2500,7 +2793,7 @@ func (m *Session) SetMaxTemperature(v int8) *Session {
 	return m
 }
 
-// SetTotalMovingTime sets Session value.
+// SetTotalMovingTime sets TotalMovingTime value.
 //
 // Scale: 1000; Units: s
 func (m *Session) SetTotalMovingTime(v uint32) *Session {
@@ -2508,7 +2801,16 @@ func (m *Session) SetTotalMovingTime(v uint32) *Session {
 	return m
 }
 
-// SetAvgPosVerticalSpeed sets Session value.
+// SetTotalMovingTimeScaled is similar to SetTotalMovingTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Session) SetTotalMovingTimeScaled(v float64) *Session {
+	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgPosVerticalSpeed sets AvgPosVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgPosVerticalSpeed(v int16) *Session {
@@ -2516,7 +2818,16 @@ func (m *Session) SetAvgPosVerticalSpeed(v int16) *Session {
 	return m
 }
 
-// SetAvgNegVerticalSpeed sets Session value.
+// SetAvgPosVerticalSpeedScaled is similar to SetAvgPosVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetAvgPosVerticalSpeedScaled(v float64) *Session {
+	m.AvgPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgNegVerticalSpeed sets AvgNegVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgNegVerticalSpeed(v int16) *Session {
@@ -2524,7 +2835,16 @@ func (m *Session) SetAvgNegVerticalSpeed(v int16) *Session {
 	return m
 }
 
-// SetMaxPosVerticalSpeed sets Session value.
+// SetAvgNegVerticalSpeedScaled is similar to SetAvgNegVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetAvgNegVerticalSpeedScaled(v float64) *Session {
+	m.AvgNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxPosVerticalSpeed sets MaxPosVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxPosVerticalSpeed(v int16) *Session {
@@ -2532,7 +2852,16 @@ func (m *Session) SetMaxPosVerticalSpeed(v int16) *Session {
 	return m
 }
 
-// SetMaxNegVerticalSpeed sets Session value.
+// SetMaxPosVerticalSpeedScaled is similar to SetMaxPosVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetMaxPosVerticalSpeedScaled(v float64) *Session {
+	m.MaxPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxNegVerticalSpeed sets MaxNegVerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxNegVerticalSpeed(v int16) *Session {
@@ -2540,7 +2869,16 @@ func (m *Session) SetMaxNegVerticalSpeed(v int16) *Session {
 	return m
 }
 
-// SetMinHeartRate sets Session value.
+// SetMaxNegVerticalSpeedScaled is similar to SetMaxNegVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetMaxNegVerticalSpeedScaled(v float64) *Session {
+	m.MaxNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMinHeartRate sets MinHeartRate value.
 //
 // Units: bpm
 func (m *Session) SetMinHeartRate(v uint8) *Session {
@@ -2548,7 +2886,7 @@ func (m *Session) SetMinHeartRate(v uint8) *Session {
 	return m
 }
 
-// SetTimeInHrZone sets Session value.
+// SetTimeInHrZone sets TimeInHrZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInHrZone(v []uint32) *Session {
@@ -2556,7 +2894,16 @@ func (m *Session) SetTimeInHrZone(v []uint32) *Session {
 	return m
 }
 
-// SetTimeInSpeedZone sets Session value.
+// SetTimeInHrZoneScaled is similar to SetTimeInHrZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Session) SetTimeInHrZoneScaled(vs []float64) *Session {
+	m.TimeInHrZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInSpeedZone sets TimeInSpeedZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInSpeedZone(v []uint32) *Session {
@@ -2564,7 +2911,16 @@ func (m *Session) SetTimeInSpeedZone(v []uint32) *Session {
 	return m
 }
 
-// SetTimeInCadenceZone sets Session value.
+// SetTimeInSpeedZoneScaled is similar to SetTimeInSpeedZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Session) SetTimeInSpeedZoneScaled(vs []float64) *Session {
+	m.TimeInSpeedZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInCadenceZone sets TimeInCadenceZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInCadenceZone(v []uint32) *Session {
@@ -2572,7 +2928,16 @@ func (m *Session) SetTimeInCadenceZone(v []uint32) *Session {
 	return m
 }
 
-// SetTimeInPowerZone sets Session value.
+// SetTimeInCadenceZoneScaled is similar to SetTimeInCadenceZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Session) SetTimeInCadenceZoneScaled(vs []float64) *Session {
+	m.TimeInCadenceZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetTimeInPowerZone sets TimeInPowerZone value.
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInPowerZone(v []uint32) *Session {
@@ -2580,7 +2945,16 @@ func (m *Session) SetTimeInPowerZone(v []uint32) *Session {
 	return m
 }
 
-// SetAvgLapTime sets Session value.
+// SetTimeInPowerZoneScaled is similar to SetTimeInPowerZone except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 1000; Units: s
+func (m *Session) SetTimeInPowerZoneScaled(vs []float64) *Session {
+	m.TimeInPowerZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	return m
+}
+
+// SetAvgLapTime sets AvgLapTime value.
 //
 // Scale: 1000; Units: s
 func (m *Session) SetAvgLapTime(v uint32) *Session {
@@ -2588,13 +2962,22 @@ func (m *Session) SetAvgLapTime(v uint32) *Session {
 	return m
 }
 
-// SetBestLapIndex sets Session value.
+// SetAvgLapTimeScaled is similar to SetAvgLapTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Session) SetAvgLapTimeScaled(v float64) *Session {
+	m.AvgLapTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetBestLapIndex sets BestLapIndex value.
 func (m *Session) SetBestLapIndex(v uint16) *Session {
 	m.BestLapIndex = v
 	return m
 }
 
-// SetMinAltitude sets Session value.
+// SetMinAltitude sets MinAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetMinAltitude(v uint16) *Session {
@@ -2602,25 +2985,34 @@ func (m *Session) SetMinAltitude(v uint16) *Session {
 	return m
 }
 
-// SetPlayerScore sets Session value.
+// SetMinAltitudeScaled is similar to SetMinAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetMinAltitudeScaled(v float64) *Session {
+	m.MinAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetPlayerScore sets PlayerScore value.
 func (m *Session) SetPlayerScore(v uint16) *Session {
 	m.PlayerScore = v
 	return m
 }
 
-// SetOpponentScore sets Session value.
+// SetOpponentScore sets OpponentScore value.
 func (m *Session) SetOpponentScore(v uint16) *Session {
 	m.OpponentScore = v
 	return m
 }
 
-// SetOpponentName sets Session value.
+// SetOpponentName sets OpponentName value.
 func (m *Session) SetOpponentName(v string) *Session {
 	m.OpponentName = v
 	return m
 }
 
-// SetStrokeCount sets Session value.
+// SetStrokeCount sets StrokeCount value.
 //
 // Array: [N]; Units: counts; stroke_type enum used as the index
 func (m *Session) SetStrokeCount(v []uint16) *Session {
@@ -2628,7 +3020,7 @@ func (m *Session) SetStrokeCount(v []uint16) *Session {
 	return m
 }
 
-// SetZoneCount sets Session value.
+// SetZoneCount sets ZoneCount value.
 //
 // Array: [N]; Units: counts; zone number used as the index
 func (m *Session) SetZoneCount(v []uint16) *Session {
@@ -2636,7 +3028,7 @@ func (m *Session) SetZoneCount(v []uint16) *Session {
 	return m
 }
 
-// SetMaxBallSpeed sets Session value.
+// SetMaxBallSpeed sets MaxBallSpeed value.
 //
 // Scale: 100; Units: m/s
 func (m *Session) SetMaxBallSpeed(v uint16) *Session {
@@ -2644,7 +3036,16 @@ func (m *Session) SetMaxBallSpeed(v uint16) *Session {
 	return m
 }
 
-// SetAvgBallSpeed sets Session value.
+// SetMaxBallSpeedScaled is similar to SetMaxBallSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m/s
+func (m *Session) SetMaxBallSpeedScaled(v float64) *Session {
+	m.MaxBallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgBallSpeed sets AvgBallSpeed value.
 //
 // Scale: 100; Units: m/s
 func (m *Session) SetAvgBallSpeed(v uint16) *Session {
@@ -2652,7 +3053,16 @@ func (m *Session) SetAvgBallSpeed(v uint16) *Session {
 	return m
 }
 
-// SetAvgVerticalOscillation sets Session value.
+// SetAvgBallSpeedScaled is similar to SetAvgBallSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m/s
+func (m *Session) SetAvgBallSpeedScaled(v float64) *Session {
+	m.AvgBallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgVerticalOscillation sets AvgVerticalOscillation value.
 //
 // Scale: 10; Units: mm
 func (m *Session) SetAvgVerticalOscillation(v uint16) *Session {
@@ -2660,7 +3070,16 @@ func (m *Session) SetAvgVerticalOscillation(v uint16) *Session {
 	return m
 }
 
-// SetAvgStanceTimePercent sets Session value.
+// SetAvgVerticalOscillationScaled is similar to SetAvgVerticalOscillation except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Session) SetAvgVerticalOscillationScaled(v float64) *Session {
+	m.AvgVerticalOscillation = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetAvgStanceTimePercent sets AvgStanceTimePercent value.
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgStanceTimePercent(v uint16) *Session {
@@ -2668,7 +3087,16 @@ func (m *Session) SetAvgStanceTimePercent(v uint16) *Session {
 	return m
 }
 
-// SetAvgStanceTime sets Session value.
+// SetAvgStanceTimePercentScaled is similar to SetAvgStanceTimePercent except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Session) SetAvgStanceTimePercentScaled(v float64) *Session {
+	m.AvgStanceTimePercent = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgStanceTime sets AvgStanceTime value.
 //
 // Scale: 10; Units: ms
 func (m *Session) SetAvgStanceTime(v uint16) *Session {
@@ -2676,7 +3104,16 @@ func (m *Session) SetAvgStanceTime(v uint16) *Session {
 	return m
 }
 
-// SetAvgFractionalCadence sets Session value.
+// SetAvgStanceTimeScaled is similar to SetAvgStanceTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: ms
+func (m *Session) SetAvgStanceTimeScaled(v float64) *Session {
+	m.AvgStanceTime = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetAvgFractionalCadence sets AvgFractionalCadence value.
 //
 // Scale: 128; Units: rpm; fractional part of the avg_cadence
 func (m *Session) SetAvgFractionalCadence(v uint8) *Session {
@@ -2684,7 +3121,16 @@ func (m *Session) SetAvgFractionalCadence(v uint8) *Session {
 	return m
 }
 
-// SetMaxFractionalCadence sets Session value.
+// SetAvgFractionalCadenceScaled is similar to SetAvgFractionalCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm; fractional part of the avg_cadence
+func (m *Session) SetAvgFractionalCadenceScaled(v float64) *Session {
+	m.AvgFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetMaxFractionalCadence sets MaxFractionalCadence value.
 //
 // Scale: 128; Units: rpm; fractional part of the max_cadence
 func (m *Session) SetMaxFractionalCadence(v uint8) *Session {
@@ -2692,7 +3138,16 @@ func (m *Session) SetMaxFractionalCadence(v uint8) *Session {
 	return m
 }
 
-// SetTotalFractionalCycles sets Session value.
+// SetMaxFractionalCadenceScaled is similar to SetMaxFractionalCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm; fractional part of the max_cadence
+func (m *Session) SetMaxFractionalCadenceScaled(v float64) *Session {
+	m.MaxFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetTotalFractionalCycles sets TotalFractionalCycles value.
 //
 // Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *Session) SetTotalFractionalCycles(v uint8) *Session {
@@ -2700,7 +3155,16 @@ func (m *Session) SetTotalFractionalCycles(v uint8) *Session {
 	return m
 }
 
-// SetAvgTotalHemoglobinConc sets Session value.
+// SetTotalFractionalCyclesScaled is similar to SetTotalFractionalCycles except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: cycles; fractional part of the total_cycles
+func (m *Session) SetTotalFractionalCyclesScaled(v float64) *Session {
+	m.TotalFractionalCycles = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetAvgTotalHemoglobinConc sets AvgTotalHemoglobinConc value.
 //
 // Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
 func (m *Session) SetAvgTotalHemoglobinConc(v []uint16) *Session {
@@ -2708,7 +3172,16 @@ func (m *Session) SetAvgTotalHemoglobinConc(v []uint16) *Session {
 	return m
 }
 
-// SetMinTotalHemoglobinConc sets Session value.
+// SetAvgTotalHemoglobinConcScaled is similar to SetAvgTotalHemoglobinConc except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
+func (m *Session) SetAvgTotalHemoglobinConcScaled(vs []float64) *Session {
+	m.AvgTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	return m
+}
+
+// SetMinTotalHemoglobinConc sets MinTotalHemoglobinConc value.
 //
 // Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Session) SetMinTotalHemoglobinConc(v []uint16) *Session {
@@ -2716,7 +3189,16 @@ func (m *Session) SetMinTotalHemoglobinConc(v []uint16) *Session {
 	return m
 }
 
-// SetMaxTotalHemoglobinConc sets Session value.
+// SetMinTotalHemoglobinConcScaled is similar to SetMinTotalHemoglobinConc except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Session) SetMinTotalHemoglobinConcScaled(vs []float64) *Session {
+	m.MinTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	return m
+}
+
+// SetMaxTotalHemoglobinConc sets MaxTotalHemoglobinConc value.
 //
 // Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Session) SetMaxTotalHemoglobinConc(v []uint16) *Session {
@@ -2724,7 +3206,16 @@ func (m *Session) SetMaxTotalHemoglobinConc(v []uint16) *Session {
 	return m
 }
 
-// SetAvgSaturatedHemoglobinPercent sets Session value.
+// SetMaxTotalHemoglobinConcScaled is similar to SetMaxTotalHemoglobinConc except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Session) SetMaxTotalHemoglobinConcScaled(vs []float64) *Session {
+	m.MaxTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	return m
+}
+
+// SetAvgSaturatedHemoglobinPercent sets AvgSaturatedHemoglobinPercent value.
 //
 // Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
 func (m *Session) SetAvgSaturatedHemoglobinPercent(v []uint16) *Session {
@@ -2732,7 +3223,16 @@ func (m *Session) SetAvgSaturatedHemoglobinPercent(v []uint16) *Session {
 	return m
 }
 
-// SetMinSaturatedHemoglobinPercent sets Session value.
+// SetAvgSaturatedHemoglobinPercentScaled is similar to SetAvgSaturatedHemoglobinPercent except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
+func (m *Session) SetAvgSaturatedHemoglobinPercentScaled(vs []float64) *Session {
+	m.AvgSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	return m
+}
+
+// SetMinSaturatedHemoglobinPercent sets MinSaturatedHemoglobinPercent value.
 //
 // Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Session) SetMinSaturatedHemoglobinPercent(v []uint16) *Session {
@@ -2740,7 +3240,16 @@ func (m *Session) SetMinSaturatedHemoglobinPercent(v []uint16) *Session {
 	return m
 }
 
-// SetMaxSaturatedHemoglobinPercent sets Session value.
+// SetMinSaturatedHemoglobinPercentScaled is similar to SetMinSaturatedHemoglobinPercent except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Session) SetMinSaturatedHemoglobinPercentScaled(vs []float64) *Session {
+	m.MinSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	return m
+}
+
+// SetMaxSaturatedHemoglobinPercent sets MaxSaturatedHemoglobinPercent value.
 //
 // Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Session) SetMaxSaturatedHemoglobinPercent(v []uint16) *Session {
@@ -2748,7 +3257,16 @@ func (m *Session) SetMaxSaturatedHemoglobinPercent(v []uint16) *Session {
 	return m
 }
 
-// SetAvgLeftTorqueEffectiveness sets Session value.
+// SetMaxSaturatedHemoglobinPercentScaled is similar to SetMaxSaturatedHemoglobinPercent except it accepts a scaled value.
+// This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Session) SetMaxSaturatedHemoglobinPercentScaled(vs []float64) *Session {
+	m.MaxSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	return m
+}
+
+// SetAvgLeftTorqueEffectiveness sets AvgLeftTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgLeftTorqueEffectiveness(v uint8) *Session {
@@ -2756,7 +3274,16 @@ func (m *Session) SetAvgLeftTorqueEffectiveness(v uint8) *Session {
 	return m
 }
 
-// SetAvgRightTorqueEffectiveness sets Session value.
+// SetAvgLeftTorqueEffectivenessScaled is similar to SetAvgLeftTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Session) SetAvgLeftTorqueEffectivenessScaled(v float64) *Session {
+	m.AvgLeftTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgRightTorqueEffectiveness sets AvgRightTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgRightTorqueEffectiveness(v uint8) *Session {
@@ -2764,7 +3291,16 @@ func (m *Session) SetAvgRightTorqueEffectiveness(v uint8) *Session {
 	return m
 }
 
-// SetAvgLeftPedalSmoothness sets Session value.
+// SetAvgRightTorqueEffectivenessScaled is similar to SetAvgRightTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Session) SetAvgRightTorqueEffectivenessScaled(v float64) *Session {
+	m.AvgRightTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgLeftPedalSmoothness sets AvgLeftPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgLeftPedalSmoothness(v uint8) *Session {
@@ -2772,7 +3308,16 @@ func (m *Session) SetAvgLeftPedalSmoothness(v uint8) *Session {
 	return m
 }
 
-// SetAvgRightPedalSmoothness sets Session value.
+// SetAvgLeftPedalSmoothnessScaled is similar to SetAvgLeftPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Session) SetAvgLeftPedalSmoothnessScaled(v float64) *Session {
+	m.AvgLeftPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgRightPedalSmoothness sets AvgRightPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgRightPedalSmoothness(v uint8) *Session {
@@ -2780,7 +3325,16 @@ func (m *Session) SetAvgRightPedalSmoothness(v uint8) *Session {
 	return m
 }
 
-// SetAvgCombinedPedalSmoothness sets Session value.
+// SetAvgRightPedalSmoothnessScaled is similar to SetAvgRightPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Session) SetAvgRightPedalSmoothnessScaled(v float64) *Session {
+	m.AvgRightPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgCombinedPedalSmoothness sets AvgCombinedPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgCombinedPedalSmoothness(v uint8) *Session {
@@ -2788,7 +3342,16 @@ func (m *Session) SetAvgCombinedPedalSmoothness(v uint8) *Session {
 	return m
 }
 
-// SetSportProfileName sets Session value.
+// SetAvgCombinedPedalSmoothnessScaled is similar to SetAvgCombinedPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Session) SetAvgCombinedPedalSmoothnessScaled(v float64) *Session {
+	m.AvgCombinedPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetSportProfileName sets SportProfileName value.
 //
 // Sport name from associated sport mesg
 func (m *Session) SetSportProfileName(v string) *Session {
@@ -2796,13 +3359,13 @@ func (m *Session) SetSportProfileName(v string) *Session {
 	return m
 }
 
-// SetSportIndex sets Session value.
+// SetSportIndex sets SportIndex value.
 func (m *Session) SetSportIndex(v uint8) *Session {
 	m.SportIndex = v
 	return m
 }
 
-// SetTimeStanding sets Session value.
+// SetTimeStanding sets TimeStanding value.
 //
 // Scale: 1000; Units: s; Total time spend in the standing position
 func (m *Session) SetTimeStanding(v uint32) *Session {
@@ -2810,7 +3373,16 @@ func (m *Session) SetTimeStanding(v uint32) *Session {
 	return m
 }
 
-// SetStandCount sets Session value.
+// SetTimeStandingScaled is similar to SetTimeStanding except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Total time spend in the standing position
+func (m *Session) SetTimeStandingScaled(v float64) *Session {
+	m.TimeStanding = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetStandCount sets StandCount value.
 //
 // Number of transitions to the standing state
 func (m *Session) SetStandCount(v uint16) *Session {
@@ -2818,7 +3390,7 @@ func (m *Session) SetStandCount(v uint16) *Session {
 	return m
 }
 
-// SetAvgLeftPco sets Session value.
+// SetAvgLeftPco sets AvgLeftPco value.
 //
 // Units: mm; Average platform center offset Left
 func (m *Session) SetAvgLeftPco(v int8) *Session {
@@ -2826,7 +3398,7 @@ func (m *Session) SetAvgLeftPco(v int8) *Session {
 	return m
 }
 
-// SetAvgRightPco sets Session value.
+// SetAvgRightPco sets AvgRightPco value.
 //
 // Units: mm; Average platform center offset Right
 func (m *Session) SetAvgRightPco(v int8) *Session {
@@ -2834,7 +3406,7 @@ func (m *Session) SetAvgRightPco(v int8) *Session {
 	return m
 }
 
-// SetAvgLeftPowerPhase sets Session value.
+// SetAvgLeftPowerPhase sets AvgLeftPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
 func (m *Session) SetAvgLeftPowerPhase(v []uint8) *Session {
@@ -2842,7 +3414,16 @@ func (m *Session) SetAvgLeftPowerPhase(v []uint8) *Session {
 	return m
 }
 
-// SetAvgLeftPowerPhasePeak sets Session value.
+// SetAvgLeftPowerPhaseScaled is similar to SetAvgLeftPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
+func (m *Session) SetAvgLeftPowerPhaseScaled(vs []float64) *Session {
+	m.AvgLeftPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets AvgLeftPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Session) SetAvgLeftPowerPhasePeak(v []uint8) *Session {
@@ -2850,7 +3431,16 @@ func (m *Session) SetAvgLeftPowerPhasePeak(v []uint8) *Session {
 	return m
 }
 
-// SetAvgRightPowerPhase sets Session value.
+// SetAvgLeftPowerPhasePeakScaled is similar to SetAvgLeftPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Session) SetAvgLeftPowerPhasePeakScaled(vs []float64) *Session {
+	m.AvgLeftPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgRightPowerPhase sets AvgRightPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Session) SetAvgRightPowerPhase(v []uint8) *Session {
@@ -2858,7 +3448,16 @@ func (m *Session) SetAvgRightPowerPhase(v []uint8) *Session {
 	return m
 }
 
-// SetAvgRightPowerPhasePeak sets Session value.
+// SetAvgRightPowerPhaseScaled is similar to SetAvgRightPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Session) SetAvgRightPowerPhaseScaled(vs []float64) *Session {
+	m.AvgRightPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets AvgRightPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
 func (m *Session) SetAvgRightPowerPhasePeak(v []uint8) *Session {
@@ -2866,7 +3465,16 @@ func (m *Session) SetAvgRightPowerPhasePeak(v []uint8) *Session {
 	return m
 }
 
-// SetAvgPowerPosition sets Session value.
+// SetAvgRightPowerPhasePeakScaled is similar to SetAvgRightPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
+func (m *Session) SetAvgRightPowerPhasePeakScaled(vs []float64) *Session {
+	m.AvgRightPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetAvgPowerPosition sets AvgPowerPosition value.
 //
 // Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
 func (m *Session) SetAvgPowerPosition(v []uint16) *Session {
@@ -2874,7 +3482,7 @@ func (m *Session) SetAvgPowerPosition(v []uint16) *Session {
 	return m
 }
 
-// SetMaxPowerPosition sets Session value.
+// SetMaxPowerPosition sets MaxPowerPosition value.
 //
 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 func (m *Session) SetMaxPowerPosition(v []uint16) *Session {
@@ -2882,7 +3490,7 @@ func (m *Session) SetMaxPowerPosition(v []uint16) *Session {
 	return m
 }
 
-// SetAvgCadencePosition sets Session value.
+// SetAvgCadencePosition sets AvgCadencePosition value.
 //
 // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
 func (m *Session) SetAvgCadencePosition(v []uint8) *Session {
@@ -2890,7 +3498,7 @@ func (m *Session) SetAvgCadencePosition(v []uint8) *Session {
 	return m
 }
 
-// SetMaxCadencePosition sets Session value.
+// SetMaxCadencePosition sets MaxCadencePosition value.
 //
 // Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
 func (m *Session) SetMaxCadencePosition(v []uint8) *Session {
@@ -2898,7 +3506,7 @@ func (m *Session) SetMaxCadencePosition(v []uint8) *Session {
 	return m
 }
 
-// SetEnhancedAvgSpeed sets Session value.
+// SetEnhancedAvgSpeed sets EnhancedAvgSpeed value.
 //
 // Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) SetEnhancedAvgSpeed(v uint32) *Session {
@@ -2906,7 +3514,16 @@ func (m *Session) SetEnhancedAvgSpeed(v uint32) *Session {
 	return m
 }
 
-// SetEnhancedMaxSpeed sets Session value.
+// SetEnhancedAvgSpeedScaled is similar to SetEnhancedAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s; total_distance / total_timer_time
+func (m *Session) SetEnhancedAvgSpeedScaled(v float64) *Session {
+	m.EnhancedAvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetEnhancedMaxSpeed sets EnhancedMaxSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetEnhancedMaxSpeed(v uint32) *Session {
@@ -2914,7 +3531,16 @@ func (m *Session) SetEnhancedMaxSpeed(v uint32) *Session {
 	return m
 }
 
-// SetEnhancedAvgAltitude sets Session value.
+// SetEnhancedMaxSpeedScaled is similar to SetEnhancedMaxSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetEnhancedMaxSpeedScaled(v float64) *Session {
+	m.EnhancedMaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetEnhancedAvgAltitude sets EnhancedAvgAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedAvgAltitude(v uint32) *Session {
@@ -2922,7 +3548,16 @@ func (m *Session) SetEnhancedAvgAltitude(v uint32) *Session {
 	return m
 }
 
-// SetEnhancedMinAltitude sets Session value.
+// SetEnhancedAvgAltitudeScaled is similar to SetEnhancedAvgAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetEnhancedAvgAltitudeScaled(v float64) *Session {
+	m.EnhancedAvgAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetEnhancedMinAltitude sets EnhancedMinAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedMinAltitude(v uint32) *Session {
@@ -2930,7 +3565,16 @@ func (m *Session) SetEnhancedMinAltitude(v uint32) *Session {
 	return m
 }
 
-// SetEnhancedMaxAltitude sets Session value.
+// SetEnhancedMinAltitudeScaled is similar to SetEnhancedMinAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetEnhancedMinAltitudeScaled(v float64) *Session {
+	m.EnhancedMinAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetEnhancedMaxAltitude sets EnhancedMaxAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedMaxAltitude(v uint32) *Session {
@@ -2938,7 +3582,16 @@ func (m *Session) SetEnhancedMaxAltitude(v uint32) *Session {
 	return m
 }
 
-// SetAvgLevMotorPower sets Session value.
+// SetEnhancedMaxAltitudeScaled is similar to SetEnhancedMaxAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Session) SetEnhancedMaxAltitudeScaled(v float64) *Session {
+	m.EnhancedMaxAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetAvgLevMotorPower sets AvgLevMotorPower value.
 //
 // Units: watts; lev average motor power during session
 func (m *Session) SetAvgLevMotorPower(v uint16) *Session {
@@ -2946,7 +3599,7 @@ func (m *Session) SetAvgLevMotorPower(v uint16) *Session {
 	return m
 }
 
-// SetMaxLevMotorPower sets Session value.
+// SetMaxLevMotorPower sets MaxLevMotorPower value.
 //
 // Units: watts; lev maximum motor power during session
 func (m *Session) SetMaxLevMotorPower(v uint16) *Session {
@@ -2954,7 +3607,7 @@ func (m *Session) SetMaxLevMotorPower(v uint16) *Session {
 	return m
 }
 
-// SetLevBatteryConsumption sets Session value.
+// SetLevBatteryConsumption sets LevBatteryConsumption value.
 //
 // Scale: 2; Units: percent; lev battery consumption during session
 func (m *Session) SetLevBatteryConsumption(v uint8) *Session {
@@ -2962,7 +3615,16 @@ func (m *Session) SetLevBatteryConsumption(v uint8) *Session {
 	return m
 }
 
-// SetAvgVerticalRatio sets Session value.
+// SetLevBatteryConsumptionScaled is similar to SetLevBatteryConsumption except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent; lev battery consumption during session
+func (m *Session) SetLevBatteryConsumptionScaled(v float64) *Session {
+	m.LevBatteryConsumption = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetAvgVerticalRatio sets AvgVerticalRatio value.
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgVerticalRatio(v uint16) *Session {
@@ -2970,7 +3632,16 @@ func (m *Session) SetAvgVerticalRatio(v uint16) *Session {
 	return m
 }
 
-// SetAvgStanceTimeBalance sets Session value.
+// SetAvgVerticalRatioScaled is similar to SetAvgVerticalRatio except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Session) SetAvgVerticalRatioScaled(v float64) *Session {
+	m.AvgVerticalRatio = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgStanceTimeBalance sets AvgStanceTimeBalance value.
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgStanceTimeBalance(v uint16) *Session {
@@ -2978,7 +3649,16 @@ func (m *Session) SetAvgStanceTimeBalance(v uint16) *Session {
 	return m
 }
 
-// SetAvgStepLength sets Session value.
+// SetAvgStanceTimeBalanceScaled is similar to SetAvgStanceTimeBalance except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Session) SetAvgStanceTimeBalanceScaled(v float64) *Session {
+	m.AvgStanceTimeBalance = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgStepLength sets AvgStepLength value.
 //
 // Scale: 10; Units: mm
 func (m *Session) SetAvgStepLength(v uint16) *Session {
@@ -2986,7 +3666,16 @@ func (m *Session) SetAvgStepLength(v uint16) *Session {
 	return m
 }
 
-// SetTotalAnaerobicTrainingEffect sets Session value.
+// SetAvgStepLengthScaled is similar to SetAvgStepLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Session) SetAvgStepLengthScaled(v float64) *Session {
+	m.AvgStepLength = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetTotalAnaerobicTrainingEffect sets TotalAnaerobicTrainingEffect value.
 //
 // Scale: 10
 func (m *Session) SetTotalAnaerobicTrainingEffect(v uint8) *Session {
@@ -2994,7 +3683,16 @@ func (m *Session) SetTotalAnaerobicTrainingEffect(v uint8) *Session {
 	return m
 }
 
-// SetAvgVam sets Session value.
+// SetTotalAnaerobicTrainingEffectScaled is similar to SetTotalAnaerobicTrainingEffect except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10
+func (m *Session) SetTotalAnaerobicTrainingEffectScaled(v float64) *Session {
+	m.TotalAnaerobicTrainingEffect = uint8(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetAvgVam sets AvgVam value.
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgVam(v uint16) *Session {
@@ -3002,7 +3700,16 @@ func (m *Session) SetAvgVam(v uint16) *Session {
 	return m
 }
 
-// SetAvgDepth sets Session value.
+// SetAvgVamScaled is similar to SetAvgVam except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetAvgVamScaled(v float64) *Session {
+	m.AvgVam = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetAvgDepth sets AvgDepth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Session) SetAvgDepth(v uint32) *Session {
@@ -3010,7 +3717,16 @@ func (m *Session) SetAvgDepth(v uint32) *Session {
 	return m
 }
 
-// SetMaxDepth sets Session value.
+// SetAvgDepthScaled is similar to SetAvgDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Session) SetAvgDepthScaled(v float64) *Session {
+	m.AvgDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetMaxDepth sets MaxDepth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Session) SetMaxDepth(v uint32) *Session {
@@ -3018,7 +3734,16 @@ func (m *Session) SetMaxDepth(v uint32) *Session {
 	return m
 }
 
-// SetSurfaceInterval sets Session value.
+// SetMaxDepthScaled is similar to SetMaxDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Session) SetMaxDepthScaled(v float64) *Session {
+	m.MaxDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetSurfaceInterval sets SurfaceInterval value.
 //
 // Units: s; Time since end of last dive
 func (m *Session) SetSurfaceInterval(v uint32) *Session {
@@ -3026,7 +3751,7 @@ func (m *Session) SetSurfaceInterval(v uint32) *Session {
 	return m
 }
 
-// SetStartCns sets Session value.
+// SetStartCns sets StartCns value.
 //
 // Units: percent
 func (m *Session) SetStartCns(v uint8) *Session {
@@ -3034,7 +3759,7 @@ func (m *Session) SetStartCns(v uint8) *Session {
 	return m
 }
 
-// SetEndCns sets Session value.
+// SetEndCns sets EndCns value.
 //
 // Units: percent
 func (m *Session) SetEndCns(v uint8) *Session {
@@ -3042,7 +3767,7 @@ func (m *Session) SetEndCns(v uint8) *Session {
 	return m
 }
 
-// SetStartN2 sets Session value.
+// SetStartN2 sets StartN2 value.
 //
 // Units: percent
 func (m *Session) SetStartN2(v uint16) *Session {
@@ -3050,7 +3775,7 @@ func (m *Session) SetStartN2(v uint16) *Session {
 	return m
 }
 
-// SetEndN2 sets Session value.
+// SetEndN2 sets EndN2 value.
 //
 // Units: percent
 func (m *Session) SetEndN2(v uint16) *Session {
@@ -3058,25 +3783,25 @@ func (m *Session) SetEndN2(v uint16) *Session {
 	return m
 }
 
-// SetAvgRespirationRate sets Session value.
+// SetAvgRespirationRate sets AvgRespirationRate value.
 func (m *Session) SetAvgRespirationRate(v uint8) *Session {
 	m.AvgRespirationRate = v
 	return m
 }
 
-// SetMaxRespirationRate sets Session value.
+// SetMaxRespirationRate sets MaxRespirationRate value.
 func (m *Session) SetMaxRespirationRate(v uint8) *Session {
 	m.MaxRespirationRate = v
 	return m
 }
 
-// SetMinRespirationRate sets Session value.
+// SetMinRespirationRate sets MinRespirationRate value.
 func (m *Session) SetMinRespirationRate(v uint8) *Session {
 	m.MinRespirationRate = v
 	return m
 }
 
-// SetMinTemperature sets Session value.
+// SetMinTemperature sets MinTemperature value.
 //
 // Units: C
 func (m *Session) SetMinTemperature(v int8) *Session {
@@ -3084,7 +3809,7 @@ func (m *Session) SetMinTemperature(v int8) *Session {
 	return m
 }
 
-// SetO2Toxicity sets Session value.
+// SetO2Toxicity sets O2Toxicity value.
 //
 // Units: OTUs
 func (m *Session) SetO2Toxicity(v uint16) *Session {
@@ -3092,13 +3817,13 @@ func (m *Session) SetO2Toxicity(v uint16) *Session {
 	return m
 }
 
-// SetDiveNumber sets Session value.
+// SetDiveNumber sets DiveNumber value.
 func (m *Session) SetDiveNumber(v uint32) *Session {
 	m.DiveNumber = v
 	return m
 }
 
-// SetTrainingLoadPeak sets Session value.
+// SetTrainingLoadPeak sets TrainingLoadPeak value.
 //
 // Scale: 65536
 func (m *Session) SetTrainingLoadPeak(v int32) *Session {
@@ -3106,7 +3831,16 @@ func (m *Session) SetTrainingLoadPeak(v int32) *Session {
 	return m
 }
 
-// SetEnhancedAvgRespirationRate sets Session value.
+// SetTrainingLoadPeakScaled is similar to SetTrainingLoadPeak except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 65536
+func (m *Session) SetTrainingLoadPeakScaled(v float64) *Session {
+	m.TrainingLoadPeak = int32(scaleoffset.Discard(v, 65536, 0))
+	return m
+}
+
+// SetEnhancedAvgRespirationRate sets EnhancedAvgRespirationRate value.
 //
 // Scale: 100; Units: Breaths/min
 func (m *Session) SetEnhancedAvgRespirationRate(v uint16) *Session {
@@ -3114,7 +3848,16 @@ func (m *Session) SetEnhancedAvgRespirationRate(v uint16) *Session {
 	return m
 }
 
-// SetEnhancedMaxRespirationRate sets Session value.
+// SetEnhancedAvgRespirationRateScaled is similar to SetEnhancedAvgRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Session) SetEnhancedAvgRespirationRateScaled(v float64) *Session {
+	m.EnhancedAvgRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets EnhancedMaxRespirationRate value.
 //
 // Scale: 100; Units: Breaths/min
 func (m *Session) SetEnhancedMaxRespirationRate(v uint16) *Session {
@@ -3122,7 +3865,16 @@ func (m *Session) SetEnhancedMaxRespirationRate(v uint16) *Session {
 	return m
 }
 
-// SetEnhancedMinRespirationRate sets Session value.
+// SetEnhancedMaxRespirationRateScaled is similar to SetEnhancedMaxRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Session) SetEnhancedMaxRespirationRateScaled(v float64) *Session {
+	m.EnhancedMaxRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEnhancedMinRespirationRate sets EnhancedMinRespirationRate value.
 //
 // Scale: 100
 func (m *Session) SetEnhancedMinRespirationRate(v uint16) *Session {
@@ -3130,7 +3882,16 @@ func (m *Session) SetEnhancedMinRespirationRate(v uint16) *Session {
 	return m
 }
 
-// SetTotalGrit sets Session value.
+// SetEnhancedMinRespirationRateScaled is similar to SetEnhancedMinRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100
+func (m *Session) SetEnhancedMinRespirationRateScaled(v float64) *Session {
+	m.EnhancedMinRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalGrit sets TotalGrit value.
 //
 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 func (m *Session) SetTotalGrit(v float32) *Session {
@@ -3138,7 +3899,7 @@ func (m *Session) SetTotalGrit(v float32) *Session {
 	return m
 }
 
-// SetTotalFlow sets Session value.
+// SetTotalFlow sets TotalFlow value.
 //
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *Session) SetTotalFlow(v float32) *Session {
@@ -3146,13 +3907,13 @@ func (m *Session) SetTotalFlow(v float32) *Session {
 	return m
 }
 
-// SetJumpCount sets Session value.
+// SetJumpCount sets JumpCount value.
 func (m *Session) SetJumpCount(v uint16) *Session {
 	m.JumpCount = v
 	return m
 }
 
-// SetAvgGrit sets Session value.
+// SetAvgGrit sets AvgGrit value.
 //
 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 func (m *Session) SetAvgGrit(v float32) *Session {
@@ -3160,7 +3921,7 @@ func (m *Session) SetAvgGrit(v float32) *Session {
 	return m
 }
 
-// SetAvgFlow sets Session value.
+// SetAvgFlow sets AvgFlow value.
 //
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *Session) SetAvgFlow(v float32) *Session {
@@ -3168,7 +3929,7 @@ func (m *Session) SetAvgFlow(v float32) *Session {
 	return m
 }
 
-// SetAvgSpo2 sets Session value.
+// SetAvgSpo2 sets AvgSpo2 value.
 //
 // Units: percent; Average SPO2 for the monitoring session
 func (m *Session) SetAvgSpo2(v uint8) *Session {
@@ -3176,7 +3937,7 @@ func (m *Session) SetAvgSpo2(v uint8) *Session {
 	return m
 }
 
-// SetAvgStress sets Session value.
+// SetAvgStress sets AvgStress value.
 //
 // Units: percent; Average stress for the monitoring session
 func (m *Session) SetAvgStress(v uint8) *Session {
@@ -3184,7 +3945,7 @@ func (m *Session) SetAvgStress(v uint8) *Session {
 	return m
 }
 
-// SetSdrrHrv sets Session value.
+// SetSdrrHrv sets SdrrHrv value.
 //
 // Units: mS; Standard deviation of R-R interval (SDRR) - Heart rate variability measure most useful for wellness users.
 func (m *Session) SetSdrrHrv(v uint8) *Session {
@@ -3192,7 +3953,7 @@ func (m *Session) SetSdrrHrv(v uint8) *Session {
 	return m
 }
 
-// SetRmssdHrv sets Session value.
+// SetRmssdHrv sets RmssdHrv value.
 //
 // Units: mS; Root mean square successive difference (RMSSD) - Heart rate variability measure most useful for athletes
 func (m *Session) SetRmssdHrv(v uint8) *Session {
@@ -3200,7 +3961,7 @@ func (m *Session) SetRmssdHrv(v uint8) *Session {
 	return m
 }
 
-// SetTotalFractionalAscent sets Session value.
+// SetTotalFractionalAscent sets TotalFractionalAscent value.
 //
 // Scale: 100; Units: m; fractional part of total_ascent
 func (m *Session) SetTotalFractionalAscent(v uint8) *Session {
@@ -3208,7 +3969,16 @@ func (m *Session) SetTotalFractionalAscent(v uint8) *Session {
 	return m
 }
 
-// SetTotalFractionalDescent sets Session value.
+// SetTotalFractionalAscentScaled is similar to SetTotalFractionalAscent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Session) SetTotalFractionalAscentScaled(v float64) *Session {
+	m.TotalFractionalAscent = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalFractionalDescent sets TotalFractionalDescent value.
 //
 // Scale: 100; Units: m; fractional part of total_descent
 func (m *Session) SetTotalFractionalDescent(v uint8) *Session {
@@ -3216,7 +3986,16 @@ func (m *Session) SetTotalFractionalDescent(v uint8) *Session {
 	return m
 }
 
-// SetAvgCoreTemperature sets Session value.
+// SetTotalFractionalDescentScaled is similar to SetTotalFractionalDescent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Session) SetTotalFractionalDescentScaled(v float64) *Session {
+	m.TotalFractionalDescent = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgCoreTemperature sets AvgCoreTemperature value.
 //
 // Scale: 100; Units: C
 func (m *Session) SetAvgCoreTemperature(v uint16) *Session {
@@ -3224,7 +4003,16 @@ func (m *Session) SetAvgCoreTemperature(v uint16) *Session {
 	return m
 }
 
-// SetMinCoreTemperature sets Session value.
+// SetAvgCoreTemperatureScaled is similar to SetAvgCoreTemperature except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C
+func (m *Session) SetAvgCoreTemperatureScaled(v float64) *Session {
+	m.AvgCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMinCoreTemperature sets MinCoreTemperature value.
 //
 // Scale: 100; Units: C
 func (m *Session) SetMinCoreTemperature(v uint16) *Session {
@@ -3232,11 +4020,29 @@ func (m *Session) SetMinCoreTemperature(v uint16) *Session {
 	return m
 }
 
-// SetMaxCoreTemperature sets Session value.
+// SetMinCoreTemperatureScaled is similar to SetMinCoreTemperature except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C
+func (m *Session) SetMinCoreTemperatureScaled(v float64) *Session {
+	m.MinCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetMaxCoreTemperature sets MaxCoreTemperature value.
 //
 // Scale: 100; Units: C
 func (m *Session) SetMaxCoreTemperature(v uint16) *Session {
 	m.MaxCoreTemperature = v
+	return m
+}
+
+// SetMaxCoreTemperatureScaled is similar to SetMaxCoreTemperature except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C
+func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
+	m.MaxCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 

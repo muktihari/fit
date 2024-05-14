@@ -106,31 +106,31 @@ func (m *FieldCapabilities) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetMessageIndex sets FieldCapabilities value.
+// SetMessageIndex sets MessageIndex value.
 func (m *FieldCapabilities) SetMessageIndex(v typedef.MessageIndex) *FieldCapabilities {
 	m.MessageIndex = v
 	return m
 }
 
-// SetFile sets FieldCapabilities value.
+// SetFile sets File value.
 func (m *FieldCapabilities) SetFile(v typedef.File) *FieldCapabilities {
 	m.File = v
 	return m
 }
 
-// SetMesgNum sets FieldCapabilities value.
+// SetMesgNum sets MesgNum value.
 func (m *FieldCapabilities) SetMesgNum(v typedef.MesgNum) *FieldCapabilities {
 	m.MesgNum = v
 	return m
 }
 
-// SetFieldNum sets FieldCapabilities value.
+// SetFieldNum sets FieldNum value.
 func (m *FieldCapabilities) SetFieldNum(v uint8) *FieldCapabilities {
 	m.FieldNum = v
 	return m
 }
 
-// SetCount sets FieldCapabilities value.
+// SetCount sets Count value.
 func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
 	m.Count = v
 	return m

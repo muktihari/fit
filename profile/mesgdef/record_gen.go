@@ -682,9 +682,10 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Record) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// AltitudeScaled return Altitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// AltitudeScaled return Altitude in its scaled value.
 // If Altitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Record) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -692,9 +693,10 @@ func (m *Record) AltitudeScaled() float64 {
 	return scaleoffset.Apply(m.Altitude, 5, 500)
 }
 
-// DistanceScaled return Distance in its scaled value [Scale: 100; Units: m].
-//
+// DistanceScaled return Distance in its scaled value.
 // If Distance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Record) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -702,9 +704,10 @@ func (m *Record) DistanceScaled() float64 {
 	return scaleoffset.Apply(m.Distance, 100, 0)
 }
 
-// SpeedScaled return Speed in its scaled value [Scale: 1000; Units: m/s].
-//
+// SpeedScaled return Speed in its scaled value.
 // If Speed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Record) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -712,9 +715,10 @@ func (m *Record) SpeedScaled() float64 {
 	return scaleoffset.Apply(m.Speed, 1000, 0)
 }
 
-// GradeScaled return Grade in its scaled value [Scale: 100; Units: %].
-//
+// GradeScaled return Grade in its scaled value.
 // If Grade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
 func (m *Record) GradeScaled() float64 {
 	if m.Grade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -722,9 +726,10 @@ func (m *Record) GradeScaled() float64 {
 	return scaleoffset.Apply(m.Grade, 100, 0)
 }
 
-// TimeFromCourseScaled return TimeFromCourse in its scaled value [Scale: 1000; Units: s].
-//
+// TimeFromCourseScaled return TimeFromCourse in its scaled value.
 // If TimeFromCourse value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Record) TimeFromCourseScaled() float64 {
 	if m.TimeFromCourse == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -732,9 +737,10 @@ func (m *Record) TimeFromCourseScaled() float64 {
 	return scaleoffset.Apply(m.TimeFromCourse, 1000, 0)
 }
 
-// CycleLengthScaled return CycleLength in its scaled value [Scale: 100; Units: m].
-//
+// CycleLengthScaled return CycleLength in its scaled value.
 // If CycleLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *Record) CycleLengthScaled() float64 {
 	if m.CycleLength == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -742,9 +748,10 @@ func (m *Record) CycleLengthScaled() float64 {
 	return scaleoffset.Apply(m.CycleLength, 100, 0)
 }
 
-// Speed1SScaled return Speed1S in its scaled value [Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.].
-//
+// Speed1SScaled return Speed1S in its scaled value.
 // If Speed1S value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
 func (m *Record) Speed1SScaled() []float64 {
 	if m.Speed1S == nil {
 		return nil
@@ -752,9 +759,10 @@ func (m *Record) Speed1SScaled() []float64 {
 	return scaleoffset.ApplySlice(m.Speed1S, 16, 0)
 }
 
-// VerticalSpeedScaled return VerticalSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// VerticalSpeedScaled return VerticalSpeed in its scaled value.
 // If VerticalSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Record) VerticalSpeedScaled() float64 {
 	if m.VerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -762,9 +770,10 @@ func (m *Record) VerticalSpeedScaled() float64 {
 	return scaleoffset.Apply(m.VerticalSpeed, 1000, 0)
 }
 
-// VerticalOscillationScaled return VerticalOscillation in its scaled value [Scale: 10; Units: mm].
-//
+// VerticalOscillationScaled return VerticalOscillation in its scaled value.
 // If VerticalOscillation value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
 func (m *Record) VerticalOscillationScaled() float64 {
 	if m.VerticalOscillation == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -772,9 +781,10 @@ func (m *Record) VerticalOscillationScaled() float64 {
 	return scaleoffset.Apply(m.VerticalOscillation, 10, 0)
 }
 
-// StanceTimePercentScaled return StanceTimePercent in its scaled value [Scale: 100; Units: percent].
-//
+// StanceTimePercentScaled return StanceTimePercent in its scaled value.
 // If StanceTimePercent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Record) StanceTimePercentScaled() float64 {
 	if m.StanceTimePercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -782,9 +792,10 @@ func (m *Record) StanceTimePercentScaled() float64 {
 	return scaleoffset.Apply(m.StanceTimePercent, 100, 0)
 }
 
-// StanceTimeScaled return StanceTime in its scaled value [Scale: 10; Units: ms].
-//
+// StanceTimeScaled return StanceTime in its scaled value.
 // If StanceTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: ms
 func (m *Record) StanceTimeScaled() float64 {
 	if m.StanceTime == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -792,9 +803,10 @@ func (m *Record) StanceTimeScaled() float64 {
 	return scaleoffset.Apply(m.StanceTime, 10, 0)
 }
 
-// LeftTorqueEffectivenessScaled return LeftTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// LeftTorqueEffectivenessScaled return LeftTorqueEffectiveness in its scaled value.
 // If LeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Record) LeftTorqueEffectivenessScaled() float64 {
 	if m.LeftTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -802,9 +814,10 @@ func (m *Record) LeftTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.LeftTorqueEffectiveness, 2, 0)
 }
 
-// RightTorqueEffectivenessScaled return RightTorqueEffectiveness in its scaled value [Scale: 2; Units: percent].
-//
+// RightTorqueEffectivenessScaled return RightTorqueEffectiveness in its scaled value.
 // If RightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Record) RightTorqueEffectivenessScaled() float64 {
 	if m.RightTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -812,9 +825,10 @@ func (m *Record) RightTorqueEffectivenessScaled() float64 {
 	return scaleoffset.Apply(m.RightTorqueEffectiveness, 2, 0)
 }
 
-// LeftPedalSmoothnessScaled return LeftPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// LeftPedalSmoothnessScaled return LeftPedalSmoothness in its scaled value.
 // If LeftPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Record) LeftPedalSmoothnessScaled() float64 {
 	if m.LeftPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -822,9 +836,10 @@ func (m *Record) LeftPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.LeftPedalSmoothness, 2, 0)
 }
 
-// RightPedalSmoothnessScaled return RightPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// RightPedalSmoothnessScaled return RightPedalSmoothness in its scaled value.
 // If RightPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Record) RightPedalSmoothnessScaled() float64 {
 	if m.RightPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -832,9 +847,10 @@ func (m *Record) RightPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.RightPedalSmoothness, 2, 0)
 }
 
-// CombinedPedalSmoothnessScaled return CombinedPedalSmoothness in its scaled value [Scale: 2; Units: percent].
-//
+// CombinedPedalSmoothnessScaled return CombinedPedalSmoothness in its scaled value.
 // If CombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
 func (m *Record) CombinedPedalSmoothnessScaled() float64 {
 	if m.CombinedPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -842,9 +858,10 @@ func (m *Record) CombinedPedalSmoothnessScaled() float64 {
 	return scaleoffset.Apply(m.CombinedPedalSmoothness, 2, 0)
 }
 
-// Time128Scaled return Time128 in its scaled value [Scale: 128; Units: s].
-//
+// Time128Scaled return Time128 in its scaled value.
 // If Time128 value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: s
 func (m *Record) Time128Scaled() float64 {
 	if m.Time128 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -852,9 +869,10 @@ func (m *Record) Time128Scaled() float64 {
 	return scaleoffset.Apply(m.Time128, 128, 0)
 }
 
-// BallSpeedScaled return BallSpeed in its scaled value [Scale: 100; Units: m/s].
-//
+// BallSpeedScaled return BallSpeed in its scaled value.
 // If BallSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m/s
 func (m *Record) BallSpeedScaled() float64 {
 	if m.BallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -862,9 +880,10 @@ func (m *Record) BallSpeedScaled() float64 {
 	return scaleoffset.Apply(m.BallSpeed, 100, 0)
 }
 
-// Cadence256Scaled return Cadence256 in its scaled value [Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility].
-//
+// Cadence256Scaled return Cadence256 in its scaled value.
 // If Cadence256 value is invalid, float64 invalid value will be returned.
+//
+// Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
 func (m *Record) Cadence256Scaled() float64 {
 	if m.Cadence256 == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -872,9 +891,10 @@ func (m *Record) Cadence256Scaled() float64 {
 	return scaleoffset.Apply(m.Cadence256, 256, 0)
 }
 
-// FractionalCadenceScaled return FractionalCadence in its scaled value [Scale: 128; Units: rpm].
-//
+// FractionalCadenceScaled return FractionalCadence in its scaled value.
 // If FractionalCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm
 func (m *Record) FractionalCadenceScaled() float64 {
 	if m.FractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -882,9 +902,10 @@ func (m *Record) FractionalCadenceScaled() float64 {
 	return scaleoffset.Apply(m.FractionalCadence, 128, 0)
 }
 
-// TotalHemoglobinConcScaled return TotalHemoglobinConc in its scaled value [Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin].
-//
+// TotalHemoglobinConcScaled return TotalHemoglobinConc in its scaled value.
 // If TotalHemoglobinConc value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
 func (m *Record) TotalHemoglobinConcScaled() float64 {
 	if m.TotalHemoglobinConc == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -892,9 +913,10 @@ func (m *Record) TotalHemoglobinConcScaled() float64 {
 	return scaleoffset.Apply(m.TotalHemoglobinConc, 100, 0)
 }
 
-// TotalHemoglobinConcMinScaled return TotalHemoglobinConcMin in its scaled value [Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin].
-//
+// TotalHemoglobinConcMinScaled return TotalHemoglobinConcMin in its scaled value.
 // If TotalHemoglobinConcMin value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Record) TotalHemoglobinConcMinScaled() float64 {
 	if m.TotalHemoglobinConcMin == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -902,9 +924,10 @@ func (m *Record) TotalHemoglobinConcMinScaled() float64 {
 	return scaleoffset.Apply(m.TotalHemoglobinConcMin, 100, 0)
 }
 
-// TotalHemoglobinConcMaxScaled return TotalHemoglobinConcMax in its scaled value [Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin].
-//
+// TotalHemoglobinConcMaxScaled return TotalHemoglobinConcMax in its scaled value.
 // If TotalHemoglobinConcMax value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
 	if m.TotalHemoglobinConcMax == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -912,9 +935,10 @@ func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
 	return scaleoffset.Apply(m.TotalHemoglobinConcMax, 100, 0)
 }
 
-// SaturatedHemoglobinPercentScaled return SaturatedHemoglobinPercent in its scaled value [Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen].
-//
+// SaturatedHemoglobinPercentScaled return SaturatedHemoglobinPercent in its scaled value.
 // If SaturatedHemoglobinPercent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen
 func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
 	if m.SaturatedHemoglobinPercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -922,9 +946,10 @@ func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercent, 10, 0)
 }
 
-// SaturatedHemoglobinPercentMinScaled return SaturatedHemoglobinPercentMin in its scaled value [Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen].
-//
+// SaturatedHemoglobinPercentMinScaled return SaturatedHemoglobinPercentMin in its scaled value.
 // If SaturatedHemoglobinPercentMin value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
 	if m.SaturatedHemoglobinPercentMin == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -932,9 +957,10 @@ func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMin, 10, 0)
 }
 
-// SaturatedHemoglobinPercentMaxScaled return SaturatedHemoglobinPercentMax in its scaled value [Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen].
-//
+// SaturatedHemoglobinPercentMaxScaled return SaturatedHemoglobinPercentMax in its scaled value.
 // If SaturatedHemoglobinPercentMax value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
 	if m.SaturatedHemoglobinPercentMax == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -942,9 +968,10 @@ func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
 	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMax, 10, 0)
 }
 
-// LeftPowerPhaseScaled return LeftPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.].
-//
+// LeftPowerPhaseScaled return LeftPowerPhase in its scaled value.
 // If LeftPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) LeftPowerPhaseScaled() []float64 {
 	if m.LeftPowerPhase == nil {
 		return nil
@@ -952,9 +979,10 @@ func (m *Record) LeftPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.LeftPowerPhase, 0.7111111, 0)
 }
 
-// LeftPowerPhasePeakScaled return LeftPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.].
-//
+// LeftPowerPhasePeakScaled return LeftPowerPhasePeak in its scaled value.
 // If LeftPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) LeftPowerPhasePeakScaled() []float64 {
 	if m.LeftPowerPhasePeak == nil {
 		return nil
@@ -962,9 +990,10 @@ func (m *Record) LeftPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.LeftPowerPhasePeak, 0.7111111, 0)
 }
 
-// RightPowerPhaseScaled return RightPowerPhase in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.].
-//
+// RightPowerPhaseScaled return RightPowerPhase in its scaled value.
 // If RightPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) RightPowerPhaseScaled() []float64 {
 	if m.RightPowerPhase == nil {
 		return nil
@@ -972,9 +1001,10 @@ func (m *Record) RightPowerPhaseScaled() []float64 {
 	return scaleoffset.ApplySlice(m.RightPowerPhase, 0.7111111, 0)
 }
 
-// RightPowerPhasePeakScaled return RightPowerPhasePeak in its scaled value [Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.].
-//
+// RightPowerPhasePeakScaled return RightPowerPhasePeak in its scaled value.
 // If RightPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) RightPowerPhasePeakScaled() []float64 {
 	if m.RightPowerPhasePeak == nil {
 		return nil
@@ -982,9 +1012,10 @@ func (m *Record) RightPowerPhasePeakScaled() []float64 {
 	return scaleoffset.ApplySlice(m.RightPowerPhasePeak, 0.7111111, 0)
 }
 
-// EnhancedSpeedScaled return EnhancedSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
 // If EnhancedSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Record) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -992,9 +1023,10 @@ func (m *Record) EnhancedSpeedScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
 }
 
-// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value [Scale: 5; Offset: 500; Units: m].
-//
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
 // If EnhancedAltitude value is invalid, float64 invalid value will be returned.
+//
+// Scale: 5; Offset: 500; Units: m
 func (m *Record) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1002,9 +1034,10 @@ func (m *Record) EnhancedAltitudeScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
 }
 
-// BatterySocScaled return BatterySoc in its scaled value [Scale: 2; Units: percent; lev battery state of charge].
-//
+// BatterySocScaled return BatterySoc in its scaled value.
 // If BatterySoc value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent; lev battery state of charge
 func (m *Record) BatterySocScaled() float64 {
 	if m.BatterySoc == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1012,9 +1045,10 @@ func (m *Record) BatterySocScaled() float64 {
 	return scaleoffset.Apply(m.BatterySoc, 2, 0)
 }
 
-// VerticalRatioScaled return VerticalRatio in its scaled value [Scale: 100; Units: percent].
-//
+// VerticalRatioScaled return VerticalRatio in its scaled value.
 // If VerticalRatio value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Record) VerticalRatioScaled() float64 {
 	if m.VerticalRatio == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1022,9 +1056,10 @@ func (m *Record) VerticalRatioScaled() float64 {
 	return scaleoffset.Apply(m.VerticalRatio, 100, 0)
 }
 
-// StanceTimeBalanceScaled return StanceTimeBalance in its scaled value [Scale: 100; Units: percent].
-//
+// StanceTimeBalanceScaled return StanceTimeBalance in its scaled value.
 // If StanceTimeBalance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
 func (m *Record) StanceTimeBalanceScaled() float64 {
 	if m.StanceTimeBalance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1032,9 +1067,10 @@ func (m *Record) StanceTimeBalanceScaled() float64 {
 	return scaleoffset.Apply(m.StanceTimeBalance, 100, 0)
 }
 
-// StepLengthScaled return StepLength in its scaled value [Scale: 10; Units: mm].
-//
+// StepLengthScaled return StepLength in its scaled value.
 // If StepLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
 func (m *Record) StepLengthScaled() float64 {
 	if m.StepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1042,9 +1078,10 @@ func (m *Record) StepLengthScaled() float64 {
 	return scaleoffset.Apply(m.StepLength, 10, 0)
 }
 
-// CycleLength16Scaled return CycleLength16 in its scaled value [Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35].
-//
+// CycleLength16Scaled return CycleLength16 in its scaled value.
 // If CycleLength16 value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
 func (m *Record) CycleLength16Scaled() float64 {
 	if m.CycleLength16 == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1052,9 +1089,10 @@ func (m *Record) CycleLength16Scaled() float64 {
 	return scaleoffset.Apply(m.CycleLength16, 100, 0)
 }
 
-// DepthScaled return Depth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// DepthScaled return Depth in its scaled value.
 // If Depth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *Record) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1062,9 +1100,10 @@ func (m *Record) DepthScaled() float64 {
 	return scaleoffset.Apply(m.Depth, 1000, 0)
 }
 
-// NextStopDepthScaled return NextStopDepth in its scaled value [Scale: 1000; Units: m; 0 if above water].
-//
+// NextStopDepthScaled return NextStopDepth in its scaled value.
 // If NextStopDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; 0 if above water
 func (m *Record) NextStopDepthScaled() float64 {
 	if m.NextStopDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1072,9 +1111,10 @@ func (m *Record) NextStopDepthScaled() float64 {
 	return scaleoffset.Apply(m.NextStopDepth, 1000, 0)
 }
 
-// EnhancedRespirationRateScaled return EnhancedRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
+// EnhancedRespirationRateScaled return EnhancedRespirationRate in its scaled value.
 // If EnhancedRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: Breaths/min
 func (m *Record) EnhancedRespirationRateScaled() float64 {
 	if m.EnhancedRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1082,9 +1122,10 @@ func (m *Record) EnhancedRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedRespirationRate, 100, 0)
 }
 
-// CurrentStressScaled return CurrentStress in its scaled value [Scale: 100; Current Stress value].
-//
+// CurrentStressScaled return CurrentStress in its scaled value.
 // If CurrentStress value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Current Stress value
 func (m *Record) CurrentStressScaled() float64 {
 	if m.CurrentStress == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1092,9 +1133,10 @@ func (m *Record) CurrentStressScaled() float64 {
 	return scaleoffset.Apply(m.CurrentStress, 100, 0)
 }
 
-// PressureSacScaled return PressureSac in its scaled value [Scale: 100; Units: bar/min; Pressure-based surface air consumption].
-//
+// PressureSacScaled return PressureSac in its scaled value.
 // If PressureSac value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: bar/min; Pressure-based surface air consumption
 func (m *Record) PressureSacScaled() float64 {
 	if m.PressureSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1102,9 +1144,10 @@ func (m *Record) PressureSacScaled() float64 {
 	return scaleoffset.Apply(m.PressureSac, 100, 0)
 }
 
-// VolumeSacScaled return VolumeSac in its scaled value [Scale: 100; Units: L/min; Volumetric surface air consumption].
-//
+// VolumeSacScaled return VolumeSac in its scaled value.
 // If VolumeSac value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: L/min; Volumetric surface air consumption
 func (m *Record) VolumeSacScaled() float64 {
 	if m.VolumeSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1112,9 +1155,10 @@ func (m *Record) VolumeSacScaled() float64 {
 	return scaleoffset.Apply(m.VolumeSac, 100, 0)
 }
 
-// RmvScaled return Rmv in its scaled value [Scale: 100; Units: L/min; Respiratory minute volume].
-//
+// RmvScaled return Rmv in its scaled value.
 // If Rmv value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: L/min; Respiratory minute volume
 func (m *Record) RmvScaled() float64 {
 	if m.Rmv == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1122,9 +1166,10 @@ func (m *Record) RmvScaled() float64 {
 	return scaleoffset.Apply(m.Rmv, 100, 0)
 }
 
-// AscentRateScaled return AscentRate in its scaled value [Scale: 1000; Units: m/s].
-//
+// AscentRateScaled return AscentRate in its scaled value.
 // If AscentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Record) AscentRateScaled() float64 {
 	if m.AscentRate == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1132,9 +1177,10 @@ func (m *Record) AscentRateScaled() float64 {
 	return scaleoffset.Apply(m.AscentRate, 1000, 0)
 }
 
-// Po2Scaled return Po2 in its scaled value [Scale: 100; Units: percent; Current partial pressure of oxygen].
-//
+// Po2Scaled return Po2 in its scaled value.
 // If Po2 value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent; Current partial pressure of oxygen
 func (m *Record) Po2Scaled() float64 {
 	if m.Po2 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1142,9 +1188,10 @@ func (m *Record) Po2Scaled() float64 {
 	return scaleoffset.Apply(m.Po2, 100, 0)
 }
 
-// CoreTemperatureScaled return CoreTemperature in its scaled value [Scale: 100; Units: C].
-//
+// CoreTemperatureScaled return CoreTemperature in its scaled value.
 // If CoreTemperature value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: C
 func (m *Record) CoreTemperatureScaled() float64 {
 	if m.CoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -1170,7 +1217,7 @@ func (m *Record) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetTimestamp sets Record value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *Record) SetTimestamp(v time.Time) *Record {
@@ -1178,7 +1225,7 @@ func (m *Record) SetTimestamp(v time.Time) *Record {
 	return m
 }
 
-// SetPositionLat sets Record value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *Record) SetPositionLat(v int32) *Record {
@@ -1186,7 +1233,14 @@ func (m *Record) SetPositionLat(v int32) *Record {
 	return m
 }
 
-// SetPositionLong sets Record value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Record) SetPositionLatDegrees(degrees float64) *Record {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *Record) SetPositionLong(v int32) *Record {
@@ -1194,7 +1248,14 @@ func (m *Record) SetPositionLong(v int32) *Record {
 	return m
 }
 
-// SetAltitude sets Record value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Record) SetPositionLongDegrees(degrees float64) *Record {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetAltitude sets Altitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Record) SetAltitude(v uint16) *Record {
@@ -1202,7 +1263,16 @@ func (m *Record) SetAltitude(v uint16) *Record {
 	return m
 }
 
-// SetHeartRate sets Record value.
+// SetAltitudeScaled is similar to SetAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Record) SetAltitudeScaled(v float64) *Record {
+	m.Altitude = uint16(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetHeartRate sets HeartRate value.
 //
 // Units: bpm
 func (m *Record) SetHeartRate(v uint8) *Record {
@@ -1210,7 +1280,7 @@ func (m *Record) SetHeartRate(v uint8) *Record {
 	return m
 }
 
-// SetCadence sets Record value.
+// SetCadence sets Cadence value.
 //
 // Units: rpm
 func (m *Record) SetCadence(v uint8) *Record {
@@ -1218,7 +1288,7 @@ func (m *Record) SetCadence(v uint8) *Record {
 	return m
 }
 
-// SetDistance sets Record value.
+// SetDistance sets Distance value.
 //
 // Scale: 100; Units: m
 func (m *Record) SetDistance(v uint32) *Record {
@@ -1226,7 +1296,16 @@ func (m *Record) SetDistance(v uint32) *Record {
 	return m
 }
 
-// SetSpeed sets Record value.
+// SetDistanceScaled is similar to SetDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Record) SetDistanceScaled(v float64) *Record {
+	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetSpeed sets Speed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetSpeed(v uint16) *Record {
@@ -1234,7 +1313,16 @@ func (m *Record) SetSpeed(v uint16) *Record {
 	return m
 }
 
-// SetPower sets Record value.
+// SetSpeedScaled is similar to SetSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Record) SetSpeedScaled(v float64) *Record {
+	m.Speed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetPower sets Power value.
 //
 // Units: watts
 func (m *Record) SetPower(v uint16) *Record {
@@ -1242,7 +1330,7 @@ func (m *Record) SetPower(v uint16) *Record {
 	return m
 }
 
-// SetCompressedSpeedDistance sets Record value.
+// SetCompressedSpeedDistance sets CompressedSpeedDistance value.
 //
 // Array: [3]; Units: m/s,m
 func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
@@ -1250,7 +1338,7 @@ func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
 	return m
 }
 
-// SetGrade sets Record value.
+// SetGrade sets Grade value.
 //
 // Scale: 100; Units: %
 func (m *Record) SetGrade(v int16) *Record {
@@ -1258,7 +1346,16 @@ func (m *Record) SetGrade(v int16) *Record {
 	return m
 }
 
-// SetResistance sets Record value.
+// SetGradeScaled is similar to SetGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Record) SetGradeScaled(v float64) *Record {
+	m.Grade = int16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetResistance sets Resistance value.
 //
 // Relative. 0 is none 254 is Max.
 func (m *Record) SetResistance(v uint8) *Record {
@@ -1266,7 +1363,7 @@ func (m *Record) SetResistance(v uint8) *Record {
 	return m
 }
 
-// SetTimeFromCourse sets Record value.
+// SetTimeFromCourse sets TimeFromCourse value.
 //
 // Scale: 1000; Units: s
 func (m *Record) SetTimeFromCourse(v int32) *Record {
@@ -1274,7 +1371,16 @@ func (m *Record) SetTimeFromCourse(v int32) *Record {
 	return m
 }
 
-// SetCycleLength sets Record value.
+// SetTimeFromCourseScaled is similar to SetTimeFromCourse except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Record) SetTimeFromCourseScaled(v float64) *Record {
+	m.TimeFromCourse = int32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetCycleLength sets CycleLength value.
 //
 // Scale: 100; Units: m
 func (m *Record) SetCycleLength(v uint8) *Record {
@@ -1282,7 +1388,16 @@ func (m *Record) SetCycleLength(v uint8) *Record {
 	return m
 }
 
-// SetTemperature sets Record value.
+// SetCycleLengthScaled is similar to SetCycleLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Record) SetCycleLengthScaled(v float64) *Record {
+	m.CycleLength = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTemperature sets Temperature value.
 //
 // Units: C
 func (m *Record) SetTemperature(v int8) *Record {
@@ -1290,7 +1405,7 @@ func (m *Record) SetTemperature(v int8) *Record {
 	return m
 }
 
-// SetSpeed1S sets Record value.
+// SetSpeed1S sets Speed1S value.
 //
 // Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
 func (m *Record) SetSpeed1S(v []uint8) *Record {
@@ -1298,7 +1413,16 @@ func (m *Record) SetSpeed1S(v []uint8) *Record {
 	return m
 }
 
-// SetCycles sets Record value.
+// SetSpeed1SScaled is similar to SetSpeed1S except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
+func (m *Record) SetSpeed1SScaled(vs []float64) *Record {
+	m.Speed1S = scaleoffset.DiscardSlice[uint8](vs, 16, 0)
+	return m
+}
+
+// SetCycles sets Cycles value.
 //
 // Units: cycles
 func (m *Record) SetCycles(v uint8) *Record {
@@ -1306,7 +1430,7 @@ func (m *Record) SetCycles(v uint8) *Record {
 	return m
 }
 
-// SetTotalCycles sets Record value.
+// SetTotalCycles sets TotalCycles value.
 //
 // Units: cycles
 func (m *Record) SetTotalCycles(v uint32) *Record {
@@ -1314,7 +1438,7 @@ func (m *Record) SetTotalCycles(v uint32) *Record {
 	return m
 }
 
-// SetCompressedAccumulatedPower sets Record value.
+// SetCompressedAccumulatedPower sets CompressedAccumulatedPower value.
 //
 // Units: watts
 func (m *Record) SetCompressedAccumulatedPower(v uint16) *Record {
@@ -1322,7 +1446,7 @@ func (m *Record) SetCompressedAccumulatedPower(v uint16) *Record {
 	return m
 }
 
-// SetAccumulatedPower sets Record value.
+// SetAccumulatedPower sets AccumulatedPower value.
 //
 // Units: watts
 func (m *Record) SetAccumulatedPower(v uint32) *Record {
@@ -1330,13 +1454,13 @@ func (m *Record) SetAccumulatedPower(v uint32) *Record {
 	return m
 }
 
-// SetLeftRightBalance sets Record value.
+// SetLeftRightBalance sets LeftRightBalance value.
 func (m *Record) SetLeftRightBalance(v typedef.LeftRightBalance) *Record {
 	m.LeftRightBalance = v
 	return m
 }
 
-// SetGpsAccuracy sets Record value.
+// SetGpsAccuracy sets GpsAccuracy value.
 //
 // Units: m
 func (m *Record) SetGpsAccuracy(v uint8) *Record {
@@ -1344,7 +1468,7 @@ func (m *Record) SetGpsAccuracy(v uint8) *Record {
 	return m
 }
 
-// SetVerticalSpeed sets Record value.
+// SetVerticalSpeed sets VerticalSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetVerticalSpeed(v int16) *Record {
@@ -1352,7 +1476,16 @@ func (m *Record) SetVerticalSpeed(v int16) *Record {
 	return m
 }
 
-// SetCalories sets Record value.
+// SetVerticalSpeedScaled is similar to SetVerticalSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Record) SetVerticalSpeedScaled(v float64) *Record {
+	m.VerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetCalories sets Calories value.
 //
 // Units: kcal
 func (m *Record) SetCalories(v uint16) *Record {
@@ -1360,7 +1493,7 @@ func (m *Record) SetCalories(v uint16) *Record {
 	return m
 }
 
-// SetVerticalOscillation sets Record value.
+// SetVerticalOscillation sets VerticalOscillation value.
 //
 // Scale: 10; Units: mm
 func (m *Record) SetVerticalOscillation(v uint16) *Record {
@@ -1368,7 +1501,16 @@ func (m *Record) SetVerticalOscillation(v uint16) *Record {
 	return m
 }
 
-// SetStanceTimePercent sets Record value.
+// SetVerticalOscillationScaled is similar to SetVerticalOscillation except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Record) SetVerticalOscillationScaled(v float64) *Record {
+	m.VerticalOscillation = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetStanceTimePercent sets StanceTimePercent value.
 //
 // Scale: 100; Units: percent
 func (m *Record) SetStanceTimePercent(v uint16) *Record {
@@ -1376,7 +1518,16 @@ func (m *Record) SetStanceTimePercent(v uint16) *Record {
 	return m
 }
 
-// SetStanceTime sets Record value.
+// SetStanceTimePercentScaled is similar to SetStanceTimePercent except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Record) SetStanceTimePercentScaled(v float64) *Record {
+	m.StanceTimePercent = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetStanceTime sets StanceTime value.
 //
 // Scale: 10; Units: ms
 func (m *Record) SetStanceTime(v uint16) *Record {
@@ -1384,13 +1535,22 @@ func (m *Record) SetStanceTime(v uint16) *Record {
 	return m
 }
 
-// SetActivityType sets Record value.
+// SetStanceTimeScaled is similar to SetStanceTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: ms
+func (m *Record) SetStanceTimeScaled(v float64) *Record {
+	m.StanceTime = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetActivityType sets ActivityType value.
 func (m *Record) SetActivityType(v typedef.ActivityType) *Record {
 	m.ActivityType = v
 	return m
 }
 
-// SetLeftTorqueEffectiveness sets Record value.
+// SetLeftTorqueEffectiveness sets LeftTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
@@ -1398,7 +1558,16 @@ func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
 	return m
 }
 
-// SetRightTorqueEffectiveness sets Record value.
+// SetLeftTorqueEffectivenessScaled is similar to SetLeftTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Record) SetLeftTorqueEffectivenessScaled(v float64) *Record {
+	m.LeftTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetRightTorqueEffectiveness sets RightTorqueEffectiveness value.
 //
 // Scale: 2; Units: percent
 func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
@@ -1406,7 +1575,16 @@ func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
 	return m
 }
 
-// SetLeftPedalSmoothness sets Record value.
+// SetRightTorqueEffectivenessScaled is similar to SetRightTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Record) SetRightTorqueEffectivenessScaled(v float64) *Record {
+	m.RightTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetLeftPedalSmoothness sets LeftPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
@@ -1414,7 +1592,16 @@ func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
 	return m
 }
 
-// SetRightPedalSmoothness sets Record value.
+// SetLeftPedalSmoothnessScaled is similar to SetLeftPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Record) SetLeftPedalSmoothnessScaled(v float64) *Record {
+	m.LeftPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetRightPedalSmoothness sets RightPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
@@ -1422,7 +1609,16 @@ func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
 	return m
 }
 
-// SetCombinedPedalSmoothness sets Record value.
+// SetRightPedalSmoothnessScaled is similar to SetRightPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Record) SetRightPedalSmoothnessScaled(v float64) *Record {
+	m.RightPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetCombinedPedalSmoothness sets CombinedPedalSmoothness value.
 //
 // Scale: 2; Units: percent
 func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
@@ -1430,7 +1626,16 @@ func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
 	return m
 }
 
-// SetTime128 sets Record value.
+// SetCombinedPedalSmoothnessScaled is similar to SetCombinedPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Record) SetCombinedPedalSmoothnessScaled(v float64) *Record {
+	m.CombinedPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetTime128 sets Time128 value.
 //
 // Scale: 128; Units: s
 func (m *Record) SetTime128(v uint8) *Record {
@@ -1438,19 +1643,28 @@ func (m *Record) SetTime128(v uint8) *Record {
 	return m
 }
 
-// SetStrokeType sets Record value.
+// SetTime128Scaled is similar to SetTime128 except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: s
+func (m *Record) SetTime128Scaled(v float64) *Record {
+	m.Time128 = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetStrokeType sets StrokeType value.
 func (m *Record) SetStrokeType(v typedef.StrokeType) *Record {
 	m.StrokeType = v
 	return m
 }
 
-// SetZone sets Record value.
+// SetZone sets Zone value.
 func (m *Record) SetZone(v uint8) *Record {
 	m.Zone = v
 	return m
 }
 
-// SetBallSpeed sets Record value.
+// SetBallSpeed sets BallSpeed value.
 //
 // Scale: 100; Units: m/s
 func (m *Record) SetBallSpeed(v uint16) *Record {
@@ -1458,7 +1672,16 @@ func (m *Record) SetBallSpeed(v uint16) *Record {
 	return m
 }
 
-// SetCadence256 sets Record value.
+// SetBallSpeedScaled is similar to SetBallSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m/s
+func (m *Record) SetBallSpeedScaled(v float64) *Record {
+	m.BallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetCadence256 sets Cadence256 value.
 //
 // Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
 func (m *Record) SetCadence256(v uint16) *Record {
@@ -1466,7 +1689,16 @@ func (m *Record) SetCadence256(v uint16) *Record {
 	return m
 }
 
-// SetFractionalCadence sets Record value.
+// SetCadence256Scaled is similar to SetCadence256 except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
+func (m *Record) SetCadence256Scaled(v float64) *Record {
+	m.Cadence256 = uint16(scaleoffset.Discard(v, 256, 0))
+	return m
+}
+
+// SetFractionalCadence sets FractionalCadence value.
 //
 // Scale: 128; Units: rpm
 func (m *Record) SetFractionalCadence(v uint8) *Record {
@@ -1474,7 +1706,16 @@ func (m *Record) SetFractionalCadence(v uint8) *Record {
 	return m
 }
 
-// SetTotalHemoglobinConc sets Record value.
+// SetFractionalCadenceScaled is similar to SetFractionalCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm
+func (m *Record) SetFractionalCadenceScaled(v float64) *Record {
+	m.FractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	return m
+}
+
+// SetTotalHemoglobinConc sets TotalHemoglobinConc value.
 //
 // Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConc(v uint16) *Record {
@@ -1482,7 +1723,16 @@ func (m *Record) SetTotalHemoglobinConc(v uint16) *Record {
 	return m
 }
 
-// SetTotalHemoglobinConcMin sets Record value.
+// SetTotalHemoglobinConcScaled is similar to SetTotalHemoglobinConc except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConcScaled(v float64) *Record {
+	m.TotalHemoglobinConc = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalHemoglobinConcMin sets TotalHemoglobinConcMin value.
 //
 // Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConcMin(v uint16) *Record {
@@ -1490,7 +1740,16 @@ func (m *Record) SetTotalHemoglobinConcMin(v uint16) *Record {
 	return m
 }
 
-// SetTotalHemoglobinConcMax sets Record value.
+// SetTotalHemoglobinConcMinScaled is similar to SetTotalHemoglobinConcMin except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConcMinScaled(v float64) *Record {
+	m.TotalHemoglobinConcMin = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetTotalHemoglobinConcMax sets TotalHemoglobinConcMax value.
 //
 // Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConcMax(v uint16) *Record {
@@ -1498,7 +1757,16 @@ func (m *Record) SetTotalHemoglobinConcMax(v uint16) *Record {
 	return m
 }
 
-// SetSaturatedHemoglobinPercent sets Record value.
+// SetTotalHemoglobinConcMaxScaled is similar to SetTotalHemoglobinConcMax except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
+func (m *Record) SetTotalHemoglobinConcMaxScaled(v float64) *Record {
+	m.TotalHemoglobinConcMax = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetSaturatedHemoglobinPercent sets SaturatedHemoglobinPercent value.
 //
 // Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercent(v uint16) *Record {
@@ -1506,7 +1774,16 @@ func (m *Record) SetSaturatedHemoglobinPercent(v uint16) *Record {
 	return m
 }
 
-// SetSaturatedHemoglobinPercentMin sets Record value.
+// SetSaturatedHemoglobinPercentScaled is similar to SetSaturatedHemoglobinPercent except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercentScaled(v float64) *Record {
+	m.SaturatedHemoglobinPercent = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetSaturatedHemoglobinPercentMin sets SaturatedHemoglobinPercentMin value.
 //
 // Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercentMin(v uint16) *Record {
@@ -1514,7 +1791,16 @@ func (m *Record) SetSaturatedHemoglobinPercentMin(v uint16) *Record {
 	return m
 }
 
-// SetSaturatedHemoglobinPercentMax sets Record value.
+// SetSaturatedHemoglobinPercentMinScaled is similar to SetSaturatedHemoglobinPercentMin except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercentMinScaled(v float64) *Record {
+	m.SaturatedHemoglobinPercentMin = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetSaturatedHemoglobinPercentMax sets SaturatedHemoglobinPercentMax value.
 //
 // Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercentMax(v uint16) *Record {
@@ -1522,13 +1808,22 @@ func (m *Record) SetSaturatedHemoglobinPercentMax(v uint16) *Record {
 	return m
 }
 
-// SetDeviceIndex sets Record value.
+// SetSaturatedHemoglobinPercentMaxScaled is similar to SetSaturatedHemoglobinPercentMax except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
+func (m *Record) SetSaturatedHemoglobinPercentMaxScaled(v float64) *Record {
+	m.SaturatedHemoglobinPercentMax = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetDeviceIndex sets DeviceIndex value.
 func (m *Record) SetDeviceIndex(v typedef.DeviceIndex) *Record {
 	m.DeviceIndex = v
 	return m
 }
 
-// SetLeftPco sets Record value.
+// SetLeftPco sets LeftPco value.
 //
 // Units: mm; Left platform center offset
 func (m *Record) SetLeftPco(v int8) *Record {
@@ -1536,7 +1831,7 @@ func (m *Record) SetLeftPco(v int8) *Record {
 	return m
 }
 
-// SetRightPco sets Record value.
+// SetRightPco sets RightPco value.
 //
 // Units: mm; Right platform center offset
 func (m *Record) SetRightPco(v int8) *Record {
@@ -1544,7 +1839,7 @@ func (m *Record) SetRightPco(v int8) *Record {
 	return m
 }
 
-// SetLeftPowerPhase sets Record value.
+// SetLeftPowerPhase sets LeftPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetLeftPowerPhase(v []uint8) *Record {
@@ -1552,7 +1847,16 @@ func (m *Record) SetLeftPowerPhase(v []uint8) *Record {
 	return m
 }
 
-// SetLeftPowerPhasePeak sets Record value.
+// SetLeftPowerPhaseScaled is similar to SetLeftPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetLeftPowerPhaseScaled(vs []float64) *Record {
+	m.LeftPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetLeftPowerPhasePeak sets LeftPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetLeftPowerPhasePeak(v []uint8) *Record {
@@ -1560,7 +1864,16 @@ func (m *Record) SetLeftPowerPhasePeak(v []uint8) *Record {
 	return m
 }
 
-// SetRightPowerPhase sets Record value.
+// SetLeftPowerPhasePeakScaled is similar to SetLeftPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetLeftPowerPhasePeakScaled(vs []float64) *Record {
+	m.LeftPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetRightPowerPhase sets RightPowerPhase value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetRightPowerPhase(v []uint8) *Record {
@@ -1568,7 +1881,16 @@ func (m *Record) SetRightPowerPhase(v []uint8) *Record {
 	return m
 }
 
-// SetRightPowerPhasePeak sets Record value.
+// SetRightPowerPhaseScaled is similar to SetRightPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetRightPowerPhaseScaled(vs []float64) *Record {
+	m.RightPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetRightPowerPhasePeak sets RightPowerPhasePeak value.
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetRightPowerPhasePeak(v []uint8) *Record {
@@ -1576,7 +1898,16 @@ func (m *Record) SetRightPowerPhasePeak(v []uint8) *Record {
 	return m
 }
 
-// SetEnhancedSpeed sets Record value.
+// SetRightPowerPhasePeakScaled is similar to SetRightPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Record) SetRightPowerPhasePeakScaled(vs []float64) *Record {
+	m.RightPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	return m
+}
+
+// SetEnhancedSpeed sets EnhancedSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetEnhancedSpeed(v uint32) *Record {
@@ -1584,7 +1915,16 @@ func (m *Record) SetEnhancedSpeed(v uint32) *Record {
 	return m
 }
 
-// SetEnhancedAltitude sets Record value.
+// SetEnhancedSpeedScaled is similar to SetEnhancedSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Record) SetEnhancedSpeedScaled(v float64) *Record {
+	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetEnhancedAltitude sets EnhancedAltitude value.
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Record) SetEnhancedAltitude(v uint32) *Record {
@@ -1592,7 +1932,16 @@ func (m *Record) SetEnhancedAltitude(v uint32) *Record {
 	return m
 }
 
-// SetBatterySoc sets Record value.
+// SetEnhancedAltitudeScaled is similar to SetEnhancedAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 5; Offset: 500; Units: m
+func (m *Record) SetEnhancedAltitudeScaled(v float64) *Record {
+	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	return m
+}
+
+// SetBatterySoc sets BatterySoc value.
 //
 // Scale: 2; Units: percent; lev battery state of charge
 func (m *Record) SetBatterySoc(v uint8) *Record {
@@ -1600,7 +1949,16 @@ func (m *Record) SetBatterySoc(v uint8) *Record {
 	return m
 }
 
-// SetMotorPower sets Record value.
+// SetBatterySocScaled is similar to SetBatterySoc except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent; lev battery state of charge
+func (m *Record) SetBatterySocScaled(v float64) *Record {
+	m.BatterySoc = uint8(scaleoffset.Discard(v, 2, 0))
+	return m
+}
+
+// SetMotorPower sets MotorPower value.
 //
 // Units: watts; lev motor power
 func (m *Record) SetMotorPower(v uint16) *Record {
@@ -1608,7 +1966,7 @@ func (m *Record) SetMotorPower(v uint16) *Record {
 	return m
 }
 
-// SetVerticalRatio sets Record value.
+// SetVerticalRatio sets VerticalRatio value.
 //
 // Scale: 100; Units: percent
 func (m *Record) SetVerticalRatio(v uint16) *Record {
@@ -1616,7 +1974,16 @@ func (m *Record) SetVerticalRatio(v uint16) *Record {
 	return m
 }
 
-// SetStanceTimeBalance sets Record value.
+// SetVerticalRatioScaled is similar to SetVerticalRatio except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Record) SetVerticalRatioScaled(v float64) *Record {
+	m.VerticalRatio = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetStanceTimeBalance sets StanceTimeBalance value.
 //
 // Scale: 100; Units: percent
 func (m *Record) SetStanceTimeBalance(v uint16) *Record {
@@ -1624,7 +1991,16 @@ func (m *Record) SetStanceTimeBalance(v uint16) *Record {
 	return m
 }
 
-// SetStepLength sets Record value.
+// SetStanceTimeBalanceScaled is similar to SetStanceTimeBalance except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Record) SetStanceTimeBalanceScaled(v float64) *Record {
+	m.StanceTimeBalance = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetStepLength sets StepLength value.
 //
 // Scale: 10; Units: mm
 func (m *Record) SetStepLength(v uint16) *Record {
@@ -1632,7 +2008,16 @@ func (m *Record) SetStepLength(v uint16) *Record {
 	return m
 }
 
-// SetCycleLength16 sets Record value.
+// SetStepLengthScaled is similar to SetStepLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Record) SetStepLengthScaled(v float64) *Record {
+	m.StepLength = uint16(scaleoffset.Discard(v, 10, 0))
+	return m
+}
+
+// SetCycleLength16 sets CycleLength16 value.
 //
 // Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
 func (m *Record) SetCycleLength16(v uint16) *Record {
@@ -1640,7 +2025,16 @@ func (m *Record) SetCycleLength16(v uint16) *Record {
 	return m
 }
 
-// SetAbsolutePressure sets Record value.
+// SetCycleLength16Scaled is similar to SetCycleLength16 except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
+func (m *Record) SetCycleLength16Scaled(v float64) *Record {
+	m.CycleLength16 = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAbsolutePressure sets AbsolutePressure value.
 //
 // Units: Pa; Includes atmospheric pressure
 func (m *Record) SetAbsolutePressure(v uint32) *Record {
@@ -1648,7 +2042,7 @@ func (m *Record) SetAbsolutePressure(v uint32) *Record {
 	return m
 }
 
-// SetDepth sets Record value.
+// SetDepth sets Depth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Record) SetDepth(v uint32) *Record {
@@ -1656,7 +2050,16 @@ func (m *Record) SetDepth(v uint32) *Record {
 	return m
 }
 
-// SetNextStopDepth sets Record value.
+// SetDepthScaled is similar to SetDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Record) SetDepthScaled(v float64) *Record {
+	m.Depth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetNextStopDepth sets NextStopDepth value.
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Record) SetNextStopDepth(v uint32) *Record {
@@ -1664,7 +2067,16 @@ func (m *Record) SetNextStopDepth(v uint32) *Record {
 	return m
 }
 
-// SetNextStopTime sets Record value.
+// SetNextStopDepthScaled is similar to SetNextStopDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; 0 if above water
+func (m *Record) SetNextStopDepthScaled(v float64) *Record {
+	m.NextStopDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetNextStopTime sets NextStopTime value.
 //
 // Units: s
 func (m *Record) SetNextStopTime(v uint32) *Record {
@@ -1672,7 +2084,7 @@ func (m *Record) SetNextStopTime(v uint32) *Record {
 	return m
 }
 
-// SetTimeToSurface sets Record value.
+// SetTimeToSurface sets TimeToSurface value.
 //
 // Units: s
 func (m *Record) SetTimeToSurface(v uint32) *Record {
@@ -1680,7 +2092,7 @@ func (m *Record) SetTimeToSurface(v uint32) *Record {
 	return m
 }
 
-// SetNdlTime sets Record value.
+// SetNdlTime sets NdlTime value.
 //
 // Units: s
 func (m *Record) SetNdlTime(v uint32) *Record {
@@ -1688,7 +2100,7 @@ func (m *Record) SetNdlTime(v uint32) *Record {
 	return m
 }
 
-// SetCnsLoad sets Record value.
+// SetCnsLoad sets CnsLoad value.
 //
 // Units: percent
 func (m *Record) SetCnsLoad(v uint8) *Record {
@@ -1696,7 +2108,7 @@ func (m *Record) SetCnsLoad(v uint8) *Record {
 	return m
 }
 
-// SetN2Load sets Record value.
+// SetN2Load sets N2Load value.
 //
 // Units: percent
 func (m *Record) SetN2Load(v uint16) *Record {
@@ -1704,7 +2116,7 @@ func (m *Record) SetN2Load(v uint16) *Record {
 	return m
 }
 
-// SetRespirationRate sets Record value.
+// SetRespirationRate sets RespirationRate value.
 //
 // Units: s
 func (m *Record) SetRespirationRate(v uint8) *Record {
@@ -1712,7 +2124,7 @@ func (m *Record) SetRespirationRate(v uint8) *Record {
 	return m
 }
 
-// SetEnhancedRespirationRate sets Record value.
+// SetEnhancedRespirationRate sets EnhancedRespirationRate value.
 //
 // Scale: 100; Units: Breaths/min
 func (m *Record) SetEnhancedRespirationRate(v uint16) *Record {
@@ -1720,7 +2132,16 @@ func (m *Record) SetEnhancedRespirationRate(v uint16) *Record {
 	return m
 }
 
-// SetGrit sets Record value.
+// SetEnhancedRespirationRateScaled is similar to SetEnhancedRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Record) SetEnhancedRespirationRateScaled(v float64) *Record {
+	m.EnhancedRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetGrit sets Grit value.
 //
 // The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 func (m *Record) SetGrit(v float32) *Record {
@@ -1728,7 +2149,7 @@ func (m *Record) SetGrit(v float32) *Record {
 	return m
 }
 
-// SetFlow sets Record value.
+// SetFlow sets Flow value.
 //
 // The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *Record) SetFlow(v float32) *Record {
@@ -1736,7 +2157,7 @@ func (m *Record) SetFlow(v float32) *Record {
 	return m
 }
 
-// SetCurrentStress sets Record value.
+// SetCurrentStress sets CurrentStress value.
 //
 // Scale: 100; Current Stress value
 func (m *Record) SetCurrentStress(v uint16) *Record {
@@ -1744,7 +2165,16 @@ func (m *Record) SetCurrentStress(v uint16) *Record {
 	return m
 }
 
-// SetEbikeTravelRange sets Record value.
+// SetCurrentStressScaled is similar to SetCurrentStress except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Current Stress value
+func (m *Record) SetCurrentStressScaled(v float64) *Record {
+	m.CurrentStress = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEbikeTravelRange sets EbikeTravelRange value.
 //
 // Units: km
 func (m *Record) SetEbikeTravelRange(v uint16) *Record {
@@ -1752,7 +2182,7 @@ func (m *Record) SetEbikeTravelRange(v uint16) *Record {
 	return m
 }
 
-// SetEbikeBatteryLevel sets Record value.
+// SetEbikeBatteryLevel sets EbikeBatteryLevel value.
 //
 // Units: percent
 func (m *Record) SetEbikeBatteryLevel(v uint8) *Record {
@@ -1760,7 +2190,7 @@ func (m *Record) SetEbikeBatteryLevel(v uint8) *Record {
 	return m
 }
 
-// SetEbikeAssistMode sets Record value.
+// SetEbikeAssistMode sets EbikeAssistMode value.
 //
 // Units: depends on sensor
 func (m *Record) SetEbikeAssistMode(v uint8) *Record {
@@ -1768,7 +2198,7 @@ func (m *Record) SetEbikeAssistMode(v uint8) *Record {
 	return m
 }
 
-// SetEbikeAssistLevelPercent sets Record value.
+// SetEbikeAssistLevelPercent sets EbikeAssistLevelPercent value.
 //
 // Units: percent
 func (m *Record) SetEbikeAssistLevelPercent(v uint8) *Record {
@@ -1776,7 +2206,7 @@ func (m *Record) SetEbikeAssistLevelPercent(v uint8) *Record {
 	return m
 }
 
-// SetAirTimeRemaining sets Record value.
+// SetAirTimeRemaining sets AirTimeRemaining value.
 //
 // Units: s
 func (m *Record) SetAirTimeRemaining(v uint32) *Record {
@@ -1784,7 +2214,7 @@ func (m *Record) SetAirTimeRemaining(v uint32) *Record {
 	return m
 }
 
-// SetPressureSac sets Record value.
+// SetPressureSac sets PressureSac value.
 //
 // Scale: 100; Units: bar/min; Pressure-based surface air consumption
 func (m *Record) SetPressureSac(v uint16) *Record {
@@ -1792,7 +2222,16 @@ func (m *Record) SetPressureSac(v uint16) *Record {
 	return m
 }
 
-// SetVolumeSac sets Record value.
+// SetPressureSacScaled is similar to SetPressureSac except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: bar/min; Pressure-based surface air consumption
+func (m *Record) SetPressureSacScaled(v float64) *Record {
+	m.PressureSac = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetVolumeSac sets VolumeSac value.
 //
 // Scale: 100; Units: L/min; Volumetric surface air consumption
 func (m *Record) SetVolumeSac(v uint16) *Record {
@@ -1800,7 +2239,16 @@ func (m *Record) SetVolumeSac(v uint16) *Record {
 	return m
 }
 
-// SetRmv sets Record value.
+// SetVolumeSacScaled is similar to SetVolumeSac except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: L/min; Volumetric surface air consumption
+func (m *Record) SetVolumeSacScaled(v float64) *Record {
+	m.VolumeSac = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetRmv sets Rmv value.
 //
 // Scale: 100; Units: L/min; Respiratory minute volume
 func (m *Record) SetRmv(v uint16) *Record {
@@ -1808,7 +2256,16 @@ func (m *Record) SetRmv(v uint16) *Record {
 	return m
 }
 
-// SetAscentRate sets Record value.
+// SetRmvScaled is similar to SetRmv except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: L/min; Respiratory minute volume
+func (m *Record) SetRmvScaled(v float64) *Record {
+	m.Rmv = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAscentRate sets AscentRate value.
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetAscentRate(v int32) *Record {
@@ -1816,7 +2273,16 @@ func (m *Record) SetAscentRate(v int32) *Record {
 	return m
 }
 
-// SetPo2 sets Record value.
+// SetAscentRateScaled is similar to SetAscentRate except it accepts a scaled value.
+// This method automatically converts the given value to its int32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Record) SetAscentRateScaled(v float64) *Record {
+	m.AscentRate = int32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetPo2 sets Po2 value.
 //
 // Scale: 100; Units: percent; Current partial pressure of oxygen
 func (m *Record) SetPo2(v uint8) *Record {
@@ -1824,11 +2290,29 @@ func (m *Record) SetPo2(v uint8) *Record {
 	return m
 }
 
-// SetCoreTemperature sets Record value.
+// SetPo2Scaled is similar to SetPo2 except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent; Current partial pressure of oxygen
+func (m *Record) SetPo2Scaled(v float64) *Record {
+	m.Po2 = uint8(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetCoreTemperature sets CoreTemperature value.
 //
 // Scale: 100; Units: C
 func (m *Record) SetCoreTemperature(v uint16) *Record {
 	m.CoreTemperature = v
+	return m
+}
+
+// SetCoreTemperatureScaled is similar to SetCoreTemperature except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: C
+func (m *Record) SetCoreTemperatureScaled(v float64) *Record {
+	m.CoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 

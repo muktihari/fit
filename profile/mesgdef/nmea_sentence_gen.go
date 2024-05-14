@@ -97,7 +97,7 @@ func (m *NmeaSentence) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *NmeaSentence) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets NmeaSentence value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Timestamp message was output
 func (m *NmeaSentence) SetTimestamp(v time.Time) *NmeaSentence {
@@ -105,7 +105,7 @@ func (m *NmeaSentence) SetTimestamp(v time.Time) *NmeaSentence {
 	return m
 }
 
-// SetTimestampMs sets NmeaSentence value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Fractional part of timestamp, added to timestamp
 func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
@@ -113,7 +113,7 @@ func (m *NmeaSentence) SetTimestampMs(v uint16) *NmeaSentence {
 	return m
 }
 
-// SetSentence sets NmeaSentence value.
+// SetSentence sets Sentence value.
 //
 // NMEA sentence
 func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {

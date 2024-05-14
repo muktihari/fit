@@ -104,7 +104,7 @@ func (m *Spo2Data) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Spo2Data) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets Spo2Data value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *Spo2Data) SetTimestamp(v time.Time) *Spo2Data {
@@ -112,7 +112,7 @@ func (m *Spo2Data) SetTimestamp(v time.Time) *Spo2Data {
 	return m
 }
 
-// SetReadingSpo2 sets Spo2Data value.
+// SetReadingSpo2 sets ReadingSpo2 value.
 //
 // Units: percent
 func (m *Spo2Data) SetReadingSpo2(v uint8) *Spo2Data {
@@ -120,13 +120,13 @@ func (m *Spo2Data) SetReadingSpo2(v uint8) *Spo2Data {
 	return m
 }
 
-// SetReadingConfidence sets Spo2Data value.
+// SetReadingConfidence sets ReadingConfidence value.
 func (m *Spo2Data) SetReadingConfidence(v uint8) *Spo2Data {
 	m.ReadingConfidence = v
 	return m
 }
 
-// SetMode sets Spo2Data value.
+// SetMode sets Mode value.
 //
 // Mode when data was captured
 func (m *Spo2Data) SetMode(v typedef.Spo2MeasurementType) *Spo2Data {

@@ -122,9 +122,10 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// PoolLengthScaled return PoolLength in its scaled value [Scale: 100; Units: m].
-//
+// PoolLengthScaled return PoolLength in its scaled value.
 // If PoolLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
 func (m *WorkoutSession) PoolLengthScaled() float64 {
 	if m.PoolLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -132,37 +133,37 @@ func (m *WorkoutSession) PoolLengthScaled() float64 {
 	return scaleoffset.Apply(m.PoolLength, 100, 0)
 }
 
-// SetMessageIndex sets WorkoutSession value.
+// SetMessageIndex sets MessageIndex value.
 func (m *WorkoutSession) SetMessageIndex(v typedef.MessageIndex) *WorkoutSession {
 	m.MessageIndex = v
 	return m
 }
 
-// SetSport sets WorkoutSession value.
+// SetSport sets Sport value.
 func (m *WorkoutSession) SetSport(v typedef.Sport) *WorkoutSession {
 	m.Sport = v
 	return m
 }
 
-// SetSubSport sets WorkoutSession value.
+// SetSubSport sets SubSport value.
 func (m *WorkoutSession) SetSubSport(v typedef.SubSport) *WorkoutSession {
 	m.SubSport = v
 	return m
 }
 
-// SetNumValidSteps sets WorkoutSession value.
+// SetNumValidSteps sets NumValidSteps value.
 func (m *WorkoutSession) SetNumValidSteps(v uint16) *WorkoutSession {
 	m.NumValidSteps = v
 	return m
 }
 
-// SetFirstStepIndex sets WorkoutSession value.
+// SetFirstStepIndex sets FirstStepIndex value.
 func (m *WorkoutSession) SetFirstStepIndex(v uint16) *WorkoutSession {
 	m.FirstStepIndex = v
 	return m
 }
 
-// SetPoolLength sets WorkoutSession value.
+// SetPoolLength sets PoolLength value.
 //
 // Scale: 100; Units: m
 func (m *WorkoutSession) SetPoolLength(v uint16) *WorkoutSession {
@@ -170,7 +171,16 @@ func (m *WorkoutSession) SetPoolLength(v uint16) *WorkoutSession {
 	return m
 }
 
-// SetPoolLengthUnit sets WorkoutSession value.
+// SetPoolLengthScaled is similar to SetPoolLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *WorkoutSession) SetPoolLengthScaled(v float64) *WorkoutSession {
+	m.PoolLength = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetPoolLengthUnit sets PoolLengthUnit value.
 func (m *WorkoutSession) SetPoolLengthUnit(v typedef.DisplayMeasure) *WorkoutSession {
 	m.PoolLengthUnit = v
 	return m

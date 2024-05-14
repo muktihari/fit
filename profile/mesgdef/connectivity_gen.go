@@ -162,7 +162,7 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetBluetoothEnabled sets Connectivity value.
+// SetBluetoothEnabled sets BluetoothEnabled value.
 //
 // Use Bluetooth for connectivity features
 func (m *Connectivity) SetBluetoothEnabled(v bool) *Connectivity {
@@ -170,7 +170,7 @@ func (m *Connectivity) SetBluetoothEnabled(v bool) *Connectivity {
 	return m
 }
 
-// SetBluetoothLeEnabled sets Connectivity value.
+// SetBluetoothLeEnabled sets BluetoothLeEnabled value.
 //
 // Use Bluetooth Low Energy for connectivity features
 func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
@@ -178,7 +178,7 @@ func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
 	return m
 }
 
-// SetAntEnabled sets Connectivity value.
+// SetAntEnabled sets AntEnabled value.
 //
 // Use ANT for connectivity features
 func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
@@ -186,61 +186,61 @@ func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
 	return m
 }
 
-// SetName sets Connectivity value.
+// SetName sets Name value.
 func (m *Connectivity) SetName(v string) *Connectivity {
 	m.Name = v
 	return m
 }
 
-// SetLiveTrackingEnabled sets Connectivity value.
+// SetLiveTrackingEnabled sets LiveTrackingEnabled value.
 func (m *Connectivity) SetLiveTrackingEnabled(v bool) *Connectivity {
 	m.LiveTrackingEnabled = v
 	return m
 }
 
-// SetWeatherConditionsEnabled sets Connectivity value.
+// SetWeatherConditionsEnabled sets WeatherConditionsEnabled value.
 func (m *Connectivity) SetWeatherConditionsEnabled(v bool) *Connectivity {
 	m.WeatherConditionsEnabled = v
 	return m
 }
 
-// SetWeatherAlertsEnabled sets Connectivity value.
+// SetWeatherAlertsEnabled sets WeatherAlertsEnabled value.
 func (m *Connectivity) SetWeatherAlertsEnabled(v bool) *Connectivity {
 	m.WeatherAlertsEnabled = v
 	return m
 }
 
-// SetAutoActivityUploadEnabled sets Connectivity value.
+// SetAutoActivityUploadEnabled sets AutoActivityUploadEnabled value.
 func (m *Connectivity) SetAutoActivityUploadEnabled(v bool) *Connectivity {
 	m.AutoActivityUploadEnabled = v
 	return m
 }
 
-// SetCourseDownloadEnabled sets Connectivity value.
+// SetCourseDownloadEnabled sets CourseDownloadEnabled value.
 func (m *Connectivity) SetCourseDownloadEnabled(v bool) *Connectivity {
 	m.CourseDownloadEnabled = v
 	return m
 }
 
-// SetWorkoutDownloadEnabled sets Connectivity value.
+// SetWorkoutDownloadEnabled sets WorkoutDownloadEnabled value.
 func (m *Connectivity) SetWorkoutDownloadEnabled(v bool) *Connectivity {
 	m.WorkoutDownloadEnabled = v
 	return m
 }
 
-// SetGpsEphemerisDownloadEnabled sets Connectivity value.
+// SetGpsEphemerisDownloadEnabled sets GpsEphemerisDownloadEnabled value.
 func (m *Connectivity) SetGpsEphemerisDownloadEnabled(v bool) *Connectivity {
 	m.GpsEphemerisDownloadEnabled = v
 	return m
 }
 
-// SetIncidentDetectionEnabled sets Connectivity value.
+// SetIncidentDetectionEnabled sets IncidentDetectionEnabled value.
 func (m *Connectivity) SetIncidentDetectionEnabled(v bool) *Connectivity {
 	m.IncidentDetectionEnabled = v
 	return m
 }
 
-// SetGrouptrackEnabled sets Connectivity value.
+// SetGrouptrackEnabled sets GrouptrackEnabled value.
 func (m *Connectivity) SetGrouptrackEnabled(v bool) *Connectivity {
 	m.GrouptrackEnabled = v
 	return m

@@ -92,19 +92,19 @@ func (m *Video) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetUrl sets Video value.
+// SetUrl sets Url value.
 func (m *Video) SetUrl(v string) *Video {
 	m.Url = v
 	return m
 }
 
-// SetHostingProvider sets Video value.
+// SetHostingProvider sets HostingProvider value.
 func (m *Video) SetHostingProvider(v string) *Video {
 	m.HostingProvider = v
 	return m
 }
 
-// SetDuration sets Video value.
+// SetDuration sets Duration value.
 //
 // Units: ms; Playback time of video
 func (m *Video) SetDuration(v uint32) *Video {

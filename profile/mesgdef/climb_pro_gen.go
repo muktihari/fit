@@ -145,7 +145,7 @@ func (m *ClimbPro) PositionLongDegrees() float64 {
 	return semicircles.ToDegrees(m.PositionLong)
 }
 
-// SetTimestamp sets ClimbPro value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *ClimbPro) SetTimestamp(v time.Time) *ClimbPro {
@@ -153,7 +153,7 @@ func (m *ClimbPro) SetTimestamp(v time.Time) *ClimbPro {
 	return m
 }
 
-// SetPositionLat sets ClimbPro value.
+// SetPositionLat sets PositionLat value.
 //
 // Units: semicircles
 func (m *ClimbPro) SetPositionLat(v int32) *ClimbPro {
@@ -161,7 +161,14 @@ func (m *ClimbPro) SetPositionLat(v int32) *ClimbPro {
 	return m
 }
 
-// SetPositionLong sets ClimbPro value.
+// SetPositionLatDegrees is similar to SetPositionLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *ClimbPro) SetPositionLatDegrees(degrees float64) *ClimbPro {
+	m.PositionLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetPositionLong sets PositionLong value.
 //
 // Units: semicircles
 func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
@@ -169,25 +176,32 @@ func (m *ClimbPro) SetPositionLong(v int32) *ClimbPro {
 	return m
 }
 
-// SetClimbProEvent sets ClimbPro value.
+// SetPositionLongDegrees is similar to SetPositionLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *ClimbPro) SetPositionLongDegrees(degrees float64) *ClimbPro {
+	m.PositionLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetClimbProEvent sets ClimbProEvent value.
 func (m *ClimbPro) SetClimbProEvent(v typedef.ClimbProEvent) *ClimbPro {
 	m.ClimbProEvent = v
 	return m
 }
 
-// SetClimbNumber sets ClimbPro value.
+// SetClimbNumber sets ClimbNumber value.
 func (m *ClimbPro) SetClimbNumber(v uint16) *ClimbPro {
 	m.ClimbNumber = v
 	return m
 }
 
-// SetClimbCategory sets ClimbPro value.
+// SetClimbCategory sets ClimbCategory value.
 func (m *ClimbPro) SetClimbCategory(v uint8) *ClimbPro {
 	m.ClimbCategory = v
 	return m
 }
 
-// SetCurrentDist sets ClimbPro value.
+// SetCurrentDist sets CurrentDist value.
 //
 // Units: m
 func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {

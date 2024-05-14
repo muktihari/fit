@@ -245,9 +245,10 @@ func (m *Length) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Length) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
 
-// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalElapsedTimeScaled return TotalElapsedTime in its scaled value.
 // If TotalElapsedTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Length) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -255,9 +256,10 @@ func (m *Length) TotalElapsedTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
 }
 
-// TotalTimerTimeScaled return TotalTimerTime in its scaled value [Scale: 1000; Units: s].
-//
+// TotalTimerTimeScaled return TotalTimerTime in its scaled value.
 // If TotalTimerTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
 func (m *Length) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -265,9 +267,10 @@ func (m *Length) TotalTimerTimeScaled() float64 {
 	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
 }
 
-// AvgSpeedScaled return AvgSpeed in its scaled value [Scale: 1000; Units: m/s].
-//
+// AvgSpeedScaled return AvgSpeed in its scaled value.
 // If AvgSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
 func (m *Length) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -275,9 +278,10 @@ func (m *Length) AvgSpeedScaled() float64 {
 	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
 }
 
-// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
+// EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value.
 // If EnhancedAvgRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: Breaths/min
 func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -285,9 +289,10 @@ func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
 }
 
-// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value [Scale: 100; Units: Breaths/min].
-//
+// EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value.
 // If EnhancedMaxRespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: Breaths/min
 func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -295,37 +300,37 @@ func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
 }
 
-// SetMessageIndex sets Length value.
+// SetMessageIndex sets MessageIndex value.
 func (m *Length) SetMessageIndex(v typedef.MessageIndex) *Length {
 	m.MessageIndex = v
 	return m
 }
 
-// SetTimestamp sets Length value.
+// SetTimestamp sets Timestamp value.
 func (m *Length) SetTimestamp(v time.Time) *Length {
 	m.Timestamp = v
 	return m
 }
 
-// SetEvent sets Length value.
+// SetEvent sets Event value.
 func (m *Length) SetEvent(v typedef.Event) *Length {
 	m.Event = v
 	return m
 }
 
-// SetEventType sets Length value.
+// SetEventType sets EventType value.
 func (m *Length) SetEventType(v typedef.EventType) *Length {
 	m.EventType = v
 	return m
 }
 
-// SetStartTime sets Length value.
+// SetStartTime sets StartTime value.
 func (m *Length) SetStartTime(v time.Time) *Length {
 	m.StartTime = v
 	return m
 }
 
-// SetTotalElapsedTime sets Length value.
+// SetTotalElapsedTime sets TotalElapsedTime value.
 //
 // Scale: 1000; Units: s
 func (m *Length) SetTotalElapsedTime(v uint32) *Length {
@@ -333,7 +338,16 @@ func (m *Length) SetTotalElapsedTime(v uint32) *Length {
 	return m
 }
 
-// SetTotalTimerTime sets Length value.
+// SetTotalElapsedTimeScaled is similar to SetTotalElapsedTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Length) SetTotalElapsedTimeScaled(v float64) *Length {
+	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalTimerTime sets TotalTimerTime value.
 //
 // Scale: 1000; Units: s
 func (m *Length) SetTotalTimerTime(v uint32) *Length {
@@ -341,7 +355,16 @@ func (m *Length) SetTotalTimerTime(v uint32) *Length {
 	return m
 }
 
-// SetTotalStrokes sets Length value.
+// SetTotalTimerTimeScaled is similar to SetTotalTimerTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Length) SetTotalTimerTimeScaled(v float64) *Length {
+	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetTotalStrokes sets TotalStrokes value.
 //
 // Units: strokes
 func (m *Length) SetTotalStrokes(v uint16) *Length {
@@ -349,7 +372,7 @@ func (m *Length) SetTotalStrokes(v uint16) *Length {
 	return m
 }
 
-// SetAvgSpeed sets Length value.
+// SetAvgSpeed sets AvgSpeed value.
 //
 // Scale: 1000; Units: m/s
 func (m *Length) SetAvgSpeed(v uint16) *Length {
@@ -357,7 +380,16 @@ func (m *Length) SetAvgSpeed(v uint16) *Length {
 	return m
 }
 
-// SetSwimStroke sets Length value.
+// SetAvgSpeedScaled is similar to SetAvgSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Length) SetAvgSpeedScaled(v float64) *Length {
+	m.AvgSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	return m
+}
+
+// SetSwimStroke sets SwimStroke value.
 //
 // Units: swim_stroke
 func (m *Length) SetSwimStroke(v typedef.SwimStroke) *Length {
@@ -365,7 +397,7 @@ func (m *Length) SetSwimStroke(v typedef.SwimStroke) *Length {
 	return m
 }
 
-// SetAvgSwimmingCadence sets Length value.
+// SetAvgSwimmingCadence sets AvgSwimmingCadence value.
 //
 // Units: strokes/min
 func (m *Length) SetAvgSwimmingCadence(v uint8) *Length {
@@ -373,13 +405,13 @@ func (m *Length) SetAvgSwimmingCadence(v uint8) *Length {
 	return m
 }
 
-// SetEventGroup sets Length value.
+// SetEventGroup sets EventGroup value.
 func (m *Length) SetEventGroup(v uint8) *Length {
 	m.EventGroup = v
 	return m
 }
 
-// SetTotalCalories sets Length value.
+// SetTotalCalories sets TotalCalories value.
 //
 // Units: kcal
 func (m *Length) SetTotalCalories(v uint16) *Length {
@@ -387,25 +419,25 @@ func (m *Length) SetTotalCalories(v uint16) *Length {
 	return m
 }
 
-// SetLengthType sets Length value.
+// SetLengthType sets LengthType value.
 func (m *Length) SetLengthType(v typedef.LengthType) *Length {
 	m.LengthType = v
 	return m
 }
 
-// SetPlayerScore sets Length value.
+// SetPlayerScore sets PlayerScore value.
 func (m *Length) SetPlayerScore(v uint16) *Length {
 	m.PlayerScore = v
 	return m
 }
 
-// SetOpponentScore sets Length value.
+// SetOpponentScore sets OpponentScore value.
 func (m *Length) SetOpponentScore(v uint16) *Length {
 	m.OpponentScore = v
 	return m
 }
 
-// SetStrokeCount sets Length value.
+// SetStrokeCount sets StrokeCount value.
 //
 // Array: [N]; Units: counts; stroke_type enum used as the index
 func (m *Length) SetStrokeCount(v []uint16) *Length {
@@ -413,7 +445,7 @@ func (m *Length) SetStrokeCount(v []uint16) *Length {
 	return m
 }
 
-// SetZoneCount sets Length value.
+// SetZoneCount sets ZoneCount value.
 //
 // Array: [N]; Units: counts; zone number used as the index
 func (m *Length) SetZoneCount(v []uint16) *Length {
@@ -421,7 +453,7 @@ func (m *Length) SetZoneCount(v []uint16) *Length {
 	return m
 }
 
-// SetEnhancedAvgRespirationRate sets Length value.
+// SetEnhancedAvgRespirationRate sets EnhancedAvgRespirationRate value.
 //
 // Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
@@ -429,7 +461,16 @@ func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
 	return m
 }
 
-// SetEnhancedMaxRespirationRate sets Length value.
+// SetEnhancedAvgRespirationRateScaled is similar to SetEnhancedAvgRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Length) SetEnhancedAvgRespirationRateScaled(v float64) *Length {
+	m.EnhancedAvgRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetEnhancedMaxRespirationRate sets EnhancedMaxRespirationRate value.
 //
 // Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
@@ -437,13 +478,22 @@ func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
 	return m
 }
 
-// SetAvgRespirationRate sets Length value.
+// SetEnhancedMaxRespirationRateScaled is similar to SetEnhancedMaxRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: Breaths/min
+func (m *Length) SetEnhancedMaxRespirationRateScaled(v float64) *Length {
+	m.EnhancedMaxRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	return m
+}
+
+// SetAvgRespirationRate sets AvgRespirationRate value.
 func (m *Length) SetAvgRespirationRate(v uint8) *Length {
 	m.AvgRespirationRate = v
 	return m
 }
 
-// SetMaxRespirationRate sets Length value.
+// SetMaxRespirationRate sets MaxRespirationRate value.
 func (m *Length) SetMaxRespirationRate(v uint8) *Length {
 	m.MaxRespirationRate = v
 	return m

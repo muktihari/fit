@@ -139,7 +139,7 @@ func (m *MagnetometerData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *MagnetometerData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets MagnetometerData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *MagnetometerData) SetTimestamp(v time.Time) *MagnetometerData {
@@ -147,7 +147,7 @@ func (m *MagnetometerData) SetTimestamp(v time.Time) *MagnetometerData {
 	return m
 }
 
-// SetTimestampMs sets MagnetometerData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
@@ -155,7 +155,7 @@ func (m *MagnetometerData) SetTimestampMs(v uint16) *MagnetometerData {
 	return m
 }
 
-// SetSampleTimeOffset sets MagnetometerData value.
+// SetSampleTimeOffset sets SampleTimeOffset value.
 //
 // Array: [N]; Units: ms; Each time in the array describes the time at which the compass sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in cmps_x and cmps_y and cmps_z
 func (m *MagnetometerData) SetSampleTimeOffset(v []uint16) *MagnetometerData {
@@ -163,7 +163,7 @@ func (m *MagnetometerData) SetSampleTimeOffset(v []uint16) *MagnetometerData {
 	return m
 }
 
-// SetMagX sets MagnetometerData value.
+// SetMagX sets MagX value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *MagnetometerData) SetMagX(v []uint16) *MagnetometerData {
@@ -171,7 +171,7 @@ func (m *MagnetometerData) SetMagX(v []uint16) *MagnetometerData {
 	return m
 }
 
-// SetMagY sets MagnetometerData value.
+// SetMagY sets MagY value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *MagnetometerData) SetMagY(v []uint16) *MagnetometerData {
@@ -179,7 +179,7 @@ func (m *MagnetometerData) SetMagY(v []uint16) *MagnetometerData {
 	return m
 }
 
-// SetMagZ sets MagnetometerData value.
+// SetMagZ sets MagZ value.
 //
 // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *MagnetometerData) SetMagZ(v []uint16) *MagnetometerData {
@@ -187,7 +187,7 @@ func (m *MagnetometerData) SetMagZ(v []uint16) *MagnetometerData {
 	return m
 }
 
-// SetCalibratedMagX sets MagnetometerData value.
+// SetCalibratedMagX sets CalibratedMagX value.
 //
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagX(v []float32) *MagnetometerData {
@@ -195,7 +195,7 @@ func (m *MagnetometerData) SetCalibratedMagX(v []float32) *MagnetometerData {
 	return m
 }
 
-// SetCalibratedMagY sets MagnetometerData value.
+// SetCalibratedMagY sets CalibratedMagY value.
 //
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
@@ -203,7 +203,7 @@ func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
 	return m
 }
 
-// SetCalibratedMagZ sets MagnetometerData value.
+// SetCalibratedMagZ sets CalibratedMagZ value.
 //
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagZ(v []float32) *MagnetometerData {

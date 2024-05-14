@@ -113,9 +113,10 @@ func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *DeviceAuxBatteryInfo) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// BatteryVoltageScaled return BatteryVoltage in its scaled value [Scale: 256; Units: V].
-//
+// BatteryVoltageScaled return BatteryVoltage in its scaled value.
 // If BatteryVoltage value is invalid, float64 invalid value will be returned.
+//
+// Scale: 256; Units: V
 func (m *DeviceAuxBatteryInfo) BatteryVoltageScaled() float64 {
 	if m.BatteryVoltage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -123,19 +124,19 @@ func (m *DeviceAuxBatteryInfo) BatteryVoltageScaled() float64 {
 	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
 }
 
-// SetTimestamp sets DeviceAuxBatteryInfo value.
+// SetTimestamp sets Timestamp value.
 func (m *DeviceAuxBatteryInfo) SetTimestamp(v time.Time) *DeviceAuxBatteryInfo {
 	m.Timestamp = v
 	return m
 }
 
-// SetDeviceIndex sets DeviceAuxBatteryInfo value.
+// SetDeviceIndex sets DeviceIndex value.
 func (m *DeviceAuxBatteryInfo) SetDeviceIndex(v typedef.DeviceIndex) *DeviceAuxBatteryInfo {
 	m.DeviceIndex = v
 	return m
 }
 
-// SetBatteryVoltage sets DeviceAuxBatteryInfo value.
+// SetBatteryVoltage sets BatteryVoltage value.
 //
 // Scale: 256; Units: V
 func (m *DeviceAuxBatteryInfo) SetBatteryVoltage(v uint16) *DeviceAuxBatteryInfo {
@@ -143,13 +144,22 @@ func (m *DeviceAuxBatteryInfo) SetBatteryVoltage(v uint16) *DeviceAuxBatteryInfo
 	return m
 }
 
-// SetBatteryStatus sets DeviceAuxBatteryInfo value.
+// SetBatteryVoltageScaled is similar to SetBatteryVoltage except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 256; Units: V
+func (m *DeviceAuxBatteryInfo) SetBatteryVoltageScaled(v float64) *DeviceAuxBatteryInfo {
+	m.BatteryVoltage = uint16(scaleoffset.Discard(v, 256, 0))
+	return m
+}
+
+// SetBatteryStatus sets BatteryStatus value.
 func (m *DeviceAuxBatteryInfo) SetBatteryStatus(v typedef.BatteryStatus) *DeviceAuxBatteryInfo {
 	m.BatteryStatus = v
 	return m
 }
 
-// SetBatteryIdentifier sets DeviceAuxBatteryInfo value.
+// SetBatteryIdentifier sets BatteryIdentifier value.
 func (m *DeviceAuxBatteryInfo) SetBatteryIdentifier(v uint8) *DeviceAuxBatteryInfo {
 	m.BatteryIdentifier = v
 	return m

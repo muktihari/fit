@@ -126,9 +126,10 @@ func (m *HsaGyroscopeData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaGyroscopeData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// GyroXScaled return GyroX in its scaled value [Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement].
-//
+// GyroXScaled return GyroX in its scaled value.
 // If GyroX value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
 func (m *HsaGyroscopeData) GyroXScaled() []float64 {
 	if m.GyroX == nil {
 		return nil
@@ -136,9 +137,10 @@ func (m *HsaGyroscopeData) GyroXScaled() []float64 {
 	return scaleoffset.ApplySlice(m.GyroX, 28.57143, 0)
 }
 
-// GyroYScaled return GyroY in its scaled value [Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement].
-//
+// GyroYScaled return GyroY in its scaled value.
 // If GyroY value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement
 func (m *HsaGyroscopeData) GyroYScaled() []float64 {
 	if m.GyroY == nil {
 		return nil
@@ -146,9 +148,10 @@ func (m *HsaGyroscopeData) GyroYScaled() []float64 {
 	return scaleoffset.ApplySlice(m.GyroY, 28.57143, 0)
 }
 
-// GyroZScaled return GyroZ in its scaled value [Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement].
-//
+// GyroZScaled return GyroZ in its scaled value.
 // If GyroZ value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement
 func (m *HsaGyroscopeData) GyroZScaled() []float64 {
 	if m.GyroZ == nil {
 		return nil
@@ -156,7 +159,7 @@ func (m *HsaGyroscopeData) GyroZScaled() []float64 {
 	return scaleoffset.ApplySlice(m.GyroZ, 28.57143, 0)
 }
 
-// SetTimestamp sets HsaGyroscopeData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaGyroscopeData) SetTimestamp(v time.Time) *HsaGyroscopeData {
@@ -164,7 +167,7 @@ func (m *HsaGyroscopeData) SetTimestamp(v time.Time) *HsaGyroscopeData {
 	return m
 }
 
-// SetTimestampMs sets HsaGyroscopeData value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond resolution of the timestamp
 func (m *HsaGyroscopeData) SetTimestampMs(v uint16) *HsaGyroscopeData {
@@ -172,7 +175,7 @@ func (m *HsaGyroscopeData) SetTimestampMs(v uint16) *HsaGyroscopeData {
 	return m
 }
 
-// SetSamplingInterval sets HsaGyroscopeData value.
+// SetSamplingInterval sets SamplingInterval value.
 //
 // Units: 1/32768 s; Sampling Interval in 32 kHz timescale
 func (m *HsaGyroscopeData) SetSamplingInterval(v uint16) *HsaGyroscopeData {
@@ -180,7 +183,7 @@ func (m *HsaGyroscopeData) SetSamplingInterval(v uint16) *HsaGyroscopeData {
 	return m
 }
 
-// SetGyroX sets HsaGyroscopeData value.
+// SetGyroX sets GyroX value.
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroX(v []int16) *HsaGyroscopeData {
@@ -188,7 +191,16 @@ func (m *HsaGyroscopeData) SetGyroX(v []int16) *HsaGyroscopeData {
 	return m
 }
 
-// SetGyroY sets HsaGyroscopeData value.
+// SetGyroXScaled is similar to SetGyroX except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
+func (m *HsaGyroscopeData) SetGyroXScaled(vs []float64) *HsaGyroscopeData {
+	m.GyroX = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	return m
+}
+
+// SetGyroY sets GyroY value.
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroY(v []int16) *HsaGyroscopeData {
@@ -196,7 +208,16 @@ func (m *HsaGyroscopeData) SetGyroY(v []int16) *HsaGyroscopeData {
 	return m
 }
 
-// SetGyroZ sets HsaGyroscopeData value.
+// SetGyroYScaled is similar to SetGyroY except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement
+func (m *HsaGyroscopeData) SetGyroYScaled(vs []float64) *HsaGyroscopeData {
+	m.GyroY = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	return m
+}
+
+// SetGyroZ sets GyroZ value.
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroZ(v []int16) *HsaGyroscopeData {
@@ -204,7 +225,16 @@ func (m *HsaGyroscopeData) SetGyroZ(v []int16) *HsaGyroscopeData {
 	return m
 }
 
-// SetTimestamp32K sets HsaGyroscopeData value.
+// SetGyroZScaled is similar to SetGyroZ except it accepts a scaled value.
+// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement
+func (m *HsaGyroscopeData) SetGyroZScaled(vs []float64) *HsaGyroscopeData {
+	m.GyroZ = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	return m
+}
+
+// SetTimestamp32K sets Timestamp32K value.
 //
 // Units: 1/32768 s; 32 kHz timestamp
 func (m *HsaGyroscopeData) SetTimestamp32K(v uint32) *HsaGyroscopeData {

@@ -97,7 +97,7 @@ func (m *VideoFrame) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *VideoFrame) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets VideoFrame value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Whole second part of the timestamp
 func (m *VideoFrame) SetTimestamp(v time.Time) *VideoFrame {
@@ -105,7 +105,7 @@ func (m *VideoFrame) SetTimestamp(v time.Time) *VideoFrame {
 	return m
 }
 
-// SetTimestampMs sets VideoFrame value.
+// SetTimestampMs sets TimestampMs value.
 //
 // Units: ms; Millisecond part of the timestamp.
 func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
@@ -113,7 +113,7 @@ func (m *VideoFrame) SetTimestampMs(v uint16) *VideoFrame {
 	return m
 }
 
-// SetFrameNumber sets VideoFrame value.
+// SetFrameNumber sets FrameNumber value.
 //
 // Number of the frame that the timestamp and timestamp_ms correlate to
 func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {

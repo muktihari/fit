@@ -104,7 +104,7 @@ func (m *HsaHeartRateData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaHeartRateData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaHeartRateData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaHeartRateData) SetTimestamp(v time.Time) *HsaHeartRateData {
@@ -112,7 +112,7 @@ func (m *HsaHeartRateData) SetTimestamp(v time.Time) *HsaHeartRateData {
 	return m
 }
 
-// SetProcessingInterval sets HsaHeartRateData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaHeartRateData) SetProcessingInterval(v uint16) *HsaHeartRateData {
@@ -120,7 +120,7 @@ func (m *HsaHeartRateData) SetProcessingInterval(v uint16) *HsaHeartRateData {
 	return m
 }
 
-// SetStatus sets HsaHeartRateData value.
+// SetStatus sets Status value.
 //
 // Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
 func (m *HsaHeartRateData) SetStatus(v uint8) *HsaHeartRateData {
@@ -128,7 +128,7 @@ func (m *HsaHeartRateData) SetStatus(v uint8) *HsaHeartRateData {
 	return m
 }
 
-// SetHeartRate sets HsaHeartRateData value.
+// SetHeartRate sets HeartRate value.
 //
 // Array: [N]; Units: bpm; Beats / min
 func (m *HsaHeartRateData) SetHeartRate(v []uint8) *HsaHeartRateData {

@@ -92,9 +92,10 @@ func (m *RespirationRate) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *RespirationRate) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// RespirationRateScaled return RespirationRate in its scaled value [Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist].
-//
+// RespirationRateScaled return RespirationRate in its scaled value.
 // If RespirationRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 func (m *RespirationRate) RespirationRateScaled() float64 {
 	if m.RespirationRate == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -102,7 +103,7 @@ func (m *RespirationRate) RespirationRateScaled() float64 {
 	return scaleoffset.Apply(m.RespirationRate, 100, 0)
 }
 
-// SetTimestamp sets RespirationRate value.
+// SetTimestamp sets Timestamp value.
 func (m *RespirationRate) SetTimestamp(v time.Time) *RespirationRate {
 	m.Timestamp = v
 	return m
@@ -113,6 +114,15 @@ func (m *RespirationRate) SetTimestamp(v time.Time) *RespirationRate {
 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 func (m *RespirationRate) SetRespirationRate(v int16) *RespirationRate {
 	m.RespirationRate = v
+	return m
+}
+
+// SetRespirationRateScaled is similar to SetRespirationRate except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
+func (m *RespirationRate) SetRespirationRateScaled(v float64) *RespirationRate {
+	m.RespirationRate = int16(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 

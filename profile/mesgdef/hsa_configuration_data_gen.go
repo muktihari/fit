@@ -97,7 +97,7 @@ func (m *HsaConfigurationData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaConfigurationData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaConfigurationData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s; Encoded configuration data
 func (m *HsaConfigurationData) SetTimestamp(v time.Time) *HsaConfigurationData {
@@ -105,7 +105,7 @@ func (m *HsaConfigurationData) SetTimestamp(v time.Time) *HsaConfigurationData {
 	return m
 }
 
-// SetData sets HsaConfigurationData value.
+// SetData sets Data value.
 //
 // Array: [N]
 func (m *HsaConfigurationData) SetData(v []byte) *HsaConfigurationData {
@@ -113,7 +113,7 @@ func (m *HsaConfigurationData) SetData(v []byte) *HsaConfigurationData {
 	return m
 }
 
-// SetDataSize sets HsaConfigurationData value.
+// SetDataSize sets DataSize value.
 //
 // Size in bytes of data field
 func (m *HsaConfigurationData) SetDataSize(v uint8) *HsaConfigurationData {

@@ -99,13 +99,13 @@ func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// SetScreenIndex sets ExdScreenConfiguration value.
+// SetScreenIndex sets ScreenIndex value.
 func (m *ExdScreenConfiguration) SetScreenIndex(v uint8) *ExdScreenConfiguration {
 	m.ScreenIndex = v
 	return m
 }
 
-// SetFieldCount sets ExdScreenConfiguration value.
+// SetFieldCount sets FieldCount value.
 //
 // number of fields in screen
 func (m *ExdScreenConfiguration) SetFieldCount(v uint8) *ExdScreenConfiguration {
@@ -113,13 +113,13 @@ func (m *ExdScreenConfiguration) SetFieldCount(v uint8) *ExdScreenConfiguration 
 	return m
 }
 
-// SetLayout sets ExdScreenConfiguration value.
+// SetLayout sets Layout value.
 func (m *ExdScreenConfiguration) SetLayout(v typedef.ExdLayout) *ExdScreenConfiguration {
 	m.Layout = v
 	return m
 }
 
-// SetScreenEnabled sets ExdScreenConfiguration value.
+// SetScreenEnabled sets ScreenEnabled value.
 func (m *ExdScreenConfiguration) SetScreenEnabled(v bool) *ExdScreenConfiguration {
 	m.ScreenEnabled = v
 	return m

@@ -111,7 +111,7 @@ func (m *HsaBodyBatteryData) ToMesg(options *Options) proto.Message {
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *HsaBodyBatteryData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
-// SetTimestamp sets HsaBodyBatteryData value.
+// SetTimestamp sets Timestamp value.
 //
 // Units: s
 func (m *HsaBodyBatteryData) SetTimestamp(v time.Time) *HsaBodyBatteryData {
@@ -119,7 +119,7 @@ func (m *HsaBodyBatteryData) SetTimestamp(v time.Time) *HsaBodyBatteryData {
 	return m
 }
 
-// SetProcessingInterval sets HsaBodyBatteryData value.
+// SetProcessingInterval sets ProcessingInterval value.
 //
 // Units: s; Processing interval length in seconds
 func (m *HsaBodyBatteryData) SetProcessingInterval(v uint16) *HsaBodyBatteryData {
@@ -127,7 +127,7 @@ func (m *HsaBodyBatteryData) SetProcessingInterval(v uint16) *HsaBodyBatteryData
 	return m
 }
 
-// SetLevel sets HsaBodyBatteryData value.
+// SetLevel sets Level value.
 //
 // Array: [N]; Units: percent; Body battery level
 func (m *HsaBodyBatteryData) SetLevel(v []int8) *HsaBodyBatteryData {
@@ -135,7 +135,7 @@ func (m *HsaBodyBatteryData) SetLevel(v []int8) *HsaBodyBatteryData {
 	return m
 }
 
-// SetCharged sets HsaBodyBatteryData value.
+// SetCharged sets Charged value.
 //
 // Array: [N]; Body battery charged value
 func (m *HsaBodyBatteryData) SetCharged(v []int16) *HsaBodyBatteryData {
@@ -143,7 +143,7 @@ func (m *HsaBodyBatteryData) SetCharged(v []int16) *HsaBodyBatteryData {
 	return m
 }
 
-// SetUncharged sets HsaBodyBatteryData value.
+// SetUncharged sets Uncharged value.
 //
 // Array: [N]; Body battery uncharged value
 func (m *HsaBodyBatteryData) SetUncharged(v []int16) *HsaBodyBatteryData {

@@ -90,13 +90,13 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 // StressLevelTimeUint32 returns StressLevelTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *StressLevel) StressLevelTimeUint32() uint32 { return datetime.ToUint32(m.StressLevelTime) }
 
-// SetStressLevelValue sets StressLevel value.
+// SetStressLevelValue sets StressLevelValue value.
 func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
 	m.StressLevelValue = v
 	return m
 }
 
-// SetStressLevelTime sets StressLevel value.
+// SetStressLevelTime sets StressLevelTime value.
 //
 // Units: s; Time stress score was calculated
 func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {

@@ -98,13 +98,13 @@ func (m *Sport) SetSport(v typedef.Sport) *Sport {
 	return m
 }
 
-// SetSubSport sets Sport value.
+// SetSubSport sets SubSport value.
 func (m *Sport) SetSubSport(v typedef.SubSport) *Sport {
 	m.SubSport = v
 	return m
 }
 
-// SetName sets Sport value.
+// SetName sets Name value.
 func (m *Sport) SetName(v string) *Sport {
 	m.Name = v
 	return m

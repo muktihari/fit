@@ -171,9 +171,10 @@ func (m *SleepAssessment) ToMesg(options *Options) proto.Message {
 	return mesg
 }
 
-// AverageStressDuringSleepScaled return AverageStressDuringSleep in its scaled value [Scale: 100; Excludes stress during awake periods in the sleep window].
-//
+// AverageStressDuringSleepScaled return AverageStressDuringSleep in its scaled value.
 // If AverageStressDuringSleep value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Excludes stress during awake periods in the sleep window
 func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 	if m.AverageStressDuringSleep == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
@@ -181,7 +182,7 @@ func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
 }
 
-// SetCombinedAwakeScore sets SleepAssessment value.
+// SetCombinedAwakeScore sets CombinedAwakeScore value.
 //
 // Average of awake_time_score and awakenings_count_score. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetCombinedAwakeScore(v uint8) *SleepAssessment {
@@ -189,7 +190,7 @@ func (m *SleepAssessment) SetCombinedAwakeScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetAwakeTimeScore sets SleepAssessment value.
+// SetAwakeTimeScore sets AwakeTimeScore value.
 //
 // Score that evaluates the total time spent awake between sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetAwakeTimeScore(v uint8) *SleepAssessment {
@@ -197,7 +198,7 @@ func (m *SleepAssessment) SetAwakeTimeScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetAwakeningsCountScore sets SleepAssessment value.
+// SetAwakeningsCountScore sets AwakeningsCountScore value.
 //
 // Score that evaluates the number of awakenings that interrupt sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetAwakeningsCountScore(v uint8) *SleepAssessment {
@@ -205,7 +206,7 @@ func (m *SleepAssessment) SetAwakeningsCountScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetDeepSleepScore sets SleepAssessment value.
+// SetDeepSleepScore sets DeepSleepScore value.
 //
 // Score that evaluates the amount of deep sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetDeepSleepScore(v uint8) *SleepAssessment {
@@ -213,7 +214,7 @@ func (m *SleepAssessment) SetDeepSleepScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetSleepDurationScore sets SleepAssessment value.
+// SetSleepDurationScore sets SleepDurationScore value.
 //
 // Score that evaluates the quality of sleep based on sleep stages, heart-rate variability and possible awakenings during the night. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetSleepDurationScore(v uint8) *SleepAssessment {
@@ -221,7 +222,7 @@ func (m *SleepAssessment) SetSleepDurationScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetLightSleepScore sets SleepAssessment value.
+// SetLightSleepScore sets LightSleepScore value.
 //
 // Score that evaluates the amount of light sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetLightSleepScore(v uint8) *SleepAssessment {
@@ -229,7 +230,7 @@ func (m *SleepAssessment) SetLightSleepScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetOverallSleepScore sets SleepAssessment value.
+// SetOverallSleepScore sets OverallSleepScore value.
 //
 // Total score that summarizes the overall quality of sleep, combining sleep duration and quality. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetOverallSleepScore(v uint8) *SleepAssessment {
@@ -237,7 +238,7 @@ func (m *SleepAssessment) SetOverallSleepScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetSleepQualityScore sets SleepAssessment value.
+// SetSleepQualityScore sets SleepQualityScore value.
 //
 // Score that evaluates the quality of sleep based on sleep stages, heart-rate variability and possible awakenings during the night. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetSleepQualityScore(v uint8) *SleepAssessment {
@@ -245,7 +246,7 @@ func (m *SleepAssessment) SetSleepQualityScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetSleepRecoveryScore sets SleepAssessment value.
+// SetSleepRecoveryScore sets SleepRecoveryScore value.
 //
 // Score that evaluates stress and recovery during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetSleepRecoveryScore(v uint8) *SleepAssessment {
@@ -253,7 +254,7 @@ func (m *SleepAssessment) SetSleepRecoveryScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetRemSleepScore sets SleepAssessment value.
+// SetRemSleepScore sets RemSleepScore value.
 //
 // Score that evaluates the amount of REM sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetRemSleepScore(v uint8) *SleepAssessment {
@@ -261,7 +262,7 @@ func (m *SleepAssessment) SetRemSleepScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetSleepRestlessnessScore sets SleepAssessment value.
+// SetSleepRestlessnessScore sets SleepRestlessnessScore value.
 //
 // Score that evaluates the amount of restlessness during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetSleepRestlessnessScore(v uint8) *SleepAssessment {
@@ -269,7 +270,7 @@ func (m *SleepAssessment) SetSleepRestlessnessScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetAwakeningsCount sets SleepAssessment value.
+// SetAwakeningsCount sets AwakeningsCount value.
 //
 // The number of awakenings during sleep.
 func (m *SleepAssessment) SetAwakeningsCount(v uint8) *SleepAssessment {
@@ -277,7 +278,7 @@ func (m *SleepAssessment) SetAwakeningsCount(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetInterruptionsScore sets SleepAssessment value.
+// SetInterruptionsScore sets InterruptionsScore value.
 //
 // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 func (m *SleepAssessment) SetInterruptionsScore(v uint8) *SleepAssessment {
@@ -285,11 +286,20 @@ func (m *SleepAssessment) SetInterruptionsScore(v uint8) *SleepAssessment {
 	return m
 }
 
-// SetAverageStressDuringSleep sets SleepAssessment value.
+// SetAverageStressDuringSleep sets AverageStressDuringSleep value.
 //
 // Scale: 100; Excludes stress during awake periods in the sleep window
 func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment {
 	m.AverageStressDuringSleep = v
+	return m
+}
+
+// SetAverageStressDuringSleepScaled is similar to SetAverageStressDuringSleep except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Excludes stress during awake periods in the sleep window
+func (m *SleepAssessment) SetAverageStressDuringSleepScaled(v float64) *SleepAssessment {
+	m.AverageStressDuringSleep = uint16(scaleoffset.Discard(v, 100, 0))
 	return m
 }
 
