@@ -9,10 +9,12 @@ const (
 	conversionFactor = 180.0 / piRadians
 )
 
+// ToDegrees converts semicircles into degrees value.
 func ToDegrees(semicircles int32) float64 {
 	return float64(semicircles) * conversionFactor
 }
 
+// ToSemicircles converts degrees into semicircles value.
 func ToSemicircles(degrees float64) int32 {
 	return int32(degrees / conversionFactor)
 }

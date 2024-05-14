@@ -35,7 +35,8 @@ func TestNewSize(t *testing.T) {
 		size         int
 		expectedSize int
 	}{
-		{w: (io.Writer)(nil), size: 1 << 10, expectedSize: 4 << 10},
+		{w: (io.Writer)(nil), size: 0, expectedSize: 4 << 10},
+		{w: (io.Writer)(nil), size: 1 << 10, expectedSize: 1 << 10},
 		{w: (*writerAt)(nil), size: 8 << 10, expectedSize: 8 << 10}, // 8 KB
 		{w: (*writeSeeker)(nil), size: 8 << 10, expectedSize: 8 << 10},
 	}
@@ -48,9 +49,9 @@ func TestNewSize(t *testing.T) {
 			case *bufio.Writer:
 				size = w.Size()
 			case *WriterAt:
-				size = w.bw.Size()
+				size = w.Size()
 			case *WriteSeeker:
-				size = w.bw.Size()
+				size = w.Size()
 			}
 			if size != tc.expectedSize {
 				t.Fatalf("expected size: %d, got: %d", tc.expectedSize, size)
@@ -181,6 +182,46 @@ func TestWriteSeeker(t *testing.T) {
 			err = ws.Flush()
 			if !errors.Is(err, tc.errs[2]) {
 				t.Fatalf("expected flush err: %v, got: %v", tc.errs[2], err)
+			}
+		})
+	}
+}
+
+type mockWriterAt struct {
+	io.Writer
+	io.WriterAt
+}
+
+type mockWriteSeeker struct {
+	io.Writer
+	io.Seeker
+}
+
+func TestTypeAssertion(t *testing.T) {
+	tt := []struct {
+		name string
+		w    io.Writer
+		ok   bool
+	}{
+		{name: "writerAt", w: New(mockWriterAt{fnWriteOK, fnWriteAtOK}), ok: true},
+		{name: "writeSeeker", w: New(mockWriteSeeker{fnWriteOK, fnSeekerOK}), ok: true},
+		{name: "writer only", w: New(fnWriteOK), ok: true},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			switch wr := tc.w.(type) {
+			case io.WriterAt, io.WriteSeeker:
+				if tc.ok != true {
+					t.Fatalf("w: %T: expected: %v, got: %v", wr, tc.ok, true)
+				}
+			case *bufio.Writer:
+				if tc.ok != true {
+					t.Fatalf("w: %T: expected: %v, got: %v", wr, tc.ok, true)
+				}
+			default:
+				if tc.ok != false {
+					t.Fatalf("w: %T: expected: %v, got: %v", tc.w, tc.ok, false)
+				}
 			}
 		})
 	}

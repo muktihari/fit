@@ -144,12 +144,14 @@ func Discard(value, scale, offset float64) float64 {
 // DiscardSlice discards applied scale and offset on slice values.
 func DiscardSlice[T Numeric](values []float64, scale, offset float64) []T {
 	vals := make([]T, len(values))
-	for i := range values {
-		if scale == 1 && offset == 0 {
+	if scale == 1 && offset == 0 {
+		for i := range values {
 			vals[i] = T(values[i])
-			continue
 		}
-		vals[i] = T((values[i] + offset) * scale)
+	} else {
+		for i := range values {
+			vals[i] = T((values[i] + offset) * scale)
+		}
 	}
 	return vals
 }
