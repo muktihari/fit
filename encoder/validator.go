@@ -5,7 +5,6 @@
 package encoder
 
 import (
-	"errors"
 	"fmt"
 	"unicode/utf8"
 
@@ -18,13 +17,13 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-var (
-	ErrInvalidUTF8String       = errors.New("invalid UTF-8 string")
-	ErrValueTypeMismatch       = errors.New("value type mismatch")
-	ErrNoFields                = errors.New("no fields")
-	ErrMissingDeveloperDataId  = errors.New("missing developer data id")
-	ErrMissingFieldDescription = errors.New("missing field description")
-	ErrExceedMaxAllowed        = errors.New("exceed max allowed")
+const (
+	ErrInvalidUTF8String       = errorString("invalid UTF-8 string")
+	ErrValueTypeMismatch       = errorString("value type mismatch")
+	ErrNoFields                = errorString("no fields")
+	ErrMissingDeveloperDataId  = errorString("missing developer data id")
+	ErrMissingFieldDescription = errorString("missing field description")
+	ErrExceedMaxAllowed        = errorString("exceed max allowed")
 )
 
 // MessageValidator is an interface for implementing message validation before encoding the message.

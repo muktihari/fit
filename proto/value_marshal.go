@@ -6,12 +6,11 @@ package proto
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"math"
 )
 
-var ErrTypeNotSupported = errors.New("type is not supported")
+const ErrTypeNotSupported = errorString("type is not supported")
 
 // MarshalAppend appends the FIT format encoding of Value to b. Returning the result.
 // If arch is 0, marshal in Little-Endian, otherwise marshal in Big-Endian.

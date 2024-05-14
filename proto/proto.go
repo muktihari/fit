@@ -11,6 +11,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+type errorString string
+
+func (e errorString) Error() string { return string(e) }
+
 // NOTE: The term "Global FIT Profile" refers to the definition provided in the Profile.xlsx proto.
 
 const ( // header is 1 byte ->	 0bxxxxxxxx

@@ -4,14 +4,12 @@
 
 package proto
 
-import "errors"
-
-var ErrProtocolVersionNotSupported = errors.New("protocol version not supported")
-
 // Version is FIT Protocol Version
 type Version byte
 
 const (
+	ErrProtocolVersionNotSupported = errorString("protocol version not supported")
+
 	MajorVersionShift = 4
 	MajorVersionMask  = 0x0F << MajorVersionShift
 	MinorVersionMask  = 0x0F

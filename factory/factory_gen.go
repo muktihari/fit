@@ -7,7 +7,6 @@
 package factory
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"sync"
@@ -18,14 +17,16 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+type errorString string
+
+func (e errorString) Error() string { return string(e) }
+
 const (
+	// ErrRegisterForbidden occurs when trying to create manufacturer specific message outside available range.
+	ErrRegisterForbidden = errorString("register is forbidden")
+
 	// NameUnknown is unknown message or field name
 	NameUnknown string = "unknown"
-)
-
-var (
-	// ErrRegisterForbidden occurs when trying to create manufacturer specific message outside available range.
-	ErrRegisterForbidden = errors.New("register is forbidden")
 )
 
 // Factory handles creation and registration for FIT's message and field.
