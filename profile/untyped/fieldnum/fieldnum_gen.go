@@ -1128,6 +1128,8 @@ const (
 	SessionTrainingLoadPeak                           = 168 // [ Session ] [Type: Sint32, Base: sint32, Scale: 65536, Offset: 0];
 	SessionTrainingStressScore                        = 35  // [ Session ] [Type: Uint16, Base: uint16, Scale: 10, Offset: 0, Units: tss];
 	SessionTrigger                                    = 28  // [ Session ] [Type: SessionTrigger, Base: enum];
+	SessionWorkoutFeel                                = 192 // [ Session ] [Type: Uint8, Base: uint8]; A 0-100 scale representing how a user felt while performing a workout. Low values are considered feeling bad, while high values are good.
+	SessionWorkoutRpe                                 = 193 // [ Session ] [Type: Uint8, Base: uint8]; Common Borg CR10 / 0-10 RPE scale, multiplied 10x.. Aggregate score for all workouts in a single session.
 	SessionZoneCount                                  = 86  // [ Session ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; zone number used as the index
 	SetCategory                                       = 7   // [ Set ] [Type: ExerciseCategory, Base: uint16, Array: [N]];
 	SetCategorySubtype                                = 8   // [ Set ] [Type: Uint16, Base: uint16, Array: [N]]; Based on the associated category, see [category]_exercise_names
@@ -1140,6 +1142,11 @@ const (
 	SetWeight                                         = 4   // [ Set ] [Type: Uint16, Base: uint16, Scale: 16, Offset: 0, Units: kg]; Amount of weight applied for the set
 	SetWeightDisplayUnit                              = 9   // [ Set ] [Type: FitBaseUnit, Base: uint16];
 	SetWktStepIndex                                   = 11  // [ Set ] [Type: MessageIndex, Base: uint16];
+	SkinTempOvernightAverage7DayDeviation             = 2   // [ SkinTempOvernight ] [Type: Float32, Base: float32]; The average 7 day overnight deviation from baseline temperature in degrees C
+	SkinTempOvernightAverageDeviation                 = 1   // [ SkinTempOvernight ] [Type: Float32, Base: float32]; The average overnight deviation from baseline temperature in degrees C
+	SkinTempOvernightLocalTimestamp                   = 0   // [ SkinTempOvernight ] [Type: LocalDateTime, Base: uint32];
+	SkinTempOvernightNightlyValue                     = 4   // [ SkinTempOvernight ] [Type: Float32, Base: float32]; Final overnight temperature value
+	SkinTempOvernightTimestamp                        = 253 // [ SkinTempOvernight ] [Type: DateTime, Base: uint32];
 	SlaveDeviceManufacturer                           = 0   // [ SlaveDevice ] [Type: Manufacturer, Base: uint16];
 	SlaveDeviceProduct                                = 1   // [ SlaveDevice ] [Type: Uint16, Base: uint16];
 	SleepAssessmentAverageStressDuringSleep           = 15  // [ SleepAssessment ] [Type: Uint16, Base: uint16, Scale: 100, Offset: 0]; Excludes stress during awake periods in the sleep window

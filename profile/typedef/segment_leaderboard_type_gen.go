@@ -22,8 +22,12 @@ const (
 	SegmentLeaderboardTypeQom          SegmentLeaderboardType = 6
 	SegmentLeaderboardTypePr           SegmentLeaderboardType = 7
 	SegmentLeaderboardTypeGoal         SegmentLeaderboardType = 8
-	SegmentLeaderboardTypeRival        SegmentLeaderboardType = 9
+	SegmentLeaderboardTypeCarrot       SegmentLeaderboardType = 9
 	SegmentLeaderboardTypeClubLeader   SegmentLeaderboardType = 10
+	SegmentLeaderboardTypeRival        SegmentLeaderboardType = 11
+	SegmentLeaderboardTypeLast         SegmentLeaderboardType = 12
+	SegmentLeaderboardTypeRecentBest   SegmentLeaderboardType = 13
+	SegmentLeaderboardTypeCourseRecord SegmentLeaderboardType = 14
 	SegmentLeaderboardTypeInvalid      SegmentLeaderboardType = 0xFF
 )
 
@@ -49,10 +53,18 @@ func (s SegmentLeaderboardType) String() string {
 		return "pr"
 	case SegmentLeaderboardTypeGoal:
 		return "goal"
-	case SegmentLeaderboardTypeRival:
-		return "rival"
+	case SegmentLeaderboardTypeCarrot:
+		return "carrot"
 	case SegmentLeaderboardTypeClubLeader:
 		return "club_leader"
+	case SegmentLeaderboardTypeRival:
+		return "rival"
+	case SegmentLeaderboardTypeLast:
+		return "last"
+	case SegmentLeaderboardTypeRecentBest:
+		return "recent_best"
+	case SegmentLeaderboardTypeCourseRecord:
+		return "course_record"
 	default:
 		return "SegmentLeaderboardTypeInvalid(" + strconv.Itoa(int(s)) + ")"
 	}
@@ -79,10 +91,18 @@ func SegmentLeaderboardTypeFromString(s string) SegmentLeaderboardType {
 		return SegmentLeaderboardTypePr
 	case "goal":
 		return SegmentLeaderboardTypeGoal
-	case "rival":
-		return SegmentLeaderboardTypeRival
+	case "carrot":
+		return SegmentLeaderboardTypeCarrot
 	case "club_leader":
 		return SegmentLeaderboardTypeClubLeader
+	case "rival":
+		return SegmentLeaderboardTypeRival
+	case "last":
+		return SegmentLeaderboardTypeLast
+	case "recent_best":
+		return SegmentLeaderboardTypeRecentBest
+	case "course_record":
+		return SegmentLeaderboardTypeCourseRecord
 	default:
 		return SegmentLeaderboardTypeInvalid
 	}
@@ -100,7 +120,11 @@ func ListSegmentLeaderboardType() []SegmentLeaderboardType {
 		SegmentLeaderboardTypeQom,
 		SegmentLeaderboardTypePr,
 		SegmentLeaderboardTypeGoal,
-		SegmentLeaderboardTypeRival,
+		SegmentLeaderboardTypeCarrot,
 		SegmentLeaderboardTypeClubLeader,
+		SegmentLeaderboardTypeRival,
+		SegmentLeaderboardTypeLast,
+		SegmentLeaderboardTypeRecentBest,
+		SegmentLeaderboardTypeCourseRecord,
 	}
 }

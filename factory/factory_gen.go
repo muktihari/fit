@@ -7329,6 +7329,38 @@ var mesgs = [...]message{
 				},
 				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
+			192: {
+				FieldBase: &proto.FieldBase{
+					Name:       "workout_feel",
+					Num:        192,
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+			},
+			193: {
+				FieldBase: &proto.FieldBase{
+					Name:       "workout_rpe",
+					Num:        193,
+					Type:       profile.Uint8,
+					BaseType:   basetype.Uint8, /* (size: 1) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Uint8(basetype.Uint8Invalid), /* Default Value: Invalid */
+			},
 			194: {
 				FieldBase: &proto.FieldBase{
 					Name:       "avg_spo2",
@@ -23536,6 +23568,91 @@ var mesgs = [...]message{
 					SubFields:  nil,
 				},
 				Value: proto.Uint16(basetype.Uint16Invalid), /* Default Value: Invalid */
+			},
+		},
+	},
+	typedef.MesgNumSkinTempOvernight: {
+		Num: typedef.MesgNumSkinTempOvernight, /* skin_temp_overnight */
+		Fields: [256]proto.Field{
+			253: {
+				FieldBase: &proto.FieldBase{
+					Name:       "timestamp",
+					Num:        253,
+					Type:       profile.DateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Uint32(basetype.Uint32Invalid), /* Default Value: Invalid */
+			},
+			0: {
+				FieldBase: &proto.FieldBase{
+					Name:       "local_timestamp",
+					Num:        0,
+					Type:       profile.LocalDateTime,
+					BaseType:   basetype.Uint32, /* (size: 4) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Uint32(basetype.Uint32Invalid), /* Default Value: Invalid */
+			},
+			1: {
+				FieldBase: &proto.FieldBase{
+					Name:       "average_deviation",
+					Num:        1,
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
+			},
+			2: {
+				FieldBase: &proto.FieldBase{
+					Name:       "average_7_day_deviation",
+					Num:        2,
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
+			},
+			4: {
+				FieldBase: &proto.FieldBase{
+					Name:       "nightly_value",
+					Num:        4,
+					Type:       profile.Float32,
+					BaseType:   basetype.Float32, /* (size: 4) */
+					Array:      false,
+					Components: nil,
+					Scale:      1,
+					Offset:     0,
+					Units:      "",
+					Accumulate: false,
+					SubFields:  nil,
+				},
+				Value: proto.Float32(math.Float32frombits(basetype.Float32Invalid)), /* Default Value: Invalid */
 			},
 		},
 	},

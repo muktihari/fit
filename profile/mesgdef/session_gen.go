@@ -171,6 +171,8 @@ type Session struct {
 	MaxRespirationRate            uint8
 	MinRespirationRate            uint8
 	MinTemperature                int8  // Units: C
+	WorkoutFeel                   uint8 // A 0-100 scale representing how a user felt while performing a workout. Low values are considered feeling bad, while high values are good.
+	WorkoutRpe                    uint8 // Common Borg CR10 / 0-10 RPE scale, multiplied 10x.. Aggregate score for all workouts in a single session.
 	AvgSpo2                       uint8 // Units: percent; Average SPO2 for the monitoring session
 	AvgStress                     uint8 // Units: percent; Average stress for the monitoring session
 	SdrrHrv                       uint8 // Units: mS; Standard deviation of R-R interval (SDRR) - Heart rate variability measure most useful for wellness users.
@@ -351,6 +353,8 @@ func NewSession(mesg *proto.Message) *Session {
 		JumpCount:                     vals[183].Uint16(),
 		AvgGrit:                       vals[186].Float32(),
 		AvgFlow:                       vals[187].Float32(),
+		WorkoutFeel:                   vals[192].Uint8(),
+		WorkoutRpe:                    vals[193].Uint8(),
 		AvgSpo2:                       vals[194].Uint8(),
 		AvgStress:                     vals[195].Uint8(),
 		SdrrHrv:                       vals[197].Uint8(),
@@ -1114,6 +1118,16 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 187)
 		field.Value = proto.Float32(m.AvgFlow)
+		fields = append(fields, field)
+	}
+	if m.WorkoutFeel != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 192)
+		field.Value = proto.Uint8(m.WorkoutFeel)
+		fields = append(fields, field)
+	}
+	if m.WorkoutRpe != basetype.Uint8Invalid {
+		field := fac.CreateField(mesg.Num, 193)
+		field.Value = proto.Uint8(m.WorkoutRpe)
 		fields = append(fields, field)
 	}
 	if m.AvgSpo2 != basetype.Uint8Invalid {
@@ -3926,6 +3940,22 @@ func (m *Session) SetAvgGrit(v float32) *Session {
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *Session) SetAvgFlow(v float32) *Session {
 	m.AvgFlow = v
+	return m
+}
+
+// SetWorkoutFeel sets WorkoutFeel value.
+//
+// A 0-100 scale representing how a user felt while performing a workout. Low values are considered feeling bad, while high values are good.
+func (m *Session) SetWorkoutFeel(v uint8) *Session {
+	m.WorkoutFeel = v
+	return m
+}
+
+// SetWorkoutRpe sets WorkoutRpe value.
+//
+// Common Borg CR10 / 0-10 RPE scale, multiplied 10x.. Aggregate score for all workouts in a single session.
+func (m *Session) SetWorkoutRpe(v uint8) *Session {
+	m.WorkoutRpe = v
 	return m
 }
 

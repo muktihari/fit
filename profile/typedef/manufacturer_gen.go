@@ -234,6 +234,7 @@ const (
 	ManufacturerNike                   Manufacturer = 326
 	ManufacturerMagicshine             Manufacturer = 327
 	ManufacturerIctrainer              Manufacturer = 328
+	ManufacturerAbsoluteCycling        Manufacturer = 329
 	ManufacturerActigraphcorp          Manufacturer = 5759
 	ManufacturerInvalid                Manufacturer = 0xFFFF
 )
@@ -684,6 +685,8 @@ func (m Manufacturer) String() string {
 		return "magicshine"
 	case ManufacturerIctrainer:
 		return "ictrainer"
+	case ManufacturerAbsoluteCycling:
+		return "absolute_cycling"
 	case ManufacturerActigraphcorp:
 		return "actigraphcorp"
 	default:
@@ -1136,6 +1139,8 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerMagicshine
 	case "ictrainer":
 		return ManufacturerIctrainer
+	case "absolute_cycling":
+		return ManufacturerAbsoluteCycling
 	case "actigraphcorp":
 		return ManufacturerActigraphcorp
 	default:
@@ -1367,6 +1372,7 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerNike,
 		ManufacturerMagicshine,
 		ManufacturerIctrainer,
+		ManufacturerAbsoluteCycling,
 		ManufacturerActigraphcorp,
 	}
 }
