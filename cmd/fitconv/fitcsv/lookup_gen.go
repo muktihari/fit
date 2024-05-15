@@ -13,7 +13,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21133] }
+func _() { _ = [1]struct{}{}[profile.Version-21141] }
 
 var mesgNumLookup = map[string]typedef.MesgNum{
 	"file_id":                        0,
@@ -134,6 +134,7 @@ var mesgNumLookup = map[string]typedef.MesgNum{
 	"chrono_shot_data":               388,
 	"hsa_configuration_data":         389,
 	"dive_apnea_alarm":               393,
+	"skin_temp_overnight":            398,
 	"hsa_wrist_temperature_data":     409,
 }
 
@@ -448,6 +449,8 @@ var fieldNumLookup = [...]map[string]byte{
 		"jump_count":                       183,
 		"avg_grit":                         186,
 		"avg_flow":                         187,
+		"workout_feel":                     192,
+		"workout_rpe":                      193,
 		"avg_spo2":                         194,
 		"avg_stress":                       195,
 		"sdrr_hrv":                         197,
@@ -1742,6 +1745,13 @@ var fieldNumLookup = [...]map[string]byte{
 		"repeating":          10,
 		"speed":              11,
 		"message_index":      254,
+	},
+	398: {
+		"local_timestamp":         0,
+		"average_deviation":       1,
+		"average_7_day_deviation": 2,
+		"nightly_value":           4,
+		"timestamp":               253,
 	},
 	409: {
 		"processing_interval": 0,

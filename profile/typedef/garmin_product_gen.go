@@ -429,6 +429,8 @@ const (
 	GarminProductLily2                      GarminProduct = 4380
 	GarminProductInstinct2X                 GarminProduct = 4394
 	GarminProductVivoactive5                GarminProduct = 4426
+	GarminProductFr165                      GarminProduct = 4432
+	GarminProductFr165Music                 GarminProduct = 4433
 	GarminProductDescentT2                  GarminProduct = 4442
 	GarminProductHrmFit                     GarminProduct = 4446
 	GarminProductMarqGen2Commander          GarminProduct = 4472
@@ -1284,6 +1286,10 @@ func (g GarminProduct) String() string {
 		return "instinct_2x"
 	case GarminProductVivoactive5:
 		return "vivoactive5"
+	case GarminProductFr165:
+		return "fr165"
+	case GarminProductFr165Music:
+		return "fr165_music"
 	case GarminProductDescentT2:
 		return "descent_t2"
 	case GarminProductHrmFit:
@@ -2156,6 +2162,10 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductInstinct2X
 	case "vivoactive5":
 		return GarminProductVivoactive5
+	case "fr165":
+		return GarminProductFr165
+	case "fr165_music":
+		return GarminProductFr165Music
 	case "descent_t2":
 		return GarminProductDescentT2
 	case "hrm_fit":
@@ -2612,6 +2622,8 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductLily2,
 		GarminProductInstinct2X,
 		GarminProductVivoactive5,
+		GarminProductFr165,
+		GarminProductFr165Music,
 		GarminProductDescentT2,
 		GarminProductHrmFit,
 		GarminProductMarqGen2Commander,

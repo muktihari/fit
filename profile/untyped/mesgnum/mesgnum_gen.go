@@ -132,6 +132,7 @@ const (
 	ChronoShotData              = 388
 	HsaConfigurationData        = 389
 	DiveApneaAlarm              = 393
+	SkinTempOvernight           = 398
 	HsaWristTemperatureData     = 409    // Message number for the HSA wrist temperature data message
 	MfgRangeMin                 = 0xFF00 // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
 	MfgRangeMax                 = 0xFFFE // 0xFF00 - 0xFFFE reserved for manufacturer specific messages

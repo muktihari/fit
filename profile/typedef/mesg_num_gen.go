@@ -132,6 +132,7 @@ const (
 	MesgNumChronoShotData              MesgNum = 388
 	MesgNumHsaConfigurationData        MesgNum = 389
 	MesgNumDiveApneaAlarm              MesgNum = 393
+	MesgNumSkinTempOvernight           MesgNum = 398
 	MesgNumHsaWristTemperatureData     MesgNum = 409    // Message number for the HSA wrist temperature data message
 	MesgNumMfgRangeMin                 MesgNum = 0xFF00 // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
 	MesgNumMfgRangeMax                 MesgNum = 0xFFFE // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
@@ -381,6 +382,8 @@ func (m MesgNum) String() string {
 		return "hsa_configuration_data"
 	case MesgNumDiveApneaAlarm:
 		return "dive_apnea_alarm"
+	case MesgNumSkinTempOvernight:
+		return "skin_temp_overnight"
 	case MesgNumHsaWristTemperatureData:
 		return "hsa_wrist_temperature_data"
 	case MesgNumMfgRangeMin:
@@ -634,6 +637,8 @@ func MesgNumFromString(s string) MesgNum {
 		return MesgNumHsaConfigurationData
 	case "dive_apnea_alarm":
 		return MesgNumDiveApneaAlarm
+	case "skin_temp_overnight":
+		return MesgNumSkinTempOvernight
 	case "hsa_wrist_temperature_data":
 		return MesgNumHsaWristTemperatureData
 	case "mfg_range_min":
@@ -769,6 +774,7 @@ func ListMesgNum() []MesgNum {
 		MesgNumChronoShotData,
 		MesgNumHsaConfigurationData,
 		MesgNumDiveApneaAlarm,
+		MesgNumSkinTempOvernight,
 		MesgNumHsaWristTemperatureData,
 		MesgNumMfgRangeMin,
 		MesgNumMfgRangeMax,
@@ -1025,6 +1031,8 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumHsaConfigurationData", v)
 	case MesgNumDiveApneaAlarm:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumDiveApneaAlarm", v)
+	case MesgNumSkinTempOvernight:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumSkinTempOvernight", v)
 	case MesgNumHsaWristTemperatureData:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumHsaWristTemperatureData", v)
 	case MesgNumMfgRangeMin:
