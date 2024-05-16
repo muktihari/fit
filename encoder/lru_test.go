@@ -142,3 +142,26 @@ func BenchmarkLRUReset(b *testing.B) {
 		}
 	})
 }
+
+func TestResetWithSize(t *testing.T) {
+	l := newLRU(1)
+	l.ResetWithNewSize(10)
+	for i := byte(0); i < 10; i++ {
+		index, isNew := l.Put([]byte{i})
+		if index != i && isNew != true {
+			t.Fatalf("expected index: %d, got: %d, expected newItem: %t, got: %t",
+				i, index, true, isNew,
+			)
+		}
+	}
+	if cap(l.bucket) != cap(l.items) {
+		t.Fatalf("expected cap(l.bucket): %d and cap(l.items): %d is same, got mismatch",
+			cap(l.bucket), cap(l.items))
+	}
+
+	l.ResetWithNewSize(3) // should reslice
+	if cap(l.bucket) != 10 && cap(l.bucket) != cap(l.items) {
+		t.Fatalf("expected cap(l.bucket): %d and cap(l.items): %d is same, got mismatch",
+			cap(l.bucket), cap(l.items))
+	}
+}

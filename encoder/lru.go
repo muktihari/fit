@@ -20,16 +20,15 @@ type lru struct {
 
 // newLRU creates new lru with fixed size, where size should be > 0.
 func newLRU(size byte) *lru {
-	return &lru{
-		items:  make([][]byte, size),
-		bucket: make([]byte, 0, size),
-	}
+	l := &lru{}
+	l.ResetWithNewSize(size)
+	return l
 }
 
 // Reset reset variables so lru can be reused again without reallocation.
 func (l *lru) Reset() {
 	for i := range l.items {
-		l.items[i] = nil
+		l.items[i] = nil // avoid memory leaks
 	}
 	l.bucket = l.bucket[:0]
 }
@@ -39,10 +38,11 @@ func (l *lru) Reset() {
 func (l *lru) ResetWithNewSize(size byte) {
 	if size > byte(cap(l.items)) {
 		l.items = make([][]byte, size)
-	} else if size < byte(cap(l.items)) {
-		l.items = l.items[:size]
+		l.bucket = make([]byte, 0, size)
+		return
 	}
-	l.Reset()
+	l.Reset() // Must reset first to avoid memory leaks.
+	l.items = l.items[:size]
 }
 
 // Put will compare the equality of item with lru' items and store the item accordingly.
