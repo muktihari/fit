@@ -762,10 +762,12 @@ func SliceString[S []E, E ~string](s S) Value {
 	return Value{num: uint64(len(s)), any: unsafe.SliceData(*(*[]string)(unsafe.Pointer(&s)))}
 }
 
-// Any converts any value into Value. If the given v is not a primitive-type value (or a slice of primitive-type)
-// it will determine it using reflection, and if it's a non-primitive-type slice it will make 1 alloc.
-//   - If v is not supported such as int, uint, []int, []uint, []any, slice with zero len, etc. Value with TypeInvalid is returned.
-//   - If v is a primitive-type slice, this will take ownership of v, and the caller should not use v after this call.
+// Any converts any value into Value. If the given v is not a primitive-type value or
+// a slice of primitive-type, it will determine its types using reflection.
+//
+// It works with important caveats:
+//   - If v is not a supported value such as int, uint, []int, []uint, []any, etc. Value with TypeInvalid will be returned.
+//   - If v is a slice, this will take ownership of v, and the caller should not use v after this call.
 func Any(v any) Value {
 	switch val := v.(type) { // Fast path
 	case int, uint, []int, []uint, []any: // Fast return on invalid value
@@ -849,83 +851,33 @@ func Any(v any) Value {
 		return Float64(float64(rv.Float()))
 	case reflect.String:
 		return String(rv.String())
-	case reflect.Slice: // Always alloc since it makes new slice.
-		if rv.Len() == 0 {
-			return Value{any: TypeInvalid}
-		}
-		switch rv.Index(0).Kind() {
+	case reflect.Slice:
+		ptr := rv.UnsafePointer()
+		switch rv.Type().Elem().Kind() {
 		case reflect.Bool:
-			var vals = make([]bool, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = rv.Index(i).Bool()
-			}
-			return SliceBool(vals)
+			return SliceBool(unsafe.Slice((*bool)(ptr), rv.Len()))
 		case reflect.Int8:
-			var vals = make([]int8, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = int8(rv.Index(i).Int())
-			}
-			return SliceInt8(vals)
+			return SliceInt8(unsafe.Slice((*int8)(ptr), rv.Len()))
 		case reflect.Uint8:
-			var vals = make([]uint8, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = uint8(rv.Index(i).Uint())
-			}
-			return SliceUint8(vals)
+			return SliceUint8(unsafe.Slice((*uint8)(ptr), rv.Len()))
 		case reflect.Int16:
-			var vals = make([]int16, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = int16(rv.Index(i).Int())
-			}
-			return SliceInt16(vals)
+			return SliceInt16(unsafe.Slice((*int16)(ptr), rv.Len()))
 		case reflect.Uint16:
-			var vals = make([]uint16, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = uint16(rv.Index(i).Uint())
-			}
-			return SliceUint16(vals)
+			return SliceUint16(unsafe.Slice((*uint16)(ptr), rv.Len()))
 		case reflect.Int32:
-			var vals = make([]int32, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = int32(rv.Index(i).Int())
-			}
-			return SliceInt32(vals)
+			return SliceInt32(unsafe.Slice((*int32)(ptr), rv.Len()))
 		case reflect.Uint32:
-			var vals = make([]uint32, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = uint32(rv.Index(i).Uint())
-			}
-			return SliceUint32(vals)
+			return SliceUint32(unsafe.Slice((*uint32)(ptr), rv.Len()))
 		case reflect.Int64:
-			var vals = make([]int64, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = int64(rv.Index(i).Int())
-			}
-			return SliceInt64(vals)
+			return SliceInt64(unsafe.Slice((*int64)(ptr), rv.Len()))
 		case reflect.Uint64:
-			var vals = make([]uint64, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = uint64(rv.Index(i).Uint())
-			}
-			return SliceUint64(vals)
+			return SliceUint64(unsafe.Slice((*uint64)(ptr), rv.Len()))
 		case reflect.Float32:
-			var vals = make([]float32, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = float32(rv.Index(i).Float())
-			}
-			return SliceFloat32(vals)
+			return SliceFloat32(unsafe.Slice((*float32)(ptr), rv.Len()))
 		case reflect.Float64:
-			var vals = make([]float64, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = float64(rv.Index(i).Float())
-			}
-			return SliceFloat64(vals)
+			return SliceFloat64(unsafe.Slice((*float64)(ptr), rv.Len()))
 		case reflect.String:
-			var vals = make([]string, rv.Len())
-			for i := 0; i < rv.Len(); i++ {
-				vals[i] = string(rv.Index(i).String())
-			}
-			return SliceString(vals)
+			return SliceString(unsafe.Slice((*string)(ptr), rv.Len()))
 		}
 	}
 
