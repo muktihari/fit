@@ -30,12 +30,6 @@ const (
 	ErrWriterAtOrWriteSeekerIsExpected = errorString("io.WriterAt or io.WriteSeeker is expected")
 )
 
-const (
-	// The 5-bit time offset rolls over every 32 seconds.
-	// When an incoming time offset is less than previous time offset, rollover event has occurred.
-	RolloverEvent = 32
-)
-
 // headerOption is header option.
 type headerOption byte
 
@@ -72,7 +66,7 @@ type Encoder struct {
 
 	// This timestamp reference serves as current active timestamp when 'headerOptionCompressedTimestamp' is specified.
 	// The first timestamp value is retrieved from the first message containing a valid timestamp field,
-	// and will change every RolloverEvent occurrence.
+	// and will change every rollover event occurrence.
 	timestampReference uint32
 
 	mesgDef    *proto.MessageDefinition       // Temporary message definition to reduce alloc.
@@ -478,12 +472,11 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 		return
 	}
 
-	if (timestamp - e.timestampReference) > RolloverEvent {
-		// There should be at least one valid timestamp reference in a field prior to the use of
-		// the compressed timestamp header. If the gap beetween new timestamp and last reference is more
-		// than allowed Rollover Event (32 seconds), the new timestamp become new reference.
+	// The 5-bit time offset rolls over every 32 seconds, it is necessary that the difference
+	// between timestamp and timestamp reference be measured less than 32 seconds apart.
+	if (timestamp - e.timestampReference) > proto.CompressedTimeMask {
 		e.timestampReference = timestamp
-		return
+		return // Rollover event occurs, keep it as it is.
 	}
 
 	e.timestampReference = timestamp

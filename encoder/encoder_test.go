@@ -866,6 +866,30 @@ func TestCompressTimestampInHeader(t *testing.T) {
 			},
 		},
 		{
+			name: "compress timestamp in header happy flow: roll over occured exactly after 32 seconds",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
+					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
+					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
+				}),
+				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+					fieldnum.RecordTimestamp: datetime.ToUint32(now),
+				}),
+				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(32 * time.Second)),
+				}),
+				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(33 * time.Second)),
+				}),
+			},
+			headers: []byte{
+				proto.MesgNormalHeaderMask, // file_id: has no timestamp
+				proto.MesgNormalHeaderMask, // record: the message containing timestamp reference prior to the use of compressed header.
+				proto.MesgNormalHeaderMask, // record: roll over has occured, the timestamp is used new timestamp reference.
+				proto.MesgCompressedHeaderMask | (offset+1)&proto.CompressedTimeMask,
+			},
+		},
+		{
 			name: "timestamp less than DateTimeMin",
 			mesgs: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
