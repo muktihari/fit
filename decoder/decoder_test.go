@@ -2520,7 +2520,7 @@ func TestDecodeMessagesWithContext(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "context ContextExceeded",
+			name: "context canceled",
 			r: fnReader(func(b []byte) (n int, err error) {
 				return len(b), nil
 			}),
