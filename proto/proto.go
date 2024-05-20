@@ -15,7 +15,7 @@ type errorString string
 
 func (e errorString) Error() string { return string(e) }
 
-// NOTE: The term "Global FIT Profile" refers to the definition provided in the Profile.xlsx proto.
+// NOTE: The term "Global FIT Profile" refers to the definition provided in the Profile.xlsx.
 
 const ( // header is 1 byte ->	 0bxxxxxxxx
 	MesgDefinitionMask         = 0b01000000 // Mask for determining if the message type is a message definition.
