@@ -21,7 +21,9 @@ func StandardFactory() *Factory { return std }
 // This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
 // If you want a deep copy of the mesg, clone it by calling mesg.Clone().
 //
-// NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
+// NOTE: This method is not used by either the Decoder or the Encoder, and the data will only be populated once upon the first invocation.
+// Unless you need most of the returned fields, it's recommended create an empty proto.Message{Num: num} then fill only the necessary fields
+// using CreateField method.
 func CreateMesg(num typedef.MesgNum) proto.Message {
 	return std.CreateMesg(num)
 }
