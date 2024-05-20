@@ -33,7 +33,7 @@ const (
 	// ErrRegisterForbidden occurs when trying to create manufacturer specific message outside available range.
 	ErrRegisterForbidden = errorString("register is forbidden")
 
-	// NameUnknown is unknown message or field name
+	// NameUnknown is the name of an unknown message or an unknown field.
 	NameUnknown string = "unknown"
 )
 
@@ -61,26 +61,31 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	once.Do(func() { // populate data for the firt invocation.
         protoMesgs = make([]proto.Message, len(mesgs))
 		for i := range mesgs {
-			rawmesg := &mesgs[i]
-			if rawmesg.Num != typedef.MesgNum(i) {
+			m := &mesgs[i]
+			if m.Num != typedef.MesgNum(i) {
 				continue // skip unknown message
 			}
 			var n byte
-			for j := range rawmesg.Fields {
-				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
+			for j := range m.Fields {
+				if m.Fields[j].FieldBase != nil {
 					n++
 				}
 			}
 			fields := make([]proto.Field, 0, n)
-			for j := range rawmesg.Fields {
-				field := rawmesg.Fields[j]
-				if field.FieldBase != nil {
+            
+			// Place timestamp field at the first index since the field is frequently used.
+			// This kind of ordering matches the fields' ordering in Profile.xlsx which put timestamp at the beginning.
+            field := m.Fields[proto.FieldNumTimestamp]
+			if field.FieldBase != nil {
+				fields = append(fields, field)
+			}
+			for _, field = range m.Fields {
+				if field.FieldBase != nil && field.Num != proto.FieldNumTimestamp {
 					fields = append(fields, field)
 				}
 			}
-			protoMesgs[rawmesg.Num] = proto.Message{
-				Num:    rawmesg.Num, 
+			protoMesgs[m.Num] = proto.Message{
+				Num:    m.Num, 
 				Fields: fields,
 			}
 		}
@@ -210,7 +215,9 @@ func RegisterMesg(mesg proto.Message) error {
 // This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
 // If you want a deep copy of the mesg, clone it by calling mesg.Clone().
 //
-// NOTE: This method is not used by either the decoder or the encoder, and the data will only be populated once upon the first invocation.
+// NOTE: This method is not used by either the Decoder or the Encoder, and the data will only be populated once upon the first invocation.
+// Unless you need most of the returned fields, it's recommended create an empty proto.Message{Num: num} then fill only the necessary fields 
+// using CreateField method.
 {{ end }}
 
 {{ define "create_mesg_only_doc" }}
