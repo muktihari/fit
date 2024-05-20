@@ -29,11 +29,11 @@ func TestMessageValidatorOption(t *testing.T) {
 	tt := []struct {
 		name    string
 		opts    []ValidatorOption
-		options *validatorOptions
+		options validatorOptions
 	}{
 		{
 			name: "defaultValidatorOptions",
-			options: &validatorOptions{
+			options: validatorOptions{
 				omitInvalidValues: true,
 				factory:           factory.StandardFactory(),
 			},
@@ -44,7 +44,7 @@ func TestMessageValidatorOption(t *testing.T) {
 				ValidatorWithPreserveInvalidValues(),
 				ValidatorWithFactory(fac),
 			},
-			options: &validatorOptions{
+			options: validatorOptions{
 				omitInvalidValues: false,
 				factory:           fac,
 			},

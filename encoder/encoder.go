@@ -58,7 +58,7 @@ type Encoder struct {
 	lastFileHeaderPos int64       // The byte position of the last header.
 	crc16             hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
 
-	options           *options         // Encoder's options.
+	options           options          // Encoder's options.
 	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
 	localMesgNumLRU   *lru             // LRU cache for writing local message definition
 
@@ -69,7 +69,7 @@ type Encoder struct {
 	// and will change every rollover event occurrence.
 	timestampReference uint32
 
-	mesgDef    *proto.MessageDefinition       // Temporary message definition to reduce alloc.
+	mesgDef    proto.MessageDefinition        // Temporary message definition to reduce alloc.
 	bytesArray [proto.MaxBytesPerMessage]byte // General purpose array for encoding process.
 }
 
@@ -81,8 +81,8 @@ type options struct {
 	multipleLocalMessageType byte
 }
 
-func defaultOptions() *options {
-	return &options{
+func defaultOptions() options {
+	return options{
 		messageValidator: NewMessageValidator(),
 		protocolVersion:  proto.V1,
 		endianness:       littleEndian,
@@ -175,58 +175,47 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 // and having frequent write on non-buffered writer might impact performance, especially if it involves syscall
 // such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
 func New(w io.Writer, opts ...Option) *Encoder {
-	options := defaultOptions()
-	for i := range opts {
-		opts[i].apply(options)
-	}
-
-	var lruCapacity byte = 1
-	if options.headerOption == headerOptionNormal && options.multipleLocalMessageType > 0 {
-		lruCapacity = options.multipleLocalMessageType + 1
-	}
-
 	e := &Encoder{
 		w:                 w,
-		options:           options,
 		crc16:             crc16.New(nil),
-		protocolValidator: proto.NewValidator(options.protocolVersion),
-		localMesgNumLRU:   newLRU(lruCapacity),
-		mesgDef:           &proto.MessageDefinition{},
+		protocolValidator: new(proto.Validator),
+		localMesgNumLRU:   new(lru),
 	}
-
+	e.Reset(w, opts...)
 	return e
-}
-
-// reset resets the encoder's data that is being used for encoding,
-// allowing the encoder to be reused for writing the subsequent chained FIT file.
-func (e *Encoder) reset() {
-	e.dataSize = 0
-	e.crc16.Reset()
-	e.localMesgNumLRU.Reset()
-	e.options.messageValidator.Reset()
-	e.timestampReference = 0
 }
 
 // Reset resets the Encoder to write its output to w and reset previous options to
 // default options so any options needs to be inputed again. It is similar to New()
 // but it retains the underlying storage for use by future encode to reduce memory allocs.
 func (e *Encoder) Reset(w io.Writer, opts ...Option) {
-	e.reset()
 	e.n = 0
 	e.lastFileHeaderPos = 0
 
 	e.options = defaultOptions()
 	for i := range opts {
-		opts[i].apply(e.options)
+		opts[i].apply(&e.options)
 	}
 
-	var lruCapacity byte = 1
+	e.reset()
+
+	var lruSize byte = 1
 	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
-		lruCapacity = e.options.multipleLocalMessageType + 1
+		lruSize = e.options.multipleLocalMessageType + 1
 	}
-	e.localMesgNumLRU.ResetWithNewSize(lruCapacity)
+	e.localMesgNumLRU.ResetWithNewSize(lruSize)
 
 	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
+}
+
+// reset resets the encoder's data that is being used for encoding,
+// allowing the encoder to be reused for writing the subsequent chained FIT file.
+func (e *Encoder) reset() {
+	e.options.messageValidator.Reset()
+	e.crc16.Reset()
+	e.localMesgNumLRU.Reset()
+	e.dataSize = 0
+	e.timestampReference = 0
 }
 
 // Encode encodes FIT into the dest writer. Only FIT's Messages is required, while FileHeader and CRC will be
@@ -423,8 +412,8 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 		e.compressTimestampIntoHeader(mesg)
 	}
 
-	proto.CreateMessageDefinitionTo(e.mesgDef, mesg)
-	if err := e.protocolValidator.ValidateMessageDefinition(e.mesgDef); err != nil {
+	proto.CreateMessageDefinitionTo(&e.mesgDef, mesg)
+	if err := e.protocolValidator.ValidateMessageDefinition(&e.mesgDef); err != nil {
 		return err
 	}
 
