@@ -106,12 +106,12 @@ func (f *FIT) WithMessages(messages ...Message) *FIT {
 
 // FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
 type FileHeader struct {
-	Size            byte   // Header size either 12 (legacy) or 14.
+	Size            byte   // File header size either 12 (legacy) or 14.
 	ProtocolVersion byte   // The FIT Protocol version which is being used to encode the FIT file.
 	ProfileVersion  uint16 // The FIT Profile Version (associated with data defined in Global FIT Profile).
 	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
 	DataType        string // ".FIT" (a string constant)
-	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity if the header. (this field will be automatically updated by the encoder)
+	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity of the file header. (this field will be automatically updated by the encoder)
 }
 
 // MessageDefinition is the definition of the upcoming data messages.
@@ -140,7 +140,7 @@ type FieldDefinition struct {
 
 // FieldDefinition is the definition of the upcoming developer field within the message's structure.
 type DeveloperFieldDefinition struct { // 3 bits
-	Num                byte // Map to the `field_definition_number` of a `field_description` Message.
+	Num                byte // Maps to the `field_definition_number` of a `field_description` Message.
 	Size               byte // Size (in bytes) of the specified FIT message’s field
 	DeveloperDataIndex byte // Maps to the `developer_data_index`` of a `developer_data_id` Message
 }
@@ -150,7 +150,7 @@ type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
 	Num             typedef.MesgNum  // Global Message Number defined in Global FIT Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
 	Reserved        byte             // Currently undetermined; the default value is 0.
-	Architecture    byte             // Architecture type / Endianness. Must be the same
+	Architecture    byte             // Architecture type / Endianness.
 	Fields          []Field          // List of Field
 	DeveloperFields []DeveloperField // List of DeveloperField
 }
@@ -163,7 +163,7 @@ func (m Message) WithFields(fields ...Field) Message {
 
 // WithFieldValues assigns the values of the targeted fields with the given map,
 // where map[byte]any represents the field numbers and their respective values.
-// If the specified fieldNum does not have a corresponding target match in the fields, no value will be assigned.
+// If the Message does not have a corresponding field number match in the Fields, no value will be assigned or added.
 func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
 	for i := range m.Fields {
 		value, ok := fieldNumValues[m.Fields[i].Num]
@@ -292,22 +292,15 @@ func (f *Field) isValueEqualTo(refFieldValue int64) bool {
 // convertToInt64 converts any integer value of val to int64, if val is non-integer value return false.
 func convertToInt64(val Value) (int64, bool) {
 	switch val.Type() {
-	case TypeInt8:
-		return int64(val.Int8()), true
-	case TypeUint8:
-		return int64(val.Uint8()), true
-	case TypeInt16:
-		return int64(val.Int16()), true
-	case TypeUint16:
-		return int64(val.Uint16()), true
-	case TypeInt32:
-		return int64(val.Int32()), true
-	case TypeUint32:
-		return int64(val.Uint32()), true
-	case TypeInt64:
-		return val.Int64(), true
-	case TypeUint64:
-		return int64(val.Uint64()), true
+	case TypeInt8,
+		TypeUint8,
+		TypeInt16,
+		TypeUint16,
+		TypeInt32,
+		TypeUint32,
+		TypeInt64,
+		TypeUint64:
+		return int64(val.num), true
 	}
 	return 0, false
 }
@@ -381,7 +374,7 @@ func (s SubField) Clone() SubField {
 	return s
 }
 
-// SubFieldMap is the mapping between SubField and and the corresponding main Field in a Message.
+// SubFieldMap is the mapping between SubField and the corresponding main Field in a Message.
 // When any Field in a Message has Field.Num == RefFieldNum and Field.Value == RefFieldValue, then the SubField containing
 // this mapping can be interpreted as the main Field's properties (name, scale, type etc.)
 type SubFieldMap struct {
