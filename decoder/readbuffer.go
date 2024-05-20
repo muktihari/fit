@@ -43,11 +43,6 @@ type readBuffer struct {
 // allowing us to read bytes directly from the buffer without extra copying.
 // This is unlike *bufio.Reader, which requires us to copy the bytes on every Read() method call.
 func newReadBuffer(rd io.Reader, size int) *readBuffer {
-	if size < minReadBufferSize {
-		size = minReadBufferSize
-	} else if size > maxReadBufferSize {
-		size = maxReadBufferSize
-	}
 	r := new(readBuffer)
 	r.Reset(rd, size)
 	return r
@@ -80,6 +75,12 @@ func (b *readBuffer) ReadN(n int) ([]byte, error) {
 
 // Reset resets buf reader.
 func (b *readBuffer) Reset(rd io.Reader, size int) {
+	if size < minReadBufferSize {
+		size = minReadBufferSize
+	} else if size > maxReadBufferSize {
+		size = maxReadBufferSize
+	}
+
 	oldsize := cap(b.buf) - reservedbuf
 	if size > oldsize {
 		b.buf = make([]byte, reservedbuf+size)
