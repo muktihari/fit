@@ -59,7 +59,7 @@ var ( // cache for CreateMesg method
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	once.Do(func() { // populate data for the firt invocation.
-        protoMesgs = make([]proto.Message, len(mesgs))
+		protoMesgs = make([]proto.Message, len(mesgs))
 		for i := range mesgs {
 			m := &mesgs[i]
 			if m.Num != typedef.MesgNum(i) {
@@ -75,7 +75,7 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
             
 			// Place timestamp field at the first index since the field is frequently used.
 			// This kind of ordering matches the fields' ordering in Profile.xlsx which put timestamp at the beginning.
-            field := m.Fields[proto.FieldNumTimestamp]
+			field := m.Fields[proto.FieldNumTimestamp]
 			if field.FieldBase != nil {
 				fields = append(fields, field)
 			}
