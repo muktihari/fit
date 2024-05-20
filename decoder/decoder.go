@@ -53,7 +53,7 @@ type Decoder struct {
 	fieldsArray           [256]proto.Field
 	developersFieldsArray [256]proto.DeveloperField
 
-	options *options
+	options options
 
 	once              sync.Once // It is used to invoke decodeFileHeader exactly once. Must be reassigned on init/reset.
 	n                 int64     // The n read bytes counter, always moving forward, do not reset (except on full reset).
@@ -101,8 +101,8 @@ type options struct {
 	broadcastMesgCopy     bool
 }
 
-func defaultOptions() *options {
-	return &options{
+func defaultOptions() options {
+	return options{
 		factory:               factory.StandardFactory(),
 		logWriter:             nil,
 		readBufferSize:        defaultReadBufferSize,
@@ -196,39 +196,26 @@ func WithReadBufferSize(size int) Option {
 // Note: Decoder already implements efficient io.Reader buffering, so there's no need to wrap 'r' using *bufio.Reader
 // for optimal performance.
 func New(r io.Reader, opts ...Option) *Decoder {
-	options := defaultOptions()
-	for i := range opts {
-		opts[i].apply(options)
-	}
-
 	d := &Decoder{
-		readBuffer:              newReadBuffer(r, options.readBufferSize),
-		options:                 options,
-		factory:                 options.factory,
-		accumulator:             NewAccumulator(),
-		crc16:                   crc16.New(nil),
-		localMessageDefinitions: [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{},
-		mesgListeners:           options.mesgListeners,
-		mesgDefListeners:        options.mesgDefListeners,
-		developerDataIds:        make([]*mesgdef.DeveloperDataId, 0),
-		fieldDescriptions:       make([]*mesgdef.FieldDescription, 0),
+		readBuffer:  new(readBuffer),
+		accumulator: NewAccumulator(),
+		crc16:       crc16.New(nil),
 	}
-
+	d.Reset(r, opts...)
 	return d
 }
 
 // Reset resets the Decoder to read its input from r, clear any error and
 // reset previous options to default options so any options needs to be inputed again.
 // It is similar to New() but it retains the underlying storage for use by
-// future decode to reduce memory allocs (except messages need to be re-allocated).
+// future decode to reduce memory allocs.
 func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.reset()
 	d.n = 0 // Must reset bytes counter since it's a full reset.
-	d.err = nil
 
 	d.options = defaultOptions()
 	for i := range opts {
-		opts[i].apply(d.options)
+		opts[i].apply(&d.options)
 	}
 
 	d.readBuffer.Reset(r, d.options.readBufferSize)
@@ -238,21 +225,19 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 }
 
 func (d *Decoder) reset() {
-	for i := range d.localMessageDefinitions {
-		d.localMessageDefinitions[i] = nil
-	}
-
-	d.once = sync.Once{}
 	d.accumulator.Reset()
 	d.crc16.Reset()
-	d.fileHeader = proto.FileHeader{}
-	d.messages = nil
-	d.fileId = nil
-	d.crc = 0
+	d.once = sync.Once{}
 	d.cur = 0
 	d.timestamp = 0
 	d.lastTimeOffset = 0
 	d.sequenceCompleted = false
+	d.err = nil
+	d.fileHeader = proto.FileHeader{}
+	d.messages = nil
+	d.crc = 0
+	d.fileId = nil
+	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
 
 	for i := range d.developerDataIds {
 		d.developerDataIds[i] = nil // avoid memory leaks

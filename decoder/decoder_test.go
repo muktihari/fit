@@ -165,11 +165,11 @@ func TestOptions(t *testing.T) {
 	tt := []struct {
 		name    string
 		opts    []Option
-		options *options
+		options options
 	}{
 		{
 			name: "defaultOptions",
-			options: &options{
+			options: options{
 				factory:               factory.StandardFactory(),
 				logWriter:             nil,
 				readBufferSize:        defaultReadBufferSize,
@@ -192,7 +192,7 @@ func TestOptions(t *testing.T) {
 				WithReadBufferSize(8192),
 				WithBroadcastMesgCopy(),
 			},
-			options: &options{
+			options: options{
 				factory:               decoderFactory,
 				readBufferSize:        8192,
 				shouldChecksum:        false,
@@ -2520,9 +2520,8 @@ func TestDecodeMessagesWithContext(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "context DeadlineExceeded",
+			name: "context ContextExceeded",
 			r: fnReader(func(b []byte) (n int, err error) {
-				time.Sleep(1 * time.Second) // Let's make our process take longer, 1s per reader Read call.
 				return len(b), nil
 			}),
 			ctx: func() context.Context {
