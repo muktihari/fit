@@ -105,12 +105,12 @@ func TestOptions(t *testing.T) {
 	tt := []struct {
 		name     string
 		opts     []Option
-		expected *options
+		expected options
 	}{
 		{
 			name: "defaultOptions",
 			opts: nil,
-			expected: &options{
+			expected: options{
 				multipleLocalMessageType: 0,
 				endianness:               0,
 				protocolVersion:          proto.V1,
@@ -126,7 +126,7 @@ func TestOptions(t *testing.T) {
 				WithCompressedTimestampHeader(),
 				WithMessageValidator(fnValidateOK),
 			},
-			expected: &options{
+			expected: options{
 				multipleLocalMessageType: 15,
 				endianness:               1,
 				protocolVersion:          proto.V2,
@@ -866,7 +866,7 @@ func TestCompressTimestampInHeader(t *testing.T) {
 			},
 		},
 		{
-			name: "compress timestamp in header happy flow: roll over occured exactly after 32 seconds",
+			name: "compress timestamp in header happy flow: roll over occurred exactly after 32 seconds",
 			mesgs: []proto.Message{
 				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
 					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
@@ -885,7 +885,7 @@ func TestCompressTimestampInHeader(t *testing.T) {
 			headers: []byte{
 				proto.MesgNormalHeaderMask, // file_id: has no timestamp
 				proto.MesgNormalHeaderMask, // record: the message containing timestamp reference prior to the use of compressed header.
-				proto.MesgNormalHeaderMask, // record: roll over has occured, the timestamp is used new timestamp reference.
+				proto.MesgNormalHeaderMask, // record: roll over has occurred, the timestamp is used new timestamp reference.
 				proto.MesgCompressedHeaderMask | (offset+1)&proto.CompressedTimeMask,
 			},
 		},

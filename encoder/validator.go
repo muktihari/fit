@@ -53,8 +53,8 @@ type fnApplyValidatorOption func(o *validatorOptions)
 
 func (f fnApplyValidatorOption) apply(o *validatorOptions) { f(o) }
 
-func defaultValidatorOptions() *validatorOptions {
-	return &validatorOptions{
+func defaultValidatorOptions() validatorOptions {
+	return validatorOptions{
 		omitInvalidValues: true,
 		factory:           factory.StandardFactory(),
 	}
@@ -83,23 +83,26 @@ func ValidatorWithFactory(factory Factory) ValidatorOption {
 	})
 }
 
+type messageValidator struct {
+	options           validatorOptions
+	developerDataIds  []*mesgdef.DeveloperDataId
+	fieldDescriptions []*mesgdef.FieldDescription
+}
+
 // NewMessageValidator creates new message validator. The validator is mainly used to validate message before encoding.
 // This receives options that direct the message validator how it should behave in certain way.
 func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
-	options := defaultValidatorOptions()
-	for _, opt := range opts {
-		opt.apply(options)
+	mv := &messageValidator{}
+	mv.options = defaultValidatorOptions()
+	for i := range opts {
+		opts[i].apply(&mv.options)
 	}
-
-	return &messageValidator{
-		options: options,
-	}
+	return mv
 }
 
-type messageValidator struct {
-	options           *validatorOptions
-	developerDataIds  []*mesgdef.DeveloperDataId
-	fieldDescriptions []*mesgdef.FieldDescription
+func (v *messageValidator) Reset() {
+	v.developerDataIds = v.developerDataIds[:0]
+	v.fieldDescriptions = v.fieldDescriptions[:0]
 }
 
 func (v *messageValidator) Validate(mesg *proto.Message) error {
@@ -232,11 +235,6 @@ func (v *messageValidator) handleNativeValue(developerField *proto.DeveloperFiel
 			field.Offset,
 		)
 	}
-}
-
-func (v *messageValidator) Reset() {
-	v.developerDataIds = v.developerDataIds[:0]
-	v.fieldDescriptions = v.fieldDescriptions[:0]
 }
 
 func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
