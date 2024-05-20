@@ -916,7 +916,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
 		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/355554/how-to-determine-developer-field-s-value-type-is-a-string-or-string
-		const overrideStringArray = true
+		overrideStringArray := developerField.BaseType == basetype.String
 		val, err := d.readValue(developerField.Size, mesgDef.Architecture, baseType, profileType, isArray, overrideStringArray)
 		if err != nil {
 			return err
@@ -967,7 +967,7 @@ func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, pr
 	if err != nil {
 		return val, err
 	}
-	if overrideStringArray {
+	if overrideStringArray && baseType == basetype.String {
 		isArray = strlen(b) > 1
 	}
 	return proto.UnmarshalValue(b, arch, baseType, profileType, isArray)
