@@ -22,6 +22,8 @@ type File interface {
 }
 
 // ToMesgs bulks convert mesgdef into proto.Message and append it to messages
+//
+// Deprecated: no longer used in filedef, will be removed in the next major/minor release.
 func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, options *mesgdef.Options, mesgNum typedef.MesgNum, s S) {
 	for i := range s {
 		*messages = append(*messages, s[i].ToMesg(options))
@@ -29,6 +31,8 @@ func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, options *mesgdef.Option
 }
 
 // ToMesg is a type constraint to retrieve all mesgdef structures which implement ToMesg method.
+//
+// Deprecated: no longer used in filedef, will be removed in the next major/minor release.
 type ToMesg interface {
 	ToMesg(options *mesgdef.Options) proto.Message
 }

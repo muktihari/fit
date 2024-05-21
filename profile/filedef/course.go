@@ -46,7 +46,6 @@ func NewCourse(mesgs ...proto.Message) *Course {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -90,20 +89,27 @@ func (f *Course) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
 	if f.Course != nil {
 		fit.Messages = append(fit.Messages, f.Course.ToMesg(options))
 	}
-
 	if f.Lap != nil {
 		fit.Messages = append(fit.Messages, f.Lap.ToMesg(options))
 	}
-
-	ToMesgs(&fit.Messages, options, mesgnum.Record, f.Records)
-	ToMesgs(&fit.Messages, options, mesgnum.Event, f.Events)
-	ToMesgs(&fit.Messages, options, mesgnum.CoursePoint, f.CoursePoints)
+	for i := range f.Records {
+		fit.Messages = append(fit.Messages, f.Records[i].ToMesg(options))
+	}
+	for i := range f.Events {
+		fit.Messages = append(fit.Messages, f.Events[i].ToMesg(options))
+	}
+	for i := range f.CoursePoints {
+		fit.Messages = append(fit.Messages, f.CoursePoints[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

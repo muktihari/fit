@@ -34,7 +34,6 @@ func NewWeight(mesgs ...proto.Message) *Weight {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -74,15 +73,21 @@ func (f *Weight) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
 	if f.UserProfile != nil {
 		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
-
-	ToMesgs(&fit.Messages, options, mesgnum.WeightScale, f.WeightScales)
-	ToMesgs(&fit.Messages, options, mesgnum.DeviceInfo, f.DeviceInfos)
+	for i := range f.WeightScales {
+		fit.Messages = append(fit.Messages, f.WeightScales[i].ToMesg(options))
+	}
+	for i := range f.DeviceInfos {
+		fit.Messages = append(fit.Messages, f.DeviceInfos[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
