@@ -54,7 +54,6 @@ func NewActivity(mesgs ...proto.Message) *Activity {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -118,30 +117,54 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
-	ToMesgs(&fit.Messages, options, mesgnum.DeviceInfo, f.DeviceInfos)
-
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
+	for i := range f.DeviceInfos {
+		fit.Messages = append(fit.Messages, f.DeviceInfos[i].ToMesg(options))
+	}
 	if f.UserProfile != nil {
 		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
-
 	if f.Activity != nil {
 		fit.Messages = append(fit.Messages, f.Activity.ToMesg(options))
 	}
-
-	ToMesgs(&fit.Messages, options, mesgnum.Session, f.Sessions)
-	ToMesgs(&fit.Messages, options, mesgnum.Lap, f.Laps)
-	ToMesgs(&fit.Messages, options, mesgnum.Record, f.Records)
-	ToMesgs(&fit.Messages, options, mesgnum.Event, f.Events)
-	ToMesgs(&fit.Messages, options, mesgnum.Length, f.Lengths)
-	ToMesgs(&fit.Messages, options, mesgnum.SegmentLap, f.SegmentLap)
-	ToMesgs(&fit.Messages, options, mesgnum.ZonesTarget, f.ZonesTargets)
-	ToMesgs(&fit.Messages, options, mesgnum.Workout, f.Workouts)
-	ToMesgs(&fit.Messages, options, mesgnum.WorkoutStep, f.WorkoutSteps)
-	ToMesgs(&fit.Messages, options, mesgnum.Hr, f.HRs)
-	ToMesgs(&fit.Messages, options, mesgnum.Hrv, f.HRVs)
+	for i := range f.Sessions {
+		fit.Messages = append(fit.Messages, f.Sessions[i].ToMesg(options))
+	}
+	for i := range f.Laps {
+		fit.Messages = append(fit.Messages, f.Laps[i].ToMesg(options))
+	}
+	for i := range f.Records {
+		fit.Messages = append(fit.Messages, f.Records[i].ToMesg(options))
+	}
+	for i := range f.Events {
+		fit.Messages = append(fit.Messages, f.Events[i].ToMesg(options))
+	}
+	for i := range f.Lengths {
+		fit.Messages = append(fit.Messages, f.Lengths[i].ToMesg(options))
+	}
+	for i := range f.SegmentLap {
+		fit.Messages = append(fit.Messages, f.SegmentLap[i].ToMesg(options))
+	}
+	for i := range f.ZonesTargets {
+		fit.Messages = append(fit.Messages, f.ZonesTargets[i].ToMesg(options))
+	}
+	for i := range f.Workouts {
+		fit.Messages = append(fit.Messages, f.Workouts[i].ToMesg(options))
+	}
+	for i := range f.WorkoutSteps {
+		fit.Messages = append(fit.Messages, f.WorkoutSteps[i].ToMesg(options))
+	}
+	for i := range f.HRs {
+		fit.Messages = append(fit.Messages, f.HRs[i].ToMesg(options))
+	}
+	for i := range f.HRVs {
+		fit.Messages = append(fit.Messages, f.HRVs[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

@@ -36,7 +36,6 @@ func NewSettings(mesgs ...proto.Message) *Settings {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -81,14 +80,27 @@ func (f *Settings) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
-	ToMesgs(&fit.Messages, options, mesgnum.UserProfile, f.UserProfiles)
-	ToMesgs(&fit.Messages, options, mesgnum.HrmProfile, f.HrmProfiles)
-	ToMesgs(&fit.Messages, options, mesgnum.SdmProfile, f.SdmProfiles)
-	ToMesgs(&fit.Messages, options, mesgnum.BikeProfile, f.BikeProfiles)
-	ToMesgs(&fit.Messages, options, mesgnum.DeviceSettings, f.DeviceSettings)
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
+	for i := range f.UserProfiles {
+		fit.Messages = append(fit.Messages, f.UserProfiles[i].ToMesg(options))
+	}
+	for i := range f.HrmProfiles {
+		fit.Messages = append(fit.Messages, f.HrmProfiles[i].ToMesg(options))
+	}
+	for i := range f.SdmProfiles {
+		fit.Messages = append(fit.Messages, f.SdmProfiles[i].ToMesg(options))
+	}
+	for i := range f.BikeProfiles {
+		fit.Messages = append(fit.Messages, f.BikeProfiles[i].ToMesg(options))
+	}
+	for i := range f.DeviceSettings {
+		fit.Messages = append(fit.Messages, f.DeviceSettings[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

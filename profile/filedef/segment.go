@@ -35,7 +35,6 @@ func NewSegment(mesgs ...proto.Message) *Segment {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -77,22 +76,24 @@ func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
 	if f.SegmentId != nil {
 		fit.Messages = append(fit.Messages, f.SegmentId.ToMesg(options))
 	}
-
 	if f.SegmentLeaderboardEntry != nil {
 		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry.ToMesg(options))
 	}
-
 	if f.SegmentLap != nil {
 		fit.Messages = append(fit.Messages, f.SegmentLap.ToMesg(options))
 	}
-
-	ToMesgs(&fit.Messages, options, mesgnum.SegmentPoint, f.SegmentPoints)
+	for i := range f.SegmentPoints {
+		fit.Messages = append(fit.Messages, f.SegmentPoints[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 

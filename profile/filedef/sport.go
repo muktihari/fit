@@ -38,7 +38,6 @@ func NewSport(mesgs ...proto.Message) *Sport {
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
-
 	return f
 }
 
@@ -87,20 +86,33 @@ func (f *Sport) ToFIT(options *mesgdef.Options) proto.FIT {
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
-	ToMesgs(&fit.Messages, options, mesgnum.DeveloperDataId, f.DeveloperDataIds)
-	ToMesgs(&fit.Messages, options, mesgnum.FieldDescription, f.FieldDescriptions)
-
-	ToMesgs(&fit.Messages, options, mesgnum.ZonesTarget, f.ZonesTargets)
-
+	for i := range f.DeveloperDataIds {
+		fit.Messages = append(fit.Messages, f.DeveloperDataIds[i].ToMesg(options))
+	}
+	for i := range f.FieldDescriptions {
+		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
+	}
+	for i := range f.ZonesTargets {
+		fit.Messages = append(fit.Messages, f.ZonesTargets[i].ToMesg(options))
+	}
 	if f.Sport != nil {
 		fit.Messages = append(fit.Messages, f.Sport.ToMesg(options))
 	}
-
-	ToMesgs(&fit.Messages, options, mesgnum.HrZone, f.HrZones)
-	ToMesgs(&fit.Messages, options, mesgnum.PowerZone, f.PowerZones)
-	ToMesgs(&fit.Messages, options, mesgnum.MetZone, f.MetZones)
-	ToMesgs(&fit.Messages, options, mesgnum.SpeedZone, f.SpeedZones)
-	ToMesgs(&fit.Messages, options, mesgnum.CadenceZone, f.CadenceZones)
+	for i := range f.HrZones {
+		fit.Messages = append(fit.Messages, f.HrZones[i].ToMesg(options))
+	}
+	for i := range f.PowerZones {
+		fit.Messages = append(fit.Messages, f.PowerZones[i].ToMesg(options))
+	}
+	for i := range f.MetZones {
+		fit.Messages = append(fit.Messages, f.MetZones[i].ToMesg(options))
+	}
+	for i := range f.SpeedZones {
+		fit.Messages = append(fit.Messages, f.SpeedZones[i].ToMesg(options))
+	}
+	for i := range f.CadenceZones {
+		fit.Messages = append(fit.Messages, f.CadenceZones[i].ToMesg(options))
+	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
