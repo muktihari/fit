@@ -590,6 +590,9 @@ func TestCheckIntegrity(t *testing.T) {
 			if n != tc.n {
 				t.Fatalf("expected n sequence of FIT: %d, got: %d", tc.n, n)
 			}
+			if dec.err != nil { // Should not remember error.
+				t.Fatalf("decoder's error should be nil, got: %v", dec.err)
+			}
 		})
 	}
 }

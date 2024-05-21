@@ -298,7 +298,6 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 	// Reset used variables so that the decoder can be reused by the same reader.
 	d.reset()
 	d.n = 0 // Must reset bytes counter
-	d.err = err
 	d.options.shouldChecksum = shouldChecksum
 
 	return seq, err
