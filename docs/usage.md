@@ -19,7 +19,7 @@ Table of Contents:
 
 ## Decoding
 
-NOTE: Decoder already implements efficient io.Reader buffering, so there's no need to wrap io.Reader (such as *os.File) using *bufio.Reader for optimal performance.
+NOTE: Decoder already implements efficient io.Reader buffering, so there's no need to wrap io.Reader (such as *os.File) using *bufio.Reader. Doing so will only reduce performance.
 
 ### Decode RAW Protocol Messages
 
@@ -54,7 +54,8 @@ func main() {
 
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
-    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any()) // FileId is always the first message; 4 = activity
+    // FileId is always the first message; 4 = activity
+    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any())
 
     // Output:
     // FileHeader DataSize: 94080
@@ -168,13 +169,13 @@ func main() {
     defer f.Close()
 
     // The listener will receive every decoded message from the decoder as soon as it is decoded
-    // and transform it into an filedef's File.
+    // and transform it into an filedef.File.
     lis := filedef.NewListener()
     defer lis.Close() // release channel used by listener
 
     dec := decoder.New(f,
         decoder.WithMesgListener(lis), // Add activity listener to the decoder
-        decoder.WithBroadcastOnly(),  // Direct the decoder to only broadcast the messages without retaining them.
+        decoder.WithBroadcastOnly(),   // Direct the decoder to only broadcast the messages without retaining them.
     )
 
     for dec.Next() {
@@ -184,6 +185,7 @@ func main() {
         }
 
         // The resulting File can be retrieved after decoding process completed.
+        // filedef.File is just an interface, we can do type assertion like this.
         switch file := lis.File().(type) {
         case *filedef.Course:
             // do something if it's a course file
@@ -348,6 +350,8 @@ When handling a chained fit file, sometimes we only want to decode a certain fil
 ### Check Integrity
 
 Check integrity checks whether FIT File is not corrupted or contains missing data that can invalidates the entire file. Example of when we need to check the integrity is when dealing with **Course File** that contains turn-by-turn navigation, we don't want to guide a person halfway to their destination or guide them to unintended route, do we? The same applies for other file types where it is critical that the contents of the file should be valid, such as Workout, User Profile, Device Settings, etc. For Activity File, most cases, we don't need to check the integrity.
+
+This method ensures the entire FIT File is valid; any trailing bytes will invalidate its integrity, an error will be returned. This also ensures that the FIT File we're working on doesn't contain any malicious byte code.
 
 This returns the number of sequences completed and any error encountered. The number of sequences completed can help recovering valid FIT sequences in a chained FIT that contains invalid or corrupted data.
 
@@ -632,11 +636,9 @@ Note: By default, Encoder use protocol version 1.0 (proto.V1), if you want to us
 Example of encoding fit by self declaring the protocol messages, this is to show how we can compose the message using this SDK.
 
 ```go
-
 package main
 
 import (
-    "context"
     "os"
     "time"
 
@@ -651,47 +653,49 @@ import (
 )
 
 func main() {
+    now := time.Now()
+    fit := proto.FIT{
+        Messages: []proto.Message{
+            // Use factory.CreateMesg if performance is not your main concern,
+            // it's slightly slower as it allocates all of the message's fields.
+            factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
+                fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
+                fieldnum.FileIdManufacturer: typedef.ManufacturerBryton,
+                fieldnum.FileIdProductName:  "Bryton Active App",
+            }),
+            // For better performance, consider using factory.CreateMesgOnly or other alternatives listed below,
+            // as these only allocate the specified fields. However, you can not use WithFieldValues method.
+            factory.CreateMesgOnly(mesgnum.Activity).WithFields(
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityManual.Byte()),
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
+            ),
+            // Alternative #1: Directly compose like this, which is the same as above.
+            proto.Message{Num: mesgnum.Session}.WithFields(
+                factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(1000)),
+                factory.CreateField(mesgnum.Session, fieldnum.SessionAvgCadence).WithValue(uint8(78)),
+                factory.CreateField(mesgnum.Session, fieldnum.SessionAvgHeartRate).WithValue(uint8(100)),
+            ),
+            // Alternative #2: Compose like this, which is as performant as the two examples above.
+            proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
+                factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
+            }},
+        },
+    }
+
     f, err := os.OpenFile("CoffeeRide.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
     if err != nil {
         panic(err)
     }
     defer f.Close()
 
-    now := time.Now()
-
-    fit := &proto.FIT{
-        Messages: []proto.Message{
-            factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-                fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-                fieldnum.FileIdManufacturer: typedef.ManufacturerBryton,
-                fieldnum.FileIdProductName:  "Bryton Active App",
-            }),
-            factory.CreateMesg(mesgnum.Activity).WithFieldValues(map[byte]any{
-                fieldnum.ActivityType:        typedef.ActivityManual,
-                fieldnum.ActivityTimestamp:   datetime.ToUint32(now),
-                fieldnum.ActivityNumSessions: uint16(1),
-            }),
-            factory.CreateMesg(mesgnum.Session).WithFieldValues(map[byte]any{
-                fieldnum.SessionAvgSpeed:     uint16(1000),
-                fieldnum.SessionAvgCadence:   uint8(78),
-                fieldnum.SessionAvgHeartRate: uint8(100),
-            }),
-            // We can use WithFields as well, see `proto` for details.
-            // When using WithFields, it's recommended to use CreateMesgOnly to create a mesg with empty fields
-            // to reduce unnecessary alloc since the fields will be replaced anyway, see `factory` for details.
-            factory.CreateMesgOnly(mesgnum.Record).WithFields(
-                factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-                factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
-                factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
-            ),
-        },
-    }
-
-    bw := bufferedwriter.NewSize(f, 1000<<10) // write to file every 1MB
-    defer bw.Flush() // write any buffered data to the underlying io.Writer.
+    bw := bufferedwriter.New(f) // Wrap *os.File with buffer for fast encoding.
+    defer bw.Flush()            // Flush any buffered data to the underlying io.Writer.
 
     enc := encoder.New(bw)
-    if err := enc.Encode(fit); err != nil {
+    if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
 }
@@ -709,7 +713,6 @@ import (
     "time"
 
     "github.com/muktihari/fit/encoder"
-    "github.com/muktihari/fit/factory"
     "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/profile/filedef"
     "github.com/muktihari/fit/profile/mesgdef"
@@ -717,14 +720,7 @@ import (
 )
 
 func main() {
-    f, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
-    if err != nil {
-        panic(err)
-    }
-    defer f.Close()
-
     now := time.Now()
-
     activity := filedef.NewActivity()
 
     activity.FileId = *mesgdef.NewFileId(nil).
@@ -773,6 +769,12 @@ func main() {
     // Convert back to FIT protocol messages
     fit := activity.ToFIT(nil)
 
+    f, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
     bw := bufferedwriter.New(f)
     defer bw.Flush()
 
@@ -781,16 +783,24 @@ func main() {
         panic(err)
     }
 }
-
-
 ```
 
 Example decoding FIT file into common file `Activity File`, edit the manufacturer and product, and then encode it again.
 
 ```go
-    ...
-    /* Assume you retrive the activity file from decoding a FIT file. */
+package main
 
+import (
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/kit/bufferedwriter"
+    "github.com/muktihari/fit/profile/filedef"
+    "github.com/muktihari/fit/profile/typedef"
+)
+
+func main() {
     fin, err := os.Open("Activity.fit")
     if err != nil {
         panic(err)
@@ -800,7 +810,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     lis := filedef.NewListener()
     defer lis.Close()
 
-    dec := decoder.New(fin),
+    dec := decoder.New(fin,
         decoder.WithMesgListener(lis),
         decoder.WithBroadcastOnly(),
     )
@@ -833,8 +843,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
-
-    ...
+}
 ```
 
 ### Available Encode Options
@@ -877,6 +886,20 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
      )
      ```
 
+   - If you love to live dangerously, you can always bypass the message validator. It might speed up the encoding process, but be warned—it's prone to errors. So, only go for it if you know what you're doing!
+
+   ```go
+     // Define your own message validator, for example this validator will always return nil error.
+     type messageValidatorBypass struct{}
+
+     func (messageValidatorBypass) Validate(mesg *proto.Message) error { return nil }
+     func (messageValidatorBypass) Reset()
+
+     ...
+
+     enc := encoder.New(f, encoder.WithMessageValidator(&messageValidatorBypass{}))
+   ```
+
 1. **WithBigEndian**: directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 
    Example:
@@ -915,7 +938,7 @@ Example decoding FIT file into common file `Activity File`, edit the manufacture
 
 ### Stream Encoder
 
-This is a new feature to enable encode per message basis or in streaming fashion rather than bulk per `proto.FIT`. To enable this, the Encoder's Writer should either implement io.WriterAt or io.WriteSeeker, since we need to be able to update FileHeader (the first 14 bytes) for every sequence completed. This is another building block that we can use.
+This feature enables us to encode per message basis or in streaming fashion rather than bulk per `proto.FIT`. To enable this, the Encoder's Writer should either implement io.WriterAt or io.WriteSeeker, since we need to be able to update FileHeader (the first 14 bytes) for every sequence completed. This is another building block that we can use.
 
 ```go
 package main
@@ -940,7 +963,8 @@ func main() {
     defer f.Close()
 
     // f (*os.File) is implementing both io.WriterAt and io.WriteSeeker so it can be used directly.
-    // But to reduce syscall, let's wrap it using buffered writer instead.
+    // But to reduce syscall, let's wrap it using buffered writer for fast encoding. Unlike bufio.Writer,
+    // bufferedwriter maintains the underlying io.Writer ability to write at specific byte.
     bw := bufferedwriter.New(f)
     defer bw.Flush()
 
@@ -951,6 +975,9 @@ func main() {
 
     // Simplified example, writing only this mesg.
     mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+        factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
+        factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
+        factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(0)),
         factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
     )
 
@@ -968,5 +995,4 @@ func main() {
         panic(err)
     }
 }
-
 ```
