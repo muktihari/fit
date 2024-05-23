@@ -661,7 +661,8 @@ func main() {
             factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
                 fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
                 fieldnum.FileIdManufacturer: typedef.ManufacturerBryton,
-                fieldnum.FileIdProductName:  "Bryton Active App",
+                fieldnum.FileIdProduct: uint16(1901), // Bryton Rider 420
+                fieldnum.FileIdProductName:  "Bryton Rider 420",
             }),
             // For better performance, consider using factory.CreateMesgOnly or other alternatives listed below,
             // as these only allocate the specified fields. However, you can not use WithFieldValues method.
@@ -677,7 +678,7 @@ func main() {
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgHeartRate).WithValue(uint8(100)),
             ),
             // Alternative #2: Compose like this, which is as performant as the two examples above.
-            proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
+            proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
                 factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
                 factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
                 factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
