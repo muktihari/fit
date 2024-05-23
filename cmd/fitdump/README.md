@@ -22,6 +22,10 @@ go run main.go triathlon_summary_last.fit
 # FIT dumped: "triathlon_summary_last.fit" -> "triathlon_summary_last-fitdump.txt"
 ```
 
+```sh
+go run main.go -hex triathlon_summary_last.fit
+```
+
 ### Build or Install
 
 #### Build
@@ -43,4 +47,15 @@ fitdump triathlon_summary_last.fit
 
 # Output:
 # FIT dumped: "triathlon_summary_last.fit" -> "triathlon_summary_last-fitdump.txt"
+```
+
+### Options
+
+| Options | Description                |
+| ------- | -------------------------- |
+| -hex    | Print bytes in hexadecimal |
+
+```sh
+go run main.go -hex triathlon_summary_last.fit
+fitdump -hex triathlon_summary_last.fit
 ```
