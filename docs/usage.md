@@ -246,6 +246,7 @@ func main() {
         panic(err)
     }
     defer f.Close()
+
     dec := decoder.New(f)
 
     fileHeader, err := dec.PeekFileHeader()
@@ -659,6 +660,7 @@ func main() {
             // Use factory.CreateMesg if performance is not your main concern,
             // it's slightly slower as it allocates all of the message's fields.
             factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
+                fieldnum.FileIdType: typedef.FileActivity,
                 fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
                 fieldnum.FileIdManufacturer: typedef.ManufacturerBryton,
                 fieldnum.FileIdProduct: uint16(1901), // Bryton Rider 420
