@@ -26,7 +26,7 @@ type Weight struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Weight{}
+var _ File = (*Weight)(nil)
 
 // NewWeight creates new Weight File.
 func NewWeight(mesgs ...proto.Message) *Weight {

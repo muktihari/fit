@@ -30,7 +30,7 @@ type MonitoringAB struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &MonitoringAB{}
+var _ File = (*MonitoringAB)(nil)
 
 // NewMonitoringAB creates new MonitoringAB File.
 func NewMonitoringAB(mesgs ...proto.Message) *MonitoringAB {

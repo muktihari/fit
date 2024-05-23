@@ -46,7 +46,7 @@ type Activity struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Activity{}
+var _ File = (*Activity)(nil)
 
 // NewActivity creates new Activity File.
 func NewActivity(mesgs ...proto.Message) *Activity {

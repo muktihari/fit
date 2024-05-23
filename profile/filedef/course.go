@@ -38,7 +38,7 @@ type Course struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Course{}
+var _ File = (*Course)(nil)
 
 // NewCourse creates new Course File.
 func NewCourse(mesgs ...proto.Message) *Course {

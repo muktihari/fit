@@ -30,7 +30,7 @@ type Sport struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Sport{}
+var _ File = (*Sport)(nil)
 
 // NewSport creates new Sport File.
 func NewSport(mesgs ...proto.Message) *Sport {

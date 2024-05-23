@@ -26,7 +26,7 @@ type ActivitySummary struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &ActivitySummary{}
+var _ File = (*ActivitySummary)(nil)
 
 // NewActivitySummary creates new ActivitySummary File.
 func NewActivitySummary(mesgs ...proto.Message) *ActivitySummary {

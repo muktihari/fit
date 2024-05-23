@@ -25,7 +25,7 @@ type Totals struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Totals{}
+var _ File = (*Totals)(nil)
 
 // NewTotals creates new Totals File.
 func NewTotals(mesgs ...proto.Message) *Totals {

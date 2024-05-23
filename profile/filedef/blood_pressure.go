@@ -26,7 +26,7 @@ type BloodPressure struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &BloodPressure{}
+var _ File = (*BloodPressure)(nil)
 
 // NewBloodPressure creates new BloodPressure File.
 func NewBloodPressure(mesgs ...proto.Message) *BloodPressure {

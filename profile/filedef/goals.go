@@ -24,7 +24,7 @@ type Goals struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Goals{}
+var _ File = (*Goals)(nil)
 
 // NewGoals creates new Goals File.
 func NewGoals(mesgs ...proto.Message) *Goals {
