@@ -24,7 +24,7 @@ type Schedules struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Schedules{}
+var _ File = (*Schedules)(nil)
 
 // NewSchedules creates new Schedules File.
 func NewSchedules(mesgs ...proto.Message) *Schedules {

@@ -27,7 +27,7 @@ type Segment struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Segment{}
+var _ File = (*Segment)(nil)
 
 // NewSegment creates new Segment File.
 func NewSegment(mesgs ...proto.Message) *Segment {

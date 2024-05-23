@@ -18,7 +18,7 @@ type ComponentField interface {
 	GetBits() []byte
 }
 
-var _ ComponentField = Field{}
+var _ ComponentField = (*Field)(nil)
 
 type Field struct {
 	Num        byte
@@ -43,7 +43,7 @@ func (f Field) GetOffsets() []float64   { return f.Offsets }
 func (f Field) GetAccumulate() []bool   { return f.Accumulate }
 func (f Field) GetBits() []byte         { return f.Bits }
 
-var _ ComponentField = SubField{}
+var _ ComponentField = (*SubField)(nil)
 
 type SubField struct {
 	FieldNum      byte

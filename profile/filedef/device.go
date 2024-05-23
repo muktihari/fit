@@ -28,7 +28,7 @@ type Device struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Device{}
+var _ File = (*Device)(nil)
 
 // NewDevice creates new Device File.
 func NewDevice(mesgs ...proto.Message) *Device {

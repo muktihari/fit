@@ -1,7 +1,6 @@
 package benchfit_test
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/binary"
 	"io"
@@ -84,11 +83,10 @@ var discard = discardAt{}
 
 type discardAt struct{}
 
-var _ io.Writer = discardAt{}
-var _ io.WriterAt = discardAt{}
+var _ io.Writer = (*discardAt)(nil)
+var _ io.WriterAt = (*discardAt)(nil)
 
-func (discardAt) Write(p []byte) (int, error) { return len(p), nil }
-
+func (discardAt) Write(p []byte) (int, error)                    { return len(p), nil }
 func (discardAt) WriteAt(p []byte, off int64) (n int, err error) { return len(p), nil }
 
 func BenchmarkEncode(b *testing.B) {
@@ -99,7 +97,7 @@ func BenchmarkEncode(b *testing.B) {
 			b.Fatalf("open file: %v", err)
 		}
 
-		dec := decoder.New(bufio.NewReader(bytes.NewReader(f)))
+		dec := decoder.New(bytes.NewReader(f))
 
 		fit, err := dec.Decode()
 		if err != nil {
@@ -125,7 +123,7 @@ func BenchmarkEncode(b *testing.B) {
 		al := filedef.NewListener()
 		defer al.Close()
 
-		dec := decoder.New(bufio.NewReader(bytes.NewReader(f)),
+		dec := decoder.New(bytes.NewReader(f),
 			decoder.WithMesgListener(al),
 			decoder.WithBroadcastOnly(),
 		)

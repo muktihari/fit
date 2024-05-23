@@ -176,7 +176,7 @@ func (p *printer) Close() {
 	close(p.poolc)
 }
 
-var _ decoder.MesgListener = &printer{}
+var _ decoder.MesgListener = (*printer)(nil)
 
 func (p *printer) OnMesg(mesg proto.Message) {
 	if !p.active {

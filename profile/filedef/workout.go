@@ -29,7 +29,7 @@ type Workout struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Workout{}
+var _ File = (*Workout)(nil)
 
 // NewWorkout creates new Workout File.
 func NewWorkout(mesgs ...proto.Message) *Workout {

@@ -26,7 +26,7 @@ type MonitoringDaily struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &MonitoringDaily{}
+var _ File = (*MonitoringDaily)(nil)
 
 // NewMonitoringDaily creates new MonitoringDaily File.
 func NewMonitoringDaily(mesgs ...proto.Message) *MonitoringDaily {

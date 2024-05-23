@@ -1253,16 +1253,11 @@ var discard = discardAt{}
 
 type discardAt struct{}
 
-var _ io.Writer = discardAt{}
-var _ io.WriterAt = discardAt{}
+var _ io.Writer = (*discardAt)(nil)
+var _ io.WriterAt = (*discardAt)(nil)
 
-func (discardAt) Write(p []byte) (int, error) {
-	return len(p), nil
-}
-
-func (discardAt) WriteAt(p []byte, off int64) (n int, err error) {
-	return len(p), nil
-}
+func (discardAt) Write(p []byte) (int, error)                    { return len(p), nil }
+func (discardAt) WriteAt(p []byte, off int64) (n int, err error) { return len(p), nil }
 
 func BenchmarkEncodeWriterAt(b *testing.B) {
 	b.StopTimer()

@@ -28,7 +28,7 @@ type Settings struct {
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = &Settings{}
+var _ File = (*Settings)(nil)
 
 // NewSettings creates new Settings File.
 func NewSettings(mesgs ...proto.Message) *Settings {

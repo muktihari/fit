@@ -23,14 +23,14 @@ type writerAtStub struct {
 	b *[]byte
 }
 
-var _ io.Writer = &writerAtStub{}
+var _ io.Writer = (*writerAtStub)(nil)
 
 func (w *writerAtStub) Write(p []byte) (n int, err error) {
 	*w.b = append(*w.b, p...)
 	return len(p), nil
 }
 
-var _ io.WriterAt = &writerAtStub{}
+var _ io.WriterAt = (*writerAtStub)(nil)
 
 func (w *writerAtStub) WriteAt(p []byte, pos int64) (int, error) {
 	for i := 0; i < len(p); i++ {
