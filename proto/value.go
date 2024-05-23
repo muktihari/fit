@@ -91,13 +91,19 @@ type Value struct {
 	_ [0]func() // disallow ==
 	// num holds a numeric value when it's single value, and hold slice's len when it's a slice value.
 	num uint64
-	// any holds a Type when it's a single value, and hold a pointer to the slice when it's slice value.
+	// any holds a Type when it's a single value, and hold a pointer to the underlying array when it's slice value.
 	//
-	// This implementation takes advantage of compiler interface optimization:
-	// - Compiler adds global [256]byte array called 'staticbytes' to every binary.
-	// - So putting single-byte value into an interface{} do not allocate.
+	// An interface is represented as two words. This implementation takes advantage of
+	// compiler interface optimization:
+	// - Since Go v1.4, the second word is must contain a pointer and when we put a pointer to an interface
+	//   it will be put directly into the second interface word, no allocation needed.
+	// - Since Go v1.9, putting a constant to an interface do not allocate.
 	//
-	// ref: https://commaok.xyz/post/interface-allocs
+	// Ref: https://commaok.xyz/post/interface-allocs
+	//
+	// This implementation is similar to [log/slog]'s value.go (added in standard library since Go v1.21).
+	// See https://github.com/golang/go/blob/master/src/log/slog/value.go for details.
+	// As long as we follow a similar pattern and keep updating, this implementation should be working as intended.
 	any any
 }
 
@@ -455,6 +461,7 @@ func (v Value) Any() any {
 	return nil
 }
 
+// Align checks whether Value's type is align with given basetype.
 func (v Value) Align(t basetype.BaseType) bool {
 	switch v.Type() {
 	case TypeBool, TypeSliceBool:

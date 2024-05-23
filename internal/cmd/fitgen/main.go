@@ -64,7 +64,7 @@ func main() {
 	flag.StringVar(&generatePath, "path", "", generatePathHelp)
 
 	var whichBuilder string
-	whichBuilderHelp := "Which builder to generate (separated by comma): [types, mesgs, profile, factory] or all"
+	whichBuilderHelp := "Which builder to generate (separated by comma): [typedef, mesgdef, profile, factory, untyped, mesgnum, fieldnum] or all"
 	flag.StringVar(&whichBuilder, "b", "", whichBuilderHelp)
 	flag.StringVar(&whichBuilder, "builders", "", whichBuilderHelp)
 
@@ -128,7 +128,7 @@ func main() {
 		fatalf(fmt.Sprintf("could no parse message: %v\n", err))
 	}
 
-	lookup := lookup.NewLookup(parsedtypes, parsedmesgs)
+	lookup := lookup.New(parsedtypes, parsedmesgs)
 	var (
 		typedefb = typedef.NewBuilder(generatePath, parsedtypes)
 		profileb = profile.NewBuilder(generatePath, profileVersion, parsedtypes)
