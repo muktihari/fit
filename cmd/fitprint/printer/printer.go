@@ -213,8 +213,8 @@ func (p *printer) print(mesg proto.Message) {
 		numstr = factory.NameUnknown
 	}
 
-	fmt.Fprintf(p.w, "%s (num: %d, fields[-]: %d, developerFields[+]: %d) [%d]:\n",
-		numstr, mesg.Num, len(mesg.Fields), len(mesg.DeveloperFields), p.count)
+	fmt.Fprintf(p.w, "%s (num: %d, arch: %d, fields[-]: %d, developerFields[+]: %d) [%d]:\n",
+		numstr, mesg.Num, mesg.Architecture, len(mesg.Fields), len(mesg.DeveloperFields), p.count)
 
 	for j := range mesg.Fields {
 		field := &mesg.Fields[j]

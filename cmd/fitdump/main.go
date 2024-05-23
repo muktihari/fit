@@ -6,6 +6,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,18 +17,28 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
+	var opt options
+	flag.BoolVar(&opt.hex, "hex", false, "print bytes in hexadecimal")
+	flag.Parse()
+
+	args := flag.Args()
+
+	if len(args) < 1 {
 		fmt.Fprintf(os.Stderr, "missing arguments\n")
 		os.Exit(2)
 	}
-	for i, arg := range os.Args[1:] {
-		if err := textdump(arg); err != nil {
+	for i, arg := range args {
+		if err := textdump(arg, &opt); err != nil {
 			fmt.Printf("could not dump args[%d] %q: %v\n", i, arg, err)
 		}
 	}
 }
 
-func textdump(path string) error {
+type options struct {
+	hex bool
+}
+
+func textdump(path string, opt *options) error {
 	ext := filepath.Ext(path)
 	if strings.ToLower(ext) != ".fit" {
 		return fmt.Errorf("expected ext: *.fit, got: %s", ext)
@@ -63,9 +74,10 @@ func textdump(path string) error {
 	fmt.Fprintf(w, "%s %16s %7s %8s\n", "SEGMENT", "|LOCAL NUM|", "HEADER", "BYTES")
 	_, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
 		if flag == decoder.RawFlagMesgDef || flag == decoder.RawFlagMesgData {
-			fmt.Fprintf(w, "%-19s |%2d|  %08b  %v\n", flag, proto.LocalMesgNum(b[0]), b[0], b)
+			fmt.Fprintf(w, "%-19s |%s|  %08b  %s\n",
+				flag, formatByte(proto.LocalMesgNum(b[0]), opt.hex), b[0], formatBytes(b, opt.hex))
 		} else {
-			fmt.Fprintf(w, "%-19s %15s %v\n", flag, "", b)
+			fmt.Fprintf(w, "%-19s %15s %s\n", flag, "", formatBytes(b, opt.hex))
 		}
 		return nil
 	})
@@ -76,4 +88,29 @@ func textdump(path string) error {
 	fmt.Printf("FIT dumped: %q -> %q\n", path, resultPath)
 
 	return nil
+}
+
+func formatByte(b byte, hexadecimal bool) string {
+	if !hexadecimal {
+		return fmt.Sprintf("%.2d", b)
+	}
+	return fmt.Sprintf("%.2x", b)
+}
+
+func formatBytes(b []byte, hexadecimal bool) string {
+	if !hexadecimal {
+		return fmt.Sprintf("%v", b)
+	}
+
+	var buf strings.Builder
+	buf.WriteByte('[')
+	for ; len(b) > 0; b = b[1:] {
+		buf.WriteString(fmt.Sprintf("%.2x", b[0]))
+		if len(b) > 1 {
+			buf.WriteByte(' ')
+		}
+	}
+	buf.WriteByte(']')
+
+	return buf.String()
 }
