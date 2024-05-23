@@ -36,7 +36,7 @@ func CreateMesgOnly(num typedef.MesgNum) proto.Message {
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 //
 // Field's FieldBase is a pointer struct embedded, and this will only create a shallow copy of the field, so changing any value declared in
-// FieldBase is prohibited (except fot the unknown field) since it still referencing the same struct. If you want a deep copy of the Field,
+// FieldBase is prohibited (except for the unknown field) since it still referencing the same struct. If you want a deep copy of the Field,
 // create it by calling field.Clone().
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return std.CreateField(mesgNum, num)
