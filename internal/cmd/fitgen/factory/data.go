@@ -7,6 +7,5 @@ package factory
 // Data represent factory.tmpl
 type Data struct {
 	Package  string // Package name
-	Messages string // string formated struct []*proto.Message{...}
-	Mesgnums []string
+	Messages string // string formated struct [...]message{...}
 }

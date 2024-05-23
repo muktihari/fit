@@ -16,7 +16,7 @@ type profile struct {
 	valuesByName map[string]string
 }
 
-func NewLookup(types []parser.Type, messages []parser.Message) *Lookup {
+func New(types []parser.Type, messages []parser.Message) *Lookup {
 	l := &Lookup{
 		fieldsByMesgName: make(map[string][]parser.Field),
 		profiles:         make(map[string]profile),

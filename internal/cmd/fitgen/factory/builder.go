@@ -91,13 +91,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 		strbuf.WriteString(fmt.Sprintf("Fields: %s,\n", b.makeFields(message)))
 		strbuf.WriteString("},\n")
 	}
-
 	strbuf.WriteString("}")
-
-	mesgnums := make([]string, 0, len(b.messages))
-	for i := range b.messages {
-		mesgnums = append(mesgnums, b.transformMesgnum(b.messages[i].Name))
-	}
 
 	return []builder.Data{
 		{
@@ -108,7 +102,6 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 			Data: Data{
 				Package:  "factory",
 				Messages: strbuf.String(),
-				Mesgnums: mesgnums,
 			},
 		},
 		{

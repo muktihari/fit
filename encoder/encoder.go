@@ -198,6 +198,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	}
 
 	e.reset()
+	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 
 	var lruSize byte = 1
 	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
@@ -205,7 +206,6 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	}
 	e.localMesgNumLRU.ResetWithNewSize(lruSize)
 
-	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 }
 
 // reset resets the encoder's data that is being used for encoding,
@@ -348,9 +348,6 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) error {
 		if err != nil {
 			return err
 		}
-
-		// Restore the offset to the end since we have no control over the writer after the encoding process is completed.
-		// In case the user accidentally writes to the writer, this ensures that the FIT File doesn't get corrupted.
 		_, err = w.Seek(0, io.SeekEnd)
 		if err != nil {
 			return err
