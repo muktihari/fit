@@ -406,7 +406,26 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 	}
 
 	if e.options.headerOption == headerOptionCompressedTimestamp {
-		e.compressTimestampIntoHeader(mesg)
+		if e.w == io.Discard {
+			// NOTE: Only for calculating data size (Early Check Strategy)
+			var timestampField proto.Field
+			if field := mesg.FieldByNum(proto.FieldNumTimestamp); field != nil {
+				timestampField = *field
+			}
+
+			prevLen := len(mesg.Fields)
+			e.compressTimestampIntoHeader(mesg)
+
+			if prevLen != len(mesg.Fields) {
+				defer func() { // Revert: put timestamp field back
+					mesg.Fields = mesg.Fields[:prevLen]
+					copy(mesg.Fields[1:], mesg.Fields[:len(mesg.Fields)])
+					mesg.Fields[0] = timestampField
+				}()
+			}
+		} else {
+			e.compressTimestampIntoHeader(mesg)
+		}
 	}
 
 	proto.CreateMessageDefinitionTo(&e.mesgDef, mesg)
@@ -416,8 +435,10 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 
 	b, _ := e.mesgDef.MarshalAppend(e.bytesArray[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
-	b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
-	mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
+	if e.options.headerOption == headerOptionNormal {
+		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
+		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
+	}
 
 	if isNewMesgDef {
 		n, err := e.w.Write(b)

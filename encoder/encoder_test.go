@@ -22,6 +22,7 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -950,6 +951,87 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				if diff := cmp.Diff(tc.mesgs[i].Header, tc.headers[i]); diff != "" {
 					t.Errorf("index: %d: %s", i, diff)
 				}
+			}
+		})
+	}
+}
+
+// bufferAt wraps bytes.Buffer to enable WriteAt for faster encoding.
+type bufferAt struct{ *bytes.Buffer }
+
+func (b *bufferAt) WriteAt(p []byte, off int64) (n int, err error) {
+	return copy(b.Bytes()[off:], p), nil
+}
+
+func TestEncodeWithCompressedTimestampHeader(t *testing.T) {
+	now := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) // uint32(1073001600) -> []byte{128, 180, 244, 63}
+	fnCreateFIT := func() proto.FIT {
+		return proto.FIT{
+			Messages: []proto.Message{
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(60)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(1 * time.Second))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(60)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(60)),
+				}},
+			},
+		}
+	}
+
+	expected := []byte{ // Records only
+		proto.MesgDefinitionMask, 0, 0, 0, 0, 1, fieldnum.FileIdManufacturer, basetype.Uint16.Size(), byte(basetype.Uint16),
+		/* FileId */ 0, 255, 0,
+		proto.MesgDefinitionMask, 0, 0, 20, 0, 2,
+		/* ~ */ fieldnum.RecordTimestamp, basetype.Uint32.Size(), byte(basetype.Uint32),
+		/* ~ */ fieldnum.RecordHeartRate, basetype.Uint8.Size(), byte(basetype.Uint8),
+		/* Record 0 */ 0, 128, 180, 244, 63, 60, // Timestamp + HeartRate
+		proto.MesgDefinitionMask, 0, 0, 20, 0, 1, fieldnum.RecordHeartRate, basetype.Uint8.Size(), byte(basetype.Uint8),
+		/* Record 1 */ 0 | proto.MesgCompressedHeaderMask | 1, 60, // HeartRate only
+		/* Record 2 */ 0 | proto.MesgCompressedHeaderMask | 2, 60, // HeartRate only
+	}
+
+	tt := []struct {
+		name string
+		w    interface {
+			io.Writer
+			Bytes() []byte
+		}
+		fit proto.FIT
+	}{
+		{
+			name: "early check strategy",
+			w:    new(bytes.Buffer),
+			fit:  fnCreateFIT(),
+		},
+		{
+			name: "direct update strategy",
+			w:    &bufferAt{new(bytes.Buffer)},
+			fit:  fnCreateFIT(),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			enc := New(tc.w, WithCompressedTimestampHeader())
+			if err := enc.Encode(&tc.fit); err != nil {
+				t.Fatalf("expected error nil, got: %v", err)
+			}
+
+			b := tc.w.(interface{ Bytes() []byte }).Bytes()
+			b = b[14:]       // omit FileHeader
+			b = b[:len(b)-2] // omit CRC
+
+			if diff := cmp.Diff(expected, b); diff != "" {
+				t.Fatal(diff)
 			}
 		})
 	}
