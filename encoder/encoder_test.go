@@ -20,6 +20,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
+	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
@@ -1091,18 +1092,20 @@ func TestStreamEncoder(t *testing.T) {
 func TestReset(t *testing.T) {
 	tt := []struct {
 		name     string
+		w        io.Writer
 		opts     []Option
 		expected *Encoder
 	}{
 		{
 			name: "reset with options",
+			w:    io.Discard,
 			opts: []Option{
 				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
 				WithNormalHeader(15),
 				WithMessageValidator(fnValidateOK),
 			},
-			expected: New(nil,
+			expected: New(io.Discard,
 				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
 				WithNormalHeader(15),
@@ -1112,13 +1115,13 @@ func TestReset(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(io.Discard)
-			enc.Reset(io.Discard, tc.opts...)
+			enc := New(nil)
+			enc.Reset(tc.w, tc.opts...)
 			if diff := cmp.Diff(enc, tc.expected,
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Encoder{}),
 				cmp.FilterValues(func(x, y MessageValidator) bool { return true }, cmp.Ignore()),
-				cmp.FilterValues(func(x, y io.Writer) bool { return true }, cmp.Ignore()),
+				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y *proto.Validator) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y *lru) bool { return true }, cmp.Ignore()),
 			); diff != "" {
