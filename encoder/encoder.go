@@ -83,10 +83,9 @@ type options struct {
 
 func defaultOptions() options {
 	return options{
-		messageValidator: NewMessageValidator(),
-		protocolVersion:  proto.V1,
-		endianness:       littleEndian,
-		headerOption:     headerOptionNormal,
+		protocolVersion: proto.V1,
+		endianness:      littleEndian,
+		headerOption:    headerOptionNormal,
 	}
 }
 
@@ -176,7 +175,6 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 // such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
 func New(w io.Writer, opts ...Option) *Encoder {
 	e := &Encoder{
-		w:                 w,
 		crc16:             crc16.New(nil),
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
@@ -198,6 +196,10 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 		opts[i].apply(&e.options)
 	}
 
+	if e.options.messageValidator == nil {
+		e.options.messageValidator = NewMessageValidator()
+	}
+
 	e.reset()
 	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 
@@ -206,7 +208,6 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 		lruSize = e.options.multipleLocalMessageType + 1
 	}
 	e.localMesgNumLRU.ResetWithNewSize(lruSize)
-
 }
 
 // reset resets the encoder's data that is being used for encoding,

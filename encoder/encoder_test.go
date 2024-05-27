@@ -13,6 +13,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"testing"
 	"time"
@@ -120,16 +121,31 @@ func TestOptions(t *testing.T) {
 			},
 		},
 		{
-			name: "with options",
+			name: "with options: normal header",
 			opts: []Option{
 				WithBigEndian(),
 				WithNormalHeader(20),
+				WithProtocolVersion(proto.V2),
+				WithMessageValidator(fnValidateOK),
+			},
+			expected: options{
+				multipleLocalMessageType: 15,
+				endianness:               1,
+				protocolVersion:          proto.V2,
+				messageValidator:         fnValidateOK,
+				headerOption:             headerOptionNormal,
+			},
+		},
+		{
+			name: "with options: compressed timestamp header",
+			opts: []Option{
+				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
 				WithCompressedTimestampHeader(),
 				WithMessageValidator(fnValidateOK),
 			},
 			expected: options{
-				multipleLocalMessageType: 15,
+				multipleLocalMessageType: 0,
 				endianness:               1,
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
@@ -141,12 +157,26 @@ func TestOptions(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(nil, tc.opts...)
-			if diff := cmp.Diff(enc.options, tc.expected,
+
+			cmpOpts := []cmp.Option{
 				cmp.AllowUnexported(options{}),
-				cmp.FilterValues(func(x, y MessageValidator) bool {
-					return true
-				}, cmp.Ignore()),
-			); diff != "" {
+			}
+
+			if tc.opts == nil { // defaultOptions
+				cmpOpts = append(cmpOpts,
+					cmp.Transformer("MessageValidator", func(mv MessageValidator) string {
+						return fmt.Sprintf("%T", mv) // compare type only
+					}),
+				)
+			} else {
+				cmpOpts = append(cmpOpts,
+					cmp.Transformer("MessageValidator", func(v MessageValidator) uintptr {
+						return reflect.ValueOf(v).Pointer() // should reference the same object
+					}),
+				)
+			}
+
+			if diff := cmp.Diff(enc.options, tc.expected, cmpOpts...); diff != "" {
 				t.Fatal(diff)
 			}
 		})
@@ -1294,9 +1324,10 @@ func BenchmarkEncodeWriterAt(b *testing.B) {
 }
 
 func BenchmarkReset(b *testing.B) {
+	mv := NewMessageValidator()
 	b.Run("benchmark New()", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = New(nil)
+			_ = New(nil, WithMessageValidator(mv))
 		}
 	})
 	b.Run("benchmark Reset()", func(b *testing.B) {
@@ -1305,7 +1336,7 @@ func BenchmarkReset(b *testing.B) {
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
-			enc.Reset(nil)
+			enc.Reset(nil, WithMessageValidator(mv))
 		}
 	})
 }
