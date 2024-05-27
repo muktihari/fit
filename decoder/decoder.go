@@ -336,17 +336,16 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 //
 // After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 // This method is idempotent and can be invoked even after Decode has been invoked.
-func (d *Decoder) PeekFileId() (fileId *mesgdef.FileId, err error) {
+func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err != nil {
 		return nil, d.err
 	}
-	defer func() { d.err = err }()
-	if err = d.decodeFileHeaderOnce(); err != nil {
-		return
+	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
+		return nil, d.err
 	}
 	for d.fileId == nil {
-		if err = d.decodeMessage(); err != nil {
-			return
+		if d.err = d.decodeMessage(); d.err != nil {
+			return nil, d.err
 		}
 	}
 	return d.fileId, nil
@@ -357,20 +356,17 @@ func (d *Decoder) Next() bool {
 	if d.err != nil {
 		return false
 	}
-
 	if !d.sequenceCompleted {
 		return true
 	}
-
 	d.reset() // reset values for the next chained FIT file
-
 	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeFileHeaderOnce() == nil
 }
 
-// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or an error if it occurs.
-// To decode a chained FIT file that contains more than one FIT data, this decode method should be invoked
-// multiple times. It is recommended to wrap it with the Next() method when you are uncertain if it's a chained FIT file.
+// Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or
+// an error if it occurs. To decode a chained FIT file containing multiple FIT data, invoke this
+// method multiple times, however, the invocation must be wrapped with Next() method as follows:
 //
 //	for dec.Next() {
 //	     fit, err := dec.Decode()
@@ -378,19 +374,18 @@ func (d *Decoder) Next() bool {
 //	         return err
 //	     }
 //	}
-func (d *Decoder) Decode() (fit *proto.FIT, err error) {
+func (d *Decoder) Decode() (*proto.FIT, error) {
 	if d.err != nil {
 		return nil, d.err
 	}
-	defer func() { d.err = err }()
-	if err = d.decodeFileHeaderOnce(); err != nil {
-		return nil, err
+	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
+		return nil, d.err
 	}
-	if err = d.decodeMessages(); err != nil {
-		return nil, err
+	if d.err = d.decodeMessages(); d.err != nil {
+		return nil, d.err
 	}
-	if err = d.decodeCRC(); err != nil {
-		return nil, err
+	if d.err = d.decodeCRC(); d.err != nil {
+		return nil, d.err
 	}
 	d.sequenceCompleted = true
 	return &proto.FIT{
@@ -993,28 +988,27 @@ func (d *Decoder) logDeveloperField(m *proto.Message, dfd *proto.DeveloperFieldD
 }
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.
-func (d *Decoder) DecodeWithContext(ctx context.Context) (fit *proto.FIT, err error) {
+func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 	if d.err != nil {
 		return nil, d.err
 	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	defer func() { d.err = err }()
-	if err = checkContext(ctx); err != nil {
-		return nil, err
+	if d.err = checkContext(ctx); d.err != nil {
+		return nil, d.err
 	}
-	if err = d.decodeFileHeaderOnce(); err != nil {
-		return nil, err
+	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
+		return nil, d.err
 	}
-	if err = d.decodeMessagesWithContext(ctx); err != nil {
-		return nil, err
+	if d.err = d.decodeMessagesWithContext(ctx); d.err != nil {
+		return nil, d.err
 	}
-	if err = checkContext(ctx); err != nil {
-		return nil, err
+	if d.err = checkContext(ctx); d.err != nil {
+		return nil, d.err
 	}
-	if err = d.decodeCRC(); err != nil {
-		return nil, err
+	if d.err = d.decodeCRC(); d.err != nil {
+		return nil, d.err
 	}
 	d.sequenceCompleted = true
 	return &proto.FIT{
