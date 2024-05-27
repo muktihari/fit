@@ -82,7 +82,7 @@ func TzOffsetHoursFromUint32(localDateTime, dateTime uint32) int {
 
 // Convert t into uint32 fit representative time value.
 func ToUint32(t time.Time) uint32 {
-	if t.IsZero() {
+	if t.Before(epoch) {
 		return basetype.Uint32Invalid
 	}
 	return uint32(t.Sub(epoch).Seconds())
