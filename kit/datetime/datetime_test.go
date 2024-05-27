@@ -179,12 +179,17 @@ func TestToUint32(t *testing.T) {
 			time: time.Time{},
 			u32:  basetype.Uint32Invalid,
 		},
+		{
+			name: "before FIT's epoch",
+			time: time.Date(1945, time.November, 10, 0, 0, 0, 0, time.UTC),
+			u32:  basetype.Uint32Invalid,
+		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			res := datetime.ToUint32(tc.time)
 			if res != tc.u32 {
-				t.Fatalf("expected time: %d, got: %d", tc.u32, res)
+				t.Fatalf("expected time in uint32: %d, got: %d", tc.u32, res)
 			}
 		})
 	}
