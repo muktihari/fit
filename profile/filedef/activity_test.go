@@ -138,11 +138,14 @@ func newActivityMessagesWithExpectedOrder(now time.Time) (mesgs []proto.Message,
 		21: factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
-		// Special case these messages are not counted:
+		// Special case:
 		// 1. CoursePoint's Timestamp Num is 1
 		// 2. Set's Timestamp Num is 254
 		22: factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		),
+		23: factory.CreateMesgOnly(mesgnum.Set).WithFields(
+			factory.CreateField(mesgnum.Set, fieldnum.SetTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		),
 	}
 
@@ -158,18 +161,19 @@ func newActivityMessagesWithExpectedOrder(now time.Time) (mesgs []proto.Message,
 		8:  mesgs[17],
 		9:  mesgs[18],
 		10: mesgs[20],
-		11: mesgs[22],
-		12: mesgs[5],
-		13: mesgs[6],
-		14: mesgs[7],
-		15: mesgs[8],
-		16: mesgs[9],
-		17: mesgs[10],
-		18: mesgs[11],
-		19: mesgs[12],
-		20: mesgs[13],
-		21: mesgs[19],
-		22: mesgs[21],
+		11: mesgs[5],
+		12: mesgs[6],
+		13: mesgs[7],
+		14: mesgs[8],
+		15: mesgs[9],
+		16: mesgs[10],
+		17: mesgs[11],
+		18: mesgs[12],
+		19: mesgs[13],
+		20: mesgs[19],
+		21: mesgs[21],
+		22: mesgs[22],
+		23: mesgs[23],
 	}
 	return
 }

@@ -31,7 +31,18 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
 
-	FieldNumTimestamp = 253 // Field Num for timestamp across all defined messages in the profile.
+	// Field Num for timestamp across all defined messages in the profile.
+	//
+	// All timestamp fields should have num 253, except for these two messages that have different num
+	// due to the messages may have been added before the rule was put in place:
+	//   - Course Point's Timestamp num: 1
+	//   - Set's Timestamp num: 254
+	//
+	// However, we don't see Official SDK implementations making exception regarding this, such as when decoding
+	// and encoding compressed timestamp, only messages that have timestamp num 253 are eligible for that feature.
+	//
+	// Ref: https://forums.garmin.com/developer/fit-sdk/f/discussion/311106/why-has-course_point-message-a-timestamp-field-1-and-not-253
+	FieldNumTimestamp = 253
 )
 
 // LocalMesgNum extracts LocalMesgNum from message header.
