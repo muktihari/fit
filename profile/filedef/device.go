@@ -102,6 +102,10 @@ func (f *Device) ToFIT(options *mesgdef.Options) proto.FIT {
 		fit.Messages = append(fit.Messages, f.FieldCapabilities[i].ToMesg(options))
 	}
 
+	// Device File does not have fields require sorting,
+	// only sort unrelated messages in case it matters.
+	SortMessagesByTimestamp(f.UnrelatedMessages)
+
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
 	return fit

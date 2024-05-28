@@ -66,6 +66,7 @@ func (f *Totals) ToFIT(options *mesgdef.Options) proto.FIT {
 	}
 
 	// Should be as ordered: FieldId, DeveloperDataId and FieldDescription
+	var sortStartPos = 1 + len(f.DeveloperDataIds) + len(f.FieldDescriptions)
 	fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
 
 	for i := range f.DeveloperDataIds {
@@ -80,7 +81,7 @@ func (f *Totals) ToFIT(options *mesgdef.Options) proto.FIT {
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
-	SortMessagesByTimestamp(fit.Messages)
+	SortMessagesByTimestamp(fit.Messages[sortStartPos:])
 
 	return fit
 }

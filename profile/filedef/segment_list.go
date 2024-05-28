@@ -83,6 +83,10 @@ func (f *SegmentList) ToFIT(options *mesgdef.Options) proto.FIT {
 		fit.Messages = append(fit.Messages, f.SegmentFiles[i].ToMesg(options))
 	}
 
+	// SegmentList File does not have fields require sorting,
+	// only sort unrelated messages in case it matters.
+	SortMessagesByTimestamp(f.UnrelatedMessages)
+
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
 
 	return fit
