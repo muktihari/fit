@@ -5,9 +5,7 @@
 package filedef
 
 import (
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
-	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"golang.org/x/exp/slices"
 )
@@ -21,38 +19,32 @@ type File interface {
 	ToFIT(options *mesgdef.Options) proto.FIT
 }
 
-// ToMesgs bulks convert mesgdef into proto.Message and append it to messages
-//
-// Deprecated: no longer used in filedef, will be removed in the next major/minor release.
-func ToMesgs[S []E, E ToMesg](messages *[]proto.Message, options *mesgdef.Options, mesgNum typedef.MesgNum, s S) {
-	for i := range s {
-		*messages = append(*messages, s[i].ToMesg(options))
-	}
-}
-
-// ToMesg is a type constraint to retrieve all mesgdef structures which implement ToMesg method.
-//
-// Deprecated: no longer used in filedef, will be removed in the next major/minor release.
-type ToMesg interface {
-	ToMesg(options *mesgdef.Options) proto.Message
-}
-
-// SortMessagesByTimestamp sorts messages by timestamp only if the message has timestamp field.
-// When a message has no timestamp field, its order will not be changed.
+// SortMessagesByTimestamp sorts messages by timestamp. The following rules will apply:
+//   - Any message without timestamp field will be placed to the beginning of the slice
+//     to enable these messages to be retrieved early such as UserProfile.
+//   - Any message with invalid timestamp will be places at the end of the slices.
 func SortMessagesByTimestamp(messages []proto.Message) {
 	slices.SortStableFunc(messages, func(m1, m2 proto.Message) int {
-		timestamp1 := m1.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-		if timestamp1 == basetype.Uint32Invalid {
+		v1 := m1.FieldByNum(proto.FieldNumTimestamp)
+		v2 := m2.FieldByNum(proto.FieldNumTimestamp)
+
+		// Place message which does not have a timestamp at the beginning of the slice.
+		if v1 == nil && v2 == nil {
 			return 0
+		} else if v1 == nil {
+			return -1
+		} else if v2 == nil {
+			return 1
 		}
-		timestamp2 := m2.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-		if timestamp2 == basetype.Uint32Invalid {
-			return 0
-		}
-		if timestamp1 < timestamp2 {
+
+		// Sort timestamps regardless of whether any of the values are invalid.
+		// Any invalid value will be placed at the end of the slice.
+		t1 := v1.Value.Uint32()
+		t2 := v2.Value.Uint32()
+		if t1 < t2 {
 			return -1
 		}
-		if timestamp1 > timestamp2 {
+		if t1 > t2 {
 			return 1
 		}
 		return 0

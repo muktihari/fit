@@ -22,7 +22,10 @@ func TestToMesgs(t *testing.T) {
 	records[0] = mesgdef.NewRecord(nil).
 		SetTimestamp(time.Now())
 
-	filedef.ToMesgs(&messages, nil, mesgnum.Record, records)
+	for i := range records {
+		messages = append(messages, records[i].ToMesg(nil))
+	}
+
 	if len(messages) != 1 {
 		t.Fatalf("expected 1: got: %d", len(messages))
 	}
@@ -50,15 +53,23 @@ func TestSortMessagesByTimestamp(t *testing.T) {
 		5: factory.CreateMesgOnly(mesgnum.Session).WithFields(
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
 		),
+		6: factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileFriendlyName).WithValue("muktihari"),
+		),
+		7: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
+		),
 	}
 
 	expected := []proto.Message{
 		messages[0],
+		messages[6],
 		messages[1],
 		messages[3],
 		messages[2],
 		messages[4],
 		messages[5],
+		messages[7],
 	}
 
 	filedef.SortMessagesByTimestamp(messages)

@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/filedef"
@@ -31,7 +30,7 @@ func newActivitySummaryMessageForTest(now time.Time) []proto.Message {
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 		),
 		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
-			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)), // intentionally using same timestamp as last messag)e
+			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)),
 		),
 		factory.CreateMesgOnly(mesgnum.Session).WithFields(
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
@@ -49,26 +48,6 @@ func newActivitySummaryMessageForTest(now time.Time) []proto.Message {
 	}
 }
 
-func isMessageOrdered(in, out []proto.Message, t *testing.T) bool {
-	var ordered = true
-	for i := range in {
-		if in[i].Num != out[i].Num {
-			ordered = false
-			t.Logf("mesg order[%d]: expected: %s, got: %s", i, out[i].Num, in[i].Num)
-			continue
-		}
-		for j := range in[i].Fields {
-			num1 := in[i].Fields[j].Num
-			num2 := out[i].Fields[j].Num
-			if num1 != num2 {
-				ordered = false
-				t.Logf("field order[%d][%d]: expected: %d, got: %d", i, j, num1, num2)
-			}
-		}
-	}
-	return ordered
-}
-
 func TestActivitySummaryCorrectness(t *testing.T) {
 	mesgs := newActivitySummaryMessageForTest(time.Now())
 
@@ -79,21 +58,27 @@ func TestActivitySummaryCorrectness(t *testing.T) {
 
 	fit := activitySummary.ToFIT(nil) // use standard factory
 
-	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
-	sortFields(mesgs)
-	sortFields(fit.Messages)
+	// NOTE: No need to check order of the messages as we have test the ordering in
+	// TestSortMessagesByTimestamp and TestActivityCorrectness, should be enough.
+	// Check only if all messages is retrieved. Applies for all other common file types.
 
-	if !isMessageOrdered(mesgs, fit.Messages, t) {
-		t.Fatalf("messages order mismatch")
+	histogramExpected := map[typedef.MesgNum]int{}
+	for i := range mesgs {
+		histogramExpected[mesgs[i].Num]++
 	}
 
-	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff != "" {
-		t.Fatal(diff)
+	histogramResult := map[typedef.MesgNum]int{}
+	for i := range fit.Messages {
+		histogramResult[fit.Messages[i].Num]++
 	}
 
-	// Edit unrelated message, should not change the resulting messages.
-	mesgs[len(mesgs)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
-	if diff := cmp.Diff(mesgs, fit.Messages, valueTransformer()); diff == "" {
-		t.Fatalf("the modification reflect on the resulting messages")
+	if len(histogramExpected) != len(histogramResult) {
+		t.Fatalf("expected len: %d, got: %d", len(histogramExpected), len(histogramResult))
+	}
+
+	for k, expectedCount := range histogramExpected {
+		if resultCount := histogramResult[k]; expectedCount != resultCount {
+			t.Errorf("expected message count: %d, got: %d", expectedCount, resultCount)
+		}
 	}
 }

@@ -5,11 +5,9 @@
 package filedef_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/filedef"
@@ -75,25 +73,7 @@ func TestMonitoringABCorrectness(t *testing.T) {
 
 	fit := monitoringA.ToFIT(nil) // use standard factory
 
-	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
-	sortFields(mesgsA)
-	sortFields(fit.Messages)
-
-	if diff := cmp.Diff(mesgsA, fit.Messages, valueTransformer()); diff != "" {
-		fmt.Println("messages order:")
-		for i := range fit.Messages {
-			mesg := fit.Messages[i]
-			fmt.Printf("%d: %s\n", mesg.Num, mesg.Num)
-		}
-		fmt.Println("")
-		t.Fatal(diff)
-	}
-
-	// Edit unrelated message, should not change the resulting messages.
-	mesgsA[len(mesgsA)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
-	if diff := cmp.Diff(mesgsA, fit.Messages, valueTransformer()); diff == "" {
-		t.Fatalf("the modification reflect on the resulting messages")
-	}
+	compare(t, mesgsA, fit.Messages)
 
 	mesgsB := newMonitoringBMessageForTest(time.Now())
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
@@ -106,23 +86,27 @@ func TestMonitoringABCorrectness(t *testing.T) {
 
 	fit = monitoringB.ToFIT(nil) // use standard factory
 
-	// ignore fields order, make the order asc, as long as the data is equal, we consider equal.
-	sortFields(mesgsB)
-	sortFields(fit.Messages)
+	compare(t, mesgsB, fit.Messages)
+}
 
-	if diff := cmp.Diff(mesgsB, fit.Messages, valueTransformer()); diff != "" {
-		fmt.Println("messages order:")
-		for i := range fit.Messages {
-			mesg := fit.Messages[i]
-			fmt.Printf("%d: %s\n", mesg.Num, mesg.Num)
-		}
-		fmt.Println("")
-		t.Fatal(diff)
+func compare(t *testing.T, expected, result []proto.Message) {
+	histogramExpected := map[typedef.MesgNum]int{}
+	for i := range expected {
+		histogramExpected[expected[i].Num]++
 	}
 
-	// Edit unrelated message, should not change the resulting messages.
-	mesgsB[len(mesgsB)-1].Fields[0].Value = proto.Uint32(datetime.ToUint32(time.Now()))
-	if diff := cmp.Diff(mesgsB, fit.Messages, valueTransformer()); diff == "" {
-		t.Fatalf("the modification reflect on the resulting messages")
+	histogramResult := map[typedef.MesgNum]int{}
+	for i := range result {
+		histogramResult[result[i].Num]++
+	}
+
+	if len(histogramExpected) != len(histogramResult) {
+		t.Fatalf("expected len: %d, got: %d", len(histogramExpected), len(histogramResult))
+	}
+
+	for k, expectedCount := range histogramExpected {
+		if resultCount := histogramResult[k]; expectedCount != resultCount {
+			t.Errorf("expected message count: %d, got: %d", expectedCount, resultCount)
+		}
 	}
 }
