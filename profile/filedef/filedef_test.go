@@ -34,6 +34,9 @@ func TestToMesgs(t *testing.T) {
 func TestSortMessagesByTimestamp(t *testing.T) {
 	now := time.Now()
 
+	// Special case:
+	// 1. CoursePoint's Timestamp Num is 1
+	// 2. Set's Timestamp Num is 254
 	messages := []proto.Message{
 		0: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
@@ -56,8 +59,14 @@ func TestSortMessagesByTimestamp(t *testing.T) {
 		6: factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
 			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileFriendlyName).WithValue("muktihari"),
 		),
-		7: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		7: factory.CreateMesgOnly(mesgnum.Set).WithFields(
+			factory.CreateField(mesgnum.Set, fieldnum.SetTimestamp).WithValue(datetime.ToUint32(now.Add(4 * time.Second))),
+		),
+		8: factory.CreateMesgOnly(mesgnum.Record).WithFields(
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
+		),
+		9: factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(now.Add(3 * time.Second))),
 		),
 	}
 
@@ -69,6 +78,8 @@ func TestSortMessagesByTimestamp(t *testing.T) {
 		messages[2],
 		messages[4],
 		messages[5],
+		messages[8],
+		messages[9],
 		messages[7],
 	}
 
