@@ -833,6 +833,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 				continue
 			}
 			developerDataId = devDataId
+			break
 		}
 
 		if developerDataId == nil {
