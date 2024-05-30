@@ -65,6 +65,30 @@ func TestMessageValidatorOption(t *testing.T) {
 	}
 }
 
+func TestValidatorReset(t *testing.T) {
+	mv := NewMessageValidator().(*messageValidator)
+
+	mv.developerDataIds = append(mv.developerDataIds, mesgdef.NewDeveloperDataId(nil))
+	mv.fieldDescriptions = append(mv.fieldDescriptions, mesgdef.NewFieldDescription(nil))
+
+	mv.Reset()
+
+	mv.developerDataIds = mv.developerDataIds[:cap(mv.developerDataIds)]
+	mv.fieldDescriptions = mv.fieldDescriptions[:cap(mv.developerDataIds)]
+
+	for i, d := range mv.developerDataIds {
+		if d != nil {
+			t.Errorf("developerDataIds[%d]: expected nil: got: %p", i, d)
+		}
+	}
+
+	for i, f := range mv.fieldDescriptions {
+		if f != nil {
+			t.Errorf("fieldDescriptions[%d]: expected nil: got: %p", i, f)
+		}
+	}
+}
+
 func TestMessageValidatorValidate(t *testing.T) {
 	tt := []struct {
 		name          string

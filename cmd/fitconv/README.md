@@ -9,7 +9,7 @@ Note:
 - Currently, only conversions between FIT and CSV formats are supported. Other formats may be added in the future as needed or upon request.
 - When converting from CSV to FIT, any unknown messages and fields are omitted due to the inability to ascertain their correct value types without additional context.
 
-## Usage Examples
+## Usage
 
 ```sh
 go run main.go activity.fit activity2.csv
@@ -20,6 +20,30 @@ go run main.go activity.fit activity2.csv
 
 ls
 # activity.fit activity.csv activity2.fit activity2.csv
+```
+
+### Build or Install
+
+#### Build
+
+```sh
+go build -o fitconv main.go
+```
+
+#### Install
+
+```sh
+go install .
+```
+
+#### Run the resulting Binary
+
+```sh
+fitconv activity.fit activity2.csv
+
+# Output:
+# 📄 "activity.fit" -> "activity.csv"
+# 🚀 "activity2.csv" -> "activity2.fit". [Info: 2 unknown messages are skipped]
 ```
 
 ### Options
