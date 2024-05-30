@@ -230,8 +230,8 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 }
 
 // Note: The size may be a multiple of the underlying FIT Base Type size indicating the field contains multiple elements represented as an array.
-func size(lenbytes int, typesize byte) byte {
-	return byte(lenbytes % int(typesize))
+func size(lenbytes, typesize int) byte {
+	return byte(lenbytes % typesize)
 }
 
 // trimUTF8NullTerminatedString trims all utf8 null-terminated string including the paddings.
