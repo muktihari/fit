@@ -170,9 +170,10 @@ func WithNoComponentExpansion() Option {
 // WithLogWriter specifies where the log messages will be written to. By default, the Decoder do not write any log if
 // log writer is not specified. The Decoder will only write log messages when it encountered a bad encoded FIT file such as:
 //   - Field Definition's Size (or Developer Field Definition's Size) is zero.
-//   - Field Definition's Size (or Developer Field Definition's Size) is less than basetype's size.
+//   - Field Definition's Size (or Developer Field Definition's Size) is less than basetype's Size.
 //     e.g. Size 1 bytes but having basetype uint32 (4 bytes).
-//   - Encountering a Developer Field without prior Field Description Message.
+//   - Field Definition's Size is more than basetype's Size but field.Array is false.
+//   - Encountering a Developer Field without prior DeveloperDataId or FieldDescription Message.
 func WithLogWriter(w io.Writer) Option {
 	return fnApply(func(o *options) { o.logWriter = w })
 }
@@ -193,8 +194,8 @@ func WithReadBufferSize(size int) Option {
 //	   fit, err := dec.Decode()
 //	}
 //
-// Note: Decoder already implements efficient io.Reader buffering, so there's no need to wrap 'r' using *bufio.Reader
-// for optimal performance.
+// Note: Decoder already implements efficient io.Reader buffering, so there's no need to wrap 'r' using *bufio.Reader;
+// doing so will only reduce performance.
 func New(r io.Reader, opts ...Option) *Decoder {
 	d := &Decoder{
 		readBuffer:  new(readBuffer),
