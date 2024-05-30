@@ -101,7 +101,14 @@ func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
 }
 
 func (v *messageValidator) Reset() {
+	for i := range v.developerDataIds {
+		v.developerDataIds[i] = nil // avoid memory leaks
+	}
 	v.developerDataIds = v.developerDataIds[:0]
+
+	for i := range v.fieldDescriptions {
+		v.fieldDescriptions[i] = nil // avoid memory leaks
+	}
 	v.fieldDescriptions = v.fieldDescriptions[:0]
 }
 
