@@ -30,6 +30,10 @@ The first file will be the base for the resulting file and we will combine these
 
 Other messages from the next FIT files will be appended as it is except **FileId** and **FileCreator**.
 
+### Limitation
+
+- We will not include SplitSummary messages from the next FIT files, as doing so causes the resulting FIT file to be unable to be uploaded to Garmin Connect.
+
 ### Calculated Session Fields:
 
 Currently we only care these following session fields:

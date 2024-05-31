@@ -6,6 +6,7 @@ package combiner
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
@@ -57,12 +58,14 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 				if i == 0 { // First FIT as base
 					sessionMesgs = append(sessionMesgs, mesg)
 					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all sessions from result
+					j--
 				}
 				sessionsByFIT[i] = append(sessionsByFIT[i], mesg)
 			case mesgnum.Activity:
 				if activityMesg.Num != mesgnum.Activity {
 					activityMesg = mesg
 					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove activity from result
+					j--
 				}
 			}
 		}
@@ -87,23 +90,18 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 				i, curSes.Sport, nextSes.Sport, ErrSportMismatch)
 		}
 
-		nextSesEndTime := datetime.ToUint32(nextSes.StartTime) + uint32(float64(nextSes.TotalElapsedTime)/1000)
-
-		var lastTimestampPerFit uint32
 		for _, mesg := range fits[i].Messages {
 			switch mesg.Num {
 			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
 				continue // skip
+			case mesgnum.SplitSummary:
+				continue // TODO: Still failed to upload to Garmin Connect if we include this message.
+			default:
+				fitResult.Messages = append(fitResult.Messages, mesg)
 			}
-			timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-			if timestamp != basetype.Uint32Invalid && timestamp <= nextSesEndTime {
-				lastTimestampPerFit = timestamp
-			}
-			fitResult.Messages = append(fitResult.Messages, mesg)
 		}
 
 		combineSession(curSes, nextSes)
-		curSes.TotalElapsedTime = lastTimestampPerFit - datetime.ToUint32(curSes.StartTime)
 		sessionMesgs[len(sessionMesgs)-1] = curSes.ToMesg(nil) // Update Session
 
 		if len(nextFitSessions) > 1 { // append the rest of the sessions
@@ -183,26 +181,17 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 
 	fitResult.Messages = append(fitResult.Messages, activityMesg)
 
-	slices.SortStableFunc(fitResult.Messages, func(mesg1, mesg2 proto.Message) int {
-		timestamp1 := mesg1.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-		if timestamp1 != basetype.Uint32Invalid {
-			return 0
-		}
-		timestamp2 := mesg2.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-		if timestamp2 != basetype.Uint32Invalid {
-			return 0
-		}
-		if timestamp1 < timestamp2 {
-			return -1
-		}
-		return 1
-	})
-
 	return fitResult, nil
 }
 
-// combineSession combines s2 into s1. // s1.TotalElapsedTime will be calculated separately.
+// combineSession combines s2 into s1.
 func combineSession(s1, s2 *mesgdef.Session) {
+	s1EndTime := s1.StartTime.Add(time.Duration(s1.TotalElapsedTime/1000) * time.Second)
+	gap := s2.StartTime.Sub(s1EndTime).Seconds() * 1000
+	s1.TotalElapsedTime += uint32(gap)
+	s1.TotalTimerTime += uint32(gap)
+
+	s1.TotalElapsedTime += s2.TotalElapsedTime
 	s1.TotalTimerTime += s2.TotalTimerTime
 	s1.TotalDistance += s2.TotalDistance
 	s1.EndPositionLat = s2.EndPositionLat
