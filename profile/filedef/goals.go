@@ -48,7 +48,6 @@ func (f *Goals) Add(mesg proto.Message) {
 		f.Goals = append(f.Goals, mesgdef.NewGoal(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

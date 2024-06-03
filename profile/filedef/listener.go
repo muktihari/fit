@@ -5,6 +5,7 @@
 package filedef
 
 import (
+	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -14,7 +15,7 @@ import (
 
 // Listener is Message Listener.
 type Listener struct {
-	options *options
+	options options
 	file    File
 	poolc   chan []proto.Field // pool of reusable objects to minimalize slice allocations. do not close this channel.
 	mesgc   chan proto.Message // queue messages to be processed concurrently.
@@ -27,14 +28,14 @@ type Listener struct {
 type FileSets = map[typedef.File]func() File
 
 type options struct {
-	channelBuffer uint
 	fileSets      FileSets
+	channelBuffer uint
 }
 
-func defaultOptions() *options {
-	return &options{
-		channelBuffer: 128,
+func defaultOptions() options {
+	return options{
 		fileSets:      PredefinedFileSet(),
+		channelBuffer: 128,
 	}
 }
 
@@ -83,18 +84,22 @@ func WithFileSets(fileSets FileSets) Option {
 	})
 }
 
+var _ decoder.MesgListener = (*Listener)(nil)
+
 // NewListener creates mesg listener.
 func NewListener(opts ...Option) *Listener {
-	options := defaultOptions()
-	for _, opt := range opts {
-		opt.apply(options)
+	l := &Listener{
+		options: defaultOptions(),
+		active:  true,
+	}
+	for i := range opts {
+		opts[i].apply(&l.options)
 	}
 
-	l := &Listener{options: options, active: true}
 	l.reset()
 
-	l.poolc = make(chan []proto.Field, options.channelBuffer)
-	for i := 0; i < int(options.channelBuffer); i++ {
+	l.poolc = make(chan []proto.Field, l.options.channelBuffer)
+	for i := uint(0); i < l.options.channelBuffer; i++ {
 		l.poolc <- nil // fill pool with nil slice, alloc as needed.
 	}
 

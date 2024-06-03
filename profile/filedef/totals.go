@@ -49,7 +49,6 @@ func (f *Totals) Add(mesg proto.Message) {
 		f.Totals = append(f.Totals, mesgdef.NewTotals(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

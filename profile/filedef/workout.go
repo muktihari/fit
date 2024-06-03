@@ -55,7 +55,6 @@ func (f *Workout) Add(mesg proto.Message) {
 		f.WorkoutSteps = append(f.WorkoutSteps, mesgdef.NewWorkoutStep(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

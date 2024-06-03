@@ -54,7 +54,6 @@ func (f *MonitoringDaily) Add(mesg proto.Message) {
 		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
