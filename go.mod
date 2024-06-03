@@ -5,9 +5,9 @@ go 1.20
 require (
 	github.com/client9/misspell v0.3.4
 	github.com/google/go-cmp v0.6.0
-	github.com/thedatashed/xlsxreader v1.2.5
-	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
+	github.com/thedatashed/xlsxreader v1.2.8
+	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc
 	golang.org/x/text v0.15.0
 )
 
-require github.com/stretchr/testify v1.8.0 // indirect
+require github.com/stretchr/testify v1.9.0 // indirect
