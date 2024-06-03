@@ -50,8 +50,8 @@ type Decoder struct {
 	accumulator *Accumulator
 	crc16       hash.Hash16
 
-	fieldsArray           [256]proto.Field
-	developersFieldsArray [256]proto.DeveloperField
+	fieldsArray           [255]proto.Field
+	developersFieldsArray [255]proto.DeveloperField
 
 	options options
 
