@@ -57,7 +57,6 @@ func (f *Segment) Add(mesg proto.Message) {
 		f.SegmentPoints = append(f.SegmentPoints, mesgdef.NewSegmentPoint(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

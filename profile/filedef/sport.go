@@ -66,7 +66,6 @@ func (f *Sport) Add(mesg proto.Message) {
 		f.CadenceZones = append(f.CadenceZones, mesgdef.NewCadenceZone(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

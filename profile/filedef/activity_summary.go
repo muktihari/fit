@@ -54,7 +54,6 @@ func (f *ActivitySummary) Add(mesg proto.Message) {
 		f.Laps = append(f.Laps, mesgdef.NewLap(&mesg))
 	default:
 		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
