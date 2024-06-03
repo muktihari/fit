@@ -246,8 +246,8 @@ func trimUTF8NullTerminatedString(b []byte) []byte {
 	return b[:pos]
 }
 
-// smallpool is an [256]byte array pool.
-var smallpool = sync.Pool{New: func() any { return new([256]byte) }}
+// smallpool is an [255]byte array pool.
+var smallpool = sync.Pool{New: func() any { return new([255]byte) }}
 
 // utf8String converts b into a valid utf8 string.
 // Any invalid utf8 character will be converted into utf8.RuneError.
@@ -255,7 +255,7 @@ func utf8String(b []byte) string {
 	if utf8.Valid(b) { // Fast path
 		return string(b)
 	}
-	arr := smallpool.Get().(*[256]byte)
+	arr := smallpool.Get().(*[255]byte)
 	defer smallpool.Put(arr)
 	buf := arr[:0]
 	for len(b) > 0 {

@@ -20,6 +20,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
+	"golang.org/x/exp/slices"
 )
 
 type CSVToFITConv struct {
@@ -29,9 +30,9 @@ type CSVToFITConv struct {
 
 	fit proto.FIT
 
-	fieldsArray          [256]proto.Field
-	developerFieldsArray [256]proto.DeveloperField
-	protoValuesArray     [256]proto.Value
+	fieldsArray          [255]proto.Field
+	developerFieldsArray [255]proto.DeveloperField
+	protoValuesArray     [255]proto.Value
 
 	fieldDescriptions []*mesgdef.FieldDescription
 
@@ -134,10 +135,8 @@ loop:
 			}
 
 			if c.streamEnc == nil {
-				mesg.Fields = make([]proto.Field, len(mesg.Fields))
-				copy(mesg.Fields, c.fieldsArray[:])
-				mesg.DeveloperFields = make([]proto.DeveloperField, len(mesg.DeveloperFields))
-				copy(mesg.DeveloperFields, c.developerFieldsArray[:])
+				mesg.Fields = slices.Clone(mesg.Fields)
+				mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
 				c.fit.Messages = append(c.fit.Messages, mesg)
 				continue loop
 			}
