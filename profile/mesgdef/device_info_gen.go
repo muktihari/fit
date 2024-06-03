@@ -98,7 +98,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[256]proto.Field)
+	arr := pool.Get().(*[255]proto.Field)
 	defer pool.Put(arr)
 
 	fields := arr[:0] // Create slice from array with zero len.
