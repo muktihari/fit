@@ -871,46 +871,50 @@ func TestValueValid(t *testing.T) {
 func TestLen(t *testing.T) {
 	tt := []struct {
 		value       Value
-		baseType    basetype.BaseType
 		sizeInBytes int
 	}{
-		{value: Value{}, sizeInBytes: 0, baseType: basetype.Sint8},
-		{value: Int8(10), sizeInBytes: 1, baseType: basetype.Sint8},
-		{value: Uint8(10), sizeInBytes: 1, baseType: basetype.Uint8},
-		{value: Int16(10), sizeInBytes: 2, baseType: basetype.Sint16},
-		{value: Uint16(10), sizeInBytes: 2, baseType: basetype.Uint16},
-		{value: Int32(10), sizeInBytes: 4, baseType: basetype.Sint32},
-		{value: Uint32(10), sizeInBytes: 4, baseType: basetype.Uint32},
-		{value: Float32(10), sizeInBytes: 4, baseType: basetype.Float32},
-		{value: Float64(10), sizeInBytes: 8, baseType: basetype.Float64},
-		{value: Int64(10), sizeInBytes: 8, baseType: basetype.Sint64},
-		{value: Uint64(10), sizeInBytes: 8, baseType: basetype.Uint64},
-		{value: SliceInt8([]int8{10, 9, 8, 7}), sizeInBytes: 4, baseType: basetype.Sint8},
-		{value: SliceUint8([]uint8{10, 9, 8, 7}), sizeInBytes: 4, baseType: basetype.Uint8},
-		{value: SliceInt16([]int16{10, 9, 8, 7}), sizeInBytes: 4 * 2, baseType: basetype.Uint16},
-		{value: SliceUint16([]uint16{10, 9, 8, 7}), sizeInBytes: 4 * 2, baseType: basetype.Uint16},
-		{value: SliceInt32([]int32{10, 9, 8, 7}), sizeInBytes: 4 * 4, baseType: basetype.Sint32},
-		{value: SliceUint32([]uint32{10, 9, 8, 7}), sizeInBytes: 4 * 4, baseType: basetype.Uint32},
-		{value: String(""), sizeInBytes: 1, baseType: basetype.String},
-		{value: String("\x00"), sizeInBytes: 1, baseType: basetype.String},
-		{value: String("fit sdk"), sizeInBytes: 8, baseType: basetype.String},
-		{value: String("fit sdk\x00"), sizeInBytes: 8, baseType: basetype.String},
-		{value: SliceString([]string{"fit sdk"}), sizeInBytes: 8, baseType: basetype.String},
-		{value: SliceString([]string{}), sizeInBytes: 1, baseType: basetype.String},
-		{value: SliceString([]string{""}), sizeInBytes: 1, baseType: basetype.String},
-		{value: SliceString([]string{"\x00"}), sizeInBytes: 1, baseType: basetype.String},
-		{value: SliceString([]string{"\x00\x00\x00"}), sizeInBytes: 3, baseType: basetype.String},
-		{value: SliceString([]string{"\x00", "\x00", "\x00"}), sizeInBytes: 3, baseType: basetype.String},
-		{value: SliceString([]string{"fit sdk", "a"}), sizeInBytes: 10, baseType: basetype.String},
-		{value: SliceString([]string{"fit sdk\x00", "a\x00"}), sizeInBytes: 10, baseType: basetype.String},
-		{value: SliceFloat32([]float32{10, 9, 8, 7}), sizeInBytes: 4 * 4, baseType: basetype.Float32},
-		{value: SliceFloat64([]float64{10, 9, 8, 7}), sizeInBytes: 4 * 8, baseType: basetype.Float64},
-		{value: SliceInt64([]int64{10, 9, 8, 7}), sizeInBytes: 4 * 8, baseType: basetype.Sint64},
-		{value: SliceUint64([]uint64{10, 9, 8, 7}), sizeInBytes: 4 * 8, baseType: basetype.Uint64},
+		{value: Value{}, sizeInBytes: 0},
+		{value: Value{any: TypeInvalid}, sizeInBytes: 0},
+		{value: Bool(true), sizeInBytes: 1},
+		{value: Int8(10), sizeInBytes: 1},
+		{value: Uint8(10), sizeInBytes: 1},
+		{value: Int16(10), sizeInBytes: 2},
+		{value: Uint16(10), sizeInBytes: 2},
+		{value: Int32(10), sizeInBytes: 4},
+		{value: Uint32(10), sizeInBytes: 4},
+		{value: Float32(10), sizeInBytes: 4},
+		{value: Float64(10), sizeInBytes: 8},
+		{value: Int64(10), sizeInBytes: 8},
+		{value: Uint64(10), sizeInBytes: 8},
+		{value: SliceBool([]bool{}), sizeInBytes: 0},
+		{value: SliceBool([]bool{true, false}), sizeInBytes: 2},
+		{value: SliceInt8([]int8{10, 9, 8, 7}), sizeInBytes: 4},
+		{value: SliceUint8([]uint8{10, 9, 8, 7}), sizeInBytes: 4},
+		{value: SliceInt16([]int16{10, 9, 8, 7}), sizeInBytes: 4 * 2},
+		{value: SliceUint16([]uint16{10, 9, 8, 7}), sizeInBytes: 4 * 2},
+		{value: SliceInt32([]int32{10, 9, 8, 7}), sizeInBytes: 4 * 4},
+		{value: SliceUint32([]uint32{10, 9, 8, 7}), sizeInBytes: 4 * 4},
+		{value: String(""), sizeInBytes: 1},
+		{value: String("\x00"), sizeInBytes: 1},
+		{value: String("fit sdk"), sizeInBytes: 8},
+		{value: String("fit sdk\x00"), sizeInBytes: 8},
+		{value: SliceString([]string{"fit sdk"}), sizeInBytes: 8},
+		{value: SliceString([]string{}), sizeInBytes: 1},
+		{value: SliceString([]string{""}), sizeInBytes: 1},
+		{value: SliceString([]string{"\x00"}), sizeInBytes: 1},
+		{value: SliceString([]string{"\x00\x00\x00"}), sizeInBytes: 3},
+		{value: SliceString([]string{"\x00", "\x00", "\x00"}), sizeInBytes: 3},
+		{value: SliceString([]string{"fit sdk", "a"}), sizeInBytes: 10},
+		{value: SliceString([]string{"fit sdk\x00", "a\x00"}), sizeInBytes: 10},
+		{value: SliceFloat32([]float32{10, 9, 8, 7}), sizeInBytes: 4 * 4},
+		{value: SliceFloat64([]float64{10, 9, 8, 7}), sizeInBytes: 4 * 8},
+		{value: SliceInt64([]int64{10, 9, 8, 7}), sizeInBytes: 4 * 8},
+		{value: SliceUint64([]uint64{10, 9, 8, 7}), sizeInBytes: 4 * 8},
 	}
-	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%T(%v)", tc.value, tc.value.Any()), func(t *testing.T) {
-			size := Sizeof(tc.value, tc.baseType)
+	for i, tc := range tt {
+		val := tc.value.Any()
+		t.Run(fmt.Sprintf("[%d] %T(%v)", i, val, val), func(t *testing.T) {
+			size := Sizeof(tc.value)
 			if size != tc.sizeInBytes {
 				t.Fatalf("expected: %d, got: %d", tc.sizeInBytes, size)
 			}

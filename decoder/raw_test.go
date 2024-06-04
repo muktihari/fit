@@ -17,7 +17,6 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash/crc16"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -229,11 +228,6 @@ func TestRawDecoderDecode(t *testing.T) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                0,
-						Size:               1,
-						Name:               "Heart Rate",
-						NativeMesgNum:      mesgnum.Record,
-						NativeFieldNum:     fieldnum.RecordHeartRate,
-						BaseType:           basetype.Uint8,
 						Value:              proto.Uint8(100),
 					},
 				)
@@ -264,11 +258,6 @@ func TestRawDecoderDecode(t *testing.T) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                0,
-						Size:               1,
-						Name:               "Heart Rate",
-						NativeMesgNum:      mesgnum.Record,
-						NativeFieldNum:     fieldnum.RecordHeartRate,
-						BaseType:           basetype.Uint8,
 						Value:              proto.Uint8(100),
 					},
 				)
@@ -299,11 +288,6 @@ func TestRawDecoderDecode(t *testing.T) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                0,
-						Size:               1,
-						Name:               "Heart Rate",
-						NativeMesgNum:      mesgnum.Record,
-						NativeFieldNum:     fieldnum.RecordHeartRate,
-						BaseType:           basetype.Uint8,
 						Value:              proto.Uint8(100),
 					},
 				)

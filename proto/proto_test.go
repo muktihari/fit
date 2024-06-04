@@ -253,8 +253,6 @@ func TestMessageClone(t *testing.T) {
 		proto.DeveloperField{
 			Num:                0,
 			DeveloperDataIndex: 0,
-			Size:               1,
-			BaseType:           basetype.Uint8,
 			Value:              proto.Uint8(1),
 		},
 		proto.DeveloperField{},
@@ -437,7 +435,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "FIT SDK Go", BaseType: basetype.Byte, DeveloperDataIndex: 0, Value: proto.Uint8(1),
+						Num: 0, DeveloperDataIndex: 0, Value: proto.Uint8(1),
 					},
 				),
 			mesgDef: proto.MessageDefinition{
@@ -464,7 +462,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "FIT SDK Go", BaseType: basetype.String, DeveloperDataIndex: 0, Value: proto.String("FIT SDK Go"),
+						Num: 0, DeveloperDataIndex: 0, Value: proto.String("FIT SDK Go"),
 					},
 				),
 			mesgDef: proto.MessageDefinition{
@@ -491,7 +489,7 @@ func TestCreateMessageDefinition(t *testing.T) {
 					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
 				WithDeveloperFields(
 					proto.DeveloperField{
-						Num: 0, Name: "FIT SDK Go", BaseType: basetype.Uint16, DeveloperDataIndex: 0, Value: proto.SliceUint16([]uint16{1, 2, 3}),
+						Num: 0, DeveloperDataIndex: 0, Value: proto.SliceUint16([]uint16{1, 2, 3}),
 					},
 				),
 			mesgDef: proto.MessageDefinition{

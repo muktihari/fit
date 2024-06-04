@@ -129,11 +129,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordHeartRate,
-							BaseType:           basetype.Uint8,
 							Value:              proto.Uint8(60),
 						},
 					},
@@ -279,11 +274,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 							// dummy data
 							devFields[i].DeveloperDataIndex = 0
 							devFields[i].Num = 0
-							devFields[i].Size = 1
-							devFields[i].Name = "Heart Rate"
-							devFields[i].NativeMesgNum = mesgnum.Record
-							devFields[i].NativeFieldNum = fieldnum.RecordHeartRate
-							devFields[i].BaseType = basetype.Uint8
 							devFields[i].Value = proto.Uint8(60)
 						}
 						return devFields
@@ -319,6 +309,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					Num: mesgnum.FieldDescription,
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.String)),
 						factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(1)),
 					},
 				}
@@ -332,7 +323,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                1,
-						BaseType:           basetype.String,
 						Value:              proto.String(strings.Repeat("a", 256)),
 					},
 				),
@@ -362,12 +352,39 @@ func TestMessageValidatorValidate(t *testing.T) {
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordHeartRate,
-							BaseType:           basetype.Uint8,
 							Value:              proto.Uint8(basetype.Uint8Invalid),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "mesg contain developer field value scaled",
+			mesgs: []proto.Message{
+				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
+					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
+					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
+				}),
+				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
+					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
+					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
+					fieldnum.FieldDescriptionFieldName:             "Custom Distance",
+					fieldnum.FieldDescriptionNativeMesgNum:         uint16(basetype.Uint16Invalid),
+					fieldnum.FieldDescriptionNativeFieldNum:        uint8(basetype.Uint8Invalid),
+					fieldnum.FieldDescriptionScale:                 uint8(100),
+					fieldnum.FieldDescriptionOffset:                int8(0),
+					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
+				}),
+				{
+					Num: mesgnum.Record,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Value:              proto.Float64(6960.8),
 						},
 					},
 				},
@@ -396,11 +413,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordAltitude,
-							BaseType:           basetype.Uint16,
 							Value:              proto.Float64(6960.8),
 						},
 					},
@@ -430,11 +442,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "??",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     255,
-							BaseType:           basetype.Uint16,
 							Value:              proto.Float64(0), // Scaled value + targeted Native Field not found
 						},
 					},
@@ -486,21 +493,11 @@ func TestMessageValidatorValidate(t *testing.T) {
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordHeartRate,
-							BaseType:           basetype.Uint8,
 							Value:              proto.Value{}, // invalid value
 						},
 						{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordHeartRate,
-							BaseType:           basetype.Uint8,
 							Value:              proto.Uint8(60),
 						},
 					},

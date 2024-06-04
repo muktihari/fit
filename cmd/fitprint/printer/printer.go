@@ -22,6 +22,8 @@ import (
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -131,6 +133,8 @@ type printer struct {
 	done   chan struct{}
 	active bool
 	count  int
+
+	fieldDescriptions []*mesgdef.FieldDescription
 }
 
 func New(w io.Writer) *printer {
@@ -148,6 +152,10 @@ func New(w io.Writer) *printer {
 
 func (p *printer) loop() {
 	for mesg := range p.mesgc {
+		switch mesg.Num {
+		case mesgnum.FieldDescription:
+			p.fieldDescriptions = append(p.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
+		}
 		p.print(mesg)
 		p.poolc <- mesg
 		p.count++
@@ -284,12 +292,28 @@ func (p *printer) print(mesg proto.Message) {
 	}
 
 	for i := range mesg.DeveloperFields {
+		devField := &mesg.DeveloperFields[i]
+		fieldDesc := p.getFieldDescription(devField.DeveloperDataIndex, devField.Num)
+		if fieldDesc == nil {
+			continue
+		}
 		fmt.Fprintf(p.w, "  + %s (num: %d, type: %s): %v\n",
-			mesg.DeveloperFields[i].Name,
-			mesg.DeveloperFields[i].Num,
-			mesg.DeveloperFields[i].BaseType,
-			formatDeveloperFieldValue(&mesg.DeveloperFields[i]))
+			strings.Join(fieldDesc.FieldName, "|"),
+			devField.Num,
+			fieldDesc.FitBaseTypeId,
+			formatDeveloperFieldValue(devField.Value, strings.Join(fieldDesc.Units, "|")),
+		)
 	}
+}
+
+func (c *printer) getFieldDescription(developerDataIndex, fieldDefinitionNumber uint8) *mesgdef.FieldDescription {
+	for _, fieldDesc := range c.fieldDescriptions {
+		if fieldDesc.DeveloperDataIndex == developerDataIndex &&
+			fieldDesc.FieldDefinitionNumber == fieldDefinitionNumber {
+			return fieldDesc
+		}
+	}
+	return nil
 }
 
 func formatFieldValue(
@@ -396,6 +420,6 @@ func formatCast[S []E, E any](s S, bt basetype.BaseType, pt profile.ProfileType)
 	return fmt.Sprintf("%v <%v>", s, ss)
 }
 
-func formatDeveloperFieldValue(developerField *proto.DeveloperField) string {
-	return fmt.Sprintf("%v %s", developerField.Value.Any(), developerField.Units)
+func formatDeveloperFieldValue(value proto.Value, units string) string {
+	return fmt.Sprintf("%v %s", value.Any(), units)
 }

@@ -78,7 +78,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.Fields {
 		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
 			Num:      mesg.Fields[i].Num,
-			Size:     byte(Sizeof(mesg.Fields[i].Value, mesg.Fields[i].BaseType)),
+			Size:     byte(Sizeof(mesg.Fields[i].Value)),
 			BaseType: mesg.Fields[i].BaseType,
 		})
 	}
@@ -96,7 +96,7 @@ func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
 	for i := range mesg.DeveloperFields {
 		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
 			Num:                mesg.DeveloperFields[i].Num,
-			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value, mesg.DeveloperFields[i].BaseType)),
+			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value)),
 			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
 		})
 	}
@@ -151,9 +151,9 @@ type FieldDefinition struct {
 
 // FieldDefinition is the definition of the upcoming developer field within the message's structure.
 type DeveloperFieldDefinition struct { // 3 bits
-	Num                byte // Maps to the `field_definition_number` of a `field_description` Message.
+	Num                byte // Maps to `field_definition_number` of a `field_description` message.
 	Size               byte // Size (in bytes) of the specified FIT message’s field
-	DeveloperDataIndex byte // Maps to the `developer_data_index`` of a `developer_data_id` Message
+	DeveloperDataIndex byte // Maps to `developer_data_index` of a `developer_data_id` and a `field_description` messages.
 }
 
 // Message is a FIT protocol message containing the data defined in the Message Definition
@@ -333,22 +333,17 @@ func (f Field) Clone() Field {
 	return f
 }
 
-// Developer Field is a way to add custom data fields to existing messages. Developer Data Fields can be added to
-// any message at runtime by providing a self-describing field definition. Developer Data Fields are also used by
-// the Connect IQ FIT Contributor library, allowing Connect IQ apps and data fields to include custom data in
-// FIT Activity files during the recording of activities. [Added since protocol version 2.0]
+// DeveloperField is a way to add custom data fields to existing messages. Developer Data Fields can be added
+// to any message at runtime by providing a self-describing FieldDefinition messages prior to that message.
+// The combination of the DeveloperDataIndex and FieldDefinitionNumber create a unique id for each FieldDescription.
+// Developer Data Fields are also used by the Connect IQ FIT Contributor library, allowing Connect IQ apps
+// and data fields to include custom data in FIT Activity files during the recording of activities.
 //
-// NOTE: If Developer Field contains a valid NativeMesgNum and NativeFieldNum,
-// the value should be treated as native value (scale, offset, etc shall apply).
+// NOTE: If DeveloperField contains a valid NativeMesgNum and NativeFieldNum, the value should be treated as
+// native value (scale, offset, etc shall apply). [Added since protocol version 2.0]
 type DeveloperField struct {
-	Num                byte
-	DeveloperDataIndex byte
-	Size               byte
-	NativeMesgNum      typedef.MesgNum
-	NativeFieldNum     byte
-	BaseType           basetype.BaseType
-	Name               string
-	Units              string
+	Num                byte // Maps to `field_definition_number` of a `field_description` message.
+	DeveloperDataIndex byte // Maps to `developer_data_index` of a `developer_data_id` and a `field_description` messages.
 	Value              Value
 }
 
