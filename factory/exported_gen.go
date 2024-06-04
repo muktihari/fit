@@ -18,8 +18,8 @@ func StandardFactory() *Factory { return std }
 
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns proto.Message{Num: num}.
 //
-// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
-// If you want a deep copy of the mesg, clone it by calling mesg.Clone().
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited
+// (except in case of unknown field). If you want a deep copy of the mesg, use mesg.Clone().
 //
 // NOTE: This method is not used by either the Decoder or the Encoder, and the data will only be populated once upon the first invocation.
 // Unless you need most of the returned fields, it's recommended create an empty proto.Message{Num: num} then fill only the necessary fields
@@ -35,17 +35,15 @@ func CreateMesgOnly(num typedef.MesgNum) proto.Message {
 
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 //
-// Field's FieldBase is a pointer struct embedded, and this will only create a shallow copy of the field, so changing any value declared in
-// FieldBase is prohibited (except for the unknown field) since it still referencing the same struct. If you want a deep copy of the Field,
-// create it by calling field.Clone().
+// Field's FieldBase is a pointer embedded struct and it will only be referenced into the returned field, so changing any value
+// declared in  FieldBase is prohibited (except in the case of unknown field). If you want a deep copy, use field.Clone().
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return std.CreateField(mesgNum, num)
 }
 
 // RegisterMesg registers a new message that is not defined in the profile.xlsx.
 // You can not edit or replace existing predefined messages in the factory, you can only edit the messages you have registered.
-// However, we don't create a lock for efficiency, since this is intended to be used on instantiation. If you want to
-// change something without triggering data race, you can create a new instance of Factory using New().
+// Please note, we don't use mutex for efficiency, since this is intended to be used on instantiation.
 //
 // By registering, any FIT file containing these messages can be recognized instead of returning "unknown" message.
 func RegisterMesg(mesg proto.Message) error {

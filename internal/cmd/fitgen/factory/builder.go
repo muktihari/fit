@@ -79,16 +79,15 @@ func (b *factoryBuilder) preproccessMessageField() {
 }
 
 func (b *factoryBuilder) Build() ([]builder.Data, error) {
-	// Create structure of []proto.Message as string using strings.Builder{},
+	// Create message/field lookup structure as string using strings.Builder{},
 	// This way, we don't depend on generated value such as types and profile package to be able to generate factory.
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
 
-	strbuf := new(strings.Builder)
-	strbuf.WriteString("[...]message{\n")
+	var strbuf strings.Builder
+	strbuf.WriteString("[...]*[256]*proto.FieldBase{\n")
 	for _, message := range b.messages {
 		strbuf.WriteString(b.transformMesgnum(message.Name) + ": {\n") // indexed to create fixed-size slice.
-		strbuf.WriteString(fmt.Sprintf("Num: %s, /* %s */\n", b.transformMesgnum(message.Name), message.Name))
-		strbuf.WriteString(fmt.Sprintf("Fields: %s,\n", b.makeFields(message)))
+		strbuf.WriteString(b.makeFieldBases(message))
 		strbuf.WriteString("},\n")
 	}
 	strbuf.WriteString("}")
@@ -116,23 +115,18 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	}, nil
 }
 
-func (b *factoryBuilder) makeFields(message parser.Message) string {
+func (b *factoryBuilder) makeFieldBases(message parser.Message) string {
 	if len(message.Fields) == 0 {
 		return "nil"
 	}
 
-	strbuf := new(strings.Builder)
-	strbuf.WriteString("[256]proto.Field{\n")
+	var strbuf strings.Builder
 	for _, field := range message.Fields {
 		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
-		strbuf.WriteString("FieldBase: &proto.FieldBase{\n")
 		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
 		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))
 		strbuf.WriteString(fmt.Sprintf("Type: %s,\n", b.transformProfileType(field.Type)))
-		strbuf.WriteString(fmt.Sprintf("BaseType: %s, /* (size: %d) */\n",
-			b.transformBaseType(field.Type),
-			b.lookup.BaseType(field.Type).Size(),
-		))
+		strbuf.WriteString(fmt.Sprintf("BaseType: %s,\n", b.transformBaseType(field.Type)))
 		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
 		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(field, message.Name)))
 		strbuf.WriteString(fmt.Sprintf("Scale: %g,\n", scaleOrDefault(field.Scales, 0)))    // first index or default
@@ -141,10 +135,7 @@ func (b *factoryBuilder) makeFields(message parser.Message) string {
 		strbuf.WriteString(fmt.Sprintf("Accumulate: %t,\n", accumulateOrDefault(field.Accumulate, 0)))
 		strbuf.WriteString(fmt.Sprintf("SubFields: %s,\n", b.makeSubFields(field, message.Name)))
 		strbuf.WriteString("},\n")
-		strbuf.WriteString(fmt.Sprintf("Value: %s, /* Default Value: Invalid */\n", b.invalidValueOf(field.Type, field.Array)))
-		strbuf.WriteString("},\n")
 	}
-	strbuf.WriteString("}")
 
 	return strbuf.String()
 }
@@ -154,7 +145,7 @@ func (b *factoryBuilder) makeComponents(compField parser.ComponentField, message
 		return "nil"
 	}
 
-	strbuf := new(strings.Builder)
+	var strbuf strings.Builder
 	strbuf.WriteString("[]proto.Component{\n")
 	for i, fieldNameRef := range compField.GetComponents() {
 		fieldRef := b.lookup.FieldByName(messageName, fieldNameRef)
@@ -176,7 +167,7 @@ func (b *factoryBuilder) makeSubFields(field parser.Field, messageName string) s
 		return "nil"
 	}
 
-	strbuf := new(strings.Builder)
+	var strbuf strings.Builder
 	strbuf.WriteString("[]proto.SubField{\n")
 	for _, subField := range field.SubFields {
 		strbuf.WriteString("{")
@@ -199,7 +190,7 @@ func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName 
 		return "nil"
 	}
 
-	strbuf := new(strings.Builder)
+	var strbuf strings.Builder
 	strbuf.WriteString("[]proto.SubFieldMap{\n")
 	for i, refValueName := range subfield.RefFieldNames {
 		fieldRef := b.lookup.FieldByName(messageName, refValueName)
@@ -225,44 +216,6 @@ func (b *factoryBuilder) transformBaseType(fieldType string) string {
 
 func (b *factoryBuilder) transformMesgnum(s string) string {
 	return b.mesgnumPackageName + ".MesgNum" + strutil.ToTitle(s) // types.MesgNumFileId
-}
-
-var baseTypeReplacer = strings.NewReplacer(
-	"Enum", "Uint8",
-	"Sint", "Int",
-	"Byte", "Uint8",
-)
-
-func (b *factoryBuilder) invalidValueOf(fieldType, array string) string {
-	if fieldType == "bool" { // Special type, bool does not have basetype
-		if array != "" {
-			return "proto.SliceBool([]bool(nil))"
-		}
-		return "proto.Bool(false)"
-	}
-
-	var (
-		baseType      = strutil.ToTitle(b.lookup.BaseType(fieldType).String())
-		protoFuncName = strings.TrimSuffix(baseTypeReplacer.Replace(baseType), "z")
-		goType        = b.lookup.GoType(fieldType)
-	)
-
-	if array != "" {
-		return fmt.Sprintf("proto.Slice%s([]%s(nil))", protoFuncName, goType)
-	}
-
-	// Float is a special case since NaN is not comparable, so for example, basetype.Float32Invalid, is not a float,
-	// but its representation in integer form. This way we can compare it in its integer form later.
-	if baseType == "Float32" {
-		return "proto.Float32(math.Float32frombits(basetype.Float32Invalid))" // same as `math.Float32frombits(basetype.Float32Invalid)`
-	}
-
-	if baseType == "Float64" {
-		return "proto.Float64(math.Float64frombits(basetype.Float64Invalid))" // same as `math.Float64frombits(basetype.Float64Invalid)`
-	}
-
-	return fmt.Sprintf("proto.%s(basetype.%sInvalid)", protoFuncName, baseType)
-
 }
 
 func bitsOrDefault(bits []byte, index int) byte {
