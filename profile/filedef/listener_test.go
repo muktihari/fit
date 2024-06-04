@@ -12,7 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/filedef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -151,11 +150,6 @@ func TestListenerForSingleFitFile(t *testing.T) {
 						proto.DeveloperField{
 							DeveloperDataIndex: 0,
 							Num:                0,
-							Size:               1,
-							Name:               "Heart Rate",
-							NativeMesgNum:      mesgnum.Record,
-							NativeFieldNum:     fieldnum.RecordHeartRate,
-							BaseType:           basetype.Uint8,
 							Value:              proto.Uint8(100),
 						},
 					),

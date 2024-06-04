@@ -638,11 +638,6 @@ func createFitForTest() (proto.FIT, []byte) {
 					proto.DeveloperField{
 						DeveloperDataIndex: 0,
 						Num:                0,
-						Size:               1,
-						Name:               "Heart Rate",
-						NativeMesgNum:      mesgnum.Record,
-						NativeFieldNum:     fieldnum.RecordHeartRate,
-						BaseType:           basetype.Uint8,
 						Value:              proto.Uint8(100),
 					},
 				),
@@ -1577,9 +1572,7 @@ func TestDecodeMessageData(t *testing.T) {
 					dec.localMessageDefinitions[(tc.mesgdef.Header&proto.CompressedLocalMesgNumMask)>>proto.CompressedBitShift] = tc.mesgdef
 				} else {
 					dec.localMessageDefinitions[tc.mesgdef.Header&proto.LocalMesgNumMask] = tc.mesgdef
-
 				}
-
 			}
 			if tc.fieldDescription != nil {
 				dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)

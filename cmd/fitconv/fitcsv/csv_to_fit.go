@@ -272,31 +272,28 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 }
 
 func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devField proto.DeveloperField, err error) {
-	var fieldDescription *mesgdef.FieldDescription
+	var fieldDesc *mesgdef.FieldDescription
 	for i := range c.fieldDescriptions {
 		if strings.Join(c.fieldDescriptions[i].FieldName, "|") == name {
-			fieldDescription = c.fieldDescriptions[i]
+			fieldDesc = c.fieldDescriptions[i]
 			break
 		}
 	}
-	if fieldDescription == nil {
+	if fieldDesc == nil {
 		return
 	}
 
 	scale, offset := 1.0, 0.0 // default
-	if fieldDescription.Scale != basetype.Uint8Invalid {
-		scale = float64(fieldDescription.Scale)
+	if fieldDesc.Scale != basetype.Uint8Invalid {
+		scale = float64(fieldDesc.Scale)
 	}
-	if fieldDescription.Offset != basetype.Sint8Invalid {
-		offset = float64(fieldDescription.Offset)
+	if fieldDesc.Offset != basetype.Sint8Invalid {
+		offset = float64(fieldDesc.Offset)
 	}
 
 	devField = proto.DeveloperField{
-		DeveloperDataIndex: fieldDescription.DeveloperDataIndex,
-		Num:                fieldDescription.FieldDefinitionNumber,
-		Name:               name,
-		BaseType:           fieldDescription.FitBaseTypeId,
-		Units:              units,
+		DeveloperDataIndex: fieldDesc.DeveloperDataIndex,
+		Num:                fieldDesc.FieldDefinitionNumber,
 	}
 
 	sliceValues := strings.Split(strValue, "|")
@@ -305,14 +302,14 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 		for i := range sliceValues {
 			value, err := parseValue(
 				sliceValues[i],
-				devField.BaseType,
+				fieldDesc.FitBaseTypeId,
 				scale,
 				offset,
 				units,
 			)
 			if err != nil {
 				return devField, fmt.Errorf("%q: [%d]: could not parse %q into %s ",
-					devField.Name, i, sliceValues[i], devField.BaseType.GoType())
+					name, i, sliceValues[i], fieldDesc.FitBaseTypeId.GoType())
 			}
 			protoValues = append(protoValues, value)
 		}
@@ -322,16 +319,15 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 
 	devField.Value, err = parseValue(
 		strValue,
-		devField.BaseType,
+		fieldDesc.FitBaseTypeId,
 		scale,
 		offset,
 		units,
 	)
 	if err != nil {
 		err = fmt.Errorf("%q: could not parse %q into %s",
-			devField.Name, strValue, devField.BaseType.GoType())
+			name, strValue, fieldDesc.FitBaseTypeId.GoType())
 	}
-	devField.Size = byte(proto.Sizeof(devField.Value, devField.BaseType))
 
 	return
 }

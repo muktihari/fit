@@ -123,10 +123,6 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			continue
 		}
 
-		if v.options.omitInvalidValues && !field.Value.Valid(field.BaseType) {
-			continue
-		}
-
 		// Restore any scaled float64 value back into its corresponding integer representation.
 		if field.Scale != 1 || field.Offset != 0 {
 			field.Value = scaleoffset.DiscardValue(
@@ -135,6 +131,10 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 				field.Scale,
 				field.Offset,
 			)
+		}
+
+		if v.options.omitInvalidValues && !field.Value.Valid(field.BaseType) {
+			continue
 		}
 
 		if err := valueIntegrity(field.Value, field.BaseType); err != nil {
@@ -170,20 +170,61 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	for i := range mesg.DeveloperFields {
 		developerField := &mesg.DeveloperFields[i]
 
-		if err := v.validateReference(developerField); err != nil {
-			return fmt.Errorf("developer field index: %d, num: %d, name: %s: %w",
-				i, developerField.Num, developerField.Name, err)
+		var ok bool
+		for _, d := range v.developerDataIds {
+			if developerField.DeveloperDataIndex == d.DeveloperDataIndex {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return fmt.Errorf("developer field index: %d, num: %d: %w",
+				i, developerField.Num, ErrMissingDeveloperDataId)
 		}
 
-		if v.options.omitInvalidValues && !developerField.Value.Valid(developerField.BaseType) {
+		var fieldDesc *mesgdef.FieldDescription
+		for _, f := range v.fieldDescriptions {
+			if f.DeveloperDataIndex == developerField.DeveloperDataIndex &&
+				f.FieldDefinitionNumber == developerField.Num {
+				fieldDesc = f
+				break
+			}
+		}
+
+		if fieldDesc == nil {
+			return fmt.Errorf("developer field index: %d, num: %d: %w",
+				i, developerField.Num, ErrMissingFieldDescription)
+		}
+
+		// Restore any scaled float64 value back into its corresponding integer representation.
+		if fieldDesc.NativeMesgNum != typedef.MesgNumInvalid && fieldDesc.NativeFieldNum != basetype.Uint8Invalid {
+			// If Developer Field contains a valid NativeMesgNum and NativeFieldNum,
+			// the value should be treated as native value (scale, offset, etc shall apply).
+			field := v.options.factory.CreateField(fieldDesc.NativeMesgNum, fieldDesc.NativeFieldNum)
+			if field.Name != factory.NameUnknown && (field.Scale != 1 || field.Offset != 0) {
+				developerField.Value = scaleoffset.DiscardValue(
+					developerField.Value,
+					field.BaseType,
+					field.Scale,
+					field.Offset,
+				)
+			}
+		} else if fieldDesc.Scale != basetype.Uint8Invalid && fieldDesc.Offset != basetype.Sint8Invalid {
+			developerField.Value = scaleoffset.DiscardValue(
+				developerField.Value,
+				fieldDesc.FitBaseTypeId,
+				float64(fieldDesc.Scale),
+				float64(fieldDesc.Offset),
+			)
+		}
+
+		if v.options.omitInvalidValues && !developerField.Value.Valid(fieldDesc.FitBaseTypeId) {
 			continue
 		}
 
-		v.handleNativeValue(developerField)
-
-		if err := valueIntegrity(developerField.Value, developerField.BaseType); err != nil {
-			return fmt.Errorf("developer field index: %d, num: %d, name: %s: %w",
-				i, developerField.Num, developerField.Name, err)
+		if err := valueIntegrity(developerField.Value, fieldDesc.FitBaseTypeId); err != nil {
+			return fmt.Errorf("developer field index: %d, num: %d: %w",
+				i, developerField.Num, err)
 		}
 
 		if i != valid {
@@ -198,50 +239,6 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	mesg.DeveloperFields = mesg.DeveloperFields[:valid]
 
 	return nil
-}
-
-func (v *messageValidator) validateReference(developerField *proto.DeveloperField) error {
-	var ok bool
-	for _, d := range v.developerDataIds {
-		if developerField.DeveloperDataIndex == d.DeveloperDataIndex {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return ErrMissingDeveloperDataId
-	}
-
-	for _, f := range v.fieldDescriptions {
-		if developerField.DeveloperDataIndex == f.DeveloperDataIndex &&
-			developerField.Num == f.FieldDefinitionNumber {
-			return nil
-		}
-	}
-	return ErrMissingFieldDescription
-}
-
-// If Developer Field contains a valid NativeMesgNum and NativeFieldNum,
-// the value should be treated as native value (scale, offset, etc shall apply).
-func (v *messageValidator) handleNativeValue(developerField *proto.DeveloperField) {
-	if developerField.NativeMesgNum == 0 && developerField.NativeFieldNum == 0 {
-		return
-	}
-
-	field := v.options.factory.CreateField(developerField.NativeMesgNum, developerField.NativeFieldNum)
-	if field.Name == factory.NameUnknown { // Unknown Field will always have Scale: 1 and Offset: 0.
-		return
-	}
-
-	// Restore any scaled float64 value back into its corresponding integer representation.
-	if field.Scale != 1 || field.Offset != 0 {
-		developerField.Value = scaleoffset.DiscardValue(
-			developerField.Value,
-			field.BaseType,
-			field.Scale,
-			field.Offset,
-		)
-	}
 }
 
 func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
@@ -268,7 +265,7 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	}
 
 	// Both proto.FieldDefinition's Size and proto.DeveloperFieldDefinition's Size is a type of byte.
-	size := proto.Sizeof(value, baseType)
+	size := proto.Sizeof(value)
 	if size > 255 {
 		return fmt.Errorf("max value size in bytes is 255, got: %d: %w", size, ErrExceedMaxAllowed)
 	}

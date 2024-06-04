@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"strings"
 	"sync"
 
 	"github.com/muktihari/fit/factory"
@@ -829,11 +828,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		devFieldDef := &mesgDef.DeveloperFieldDefinitions[i]
 
 		var developerDataId *mesgdef.DeveloperDataId
-		for _, devDataId := range d.developerDataIds {
-			if devDataId.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
+		for _, d := range d.developerDataIds {
+			if d.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
 				continue
 			}
-			developerDataId = devDataId
+			developerDataId = d
 			break
 		}
 
@@ -847,19 +846,19 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		// Find the FieldDescription that refers to this DeveloperField.
 		// The combination of the Developer Data Index and Field Definition Number
 		// create a unique id for each Field Description.
-		var fieldDescription *mesgdef.FieldDescription
-		for _, fieldDesc := range d.fieldDescriptions {
-			if fieldDesc.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
+		var fieldDesc *mesgdef.FieldDescription
+		for _, f := range d.fieldDescriptions {
+			if f.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
 				continue
 			}
-			if fieldDesc.FieldDefinitionNumber != devFieldDef.Num {
+			if f.FieldDefinitionNumber != devFieldDef.Num {
 				continue
 			}
-			fieldDescription = fieldDesc
+			fieldDesc = f
 			break
 		}
 
-		if fieldDescription == nil {
+		if fieldDesc == nil {
 			d.log("mesg.Num: %d, developerFields[%d].Num: %d: Can't interpret developer field, "+
 				"no field description mesg found. Just read acquired bytes (%d) and move forward. [byte pos: %d]\n",
 				mesg.Num, i, devFieldDef.Num, devFieldDef.Size, d.n)
@@ -869,63 +868,53 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 			continue
 		}
 
-		if !fieldDescription.FitBaseTypeId.Valid() {
+		if !fieldDesc.FitBaseTypeId.Valid() {
 			return fmt.Errorf("fieldDescription.FitBaseTypeId: %s: %w",
-				fieldDescription.FitBaseTypeId, ErrInvalidBaseType)
+				fieldDesc.FitBaseTypeId, ErrInvalidBaseType)
 		}
 
-		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
-		// Users need to handle this themselves due to the limited context available.
-		developerField := proto.DeveloperField{
-			Num:                devFieldDef.Num,
-			DeveloperDataIndex: devFieldDef.DeveloperDataIndex,
-			Size:               devFieldDef.Size,
-			NativeMesgNum:      fieldDescription.NativeMesgNum,
-			NativeFieldNum:     fieldDescription.NativeFieldNum,
-			BaseType:           fieldDescription.FitBaseTypeId,
-		}
-
-		developerField.Name = strings.Join(fieldDescription.FieldName, "|")
-		developerField.Units = strings.Join(fieldDescription.Units, "|")
-
-		var (
-			baseType    = developerField.BaseType
-			profileType = profile.ProfileTypeFromBaseType(baseType)
-			isArray     bool
-		)
-
-		if devFieldDef.Size > developerField.BaseType.Size() && devFieldDef.Size%developerField.BaseType.Size() == 0 {
+		var isArray bool
+		typeSize := fieldDesc.FitBaseTypeId.Size()
+		if devFieldDef.Size > typeSize && devFieldDef.Size%typeSize == 0 {
 			isArray = true
 		}
 
+		baseType := fieldDesc.FitBaseTypeId
+		profileType := profile.ProfileTypeFromBaseType(baseType)
+
 		// Gracefully handle poorly encoded FIT file.
 		if devFieldDef.Size == 0 {
-			d.logDeveloperField(mesg, devFieldDef, developerField.BaseType, "Size is zero. Skip")
+			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId, "Size is zero. Skip")
 			continue
-		} else if devFieldDef.Size < developerField.BaseType.Size() {
+		} else if devFieldDef.Size < fieldDesc.FitBaseTypeId.Size() {
 			baseType = basetype.Byte
 			profileType = profile.Byte
 			isArray = devFieldDef.Size > baseType.Size() && devFieldDef.Size&baseType.Size() == 0
-			d.logDeveloperField(mesg, devFieldDef, developerField.BaseType,
+			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId,
 				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
 		}
 
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
 		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/355554/how-to-determine-developer-field-s-value-type-is-a-string-or-string
-		overrideStringArray := developerField.BaseType == basetype.String
-		val, err := d.readValue(developerField.Size, mesgDef.Architecture, baseType, profileType, isArray, overrideStringArray)
+		overrideStringArray := fieldDesc.FitBaseTypeId == basetype.String
+		val, err := d.readValue(devFieldDef.Size, mesgDef.Architecture, baseType, profileType, isArray, overrideStringArray)
 		if err != nil {
 			return err
 		}
 
-		if baseType != developerField.BaseType { // Convert value
+		if baseType != fieldDesc.FitBaseTypeId { // Convert value
 			bitVal, _ := bitsFromValue(val)
-			val = valueFromBits(bitVal, developerField.BaseType)
+			val = valueFromBits(bitVal, fieldDesc.FitBaseTypeId)
 		}
 
-		developerField.Value = val
-
-		mesg.DeveloperFields = append(mesg.DeveloperFields, developerField)
+		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
+		// Users need to handle this themselves due to the limited context available.
+		mesg.DeveloperFields = append(mesg.DeveloperFields,
+			proto.DeveloperField{
+				Num:                devFieldDef.Num,
+				DeveloperDataIndex: devFieldDef.DeveloperDataIndex,
+				Value:              val,
+			})
 	}
 	return nil
 }

@@ -891,28 +891,28 @@ func Any(v any) Value {
 	return Value{any: TypeInvalid}
 }
 
-// Sizeof returns the size of val in bytes. For every string in Value, if the last index of the string is not '\x00', size += 1.
-func Sizeof(val Value, baseType basetype.BaseType) int {
-	return lenof(val) * int(baseType.Size())
+var sizes = [...]int{
+	TypeInvalid: 0,
+	TypeBool:    1,
+	TypeInt8:    int(basetype.Sint8.Size()),
+	TypeUint8:   int(basetype.Uint8.Size()),
+	TypeInt16:   int(basetype.Sint16.Size()),
+	TypeUint16:  int(basetype.Uint16.Size()),
+	TypeInt32:   int(basetype.Sint32.Size()),
+	TypeUint32:  int(basetype.Uint32.Size()),
+	TypeInt64:   int(basetype.Sint64.Size()),
+	TypeUint64:  int(basetype.Uint64.Size()),
+	TypeFloat32: int(basetype.Float32.Size()),
+	TypeFloat64: int(basetype.Float64.Size()),
+	TypeString:  int(basetype.String.Size()),
 }
 
-func lenof(val Value) int {
-	switch val.Type() {
-	case TypeInvalid:
-		return 0
-	case TypeBool,
-		TypeInt8,
-		TypeUint8,
-		TypeInt16,
-		TypeUint16,
-		TypeInt32,
-		TypeUint32,
-		TypeFloat32,
-		TypeFloat64,
-		TypeInt64,
-		TypeUint64:
-		return 1
-	case TypeString:
+// Sizeof returns the size of val in bytes. For every string in Value, if the last index of the string is not '\x00', size += 1.
+func Sizeof(val Value) int {
+	switch typ := val.any.(type) {
+	case Type:
+		return int(sizes[typ])
+	case stringptr:
 		s := val.String()
 		if len(s) == 0 {
 			return 1 // utf-8 null terminated string
@@ -920,8 +920,30 @@ func lenof(val Value) int {
 		if l := len(s); l > 0 && s[l-1] == '\x00' {
 			return l
 		}
-		return len(s) + 1
-	case TypeSliceString:
+		return (len(s) + 1) * sizes[TypeString]
+	case *bool:
+		return int(val.num) * sizes[TypeBool]
+	case *int8:
+		return int(val.num) * sizes[TypeInt8]
+	case *uint8:
+		return int(val.num) * sizes[TypeUint8]
+	case *int16:
+		return int(val.num) * sizes[TypeInt16]
+	case *uint16:
+		return int(val.num) * sizes[TypeUint16]
+	case *int32:
+		return int(val.num) * sizes[TypeInt32]
+	case *uint32:
+		return int(val.num) * sizes[TypeUint32]
+	case *int64:
+		return int(val.num) * sizes[TypeInt64]
+	case *uint64:
+		return int(val.num) * sizes[TypeUint64]
+	case *float32:
+		return int(val.num) * sizes[TypeFloat32]
+	case *float64:
+		return int(val.num) * sizes[TypeFloat64]
+	case *string:
 		vs := val.SliceString()
 		var size int
 		for i := range vs {
@@ -938,8 +960,8 @@ func lenof(val Value) int {
 		if size == 0 {
 			return 1 // utf-8 null terminated string
 		}
-		return size
+		return size * sizes[TypeString]
 	}
 
-	return int(val.num) // other slices
+	return 0
 }

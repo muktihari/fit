@@ -44,8 +44,7 @@ type FITToCSVConv struct {
 
 	maxFields int // Since we write messages as they arrive, we don't know the exact number of headers we need, so we create an approximate size.
 
-	developerDataIds  []*mesgdef.DeveloperDataId
-	fieldDescriptions []*mesgdef.FieldDescription
+	fieldDescriptions []*mesgdef.FieldDescription // Key: uint16(DeveloperDataIndex) << 8 | uint16(FieldDefinitionNumber)
 
 	mesgc chan any      // This buffered event channel can accept either proto.Message or proto.MessageDefinition maintaining the order of arrival.
 	done  chan struct{} // Tells that all messages have been completely processed.
@@ -174,8 +173,6 @@ func (c *FITToCSVConv) handleEvent() {
 			c.writeMesgDef(mesg)
 		case proto.Message:
 			switch mesg.Num {
-			case mesgnum.DeveloperDataId:
-				c.developerDataIds = append(c.developerDataIds, mesgdef.NewDeveloperDataId(&mesg))
 			case mesgnum.FieldDescription:
 				c.fieldDescriptions = append(c.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
 			}
@@ -340,7 +337,14 @@ func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	for i := range mesgDef.DeveloperFieldDefinitions {
 		devFieldDef := &mesgDef.DeveloperFieldDefinitions[i]
 
-		c.buf.WriteString(c.devFieldName(devFieldDef))
+		name := factory.NameUnknown
+		fieldDesc := c.getFieldDescription(devFieldDef.DeveloperDataIndex, devFieldDef.Num)
+		if fieldDesc != nil {
+			name = strings.Join(fieldDesc.FieldName, "|")
+		} else if c.options.printUnknownMesgNum {
+			name = formatUnknown(int(devFieldDef.Num))
+		}
+		c.buf.WriteString(name)
 		c.buf.WriteByte(',')
 
 		c.buf.WriteString(strconv.Itoa(int(devFieldDef.Size)))
@@ -365,28 +369,6 @@ func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 		_, c.err = c.inmem.Write(c.buf.Bytes())
 	}
 	c.buf.Reset()
-}
-
-func (c *FITToCSVConv) devFieldName(devFieldDef *proto.DeveloperFieldDefinition) string {
-	var fieldDescription *mesgdef.FieldDescription
-	for i := range c.fieldDescriptions {
-		fieldDef := c.fieldDescriptions[i]
-		if fieldDef.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
-			continue
-		}
-		if fieldDef.FieldDefinitionNumber != devFieldDef.Num {
-			continue
-		}
-		fieldDescription = fieldDef
-		break
-	}
-	if fieldDescription != nil {
-		return strings.Join(fieldDescription.FieldName, "|")
-	}
-	if c.options.printUnknownMesgNum {
-		return formatUnknown(int(devFieldDef.Num))
-	}
-	return factory.NameUnknown
 }
 
 func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
@@ -448,13 +430,23 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 	for i := range mesg.DeveloperFields {
 		devField := &mesg.DeveloperFields[i]
 
-		c.buf.WriteString(devField.Name)
+		var units string
+		name := factory.NameUnknown
+		fieldDesc := c.getFieldDescription(devField.DeveloperDataIndex, devField.Num)
+		if fieldDesc != nil {
+			name = strings.Join(fieldDesc.FieldName, "|")
+			units = strings.Join(fieldDesc.Units, "|")
+		} else if c.options.printUnknownMesgNum {
+			name = formatUnknown(int(devField.Num))
+		}
+
+		c.buf.WriteString(name)
 
 		c.buf.WriteString(",\"")
 		c.buf.WriteString(format(devField.Value))
 		c.buf.WriteString("\",")
 
-		c.buf.WriteString(devField.Units)
+		c.buf.WriteString(units)
 		c.buf.WriteByte(',')
 
 		fieldCounter++
@@ -474,4 +466,14 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 		_, c.err = c.inmem.Write(c.buf.Bytes())
 	}
 	c.buf.Reset()
+}
+
+func (c *FITToCSVConv) getFieldDescription(developerDataIndex, fieldDefinitionNumber uint8) *mesgdef.FieldDescription {
+	for _, fieldDesc := range c.fieldDescriptions {
+		if fieldDesc.DeveloperDataIndex == developerDataIndex &&
+			fieldDesc.FieldDefinitionNumber == fieldDefinitionNumber {
+			return fieldDesc
+		}
+	}
+	return nil
 }
