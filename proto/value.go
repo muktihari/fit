@@ -911,14 +911,14 @@ var sizes = [...]int{
 func Sizeof(val Value) int {
 	switch typ := val.any.(type) {
 	case Type:
-		return int(sizes[typ])
+		return sizes[typ]
 	case stringptr:
 		s := val.String()
 		if len(s) == 0 {
-			return 1 // utf-8 null terminated string
+			return 1 * sizes[TypeString] // utf-8 null terminated string
 		}
 		if l := len(s); l > 0 && s[l-1] == '\x00' {
-			return l
+			return l * sizes[TypeString]
 		}
 		return (len(s) + 1) * sizes[TypeString]
 	case *bool:
@@ -958,7 +958,7 @@ func Sizeof(val Value) int {
 			size += len(vs[i]) + 1
 		}
 		if size == 0 {
-			return 1 // utf-8 null terminated string
+			return 1 * sizes[TypeString] // utf-8 null terminated string
 		}
 		return size * sizes[TypeString]
 	}
