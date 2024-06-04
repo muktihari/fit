@@ -16,13 +16,13 @@ package {{ .Package }}
 
 import (
 	"fmt"
-	"math"
 	"sync"
 
 	"github.com/muktihari/fit/proto"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
 )
 
 type errorString string
@@ -58,34 +58,44 @@ var ( // cache for CreateMesg method
 
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	once.Do(func() { // populate data for the firt invocation.
+	once.Do(func() { // populate data for the first invocation.
 		protoMesgs = make([]proto.Message, len(mesgs))
-		for i := range mesgs {
-			m := &mesgs[i]
-			if m.Num != typedef.MesgNum(i) {
-				continue // skip unknown message
+		var i int
+		var fieldBases *[256]*proto.FieldBase
+		for i, fieldBases = range mesgs {
+			if fieldBases == nil {
+				continue
 			}
 			var n byte
-			for j := range m.Fields {
-				if m.Fields[j].FieldBase != nil {
+			for j := range fieldBases {
+				if fieldBases[j] != nil {
 					n++
 				}
 			}
 			fields := make([]proto.Field, 0, n)
             
+			var timestampNum byte = proto.FieldNumTimestamp
+			mesgNum := typedef.MesgNum(i)
+			switch mesgNum {
+			case typedef.MesgNumCoursePoint:
+				timestampNum = fieldnum.CoursePointTimestamp
+			case typedef.MesgNumSet:
+				timestampNum = fieldnum.SetTimestamp
+			}
+
 			// Place timestamp field at the first index since the field is frequently used.
 			// This kind of ordering matches the fields' ordering in Profile.xlsx which put timestamp at the beginning.
-			field := m.Fields[proto.FieldNumTimestamp]
-			if field.FieldBase != nil {
-				fields = append(fields, field)
+			fieldBase := fieldBases[timestampNum]
+			if fieldBase != nil {
+				fields = append(fields, proto.Field{FieldBase: fieldBase})
 			}
-			for _, field = range m.Fields {
-				if field.FieldBase != nil && field.Num != proto.FieldNumTimestamp {
-					fields = append(fields, field)
+			for _, fieldBase = range fieldBases {
+				if fieldBase != nil && fieldBase.Num != timestampNum {
+					fields = append(fields, proto.Field{FieldBase: fieldBase})
 				}
 			}
-			protoMesgs[m.Num] = proto.Message{
-				Num:    m.Num, 
+			protoMesgs[i] = proto.Message{
+				Num:    mesgNum,
 				Fields: fields,
 			}
 		}
@@ -116,10 +126,10 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
-	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum].Num == mesgNum {
-		field := mesgs[mesgNum].Fields[num]
-		if field.FieldBase != nil {
-			return field
+	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum] != nil {
+		fieldBase := mesgs[mesgNum][num]
+		if fieldBase != nil {
+			return proto.Field{FieldBase: fieldBase}
 		}
 		return createUnknownField(num)
 	}
@@ -150,7 +160,7 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 			typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
 	}
 
-	if mesg.Num < typedef.MesgNum(len(mesgs)) && mesgs[mesg.Num].Num == mesg.Num {
+	if mesg.Num < typedef.MesgNum(len(mesgs)) && mesgs[mesg.Num] != nil {
 		return fmt.Errorf("could not register on reserved predefined message, mesg.Num %d (%s) is already exist: %w",
 			mesg.Num, mesg.Num, ErrRegisterForbidden)
 	}
@@ -160,13 +170,8 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 	return nil
 }
 
-type message struct {
-	Num    typedef.MesgNum
-	Fields [256]proto.Field // Use array to ensure O(1) lookup
-}
-
 // Use array to ensure O(1) lookup
-var mesgs = {{ .Messages }} 
+var mesgs = {{ .Messages }}
 
 {{ end }} // end of "factory"
 
@@ -212,8 +217,8 @@ func RegisterMesg(mesg proto.Message) error {
 {{ define "create_mesg_doc" }}
 // CreateMesg creates new message based on defined messages in the factory. If not found, it returns proto.Message{Num: num}.
 //
-// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited (except in case of unknown field).
-// If you want a deep copy of the mesg, clone it by calling mesg.Clone().
+// This will create a shallow copy of the Fields, so changing any value declared in Field's FieldBase is prohibited 
+// (except in case of unknown field). If you want a deep copy of the mesg, use mesg.Clone().
 //
 // NOTE: This method is not used by either the Decoder or the Encoder, and the data will only be populated once upon the first invocation.
 // Unless you need most of the returned fields, it's recommended create an empty proto.Message{Num: num} then fill only the necessary fields 
@@ -227,16 +232,14 @@ func RegisterMesg(mesg proto.Message) error {
 {{ define "create_field_doc" }}
 // CreateField creates new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
 // 
-// Field's FieldBase is a pointer struct embedded, and this will only create a shallow copy of the field, so changing any value declared in 
-// FieldBase is prohibited (except for the unknown field) since it still referencing the same struct. If you want a deep copy of the Field, 
-// create it by calling field.Clone().
+// Field's FieldBase is a pointer embedded struct and it will only be referenced into the returned field, so changing any value 
+// declared in  FieldBase is prohibited (except in the case of unknown field). If you want a deep copy, use field.Clone().
 {{ end }}
 
 {{ define "register_mesg_doc" }}
 // RegisterMesg registers a new message that is not defined in the profile.xlsx. 
 // You can not edit or replace existing predefined messages in the factory, you can only edit the messages you have registered.
-// However, we don't create a lock for efficiency, since this is intended to be used on instantiation. If you want to
-// change something without triggering data race, you can create a new instance of Factory using New().
+// Please note, we don't use mutex for efficiency, since this is intended to be used on instantiation.
 //
 // By registering, any FIT file containing these messages can be recognized instead of returning "unknown" message.
 {{ end }}
