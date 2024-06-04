@@ -2632,7 +2632,21 @@ func TestReset(t *testing.T) {
 
 func BenchmarkDecodeMessageData(b *testing.B) {
 	b.StopTimer()
-	mesg := factory.CreateMesg(typedef.MesgNumRecord)
+	mesg := proto.Message{
+		Num: mesgnum.Record,
+		Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLat).WithValue(int32(-90481372)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLong).WithValue(int32(1323227263)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(8.33 * 1000)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(405.81 * 100)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(110)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(85)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((166.0 + 500.0) * 5.0)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordPower).WithValue(uint16(200)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTemperature).WithValue(int8(32)),
+		},
+	}
 	mesgDef := proto.CreateMessageDefinition(&mesg)
 	mesgb, err := mesg.MarshalBinary()
 	if err != nil {
