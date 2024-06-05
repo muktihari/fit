@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -84,9 +85,9 @@ func ValidatorWithFactory(factory Factory) ValidatorOption {
 }
 
 type messageValidator struct {
-	options           validatorOptions
-	developerDataIds  []*mesgdef.DeveloperDataId
-	fieldDescriptions []*mesgdef.FieldDescription
+	options              validatorOptions
+	developerDataIndexes []uint8
+	fieldDescriptions    []*mesgdef.FieldDescription
 }
 
 // NewMessageValidator creates new message validator. The validator is mainly used to validate message before encoding.
@@ -101,10 +102,7 @@ func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
 }
 
 func (v *messageValidator) Reset() {
-	for i := range v.developerDataIds {
-		v.developerDataIds[i] = nil // avoid memory leaks
-	}
-	v.developerDataIds = v.developerDataIds[:0]
+	v.developerDataIndexes = v.developerDataIndexes[:0]
 
 	for i := range v.fieldDescriptions {
 		v.fieldDescriptions[i] = nil // avoid memory leaks
@@ -157,7 +155,8 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
-		v.developerDataIds = append(v.developerDataIds, mesgdef.NewDeveloperDataId(mesg))
+		v.developerDataIndexes = append(v.developerDataIndexes,
+			mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8())
 	case mesgnum.FieldDescription:
 		v.fieldDescriptions = append(v.fieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	}
@@ -171,8 +170,8 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		developerField := &mesg.DeveloperFields[i]
 
 		var ok bool
-		for _, d := range v.developerDataIds {
-			if developerField.DeveloperDataIndex == d.DeveloperDataIndex {
+		for _, developerDataIndex := range v.developerDataIndexes {
+			if developerDataIndex == developerField.DeveloperDataIndex {
 				ok = true
 				break
 			}
