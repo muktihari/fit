@@ -19,6 +19,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 	"golang.org/x/exp/slices"
@@ -74,8 +75,8 @@ type Decoder struct {
 	localMessageDefinitions [proto.LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
 
 	// Developer Data Lookup
-	developerDataIds  []*mesgdef.DeveloperDataId
-	fieldDescriptions []*mesgdef.FieldDescription
+	developerDataIndexes []uint8
+	fieldDescriptions    []*mesgdef.FieldDescription
 
 	// Listeners
 	mesgListeners    []MesgListener    // Each listener will received every decoded message.
@@ -238,11 +239,7 @@ func (d *Decoder) reset() {
 	d.crc = 0
 	d.fileId = nil
 	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
-
-	for i := range d.developerDataIds {
-		d.developerDataIds[i] = nil // avoid memory leaks
-	}
-	d.developerDataIds = d.developerDataIds[:0]
+	d.developerDataIndexes = d.developerDataIndexes[:0]
 
 	for i := range d.fieldDescriptions {
 		d.fieldDescriptions[i] = nil // avoid memory leaks
@@ -637,7 +634,7 @@ func (d *Decoder) decodeMessageData(header byte) error {
 		timestampField := d.factory.CreateField(mesgDef.MesgNum, proto.FieldNumTimestamp)
 		if timestampField.Name == factory.NameUnknown {
 			timestampField.BaseType = basetype.Uint32
-			timestampField.Type = profile.ProfileTypeFromBaseType(timestampField.BaseType)
+			timestampField.Type = profile.DateTime
 		}
 		timestampField.Value = proto.Uint32(d.timestamp)
 
@@ -657,7 +654,8 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
 		// These messages must occur before any related field description messages are written to the proto.
-		d.developerDataIds = append(d.developerDataIds, mesgdef.NewDeveloperDataId(&mesg))
+		d.developerDataIndexes = append(d.developerDataIndexes,
+			mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8())
 	case mesgnum.FieldDescription:
 		// These messages must occur in the file before any related developer data is written to the proto.
 		d.fieldDescriptions = append(d.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
@@ -827,16 +825,15 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 	for i := range mesgDef.DeveloperFieldDefinitions {
 		devFieldDef := &mesgDef.DeveloperFieldDefinitions[i]
 
-		var developerDataId *mesgdef.DeveloperDataId
-		for _, d := range d.developerDataIds {
-			if d.DeveloperDataIndex != devFieldDef.DeveloperDataIndex {
-				continue
+		var ok bool
+		for _, developerDataIndex := range d.developerDataIndexes {
+			if developerDataIndex == devFieldDef.DeveloperDataIndex {
+				ok = true
+				break
 			}
-			developerDataId = d
-			break
 		}
 
-		if developerDataId == nil {
+		if !ok {
 			// NOTE: Currently, we allow missing DeveloperDataId message,
 			// we only use FieldDescription messages to decode developer data.
 			d.log("mesg.Num: %d, developerFields[%d].Num: %d: missing developer data id with developer data index '%d'",

@@ -2016,25 +2016,21 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 
 func TestDecodeDeveloperFields(t *testing.T) {
 	tt := []struct {
-		name             string
-		r                io.Reader
-		developerDataIds []*mesgdef.DeveloperDataId
-		fieldDescription *mesgdef.FieldDescription
-		mesgDef          *proto.MessageDefinition
-		mesg             *proto.Message
-		validateFn       func(mesg proto.Message) error
-		err              error
+		name                 string
+		r                    io.Reader
+		developerDataIndexes []uint8
+		fieldDescription     *mesgdef.FieldDescription
+		mesgDef              *proto.MessageDefinition
+		mesg                 *proto.Message
+		validateFn           func(mesg proto.Message) error
+		err                  error
 	}{
 		{
 			name: "decode developer fields happy flow",
 			r:    fnReaderOK,
-			developerDataIds: []*mesgdef.DeveloperDataId{
-				mesgdef.NewDeveloperDataId(nil).
-					SetApplicationId([]byte{0, 0, 0, 1}).
-					SetDeveloperDataIndex(1), // not used, just to pass code logic
-				mesgdef.NewDeveloperDataId(nil).
-					SetApplicationId([]byte{0, 0, 0, 1}).
-					SetDeveloperDataIndex(0),
+			developerDataIndexes: []uint8{
+				1, // not used, just to pass code logic
+				0,
 			},
 			fieldDescription: mesgdef.NewFieldDescription(
 				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
@@ -2266,9 +2262,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r)
-			if tc.developerDataIds != nil {
-				dec.developerDataIds = append(dec.developerDataIds, tc.developerDataIds...)
-			}
+			dec.developerDataIndexes = append(dec.developerDataIndexes, tc.developerDataIndexes...)
 			dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
 			err := dec.decodeDeveloperFields(tc.mesgDef, tc.mesg)
 			if !errors.Is(err, tc.err) {
