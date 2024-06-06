@@ -204,7 +204,7 @@ func (m *Message) FieldByNum(num byte) *Field {
 	return nil
 }
 
-// FieldValueByNum returns the value of the Field in a Messsage, if not found return nil.
+// FieldValueByNum returns the value of the Field in a Messsage, if not found return invalid value.
 func (m *Message) FieldValueByNum(num byte) Value {
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {

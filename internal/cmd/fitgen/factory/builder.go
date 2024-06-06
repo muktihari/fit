@@ -122,18 +122,30 @@ func (b *factoryBuilder) makeFieldBases(message parser.Message) string {
 
 	var strbuf strings.Builder
 	for _, field := range message.Fields {
-		strbuf.WriteString(fmt.Sprintf("%d: {\n", field.Num))
-		strbuf.WriteString(fmt.Sprintf("Name: %q,\n", field.Name))
-		strbuf.WriteString(fmt.Sprintf("Num: %d,\n", field.Num))
-		strbuf.WriteString(fmt.Sprintf("Type: %s,\n", b.transformProfileType(field.Type)))
-		strbuf.WriteString(fmt.Sprintf("BaseType: %s,\n", b.transformBaseType(field.Type)))
-		strbuf.WriteString(fmt.Sprintf("Array: %t, %s\n", field.Array != "", makeArrayComment(field.Array)))
-		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(field, message.Name)))
-		strbuf.WriteString(fmt.Sprintf("Scale: %g,\n", scaleOrDefault(field.Scales, 0)))    // first index or default
-		strbuf.WriteString(fmt.Sprintf("Offset: %g,\n", offsetOrDefault(field.Offsets, 0))) // first index or default
-		strbuf.WriteString(fmt.Sprintf("Units: %q,\n", field.Units))
-		strbuf.WriteString(fmt.Sprintf("Accumulate: %t,\n", accumulateOrDefault(field.Accumulate, 0)))
-		strbuf.WriteString(fmt.Sprintf("SubFields: %s,\n", b.makeSubFields(field, message.Name)))
+		strbuf.WriteString(fmt.Sprintf("%d: {", field.Num))
+		strbuf.WriteString(fmt.Sprintf("Name: %q,", field.Name))
+		strbuf.WriteString(fmt.Sprintf("Num: %d,", field.Num))
+		strbuf.WriteString(fmt.Sprintf("Type: %s,", b.transformProfileType(field.Type)))
+		strbuf.WriteString(fmt.Sprintf("BaseType: %s,", b.transformBaseType(field.Type)))
+		if array := field.Array != ""; array {
+			strbuf.WriteString(fmt.Sprintf("Array: %t, %s", array, makeArrayComment(field.Array)))
+		}
+		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(field.Scales, 0))) // first index or default
+		if offset := offsetOrDefault(field.Offsets, 0); offset != 0 {
+			strbuf.WriteString(fmt.Sprintf("Offset: %g,", offset)) // first index or default
+		}
+		if accumulate := accumulateOrDefault(field.Accumulate, 0); accumulate {
+			strbuf.WriteString(fmt.Sprintf("Accumulate: %t,", accumulate))
+		}
+		if field.Units != "" {
+			strbuf.WriteString(fmt.Sprintf("Units: %q,", field.Units))
+		}
+		if components := b.makeComponents(field, message.Name); components != "nil" {
+			strbuf.WriteString(fmt.Sprintf("\nComponents: %s,", components))
+		}
+		if subFields := b.makeSubFields(field, message.Name); subFields != "nil" {
+			strbuf.WriteString(fmt.Sprintf("\nSubFields: %s,", subFields))
+		}
 		strbuf.WriteString("},\n")
 	}
 
@@ -149,12 +161,16 @@ func (b *factoryBuilder) makeComponents(compField parser.ComponentField, message
 	strbuf.WriteString("[]proto.Component{\n")
 	for i, fieldNameRef := range compField.GetComponents() {
 		fieldRef := b.lookup.FieldByName(messageName, fieldNameRef)
-		strbuf.WriteString("{")
+		strbuf.WriteString(fmt.Sprintf("%d: {", i))
 		strbuf.WriteString(fmt.Sprintf("FieldNum: %d, /* %s */", fieldRef.Num, fieldRef.Name))
-		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(compField.GetScales(), i)))               // component index or default
-		strbuf.WriteString(fmt.Sprintf("Offset: %g,", offsetOrDefault(compField.GetOffsets(), i)))            // component index or default
-		strbuf.WriteString(fmt.Sprintf("Accumulate: %t,", accumulateOrDefault(compField.GetAccumulate(), i))) // component index or default
-		strbuf.WriteString(fmt.Sprintf("Bits: %d,", bitsOrDefault(compField.GetBits(), i)))                   // component index or default
+		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(compField.GetScales(), i))) // component index or default
+		if offset := offsetOrDefault(compField.GetOffsets(), i); offset != 0 {
+			strbuf.WriteString(fmt.Sprintf("Offset: %g,", offset)) // component index or default
+		}
+		if accumulate := accumulateOrDefault(compField.GetAccumulate(), i); accumulate {
+			strbuf.WriteString(fmt.Sprintf("Accumulate: %t,", accumulate)) // component index or default
+		}
+		strbuf.WriteString(fmt.Sprintf("Bits: %d,", bitsOrDefault(compField.GetBits(), i))) // component index or default
 		strbuf.WriteString("},\n")
 	}
 	strbuf.WriteString("}")
@@ -169,15 +185,21 @@ func (b *factoryBuilder) makeSubFields(field parser.Field, messageName string) s
 
 	var strbuf strings.Builder
 	strbuf.WriteString("[]proto.SubField{\n")
-	for _, subField := range field.SubFields {
-		strbuf.WriteString("{")
+	for i, subField := range field.SubFields {
+		strbuf.WriteString(fmt.Sprintf("%d: {", i))
 		strbuf.WriteString(fmt.Sprintf("Name: %q,", subField.Name))
 		strbuf.WriteString(fmt.Sprintf("Type: %s, /* %s */", b.transformProfileType(subField.Type), b.transformBaseType(subField.Type)))
-		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(subField.Scales, 0)))    // first index or default
-		strbuf.WriteString(fmt.Sprintf("Offset: %g,", offsetOrDefault(subField.Offsets, 0))) // first index or default
-		strbuf.WriteString(fmt.Sprintf("Units: %q,\n", subField.Units))
-		strbuf.WriteString(fmt.Sprintf("Components: %s,\n", b.makeComponents(subField, messageName)))
-		strbuf.WriteString(fmt.Sprintf("Maps: %s,\n", b.makeSubFieldMaps(subField, messageName)))
+		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(subField.Scales, 0))) // first index or default
+		if offset := offsetOrDefault(subField.Offsets, 0); offset != 0 {
+			strbuf.WriteString(fmt.Sprintf("Offset: %g,", offset)) // first index or default
+		}
+		if subField.Units != "" {
+			strbuf.WriteString(fmt.Sprintf("Units: %q,", subField.Units))
+		}
+		if components := b.makeComponents(subField, messageName); components != "nil" {
+			strbuf.WriteString(fmt.Sprintf("\nComponents: %s,", components))
+		}
+		strbuf.WriteString(fmt.Sprintf("\nMaps: %s,", b.makeSubFieldMaps(subField, messageName)))
 		strbuf.WriteString("},\n")
 	}
 	strbuf.WriteString("}")
@@ -194,7 +216,7 @@ func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName 
 	strbuf.WriteString("[]proto.SubFieldMap{\n")
 	for i, refValueName := range subfield.RefFieldNames {
 		fieldRef := b.lookup.FieldByName(messageName, refValueName)
-		strbuf.WriteString("{")
+		strbuf.WriteString(fmt.Sprintf("%d: {", i))
 		strbuf.WriteString(fmt.Sprintf("RefFieldNum: %d /* %s */,", fieldRef.Num, fieldRef.Name))
 
 		typeValue := b.lookup.TypeValue(fieldRef.Type, subfield.RefFieldValue[i])
@@ -215,7 +237,7 @@ func (b *factoryBuilder) transformBaseType(fieldType string) string {
 }
 
 func (b *factoryBuilder) transformMesgnum(s string) string {
-	return b.mesgnumPackageName + ".MesgNum" + strutil.ToTitle(s) // types.MesgNumFileId
+	return "mesgnum." + strutil.ToTitle(s) // mesgnum.FileId
 }
 
 func bitsOrDefault(bits []byte, index int) byte {
@@ -252,5 +274,5 @@ func makeArrayComment(arr string) string {
 	if arr == "" {
 		return ""
 	}
-	return fmt.Sprintf("/* Array Size %s */", arr)
+	return fmt.Sprintf("/* %s */", arr)
 }
