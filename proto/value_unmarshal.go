@@ -49,7 +49,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Sint16:
 		if isArray {
 			const n = 2
-			vals := make([]int16, 0, size(len(b), n))
+			vals := make([]int16, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int16(binary.LittleEndian.Uint16(b[:n])))
@@ -68,7 +68,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Uint16, basetype.Uint16z:
 		if isArray {
 			const n = 2
-			vals := make([]uint16, 0, size(len(b), n))
+			vals := make([]uint16, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint16(b[:n]))
@@ -87,7 +87,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Sint32:
 		if isArray {
 			const n = 4
-			vals := make([]int32, 0, size(len(b), n))
+			vals := make([]int32, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int32(binary.LittleEndian.Uint32(b[:n])))
@@ -106,7 +106,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Uint32, basetype.Uint32z:
 		if isArray {
 			const n = 4
-			vals := make([]uint32, 0, size(len(b), n))
+			vals := make([]uint32, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint32(b[:n]))
@@ -125,7 +125,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Sint64:
 		if isArray {
 			const n = 8
-			vals := make([]int64, 0, size(len(b), n))
+			vals := make([]int64, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int64(binary.LittleEndian.Uint64(b[:n])))
@@ -144,7 +144,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Uint64, basetype.Uint64z:
 		if isArray {
 			const n = 8
-			vals := make([]uint64, 0, size(len(b), n))
+			vals := make([]uint64, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint64(b[:n]))
@@ -163,7 +163,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Float32:
 		if isArray {
 			const n = 4
-			vals := make([]float32, 0, size(len(b), n))
+			vals := make([]float32, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, math.Float32frombits(binary.LittleEndian.Uint32(b[:n])))
@@ -182,7 +182,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	case basetype.Float64:
 		if isArray {
 			const n = 8
-			vals := make([]float64, 0, size(len(b), n))
+			vals := make([]float64, 0, len(b)/n)
 			if arch == littleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, math.Float64frombits(binary.LittleEndian.Uint64(b[:n])))
@@ -227,11 +227,6 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	}
 
 	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", baseType, baseType, ErrTypeNotSupported)
-}
-
-// Note: The size may be a multiple of the underlying FIT Base Type size indicating the field contains multiple elements represented as an array.
-func size(lenbytes, typesize int) byte {
-	return byte(lenbytes % typesize)
 }
 
 // trimUTF8NullTerminatedString trims all utf8 null-terminated string including the paddings.
