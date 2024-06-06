@@ -924,8 +924,7 @@ func (d *Decoder) decodeCRC() error {
 	d.n += 2
 	d.crc = binary.LittleEndian.Uint16(b)
 	if d.options.shouldChecksum && d.crc16.Sum16() != d.crc { // check data integrity
-		err = fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
-		return err
+		return fmt.Errorf("expected crc %d, got: %d: %w", d.crc, d.crc16.Sum16(), ErrCRCChecksumMismatch)
 	}
 	d.crc16.Reset()
 	return nil

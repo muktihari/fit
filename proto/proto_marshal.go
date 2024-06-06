@@ -24,9 +24,9 @@ const MaxBytesPerMessageDefinition = 5 + 1 + (255 * 3) + 1 + (255 * 3)
 var pool = sync.Pool{New: func() any { return new([MaxBytesPerMessage]byte) }}
 
 var (
-	_ encoding.BinaryMarshaler = &FileHeader{}
-	_ encoding.BinaryMarshaler = &MessageDefinition{}
-	_ encoding.BinaryMarshaler = &Message{}
+	_ encoding.BinaryMarshaler = (*FileHeader)(nil)
+	_ encoding.BinaryMarshaler = (*MessageDefinition)(nil)
+	_ encoding.BinaryMarshaler = (*Message)(nil)
 )
 
 // MarshalBinary returns the FIT format encoding of FileHeader and nil error.
