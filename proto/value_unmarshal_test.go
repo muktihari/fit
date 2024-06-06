@@ -15,7 +15,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-func TestUnmarshal(t *testing.T) {
+func TestUnmarshalValue(t *testing.T) {
 	tt := []struct {
 		value       proto.Value
 		baseType    basetype.BaseType
@@ -134,6 +134,41 @@ func stringsToBytes(vals ...string) []byte {
 		b = append(b, vals[i]...)
 	}
 	return b
+}
+
+func TestUnmarshalValueSliceAlloc(t *testing.T) {
+	tt := []struct {
+		value       proto.Value
+		profileType profile.ProfileType
+	}{
+		{value: proto.SliceBool(make([]bool, 256)), profileType: profile.Bool},
+		{value: proto.SliceUint8(make([]uint8, 256)), profileType: profile.Uint8},
+		{value: proto.SliceInt8(make([]int8, 256)), profileType: profile.Sint8},
+		{value: proto.SliceUint8(make([]uint8, 256)), profileType: profile.Uint8},
+		{value: proto.SliceInt16(make([]int16, 256)), profileType: profile.Sint16},
+		{value: proto.SliceUint16(make([]uint16, 256)), profileType: profile.Uint16},
+		{value: proto.SliceInt32(make([]int32, 256)), profileType: profile.Sint32},
+		{value: proto.SliceUint32(make([]uint32, 256)), profileType: profile.Uint32},
+		{value: proto.SliceInt64(make([]int64, 256)), profileType: profile.Sint64},
+		{value: proto.SliceUint64(make([]uint64, 256)), profileType: profile.Uint64},
+		{value: proto.SliceFloat32(make([]float32, 256)), profileType: profile.Float32},
+		{value: proto.SliceFloat64(make([]float64, 256)), profileType: profile.Float64},
+		{value: proto.SliceString(make([]string, 256)), profileType: profile.String},
+	}
+
+	for i, tc := range tt {
+		for arch := byte(0); arch < 2; arch++ {
+			t.Run(fmt.Sprintf("[%d] arch: %d: %v", i, arch, tc.profileType.String()), func(t *testing.T) {
+				b, _ := tc.value.MarshalAppend(nil, arch)
+				alloc := testing.AllocsPerRun(10, func() {
+					_, _ = proto.UnmarshalValue(b, arch, tc.profileType.BaseType(), tc.profileType, true)
+				})
+				if alloc > 1 {
+					t.Fatalf("expected alloc: 1, got: %g", alloc)
+				}
+			})
+		}
+	}
 }
 
 func BenchmarkUnmarshalValue(b *testing.B) {
