@@ -10,7 +10,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Listener is Message Listener.
@@ -151,7 +150,7 @@ func (l *Listener) prep(mesg proto.Message) proto.Message {
 	mesg.Fields = fields
 
 	// Must clone DeveloperFields since it is being referenced in mesgdef's structs.
-	mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
+	mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
 
 	return mesg
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Device files contain information about a device’s file structure/capabilities.
@@ -59,7 +58,7 @@ func (f *Device) Add(mesg proto.Message) {
 	case mesgnum.FieldCapabilities:
 		f.FieldCapabilities = append(f.FieldCapabilities, mesgdef.NewFieldCapabilities(&mesg))
 	default:
-		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

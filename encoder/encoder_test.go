@@ -29,7 +29,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 var (
@@ -759,7 +758,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 		// We have 3 messages with differents field definitions,
 		// this should produces different localMesgNum in header.
 
-		mesgs := slices.Clone(mesgs)
+		mesgs := append(mesgs[:0:0], mesgs...)
 		for i := range mesgs {
 			mesgs[i] = mesgs[i].Clone()
 		}

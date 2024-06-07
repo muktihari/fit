@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Course is a common file type used as points of courses to assist with on- and off-road navigation,
@@ -69,7 +68,7 @@ func (f *Course) Add(mesg proto.Message) {
 	case mesgnum.CoursePoint:
 		f.CoursePoints = append(f.CoursePoints, mesgdef.NewCoursePoint(&mesg))
 	default:
-		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
