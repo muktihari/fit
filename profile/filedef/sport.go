@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Sport files contain information about the user’s desired target zones.
@@ -65,7 +64,7 @@ func (f *Sport) Add(mesg proto.Message) {
 	case mesgnum.CadenceZone:
 		f.CadenceZones = append(f.CadenceZones, mesgdef.NewCadenceZone(&mesg))
 	default:
-		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

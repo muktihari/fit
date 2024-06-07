@@ -15,7 +15,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 func newMonitoringAMessageForTest(now time.Time) []proto.Message {
@@ -57,7 +56,7 @@ func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 }
 
 func newMonitoringBMessageForTest(now time.Time) []proto.Message {
-	mesgsB := slices.Clone(newMonitoringAMessageForTest(now))
+	mesgsB := newMonitoringAMessageForTest(now)
 	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
 	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
 	return mesgsB

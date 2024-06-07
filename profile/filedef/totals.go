@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Totals files are used to summarize a user’s activities and may contain multiple totals messages each representing
@@ -48,7 +47,7 @@ func (f *Totals) Add(mesg proto.Message) {
 	case mesgnum.Totals:
 		f.Totals = append(f.Totals, mesgdef.NewTotals(&mesg))
 	default:
-		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

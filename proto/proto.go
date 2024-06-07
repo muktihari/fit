@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
-	"golang.org/x/exp/slices"
 )
 
 type errorString string
@@ -137,8 +136,8 @@ type MessageDefinition struct {
 
 // Clone clones MessageDefinition
 func (m MessageDefinition) Clone() MessageDefinition {
-	m.FieldDefinitions = slices.Clone(m.FieldDefinitions)
-	m.DeveloperFieldDefinitions = slices.Clone(m.DeveloperFieldDefinitions)
+	m.FieldDefinitions = append(m.FieldDefinitions[:0:0], m.FieldDefinitions...)
+	m.DeveloperFieldDefinitions = append(m.DeveloperFieldDefinitions[:0:0], m.DeveloperFieldDefinitions...)
 	return m
 }
 
@@ -226,11 +225,11 @@ func (m *Message) RemoveFieldByNum(num byte) {
 
 // Clone clones Message.
 func (m Message) Clone() Message {
-	m.Fields = slices.Clone(m.Fields)
+	m.Fields = append(m.Fields[:0:0], m.Fields...)
 	for i := range m.Fields {
 		m.Fields[i] = m.Fields[i].Clone()
 	}
-	m.DeveloperFields = slices.Clone(m.DeveloperFields)
+	m.DeveloperFields = append(m.DeveloperFields[:0:0], m.DeveloperFields...)
 	for i := range m.DeveloperFields {
 		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
 	}
@@ -323,8 +322,8 @@ func (f Field) Clone() Field {
 	}
 
 	fieldBase := *f.FieldBase // also include FieldBase, clone is meant to be a deep copy
-	fieldBase.Components = slices.Clone(fieldBase.Components)
-	fieldBase.SubFields = slices.Clone(fieldBase.SubFields)
+	fieldBase.Components = append(fieldBase.Components[:0:0], fieldBase.Components...)
+	fieldBase.SubFields = append(fieldBase.SubFields[:0:0], fieldBase.SubFields...)
 	for i := range fieldBase.SubFields {
 		fieldBase.SubFields[i] = fieldBase.SubFields[i].Clone()
 	}
@@ -375,8 +374,8 @@ type SubField struct {
 
 // Clone clones SubField
 func (s SubField) Clone() SubField {
-	s.Components = slices.Clone(s.Components)
-	s.Maps = slices.Clone(s.Maps)
+	s.Components = append(s.Components[:0:0], s.Components...)
+	s.Maps = append(s.Maps[:0:0], s.Maps...)
 	return s
 }
 

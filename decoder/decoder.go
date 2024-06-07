@@ -22,7 +22,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 type errorString string
@@ -669,8 +668,8 @@ func (d *Decoder) decodeMessageData(header byte) error {
 	}
 
 	if !d.options.broadcastOnly || d.options.broadcastMesgCopy {
-		mesg.Fields = slices.Clone(mesg.Fields)
-		mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
+		mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
 	}
 
 	if !d.options.broadcastOnly {

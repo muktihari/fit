@@ -36,7 +36,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 var (
@@ -332,7 +331,7 @@ func TestPeekFileHeader(t *testing.T) {
 		{
 			name: "peek file header happy flow",
 			r: func() io.Reader {
-				buf, cur := slices.Clone(buf), 0
+				buf, cur := append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					if cur >= 14 {
 						return 0, io.EOF
@@ -388,7 +387,7 @@ func TestPeekFileId(t *testing.T) {
 		{
 			name: "peek file id happy flow",
 			r: func() io.Reader {
-				buf, cur := slices.Clone(buf), 0
+				buf, cur := append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					if cur >= len(buf) {
 						return 0, io.EOF
@@ -417,7 +416,7 @@ func TestPeekFileId(t *testing.T) {
 		{
 			name: "peek file id decode message return error",
 			r: func() io.Reader {
-				buf, cur := slices.Clone(buf), 0
+				buf, cur := append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := 14
 					if cur >= m { // only decode header
@@ -466,8 +465,8 @@ func TestCheckIntegrity(t *testing.T) {
 			name: "happy flow",
 			r: func() io.Reader {
 				// Chained FIT File
-				b := slices.Clone(b)
-				nextb := slices.Clone(b)
+				b := append(b[:0:0], b...)
+				nextb := append(b[:0:0], b...)
 				b = append(b, nextb...)
 				return bytes.NewReader(b)
 			}(),
@@ -502,7 +501,7 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "read message return error",
 			r: func() io.Reader {
-				buf := slices.Clone(b)
+				buf := append(b[:0:0], b...)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := 14
@@ -523,7 +522,7 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "decode crc return error",
 			r: func() io.Reader {
-				buf := slices.Clone(b)
+				buf := append(b[:0:0], b...)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf) - 2
@@ -544,7 +543,7 @@ func TestCheckIntegrity(t *testing.T) {
 		{
 			name: "crc checksum mismatch",
 			r: func() io.Reader {
-				buf := slices.Clone(b)
+				buf := append(b[:0:0], b...)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf) - 2
@@ -567,7 +566,7 @@ func TestCheckIntegrity(t *testing.T) {
 			name: "second sequence of FIT File return error",
 			r: func() io.Reader {
 				// Chained FIT File but with next sequence header is
-				b := slices.Clone(b)
+				b := append(b[:0:0], b...)
 				h := headerForTest()
 				nextb, _ := h.MarshalBinary()
 				nextb[0] = 100 // alter FileHeader's Size
@@ -715,7 +714,7 @@ func TestDiscard(t *testing.T) {
 		{
 			name: "discard happy flow",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
 					if cur == m {
@@ -741,7 +740,7 @@ func TestDiscard(t *testing.T) {
 		{
 			name: "discard error when reading data",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := 14
 					if cur >= m {
@@ -760,7 +759,7 @@ func TestDiscard(t *testing.T) {
 		{
 			name: "discard error when reading crc",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf) - 2
 					if cur == m {
@@ -951,7 +950,7 @@ func makeDecodeTableTest() []decodeTestCase {
 		{
 			name: "decode happy flow",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
 					if cur == m {
@@ -970,7 +969,7 @@ func makeDecodeTableTest() []decodeTestCase {
 		{
 			name: "decode header return error",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf[0] = 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
@@ -990,7 +989,7 @@ func makeDecodeTableTest() []decodeTestCase {
 		{
 			name: "decode messages return error",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := 14
 					if cur == m {
@@ -1010,7 +1009,7 @@ func makeDecodeTableTest() []decodeTestCase {
 		{
 			name: "decode crc return error",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf) - 2
 					if cur == m {
@@ -1030,7 +1029,7 @@ func makeDecodeTableTest() []decodeTestCase {
 		{
 			name: "decode crc checksum mismatch",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf) - 2
 					if cur == m {
@@ -1088,7 +1087,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode header happy flow",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
 					if cur == m {
@@ -1113,7 +1112,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode header invalid size",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf[0] = 0
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
@@ -1133,7 +1132,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode header invalid size",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf = buf[:1] // trimmed
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
@@ -1153,7 +1152,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode invalid protocol",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf[1] = 100 // invalid protocol
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
@@ -1173,7 +1172,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode data type not `.FIT`",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				copy(buf[5:9], []byte("F.IT"))
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
@@ -1193,7 +1192,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode crc == 0x000",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf[12], buf[13] = 0, 0
 
 				return fnReader(func(b []byte) (n int, err error) {
@@ -1224,7 +1223,7 @@ func TestDecodeFileHeader(t *testing.T) {
 		{
 			name: "decode crc mismatch",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf), 0
+				var buf, cur = append(buf[:0:0], buf...), 0
 				buf[12], buf[13] = 0, 1
 
 				return fnReader(func(b []byte) (n int, err error) {
@@ -1281,7 +1280,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 		{
 			name: "decode message definition happy flow",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf[15:]), 0 // trim header
+				var buf, cur = append(buf[:0:0], buf[15:]...), 0 // trim header
 				return fnReader(func(b []byte) (n int, err error) {
 					m := len(buf)
 					if cur == m {
@@ -1309,7 +1308,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 		{
 			name: "decode read return io.EOF when retrieving field data",
 			r: func() io.Reader {
-				var buf, cur = slices.Clone(buf[15:]), 0 // trim header
+				var buf, cur = append(buf[:0:0], buf[15:]...), 0 // trim header
 				return fnReader(func(b []byte) (n int, err error) {
 					m := 5
 					if cur == m {
@@ -2463,7 +2462,7 @@ func TestDecodeWithContext(t *testing.T) {
 			func() strct {
 				ctx, cancel := context.WithCancel(context.Background())
 				_, buffer := createFitForTest()
-				buf, cur := slices.Clone(buffer), 0
+				buf, cur := append(buffer[:0:0], buffer...), 0
 				r := fnReader(func(b []byte) (n int, err error) {
 					if cur == len(buf)-3 {
 						cancel() // cancel right after completing decode messages

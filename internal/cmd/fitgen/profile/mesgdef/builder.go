@@ -113,7 +113,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		}
 
 		// Optimize memory usage by aligning the memory in the struct.
-		optimizedFields := slices.Clone(fields)
+		optimizedFields := append(fields[:0:0], fields...)
 		b.simpleMemoryAlignment(optimizedFields)
 
 		data := Data{

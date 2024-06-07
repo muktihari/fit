@@ -20,7 +20,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 var fnDecodeRawOK = func(flag RawFlag, b []byte) error {
@@ -103,7 +102,7 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "invalid FileHeader's Size",
 			r: func() io.Reader {
-				buf := slices.Clone(buf)
+				buf := append(buf[:0:0], buf...)
 				buf[0] = 100
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -135,7 +134,7 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "bytes 8-12 is not .FIT",
 			r: func() io.Reader {
-				buf := slices.Clone(buf)
+				buf := append(buf[:0:0], buf...)
 				copy(buf[8:12], []byte(".FTT"))
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -152,7 +151,7 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "fn FileHeader returns io.EOF",
 			r: func() io.Reader {
-				buf := slices.Clone(buf)
+				buf := append(buf[:0:0], buf...)
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
 					if cur == len(buf) {

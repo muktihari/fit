@@ -8,7 +8,6 @@ import (
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // Activity is a common file type that most wearable device or cycling computer uses to record activities.
@@ -95,7 +94,7 @@ func (f *Activity) Add(mesg proto.Message) {
 	case mesgnum.Hrv:
 		f.HRVs = append(f.HRVs, mesgdef.NewHrv(&mesg))
 	default:
-		mesg.Fields = slices.Clone(mesg.Fields)
+		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }
