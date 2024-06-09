@@ -76,6 +76,7 @@ type Encoder struct {
 type options struct {
 	messageValidator         MessageValidator
 	protocolVersion          proto.Version
+	writeBufferSize          int
 	endianness               byte
 	headerOption             headerOption
 	multipleLocalMessageType byte
@@ -86,6 +87,7 @@ func defaultOptions() options {
 		protocolVersion: proto.V1,
 		endianness:      littleEndian,
 		headerOption:    headerOptionNormal,
+		writeBufferSize: defaultWriteBuffer,
 	}
 }
 
@@ -147,6 +149,12 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 	})
 }
 
+// WithWriteBufferSize directs the Encoder to use this buffer size for writing to io.Writer instead of default 4096.
+// When size <= 0, the Encoder will write directly to io.Writer without buffering.
+func WithWriteBufferSize(size int) Option {
+	return fnApply(func(o *options) { o.writeBufferSize = size })
+}
+
 // New returns a FIT File Encoder to encode FIT data to given w.
 //
 // # Encoding Strategy
@@ -156,12 +164,11 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 // be correct after everything is written.
 //
 // There are two strategies to achieve that and it depends on what kind of [io.Writer] is provided:
-//   - [io.WriterAt] or [io.WriteSeeker]: Encoder can update the FileHeader's DataSize and CRC after
+//   - [io.WriterAt] or [io.WriteSeeker]: Encoder will update the FileHeader's DataSize and CRC after
 //     the encoding process is completed since we can write at a specific byte position, making it more
 //     ideal and efficient.
-//   - [io.Writer]: Encoder needs to iterate through the messages once to calculate
-//     the FileHeader's DataSize and CRC by writing to [io.Discard], then re-iterate through the messages
-//     again for the actual writing.
+//   - [io.Writer]: Encoder needs to iterate through the messages once to calculate the FileHeader's DataSize
+//     and CRC by writing to [io.Discard], then re-iterate through the messages again for the actual writing.
 //
 // Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file
 // is commonly small-sized, but by design, it can hold up to approximately 4GB. This is because the DataSize
@@ -169,10 +176,9 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 // multiple FIT files to be chained together in a single FIT file. Each FIT file in the chain must be a properly
 // formatted FIT file (FileHeader, Messages, CRC), making it more dynamic in size.
 //
-// Note: We encourage wrapping w into a buffered writer such as bufferedwriter.New(w) that maintain
-// io.WriteAt or io.WriteSeeker method (bufio.Writer does not). Encode process requires small bytes writing
-// and having frequent write on non-buffered writer might impact performance, especially if it involves syscall
-// such as writing a file. If you do wrap, don't forget to Flush() the buffered writer after encode is completed.
+// Note: Encoder already implements efficient io.Writer buffering, so there's no need to wrap 'w' with a buffer;
+// doing so will only reduce performance. If you don't want the Encoder to buffer the writing, please direct the
+// Encoder to do so using WithWriteBufferSize(0).
 func New(w io.Writer, opts ...Option) *Encoder {
 	e := &Encoder{
 		crc16:             crc16.New(nil),
@@ -187,7 +193,6 @@ func New(w io.Writer, opts ...Option) *Encoder {
 // default options so any options needs to be inputed again. It is similar to New()
 // but it retains the underlying storage for use by future encode to reduce memory allocs.
 func (e *Encoder) Reset(w io.Writer, opts ...Option) {
-	e.w = w
 	e.n = 0
 	e.lastFileHeaderPos = 0
 
@@ -195,6 +200,8 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	for i := range opts {
 		opts[i].apply(&e.options)
 	}
+
+	e.w = newWriteBuffer(w, e.options.writeBufferSize)
 
 	if e.options.messageValidator == nil {
 		e.options.messageValidator = NewMessageValidator()
@@ -232,18 +239,23 @@ func (e *Encoder) reset() {
 //	}
 //
 // Encode chooses which strategy to use for encoding the data based on given writer.
-func (e *Encoder) Encode(fit *proto.FIT) error {
-	defer e.reset()
-
-	// Encode Strategy
+func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
-		return e.encodeWithDirectUpdateStrategy(fit)
+		err = e.encodeWithDirectUpdateStrategy(fit)
 	case io.Writer:
-		return e.encodeWithEarlyCheckStrategy(fit)
+		err = e.encodeWithEarlyCheckStrategy(fit)
+	default:
+		err = ErrNilWriter
 	}
-
-	return ErrNilWriter
+	e.reset()
+	if err != nil {
+		return
+	}
+	if f, ok := e.w.(flusher); ok {
+		return f.Flush()
+	}
+	return
 }
 
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing,
@@ -512,17 +524,22 @@ func (e *Encoder) encodeCRC() error {
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
-	defer e.reset()
-
-	// Encode Strategy
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
-		return e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)
+		err = e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)
 	case io.Writer:
-		return e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
+		err = e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
+	default:
+		err = ErrNilWriter
 	}
-
-	return ErrNilWriter
+	e.reset()
+	if err != nil {
+		return
+	}
+	if f, ok := e.w.(flusher); ok {
+		return f.Flush()
+	}
+	return
 }
 
 func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context, fit *proto.FIT) error {

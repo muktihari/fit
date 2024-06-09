@@ -5,6 +5,7 @@
 package encoder
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/binary"
@@ -19,6 +20,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash"
@@ -65,7 +67,7 @@ func TestEncodeRealFiles(t *testing.T) {
 	}
 
 	f := new(bytes.Buffer)
-	enc := New(f)
+	enc := New(f, WithWriteBufferSize(0))
 	if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
 		panic(err)
 	}
@@ -117,6 +119,7 @@ func TestOptions(t *testing.T) {
 				endianness:               0,
 				protocolVersion:          proto.V1,
 				messageValidator:         NewMessageValidator(),
+				writeBufferSize:          defaultWriteBuffer,
 			},
 		},
 		{
@@ -126,6 +129,7 @@ func TestOptions(t *testing.T) {
 				WithNormalHeader(20),
 				WithProtocolVersion(proto.V2),
 				WithMessageValidator(fnValidateOK),
+				WithWriteBufferSize(8192),
 			},
 			expected: options{
 				multipleLocalMessageType: 15,
@@ -133,6 +137,7 @@ func TestOptions(t *testing.T) {
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionNormal,
+				writeBufferSize:          8192,
 			},
 		},
 		{
@@ -149,6 +154,7 @@ func TestOptions(t *testing.T) {
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionCompressedTimestamp,
+				writeBufferSize:          defaultWriteBuffer,
 			},
 		},
 	}
@@ -217,17 +223,29 @@ func TestEncode(t *testing.T) {
 	tt := []struct {
 		name string
 		w    io.Writer
+		err  error
 	}{
-		{name: "encode with nil", w: nil},
+		{name: "encode with nil", w: nil, err: ErrNilWriter},
 		{name: "encode with writer", w: fnWriteOK},
 		{name: "encode with writerAt", w: mockWriterAt{fnWriteOK, fnWriteAtOK}},
 		{name: "encode with writeSeeker", w: mockWriteSeeker{fnWriteOK, fnSeekOK}},
 	}
 
+	fit := proto.FIT{
+		Messages: []proto.Message{
+			{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
+			}},
+		},
+	}
+
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.Encode(&proto.FIT{})
+			err := enc.Encode(&fit)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
 		})
 	}
 
@@ -235,7 +253,10 @@ func TestEncode(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w)
-			_ = enc.EncodeWithContext(context.Background(), &proto.FIT{})
+			err := enc.EncodeWithContext(context.Background(), &fit)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
 		})
 	}
 }
@@ -244,6 +265,7 @@ type encodeWithDirectUpdateTestCase struct {
 	name string
 	fit  *proto.FIT
 	w    io.Writer
+	err  error
 }
 
 func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestCase {
@@ -261,11 +283,13 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 			name: "encode header error",
 			fit:  &proto.FIT{},
 			w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
+			err:  io.EOF,
 		},
 		{
 			name: "encode messages error",
-			fit:  &proto.FIT{Messages: []proto.Message{{}}},
-			w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
+			fit:  &proto.FIT{},
+			w:    mockWriterAt{fnWriteOK, fnWriteAtErr},
+			err:  ErrEmptyMessages,
 		},
 		{
 			name: "encode crc error",
@@ -287,6 +311,7 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 					fnWriteAtOK,
 				}
 			}(),
+			err: io.EOF,
 		},
 		{
 			name: "update error",
@@ -295,7 +320,8 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 				),
 			}},
-			w: mockWriterAt{fnWriteOK, fnWriteAtErr},
+			w:   mockWriterAt{fnWriteOK, fnWriteAtErr},
+			err: io.EOF,
 		},
 	}
 }
@@ -305,8 +331,11 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w)
-			_ = enc.Encode(tc.fit)
+			enc := New(tc.w, WithWriteBufferSize(0))
+			err := enc.Encode(tc.fit)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
 		})
 	}
 
@@ -315,8 +344,11 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 
 	for _, tc := range tt2 {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w)
-			_ = enc.EncodeWithContext(context.Background(), tc.fit)
+			enc := New(tc.w, WithWriteBufferSize(0))
+			err := enc.EncodeWithContext(context.Background(), tc.fit)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
 		})
 	}
 }
@@ -400,9 +432,12 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 	tt := makeEncodeWithEarlyCheckStrategy()
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w, WithMessageValidator(fnValidateOK))
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			enc := New(tc.w,
+				WithMessageValidator(fnValidateOK),
+				WithWriteBufferSize(0),
+			)
 			err := enc.Encode(tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
@@ -415,7 +450,10 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 
 	for _, tc := range tt2 {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w, WithMessageValidator(fnValidateOK))
+			enc := New(tc.w,
+				WithMessageValidator(fnValidateOK),
+				WithWriteBufferSize(0),
+			)
 			err := enc.EncodeWithContext(context.Background(), tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
@@ -480,7 +518,7 @@ func TestUpdateHeader(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w)
+			enc := New(tc.w, WithWriteBufferSize(0))
 			_ = enc.updateFileHeader(&tc.header)
 		})
 	}
@@ -579,7 +617,7 @@ func TestEncodeHeader(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			bytebuf := new(bytes.Buffer)
-			enc := New(bytebuf)
+			enc := New(bytebuf, WithWriteBufferSize(0))
 			if tc.protocolVersion != 0 {
 				enc.options.protocolVersion = tc.protocolVersion
 			}
@@ -722,6 +760,7 @@ func TestEncodeMessage(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
+			tc.opts = append(tc.opts, WithWriteBufferSize(0))
 			enc := New(tc.w, tc.opts...)
 			err := enc.encodeMessage(&tc.mesg)
 			if !errors.Is(err, tc.err) {
@@ -764,7 +803,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 		}
 
 		buf := new(bytes.Buffer)
-		enc := New(buf, WithNormalHeader(2))
+		enc := New(buf, WithNormalHeader(2), WithWriteBufferSize(0))
 		for i, mesg := range mesgs {
 			buf.Reset()
 			err := enc.encodeMessage(&mesg)
@@ -1051,7 +1090,10 @@ func TestEncodeWithCompressedTimestampHeader(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			enc := New(tc.w, WithCompressedTimestampHeader())
+			enc := New(tc.w,
+				WithCompressedTimestampHeader(),
+				WithWriteBufferSize(0),
+			)
 			if err := enc.Encode(&tc.fit); err != nil {
 				t.Fatalf("expected error nil, got: %v", err)
 			}
@@ -1076,7 +1118,7 @@ func TestEncodeMessagesWithContext(t *testing.T) {
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
 		),
 	}
-	enc := New(nil)
+	enc := New(nil, WithWriteBufferSize(0))
 	err := enc.encodeMessagesWithContext(ctx, mesgs)
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected: %v, got: %v", context.Canceled, err)
@@ -1106,7 +1148,7 @@ func TestStreamEncoder(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := New(tc.w).StreamEncoder()
+			_, err := New(tc.w, WithWriteBufferSize(0)).StreamEncoder()
 			if !errors.Is(err, tc.err) {
 				t.Errorf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -1149,6 +1191,9 @@ func TestReset(t *testing.T) {
 			if diff := cmp.Diff(enc, tc.expected,
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Encoder{}),
+				cmpopts.IgnoreUnexported(bufio.Writer{}),
+				cmpopts.IgnoreUnexported(writerAt{}),
+				cmpopts.IgnoreUnexported(writeSeeker{}),
 				cmp.FilterValues(func(x, y MessageValidator) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y *proto.Validator) bool { return true }, cmp.Ignore()),
