@@ -43,7 +43,10 @@ func (w *writerAtStub) WriteAt(p []byte, pos int64) (int, error) {
 func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 	var result []byte
 	enc := New(&writerAtStub{&result})
-	streamEnc, _ := enc.StreamEncoder()
+	streamEnc, err := enc.StreamEncoder()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	fileIdMesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
 		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
@@ -52,7 +55,6 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1000)),
 	)
 
-	var err error
 	err = streamEnc.WriteMessage(&fileIdMesg)
 	if err != nil {
 		t.Fatalf("expected err: %v, got: %v", nil, err)
@@ -88,7 +90,7 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 
 func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	// Decode Header Return Error
-	enc := New(mockWriterAt{Writer: fnWriteErr})
+	enc := New(mockWriterAt{Writer: fnWriteErr}, WithWriteBufferSize(0))
 	streamEnc, _ := enc.StreamEncoder()
 
 	mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
@@ -116,7 +118,9 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 		return len(b), nil
 	})
 
-	enc = New(mockWriterAt{Writer: w, WriterAt: fnWriteAtErr})
+	enc = New(mockWriterAt{Writer: w, WriterAt: fnWriteAtErr},
+		WithWriteBufferSize(0),
+	)
 	streamEnc, _ = enc.StreamEncoder()
 	err = streamEnc.WriteMessage(&mesg)
 	if err != nil {
@@ -153,12 +157,38 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 		cur++
 		return ws[cur-1].Write(b)
 	})
-	enc = New(mockWriterAt{Writer: w, WriterAt: wa})
+	enc = New(mockWriterAt{Writer: w, WriterAt: wa},
+		WithWriteBufferSize(0),
+	)
 	streamEnc, _ = enc.StreamEncoder()
 
 	err = streamEnc.WriteMessage(&mesg)
 	if !errors.Is(err, io.EOF) {
 		t.Fatalf("expected err: %v, got: %v", io.EOF, err)
+	}
+}
+
+func TestStreamEncoderWithoutWriteBuffer(t *testing.T) {
+	var result []byte
+	enc := New(&writerAtStub{&result}, WithWriteBufferSize(0))
+	streamEnc, err := enc.StreamEncoder()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fileIdMesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
+	)
+
+	err = streamEnc.WriteMessage(&fileIdMesg)
+	if err != nil {
+		t.Fatalf("expected err: %v, got: %v", nil, err)
+		return
+	}
+	err = streamEnc.SequenceCompleted()
+	if err != nil {
+		t.Fatalf("expected err: %v, got: %v", nil, err)
+		return
 	}
 }
 

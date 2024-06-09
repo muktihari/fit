@@ -47,6 +47,9 @@ func (e *StreamEncoder) SequenceCompleted() error {
 	}
 	e.fileHeaderWritten = false
 	e.enc.reset()
+	if f, ok := e.enc.w.(flusher); ok {
+		return f.Flush()
+	}
 	return nil
 }
 
