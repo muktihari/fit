@@ -645,7 +645,6 @@ import (
 
     "github.com/muktihari/fit/encoder"
     "github.com/muktihari/fit/factory"
-    "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/kit/datetime"
     "github.com/muktihari/fit/profile/typedef"
     "github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -694,10 +693,7 @@ func main() {
     }
     defer f.Close()
 
-    bw := bufferedwriter.New(f) // Wrap *os.File with buffer for fast encoding.
-    defer bw.Flush()            // Flush any buffered data to the underlying io.Writer.
-
-    enc := encoder.New(bw)
+    enc := encoder.New(f) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -716,7 +712,6 @@ import (
     "time"
 
     "github.com/muktihari/fit/encoder"
-    "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/profile/filedef"
     "github.com/muktihari/fit/profile/mesgdef"
     "github.com/muktihari/fit/profile/typedef"
@@ -778,10 +773,7 @@ func main() {
     }
     defer f.Close()
 
-    bw := bufferedwriter.New(f)
-    defer bw.Flush()
-
-    enc := encoder.New(bw)
+    enc := encoder.New(f) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -798,7 +790,6 @@ import (
 
     "github.com/muktihari/fit/decoder"
     "github.com/muktihari/fit/encoder"
-    "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/profile/filedef"
     "github.com/muktihari/fit/profile/typedef"
 )
@@ -838,11 +829,8 @@ func main() {
     }
     defer fout.Close()
 
-    bw := bufferedwriter.New(fout)
-    defer bw.Flush()
-
     // Encode FIT to file
-    enc := encoder.New(bw)
+    enc := encoder.New(fout) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -857,6 +845,16 @@ func main() {
 
    ```go
    enc := encoder.New(f, encoder.WithProtocolVersion(proto.V2))
+   ```
+
+1. **WithWriteBufferSize**: directs the Encoder to use this buffer size for writing to io.Writer instead of default 4096. When size <= 0, the Encoder will write directly to io.Writer without buffering.
+
+   Example:
+
+   ```go
+   enc := encoder.New(f, encoder.WithWriteBufferSize(0))    // No buffer
+
+   enc := encoder.New(f, encoder.WithWriteBufferSize(8192)) // 8192 buffer
    ```
 
 1. **WithMessageValidator**: directs the Encoder to use this message validator instead of the default one.
@@ -952,7 +950,6 @@ import (
 
     "github.com/muktihari/fit/encoder"
     "github.com/muktihari/fit/factory"
-    "github.com/muktihari/fit/kit/bufferedwriter"
     "github.com/muktihari/fit/kit/datetime"
     "github.com/muktihari/fit/profile/untyped/fieldnum"
     "github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -965,13 +962,8 @@ func main() {
     }
     defer f.Close()
 
-    // f (*os.File) is implementing both io.WriterAt and io.WriteSeeker so it can be used directly.
-    // But to reduce syscall, let's wrap it using buffered writer for fast encoding. Unlike bufio.Writer,
-    // bufferedwriter maintains the underlying io.Writer ability to write at specific byte.
-    bw := bufferedwriter.New(f)
-    defer bw.Flush()
-
-    streamEnc, err := encoder.New(bw).StreamEncoder()
+    // By default, the Encoder uses a buffer of size 4096 to write to the writer.
+    streamEnc, err := encoder.New(f).StreamEncoder()
     if err != nil {
         panic(err)
     }
