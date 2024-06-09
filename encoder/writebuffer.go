@@ -35,7 +35,7 @@ type writerAt struct {
 	io.WriterAt
 }
 
-func (w writerAt) WriteAt(p []byte, offset int64) (n int, err error) {
+func (w *writerAt) WriteAt(p []byte, offset int64) (n int, err error) {
 	// Flush any buffered data from buffered writer in case we are writing on unflushed data.
 	if err = w.Writer.Flush(); err != nil {
 		return
@@ -48,7 +48,7 @@ type writeSeeker struct {
 	io.Seeker
 }
 
-func (w writeSeeker) Seek(offset int64, whence int) (n int64, err error) {
+func (w *writeSeeker) Seek(offset int64, whence int) (n int64, err error) {
 	// Flush any buffered data from buffered writer in case we are seeking on unflushed data.
 	if err = w.Writer.Flush(); err != nil {
 		return
