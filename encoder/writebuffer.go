@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-const defaultWriteBuffer = 4096
+const defaultWriteBufferSize = 4096
 
 type flusher interface{ Flush() error }
 
