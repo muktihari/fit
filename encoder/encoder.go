@@ -46,7 +46,7 @@ const (
 	//      message definition. The number of multiple local message type can be specified between 0-15.
 	headerOptionNormal headerOption = 0
 
-	// Optimized to reduce file size way further by compressing timestamp's field in a message into its message header.
+	// Optimize file size by compressing timestamp's field in a message into its message header.
 	// When this enabled, LocalMesgNum 0 is automatically used since the 5 lsb is used for the timestamp.
 	headerOptionCompressedTimestamp headerOption = 1
 )
@@ -87,7 +87,7 @@ func defaultOptions() options {
 		protocolVersion: proto.V1,
 		endianness:      littleEndian,
 		headerOption:    headerOptionNormal,
-		writeBufferSize: defaultWriteBuffer,
+		writeBufferSize: defaultWriteBufferSize,
 	}
 }
 

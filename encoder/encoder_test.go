@@ -119,7 +119,7 @@ func TestOptions(t *testing.T) {
 				endianness:               0,
 				protocolVersion:          proto.V1,
 				messageValidator:         NewMessageValidator(),
-				writeBufferSize:          defaultWriteBuffer,
+				writeBufferSize:          defaultWriteBufferSize,
 			},
 		},
 		{
@@ -154,7 +154,7 @@ func TestOptions(t *testing.T) {
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionCompressedTimestamp,
-				writeBufferSize:          defaultWriteBuffer,
+				writeBufferSize:          defaultWriteBufferSize,
 			},
 		},
 	}
