@@ -50,12 +50,10 @@ type FITToCSVConv struct {
 	done  chan struct{} // Tells that all messages have been completely processed.
 }
 
-type Option interface{ apply(o *options) }
-
 type options struct {
 	channelBufferSize         int
-	useDisk                   bool // Write temporary data in disk instead of in memory.
 	ondiskWriteBuffer         int  // Buffer on read/write in disk when useDisk is specified.
+	useDisk                   bool // Write temporary data in disk instead of in memory.
 	printRawValue             bool // Print scaled value as is in the binary form (sint, uint, etc.) than in its representation.
 	printUnknownMesgNum       bool // Print 'unknown(68)' instead of 'unknown'.
 	printOnlyValidValue       bool // Print invalid value e.g. 65535 for uint16.
@@ -76,59 +74,58 @@ func defaultOptions() *options {
 	}
 }
 
-type fnApply func(o *options)
-
-func (f fnApply) apply(o *options) { f(o) }
+// Option is FITToCSVConv's option.
+type Option func(o *options)
 
 func WithChannelBufferSize(size int) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		if size > 0 {
 			o.channelBufferSize = size
 		}
-	})
+	}
 }
 
 func WithPrintRawValue() Option {
-	return fnApply(func(o *options) { o.printRawValue = true })
+	return func(o *options) { o.printRawValue = true }
 }
 
 func WithPrintUnknownMesgNum() Option {
-	return fnApply(func(o *options) { o.printUnknownMesgNum = true })
+	return func(o *options) { o.printUnknownMesgNum = true }
 }
 
 func WithUseDisk(writeBuffer int) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.useDisk = true
 		if writeBuffer > 0 {
 			o.ondiskWriteBuffer = writeBuffer
 		}
-	})
+	}
 }
 
 func WithPrintOnlyValidValue() Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.printOnlyValidValue = true
-	})
+	}
 }
 
 func WithPrintGPSPositionInDegrees() Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.printGPSPositionInDegrees = true
-	})
+	}
 }
 
 func WithTrimTrailingCommas() Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.trimTrailingCommas = true
-	})
+	}
 }
 
 // NewFITToCSVConv creates a new FIT to CSV converter.
 // The caller must call Wait() to wait all events are received and finalizing the convert process.
 func NewFITToCSVConv(w io.Writer, opts ...Option) *FITToCSVConv {
 	options := defaultOptions()
-	for _, opt := range opts {
-		opt.apply(options)
+	for i := range opts {
+		opts[i](options)
 	}
 
 	c := &FITToCSVConv{

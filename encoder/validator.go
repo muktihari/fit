@@ -47,12 +47,8 @@ type validatorOptions struct {
 	factory           Factory
 }
 
-// ValidatorOptions is message validator's option.
-type ValidatorOption interface{ apply(o *validatorOptions) }
-
-type fnApplyValidatorOption func(o *validatorOptions)
-
-func (f fnApplyValidatorOption) apply(o *validatorOptions) { f(o) }
+// ValidatorOption is message validator's option.
+type ValidatorOption func(o *validatorOptions)
 
 func defaultValidatorOptions() validatorOptions {
 	return validatorOptions{
@@ -69,19 +65,19 @@ type Factory interface {
 
 // ValidatorWithPreserveInvalidValues directs the message validator to preserve invalid value instead of omit it.
 func ValidatorWithPreserveInvalidValues() ValidatorOption {
-	return fnApplyValidatorOption(func(o *validatorOptions) {
+	return func(o *validatorOptions) {
 		o.omitInvalidValues = false
-	})
+	}
 }
 
 // ValidatorWithFactory directs the message validator to use this factory instead of standard factory.
 // The factory is only used for validating developer fields that have valid native data.
 func ValidatorWithFactory(factory Factory) ValidatorOption {
-	return fnApplyValidatorOption(func(o *validatorOptions) {
+	return func(o *validatorOptions) {
 		if o.factory != nil {
 			o.factory = factory
 		}
-	})
+	}
 }
 
 type messageValidator struct {
@@ -96,7 +92,7 @@ func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
 	mv := &messageValidator{}
 	mv.options = defaultValidatorOptions()
 	for i := range opts {
-		opts[i].apply(&mv.options)
+		opts[i](&mv.options)
 	}
 	return mv
 }

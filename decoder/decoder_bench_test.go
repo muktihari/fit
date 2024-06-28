@@ -139,17 +139,25 @@ func BenchmarkCheckIntegrity(b *testing.B) {
 
 func BenchmarkReset(b *testing.B) {
 	b.Run("benchmark New()", func(b *testing.B) {
+		b.StopTimer()
+		lis := filedef.NewListener()
+		defer lis.Close()
+		b.StartTimer()
+
 		for i := 0; i < b.N; i++ {
-			_ = decoder.New(nil)
+			_ = decoder.New(nil, decoder.WithMesgListener(lis))
 		}
 	})
 	b.Run("benchmark Reset()", func(b *testing.B) {
 		b.StopTimer()
-		dec := decoder.New(nil)
+		lis := filedef.NewListener()
+		defer lis.Close()
+
+		dec := decoder.New(nil, decoder.WithMesgListener(lis))
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
-			dec.Reset(nil)
+			dec.Reset(nil, decoder.WithMesgListener(lis))
 		}
 	})
 }

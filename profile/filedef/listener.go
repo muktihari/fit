@@ -61,26 +61,23 @@ func PredefinedFileSet() FileSets {
 	}
 }
 
-type Option interface{ apply(o *options) }
-
-type fnApply func(o *options)
-
-func (f fnApply) apply(o *options) { f(o) }
+// Option is Listener's option.
+type Option func(o *options)
 
 // WithChannelBuffer sets the size of buffered channel, default is 128.
 func WithChannelBuffer(size uint) Option {
-	return fnApply(func(o *options) { o.channelBuffer = size })
+	return func(o *options) { o.channelBuffer = size }
 }
 
 // WithFileSets sets what kind of file listener should listen to, when we encounter a file type that is not listed in fileset,
 // that file type will be skipped. This will replace the default filesets registered in listener, if you intend to append your own
 // file types, please call PredefinedFileSet() and add your file types.
 func WithFileSets(fileSets FileSets) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		if o.fileSets != nil {
 			o.fileSets = fileSets
 		}
-	})
+	}
 }
 
 var _ decoder.MesgListener = (*Listener)(nil)
@@ -92,7 +89,7 @@ func NewListener(opts ...Option) *Listener {
 		active:  true,
 	}
 	for i := range opts {
-		opts[i].apply(&l.options)
+		opts[i](&l.options)
 	}
 
 	l.reset()

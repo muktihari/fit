@@ -112,58 +112,55 @@ func defaultOptions() options {
 	}
 }
 
-type Option interface{ apply(o *options) }
-
-type fnApply func(o *options)
-
-func (f fnApply) apply(o *options) { f(o) }
+// Option is Decoder's option.
+type Option func(o *options)
 
 // WithFactory sets custom factory.
 func WithFactory(factory Factory) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		if factory != nil {
 			o.factory = factory
 		}
-	})
+	}
 }
 
 // WithMesgListener adds listeners to the listener pool, where each listener is broadcasted every message.
 // The listeners will be appended not replaced. If users need to reset use Reset().
 func WithMesgListener(listeners ...MesgListener) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.mesgListeners = append(o.mesgListeners, listeners...)
-	})
+	}
 }
 
 // WithMesgDefListener adds listeners to the listener pool, where each listener is broadcasted every message definition.
 // The listeners will be appended not replaced. If users need to reset use Reset().
 func WithMesgDefListener(listeners ...MesgDefListener) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.mesgDefListeners = append(o.mesgDefListeners, listeners...)
-	})
+	}
 }
 
 // WithBroadcastOnly directs the Decoder to only broadcast the messages without retaining them, reducing memory usage when
 // it's not going to be used anyway. This option is intended to be used with WithMesgListener and
 // When this option is specified, the Decode will return a FIT with empty messages.
 func WithBroadcastOnly() Option {
-	return fnApply(func(o *options) { o.broadcastOnly = true })
+	return func(o *options) { o.broadcastOnly = true }
 }
 
 // WithBroadcastMesgCopy directs the Decoder to copy the mesg before passing it to listeners
 // (it was the default behavior on version <= v0.14.0).
 func WithBroadcastMesgCopy() Option {
-	return fnApply(func(o *options) { o.broadcastMesgCopy = true })
+	return func(o *options) { o.broadcastMesgCopy = true }
 }
 
 // WithIgnoreChecksum directs the Decoder to not checking data integrity (CRC Checksum).
 func WithIgnoreChecksum() Option {
-	return fnApply(func(o *options) { o.shouldChecksum = false })
+	return func(o *options) { o.shouldChecksum = false }
 }
 
 // WithNoComponentExpansion directs the Decoder to not expand the components.
 func WithNoComponentExpansion() Option {
-	return fnApply(func(o *options) { o.shouldExpandComponent = false })
+	return func(o *options) { o.shouldExpandComponent = false }
 }
 
 // WithLogWriter specifies where the log messages will be written to. By default, the Decoder do not write any log if
@@ -174,12 +171,12 @@ func WithNoComponentExpansion() Option {
 //   - Field Definition's Size is more than basetype's Size but field.Array is false.
 //   - Encountering a Developer Field without prior DeveloperDataId or FieldDescription Message.
 func WithLogWriter(w io.Writer) Option {
-	return fnApply(func(o *options) { o.logWriter = w })
+	return func(o *options) { o.logWriter = w }
 }
 
 // WithReadBufferSize directs the Decoder to use this buffer size for reading from io.Reader instead of default 4096.
 func WithReadBufferSize(size int) Option {
-	return fnApply(func(o *options) { o.readBufferSize = size })
+	return func(o *options) { o.readBufferSize = size }
 }
 
 // New returns a FIT File Decoder to decode given r.
@@ -213,9 +210,21 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.reset()
 	d.n = 0 // Must reset bytes counter since it's a full reset.
 
+	// Reuse listeners' slices
+	for i := range d.mesgListeners {
+		d.mesgListeners[i] = nil // avoid memory leaks
+	}
+	d.mesgListeners = d.mesgListeners[:0]
+	for i := range d.mesgDefListeners {
+		d.mesgDefListeners[i] = nil // avoid memory leaks
+	}
+	d.mesgDefListeners = d.mesgDefListeners[:0]
+
 	d.options = defaultOptions()
+	d.options.mesgListeners = d.mesgListeners
+	d.options.mesgDefListeners = d.mesgDefListeners
 	for i := range opts {
-		opts[i].apply(&d.options)
+		opts[i](&d.options)
 	}
 
 	d.readBuffer.Reset(r, d.options.readBufferSize)
