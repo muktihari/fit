@@ -91,11 +91,8 @@ func defaultOptions() options {
 	}
 }
 
-type Option interface{ apply(o *options) }
-
-type fnApply func(o *options)
-
-func (f fnApply) apply(o *options) { f(o) }
+// Option is Encoder's option.
+type Option func(o *options)
 
 // WithProtocolVersion directs the Encoder to use specific Protocol Version (default: proto.V1).
 // If the given protocolVersion is not supported, the Protocol Version will not be changed.
@@ -103,31 +100,31 @@ func (f fnApply) apply(o *options) { f(o) }
 // whether it is supported or not. Or just use predefined Protocol Version constants such as
 // proto.V1, proto.V2, etc, which the validity is ensured.
 func WithProtocolVersion(protocolVersion proto.Version) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		if proto.Validate(byte(protocolVersion)) == nil {
 			o.protocolVersion = protocolVersion
 		}
-	})
+	}
 }
 
 // WithMessageValidator directs the Encoder to use this message validator instead of the default one.
 func WithMessageValidator(validator MessageValidator) Option {
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		if validator != nil {
 			o.messageValidator = validator
 		}
-	})
+	}
 }
 
 // WithBigEndian directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 func WithBigEndian() Option {
-	return fnApply(func(o *options) { o.endianness = bigEndian })
+	return func(o *options) { o.endianness = bigEndian }
 }
 
 // WithCompressedTimestampHeader directs the Encoder to compress timestamp in header to reduce file size.
 // Saves 7 bytes per message: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
 func WithCompressedTimestampHeader() Option {
-	return fnApply(func(o *options) { o.headerOption = headerOptionCompressedTimestamp })
+	return func(o *options) { o.headerOption = headerOptionCompressedTimestamp }
 }
 
 // WithNormalHeader directs the Encoder to use NormalHeader for encoding the message using multiple local message types.
@@ -143,16 +140,16 @@ func WithNormalHeader(multipleLocalMessageType byte) Option {
 	if multipleLocalMessageType > proto.LocalMesgNumMask {
 		multipleLocalMessageType = proto.LocalMesgNumMask
 	}
-	return fnApply(func(o *options) {
+	return func(o *options) {
 		o.headerOption = headerOptionNormal
 		o.multipleLocalMessageType = multipleLocalMessageType
-	})
+	}
 }
 
 // WithWriteBufferSize directs the Encoder to use this buffer size for writing to io.Writer instead of default 4096.
 // When size <= 0, the Encoder will write directly to io.Writer without buffering.
 func WithWriteBufferSize(size int) Option {
-	return fnApply(func(o *options) { o.writeBufferSize = size })
+	return func(o *options) { o.writeBufferSize = size }
 }
 
 // New returns a FIT File Encoder to encode FIT data to given w.
@@ -198,7 +195,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 
 	e.options = defaultOptions()
 	for i := range opts {
-		opts[i].apply(&e.options)
+		opts[i](&e.options)
 	}
 
 	e.w = newWriteBuffer(w, e.options.writeBufferSize)
