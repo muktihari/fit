@@ -10,12 +10,14 @@ Table of Contents:
    - [Discard FIT File Sequences](#Discard-FIT-File-Sequences)
    - [Check Integrity](#Check-Integrity)
    - [Available Decode Options](#Available-Decode-Options)
+   - [Advance Decoder Usage](#Advance-Decoder-Usage)
    - [RawDecoder (Low-Level Abstraction)](#RawDecoder-Low-Level-Abstraction)
 2. [Encoding](#Encoding)
    - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
    - [Encode Common File Types](#Encode-Common-File-Types)
    - [Available Encode Options](#Available-Encode-Options)
    - [Stream Encoder](#Stream-Encoder)
+   - [Advance Encoder Usage](#Advance-Encoder-Usage)
 
 ## Decoding
 
@@ -55,7 +57,8 @@ func main() {
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
     // FileId is always the first message; 4 = activity
-    fmt.Printf("File Type: %v\n", fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any())
+    fmt.Printf("File Type: %v\n",
+        fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any())
 
     // Output:
     // FileHeader DataSize: 94080
@@ -148,7 +151,7 @@ func main() {
 }
 ```
 
-2. While the previous example is work for most use cases and probably can be your goto choice to use for small scale, it's slightly inefficient as we only utilize one goroutine (the main goroutine) and also we need to allocate the `fit.Messages` before creating the `activity` file itself. For bigger scale, or in scale that require a streaming process, we can define `filedef's Listener` to create the `activity` file. This not only reduce the need to allocate `fit.Messages` but also we can receive the message as it is decode in other goroutine. As the decoder decode the message, we can create the message in another process concurrently.
+2. While the previous example is work for most use cases and probably can be your goto choice to use for small scale, it's slightly inefficient as we only utilize one goroutine (the main goroutine) and also we need to allocate the `fit.Messages` before creating the `activity` file itself. For bigger scale, or in scale that require a streaming process, we can define `filedef's Listener` to create the `activity` file. This not only reduce the need to allocate `fit.Messages` but also we can receive the message as soon as it is decoded in other goroutine. As the decoder decodes the message, we can create the message in another process concurrently.
 
 ```go
 package main
@@ -224,7 +227,7 @@ func main() {
 }
 ```
 
-**The ability to broadcast every message as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.**
+**The ability to broadcast every message as soon as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.**
 
 ### Peek FileHeader
 
@@ -334,7 +337,8 @@ When handling a chained fit file, sometimes we only want to decode a certain fil
             return err
         }
         if fileId.Type != typedef.FileCourse {
-            if err := dec.Discard(); err != nil { // not a Course File, discard this sequence!
+            // not a Course File, discard this sequence!
+            if err := dec.Discard(); err != nil {
                 return err
             }
             continue
@@ -410,17 +414,19 @@ func main() {
     ```go
     fac := factory.New()
     fac.RegisterMesg(proto.Message{
-        Num:  65281,
+        Num: 65281,
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
-                    Num:    253,
-                    Name:   "Timestamp",
-                    Type:   profile.Uint32,
-                    Size:   4,
-                    Scale:  1,
-                    Offset: 0,
-                    Units:  "s",
+                    Num:        253,
+                    Name:       "Timestamp",
+                    Type:       profile.Uint32,
+                    BaseType:   basetype.Uint32,
+                    Array:      false,
+                    Accumulate: false,
+                    Scale:      1,
+                    Offset:     0,
+                    Units:      "s",
                 },
             },
         },
@@ -508,6 +514,69 @@ func main() {
     ```go
     dec := decoder.New(f, decoder.WithLogWriter(os.Stdout))
     ```
+
+### Advance Decoder Usage
+
+Decoder is programmed to be a reusable object to reduce memory allocation, similar to bytes.Buffer that has Reset method, Decoder has one as well. We can use it with sync.Pool. This might be useful for a system where decoding happens frequently but some of the processes can occur one after another (such as a server).
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "net/http"
+    "sync"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/mesgdef"
+)
+
+var (
+    pool    = sync.Pool{New: func() any { return decoder.New(nil) }}
+    lispool = sync.Pool{New: func() any { return filedef.NewListener() }}
+)
+
+func main() {
+    srv := http.NewServeMux()
+    srv.HandleFunc("/decode", func(w http.ResponseWriter, r *http.Request) {
+        dec := pool.Get().(*decoder.Decoder)
+        defer pool.Put(dec)  // put decoder back to the pool
+        defer dec.Reset(nil) // avoid memory leaks, remove any pointer ref
+
+        lis := lispool.Get().(*filedef.Listener)
+        defer lispool.Put(lis) // put listener back to the pool
+        defer lis.Close()      // release channels used by listener
+
+        // Assign reader and options just like
+        // when using decoder.New().
+        dec.Reset(r.Body,
+            decoder.WithMesgListener(lis),
+            decoder.WithBroadcastOnly(),
+        )
+        defer r.Body.Close()
+
+        for dec.Next() {
+            _, err := dec.Decode()
+            if err != nil {
+                writeError(w, err)
+                return
+            }
+            activity, ok := lis.File().(*filedef.Activity)
+            if !ok {
+                writeError(w, fmt.Errorf("not an activity file"))
+            }
+            fmt.Fprintf(w, "%+v\n", activity.FileId)
+        }
+    })
+    log.Fatal(http.ListenAndServe(":8080", srv))
+}
+
+func writeError(w http.ResponseWriter, err error) {
+    w.WriteHeader(http.StatusInternalServerError)
+    w.Write([]byte(fmt.Sprintf("{\"err\":%q}", err)))
+}
+```
 
 ### RawDecoder (Low-Level Abstraction)
 
@@ -630,7 +699,10 @@ func main() {
 
 ## Encoding
 
-Note: By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
+Note:
+
+- By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
+- Encoder already implements efficient io.Writer buffering, DO NOT wrap io.Writer (such as \*os.File) with buffer such as using \*bufio.Writer; Doing so will greatly reduce performance.
 
 ### Encode RAW Protocol Messages
 
@@ -989,5 +1061,86 @@ func main() {
     if err := streamEnc.SequenceCompleted(); err != nil {
         panic(err)
     }
+}
+```
+
+### Advance Encoder Usage
+
+Encoder and StreamEncoder are programmed to be a reusable object to reduce memory allocation, similar to bytes.Buffer that has Reset method, Encoder and StreamEncoder have one as well. We can use it with sync.Pool. This might be useful for a system where encoding happens frequently but some of the processes can occur one after another (such as a server).
+
+```go
+package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "io"
+    "log"
+    "net/http"
+    "sync"
+
+    "github.com/muktihari/fit/encoder"
+    "github.com/muktihari/fit/profile/filedef"
+)
+
+
+
+var (
+    pool    = sync.Pool{New: func() any { return encoder.New(nil) }}
+    bufpool = sync.Pool{New: func() any { return &bufferAt{new(bytes.Buffer)} }}
+)
+
+func main() {
+    srv := http.NewServeMux()
+    srv.HandleFunc("/encode", func(w http.ResponseWriter, r *http.Request) {
+        enc := pool.Get().(*encoder.Encoder)
+        defer pool.Put(enc)  // put encoder back to the pool
+        defer enc.Reset(nil) // avoid memory leaks, remove any pointer ref
+
+        // Inmem writer for faster encoding since w does not
+        // implement io.WriterAt or io.WriteSeeker.
+        buf := bufpool.Get().(*bufferAt)
+        defer bufpool.Put(buf)
+
+        // Assign writer and options just like
+        // when using encoder.New().
+        enc.Reset(buf)
+
+        // Assume the data is in filedef.Activity JSON format encoding.
+        var activity filedef.Activity
+        err := json.NewDecoder(r.Body).Decode(&activity)
+        r.Body.Close()
+        if err != nil {
+            writeError(w, err)
+            return
+        }
+
+        fit := activity.ToFIT(nil)
+        if err := enc.Encode(&fit); err != nil {
+            writeError(w, err)
+            return
+        }
+
+        if _, err := buf.WriteTo(w); err != nil {
+            writeError(w, err)
+            return
+        }
+    })
+    log.Fatal(http.ListenAndServe(":8080", srv))
+}
+
+// bufferAt is a wrapper to enable io.WriterAt functionality.
+type bufferAt struct{ *bytes.Buffer }
+
+var _ io.WriterAt = (*bufferAt)(nil)
+
+func (b *bufferAt) WriteAt(p []byte, off int64) (int, error) {
+    return copy(b.Bytes()[off:], p), nil
+}
+
+func writeError(w http.ResponseWriter, err error) {
+    w.WriteHeader(http.StatusInternalServerError)
+    w.Write([]byte(fmt.Sprintf("{\"err\":%q}", err)))
 }
 ```

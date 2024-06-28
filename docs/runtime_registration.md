@@ -54,17 +54,20 @@ import (
 
 func main() {
     brytonFactory := factory.New()
-
     brytonFactory.RegisterMesg(proto.Message{
         Num: 68, // I found this mesg num used by Bryton & Garmin in their FIT file.
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
-                    Num:    0,
-                    Name:   "Software Version",
-                    Type:   profile.Uint16,
-                    Scale:  1,
-                    Offset: 0,
+                    Num:        0,
+                    Name:       "Software Version",
+                    Type:       profile.Uint16,
+                    BaseType:   basetype.Uint16,
+                    Array:      false,
+                    Accumulate: false,
+                    Scale:      1,
+                    Offset:     0,
+                    Units:      "",
                 },
             },
         },
@@ -75,37 +78,48 @@ func main() {
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
-                    Num:    0,
-                    Name:   "Max Heart Rate",
-                    Type:   profile.Uint8,
-                    Scale:  1,
-                    Offset: 0,
+                    Num:        0,
+                    Name:       "Max Heart Rate",
+                    Type:       profile.Uint8,
+                    BaseType:   basetype.Uint8,
+                    Array:      false,
+                    Accumulate: false,
+                    Scale:      1,
+                    Offset:     0,
+                    Units:      "",
                 },
             },
         },
     })
 
     garminFactory := factory.New()
-
     garminFactory.RegisterMesg(proto.Message{
         Num: 65282, // I found this mesg num used by Garmin in their FIT file.
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
-                    Num:    0,
-                    Name:   "Region",
-                    Type:   profile.String,
-                    Scale:  1,
-                    Offset: 0,
+                    Num:        0,
+                    Name:       "Region",
+                    Type:       profile.String,
+                    BaseType:   basetype.String,
+                    Array:      false,
+                    Accumulate: false,
+                    Scale:      1,
+                    Offset:     0,
+                    Units:      "",
                 },
             },
             {
                 FieldBase: &proto.FieldBase{
-                    Num:    1,
-                    Name:   "Product Year",
-                    Type:   profile.Uint8,
-                    Scale:  1,
-                    Offset: 0,
+                    Num:        1,
+                    Name:       "Product Year",
+                    Type:       profile.Uint16,
+                    BaseType:   basetype.Uint16,
+                    Array:      false,
+                    Accumulate: false,
+                    Scale:      1,
+                    Offset:     0,
+                    Units:      "",
                 },
             },
         },
@@ -126,4 +140,4 @@ func main() {
 
 ```
 
-Note: When using this approach, by default, you can only work with RAW messages since `mesgdef` is only available through code generation.
+Note: When using this approach, by default, you can only work with RAW messages for the manufacturer specific messages, since `mesgdef` is only available through code generation.
