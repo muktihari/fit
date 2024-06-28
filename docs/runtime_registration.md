@@ -2,13 +2,13 @@
 
 The `typedef` and `factory` packages contains predefined types and messages declared in [Profile.xlsx] provided in the Official FIT SDK. These packages can be updated through [code generation](./generating_code.md) using `fitgen` by providing your custom `Profile.xlsx`.
 
-However, code generation is not for everyone, when using code generation they need to maintain their custom SDK always align with this SDK release. We make a simple approach to allowing register manufacturer specific massage at runtime. It has limitations but it should be sufficient for simple case.
+However, code generation is not suitable for everyone. When using code generation, users need to maintain their custom SDK to always align with this SDK release. We have implemented a simple approach to allow registration of manufacturer-specific messages at runtime. It has limitations, but it should be sufficient for simple cases.
 
-Note: The data presented here is only for demonstration, we don't known any specific messages since we haven't work with the manufacturers we mention below.
+Note: The data presented here is only for demonstration, we don't know any specific messages since we haven't work with the manufacturers we mention below.
 
 ## 1. Typedef
 
-Note: If you don't need stringer for your constants or you have your own custom stringer, you can skip this.
+Note: If you don't need stringer for your constants or you have your own custom stringer, you can skip this section.
 
 To track your own **MesgNum** constants and its string representative, you can add your types in typedef. However, unlike `factory` that you can have different Factory instances for different manufacturers, `typedef` is shared globally, so you can only work with one manufacturer for this (this is one of our current limitation that we mention earlier). Other than **MesgNum**, you can register **File** type as well.
 
@@ -34,7 +34,7 @@ func main() {
 
 Let's say you will work with FIT files from two different manufacturers, or maybe you are the manufacturer itself that want to use this SDK to build a service in Go. You can define messages that only your company use in the FIT you are created.
 
-The available range is between `0xFF00 - 0xFFFE (65280 - 65534)`, but we found some company are using lower number such as `68`, so we accommodate that as long as the number is not already defined in original `Profile.xlsx`.
+The available range is between `0xFF00 - 0xFFFE (65280 - 65534)`, but we found some companies are using lower number such as `68`, so we accommodate that as long as the number is not already defined in original `Profile.xlsx`.
 
 ```go
 package main
@@ -55,7 +55,7 @@ import (
 func main() {
     brytonFactory := factory.New()
     brytonFactory.RegisterMesg(proto.Message{
-        Num: 68, // I found this mesg num used by Bryton & Garmin in their FIT file.
+        Num: 68, // I found this mesg num is used by Bryton & Garmin in their FIT file.
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
@@ -94,7 +94,7 @@ func main() {
 
     garminFactory := factory.New()
     garminFactory.RegisterMesg(proto.Message{
-        Num: 65282, // I found this mesg num used by Garmin in their FIT file.
+        Num: 65282, // I found this mesg num is used by Garmin in their FIT file.
         Fields: []proto.Field{
             {
                 FieldBase: &proto.FieldBase{
