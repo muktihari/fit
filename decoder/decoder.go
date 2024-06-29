@@ -71,7 +71,8 @@ type Decoder struct {
 	fileId *mesgdef.FileId
 
 	// Message Definition Lookup
-	localMessageDefinitions [proto.LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
+	localMessageDefinitions      [proto.LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
+	localMessageDefinitionsArray [proto.LocalMesgNumMask + 1]proto.MessageDefinition  // PERF: backing array for message definition
 
 	// Developer Data Lookup
 	developerDataIndexes []uint8
@@ -539,11 +540,16 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		return err
 	}
 
-	// PERF: Reuse existing object when possible, as it is intended solely for temporary use.
 	localMesgNum := header & proto.LocalMesgNumMask
 	mesgDef := d.localMessageDefinitions[localMesgNum]
 	if mesgDef == nil {
-		mesgDef = &proto.MessageDefinition{}
+		// PERF: Use backing array to avoid object creation. On init, allocate slices
+		// with max cap for more deterministic performance by avoiding re-allocation.
+		mesgDef = &d.localMessageDefinitionsArray[localMesgNum]
+		if mesgDef.FieldDefinitions == nil && mesgDef.DeveloperFieldDefinitions == nil {
+			mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, 255)
+			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, 255)
+		}
 	}
 
 	mesgDef.Header = header
@@ -562,10 +568,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	}
 
 	mesgDef.FieldDefinitions = mesgDef.FieldDefinitions[:0]
-	if cap(mesgDef.FieldDefinitions) < n { // PERF: Only alloc when necessary
-		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, n)
-	}
-
 	for ; len(b) >= 3; b = b[3:] {
 		fieldDef := proto.FieldDefinition{
 			Num:      b[0],
@@ -590,10 +592,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		b, err = d.readN(n * 3) // 3 byte per field
 		if err != nil {
 			return err
-		}
-
-		if cap(mesgDef.DeveloperFieldDefinitions) < n { // PERF: Only alloc when necessary
-			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, n)
 		}
 
 		for ; len(b) >= 3; b = b[3:] {

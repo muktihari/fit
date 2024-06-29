@@ -1407,6 +1407,9 @@ func TestDecodeMessageDefinition(t *testing.T) {
 				return
 			}
 			mesgDef := *dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
+			if len(mesgDef.DeveloperFieldDefinitions) == 0 {
+				mesgDef.DeveloperFieldDefinitions = nil
+			}
 			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
 				t.Fatal(diff)
 			}
