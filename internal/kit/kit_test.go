@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/muktihari/fit/kit"
+	"github.com/muktihari/fit/internal/kit"
 )
 
 func TestPtr(t *testing.T) {
