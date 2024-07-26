@@ -326,7 +326,7 @@ func formatFieldValue(
 ) string {
 	switch profileType {
 	case profile.DateTime, profile.LocalDateTime: // Special Case: time.Time
-		return fmt.Sprintf("%q (%d)", datetime.ToTime(value).Format(time.RFC3339), value.Uint32())
+		return fmt.Sprintf("%q (%d)", datetime.ToTime(value.Uint32()).Format(time.RFC3339), value.Uint32())
 	}
 
 	if scale != 1 || offset != 0 { // Scaled Value
