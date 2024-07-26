@@ -25,7 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit"
+	"github.com/muktihari/fit/internal/kit"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
