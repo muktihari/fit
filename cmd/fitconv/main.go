@@ -16,7 +16,6 @@ import (
 
 	"github.com/muktihari/fit/cmd/fitconv/fitcsv"
 	"github.com/muktihari/fit/decoder"
-	"github.com/muktihari/fit/kit/bufferedwriter"
 )
 
 var version = "dev"
@@ -222,11 +221,7 @@ func csvToFit(path string) error {
 	}
 	defer ff.Close()
 
-	bw := bufferedwriter.NewSize(ff, blockSize)
-	defer bw.Flush()
-
-	conv := fitcsv.NewCSVToFITConv(bw, bufio.NewReaderSize(cf, blockSize))
-
+	conv := fitcsv.NewCSVToFITConv(ff, bufio.NewReaderSize(cf, blockSize))
 	if err := conv.Convert(); err != nil {
 		return err
 	}

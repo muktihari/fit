@@ -12,7 +12,6 @@ import (
 
 	"github.com/muktihari/fit/encoder"
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/bufferedwriter"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -89,10 +88,7 @@ func createBigActivityFile(ctx context.Context) error {
 		}))
 	}
 
-	bw := bufferedwriter.NewSize(f, 1000<<10)
-	defer bw.Flush()
-
-	enc := encoder.New(bw)
+	enc := encoder.New(f)
 	if err := enc.EncodeWithContext(ctx, fit); err != nil {
 		return err
 	}
