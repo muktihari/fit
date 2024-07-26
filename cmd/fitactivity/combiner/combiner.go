@@ -156,8 +156,8 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 	}
 
 	tzOffsetHour := datetime.TzOffsetHours(
-		datetime.ToTime(localTimestampField.Value),
-		datetime.ToTime(timestampField.Value),
+		datetime.ToTime(localTimestampField.Value.Uint32()),
+		datetime.ToTime(timestampField.Value.Uint32()),
 	)
 
 	timestampField.Value = proto.Uint32(lastTimestamp)
