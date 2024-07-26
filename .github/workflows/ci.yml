@@ -6,17 +6,9 @@ name: CI
 on:
   push:
     branches: ["master"]
-    paths:
-      - "**.go" # Trigger only when Go files are modified
-      - "go.mod"
-      - "go.sum"
 
   pull_request:
     branches: ["master"]
-    paths:
-      - "**.go" # Trigger only when Go files are modified
-      - "go.mod"
-      - "go.sum"
 
 permissions: {}
 
