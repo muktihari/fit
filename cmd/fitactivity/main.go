@@ -17,7 +17,6 @@ import (
 	"github.com/muktihari/fit/cmd/fitactivity/opener"
 	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/encoder"
-	"github.com/muktihari/fit/kit/bufferedwriter"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -150,18 +149,13 @@ func combineAndConcealPosition(paths []string, opts *options) error {
 		defer fout.Close()
 	}
 
-	bw := bufferedwriter.New(fout)
-	enc := encoder.New(bw,
+	enc := encoder.New(fout,
 		encoder.WithProtocolVersion(proto.V2),
 		opts.encoderHeaderOption,
 	)
 
 	if err := enc.Encode(fit); err != nil {
 		return fmt.Errorf("could not encode: %v", err)
-	}
-
-	if err := bw.Flush(); err != nil {
-		return fmt.Errorf("could not flush: %v", err)
 	}
 
 	return nil
@@ -201,8 +195,7 @@ func openAndConcealPosition(path string, opts *options) error {
 	}
 	defer fout.Close()
 
-	bw := bufferedwriter.New(fout)
-	enc := encoder.New(bw,
+	enc := encoder.New(fout,
 		encoder.WithProtocolVersion(proto.V2),
 		opts.encoderHeaderOption,
 	)
@@ -213,7 +206,7 @@ func openAndConcealPosition(path string, opts *options) error {
 		}
 	}
 
-	return bw.Flush()
+	return nil
 }
 
 func fatalf(format string, args ...any) {
