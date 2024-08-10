@@ -6,6 +6,7 @@ package filedef_test
 
 import (
 	"math"
+	"reflect"
 	"testing"
 	"time"
 
@@ -177,6 +178,7 @@ func TestListenerForSingleFitFile(t *testing.T) {
 				createFloat32Comparer(),
 				createFloat64Comparer(),
 				valueTransformer(),
+				fileExporter(result),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -222,6 +224,7 @@ func TestListenerForChainedFitFile(t *testing.T) {
 		createFloat32Comparer(),
 		createFloat64Comparer(),
 		valueTransformer(),
+		fileExporter(result...),
 	); diff != "" {
 		t.Fatal(diff)
 	}
@@ -237,4 +240,37 @@ func TestClose(t *testing.T) {
 	l := filedef.NewListener()
 	l.Close()
 	l.Close() // already closed, should not panic
+}
+
+// mapFileStruct maps all unexported fields in all struct tree of filedef.File since mesgdef's structs may contains unexported fields.
+// e.g. mesgdef.FileId, *mesgdef.Activity, []*mesgdef.Sessions, []*mesgdef.Records, etc.
+func mapFileStruct(file filedef.File) map[reflect.Type]bool {
+	m := map[reflect.Type]bool{}
+	rv := reflect.Indirect(reflect.ValueOf(file))
+	for i := 0; i < rv.NumField(); i++ {
+		field := rv.Field(i) // e.g. mesgdef.FileId, *mesgdef.Activity
+		m[reflect.Indirect(field).Type()] = true
+		if field.Kind() == reflect.Slice { // e.g. []*mesgdef.Sessions, []*mesgdef.Records, etc.
+			for j := 0; j < field.Len(); j++ {
+				m[reflect.Indirect(field.Index(j)).Type()] = true
+			}
+		}
+	}
+	return m
+}
+
+// fileExporter exports all unexported fields in all struct tree of filedef.File since mesgdef's structs may contains unexported fields.
+// e.g. mesgdef.FileId, *mesgdef.Activity, []*mesgdef.Sessions, []*mesgdef.Records, etc.
+func fileExporter(files ...filedef.File) cmp.Option {
+	m := map[reflect.Type]bool{}
+	for _, file := range files {
+		if file == nil {
+			continue
+		}
+		m2 := mapFileStruct(file)
+		for k, v := range m2 {
+			m[k] = v
+		}
+	}
+	return cmp.Exporter(func(t reflect.Type) bool { return m[t] })
 }
