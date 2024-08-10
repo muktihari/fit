@@ -317,7 +317,9 @@ To be able to decode or create the manufacturer specific messages, we provide op
 
 We do not aim to compete with anyone; rather, we have created this FIT SDK with the intention of providing an alternative. However, having a benchmark can show us how relevant we are to the world.
 
-Here is a benchmark for decoding and encoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding and encoding FIT files. See [internal/cmd/benchfit/benchfit_test.go](./internal/cmd/benchfit/benchfit_test.go)
+Here is a benchmark for decoding and encoding [big_activity.fit](./testdata/big_activity.fit) using this FIT SDK in comparison to [github.com/tormoder/fit](https://github.com/tormoder/fit), the long-standing Go library for decoding and encoding FIT files. See [internal/cmd/benchfit/benchfit_test.go](./internal/cmd/benchfit/benchfit_test.go).
+
+NOTE: The file used for benchmarking does not contain any developer data or unknown messages, as each library handles these differently.
 
 ```sh
 cd internal/cmd/benchfit
@@ -325,18 +327,14 @@ go test -bench=. -benchmem
 ```
 
 ```js
-goos: darwin
-goarch: amd64
-pkg: benchfit
-cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
-BenchmarkDecode/muktihari/fit_raw-4  12    94329778 ns/op   77092752 B/op    100046 allocs/op
-BenchmarkDecode/muktihari/fit-4      12    88640146 ns/op   52205512 B/op    100192 allocs/op
-BenchmarkDecode/tormoder/fit-4       10   106416303 ns/op   84108940 B/op    700051 allocs/op
-BenchmarkEncode/muktihari/fit_raw-4  19    58971880 ns/op     131514 B/op        14 allocs/op
-BenchmarkEncode/muktihari/fit-4       9   122926830 ns/op   44137916 B/op    100017 allocs/op
-BenchmarkEncode/tormoder/fit-4        1  1324877437 ns/op  101992744 B/op  12100315 allocs/op
-PASS
-ok      benchfit        12.575s
+goos: darwin; goarch: amd64; pkg: benchfit; cpu: Intel(R) Core(TM) i5-5257U CPU @ 2.70GHz
+BenchmarkDecode/muktihari/fit_raw-4  12    94936751 ns/op   77087248 B/op    100043 allocs/op
+BenchmarkDecode/muktihari/fit-4      14    82229838 ns/op   39400001 B/op    100187 allocs/op
+BenchmarkDecode/tormoder/fit-4       10   107181982 ns/op   84109019 B/op    700051 allocs/op
+BenchmarkEncode/muktihari/fit_raw-4  20    56309898 ns/op     135602 B/op        14 allocs/op
+BenchmarkEncode/muktihari/fit-4       9   112494366 ns/op   44142141 B/op    100018 allocs/op
+BenchmarkEncode/tormoder/fit-4        1  1301167388 ns/op  101592672 B/op  12100313 allocs/op
+PASS; ok  	benchfit	9.737s
 ```
 
 NOTE: The `1st` on the list, "raw", means we decode the file into the original FIT protocol message structure (similar to the Official FIT SDK implementation in other languages). While the `2nd` decodes messages to **Activity File** struct, which should be equivalent to what the `3rd` does.
