@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -109,7 +108,7 @@ func (m *MetZone) CaloriesScaled() float64 {
 	if m.Calories == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Calories, 10, 0)
+	return float64(m.Calories)/10 - 0
 }
 
 // FatCaloriesScaled return FatCalories in its scaled value.
@@ -120,7 +119,7 @@ func (m *MetZone) FatCaloriesScaled() float64 {
 	if m.FatCalories == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FatCalories, 10, 0)
+	return float64(m.FatCalories)/10 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -148,7 +147,12 @@ func (m *MetZone) SetCalories(v uint16) *MetZone {
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetCaloriesScaled(v float64) *MetZone {
-	m.Calories = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Calories = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Calories = uint16(unscaled)
 	return m
 }
 
@@ -165,7 +169,12 @@ func (m *MetZone) SetFatCalories(v uint8) *MetZone {
 //
 // Scale: 10; Units: kcal / min
 func (m *MetZone) SetFatCaloriesScaled(v float64) *MetZone {
-	m.FatCalories = uint8(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.FatCalories = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.FatCalories = uint8(unscaled)
 	return m
 }
 

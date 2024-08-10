@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -121,7 +120,7 @@ func (m *TankSummary) StartPressureScaled() float64 {
 	if m.StartPressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.StartPressure, 100, 0)
+	return float64(m.StartPressure)/100 - 0
 }
 
 // EndPressureScaled return EndPressure in its scaled value.
@@ -132,7 +131,7 @@ func (m *TankSummary) EndPressureScaled() float64 {
 	if m.EndPressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EndPressure, 100, 0)
+	return float64(m.EndPressure)/100 - 0
 }
 
 // VolumeUsedScaled return VolumeUsed in its scaled value.
@@ -143,7 +142,7 @@ func (m *TankSummary) VolumeUsedScaled() float64 {
 	if m.VolumeUsed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.VolumeUsed, 100, 0)
+	return float64(m.VolumeUsed)/100 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -173,7 +172,12 @@ func (m *TankSummary) SetStartPressure(v uint16) *TankSummary {
 //
 // Scale: 100; Units: bar
 func (m *TankSummary) SetStartPressureScaled(v float64) *TankSummary {
-	m.StartPressure = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.StartPressure = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.StartPressure = uint16(unscaled)
 	return m
 }
 
@@ -190,7 +194,12 @@ func (m *TankSummary) SetEndPressure(v uint16) *TankSummary {
 //
 // Scale: 100; Units: bar
 func (m *TankSummary) SetEndPressureScaled(v float64) *TankSummary {
-	m.EndPressure = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EndPressure = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EndPressure = uint16(unscaled)
 	return m
 }
 
@@ -207,7 +216,12 @@ func (m *TankSummary) SetVolumeUsed(v uint32) *TankSummary {
 //
 // Scale: 100; Units: L
 func (m *TankSummary) SetVolumeUsedScaled(v float64) *TankSummary {
-	m.VolumeUsed = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.VolumeUsed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.VolumeUsed = uint32(unscaled)
 	return m
 }
 

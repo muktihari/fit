@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -25,11 +24,11 @@ import (
 type GpsMetadata struct {
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp.
 	UtcTimestamp     time.Time // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
-	Velocity         []int16   // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 	PositionLat      int32     // Units: semicircles
 	PositionLong     int32     // Units: semicircles
 	EnhancedAltitude uint32    // Scale: 5; Offset: 500; Units: m
 	EnhancedSpeed    uint32    // Scale: 1000; Units: m/s
+	Velocity         [3]int16  // Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	Heading          uint16    // Scale: 100; Units: degrees
 
@@ -63,7 +62,15 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 		EnhancedSpeed:    vals[4].Uint32(),
 		Heading:          vals[5].Uint16(),
 		UtcTimestamp:     datetime.ToTime(vals[6].Uint32()),
-		Velocity:         vals[7].SliceInt16(),
+		Velocity: func() (arr [3]int16) {
+			arr = [3]int16{
+				basetype.Sint16Invalid,
+				basetype.Sint16Invalid,
+				basetype.Sint16Invalid,
+			}
+			copy(arr[:], vals[7].SliceInt16())
+			return arr
+		}(),
 
 		DeveloperFields: developerFields,
 	}
@@ -125,9 +132,14 @@ func (m *GpsMetadata) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.UtcTimestamp))
 		fields = append(fields, field)
 	}
-	if m.Velocity != nil {
+	if m.Velocity != [3]int16{
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+	} {
 		field := fac.CreateField(mesg.Num, 7)
-		field.Value = proto.SliceInt16(m.Velocity)
+		copied := m.Velocity
+		field.Value = proto.SliceInt16(copied[:])
 		fields = append(fields, field)
 	}
 
@@ -153,7 +165,7 @@ func (m *GpsMetadata) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+	return float64(m.EnhancedAltitude)/5 - 500
 }
 
 // EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
@@ -164,7 +176,7 @@ func (m *GpsMetadata) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+	return float64(m.EnhancedSpeed)/1000 - 0
 }
 
 // HeadingScaled return Heading in its scaled value.
@@ -175,18 +187,34 @@ func (m *GpsMetadata) HeadingScaled() float64 {
 	if m.Heading == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Heading, 100, 0)
+	return float64(m.Heading)/100 - 0
 }
 
 // VelocityScaled return Velocity in its scaled value.
 // If Velocity value is invalid, nil will be returned.
 //
-// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
-func (m *GpsMetadata) VelocityScaled() []float64 {
-	if m.Velocity == nil {
-		return nil
+// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) VelocityScaled() [3]float64 {
+	if m.Velocity == [3]int16{
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+	} {
+		return [3]float64{
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+		}
 	}
-	return scaleoffset.ApplySlice(m.Velocity, 100, 0)
+	var vals [3]float64
+	for i := range m.Velocity {
+		if m.Velocity[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Velocity[i])/100 - 0
+	}
+	return vals
 }
 
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
@@ -266,7 +294,12 @@ func (m *GpsMetadata) SetEnhancedAltitude(v uint32) *GpsMetadata {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *GpsMetadata) SetEnhancedAltitudeScaled(v float64) *GpsMetadata {
-	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedAltitude = uint32(unscaled)
 	return m
 }
 
@@ -283,7 +316,12 @@ func (m *GpsMetadata) SetEnhancedSpeed(v uint32) *GpsMetadata {
 //
 // Scale: 1000; Units: m/s
 func (m *GpsMetadata) SetEnhancedSpeedScaled(v float64) *GpsMetadata {
-	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedSpeed = uint32(unscaled)
 	return m
 }
 
@@ -300,7 +338,12 @@ func (m *GpsMetadata) SetHeading(v uint16) *GpsMetadata {
 //
 // Scale: 100; Units: degrees
 func (m *GpsMetadata) SetHeadingScaled(v float64) *GpsMetadata {
-	m.Heading = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Heading = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Heading = uint16(unscaled)
 	return m
 }
 
@@ -314,18 +357,29 @@ func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
 
 // SetVelocity sets Velocity value.
 //
-// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
-func (m *GpsMetadata) SetVelocity(v []int16) *GpsMetadata {
+// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) SetVelocity(v [3]int16) *GpsMetadata {
 	m.Velocity = v
 	return m
 }
 
 // SetVelocityScaled is similar to SetVelocity except it accepts a scaled value.
-// This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
+// This method automatically converts the given value to its [3]int16 form, discarding any applied scale and offset.
 //
-// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
-func (m *GpsMetadata) SetVelocityScaled(vs []float64) *GpsMetadata {
-	m.Velocity = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+func (m *GpsMetadata) SetVelocityScaled(vs [3]float64) *GpsMetadata {
+	m.Velocity = [3]int16{
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+		basetype.Sint16Invalid,
+	}
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			continue
+		}
+		m.Velocity[i] = int16(unscaled)
+	}
 	return m
 }
 

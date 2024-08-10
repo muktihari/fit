@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -134,7 +134,15 @@ func (m *HsaAccelerometerData) AccelXScaled() []float64 {
 	if m.AccelX == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AccelX, 1.024, 0)
+	var vals = make([]float64, len(m.AccelX))
+	for i := range m.AccelX {
+		if m.AccelX[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AccelX[i])/1.024 - 0
+	}
+	return vals
 }
 
 // AccelYScaled return AccelY in its scaled value.
@@ -145,7 +153,15 @@ func (m *HsaAccelerometerData) AccelYScaled() []float64 {
 	if m.AccelY == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AccelY, 1.024, 0)
+	var vals = make([]float64, len(m.AccelY))
+	for i := range m.AccelY {
+		if m.AccelY[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AccelY[i])/1.024 - 0
+	}
+	return vals
 }
 
 // AccelZScaled return AccelZ in its scaled value.
@@ -156,7 +172,15 @@ func (m *HsaAccelerometerData) AccelZScaled() []float64 {
 	if m.AccelZ == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AccelZ, 1.024, 0)
+	var vals = make([]float64, len(m.AccelZ))
+	for i := range m.AccelZ {
+		if m.AccelZ[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AccelZ[i])/1.024 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -196,7 +220,19 @@ func (m *HsaAccelerometerData) SetAccelX(v []int16) *HsaAccelerometerData {
 //
 // Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelXScaled(vs []float64) *HsaAccelerometerData {
-	m.AccelX = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	if vs == nil {
+		m.AccelX = nil
+		return m
+	}
+	m.AccelX = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1.024
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.AccelX[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.AccelX[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -213,7 +249,19 @@ func (m *HsaAccelerometerData) SetAccelY(v []int16) *HsaAccelerometerData {
 //
 // Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelYScaled(vs []float64) *HsaAccelerometerData {
-	m.AccelY = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	if vs == nil {
+		m.AccelY = nil
+		return m
+	}
+	m.AccelY = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1.024
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.AccelY[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.AccelY[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -230,7 +278,19 @@ func (m *HsaAccelerometerData) SetAccelZ(v []int16) *HsaAccelerometerData {
 //
 // Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement
 func (m *HsaAccelerometerData) SetAccelZScaled(vs []float64) *HsaAccelerometerData {
-	m.AccelZ = scaleoffset.DiscardSlice[int16](vs, 1.024, 0)
+	if vs == nil {
+		m.AccelZ = nil
+		return m
+	}
+	m.AccelZ = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1.024
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.AccelZ[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.AccelZ[i] = int16(unscaled)
+	}
 	return m
 }
 

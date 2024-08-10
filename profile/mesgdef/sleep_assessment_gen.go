@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -179,7 +178,7 @@ func (m *SleepAssessment) AverageStressDuringSleepScaled() float64 {
 	if m.AverageStressDuringSleep == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AverageStressDuringSleep, 100, 0)
+	return float64(m.AverageStressDuringSleep)/100 - 0
 }
 
 // SetCombinedAwakeScore sets CombinedAwakeScore value.
@@ -299,7 +298,12 @@ func (m *SleepAssessment) SetAverageStressDuringSleep(v uint16) *SleepAssessment
 //
 // Scale: 100; Excludes stress during awake periods in the sleep window
 func (m *SleepAssessment) SetAverageStressDuringSleepScaled(v float64) *SleepAssessment {
-	m.AverageStressDuringSleep = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AverageStressDuringSleep = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AverageStressDuringSleep = uint16(unscaled)
 	return m
 }
 

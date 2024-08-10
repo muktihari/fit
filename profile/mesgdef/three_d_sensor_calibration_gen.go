@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -22,8 +22,8 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type ThreeDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
-	OffsetCal          []int32            // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-	OrientationMatrix  []int32            // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
+	OffsetCal          [3]int32           // Internal calibration factors, one for each: xy, yx, zx
+	OrientationMatrix  [9]int32           // Scale: 65535; 3 x 3 rotation matrix (row major)
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
@@ -56,8 +56,30 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 		CalibrationFactor:  vals[1].Uint32(),
 		CalibrationDivisor: vals[2].Uint32(),
 		LevelShift:         vals[3].Uint32(),
-		OffsetCal:          vals[4].SliceInt32(),
-		OrientationMatrix:  vals[5].SliceInt32(),
+		OffsetCal: func() (arr [3]int32) {
+			arr = [3]int32{
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+			}
+			copy(arr[:], vals[4].SliceInt32())
+			return arr
+		}(),
+		OrientationMatrix: func() (arr [9]int32) {
+			arr = [9]int32{
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+				basetype.Sint32Invalid,
+			}
+			copy(arr[:], vals[5].SliceInt32())
+			return arr
+		}(),
 
 		DeveloperFields: developerFields,
 	}
@@ -104,14 +126,30 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.LevelShift)
 		fields = append(fields, field)
 	}
-	if m.OffsetCal != nil {
+	if m.OffsetCal != [3]int32{
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+	} {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceInt32(m.OffsetCal)
+		copied := m.OffsetCal
+		field.Value = proto.SliceInt32(copied[:])
 		fields = append(fields, field)
 	}
-	if m.OrientationMatrix != nil {
+	if m.OrientationMatrix != [9]int32{
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+	} {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceInt32(m.OrientationMatrix)
+		copied := m.OrientationMatrix
+		field.Value = proto.SliceInt32(copied[:])
 		fields = append(fields, field)
 	}
 
@@ -147,12 +185,40 @@ func (m *ThreeDSensorCalibration) TimestampUint32() uint32 { return datetime.ToU
 // OrientationMatrixScaled return OrientationMatrix in its scaled value.
 // If OrientationMatrix value is invalid, nil will be returned.
 //
-// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
-func (m *ThreeDSensorCalibration) OrientationMatrixScaled() []float64 {
-	if m.OrientationMatrix == nil {
-		return nil
+// Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) OrientationMatrixScaled() [9]float64 {
+	if m.OrientationMatrix == [9]int32{
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+	} {
+		return [9]float64{
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+			math.Float64frombits(basetype.Float64Invalid),
+		}
 	}
-	return scaleoffset.ApplySlice(m.OrientationMatrix, 65535, 0)
+	var vals [9]float64
+	for i := range m.OrientationMatrix {
+		if m.OrientationMatrix[i] == basetype.Sint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.OrientationMatrix[i])/65535 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -197,26 +263,43 @@ func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibrati
 
 // SetOffsetCal sets OffsetCal value.
 //
-// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
-func (m *ThreeDSensorCalibration) SetOffsetCal(v []int32) *ThreeDSensorCalibration {
+// Internal calibration factors, one for each: xy, yx, zx
+func (m *ThreeDSensorCalibration) SetOffsetCal(v [3]int32) *ThreeDSensorCalibration {
 	m.OffsetCal = v
 	return m
 }
 
 // SetOrientationMatrix sets OrientationMatrix value.
 //
-// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
-func (m *ThreeDSensorCalibration) SetOrientationMatrix(v []int32) *ThreeDSensorCalibration {
+// Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrix(v [9]int32) *ThreeDSensorCalibration {
 	m.OrientationMatrix = v
 	return m
 }
 
 // SetOrientationMatrixScaled is similar to SetOrientationMatrix except it accepts a scaled value.
-// This method automatically converts the given value to its []int32 form, discarding any applied scale and offset.
+// This method automatically converts the given value to its [9]int32 form, discarding any applied scale and offset.
 //
-// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
-func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs []float64) *ThreeDSensorCalibration {
-	m.OrientationMatrix = scaleoffset.DiscardSlice[int32](vs, 65535, 0)
+// Scale: 65535; 3 x 3 rotation matrix (row major)
+func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs [9]float64) *ThreeDSensorCalibration {
+	m.OrientationMatrix = [9]int32{
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+		basetype.Sint32Invalid,
+	}
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 65535
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+			continue
+		}
+		m.OrientationMatrix[i] = int32(unscaled)
+	}
 	return m
 }
 

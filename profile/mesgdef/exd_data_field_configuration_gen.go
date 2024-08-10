@@ -18,14 +18,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ExdDataFieldConfiguration struct {
-	Title        []string // Array: [32]
+	Title        [32]string
 	ScreenIndex  uint8
 	ConceptField byte
 	FieldId      uint8
 	ConceptCount uint8
 	DisplayType  typedef.ExdDisplayType
 
-	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
+	state [1]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -36,16 +36,17 @@ type ExdDataFieldConfiguration struct {
 // If mesg is nil, it will return ExdDataFieldConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguration {
 	vals := [6]proto.Value{}
-	isExpandedFields := [4]bool{}
 
+	var state [1]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 4 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -58,9 +59,46 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 		FieldId:      vals[2].Uint8(),
 		ConceptCount: vals[3].Uint8(),
 		DisplayType:  typedef.ExdDisplayType(vals[4].Uint8()),
-		Title:        vals[5].SliceString(),
+		Title: func() (arr [32]string) {
+			arr = [32]string{
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+				basetype.StringInvalid,
+			}
+			copy(arr[:], vals[5].SliceString())
+			return arr
+		}(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -92,26 +130,64 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
-	if m.FieldId != basetype.Uint8Invalid && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint8(m.FieldId)
-		field.IsExpandedField = m.IsExpandedFields[2]
-		fields = append(fields, field)
+	if m.FieldId != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 2)
+			field.Value = proto.Uint8(m.FieldId)
+			field.IsExpandedField = m.IsExpandedField(2)
+			fields = append(fields, field)
+		}
 	}
-	if m.ConceptCount != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint8(m.ConceptCount)
-		field.IsExpandedField = m.IsExpandedFields[3]
-		fields = append(fields, field)
+	if m.ConceptCount != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 3)
+			field.Value = proto.Uint8(m.ConceptCount)
+			field.IsExpandedField = m.IsExpandedField(3)
+			fields = append(fields, field)
+		}
 	}
 	if byte(m.DisplayType) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.DisplayType))
 		fields = append(fields, field)
 	}
-	if m.Title != nil {
+	if m.Title != [32]string{
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+		basetype.StringInvalid,
+	} {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.SliceString(m.Title)
+		copied := m.Title
+		field.Value = proto.SliceString(copied[:])
 		fields = append(fields, field)
 	}
 
@@ -154,9 +230,7 @@ func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *Ex
 }
 
 // SetTitle sets Title value.
-//
-// Array: [32]
-func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfiguration {
+func (m *ExdDataFieldConfiguration) SetTitle(v [32]string) *ExdDataFieldConfiguration {
 	m.Title = v
 	return m
 }
@@ -165,4 +239,32 @@ func (m *ExdDataFieldConfiguration) SetTitle(v []string) *ExdDataFieldConfigurat
 func (m *ExdDataFieldConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataFieldConfiguration {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 2, 3.
+func (m *ExdDataFieldConfiguration) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 2, 3:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 2, 3.
+func (m *ExdDataFieldConfiguration) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 4 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

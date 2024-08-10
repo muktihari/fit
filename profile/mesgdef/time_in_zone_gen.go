@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -204,7 +204,15 @@ func (m *TimeInZone) TimeInHrZoneScaled() []float64 {
 	if m.TimeInHrZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInHrZone))
+	for i := range m.TimeInHrZone {
+		if m.TimeInHrZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInHrZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value.
@@ -215,7 +223,15 @@ func (m *TimeInZone) TimeInSpeedZoneScaled() []float64 {
 	if m.TimeInSpeedZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInSpeedZone))
+	for i := range m.TimeInSpeedZone {
+		if m.TimeInSpeedZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInSpeedZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value.
@@ -226,7 +242,15 @@ func (m *TimeInZone) TimeInCadenceZoneScaled() []float64 {
 	if m.TimeInCadenceZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInCadenceZone))
+	for i := range m.TimeInCadenceZone {
+		if m.TimeInCadenceZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInCadenceZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInPowerZoneScaled return TimeInPowerZone in its scaled value.
@@ -237,7 +261,15 @@ func (m *TimeInZone) TimeInPowerZoneScaled() []float64 {
 	if m.TimeInPowerZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInPowerZone))
+	for i := range m.TimeInPowerZone {
+		if m.TimeInPowerZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInPowerZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // SpeedZoneHighBoundaryScaled return SpeedZoneHighBoundary in its scaled value.
@@ -248,7 +280,15 @@ func (m *TimeInZone) SpeedZoneHighBoundaryScaled() []float64 {
 	if m.SpeedZoneHighBoundary == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.SpeedZoneHighBoundary, 1000, 0)
+	var vals = make([]float64, len(m.SpeedZoneHighBoundary))
+	for i := range m.SpeedZoneHighBoundary {
+		if m.SpeedZoneHighBoundary[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.SpeedZoneHighBoundary[i])/1000 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -284,7 +324,19 @@ func (m *TimeInZone) SetTimeInHrZone(v []uint32) *TimeInZone {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInHrZoneScaled(vs []float64) *TimeInZone {
-	m.TimeInHrZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInHrZone = nil
+		return m
+	}
+	m.TimeInHrZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInHrZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInHrZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -301,7 +353,19 @@ func (m *TimeInZone) SetTimeInSpeedZone(v []uint32) *TimeInZone {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInSpeedZoneScaled(vs []float64) *TimeInZone {
-	m.TimeInSpeedZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInSpeedZone = nil
+		return m
+	}
+	m.TimeInSpeedZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInSpeedZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInSpeedZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -318,7 +382,19 @@ func (m *TimeInZone) SetTimeInCadenceZone(v []uint32) *TimeInZone {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInCadenceZoneScaled(vs []float64) *TimeInZone {
-	m.TimeInCadenceZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInCadenceZone = nil
+		return m
+	}
+	m.TimeInCadenceZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInCadenceZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInCadenceZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -335,7 +411,19 @@ func (m *TimeInZone) SetTimeInPowerZone(v []uint32) *TimeInZone {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *TimeInZone) SetTimeInPowerZoneScaled(vs []float64) *TimeInZone {
-	m.TimeInPowerZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInPowerZone = nil
+		return m
+	}
+	m.TimeInPowerZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInPowerZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInPowerZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -360,7 +448,19 @@ func (m *TimeInZone) SetSpeedZoneHighBoundary(v []uint16) *TimeInZone {
 //
 // Array: [N]; Scale: 1000; Units: m/s
 func (m *TimeInZone) SetSpeedZoneHighBoundaryScaled(vs []float64) *TimeInZone {
-	m.SpeedZoneHighBoundary = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
+	if vs == nil {
+		m.SpeedZoneHighBoundary = nil
+		return m
+	}
+	m.SpeedZoneHighBoundary = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.SpeedZoneHighBoundary[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.SpeedZoneHighBoundary[i] = uint16(unscaled)
+	}
 	return m
 }
 

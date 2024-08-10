@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -137,7 +136,7 @@ func (m *SdmProfile) SdmCalFactorScaled() float64 {
 	if m.SdmCalFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SdmCalFactor, 10, 0)
+	return float64(m.SdmCalFactor)/10 - 0
 }
 
 // OdometerScaled return Odometer in its scaled value.
@@ -148,7 +147,7 @@ func (m *SdmProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Odometer, 100, 0)
+	return float64(m.Odometer)/100 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -182,7 +181,12 @@ func (m *SdmProfile) SetSdmCalFactor(v uint16) *SdmProfile {
 //
 // Scale: 10; Units: %
 func (m *SdmProfile) SetSdmCalFactorScaled(v float64) *SdmProfile {
-	m.SdmCalFactor = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.SdmCalFactor = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.SdmCalFactor = uint16(unscaled)
 	return m
 }
 
@@ -199,7 +203,12 @@ func (m *SdmProfile) SetOdometer(v uint32) *SdmProfile {
 //
 // Scale: 100; Units: m
 func (m *SdmProfile) SetOdometerScaled(v float64) *SdmProfile {
-	m.Odometer = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Odometer = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Odometer = uint32(unscaled)
 	return m
 }
 

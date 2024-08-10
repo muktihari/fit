@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -106,7 +106,15 @@ func (m *HsaWristTemperatureData) ValueScaled() []float64 {
 	if m.Value == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Value, 1000, 0)
+	var vals = make([]float64, len(m.Value))
+	for i := range m.Value {
+		if m.Value[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Value[i])/1000 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -138,7 +146,19 @@ func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData 
 //
 // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
 func (m *HsaWristTemperatureData) SetValueScaled(vs []float64) *HsaWristTemperatureData {
-	m.Value = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
+	if vs == nil {
+		m.Value = nil
+		return m
+	}
+	m.Value = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.Value[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.Value[i] = uint16(unscaled)
+	}
 	return m
 }
 

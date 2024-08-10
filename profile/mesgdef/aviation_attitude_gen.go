@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 	"unsafe"
 )
@@ -178,7 +178,15 @@ func (m *AviationAttitude) PitchScaled() []float64 {
 	if m.Pitch == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Pitch, 10430.38, 0)
+	var vals = make([]float64, len(m.Pitch))
+	for i := range m.Pitch {
+		if m.Pitch[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Pitch[i])/10430.38 - 0
+	}
+	return vals
 }
 
 // RollScaled return Roll in its scaled value.
@@ -189,7 +197,15 @@ func (m *AviationAttitude) RollScaled() []float64 {
 	if m.Roll == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Roll, 10430.38, 0)
+	var vals = make([]float64, len(m.Roll))
+	for i := range m.Roll {
+		if m.Roll[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Roll[i])/10430.38 - 0
+	}
+	return vals
 }
 
 // AccelLateralScaled return AccelLateral in its scaled value.
@@ -200,7 +216,15 @@ func (m *AviationAttitude) AccelLateralScaled() []float64 {
 	if m.AccelLateral == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AccelLateral, 100, 0)
+	var vals = make([]float64, len(m.AccelLateral))
+	for i := range m.AccelLateral {
+		if m.AccelLateral[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AccelLateral[i])/100 - 0
+	}
+	return vals
 }
 
 // AccelNormalScaled return AccelNormal in its scaled value.
@@ -211,7 +235,15 @@ func (m *AviationAttitude) AccelNormalScaled() []float64 {
 	if m.AccelNormal == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AccelNormal, 100, 0)
+	var vals = make([]float64, len(m.AccelNormal))
+	for i := range m.AccelNormal {
+		if m.AccelNormal[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AccelNormal[i])/100 - 0
+	}
+	return vals
 }
 
 // TurnRateScaled return TurnRate in its scaled value.
@@ -222,7 +254,15 @@ func (m *AviationAttitude) TurnRateScaled() []float64 {
 	if m.TurnRate == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TurnRate, 1024, 0)
+	var vals = make([]float64, len(m.TurnRate))
+	for i := range m.TurnRate {
+		if m.TurnRate[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TurnRate[i])/1024 - 0
+	}
+	return vals
 }
 
 // TrackScaled return Track in its scaled value.
@@ -233,7 +273,15 @@ func (m *AviationAttitude) TrackScaled() []float64 {
 	if m.Track == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Track, 10430.38, 0)
+	var vals = make([]float64, len(m.Track))
+	for i := range m.Track {
+		if m.Track[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Track[i])/10430.38 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -273,7 +321,19 @@ func (m *AviationAttitude) SetPitch(v []int16) *AviationAttitude {
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
 func (m *AviationAttitude) SetPitchScaled(vs []float64) *AviationAttitude {
-	m.Pitch = scaleoffset.DiscardSlice[int16](vs, 10430.38, 0)
+	if vs == nil {
+		m.Pitch = nil
+		return m
+	}
+	m.Pitch = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10430.38
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.Pitch[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.Pitch[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -290,7 +350,19 @@ func (m *AviationAttitude) SetRoll(v []int16) *AviationAttitude {
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
 func (m *AviationAttitude) SetRollScaled(vs []float64) *AviationAttitude {
-	m.Roll = scaleoffset.DiscardSlice[int16](vs, 10430.38, 0)
+	if vs == nil {
+		m.Roll = nil
+		return m
+	}
+	m.Roll = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10430.38
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.Roll[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.Roll[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -307,7 +379,19 @@ func (m *AviationAttitude) SetAccelLateral(v []int16) *AviationAttitude {
 //
 // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) SetAccelLateralScaled(vs []float64) *AviationAttitude {
-	m.AccelLateral = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+	if vs == nil {
+		m.AccelLateral = nil
+		return m
+	}
+	m.AccelLateral = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.AccelLateral[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.AccelLateral[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -324,7 +408,19 @@ func (m *AviationAttitude) SetAccelNormal(v []int16) *AviationAttitude {
 //
 // Array: [N]; Scale: 100; Units: m/s^2; Range -78.4 to +78.4 (-8 Gs to 8 Gs)
 func (m *AviationAttitude) SetAccelNormalScaled(vs []float64) *AviationAttitude {
-	m.AccelNormal = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+	if vs == nil {
+		m.AccelNormal = nil
+		return m
+	}
+	m.AccelNormal = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.AccelNormal[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.AccelNormal[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -341,7 +437,19 @@ func (m *AviationAttitude) SetTurnRate(v []int16) *AviationAttitude {
 //
 // Array: [N]; Scale: 1024; Units: radians/second; Range -8.727 to +8.727 (-500 degs/sec to +500 degs/sec)
 func (m *AviationAttitude) SetTurnRateScaled(vs []float64) *AviationAttitude {
-	m.TurnRate = scaleoffset.DiscardSlice[int16](vs, 1024, 0)
+	if vs == nil {
+		m.TurnRate = nil
+		return m
+	}
+	m.TurnRate = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1024
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.TurnRate[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.TurnRate[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -374,7 +482,19 @@ func (m *AviationAttitude) SetTrack(v []uint16) *AviationAttitude {
 //
 // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 func (m *AviationAttitude) SetTrackScaled(vs []float64) *AviationAttitude {
-	m.Track = scaleoffset.DiscardSlice[uint16](vs, 10430.38, 0)
+	if vs == nil {
+		m.Track = nil
+		return m
+	}
+	m.Track = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10430.38
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.Track[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.Track[i] = uint16(unscaled)
+	}
 	return m
 }
 

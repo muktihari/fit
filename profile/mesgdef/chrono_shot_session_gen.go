@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -135,7 +134,7 @@ func (m *ChronoShotSession) MinSpeedScaled() float64 {
 	if m.MinSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MinSpeed, 1000, 0)
+	return float64(m.MinSpeed)/1000 - 0
 }
 
 // MaxSpeedScaled return MaxSpeed in its scaled value.
@@ -146,7 +145,7 @@ func (m *ChronoShotSession) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
+	return float64(m.MaxSpeed)/1000 - 0
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value.
@@ -157,7 +156,7 @@ func (m *ChronoShotSession) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+	return float64(m.AvgSpeed)/1000 - 0
 }
 
 // GrainWeightScaled return GrainWeight in its scaled value.
@@ -168,7 +167,7 @@ func (m *ChronoShotSession) GrainWeightScaled() float64 {
 	if m.GrainWeight == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.GrainWeight, 10, 0)
+	return float64(m.GrainWeight)/10 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -190,7 +189,12 @@ func (m *ChronoShotSession) SetMinSpeed(v uint32) *ChronoShotSession {
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetMinSpeedScaled(v float64) *ChronoShotSession {
-	m.MinSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MinSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MinSpeed = uint32(unscaled)
 	return m
 }
 
@@ -207,7 +211,12 @@ func (m *ChronoShotSession) SetMaxSpeed(v uint32) *ChronoShotSession {
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetMaxSpeedScaled(v float64) *ChronoShotSession {
-	m.MaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxSpeed = uint32(unscaled)
 	return m
 }
 
@@ -224,7 +233,12 @@ func (m *ChronoShotSession) SetAvgSpeed(v uint32) *ChronoShotSession {
 //
 // Scale: 1000; Units: m/s
 func (m *ChronoShotSession) SetAvgSpeedScaled(v float64) *ChronoShotSession {
-	m.AvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgSpeed = uint32(unscaled)
 	return m
 }
 
@@ -253,7 +267,12 @@ func (m *ChronoShotSession) SetGrainWeight(v uint32) *ChronoShotSession {
 //
 // Scale: 10; Units: gr
 func (m *ChronoShotSession) SetGrainWeightScaled(v float64) *ChronoShotSession {
-	m.GrainWeight = uint32(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.GrainWeight = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.GrainWeight = uint32(unscaled)
 	return m
 }
 

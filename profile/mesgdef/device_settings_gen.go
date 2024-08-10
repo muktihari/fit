@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 	"unsafe"
 )
@@ -258,7 +258,15 @@ func (m *DeviceSettings) TimeZoneOffsetScaled() []float64 {
 	if m.TimeZoneOffset == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeZoneOffset, 4, 0)
+	var vals = make([]float64, len(m.TimeZoneOffset))
+	for i := range m.TimeZoneOffset {
+		if m.TimeZoneOffset[i] == basetype.Sint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeZoneOffset[i])/4 - 0
+	}
+	return vals
 }
 
 // SetActiveTimeZone sets ActiveTimeZone value.
@@ -306,7 +314,19 @@ func (m *DeviceSettings) SetTimeZoneOffset(v []int8) *DeviceSettings {
 //
 // Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
 func (m *DeviceSettings) SetTimeZoneOffsetScaled(vs []float64) *DeviceSettings {
-	m.TimeZoneOffset = scaleoffset.DiscardSlice[int8](vs, 4, 0)
+	if vs == nil {
+		m.TimeZoneOffset = nil
+		return m
+	}
+	m.TimeZoneOffset = make([]int8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 4
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint8Invalid) {
+			m.TimeZoneOffset[i] = int8(basetype.Sint8Invalid)
+			continue
+		}
+		m.TimeZoneOffset[i] = int8(unscaled)
+	}
 	return m
 }
 

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -261,7 +260,7 @@ func (m *DeviceInfo) SoftwareVersionScaled() float64 {
 	if m.SoftwareVersion == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SoftwareVersion, 100, 0)
+	return float64(m.SoftwareVersion)/100 - 0
 }
 
 // BatteryVoltageScaled return BatteryVoltage in its scaled value.
@@ -272,7 +271,7 @@ func (m *DeviceInfo) BatteryVoltageScaled() float64 {
 	if m.BatteryVoltage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BatteryVoltage, 256, 0)
+	return float64(m.BatteryVoltage)/256 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -326,7 +325,12 @@ func (m *DeviceInfo) SetSoftwareVersion(v uint16) *DeviceInfo {
 //
 // Scale: 100
 func (m *DeviceInfo) SetSoftwareVersionScaled(v float64) *DeviceInfo {
-	m.SoftwareVersion = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.SoftwareVersion = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.SoftwareVersion = uint16(unscaled)
 	return m
 }
 
@@ -357,7 +361,12 @@ func (m *DeviceInfo) SetBatteryVoltage(v uint16) *DeviceInfo {
 //
 // Scale: 256; Units: V
 func (m *DeviceInfo) SetBatteryVoltageScaled(v float64) *DeviceInfo {
-	m.BatteryVoltage = uint16(scaleoffset.Discard(v, 256, 0))
+	unscaled := (v + 0) * 256
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BatteryVoltage = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BatteryVoltage = uint16(unscaled)
 	return m
 }
 

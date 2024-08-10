@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -29,7 +28,7 @@ type SegmentPoint struct {
 	MessageIndex     typedef.MessageIndex
 	Altitude         uint16 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 
-	IsExpandedFields [7]bool // Used for tracking expanded fields, field.Num as index.
+	state [1]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -40,16 +39,17 @@ type SegmentPoint struct {
 // If mesg is nil, it will return SegmentPoint with all fields being set to its corresponding invalid value.
 func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	vals := [255]proto.Value{}
-	isExpandedFields := [7]bool{}
 
+	var state [1]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 7 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -65,7 +65,7 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 		LeaderTime:       vals[5].SliceUint32(),
 		EnhancedAltitude: vals[6].Uint32(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -117,11 +117,13 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint32(m.LeaderTime)
 		fields = append(fields, field)
 	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(m.EnhancedAltitude)
-		field.IsExpandedField = m.IsExpandedFields[6]
-		fields = append(fields, field)
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(6); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 6)
+			field.Value = proto.Uint32(m.EnhancedAltitude)
+			field.IsExpandedField = m.IsExpandedField(6)
+			fields = append(fields, field)
+		}
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -140,7 +142,7 @@ func (m *SegmentPoint) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Distance, 100, 0)
+	return float64(m.Distance)/100 - 0
 }
 
 // AltitudeScaled return Altitude in its scaled value.
@@ -151,7 +153,7 @@ func (m *SegmentPoint) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Altitude, 5, 500)
+	return float64(m.Altitude)/5 - 500
 }
 
 // LeaderTimeScaled return LeaderTime in its scaled value.
@@ -162,7 +164,15 @@ func (m *SegmentPoint) LeaderTimeScaled() []float64 {
 	if m.LeaderTime == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.LeaderTime, 1000, 0)
+	var vals = make([]float64, len(m.LeaderTime))
+	for i := range m.LeaderTime {
+		if m.LeaderTime[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.LeaderTime[i])/1000 - 0
+	}
+	return vals
 }
 
 // EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
@@ -173,7 +183,7 @@ func (m *SegmentPoint) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+	return float64(m.EnhancedAltitude)/5 - 500
 }
 
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
@@ -243,7 +253,12 @@ func (m *SegmentPoint) SetDistance(v uint32) *SegmentPoint {
 //
 // Scale: 100; Units: m; Accumulated distance along the segment at the described point
 func (m *SegmentPoint) SetDistanceScaled(v float64) *SegmentPoint {
-	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Distance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Distance = uint32(unscaled)
 	return m
 }
 
@@ -260,7 +275,12 @@ func (m *SegmentPoint) SetAltitude(v uint16) *SegmentPoint {
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetAltitudeScaled(v float64) *SegmentPoint {
-	m.Altitude = uint16(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Altitude = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Altitude = uint16(unscaled)
 	return m
 }
 
@@ -277,7 +297,19 @@ func (m *SegmentPoint) SetLeaderTime(v []uint32) *SegmentPoint {
 //
 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 func (m *SegmentPoint) SetLeaderTimeScaled(vs []float64) *SegmentPoint {
-	m.LeaderTime = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.LeaderTime = nil
+		return m
+	}
+	m.LeaderTime = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.LeaderTime[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.LeaderTime[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -294,7 +326,12 @@ func (m *SegmentPoint) SetEnhancedAltitude(v uint32) *SegmentPoint {
 //
 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 func (m *SegmentPoint) SetEnhancedAltitudeScaled(v float64) *SegmentPoint {
-	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedAltitude = uint32(unscaled)
 	return m
 }
 
@@ -302,4 +339,32 @@ func (m *SegmentPoint) SetEnhancedAltitudeScaled(v float64) *SegmentPoint {
 func (m *SegmentPoint) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentPoint {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 6.
+func (m *SegmentPoint) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 6:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 6.
+func (m *SegmentPoint) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 7 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

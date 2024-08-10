@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -45,7 +44,7 @@ type Length struct {
 	AvgRespirationRate         uint8
 	MaxRespirationRate         uint8
 
-	IsExpandedFields [24]bool // Used for tracking expanded fields, field.Num as index.
+	state [4]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -56,16 +55,17 @@ type Length struct {
 // If mesg is nil, it will return Length with all fields being set to its corresponding invalid value.
 func NewLength(mesg *proto.Message) *Length {
 	vals := [255]proto.Value{}
-	isExpandedFields := [24]bool{}
 
+	var state [4]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 24 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -96,7 +96,7 @@ func NewLength(mesg *proto.Message) *Length {
 		AvgRespirationRate:         vals[24].Uint8(),
 		MaxRespirationRate:         vals[25].Uint8(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -208,17 +208,21 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.ZoneCount)
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[22] && options.IncludeExpandedFields) || !m.IsExpandedFields[22]) {
-		field := fac.CreateField(mesg.Num, 22)
-		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[22]
-		fields = append(fields, field)
+	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(22); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 22)
+			field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(22)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[23] && options.IncludeExpandedFields) || !m.IsExpandedFields[23]) {
-		field := fac.CreateField(mesg.Num, 23)
-		field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[23]
-		fields = append(fields, field)
+	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(23); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 23)
+			field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(23)
+			fields = append(fields, field)
+		}
 	}
 	if m.AvgRespirationRate != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 24)
@@ -253,7 +257,7 @@ func (m *Length) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
+	return float64(m.TotalElapsedTime)/1000 - 0
 }
 
 // TotalTimerTimeScaled return TotalTimerTime in its scaled value.
@@ -264,7 +268,7 @@ func (m *Length) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+	return float64(m.TotalTimerTime)/1000 - 0
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value.
@@ -275,7 +279,7 @@ func (m *Length) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+	return float64(m.AvgSpeed)/1000 - 0
 }
 
 // EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value.
@@ -286,7 +290,7 @@ func (m *Length) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
+	return float64(m.EnhancedAvgRespirationRate)/100 - 0
 }
 
 // EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value.
@@ -297,7 +301,7 @@ func (m *Length) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
+	return float64(m.EnhancedMaxRespirationRate)/100 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -343,7 +347,12 @@ func (m *Length) SetTotalElapsedTime(v uint32) *Length {
 //
 // Scale: 1000; Units: s
 func (m *Length) SetTotalElapsedTimeScaled(v float64) *Length {
-	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalElapsedTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalElapsedTime = uint32(unscaled)
 	return m
 }
 
@@ -360,7 +369,12 @@ func (m *Length) SetTotalTimerTime(v uint32) *Length {
 //
 // Scale: 1000; Units: s
 func (m *Length) SetTotalTimerTimeScaled(v float64) *Length {
-	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalTimerTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalTimerTime = uint32(unscaled)
 	return m
 }
 
@@ -385,7 +399,12 @@ func (m *Length) SetAvgSpeed(v uint16) *Length {
 //
 // Scale: 1000; Units: m/s
 func (m *Length) SetAvgSpeedScaled(v float64) *Length {
-	m.AvgSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgSpeed = uint16(unscaled)
 	return m
 }
 
@@ -466,7 +485,12 @@ func (m *Length) SetEnhancedAvgRespirationRate(v uint16) *Length {
 //
 // Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedAvgRespirationRateScaled(v float64) *Length {
-	m.EnhancedAvgRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedAvgRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedAvgRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -483,7 +507,12 @@ func (m *Length) SetEnhancedMaxRespirationRate(v uint16) *Length {
 //
 // Scale: 100; Units: Breaths/min
 func (m *Length) SetEnhancedMaxRespirationRateScaled(v float64) *Length {
-	m.EnhancedMaxRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedMaxRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedMaxRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -503,4 +532,32 @@ func (m *Length) SetMaxRespirationRate(v uint8) *Length {
 func (m *Length) SetDeveloperFields(developerFields ...proto.DeveloperField) *Length {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 22, 23.
+func (m *Length) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 22, 23:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 22, 23.
+func (m *Length) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 24 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

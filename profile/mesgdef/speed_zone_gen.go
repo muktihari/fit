@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -102,7 +101,7 @@ func (m *SpeedZone) HighValueScaled() float64 {
 	if m.HighValue == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.HighValue, 1000, 0)
+	return float64(m.HighValue)/1000 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -124,7 +123,12 @@ func (m *SpeedZone) SetHighValue(v uint16) *SpeedZone {
 //
 // Scale: 1000; Units: m/s
 func (m *SpeedZone) SetHighValueScaled(v float64) *SpeedZone {
-	m.HighValue = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.HighValue = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.HighValue = uint16(unscaled)
 	return m
 }
 

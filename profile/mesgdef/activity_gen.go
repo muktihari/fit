@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -145,7 +144,7 @@ func (m *Activity) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+	return float64(m.TotalTimerTime)/1000 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -167,7 +166,12 @@ func (m *Activity) SetTotalTimerTime(v uint32) *Activity {
 //
 // Scale: 1000; Units: s; Exclude pauses
 func (m *Activity) SetTotalTimerTimeScaled(v float64) *Activity {
-	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalTimerTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalTimerTime = uint32(unscaled)
 	return m
 }
 

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -100,7 +99,7 @@ func (m *HrvValue) ValueScaled() float64 {
 	if m.Value == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Value, 128, 0)
+	return float64(m.Value)/128 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -122,7 +121,12 @@ func (m *HrvValue) SetValue(v uint16) *HrvValue {
 //
 // Scale: 128; Units: ms; 5 minute RMSSD
 func (m *HrvValue) SetValueScaled(v float64) *HrvValue {
-	m.Value = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Value = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Value = uint16(unscaled)
 	return m
 }
 

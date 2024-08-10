@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -24,7 +23,7 @@ import (
 type Monitoring struct {
 	Timestamp                    time.Time           // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	LocalTimestamp               time.Time           // Must align to logging interval, for example, time must be 00:00:00 for daily log.
-	ActivityTime                 []uint16            // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
+	ActivityTime                 [8]uint16           // Units: minutes; Indexed using minute_activity_level enum
 	Distance                     uint32              // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	Cycles                       uint32              // Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	ActiveTime                   uint32              // Scale: 1000; Units: s
@@ -52,7 +51,7 @@ type Monitoring struct {
 	HeartRate                    uint8 // Units: bpm
 	Intensity                    uint8 // Scale: 10
 
-	IsExpandedFields [29]bool // Used for tracking expanded fields, field.Num as index.
+	state [4]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -63,16 +62,17 @@ type Monitoring struct {
 // If mesg is nil, it will return Monitoring with all fields being set to its corresponding invalid value.
 func NewMonitoring(mesg *proto.Message) *Monitoring {
 	vals := [254]proto.Value{}
-	isExpandedFields := [29]bool{}
 
+	var state [4]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 29 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -80,23 +80,36 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 	}
 
 	return &Monitoring{
-		Timestamp:                    datetime.ToTime(vals[253].Uint32()),
-		DeviceIndex:                  typedef.DeviceIndex(vals[0].Uint8()),
-		Calories:                     vals[1].Uint16(),
-		Distance:                     vals[2].Uint32(),
-		Cycles:                       vals[3].Uint32(),
-		ActiveTime:                   vals[4].Uint32(),
-		ActivityType:                 typedef.ActivityType(vals[5].Uint8()),
-		ActivitySubtype:              typedef.ActivitySubtype(vals[6].Uint8()),
-		ActivityLevel:                typedef.ActivityLevel(vals[7].Uint8()),
-		Distance16:                   vals[8].Uint16(),
-		Cycles16:                     vals[9].Uint16(),
-		ActiveTime16:                 vals[10].Uint16(),
-		LocalTimestamp:               datetime.ToTime(vals[11].Uint32()),
-		Temperature:                  vals[12].Int16(),
-		TemperatureMin:               vals[14].Int16(),
-		TemperatureMax:               vals[15].Int16(),
-		ActivityTime:                 vals[16].SliceUint16(),
+		Timestamp:       datetime.ToTime(vals[253].Uint32()),
+		DeviceIndex:     typedef.DeviceIndex(vals[0].Uint8()),
+		Calories:        vals[1].Uint16(),
+		Distance:        vals[2].Uint32(),
+		Cycles:          vals[3].Uint32(),
+		ActiveTime:      vals[4].Uint32(),
+		ActivityType:    typedef.ActivityType(vals[5].Uint8()),
+		ActivitySubtype: typedef.ActivitySubtype(vals[6].Uint8()),
+		ActivityLevel:   typedef.ActivityLevel(vals[7].Uint8()),
+		Distance16:      vals[8].Uint16(),
+		Cycles16:        vals[9].Uint16(),
+		ActiveTime16:    vals[10].Uint16(),
+		LocalTimestamp:  datetime.ToTime(vals[11].Uint32()),
+		Temperature:     vals[12].Int16(),
+		TemperatureMin:  vals[14].Int16(),
+		TemperatureMax:  vals[15].Int16(),
+		ActivityTime: func() (arr [8]uint16) {
+			arr = [8]uint16{
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+				basetype.Uint16Invalid,
+			}
+			copy(arr[:], vals[16].SliceUint16())
+			return arr
+		}(),
 		ActiveCalories:               vals[19].Uint16(),
 		CurrentActivityTypeIntensity: vals[24].Uint8(),
 		TimestampMin8:                vals[25].Uint8(),
@@ -110,7 +123,7 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 		ModerateActivityMinutes:      vals[33].Uint16(),
 		VigorousActivityMinutes:      vals[34].Uint16(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -162,11 +175,13 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityType) != basetype.EnumInvalid && ((m.IsExpandedFields[5] && options.IncludeExpandedFields) || !m.IsExpandedFields[5]) {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint8(byte(m.ActivityType))
-		field.IsExpandedField = m.IsExpandedFields[5]
-		fields = append(fields, field)
+	if byte(m.ActivityType) != basetype.EnumInvalid {
+		if expanded := m.IsExpandedField(5); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 5)
+			field.Value = proto.Uint8(byte(m.ActivityType))
+			field.IsExpandedField = m.IsExpandedField(5)
+			fields = append(fields, field)
+		}
 	}
 	if byte(m.ActivitySubtype) != basetype.EnumInvalid {
 		field := fac.CreateField(mesg.Num, 6)
@@ -213,9 +228,19 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int16(m.TemperatureMax)
 		fields = append(fields, field)
 	}
-	if m.ActivityTime != nil {
+	if m.ActivityTime != [8]uint16{
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+		basetype.Uint16Invalid,
+	} {
 		field := fac.CreateField(mesg.Num, 16)
-		field.Value = proto.SliceUint16(m.ActivityTime)
+		copied := m.ActivityTime
+		field.Value = proto.SliceUint16(copied[:])
 		fields = append(fields, field)
 	}
 	if m.ActiveCalories != basetype.Uint16Invalid {
@@ -243,11 +268,13 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.HeartRate)
 		fields = append(fields, field)
 	}
-	if m.Intensity != basetype.Uint8Invalid && ((m.IsExpandedFields[28] && options.IncludeExpandedFields) || !m.IsExpandedFields[28]) {
-		field := fac.CreateField(mesg.Num, 28)
-		field.Value = proto.Uint8(m.Intensity)
-		field.IsExpandedField = m.IsExpandedFields[28]
-		fields = append(fields, field)
+	if m.Intensity != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(28); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 28)
+			field.Value = proto.Uint8(m.Intensity)
+			field.IsExpandedField = m.IsExpandedField(28)
+			fields = append(fields, field)
+		}
 	}
 	if m.DurationMin != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 29)
@@ -320,7 +347,7 @@ func (m *Monitoring) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Distance, 100, 0)
+	return float64(m.Distance)/100 - 0
 }
 
 // CyclesScaled return Cycles in its scaled value.
@@ -331,7 +358,7 @@ func (m *Monitoring) CyclesScaled() float64 {
 	if m.Cycles == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Cycles, 2, 0)
+	return float64(m.Cycles)/2 - 0
 }
 
 // ActiveTimeScaled return ActiveTime in its scaled value.
@@ -342,7 +369,7 @@ func (m *Monitoring) ActiveTimeScaled() float64 {
 	if m.ActiveTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.ActiveTime, 1000, 0)
+	return float64(m.ActiveTime)/1000 - 0
 }
 
 // TemperatureScaled return Temperature in its scaled value.
@@ -353,7 +380,7 @@ func (m *Monitoring) TemperatureScaled() float64 {
 	if m.Temperature == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Temperature, 100, 0)
+	return float64(m.Temperature)/100 - 0
 }
 
 // TemperatureMinScaled return TemperatureMin in its scaled value.
@@ -364,7 +391,7 @@ func (m *Monitoring) TemperatureMinScaled() float64 {
 	if m.TemperatureMin == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TemperatureMin, 100, 0)
+	return float64(m.TemperatureMin)/100 - 0
 }
 
 // TemperatureMaxScaled return TemperatureMax in its scaled value.
@@ -375,7 +402,7 @@ func (m *Monitoring) TemperatureMaxScaled() float64 {
 	if m.TemperatureMax == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TemperatureMax, 100, 0)
+	return float64(m.TemperatureMax)/100 - 0
 }
 
 // IntensityScaled return Intensity in its scaled value.
@@ -386,7 +413,7 @@ func (m *Monitoring) IntensityScaled() float64 {
 	if m.Intensity == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Intensity, 10, 0)
+	return float64(m.Intensity)/10 - 0
 }
 
 // AscentScaled return Ascent in its scaled value.
@@ -397,7 +424,7 @@ func (m *Monitoring) AscentScaled() float64 {
 	if m.Ascent == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Ascent, 1000, 0)
+	return float64(m.Ascent)/1000 - 0
 }
 
 // DescentScaled return Descent in its scaled value.
@@ -408,7 +435,7 @@ func (m *Monitoring) DescentScaled() float64 {
 	if m.Descent == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Descent, 1000, 0)
+	return float64(m.Descent)/1000 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -448,7 +475,12 @@ func (m *Monitoring) SetDistance(v uint32) *Monitoring {
 //
 // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) SetDistanceScaled(v float64) *Monitoring {
-	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Distance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Distance = uint32(unscaled)
 	return m
 }
 
@@ -465,7 +497,12 @@ func (m *Monitoring) SetCycles(v uint32) *Monitoring {
 //
 // Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 func (m *Monitoring) SetCyclesScaled(v float64) *Monitoring {
-	m.Cycles = uint32(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Cycles = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Cycles = uint32(unscaled)
 	return m
 }
 
@@ -482,7 +519,12 @@ func (m *Monitoring) SetActiveTime(v uint32) *Monitoring {
 //
 // Scale: 1000; Units: s
 func (m *Monitoring) SetActiveTimeScaled(v float64) *Monitoring {
-	m.ActiveTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.ActiveTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.ActiveTime = uint32(unscaled)
 	return m
 }
 
@@ -549,7 +591,12 @@ func (m *Monitoring) SetTemperature(v int16) *Monitoring {
 //
 // Scale: 100; Units: C; Avg temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperatureScaled(v float64) *Monitoring {
-	m.Temperature = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.Temperature = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.Temperature = int16(unscaled)
 	return m
 }
 
@@ -566,7 +613,12 @@ func (m *Monitoring) SetTemperatureMin(v int16) *Monitoring {
 //
 // Scale: 100; Units: C; Min temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperatureMinScaled(v float64) *Monitoring {
-	m.TemperatureMin = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.TemperatureMin = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.TemperatureMin = int16(unscaled)
 	return m
 }
 
@@ -583,14 +635,19 @@ func (m *Monitoring) SetTemperatureMax(v int16) *Monitoring {
 //
 // Scale: 100; Units: C; Max temperature during the logging interval ended at timestamp
 func (m *Monitoring) SetTemperatureMaxScaled(v float64) *Monitoring {
-	m.TemperatureMax = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.TemperatureMax = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.TemperatureMax = int16(unscaled)
 	return m
 }
 
 // SetActivityTime sets ActivityTime value.
 //
-// Array: [8]; Units: minutes; Indexed using minute_activity_level enum
-func (m *Monitoring) SetActivityTime(v []uint16) *Monitoring {
+// Units: minutes; Indexed using minute_activity_level enum
+func (m *Monitoring) SetActivityTime(v [8]uint16) *Monitoring {
 	m.ActivityTime = v
 	return m
 }
@@ -648,7 +705,12 @@ func (m *Monitoring) SetIntensity(v uint8) *Monitoring {
 //
 // Scale: 10
 func (m *Monitoring) SetIntensityScaled(v float64) *Monitoring {
-	m.Intensity = uint8(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Intensity = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Intensity = uint8(unscaled)
 	return m
 }
 
@@ -681,7 +743,12 @@ func (m *Monitoring) SetAscent(v uint32) *Monitoring {
 //
 // Scale: 1000; Units: m
 func (m *Monitoring) SetAscentScaled(v float64) *Monitoring {
-	m.Ascent = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Ascent = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Ascent = uint32(unscaled)
 	return m
 }
 
@@ -698,7 +765,12 @@ func (m *Monitoring) SetDescent(v uint32) *Monitoring {
 //
 // Scale: 1000; Units: m
 func (m *Monitoring) SetDescentScaled(v float64) *Monitoring {
-	m.Descent = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Descent = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Descent = uint32(unscaled)
 	return m
 }
 
@@ -722,4 +794,32 @@ func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
 func (m *Monitoring) SetDeveloperFields(developerFields ...proto.DeveloperField) *Monitoring {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 5, 28.
+func (m *Monitoring) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 5, 28:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 5, 28.
+func (m *Monitoring) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 29 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

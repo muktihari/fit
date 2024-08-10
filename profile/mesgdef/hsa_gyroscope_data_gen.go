@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -134,7 +134,15 @@ func (m *HsaGyroscopeData) GyroXScaled() []float64 {
 	if m.GyroX == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.GyroX, 28.57143, 0)
+	var vals = make([]float64, len(m.GyroX))
+	for i := range m.GyroX {
+		if m.GyroX[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.GyroX[i])/28.57143 - 0
+	}
+	return vals
 }
 
 // GyroYScaled return GyroY in its scaled value.
@@ -145,7 +153,15 @@ func (m *HsaGyroscopeData) GyroYScaled() []float64 {
 	if m.GyroY == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.GyroY, 28.57143, 0)
+	var vals = make([]float64, len(m.GyroY))
+	for i := range m.GyroY {
+		if m.GyroY[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.GyroY[i])/28.57143 - 0
+	}
+	return vals
 }
 
 // GyroZScaled return GyroZ in its scaled value.
@@ -156,7 +172,15 @@ func (m *HsaGyroscopeData) GyroZScaled() []float64 {
 	if m.GyroZ == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.GyroZ, 28.57143, 0)
+	var vals = make([]float64, len(m.GyroZ))
+	for i := range m.GyroZ {
+		if m.GyroZ[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.GyroZ[i])/28.57143 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -196,7 +220,19 @@ func (m *HsaGyroscopeData) SetGyroX(v []int16) *HsaGyroscopeData {
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroXScaled(vs []float64) *HsaGyroscopeData {
-	m.GyroX = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	if vs == nil {
+		m.GyroX = nil
+		return m
+	}
+	m.GyroX = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 28.57143
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.GyroX[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.GyroX[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -213,7 +249,19 @@ func (m *HsaGyroscopeData) SetGyroY(v []int16) *HsaGyroscopeData {
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroYScaled(vs []float64) *HsaGyroscopeData {
-	m.GyroY = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	if vs == nil {
+		m.GyroY = nil
+		return m
+	}
+	m.GyroY = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 28.57143
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.GyroY[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.GyroY[i] = int16(unscaled)
+	}
 	return m
 }
 
@@ -230,7 +278,19 @@ func (m *HsaGyroscopeData) SetGyroZ(v []int16) *HsaGyroscopeData {
 //
 // Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement
 func (m *HsaGyroscopeData) SetGyroZScaled(vs []float64) *HsaGyroscopeData {
-	m.GyroZ = scaleoffset.DiscardSlice[int16](vs, 28.57143, 0)
+	if vs == nil {
+		m.GyroZ = nil
+		return m
+	}
+	m.GyroZ = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 28.57143
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.GyroZ[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.GyroZ[i] = int16(unscaled)
+	}
 	return m
 }
 

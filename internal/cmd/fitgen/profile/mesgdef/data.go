@@ -21,6 +21,7 @@ type Field struct {
 	String          string
 	ProfileType     string
 	BaseType        string
+	BaseTypeInvalid string
 	Size            byte
 	Type            string
 	TypedValue      string
@@ -34,6 +35,9 @@ type Field struct {
 	Offset          float64
 	Array           bool
 	CanExpand       bool
+
+	FixedArraySize          byte
+	InvalidArrayValueScaled string
 }
 
 type DynamicField struct {

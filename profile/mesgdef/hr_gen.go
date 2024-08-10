@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type Hr struct {
 	FractionalTimestamp uint16   // Scale: 32768; Units: s
 	Time256             uint8    // Scale: 256; Units: s
 
-	IsExpandedFields [10]bool // Used for tracking expanded fields, field.Num as index.
+	state [2]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -40,16 +39,17 @@ type Hr struct {
 // If mesg is nil, it will return Hr with all fields being set to its corresponding invalid value.
 func NewHr(mesg *proto.Message) *Hr {
 	vals := [254]proto.Value{}
-	isExpandedFields := [10]bool{}
 
+	var state [2]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 10 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -64,7 +64,7 @@ func NewHr(mesg *proto.Message) *Hr {
 		EventTimestamp:      vals[9].SliceUint32(),
 		EventTimestamp12:    vals[10].SliceUint8(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -91,11 +91,13 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
 		fields = append(fields, field)
 	}
-	if m.FractionalTimestamp != basetype.Uint16Invalid && ((m.IsExpandedFields[0] && options.IncludeExpandedFields) || !m.IsExpandedFields[0]) {
-		field := fac.CreateField(mesg.Num, 0)
-		field.Value = proto.Uint16(m.FractionalTimestamp)
-		field.IsExpandedField = m.IsExpandedFields[0]
-		fields = append(fields, field)
+	if m.FractionalTimestamp != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(0); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 0)
+			field.Value = proto.Uint16(m.FractionalTimestamp)
+			field.IsExpandedField = m.IsExpandedField(0)
+			fields = append(fields, field)
+		}
 	}
 	if m.Time256 != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 1)
@@ -107,11 +109,13 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.FilteredBpm)
 		fields = append(fields, field)
 	}
-	if m.EventTimestamp != nil && ((m.IsExpandedFields[9] && options.IncludeExpandedFields) || !m.IsExpandedFields[9]) {
-		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.SliceUint32(m.EventTimestamp)
-		field.IsExpandedField = m.IsExpandedFields[9]
-		fields = append(fields, field)
+	if m.EventTimestamp != nil {
+		if expanded := m.IsExpandedField(9); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 9)
+			field.Value = proto.SliceUint32(m.EventTimestamp)
+			field.IsExpandedField = m.IsExpandedField(9)
+			fields = append(fields, field)
+		}
 	}
 	if m.EventTimestamp12 != nil {
 		field := fac.CreateField(mesg.Num, 10)
@@ -138,7 +142,7 @@ func (m *Hr) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+	return float64(m.FractionalTimestamp)/32768 - 0
 }
 
 // Time256Scaled return Time256 in its scaled value.
@@ -149,7 +153,7 @@ func (m *Hr) Time256Scaled() float64 {
 	if m.Time256 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Time256, 256, 0)
+	return float64(m.Time256)/256 - 0
 }
 
 // EventTimestampScaled return EventTimestamp in its scaled value.
@@ -160,7 +164,15 @@ func (m *Hr) EventTimestampScaled() []float64 {
 	if m.EventTimestamp == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.EventTimestamp, 1024, 0)
+	var vals = make([]float64, len(m.EventTimestamp))
+	for i := range m.EventTimestamp {
+		if m.EventTimestamp[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.EventTimestamp[i])/1024 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -182,7 +194,12 @@ func (m *Hr) SetFractionalTimestamp(v uint16) *Hr {
 //
 // Scale: 32768; Units: s
 func (m *Hr) SetFractionalTimestampScaled(v float64) *Hr {
-	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	unscaled := (v + 0) * 32768
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.FractionalTimestamp = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.FractionalTimestamp = uint16(unscaled)
 	return m
 }
 
@@ -199,7 +216,12 @@ func (m *Hr) SetTime256(v uint8) *Hr {
 //
 // Scale: 256; Units: s
 func (m *Hr) SetTime256Scaled(v float64) *Hr {
-	m.Time256 = uint8(scaleoffset.Discard(v, 256, 0))
+	unscaled := (v + 0) * 256
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Time256 = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Time256 = uint8(unscaled)
 	return m
 }
 
@@ -224,7 +246,19 @@ func (m *Hr) SetEventTimestamp(v []uint32) *Hr {
 //
 // Array: [N]; Scale: 1024; Units: s
 func (m *Hr) SetEventTimestampScaled(vs []float64) *Hr {
-	m.EventTimestamp = scaleoffset.DiscardSlice[uint32](vs, 1024, 0)
+	if vs == nil {
+		m.EventTimestamp = nil
+		return m
+	}
+	m.EventTimestamp = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1024
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.EventTimestamp[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.EventTimestamp[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -240,4 +274,32 @@ func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 func (m *Hr) SetDeveloperFields(developerFields ...proto.DeveloperField) *Hr {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 0, 9.
+func (m *Hr) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 0, 9:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 0, 9.
+func (m *Hr) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 10 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

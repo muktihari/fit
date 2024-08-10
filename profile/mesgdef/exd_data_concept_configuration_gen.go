@@ -30,7 +30,7 @@ type ExdDataConceptConfiguration struct {
 	Descriptor   typedef.ExdDescriptors
 	IsSigned     bool
 
-	IsExpandedFields [4]bool // Used for tracking expanded fields, field.Num as index.
+	state [1]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -41,16 +41,17 @@ type ExdDataConceptConfiguration struct {
 // If mesg is nil, it will return ExdDataConceptConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfiguration {
 	vals := [12]proto.Value{}
-	isExpandedFields := [4]bool{}
 
+	var state [1]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 4 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -70,7 +71,7 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 		Descriptor:   typedef.ExdDescriptors(vals[10].Uint8()),
 		IsSigned:     vals[11].Bool(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -102,17 +103,21 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
-	if m.FieldId != basetype.Uint8Invalid && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint8(m.FieldId)
-		field.IsExpandedField = m.IsExpandedFields[2]
-		fields = append(fields, field)
+	if m.FieldId != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 2)
+			field.Value = proto.Uint8(m.FieldId)
+			field.IsExpandedField = m.IsExpandedField(2)
+			fields = append(fields, field)
+		}
 	}
-	if m.ConceptIndex != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint8(m.ConceptIndex)
-		field.IsExpandedField = m.IsExpandedFields[3]
-		fields = append(fields, field)
+	if m.ConceptIndex != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 3)
+			field.Value = proto.Uint8(m.ConceptIndex)
+			field.IsExpandedField = m.IsExpandedField(3)
+			fields = append(fields, field)
+		}
 	}
 	if m.DataPage != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 4)
@@ -228,4 +233,32 @@ func (m *ExdDataConceptConfiguration) SetIsSigned(v bool) *ExdDataConceptConfigu
 func (m *ExdDataConceptConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataConceptConfiguration {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 2, 3.
+func (m *ExdDataConceptConfiguration) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 2, 3:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 2, 3.
+func (m *ExdDataConceptConfiguration) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 4 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

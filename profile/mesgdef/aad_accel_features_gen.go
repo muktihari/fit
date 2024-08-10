@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -128,7 +127,7 @@ func (m *AadAccelFeatures) TimeAboveThresholdScaled() float64 {
 	if m.TimeAboveThreshold == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TimeAboveThreshold, 25, 0)
+	return float64(m.TimeAboveThreshold)/25 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -182,7 +181,12 @@ func (m *AadAccelFeatures) SetTimeAboveThreshold(v uint16) *AadAccelFeatures {
 //
 // Scale: 25; Units: s; Total accelerometer time above threshold in the interval
 func (m *AadAccelFeatures) SetTimeAboveThresholdScaled(v float64) *AadAccelFeatures {
-	m.TimeAboveThreshold = uint16(scaleoffset.Discard(v, 25, 0))
+	unscaled := (v + 0) * 25
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.TimeAboveThreshold = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.TimeAboveThreshold = uint16(unscaled)
 	return m
 }
 

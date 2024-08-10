@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -34,7 +33,7 @@ type Jump struct {
 	Speed         uint16    // Scale: 1000; Units: m/s
 	Rotations     uint8
 
-	IsExpandedFields [9]bool // Used for tracking expanded fields, field.Num as index.
+	state [2]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -45,16 +44,17 @@ type Jump struct {
 // If mesg is nil, it will return Jump with all fields being set to its corresponding invalid value.
 func NewJump(mesg *proto.Message) *Jump {
 	vals := [254]proto.Value{}
-	isExpandedFields := [9]bool{}
 
+	var state [2]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 9 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -73,7 +73,7 @@ func NewJump(mesg *proto.Message) *Jump {
 		Speed:         vals[7].Uint16(),
 		EnhancedSpeed: vals[8].Uint32(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -140,11 +140,13 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Speed)
 		fields = append(fields, field)
 	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[8] && options.IncludeExpandedFields) || !m.IsExpandedFields[8]) {
-		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.Uint32(m.EnhancedSpeed)
-		field.IsExpandedField = m.IsExpandedFields[8]
-		fields = append(fields, field)
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(8); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 8)
+			field.Value = proto.Uint32(m.EnhancedSpeed)
+			field.IsExpandedField = m.IsExpandedField(8)
+			fields = append(fields, field)
+		}
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -166,7 +168,7 @@ func (m *Jump) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Speed, 1000, 0)
+	return float64(m.Speed)/1000 - 0
 }
 
 // EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
@@ -177,7 +179,7 @@ func (m *Jump) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+	return float64(m.EnhancedSpeed)/1000 - 0
 }
 
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
@@ -287,7 +289,12 @@ func (m *Jump) SetSpeed(v uint16) *Jump {
 //
 // Scale: 1000; Units: m/s
 func (m *Jump) SetSpeedScaled(v float64) *Jump {
-	m.Speed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Speed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Speed = uint16(unscaled)
 	return m
 }
 
@@ -304,7 +311,12 @@ func (m *Jump) SetEnhancedSpeed(v uint32) *Jump {
 //
 // Scale: 1000; Units: m/s
 func (m *Jump) SetEnhancedSpeedScaled(v float64) *Jump {
-	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedSpeed = uint32(unscaled)
 	return m
 }
 
@@ -312,4 +324,32 @@ func (m *Jump) SetEnhancedSpeedScaled(v float64) *Jump {
 func (m *Jump) SetDeveloperFields(developerFields ...proto.DeveloperField) *Jump {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 8.
+func (m *Jump) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 8:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 8.
+func (m *Jump) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 9 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }
