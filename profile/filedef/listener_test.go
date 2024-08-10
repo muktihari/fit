@@ -242,23 +242,6 @@ func TestClose(t *testing.T) {
 	l.Close() // already closed, should not panic
 }
 
-// mapFileStruct maps all unexported fields in all struct tree of filedef.File since mesgdef's structs may contains unexported fields.
-// e.g. mesgdef.FileId, *mesgdef.Activity, []*mesgdef.Sessions, []*mesgdef.Records, etc.
-func mapFileStruct(file filedef.File) map[reflect.Type]bool {
-	m := map[reflect.Type]bool{}
-	rv := reflect.Indirect(reflect.ValueOf(file))
-	for i := 0; i < rv.NumField(); i++ {
-		field := rv.Field(i) // e.g. mesgdef.FileId, *mesgdef.Activity
-		m[reflect.Indirect(field).Type()] = true
-		if field.Kind() == reflect.Slice { // e.g. []*mesgdef.Sessions, []*mesgdef.Records, etc.
-			for j := 0; j < field.Len(); j++ {
-				m[reflect.Indirect(field.Index(j)).Type()] = true
-			}
-		}
-	}
-	return m
-}
-
 // fileExporter exports all unexported fields in all struct tree of filedef.File since mesgdef's structs may contains unexported fields.
 // e.g. mesgdef.FileId, *mesgdef.Activity, []*mesgdef.Sessions, []*mesgdef.Records, etc.
 func fileExporter(files ...filedef.File) cmp.Option {
@@ -267,9 +250,19 @@ func fileExporter(files ...filedef.File) cmp.Option {
 		if file == nil {
 			continue
 		}
-		m2 := mapFileStruct(file)
-		for k, v := range m2 {
-			m[k] = v
+		rv := reflect.Indirect(reflect.ValueOf(file))
+		for i := 0; i < rv.NumField(); i++ {
+			field := reflect.Indirect(rv.Field(i)) // e.g. mesgdef.FileId, *mesgdef.Activity
+			switch field.Kind() {
+			case reflect.Slice: // e.g. []*mesgdef.Sessions, []*mesgdef.Records, etc.
+				typ := field.Type().Elem()
+				if field.Type().Elem().Kind() == reflect.Pointer {
+					typ = typ.Elem() // indirect
+				}
+				m[typ] = true
+			default:
+				m[field.Type()] = true
+			}
 		}
 	}
 	return cmp.Exporter(func(t reflect.Type) bool { return m[t] })
