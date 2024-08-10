@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -29,7 +28,7 @@ type AntRx struct {
 	MesgId              byte
 	ChannelNumber       uint8
 
-	IsExpandedFields [5]bool // Used for tracking expanded fields, field.Num as index.
+	state [1]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -40,16 +39,17 @@ type AntRx struct {
 // If mesg is nil, it will return AntRx with all fields being set to its corresponding invalid value.
 func NewAntRx(mesg *proto.Message) *AntRx {
 	vals := [254]proto.Value{}
-	isExpandedFields := [5]bool{}
 
+	var state [1]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 5 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -64,7 +64,7 @@ func NewAntRx(mesg *proto.Message) *AntRx {
 		ChannelNumber:       vals[3].Uint8(),
 		Data:                vals[4].SliceUint8(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -106,17 +106,21 @@ func (m *AntRx) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.MesgData)
 		fields = append(fields, field)
 	}
-	if m.ChannelNumber != basetype.Uint8Invalid && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint8(m.ChannelNumber)
-		field.IsExpandedField = m.IsExpandedFields[3]
-		fields = append(fields, field)
+	if m.ChannelNumber != basetype.Uint8Invalid {
+		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 3)
+			field.Value = proto.Uint8(m.ChannelNumber)
+			field.IsExpandedField = m.IsExpandedField(3)
+			fields = append(fields, field)
+		}
 	}
-	if m.Data != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceUint8(m.Data)
-		field.IsExpandedField = m.IsExpandedFields[4]
-		fields = append(fields, field)
+	if m.Data != nil {
+		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 4)
+			field.Value = proto.SliceUint8(m.Data)
+			field.IsExpandedField = m.IsExpandedField(4)
+			fields = append(fields, field)
+		}
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -138,7 +142,7 @@ func (m *AntRx) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+	return float64(m.FractionalTimestamp)/32768 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -162,7 +166,12 @@ func (m *AntRx) SetFractionalTimestamp(v uint16) *AntRx {
 //
 // Scale: 32768; Units: s
 func (m *AntRx) SetFractionalTimestampScaled(v float64) *AntRx {
-	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	unscaled := (v + 0) * 32768
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.FractionalTimestamp = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.FractionalTimestamp = uint16(unscaled)
 	return m
 }
 
@@ -198,4 +207,32 @@ func (m *AntRx) SetData(v []byte) *AntRx {
 func (m *AntRx) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntRx {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 3, 4.
+func (m *AntRx) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 3, 4:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 3, 4.
+func (m *AntRx) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 5 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

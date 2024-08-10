@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -305,7 +304,7 @@ func (m *BikeProfile) OdometerScaled() float64 {
 	if m.Odometer == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Odometer, 100, 0)
+	return float64(m.Odometer)/100 - 0
 }
 
 // CustomWheelsizeScaled return CustomWheelsize in its scaled value.
@@ -316,7 +315,7 @@ func (m *BikeProfile) CustomWheelsizeScaled() float64 {
 	if m.CustomWheelsize == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CustomWheelsize, 1000, 0)
+	return float64(m.CustomWheelsize)/1000 - 0
 }
 
 // AutoWheelsizeScaled return AutoWheelsize in its scaled value.
@@ -327,7 +326,7 @@ func (m *BikeProfile) AutoWheelsizeScaled() float64 {
 	if m.AutoWheelsize == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AutoWheelsize, 1000, 0)
+	return float64(m.AutoWheelsize)/1000 - 0
 }
 
 // BikeWeightScaled return BikeWeight in its scaled value.
@@ -338,7 +337,7 @@ func (m *BikeProfile) BikeWeightScaled() float64 {
 	if m.BikeWeight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BikeWeight, 10, 0)
+	return float64(m.BikeWeight)/10 - 0
 }
 
 // PowerCalFactorScaled return PowerCalFactor in its scaled value.
@@ -349,7 +348,7 @@ func (m *BikeProfile) PowerCalFactorScaled() float64 {
 	if m.PowerCalFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.PowerCalFactor, 10, 0)
+	return float64(m.PowerCalFactor)/10 - 0
 }
 
 // CrankLengthScaled return CrankLength in its scaled value.
@@ -360,7 +359,7 @@ func (m *BikeProfile) CrankLengthScaled() float64 {
 	if m.CrankLength == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CrankLength, 2, -110)
+	return float64(m.CrankLength)/2 - -110
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -400,7 +399,12 @@ func (m *BikeProfile) SetOdometer(v uint32) *BikeProfile {
 //
 // Scale: 100; Units: m
 func (m *BikeProfile) SetOdometerScaled(v float64) *BikeProfile {
-	m.Odometer = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Odometer = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Odometer = uint32(unscaled)
 	return m
 }
 
@@ -441,7 +445,12 @@ func (m *BikeProfile) SetCustomWheelsize(v uint16) *BikeProfile {
 //
 // Scale: 1000; Units: m
 func (m *BikeProfile) SetCustomWheelsizeScaled(v float64) *BikeProfile {
-	m.CustomWheelsize = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.CustomWheelsize = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.CustomWheelsize = uint16(unscaled)
 	return m
 }
 
@@ -458,7 +467,12 @@ func (m *BikeProfile) SetAutoWheelsize(v uint16) *BikeProfile {
 //
 // Scale: 1000; Units: m
 func (m *BikeProfile) SetAutoWheelsizeScaled(v float64) *BikeProfile {
-	m.AutoWheelsize = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AutoWheelsize = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AutoWheelsize = uint16(unscaled)
 	return m
 }
 
@@ -475,7 +489,12 @@ func (m *BikeProfile) SetBikeWeight(v uint16) *BikeProfile {
 //
 // Scale: 10; Units: kg
 func (m *BikeProfile) SetBikeWeightScaled(v float64) *BikeProfile {
-	m.BikeWeight = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BikeWeight = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BikeWeight = uint16(unscaled)
 	return m
 }
 
@@ -492,7 +511,12 @@ func (m *BikeProfile) SetPowerCalFactor(v uint16) *BikeProfile {
 //
 // Scale: 10; Units: %
 func (m *BikeProfile) SetPowerCalFactorScaled(v float64) *BikeProfile {
-	m.PowerCalFactor = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.PowerCalFactor = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.PowerCalFactor = uint16(unscaled)
 	return m
 }
 
@@ -551,7 +575,12 @@ func (m *BikeProfile) SetCrankLength(v uint8) *BikeProfile {
 //
 // Scale: 2; Offset: -110; Units: mm
 func (m *BikeProfile) SetCrankLengthScaled(v float64) *BikeProfile {
-	m.CrankLength = uint8(scaleoffset.Discard(v, 2, -110))
+	unscaled := (v + -110) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.CrankLength = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.CrankLength = uint8(unscaled)
 	return m
 }
 

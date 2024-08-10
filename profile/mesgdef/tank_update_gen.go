@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -107,7 +106,7 @@ func (m *TankUpdate) PressureScaled() float64 {
 	if m.Pressure == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Pressure, 100, 0)
+	return float64(m.Pressure)/100 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -137,7 +136,12 @@ func (m *TankUpdate) SetPressure(v uint16) *TankUpdate {
 //
 // Scale: 100; Units: bar
 func (m *TankUpdate) SetPressureScaled(v float64) *TankUpdate {
-	m.Pressure = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Pressure = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Pressure = uint16(unscaled)
 	return m
 }
 

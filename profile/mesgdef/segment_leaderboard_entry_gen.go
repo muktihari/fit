@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -130,7 +129,7 @@ func (m *SegmentLeaderboardEntry) SegmentTimeScaled() float64 {
 	if m.SegmentTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SegmentTime, 1000, 0)
+	return float64(m.SegmentTime)/1000 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -184,7 +183,12 @@ func (m *SegmentLeaderboardEntry) SetSegmentTime(v uint32) *SegmentLeaderboardEn
 //
 // Scale: 1000; Units: s; Segment Time (includes pauses)
 func (m *SegmentLeaderboardEntry) SetSegmentTimeScaled(v float64) *SegmentLeaderboardEntry {
-	m.SegmentTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.SegmentTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.SegmentTime = uint32(unscaled)
 	return m
 }
 

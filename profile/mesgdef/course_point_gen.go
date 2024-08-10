@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -143,7 +142,7 @@ func (m *CoursePoint) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Distance, 100, 0)
+	return float64(m.Distance)/100 - 0
 }
 
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
@@ -219,7 +218,12 @@ func (m *CoursePoint) SetDistance(v uint32) *CoursePoint {
 //
 // Scale: 100; Units: m
 func (m *CoursePoint) SetDistanceScaled(v float64) *CoursePoint {
-	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Distance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Distance = uint32(unscaled)
 	return m
 }
 

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -137,7 +136,7 @@ func (m *Workout) PoolLengthScaled() float64 {
 	if m.PoolLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.PoolLength, 100, 0)
+	return float64(m.PoolLength)/100 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -191,7 +190,12 @@ func (m *Workout) SetPoolLength(v uint16) *Workout {
 //
 // Scale: 100; Units: m
 func (m *Workout) SetPoolLengthScaled(v float64) *Workout {
-	m.PoolLength = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.PoolLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.PoolLength = uint16(unscaled)
 	return m
 }
 

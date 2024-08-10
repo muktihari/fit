@@ -27,7 +27,7 @@ type RawBbi struct {
 	Gap         []uint8  // Array: [N]
 	TimestampMs uint16   // Units: ms; ms since last overnight_raw_bbi message
 
-	IsExpandedFields [5]bool // Used for tracking expanded fields, field.Num as index.
+	state [1]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -38,16 +38,17 @@ type RawBbi struct {
 // If mesg is nil, it will return RawBbi with all fields being set to its corresponding invalid value.
 func NewRawBbi(mesg *proto.Message) *RawBbi {
 	vals := [254]proto.Value{}
-	isExpandedFields := [5]bool{}
 
+	var state [1]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 5 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -62,7 +63,7 @@ func NewRawBbi(mesg *proto.Message) *RawBbi {
 		Quality:     vals[3].SliceUint8(),
 		Gap:         vals[4].SliceUint8(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -99,23 +100,29 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.Data)
 		fields = append(fields, field)
 	}
-	if m.Time != nil && ((m.IsExpandedFields[2] && options.IncludeExpandedFields) || !m.IsExpandedFields[2]) {
-		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.SliceUint16(m.Time)
-		field.IsExpandedField = m.IsExpandedFields[2]
-		fields = append(fields, field)
+	if m.Time != nil {
+		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 2)
+			field.Value = proto.SliceUint16(m.Time)
+			field.IsExpandedField = m.IsExpandedField(2)
+			fields = append(fields, field)
+		}
 	}
-	if m.Quality != nil && ((m.IsExpandedFields[3] && options.IncludeExpandedFields) || !m.IsExpandedFields[3]) {
-		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.SliceUint8(m.Quality)
-		field.IsExpandedField = m.IsExpandedFields[3]
-		fields = append(fields, field)
+	if m.Quality != nil {
+		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 3)
+			field.Value = proto.SliceUint8(m.Quality)
+			field.IsExpandedField = m.IsExpandedField(3)
+			fields = append(fields, field)
+		}
 	}
-	if m.Gap != nil && ((m.IsExpandedFields[4] && options.IncludeExpandedFields) || !m.IsExpandedFields[4]) {
-		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.SliceUint8(m.Gap)
-		field.IsExpandedField = m.IsExpandedFields[4]
-		fields = append(fields, field)
+	if m.Gap != nil {
+		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 4)
+			field.Value = proto.SliceUint8(m.Gap)
+			field.IsExpandedField = m.IsExpandedField(4)
+			fields = append(fields, field)
+		}
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -179,4 +186,32 @@ func (m *RawBbi) SetGap(v []uint8) *RawBbi {
 func (m *RawBbi) SetDeveloperFields(developerFields ...proto.DeveloperField) *RawBbi {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 2, 3, 4.
+func (m *RawBbi) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 2, 3, 4:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 2, 3, 4.
+func (m *RawBbi) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 5 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

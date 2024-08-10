@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -142,7 +141,7 @@ func (m *HrvStatusSummary) WeeklyAverageScaled() float64 {
 	if m.WeeklyAverage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.WeeklyAverage, 128, 0)
+	return float64(m.WeeklyAverage)/128 - 0
 }
 
 // LastNightAverageScaled return LastNightAverage in its scaled value.
@@ -153,7 +152,7 @@ func (m *HrvStatusSummary) LastNightAverageScaled() float64 {
 	if m.LastNightAverage == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LastNightAverage, 128, 0)
+	return float64(m.LastNightAverage)/128 - 0
 }
 
 // LastNight5MinHighScaled return LastNight5MinHigh in its scaled value.
@@ -164,7 +163,7 @@ func (m *HrvStatusSummary) LastNight5MinHighScaled() float64 {
 	if m.LastNight5MinHigh == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LastNight5MinHigh, 128, 0)
+	return float64(m.LastNight5MinHigh)/128 - 0
 }
 
 // BaselineLowUpperScaled return BaselineLowUpper in its scaled value.
@@ -175,7 +174,7 @@ func (m *HrvStatusSummary) BaselineLowUpperScaled() float64 {
 	if m.BaselineLowUpper == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BaselineLowUpper, 128, 0)
+	return float64(m.BaselineLowUpper)/128 - 0
 }
 
 // BaselineBalancedLowerScaled return BaselineBalancedLower in its scaled value.
@@ -186,7 +185,7 @@ func (m *HrvStatusSummary) BaselineBalancedLowerScaled() float64 {
 	if m.BaselineBalancedLower == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BaselineBalancedLower, 128, 0)
+	return float64(m.BaselineBalancedLower)/128 - 0
 }
 
 // BaselineBalancedUpperScaled return BaselineBalancedUpper in its scaled value.
@@ -197,7 +196,7 @@ func (m *HrvStatusSummary) BaselineBalancedUpperScaled() float64 {
 	if m.BaselineBalancedUpper == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BaselineBalancedUpper, 128, 0)
+	return float64(m.BaselineBalancedUpper)/128 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -219,7 +218,12 @@ func (m *HrvStatusSummary) SetWeeklyAverage(v uint16) *HrvStatusSummary {
 //
 // Scale: 128; Units: ms; 7 day RMSSD average over sleep
 func (m *HrvStatusSummary) SetWeeklyAverageScaled(v float64) *HrvStatusSummary {
-	m.WeeklyAverage = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.WeeklyAverage = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.WeeklyAverage = uint16(unscaled)
 	return m
 }
 
@@ -236,7 +240,12 @@ func (m *HrvStatusSummary) SetLastNightAverage(v uint16) *HrvStatusSummary {
 //
 // Scale: 128; Units: ms; Last night RMSSD average over sleep
 func (m *HrvStatusSummary) SetLastNightAverageScaled(v float64) *HrvStatusSummary {
-	m.LastNightAverage = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.LastNightAverage = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.LastNightAverage = uint16(unscaled)
 	return m
 }
 
@@ -253,7 +262,12 @@ func (m *HrvStatusSummary) SetLastNight5MinHigh(v uint16) *HrvStatusSummary {
 //
 // Scale: 128; Units: ms; 5 minute high RMSSD value over sleep
 func (m *HrvStatusSummary) SetLastNight5MinHighScaled(v float64) *HrvStatusSummary {
-	m.LastNight5MinHigh = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.LastNight5MinHigh = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.LastNight5MinHigh = uint16(unscaled)
 	return m
 }
 
@@ -270,7 +284,12 @@ func (m *HrvStatusSummary) SetBaselineLowUpper(v uint16) *HrvStatusSummary {
 //
 // Scale: 128; Units: ms; 3 week baseline, upper boundary of low HRV status
 func (m *HrvStatusSummary) SetBaselineLowUpperScaled(v float64) *HrvStatusSummary {
-	m.BaselineLowUpper = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BaselineLowUpper = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BaselineLowUpper = uint16(unscaled)
 	return m
 }
 
@@ -287,7 +306,12 @@ func (m *HrvStatusSummary) SetBaselineBalancedLower(v uint16) *HrvStatusSummary 
 //
 // Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
 func (m *HrvStatusSummary) SetBaselineBalancedLowerScaled(v float64) *HrvStatusSummary {
-	m.BaselineBalancedLower = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BaselineBalancedLower = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BaselineBalancedLower = uint16(unscaled)
 	return m
 }
 
@@ -304,7 +328,12 @@ func (m *HrvStatusSummary) SetBaselineBalancedUpper(v uint16) *HrvStatusSummary 
 //
 // Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
 func (m *HrvStatusSummary) SetBaselineBalancedUpperScaled(v float64) *HrvStatusSummary {
-	m.BaselineBalancedUpper = uint16(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BaselineBalancedUpper = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BaselineBalancedUpper = uint16(unscaled)
 	return m
 }
 

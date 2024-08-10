@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -100,7 +99,7 @@ func (m *RespirationRate) RespirationRateScaled() float64 {
 	if m.RespirationRate == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.RespirationRate, 100, 0)
+	return float64(m.RespirationRate)/100 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -122,7 +121,12 @@ func (m *RespirationRate) SetRespirationRate(v int16) *RespirationRate {
 //
 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 func (m *RespirationRate) SetRespirationRateScaled(v float64) *RespirationRate {
-	m.RespirationRate = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.RespirationRate = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.RespirationRate = int16(unscaled)
 	return m
 }
 

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -171,7 +170,7 @@ func (m *Set) DurationScaled() float64 {
 	if m.Duration == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Duration, 1000, 0)
+	return float64(m.Duration)/1000 - 0
 }
 
 // WeightScaled return Weight in its scaled value.
@@ -182,7 +181,7 @@ func (m *Set) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Weight, 16, 0)
+	return float64(m.Weight)/16 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -206,7 +205,12 @@ func (m *Set) SetDuration(v uint32) *Set {
 //
 // Scale: 1000; Units: s
 func (m *Set) SetDurationScaled(v float64) *Set {
-	m.Duration = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Duration = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Duration = uint32(unscaled)
 	return m
 }
 
@@ -231,7 +235,12 @@ func (m *Set) SetWeight(v uint16) *Set {
 //
 // Scale: 16; Units: kg; Amount of weight applied for the set
 func (m *Set) SetWeightScaled(v float64) *Set {
-	m.Weight = uint16(scaleoffset.Discard(v, 16, 0))
+	unscaled := (v + 0) * 16
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Weight = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Weight = uint16(unscaled)
 	return m
 }
 

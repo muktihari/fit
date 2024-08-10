@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -102,7 +101,7 @@ func (m *Software) VersionScaled() float64 {
 	if m.Version == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Version, 100, 0)
+	return float64(m.Version)/100 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -124,7 +123,12 @@ func (m *Software) SetVersion(v uint16) *Software {
 //
 // Scale: 100
 func (m *Software) SetVersionScaled(v float64) *Software {
-	m.Version = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Version = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Version = uint16(unscaled)
 	return m
 }
 

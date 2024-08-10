@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -21,10 +20,10 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type UserProfile struct {
 	FriendlyName               string                   // Used for Morning Report greeting
-	GlobalId                   []byte                   // Array: [6]
 	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
 	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
 	DiveCount                  uint32
+	GlobalId                   [6]byte
 	MessageIndex               typedef.MessageIndex
 	Weight                     uint16 // Scale: 10; Units: kg
 	LocalId                    typedef.UserLocalId
@@ -93,14 +92,25 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 		PositionSetting:            typedef.DisplayPosition(vals[18].Uint8()),
 		TemperatureSetting:         typedef.DisplayMeasure(vals[21].Uint8()),
 		LocalId:                    typedef.UserLocalId(vals[22].Uint16()),
-		GlobalId:                   vals[23].SliceUint8(),
-		WakeTime:                   typedef.LocaltimeIntoDay(vals[28].Uint32()),
-		SleepTime:                  typedef.LocaltimeIntoDay(vals[29].Uint32()),
-		HeightSetting:              typedef.DisplayMeasure(vals[30].Uint8()),
-		UserRunningStepLength:      vals[31].Uint16(),
-		UserWalkingStepLength:      vals[32].Uint16(),
-		DepthSetting:               typedef.DisplayMeasure(vals[47].Uint8()),
-		DiveCount:                  vals[49].Uint32(),
+		GlobalId: func() (arr [6]uint8) {
+			arr = [6]uint8{
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+			}
+			copy(arr[:], vals[23].SliceUint8())
+			return arr
+		}(),
+		WakeTime:              typedef.LocaltimeIntoDay(vals[28].Uint32()),
+		SleepTime:             typedef.LocaltimeIntoDay(vals[29].Uint32()),
+		HeightSetting:         typedef.DisplayMeasure(vals[30].Uint8()),
+		UserRunningStepLength: vals[31].Uint16(),
+		UserWalkingStepLength: vals[32].Uint16(),
+		DepthSetting:          typedef.DisplayMeasure(vals[47].Uint8()),
+		DiveCount:             vals[49].Uint32(),
 
 		DeveloperFields: developerFields,
 	}
@@ -227,9 +237,17 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.LocalId))
 		fields = append(fields, field)
 	}
-	if m.GlobalId != nil {
+	if m.GlobalId != [6]uint8{
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+	} {
 		field := fac.CreateField(mesg.Num, 23)
-		field.Value = proto.SliceUint8(m.GlobalId)
+		copied := m.GlobalId
+		field.Value = proto.SliceUint8(copied[:])
 		fields = append(fields, field)
 	}
 	if uint32(m.WakeTime) != basetype.Uint32Invalid {
@@ -284,7 +302,7 @@ func (m *UserProfile) HeightScaled() float64 {
 	if m.Height == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Height, 100, 0)
+	return float64(m.Height)/100 - 0
 }
 
 // WeightScaled return Weight in its scaled value.
@@ -295,7 +313,7 @@ func (m *UserProfile) WeightScaled() float64 {
 	if m.Weight == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Weight, 10, 0)
+	return float64(m.Weight)/10 - 0
 }
 
 // UserRunningStepLengthScaled return UserRunningStepLength in its scaled value.
@@ -306,7 +324,7 @@ func (m *UserProfile) UserRunningStepLengthScaled() float64 {
 	if m.UserRunningStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.UserRunningStepLength, 1000, 0)
+	return float64(m.UserRunningStepLength)/1000 - 0
 }
 
 // UserWalkingStepLengthScaled return UserWalkingStepLength in its scaled value.
@@ -317,7 +335,7 @@ func (m *UserProfile) UserWalkingStepLengthScaled() float64 {
 	if m.UserWalkingStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.UserWalkingStepLength, 1000, 0)
+	return float64(m.UserWalkingStepLength)/1000 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -361,7 +379,12 @@ func (m *UserProfile) SetHeight(v uint8) *UserProfile {
 //
 // Scale: 100; Units: m
 func (m *UserProfile) SetHeightScaled(v float64) *UserProfile {
-	m.Height = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Height = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Height = uint8(unscaled)
 	return m
 }
 
@@ -378,7 +401,12 @@ func (m *UserProfile) SetWeight(v uint16) *UserProfile {
 //
 // Scale: 10; Units: kg
 func (m *UserProfile) SetWeightScaled(v float64) *UserProfile {
-	m.Weight = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Weight = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Weight = uint16(unscaled)
 	return m
 }
 
@@ -481,9 +509,7 @@ func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
 }
 
 // SetGlobalId sets GlobalId value.
-//
-// Array: [6]
-func (m *UserProfile) SetGlobalId(v []byte) *UserProfile {
+func (m *UserProfile) SetGlobalId(v [6]byte) *UserProfile {
 	m.GlobalId = v
 	return m
 }
@@ -523,7 +549,12 @@ func (m *UserProfile) SetUserRunningStepLength(v uint16) *UserProfile {
 //
 // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
 func (m *UserProfile) SetUserRunningStepLengthScaled(v float64) *UserProfile {
-	m.UserRunningStepLength = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.UserRunningStepLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.UserRunningStepLength = uint16(unscaled)
 	return m
 }
 
@@ -540,7 +571,12 @@ func (m *UserProfile) SetUserWalkingStepLength(v uint16) *UserProfile {
 //
 // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
 func (m *UserProfile) SetUserWalkingStepLengthScaled(v float64) *UserProfile {
-	m.UserWalkingStepLength = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.UserWalkingStepLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.UserWalkingStepLength = uint16(unscaled)
 	return m
 }
 

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -145,7 +144,7 @@ func (m *TimestampCorrelation) FractionalTimestampScaled() float64 {
 	if m.FractionalTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FractionalTimestamp, 32768, 0)
+	return float64(m.FractionalTimestamp)/32768 - 0
 }
 
 // FractionalSystemTimestampScaled return FractionalSystemTimestamp in its scaled value.
@@ -156,7 +155,7 @@ func (m *TimestampCorrelation) FractionalSystemTimestampScaled() float64 {
 	if m.FractionalSystemTimestamp == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FractionalSystemTimestamp, 32768, 0)
+	return float64(m.FractionalSystemTimestamp)/32768 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -180,7 +179,12 @@ func (m *TimestampCorrelation) SetFractionalTimestamp(v uint16) *TimestampCorrel
 //
 // Scale: 32768; Units: s; Fractional part of the UTC timestamp at the time the system timestamp was recorded.
 func (m *TimestampCorrelation) SetFractionalTimestampScaled(v float64) *TimestampCorrelation {
-	m.FractionalTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	unscaled := (v + 0) * 32768
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.FractionalTimestamp = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.FractionalTimestamp = uint16(unscaled)
 	return m
 }
 
@@ -205,7 +209,12 @@ func (m *TimestampCorrelation) SetFractionalSystemTimestamp(v uint16) *Timestamp
 //
 // Scale: 32768; Units: s; Fractional part of the system timestamp
 func (m *TimestampCorrelation) SetFractionalSystemTimestampScaled(v float64) *TimestampCorrelation {
-	m.FractionalSystemTimestamp = uint16(scaleoffset.Discard(v, 32768, 0))
+	unscaled := (v + 0) * 32768
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.FractionalSystemTimestamp = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.FractionalSystemTimestamp = uint16(unscaled)
 	return m
 }
 

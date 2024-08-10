@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -180,7 +179,7 @@ type Session struct {
 	TotalFractionalAscent         uint8 // Scale: 100; Units: m; fractional part of total_ascent
 	TotalFractionalDescent        uint8 // Scale: 100; Units: m; fractional part of total_descent
 
-	IsExpandedFields [181]bool // Used for tracking expanded fields, field.Num as index.
+	state [23]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -191,16 +190,17 @@ type Session struct {
 // If mesg is nil, it will return Session with all fields being set to its corresponding invalid value.
 func NewSession(mesg *proto.Message) *Session {
 	vals := [255]proto.Value{}
-	isExpandedFields := [181]bool{}
 
+	var state [23]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 181 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -365,7 +365,7 @@ func NewSession(mesg *proto.Message) *Session {
 		MinCoreTemperature:            vals[209].Uint16(),
 		MaxCoreTemperature:            vals[210].Uint16(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -937,35 +937,45 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[124] && options.IncludeExpandedFields) || !m.IsExpandedFields[124]) {
-		field := fac.CreateField(mesg.Num, 124)
-		field.Value = proto.Uint32(m.EnhancedAvgSpeed)
-		field.IsExpandedField = m.IsExpandedFields[124]
-		fields = append(fields, field)
+	if m.EnhancedAvgSpeed != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(124); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 124)
+			field.Value = proto.Uint32(m.EnhancedAvgSpeed)
+			field.IsExpandedField = m.IsExpandedField(124)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMaxSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[125] && options.IncludeExpandedFields) || !m.IsExpandedFields[125]) {
-		field := fac.CreateField(mesg.Num, 125)
-		field.Value = proto.Uint32(m.EnhancedMaxSpeed)
-		field.IsExpandedField = m.IsExpandedFields[125]
-		fields = append(fields, field)
+	if m.EnhancedMaxSpeed != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(125); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 125)
+			field.Value = proto.Uint32(m.EnhancedMaxSpeed)
+			field.IsExpandedField = m.IsExpandedField(125)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedAvgAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[126] && options.IncludeExpandedFields) || !m.IsExpandedFields[126]) {
-		field := fac.CreateField(mesg.Num, 126)
-		field.Value = proto.Uint32(m.EnhancedAvgAltitude)
-		field.IsExpandedField = m.IsExpandedFields[126]
-		fields = append(fields, field)
+	if m.EnhancedAvgAltitude != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(126); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 126)
+			field.Value = proto.Uint32(m.EnhancedAvgAltitude)
+			field.IsExpandedField = m.IsExpandedField(126)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMinAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[127] && options.IncludeExpandedFields) || !m.IsExpandedFields[127]) {
-		field := fac.CreateField(mesg.Num, 127)
-		field.Value = proto.Uint32(m.EnhancedMinAltitude)
-		field.IsExpandedField = m.IsExpandedFields[127]
-		fields = append(fields, field)
+	if m.EnhancedMinAltitude != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(127); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 127)
+			field.Value = proto.Uint32(m.EnhancedMinAltitude)
+			field.IsExpandedField = m.IsExpandedField(127)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMaxAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[128] && options.IncludeExpandedFields) || !m.IsExpandedFields[128]) {
-		field := fac.CreateField(mesg.Num, 128)
-		field.Value = proto.Uint32(m.EnhancedMaxAltitude)
-		field.IsExpandedField = m.IsExpandedFields[128]
-		fields = append(fields, field)
+	if m.EnhancedMaxAltitude != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(128); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 128)
+			field.Value = proto.Uint32(m.EnhancedMaxAltitude)
+			field.IsExpandedField = m.IsExpandedField(128)
+			fields = append(fields, field)
+		}
 	}
 	if m.AvgLevMotorPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 129)
@@ -1077,23 +1087,29 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.TrainingLoadPeak)
 		fields = append(fields, field)
 	}
-	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[169] && options.IncludeExpandedFields) || !m.IsExpandedFields[169]) {
-		field := fac.CreateField(mesg.Num, 169)
-		field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[169]
-		fields = append(fields, field)
+	if m.EnhancedAvgRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(169); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 169)
+			field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(169)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[170] && options.IncludeExpandedFields) || !m.IsExpandedFields[170]) {
-		field := fac.CreateField(mesg.Num, 170)
-		field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[170]
-		fields = append(fields, field)
+	if m.EnhancedMaxRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(170); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 170)
+			field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(170)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedMinRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[180] && options.IncludeExpandedFields) || !m.IsExpandedFields[180]) {
-		field := fac.CreateField(mesg.Num, 180)
-		field.Value = proto.Uint16(m.EnhancedMinRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[180]
-		fields = append(fields, field)
+	if m.EnhancedMinRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(180); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 180)
+			field.Value = proto.Uint16(m.EnhancedMinRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(180)
+			fields = append(fields, field)
+		}
 	}
 	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 181)
@@ -1246,7 +1262,7 @@ func (m *Session) TotalElapsedTimeScaled() float64 {
 	if m.TotalElapsedTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalElapsedTime, 1000, 0)
+	return float64(m.TotalElapsedTime)/1000 - 0
 }
 
 // TotalTimerTimeScaled return TotalTimerTime in its scaled value.
@@ -1257,7 +1273,7 @@ func (m *Session) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+	return float64(m.TotalTimerTime)/1000 - 0
 }
 
 // TotalDistanceScaled return TotalDistance in its scaled value.
@@ -1268,7 +1284,7 @@ func (m *Session) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalDistance, 100, 0)
+	return float64(m.TotalDistance)/100 - 0
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value.
@@ -1279,7 +1295,7 @@ func (m *Session) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+	return float64(m.AvgSpeed)/1000 - 0
 }
 
 // MaxSpeedScaled return MaxSpeed in its scaled value.
@@ -1290,7 +1306,7 @@ func (m *Session) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
+	return float64(m.MaxSpeed)/1000 - 0
 }
 
 // TotalTrainingEffectScaled return TotalTrainingEffect in its scaled value.
@@ -1301,7 +1317,7 @@ func (m *Session) TotalTrainingEffectScaled() float64 {
 	if m.TotalTrainingEffect == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalTrainingEffect, 10, 0)
+	return float64(m.TotalTrainingEffect)/10 - 0
 }
 
 // TrainingStressScoreScaled return TrainingStressScore in its scaled value.
@@ -1312,7 +1328,7 @@ func (m *Session) TrainingStressScoreScaled() float64 {
 	if m.TrainingStressScore == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TrainingStressScore, 10, 0)
+	return float64(m.TrainingStressScore)/10 - 0
 }
 
 // IntensityFactorScaled return IntensityFactor in its scaled value.
@@ -1323,7 +1339,7 @@ func (m *Session) IntensityFactorScaled() float64 {
 	if m.IntensityFactor == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.IntensityFactor, 1000, 0)
+	return float64(m.IntensityFactor)/1000 - 0
 }
 
 // AvgStrokeCountScaled return AvgStrokeCount in its scaled value.
@@ -1334,7 +1350,7 @@ func (m *Session) AvgStrokeCountScaled() float64 {
 	if m.AvgStrokeCount == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStrokeCount, 10, 0)
+	return float64(m.AvgStrokeCount)/10 - 0
 }
 
 // AvgStrokeDistanceScaled return AvgStrokeDistance in its scaled value.
@@ -1345,7 +1361,7 @@ func (m *Session) AvgStrokeDistanceScaled() float64 {
 	if m.AvgStrokeDistance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStrokeDistance, 100, 0)
+	return float64(m.AvgStrokeDistance)/100 - 0
 }
 
 // PoolLengthScaled return PoolLength in its scaled value.
@@ -1356,7 +1372,7 @@ func (m *Session) PoolLengthScaled() float64 {
 	if m.PoolLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.PoolLength, 100, 0)
+	return float64(m.PoolLength)/100 - 0
 }
 
 // AvgAltitudeScaled return AvgAltitude in its scaled value.
@@ -1367,7 +1383,7 @@ func (m *Session) AvgAltitudeScaled() float64 {
 	if m.AvgAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgAltitude, 5, 500)
+	return float64(m.AvgAltitude)/5 - 500
 }
 
 // MaxAltitudeScaled return MaxAltitude in its scaled value.
@@ -1378,7 +1394,7 @@ func (m *Session) MaxAltitudeScaled() float64 {
 	if m.MaxAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxAltitude, 5, 500)
+	return float64(m.MaxAltitude)/5 - 500
 }
 
 // AvgGradeScaled return AvgGrade in its scaled value.
@@ -1389,7 +1405,7 @@ func (m *Session) AvgGradeScaled() float64 {
 	if m.AvgGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgGrade, 100, 0)
+	return float64(m.AvgGrade)/100 - 0
 }
 
 // AvgPosGradeScaled return AvgPosGrade in its scaled value.
@@ -1400,7 +1416,7 @@ func (m *Session) AvgPosGradeScaled() float64 {
 	if m.AvgPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgPosGrade, 100, 0)
+	return float64(m.AvgPosGrade)/100 - 0
 }
 
 // AvgNegGradeScaled return AvgNegGrade in its scaled value.
@@ -1411,7 +1427,7 @@ func (m *Session) AvgNegGradeScaled() float64 {
 	if m.AvgNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgNegGrade, 100, 0)
+	return float64(m.AvgNegGrade)/100 - 0
 }
 
 // MaxPosGradeScaled return MaxPosGrade in its scaled value.
@@ -1422,7 +1438,7 @@ func (m *Session) MaxPosGradeScaled() float64 {
 	if m.MaxPosGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxPosGrade, 100, 0)
+	return float64(m.MaxPosGrade)/100 - 0
 }
 
 // MaxNegGradeScaled return MaxNegGrade in its scaled value.
@@ -1433,7 +1449,7 @@ func (m *Session) MaxNegGradeScaled() float64 {
 	if m.MaxNegGrade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxNegGrade, 100, 0)
+	return float64(m.MaxNegGrade)/100 - 0
 }
 
 // TotalMovingTimeScaled return TotalMovingTime in its scaled value.
@@ -1444,7 +1460,7 @@ func (m *Session) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+	return float64(m.TotalMovingTime)/1000 - 0
 }
 
 // AvgPosVerticalSpeedScaled return AvgPosVerticalSpeed in its scaled value.
@@ -1455,7 +1471,7 @@ func (m *Session) AvgPosVerticalSpeedScaled() float64 {
 	if m.AvgPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgPosVerticalSpeed, 1000, 0)
+	return float64(m.AvgPosVerticalSpeed)/1000 - 0
 }
 
 // AvgNegVerticalSpeedScaled return AvgNegVerticalSpeed in its scaled value.
@@ -1466,7 +1482,7 @@ func (m *Session) AvgNegVerticalSpeedScaled() float64 {
 	if m.AvgNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgNegVerticalSpeed, 1000, 0)
+	return float64(m.AvgNegVerticalSpeed)/1000 - 0
 }
 
 // MaxPosVerticalSpeedScaled return MaxPosVerticalSpeed in its scaled value.
@@ -1477,7 +1493,7 @@ func (m *Session) MaxPosVerticalSpeedScaled() float64 {
 	if m.MaxPosVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxPosVerticalSpeed, 1000, 0)
+	return float64(m.MaxPosVerticalSpeed)/1000 - 0
 }
 
 // MaxNegVerticalSpeedScaled return MaxNegVerticalSpeed in its scaled value.
@@ -1488,7 +1504,7 @@ func (m *Session) MaxNegVerticalSpeedScaled() float64 {
 	if m.MaxNegVerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxNegVerticalSpeed, 1000, 0)
+	return float64(m.MaxNegVerticalSpeed)/1000 - 0
 }
 
 // TimeInHrZoneScaled return TimeInHrZone in its scaled value.
@@ -1499,7 +1515,15 @@ func (m *Session) TimeInHrZoneScaled() []float64 {
 	if m.TimeInHrZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInHrZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInHrZone))
+	for i := range m.TimeInHrZone {
+		if m.TimeInHrZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInHrZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInSpeedZoneScaled return TimeInSpeedZone in its scaled value.
@@ -1510,7 +1534,15 @@ func (m *Session) TimeInSpeedZoneScaled() []float64 {
 	if m.TimeInSpeedZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInSpeedZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInSpeedZone))
+	for i := range m.TimeInSpeedZone {
+		if m.TimeInSpeedZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInSpeedZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInCadenceZoneScaled return TimeInCadenceZone in its scaled value.
@@ -1521,7 +1553,15 @@ func (m *Session) TimeInCadenceZoneScaled() []float64 {
 	if m.TimeInCadenceZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInCadenceZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInCadenceZone))
+	for i := range m.TimeInCadenceZone {
+		if m.TimeInCadenceZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInCadenceZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // TimeInPowerZoneScaled return TimeInPowerZone in its scaled value.
@@ -1532,7 +1572,15 @@ func (m *Session) TimeInPowerZoneScaled() []float64 {
 	if m.TimeInPowerZone == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.TimeInPowerZone, 1000, 0)
+	var vals = make([]float64, len(m.TimeInPowerZone))
+	for i := range m.TimeInPowerZone {
+		if m.TimeInPowerZone[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.TimeInPowerZone[i])/1000 - 0
+	}
+	return vals
 }
 
 // AvgLapTimeScaled return AvgLapTime in its scaled value.
@@ -1543,7 +1591,7 @@ func (m *Session) AvgLapTimeScaled() float64 {
 	if m.AvgLapTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgLapTime, 1000, 0)
+	return float64(m.AvgLapTime)/1000 - 0
 }
 
 // MinAltitudeScaled return MinAltitude in its scaled value.
@@ -1554,7 +1602,7 @@ func (m *Session) MinAltitudeScaled() float64 {
 	if m.MinAltitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MinAltitude, 5, 500)
+	return float64(m.MinAltitude)/5 - 500
 }
 
 // MaxBallSpeedScaled return MaxBallSpeed in its scaled value.
@@ -1565,7 +1613,7 @@ func (m *Session) MaxBallSpeedScaled() float64 {
 	if m.MaxBallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxBallSpeed, 100, 0)
+	return float64(m.MaxBallSpeed)/100 - 0
 }
 
 // AvgBallSpeedScaled return AvgBallSpeed in its scaled value.
@@ -1576,7 +1624,7 @@ func (m *Session) AvgBallSpeedScaled() float64 {
 	if m.AvgBallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgBallSpeed, 100, 0)
+	return float64(m.AvgBallSpeed)/100 - 0
 }
 
 // AvgVerticalOscillationScaled return AvgVerticalOscillation in its scaled value.
@@ -1587,7 +1635,7 @@ func (m *Session) AvgVerticalOscillationScaled() float64 {
 	if m.AvgVerticalOscillation == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgVerticalOscillation, 10, 0)
+	return float64(m.AvgVerticalOscillation)/10 - 0
 }
 
 // AvgStanceTimePercentScaled return AvgStanceTimePercent in its scaled value.
@@ -1598,7 +1646,7 @@ func (m *Session) AvgStanceTimePercentScaled() float64 {
 	if m.AvgStanceTimePercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStanceTimePercent, 100, 0)
+	return float64(m.AvgStanceTimePercent)/100 - 0
 }
 
 // AvgStanceTimeScaled return AvgStanceTime in its scaled value.
@@ -1609,7 +1657,7 @@ func (m *Session) AvgStanceTimeScaled() float64 {
 	if m.AvgStanceTime == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStanceTime, 10, 0)
+	return float64(m.AvgStanceTime)/10 - 0
 }
 
 // AvgFractionalCadenceScaled return AvgFractionalCadence in its scaled value.
@@ -1620,7 +1668,7 @@ func (m *Session) AvgFractionalCadenceScaled() float64 {
 	if m.AvgFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgFractionalCadence, 128, 0)
+	return float64(m.AvgFractionalCadence)/128 - 0
 }
 
 // MaxFractionalCadenceScaled return MaxFractionalCadence in its scaled value.
@@ -1631,7 +1679,7 @@ func (m *Session) MaxFractionalCadenceScaled() float64 {
 	if m.MaxFractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxFractionalCadence, 128, 0)
+	return float64(m.MaxFractionalCadence)/128 - 0
 }
 
 // TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value.
@@ -1642,7 +1690,7 @@ func (m *Session) TotalFractionalCyclesScaled() float64 {
 	if m.TotalFractionalCycles == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalFractionalCycles, 128, 0)
+	return float64(m.TotalFractionalCycles)/128 - 0
 }
 
 // AvgTotalHemoglobinConcScaled return AvgTotalHemoglobinConc in its scaled value.
@@ -1653,7 +1701,15 @@ func (m *Session) AvgTotalHemoglobinConcScaled() []float64 {
 	if m.AvgTotalHemoglobinConc == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgTotalHemoglobinConc, 100, 0)
+	var vals = make([]float64, len(m.AvgTotalHemoglobinConc))
+	for i := range m.AvgTotalHemoglobinConc {
+		if m.AvgTotalHemoglobinConc[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgTotalHemoglobinConc[i])/100 - 0
+	}
+	return vals
 }
 
 // MinTotalHemoglobinConcScaled return MinTotalHemoglobinConc in its scaled value.
@@ -1664,7 +1720,15 @@ func (m *Session) MinTotalHemoglobinConcScaled() []float64 {
 	if m.MinTotalHemoglobinConc == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.MinTotalHemoglobinConc, 100, 0)
+	var vals = make([]float64, len(m.MinTotalHemoglobinConc))
+	for i := range m.MinTotalHemoglobinConc {
+		if m.MinTotalHemoglobinConc[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.MinTotalHemoglobinConc[i])/100 - 0
+	}
+	return vals
 }
 
 // MaxTotalHemoglobinConcScaled return MaxTotalHemoglobinConc in its scaled value.
@@ -1675,7 +1739,15 @@ func (m *Session) MaxTotalHemoglobinConcScaled() []float64 {
 	if m.MaxTotalHemoglobinConc == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.MaxTotalHemoglobinConc, 100, 0)
+	var vals = make([]float64, len(m.MaxTotalHemoglobinConc))
+	for i := range m.MaxTotalHemoglobinConc {
+		if m.MaxTotalHemoglobinConc[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.MaxTotalHemoglobinConc[i])/100 - 0
+	}
+	return vals
 }
 
 // AvgSaturatedHemoglobinPercentScaled return AvgSaturatedHemoglobinPercent in its scaled value.
@@ -1686,7 +1758,15 @@ func (m *Session) AvgSaturatedHemoglobinPercentScaled() []float64 {
 	if m.AvgSaturatedHemoglobinPercent == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgSaturatedHemoglobinPercent, 10, 0)
+	var vals = make([]float64, len(m.AvgSaturatedHemoglobinPercent))
+	for i := range m.AvgSaturatedHemoglobinPercent {
+		if m.AvgSaturatedHemoglobinPercent[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgSaturatedHemoglobinPercent[i])/10 - 0
+	}
+	return vals
 }
 
 // MinSaturatedHemoglobinPercentScaled return MinSaturatedHemoglobinPercent in its scaled value.
@@ -1697,7 +1777,15 @@ func (m *Session) MinSaturatedHemoglobinPercentScaled() []float64 {
 	if m.MinSaturatedHemoglobinPercent == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.MinSaturatedHemoglobinPercent, 10, 0)
+	var vals = make([]float64, len(m.MinSaturatedHemoglobinPercent))
+	for i := range m.MinSaturatedHemoglobinPercent {
+		if m.MinSaturatedHemoglobinPercent[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.MinSaturatedHemoglobinPercent[i])/10 - 0
+	}
+	return vals
 }
 
 // MaxSaturatedHemoglobinPercentScaled return MaxSaturatedHemoglobinPercent in its scaled value.
@@ -1708,7 +1796,15 @@ func (m *Session) MaxSaturatedHemoglobinPercentScaled() []float64 {
 	if m.MaxSaturatedHemoglobinPercent == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.MaxSaturatedHemoglobinPercent, 10, 0)
+	var vals = make([]float64, len(m.MaxSaturatedHemoglobinPercent))
+	for i := range m.MaxSaturatedHemoglobinPercent {
+		if m.MaxSaturatedHemoglobinPercent[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.MaxSaturatedHemoglobinPercent[i])/10 - 0
+	}
+	return vals
 }
 
 // AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value.
@@ -1719,7 +1815,7 @@ func (m *Session) AvgLeftTorqueEffectivenessScaled() float64 {
 	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgLeftTorqueEffectiveness, 2, 0)
+	return float64(m.AvgLeftTorqueEffectiveness)/2 - 0
 }
 
 // AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value.
@@ -1730,7 +1826,7 @@ func (m *Session) AvgRightTorqueEffectivenessScaled() float64 {
 	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgRightTorqueEffectiveness, 2, 0)
+	return float64(m.AvgRightTorqueEffectiveness)/2 - 0
 }
 
 // AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value.
@@ -1741,7 +1837,7 @@ func (m *Session) AvgLeftPedalSmoothnessScaled() float64 {
 	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgLeftPedalSmoothness, 2, 0)
+	return float64(m.AvgLeftPedalSmoothness)/2 - 0
 }
 
 // AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value.
@@ -1752,7 +1848,7 @@ func (m *Session) AvgRightPedalSmoothnessScaled() float64 {
 	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgRightPedalSmoothness, 2, 0)
+	return float64(m.AvgRightPedalSmoothness)/2 - 0
 }
 
 // AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value.
@@ -1763,7 +1859,7 @@ func (m *Session) AvgCombinedPedalSmoothnessScaled() float64 {
 	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgCombinedPedalSmoothness, 2, 0)
+	return float64(m.AvgCombinedPedalSmoothness)/2 - 0
 }
 
 // TimeStandingScaled return TimeStanding in its scaled value.
@@ -1774,7 +1870,7 @@ func (m *Session) TimeStandingScaled() float64 {
 	if m.TimeStanding == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TimeStanding, 1000, 0)
+	return float64(m.TimeStanding)/1000 - 0
 }
 
 // AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value.
@@ -1785,7 +1881,15 @@ func (m *Session) AvgLeftPowerPhaseScaled() []float64 {
 	if m.AvgLeftPowerPhase == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhase, 0.7111111, 0)
+	var vals = make([]float64, len(m.AvgLeftPowerPhase))
+	for i := range m.AvgLeftPowerPhase {
+		if m.AvgLeftPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgLeftPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value.
@@ -1796,7 +1900,15 @@ func (m *Session) AvgLeftPowerPhasePeakScaled() []float64 {
 	if m.AvgLeftPowerPhasePeak == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgLeftPowerPhasePeak, 0.7111111, 0)
+	var vals = make([]float64, len(m.AvgLeftPowerPhasePeak))
+	for i := range m.AvgLeftPowerPhasePeak {
+		if m.AvgLeftPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgLeftPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value.
@@ -1807,7 +1919,15 @@ func (m *Session) AvgRightPowerPhaseScaled() []float64 {
 	if m.AvgRightPowerPhase == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhase, 0.7111111, 0)
+	var vals = make([]float64, len(m.AvgRightPowerPhase))
+	for i := range m.AvgRightPowerPhase {
+		if m.AvgRightPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgRightPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value.
@@ -1818,7 +1938,15 @@ func (m *Session) AvgRightPowerPhasePeakScaled() []float64 {
 	if m.AvgRightPowerPhasePeak == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.AvgRightPowerPhasePeak, 0.7111111, 0)
+	var vals = make([]float64, len(m.AvgRightPowerPhasePeak))
+	for i := range m.AvgRightPowerPhasePeak {
+		if m.AvgRightPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgRightPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // EnhancedAvgSpeedScaled return EnhancedAvgSpeed in its scaled value.
@@ -1829,7 +1957,7 @@ func (m *Session) EnhancedAvgSpeedScaled() float64 {
 	if m.EnhancedAvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAvgSpeed, 1000, 0)
+	return float64(m.EnhancedAvgSpeed)/1000 - 0
 }
 
 // EnhancedMaxSpeedScaled return EnhancedMaxSpeed in its scaled value.
@@ -1840,7 +1968,7 @@ func (m *Session) EnhancedMaxSpeedScaled() float64 {
 	if m.EnhancedMaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMaxSpeed, 1000, 0)
+	return float64(m.EnhancedMaxSpeed)/1000 - 0
 }
 
 // EnhancedAvgAltitudeScaled return EnhancedAvgAltitude in its scaled value.
@@ -1851,7 +1979,7 @@ func (m *Session) EnhancedAvgAltitudeScaled() float64 {
 	if m.EnhancedAvgAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAvgAltitude, 5, 500)
+	return float64(m.EnhancedAvgAltitude)/5 - 500
 }
 
 // EnhancedMinAltitudeScaled return EnhancedMinAltitude in its scaled value.
@@ -1862,7 +1990,7 @@ func (m *Session) EnhancedMinAltitudeScaled() float64 {
 	if m.EnhancedMinAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMinAltitude, 5, 500)
+	return float64(m.EnhancedMinAltitude)/5 - 500
 }
 
 // EnhancedMaxAltitudeScaled return EnhancedMaxAltitude in its scaled value.
@@ -1873,7 +2001,7 @@ func (m *Session) EnhancedMaxAltitudeScaled() float64 {
 	if m.EnhancedMaxAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMaxAltitude, 5, 500)
+	return float64(m.EnhancedMaxAltitude)/5 - 500
 }
 
 // LevBatteryConsumptionScaled return LevBatteryConsumption in its scaled value.
@@ -1884,7 +2012,7 @@ func (m *Session) LevBatteryConsumptionScaled() float64 {
 	if m.LevBatteryConsumption == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LevBatteryConsumption, 2, 0)
+	return float64(m.LevBatteryConsumption)/2 - 0
 }
 
 // AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value.
@@ -1895,7 +2023,7 @@ func (m *Session) AvgVerticalRatioScaled() float64 {
 	if m.AvgVerticalRatio == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgVerticalRatio, 100, 0)
+	return float64(m.AvgVerticalRatio)/100 - 0
 }
 
 // AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value.
@@ -1906,7 +2034,7 @@ func (m *Session) AvgStanceTimeBalanceScaled() float64 {
 	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStanceTimeBalance, 100, 0)
+	return float64(m.AvgStanceTimeBalance)/100 - 0
 }
 
 // AvgStepLengthScaled return AvgStepLength in its scaled value.
@@ -1917,7 +2045,7 @@ func (m *Session) AvgStepLengthScaled() float64 {
 	if m.AvgStepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgStepLength, 10, 0)
+	return float64(m.AvgStepLength)/10 - 0
 }
 
 // TotalAnaerobicTrainingEffectScaled return TotalAnaerobicTrainingEffect in its scaled value.
@@ -1928,7 +2056,7 @@ func (m *Session) TotalAnaerobicTrainingEffectScaled() float64 {
 	if m.TotalAnaerobicTrainingEffect == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalAnaerobicTrainingEffect, 10, 0)
+	return float64(m.TotalAnaerobicTrainingEffect)/10 - 0
 }
 
 // AvgVamScaled return AvgVam in its scaled value.
@@ -1939,7 +2067,7 @@ func (m *Session) AvgVamScaled() float64 {
 	if m.AvgVam == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgVam, 1000, 0)
+	return float64(m.AvgVam)/1000 - 0
 }
 
 // AvgDepthScaled return AvgDepth in its scaled value.
@@ -1950,7 +2078,7 @@ func (m *Session) AvgDepthScaled() float64 {
 	if m.AvgDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgDepth, 1000, 0)
+	return float64(m.AvgDepth)/1000 - 0
 }
 
 // MaxDepthScaled return MaxDepth in its scaled value.
@@ -1961,7 +2089,7 @@ func (m *Session) MaxDepthScaled() float64 {
 	if m.MaxDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxDepth, 1000, 0)
+	return float64(m.MaxDepth)/1000 - 0
 }
 
 // TrainingLoadPeakScaled return TrainingLoadPeak in its scaled value.
@@ -1972,7 +2100,7 @@ func (m *Session) TrainingLoadPeakScaled() float64 {
 	if m.TrainingLoadPeak == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TrainingLoadPeak, 65536, 0)
+	return float64(m.TrainingLoadPeak)/65536 - 0
 }
 
 // EnhancedAvgRespirationRateScaled return EnhancedAvgRespirationRate in its scaled value.
@@ -1983,7 +2111,7 @@ func (m *Session) EnhancedAvgRespirationRateScaled() float64 {
 	if m.EnhancedAvgRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAvgRespirationRate, 100, 0)
+	return float64(m.EnhancedAvgRespirationRate)/100 - 0
 }
 
 // EnhancedMaxRespirationRateScaled return EnhancedMaxRespirationRate in its scaled value.
@@ -1994,7 +2122,7 @@ func (m *Session) EnhancedMaxRespirationRateScaled() float64 {
 	if m.EnhancedMaxRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMaxRespirationRate, 100, 0)
+	return float64(m.EnhancedMaxRespirationRate)/100 - 0
 }
 
 // EnhancedMinRespirationRateScaled return EnhancedMinRespirationRate in its scaled value.
@@ -2005,7 +2133,7 @@ func (m *Session) EnhancedMinRespirationRateScaled() float64 {
 	if m.EnhancedMinRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedMinRespirationRate, 100, 0)
+	return float64(m.EnhancedMinRespirationRate)/100 - 0
 }
 
 // TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value.
@@ -2016,7 +2144,7 @@ func (m *Session) TotalFractionalAscentScaled() float64 {
 	if m.TotalFractionalAscent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalFractionalAscent, 100, 0)
+	return float64(m.TotalFractionalAscent)/100 - 0
 }
 
 // TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value.
@@ -2027,7 +2155,7 @@ func (m *Session) TotalFractionalDescentScaled() float64 {
 	if m.TotalFractionalDescent == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalFractionalDescent, 100, 0)
+	return float64(m.TotalFractionalDescent)/100 - 0
 }
 
 // AvgCoreTemperatureScaled return AvgCoreTemperature in its scaled value.
@@ -2038,7 +2166,7 @@ func (m *Session) AvgCoreTemperatureScaled() float64 {
 	if m.AvgCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgCoreTemperature, 100, 0)
+	return float64(m.AvgCoreTemperature)/100 - 0
 }
 
 // MinCoreTemperatureScaled return MinCoreTemperature in its scaled value.
@@ -2049,7 +2177,7 @@ func (m *Session) MinCoreTemperatureScaled() float64 {
 	if m.MinCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MinCoreTemperature, 100, 0)
+	return float64(m.MinCoreTemperature)/100 - 0
 }
 
 // MaxCoreTemperatureScaled return MaxCoreTemperature in its scaled value.
@@ -2060,7 +2188,7 @@ func (m *Session) MaxCoreTemperatureScaled() float64 {
 	if m.MaxCoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxCoreTemperature, 100, 0)
+	return float64(m.MaxCoreTemperature)/100 - 0
 }
 
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
@@ -2228,7 +2356,12 @@ func (m *Session) SetTotalElapsedTime(v uint32) *Session {
 //
 // Scale: 1000; Units: s; Time (includes pauses)
 func (m *Session) SetTotalElapsedTimeScaled(v float64) *Session {
-	m.TotalElapsedTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalElapsedTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalElapsedTime = uint32(unscaled)
 	return m
 }
 
@@ -2245,7 +2378,12 @@ func (m *Session) SetTotalTimerTime(v uint32) *Session {
 //
 // Scale: 1000; Units: s; Timer Time (excludes pauses)
 func (m *Session) SetTotalTimerTimeScaled(v float64) *Session {
-	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalTimerTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalTimerTime = uint32(unscaled)
 	return m
 }
 
@@ -2262,7 +2400,12 @@ func (m *Session) SetTotalDistance(v uint32) *Session {
 //
 // Scale: 100; Units: m
 func (m *Session) SetTotalDistanceScaled(v float64) *Session {
-	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalDistance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalDistance = uint32(unscaled)
 	return m
 }
 
@@ -2303,7 +2446,12 @@ func (m *Session) SetAvgSpeed(v uint16) *Session {
 //
 // Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) SetAvgSpeedScaled(v float64) *Session {
-	m.AvgSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgSpeed = uint16(unscaled)
 	return m
 }
 
@@ -2320,7 +2468,12 @@ func (m *Session) SetMaxSpeed(v uint16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxSpeedScaled(v float64) *Session {
-	m.MaxSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MaxSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MaxSpeed = uint16(unscaled)
 	return m
 }
 
@@ -2401,7 +2554,12 @@ func (m *Session) SetTotalTrainingEffect(v uint8) *Session {
 //
 // Scale: 10
 func (m *Session) SetTotalTrainingEffectScaled(v float64) *Session {
-	m.TotalTrainingEffect = uint8(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalTrainingEffect = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalTrainingEffect = uint8(unscaled)
 	return m
 }
 
@@ -2518,7 +2676,12 @@ func (m *Session) SetTrainingStressScore(v uint16) *Session {
 //
 // Scale: 10; Units: tss
 func (m *Session) SetTrainingStressScoreScaled(v float64) *Session {
-	m.TrainingStressScore = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.TrainingStressScore = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.TrainingStressScore = uint16(unscaled)
 	return m
 }
 
@@ -2535,7 +2698,12 @@ func (m *Session) SetIntensityFactor(v uint16) *Session {
 //
 // Scale: 1000; Units: if
 func (m *Session) SetIntensityFactorScaled(v float64) *Session {
-	m.IntensityFactor = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.IntensityFactor = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.IntensityFactor = uint16(unscaled)
 	return m
 }
 
@@ -2588,7 +2756,12 @@ func (m *Session) SetAvgStrokeCount(v uint32) *Session {
 //
 // Scale: 10; Units: strokes/lap
 func (m *Session) SetAvgStrokeCountScaled(v float64) *Session {
-	m.AvgStrokeCount = uint32(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgStrokeCount = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgStrokeCount = uint32(unscaled)
 	return m
 }
 
@@ -2605,7 +2778,12 @@ func (m *Session) SetAvgStrokeDistance(v uint16) *Session {
 //
 // Scale: 100; Units: m
 func (m *Session) SetAvgStrokeDistanceScaled(v float64) *Session {
-	m.AvgStrokeDistance = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStrokeDistance = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStrokeDistance = uint16(unscaled)
 	return m
 }
 
@@ -2630,7 +2808,12 @@ func (m *Session) SetPoolLength(v uint16) *Session {
 //
 // Scale: 100; Units: m
 func (m *Session) SetPoolLengthScaled(v float64) *Session {
-	m.PoolLength = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.PoolLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.PoolLength = uint16(unscaled)
 	return m
 }
 
@@ -2677,7 +2860,12 @@ func (m *Session) SetAvgAltitude(v uint16) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetAvgAltitudeScaled(v float64) *Session {
-	m.AvgAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgAltitude = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgAltitude = uint16(unscaled)
 	return m
 }
 
@@ -2694,7 +2882,12 @@ func (m *Session) SetMaxAltitude(v uint16) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetMaxAltitudeScaled(v float64) *Session {
-	m.MaxAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MaxAltitude = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MaxAltitude = uint16(unscaled)
 	return m
 }
 
@@ -2719,7 +2912,12 @@ func (m *Session) SetAvgGrade(v int16) *Session {
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgGradeScaled(v float64) *Session {
-	m.AvgGrade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgGrade = int16(unscaled)
 	return m
 }
 
@@ -2736,7 +2934,12 @@ func (m *Session) SetAvgPosGrade(v int16) *Session {
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgPosGradeScaled(v float64) *Session {
-	m.AvgPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgPosGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgPosGrade = int16(unscaled)
 	return m
 }
 
@@ -2753,7 +2956,12 @@ func (m *Session) SetAvgNegGrade(v int16) *Session {
 //
 // Scale: 100; Units: %
 func (m *Session) SetAvgNegGradeScaled(v float64) *Session {
-	m.AvgNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgNegGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgNegGrade = int16(unscaled)
 	return m
 }
 
@@ -2770,7 +2978,12 @@ func (m *Session) SetMaxPosGrade(v int16) *Session {
 //
 // Scale: 100; Units: %
 func (m *Session) SetMaxPosGradeScaled(v float64) *Session {
-	m.MaxPosGrade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.MaxPosGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.MaxPosGrade = int16(unscaled)
 	return m
 }
 
@@ -2787,7 +3000,12 @@ func (m *Session) SetMaxNegGrade(v int16) *Session {
 //
 // Scale: 100; Units: %
 func (m *Session) SetMaxNegGradeScaled(v float64) *Session {
-	m.MaxNegGrade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.MaxNegGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.MaxNegGrade = int16(unscaled)
 	return m
 }
 
@@ -2820,7 +3038,12 @@ func (m *Session) SetTotalMovingTime(v uint32) *Session {
 //
 // Scale: 1000; Units: s
 func (m *Session) SetTotalMovingTimeScaled(v float64) *Session {
-	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalMovingTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalMovingTime = uint32(unscaled)
 	return m
 }
 
@@ -2837,7 +3060,12 @@ func (m *Session) SetAvgPosVerticalSpeed(v int16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgPosVerticalSpeedScaled(v float64) *Session {
-	m.AvgPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgPosVerticalSpeed = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgPosVerticalSpeed = int16(unscaled)
 	return m
 }
 
@@ -2854,7 +3082,12 @@ func (m *Session) SetAvgNegVerticalSpeed(v int16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgNegVerticalSpeedScaled(v float64) *Session {
-	m.AvgNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgNegVerticalSpeed = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgNegVerticalSpeed = int16(unscaled)
 	return m
 }
 
@@ -2871,7 +3104,12 @@ func (m *Session) SetMaxPosVerticalSpeed(v int16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxPosVerticalSpeedScaled(v float64) *Session {
-	m.MaxPosVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.MaxPosVerticalSpeed = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.MaxPosVerticalSpeed = int16(unscaled)
 	return m
 }
 
@@ -2888,7 +3126,12 @@ func (m *Session) SetMaxNegVerticalSpeed(v int16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetMaxNegVerticalSpeedScaled(v float64) *Session {
-	m.MaxNegVerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.MaxNegVerticalSpeed = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.MaxNegVerticalSpeed = int16(unscaled)
 	return m
 }
 
@@ -2913,7 +3156,19 @@ func (m *Session) SetTimeInHrZone(v []uint32) *Session {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInHrZoneScaled(vs []float64) *Session {
-	m.TimeInHrZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInHrZone = nil
+		return m
+	}
+	m.TimeInHrZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInHrZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInHrZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -2930,7 +3185,19 @@ func (m *Session) SetTimeInSpeedZone(v []uint32) *Session {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInSpeedZoneScaled(vs []float64) *Session {
-	m.TimeInSpeedZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInSpeedZone = nil
+		return m
+	}
+	m.TimeInSpeedZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInSpeedZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInSpeedZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -2947,7 +3214,19 @@ func (m *Session) SetTimeInCadenceZone(v []uint32) *Session {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInCadenceZoneScaled(vs []float64) *Session {
-	m.TimeInCadenceZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInCadenceZone = nil
+		return m
+	}
+	m.TimeInCadenceZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInCadenceZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInCadenceZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -2964,7 +3243,19 @@ func (m *Session) SetTimeInPowerZone(v []uint32) *Session {
 //
 // Array: [N]; Scale: 1000; Units: s
 func (m *Session) SetTimeInPowerZoneScaled(vs []float64) *Session {
-	m.TimeInPowerZone = scaleoffset.DiscardSlice[uint32](vs, 1000, 0)
+	if vs == nil {
+		m.TimeInPowerZone = nil
+		return m
+	}
+	m.TimeInPowerZone = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.TimeInPowerZone[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.TimeInPowerZone[i] = uint32(unscaled)
+	}
 	return m
 }
 
@@ -2981,7 +3272,12 @@ func (m *Session) SetAvgLapTime(v uint32) *Session {
 //
 // Scale: 1000; Units: s
 func (m *Session) SetAvgLapTimeScaled(v float64) *Session {
-	m.AvgLapTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgLapTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgLapTime = uint32(unscaled)
 	return m
 }
 
@@ -3004,7 +3300,12 @@ func (m *Session) SetMinAltitude(v uint16) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetMinAltitudeScaled(v float64) *Session {
-	m.MinAltitude = uint16(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MinAltitude = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MinAltitude = uint16(unscaled)
 	return m
 }
 
@@ -3055,7 +3356,12 @@ func (m *Session) SetMaxBallSpeed(v uint16) *Session {
 //
 // Scale: 100; Units: m/s
 func (m *Session) SetMaxBallSpeedScaled(v float64) *Session {
-	m.MaxBallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MaxBallSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MaxBallSpeed = uint16(unscaled)
 	return m
 }
 
@@ -3072,7 +3378,12 @@ func (m *Session) SetAvgBallSpeed(v uint16) *Session {
 //
 // Scale: 100; Units: m/s
 func (m *Session) SetAvgBallSpeedScaled(v float64) *Session {
-	m.AvgBallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgBallSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgBallSpeed = uint16(unscaled)
 	return m
 }
 
@@ -3089,7 +3400,12 @@ func (m *Session) SetAvgVerticalOscillation(v uint16) *Session {
 //
 // Scale: 10; Units: mm
 func (m *Session) SetAvgVerticalOscillationScaled(v float64) *Session {
-	m.AvgVerticalOscillation = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVerticalOscillation = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVerticalOscillation = uint16(unscaled)
 	return m
 }
 
@@ -3106,7 +3422,12 @@ func (m *Session) SetAvgStanceTimePercent(v uint16) *Session {
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgStanceTimePercentScaled(v float64) *Session {
-	m.AvgStanceTimePercent = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTimePercent = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTimePercent = uint16(unscaled)
 	return m
 }
 
@@ -3123,7 +3444,12 @@ func (m *Session) SetAvgStanceTime(v uint16) *Session {
 //
 // Scale: 10; Units: ms
 func (m *Session) SetAvgStanceTimeScaled(v float64) *Session {
-	m.AvgStanceTime = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTime = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTime = uint16(unscaled)
 	return m
 }
 
@@ -3140,7 +3466,12 @@ func (m *Session) SetAvgFractionalCadence(v uint8) *Session {
 //
 // Scale: 128; Units: rpm; fractional part of the avg_cadence
 func (m *Session) SetAvgFractionalCadenceScaled(v float64) *Session {
-	m.AvgFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgFractionalCadence = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgFractionalCadence = uint8(unscaled)
 	return m
 }
 
@@ -3157,7 +3488,12 @@ func (m *Session) SetMaxFractionalCadence(v uint8) *Session {
 //
 // Scale: 128; Units: rpm; fractional part of the max_cadence
 func (m *Session) SetMaxFractionalCadenceScaled(v float64) *Session {
-	m.MaxFractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.MaxFractionalCadence = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.MaxFractionalCadence = uint8(unscaled)
 	return m
 }
 
@@ -3174,7 +3510,12 @@ func (m *Session) SetTotalFractionalCycles(v uint8) *Session {
 //
 // Scale: 128; Units: cycles; fractional part of the total_cycles
 func (m *Session) SetTotalFractionalCyclesScaled(v float64) *Session {
-	m.TotalFractionalCycles = uint8(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalCycles = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalCycles = uint8(unscaled)
 	return m
 }
 
@@ -3191,7 +3532,19 @@ func (m *Session) SetAvgTotalHemoglobinConc(v []uint16) *Session {
 //
 // Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
 func (m *Session) SetAvgTotalHemoglobinConcScaled(vs []float64) *Session {
-	m.AvgTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	if vs == nil {
+		m.AvgTotalHemoglobinConc = nil
+		return m
+	}
+	m.AvgTotalHemoglobinConc = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.AvgTotalHemoglobinConc[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.AvgTotalHemoglobinConc[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3208,7 +3561,19 @@ func (m *Session) SetMinTotalHemoglobinConc(v []uint16) *Session {
 //
 // Array: [N]; Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Session) SetMinTotalHemoglobinConcScaled(vs []float64) *Session {
-	m.MinTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	if vs == nil {
+		m.MinTotalHemoglobinConc = nil
+		return m
+	}
+	m.MinTotalHemoglobinConc = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.MinTotalHemoglobinConc[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.MinTotalHemoglobinConc[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3225,7 +3590,19 @@ func (m *Session) SetMaxTotalHemoglobinConc(v []uint16) *Session {
 //
 // Array: [N]; Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Session) SetMaxTotalHemoglobinConcScaled(vs []float64) *Session {
-	m.MaxTotalHemoglobinConc = scaleoffset.DiscardSlice[uint16](vs, 100, 0)
+	if vs == nil {
+		m.MaxTotalHemoglobinConc = nil
+		return m
+	}
+	m.MaxTotalHemoglobinConc = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.MaxTotalHemoglobinConc[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.MaxTotalHemoglobinConc[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3242,7 +3619,19 @@ func (m *Session) SetAvgSaturatedHemoglobinPercent(v []uint16) *Session {
 //
 // Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
 func (m *Session) SetAvgSaturatedHemoglobinPercentScaled(vs []float64) *Session {
-	m.AvgSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	if vs == nil {
+		m.AvgSaturatedHemoglobinPercent = nil
+		return m
+	}
+	m.AvgSaturatedHemoglobinPercent = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.AvgSaturatedHemoglobinPercent[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.AvgSaturatedHemoglobinPercent[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3259,7 +3648,19 @@ func (m *Session) SetMinSaturatedHemoglobinPercent(v []uint16) *Session {
 //
 // Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Session) SetMinSaturatedHemoglobinPercentScaled(vs []float64) *Session {
-	m.MinSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	if vs == nil {
+		m.MinSaturatedHemoglobinPercent = nil
+		return m
+	}
+	m.MinSaturatedHemoglobinPercent = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.MinSaturatedHemoglobinPercent[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.MinSaturatedHemoglobinPercent[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3276,7 +3677,19 @@ func (m *Session) SetMaxSaturatedHemoglobinPercent(v []uint16) *Session {
 //
 // Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Session) SetMaxSaturatedHemoglobinPercentScaled(vs []float64) *Session {
-	m.MaxSaturatedHemoglobinPercent = scaleoffset.DiscardSlice[uint16](vs, 10, 0)
+	if vs == nil {
+		m.MaxSaturatedHemoglobinPercent = nil
+		return m
+	}
+	m.MaxSaturatedHemoglobinPercent = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 10
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.MaxSaturatedHemoglobinPercent[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.MaxSaturatedHemoglobinPercent[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -3293,7 +3706,12 @@ func (m *Session) SetAvgLeftTorqueEffectiveness(v uint8) *Session {
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgLeftTorqueEffectivenessScaled(v float64) *Session {
-	m.AvgLeftTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgLeftTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgLeftTorqueEffectiveness = uint8(unscaled)
 	return m
 }
 
@@ -3310,7 +3728,12 @@ func (m *Session) SetAvgRightTorqueEffectiveness(v uint8) *Session {
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgRightTorqueEffectivenessScaled(v float64) *Session {
-	m.AvgRightTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgRightTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgRightTorqueEffectiveness = uint8(unscaled)
 	return m
 }
 
@@ -3327,7 +3750,12 @@ func (m *Session) SetAvgLeftPedalSmoothness(v uint8) *Session {
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgLeftPedalSmoothnessScaled(v float64) *Session {
-	m.AvgLeftPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgLeftPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgLeftPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -3344,7 +3772,12 @@ func (m *Session) SetAvgRightPedalSmoothness(v uint8) *Session {
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgRightPedalSmoothnessScaled(v float64) *Session {
-	m.AvgRightPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgRightPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgRightPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -3361,7 +3794,12 @@ func (m *Session) SetAvgCombinedPedalSmoothness(v uint8) *Session {
 //
 // Scale: 2; Units: percent
 func (m *Session) SetAvgCombinedPedalSmoothnessScaled(v float64) *Session {
-	m.AvgCombinedPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgCombinedPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgCombinedPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -3392,7 +3830,12 @@ func (m *Session) SetTimeStanding(v uint32) *Session {
 //
 // Scale: 1000; Units: s; Total time spend in the standing position
 func (m *Session) SetTimeStandingScaled(v float64) *Session {
-	m.TimeStanding = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TimeStanding = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TimeStanding = uint32(unscaled)
 	return m
 }
 
@@ -3433,7 +3876,19 @@ func (m *Session) SetAvgLeftPowerPhase(v []uint8) *Session {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
 func (m *Session) SetAvgLeftPowerPhaseScaled(vs []float64) *Session {
-	m.AvgLeftPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.AvgLeftPowerPhase = nil
+		return m
+	}
+	m.AvgLeftPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgLeftPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgLeftPowerPhase[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -3450,7 +3905,19 @@ func (m *Session) SetAvgLeftPowerPhasePeak(v []uint8) *Session {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Session) SetAvgLeftPowerPhasePeakScaled(vs []float64) *Session {
-	m.AvgLeftPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.AvgLeftPowerPhasePeak = nil
+		return m
+	}
+	m.AvgLeftPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgLeftPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgLeftPowerPhasePeak[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -3467,7 +3934,19 @@ func (m *Session) SetAvgRightPowerPhase(v []uint8) *Session {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Session) SetAvgRightPowerPhaseScaled(vs []float64) *Session {
-	m.AvgRightPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.AvgRightPowerPhase = nil
+		return m
+	}
+	m.AvgRightPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgRightPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgRightPowerPhase[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -3484,7 +3963,19 @@ func (m *Session) SetAvgRightPowerPhasePeak(v []uint8) *Session {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles data value indexes defined by power_phase_type.
 func (m *Session) SetAvgRightPowerPhasePeakScaled(vs []float64) *Session {
-	m.AvgRightPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.AvgRightPowerPhasePeak = nil
+		return m
+	}
+	m.AvgRightPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgRightPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgRightPowerPhasePeak[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -3533,7 +4024,12 @@ func (m *Session) SetEnhancedAvgSpeed(v uint32) *Session {
 //
 // Scale: 1000; Units: m/s; total_distance / total_timer_time
 func (m *Session) SetEnhancedAvgSpeedScaled(v float64) *Session {
-	m.EnhancedAvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedAvgSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedAvgSpeed = uint32(unscaled)
 	return m
 }
 
@@ -3550,7 +4046,12 @@ func (m *Session) SetEnhancedMaxSpeed(v uint32) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetEnhancedMaxSpeedScaled(v float64) *Session {
-	m.EnhancedMaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedMaxSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedMaxSpeed = uint32(unscaled)
 	return m
 }
 
@@ -3567,7 +4068,12 @@ func (m *Session) SetEnhancedAvgAltitude(v uint32) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedAvgAltitudeScaled(v float64) *Session {
-	m.EnhancedAvgAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedAvgAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedAvgAltitude = uint32(unscaled)
 	return m
 }
 
@@ -3584,7 +4090,12 @@ func (m *Session) SetEnhancedMinAltitude(v uint32) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedMinAltitudeScaled(v float64) *Session {
-	m.EnhancedMinAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedMinAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedMinAltitude = uint32(unscaled)
 	return m
 }
 
@@ -3601,7 +4112,12 @@ func (m *Session) SetEnhancedMaxAltitude(v uint32) *Session {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Session) SetEnhancedMaxAltitudeScaled(v float64) *Session {
-	m.EnhancedMaxAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedMaxAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedMaxAltitude = uint32(unscaled)
 	return m
 }
 
@@ -3634,7 +4150,12 @@ func (m *Session) SetLevBatteryConsumption(v uint8) *Session {
 //
 // Scale: 2; Units: percent; lev battery consumption during session
 func (m *Session) SetLevBatteryConsumptionScaled(v float64) *Session {
-	m.LevBatteryConsumption = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.LevBatteryConsumption = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.LevBatteryConsumption = uint8(unscaled)
 	return m
 }
 
@@ -3651,7 +4172,12 @@ func (m *Session) SetAvgVerticalRatio(v uint16) *Session {
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgVerticalRatioScaled(v float64) *Session {
-	m.AvgVerticalRatio = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVerticalRatio = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVerticalRatio = uint16(unscaled)
 	return m
 }
 
@@ -3668,7 +4194,12 @@ func (m *Session) SetAvgStanceTimeBalance(v uint16) *Session {
 //
 // Scale: 100; Units: percent
 func (m *Session) SetAvgStanceTimeBalanceScaled(v float64) *Session {
-	m.AvgStanceTimeBalance = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTimeBalance = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTimeBalance = uint16(unscaled)
 	return m
 }
 
@@ -3685,7 +4216,12 @@ func (m *Session) SetAvgStepLength(v uint16) *Session {
 //
 // Scale: 10; Units: mm
 func (m *Session) SetAvgStepLengthScaled(v float64) *Session {
-	m.AvgStepLength = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStepLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStepLength = uint16(unscaled)
 	return m
 }
 
@@ -3702,7 +4238,12 @@ func (m *Session) SetTotalAnaerobicTrainingEffect(v uint8) *Session {
 //
 // Scale: 10
 func (m *Session) SetTotalAnaerobicTrainingEffectScaled(v float64) *Session {
-	m.TotalAnaerobicTrainingEffect = uint8(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalAnaerobicTrainingEffect = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalAnaerobicTrainingEffect = uint8(unscaled)
 	return m
 }
 
@@ -3719,7 +4260,12 @@ func (m *Session) SetAvgVam(v uint16) *Session {
 //
 // Scale: 1000; Units: m/s
 func (m *Session) SetAvgVamScaled(v float64) *Session {
-	m.AvgVam = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVam = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVam = uint16(unscaled)
 	return m
 }
 
@@ -3736,7 +4282,12 @@ func (m *Session) SetAvgDepth(v uint32) *Session {
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Session) SetAvgDepthScaled(v float64) *Session {
-	m.AvgDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgDepth = uint32(unscaled)
 	return m
 }
 
@@ -3753,7 +4304,12 @@ func (m *Session) SetMaxDepth(v uint32) *Session {
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Session) SetMaxDepthScaled(v float64) *Session {
-	m.MaxDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxDepth = uint32(unscaled)
 	return m
 }
 
@@ -3850,7 +4406,12 @@ func (m *Session) SetTrainingLoadPeak(v int32) *Session {
 //
 // Scale: 65536
 func (m *Session) SetTrainingLoadPeakScaled(v float64) *Session {
-	m.TrainingLoadPeak = int32(scaleoffset.Discard(v, 65536, 0))
+	unscaled := (v + 0) * 65536
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+		m.TrainingLoadPeak = int32(basetype.Sint32Invalid)
+		return m
+	}
+	m.TrainingLoadPeak = int32(unscaled)
 	return m
 }
 
@@ -3867,7 +4428,12 @@ func (m *Session) SetEnhancedAvgRespirationRate(v uint16) *Session {
 //
 // Scale: 100; Units: Breaths/min
 func (m *Session) SetEnhancedAvgRespirationRateScaled(v float64) *Session {
-	m.EnhancedAvgRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedAvgRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedAvgRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -3884,7 +4450,12 @@ func (m *Session) SetEnhancedMaxRespirationRate(v uint16) *Session {
 //
 // Scale: 100; Units: Breaths/min
 func (m *Session) SetEnhancedMaxRespirationRateScaled(v float64) *Session {
-	m.EnhancedMaxRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedMaxRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedMaxRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -3901,7 +4472,12 @@ func (m *Session) SetEnhancedMinRespirationRate(v uint16) *Session {
 //
 // Scale: 100
 func (m *Session) SetEnhancedMinRespirationRateScaled(v float64) *Session {
-	m.EnhancedMinRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedMinRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedMinRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -4004,7 +4580,12 @@ func (m *Session) SetTotalFractionalAscent(v uint8) *Session {
 //
 // Scale: 100; Units: m; fractional part of total_ascent
 func (m *Session) SetTotalFractionalAscentScaled(v float64) *Session {
-	m.TotalFractionalAscent = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalAscent = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalAscent = uint8(unscaled)
 	return m
 }
 
@@ -4021,7 +4602,12 @@ func (m *Session) SetTotalFractionalDescent(v uint8) *Session {
 //
 // Scale: 100; Units: m; fractional part of total_descent
 func (m *Session) SetTotalFractionalDescentScaled(v float64) *Session {
-	m.TotalFractionalDescent = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalDescent = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalDescent = uint8(unscaled)
 	return m
 }
 
@@ -4038,7 +4624,12 @@ func (m *Session) SetAvgCoreTemperature(v uint16) *Session {
 //
 // Scale: 100; Units: C
 func (m *Session) SetAvgCoreTemperatureScaled(v float64) *Session {
-	m.AvgCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgCoreTemperature = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgCoreTemperature = uint16(unscaled)
 	return m
 }
 
@@ -4055,7 +4646,12 @@ func (m *Session) SetMinCoreTemperature(v uint16) *Session {
 //
 // Scale: 100; Units: C
 func (m *Session) SetMinCoreTemperatureScaled(v float64) *Session {
-	m.MinCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MinCoreTemperature = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MinCoreTemperature = uint16(unscaled)
 	return m
 }
 
@@ -4072,7 +4668,12 @@ func (m *Session) SetMaxCoreTemperature(v uint16) *Session {
 //
 // Scale: 100; Units: C
 func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
-	m.MaxCoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MaxCoreTemperature = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MaxCoreTemperature = uint16(unscaled)
 	return m
 }
 
@@ -4080,4 +4681,32 @@ func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
 func (m *Session) SetDeveloperFields(developerFields ...proto.DeveloperField) *Session {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 124, 125, 126, 127, 128, 169, 170, 180.
+func (m *Session) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 124, 125, 126, 127, 128, 169, 170, 180:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 124, 125, 126, 127, 128, 169, 170, 180.
+func (m *Session) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 181 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -142,7 +141,7 @@ func (m *MaxMetData) Vo2MaxScaled() float64 {
 	if m.Vo2Max == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Vo2Max, 10, 0)
+	return float64(m.Vo2Max)/10 - 0
 }
 
 // SetUpdateTime sets UpdateTime value.
@@ -166,7 +165,12 @@ func (m *MaxMetData) SetVo2Max(v uint16) *MaxMetData {
 //
 // Scale: 10; Units: mL/kg/min
 func (m *MaxMetData) SetVo2MaxScaled(v float64) *MaxMetData {
-	m.Vo2Max = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Vo2Max = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Vo2Max = uint16(unscaled)
 	return m
 }
 

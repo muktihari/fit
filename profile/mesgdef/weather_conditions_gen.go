@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -202,7 +201,7 @@ func (m *WeatherConditions) WindSpeedScaled() float64 {
 	if m.WindSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.WindSpeed, 1000, 0)
+	return float64(m.WindSpeed)/1000 - 0
 }
 
 // ObservedLocationLatDegrees returns ObservedLocationLat in degrees instead of semicircles.
@@ -276,7 +275,12 @@ func (m *WeatherConditions) SetWindSpeed(v uint16) *WeatherConditions {
 //
 // Scale: 1000; Units: m/s
 func (m *WeatherConditions) SetWindSpeedScaled(v float64) *WeatherConditions {
-	m.WindSpeed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.WindSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.WindSpeed = uint16(unscaled)
 	return m
 }
 

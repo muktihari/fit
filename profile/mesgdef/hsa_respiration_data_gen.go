@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -106,7 +106,15 @@ func (m *HsaRespirationData) RespirationRateScaled() []float64 {
 	if m.RespirationRate == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.RespirationRate, 100, 0)
+	var vals = make([]float64, len(m.RespirationRate))
+	for i := range m.RespirationRate {
+		if m.RespirationRate[i] == basetype.Sint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.RespirationRate[i])/100 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -138,7 +146,19 @@ func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
 //
 // Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
 func (m *HsaRespirationData) SetRespirationRateScaled(vs []float64) *HsaRespirationData {
-	m.RespirationRate = scaleoffset.DiscardSlice[int16](vs, 100, 0)
+	if vs == nil {
+		m.RespirationRate = nil
+		return m
+	}
+	m.RespirationRate = make([]int16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 100
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+			m.RespirationRate[i] = int16(basetype.Sint16Invalid)
+			continue
+		}
+		m.RespirationRate[i] = int16(unscaled)
+	}
 	return m
 }
 

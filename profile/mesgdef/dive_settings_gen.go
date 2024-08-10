@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -349,7 +348,7 @@ func (m *DiveSettings) Po2WarnScaled() float64 {
 	if m.Po2Warn == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Po2Warn, 100, 0)
+	return float64(m.Po2Warn)/100 - 0
 }
 
 // Po2CriticalScaled return Po2Critical in its scaled value.
@@ -360,7 +359,7 @@ func (m *DiveSettings) Po2CriticalScaled() float64 {
 	if m.Po2Critical == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Po2Critical, 100, 0)
+	return float64(m.Po2Critical)/100 - 0
 }
 
 // Po2DecoScaled return Po2Deco in its scaled value.
@@ -371,7 +370,7 @@ func (m *DiveSettings) Po2DecoScaled() float64 {
 	if m.Po2Deco == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Po2Deco, 100, 0)
+	return float64(m.Po2Deco)/100 - 0
 }
 
 // CcrLowSetpointScaled return CcrLowSetpoint in its scaled value.
@@ -382,7 +381,7 @@ func (m *DiveSettings) CcrLowSetpointScaled() float64 {
 	if m.CcrLowSetpoint == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CcrLowSetpoint, 100, 0)
+	return float64(m.CcrLowSetpoint)/100 - 0
 }
 
 // CcrLowSetpointDepthScaled return CcrLowSetpointDepth in its scaled value.
@@ -393,7 +392,7 @@ func (m *DiveSettings) CcrLowSetpointDepthScaled() float64 {
 	if m.CcrLowSetpointDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CcrLowSetpointDepth, 1000, 0)
+	return float64(m.CcrLowSetpointDepth)/1000 - 0
 }
 
 // CcrHighSetpointScaled return CcrHighSetpoint in its scaled value.
@@ -404,7 +403,7 @@ func (m *DiveSettings) CcrHighSetpointScaled() float64 {
 	if m.CcrHighSetpoint == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CcrHighSetpoint, 100, 0)
+	return float64(m.CcrHighSetpoint)/100 - 0
 }
 
 // CcrHighSetpointDepthScaled return CcrHighSetpointDepth in its scaled value.
@@ -415,7 +414,7 @@ func (m *DiveSettings) CcrHighSetpointDepthScaled() float64 {
 	if m.CcrHighSetpointDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CcrHighSetpointDepth, 1000, 0)
+	return float64(m.CcrHighSetpointDepth)/1000 - 0
 }
 
 // LastStopMultipleScaled return LastStopMultiple in its scaled value.
@@ -426,7 +425,7 @@ func (m *DiveSettings) LastStopMultipleScaled() float64 {
 	if m.LastStopMultiple == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LastStopMultiple, 10, 0)
+	return float64(m.LastStopMultiple)/10 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -496,7 +495,12 @@ func (m *DiveSettings) SetPo2Warn(v uint8) *DiveSettings {
 //
 // Scale: 100; Units: percent; Typically 1.40
 func (m *DiveSettings) SetPo2WarnScaled(v float64) *DiveSettings {
-	m.Po2Warn = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Po2Warn = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Po2Warn = uint8(unscaled)
 	return m
 }
 
@@ -513,7 +517,12 @@ func (m *DiveSettings) SetPo2Critical(v uint8) *DiveSettings {
 //
 // Scale: 100; Units: percent; Typically 1.60
 func (m *DiveSettings) SetPo2CriticalScaled(v float64) *DiveSettings {
-	m.Po2Critical = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Po2Critical = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Po2Critical = uint8(unscaled)
 	return m
 }
 
@@ -530,7 +539,12 @@ func (m *DiveSettings) SetPo2Deco(v uint8) *DiveSettings {
 //
 // Scale: 100; Units: percent
 func (m *DiveSettings) SetPo2DecoScaled(v float64) *DiveSettings {
-	m.Po2Deco = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Po2Deco = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Po2Deco = uint8(unscaled)
 	return m
 }
 
@@ -639,7 +653,12 @@ func (m *DiveSettings) SetCcrLowSetpoint(v uint8) *DiveSettings {
 //
 // Scale: 100; Units: percent; Target PO2 when using low setpoint
 func (m *DiveSettings) SetCcrLowSetpointScaled(v float64) *DiveSettings {
-	m.CcrLowSetpoint = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.CcrLowSetpoint = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.CcrLowSetpoint = uint8(unscaled)
 	return m
 }
 
@@ -656,7 +675,12 @@ func (m *DiveSettings) SetCcrLowSetpointDepth(v uint32) *DiveSettings {
 //
 // Scale: 1000; Units: m; Depth to switch to low setpoint in automatic mode
 func (m *DiveSettings) SetCcrLowSetpointDepthScaled(v float64) *DiveSettings {
-	m.CcrLowSetpointDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.CcrLowSetpointDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.CcrLowSetpointDepth = uint32(unscaled)
 	return m
 }
 
@@ -681,7 +705,12 @@ func (m *DiveSettings) SetCcrHighSetpoint(v uint8) *DiveSettings {
 //
 // Scale: 100; Units: percent; Target PO2 when using high setpoint
 func (m *DiveSettings) SetCcrHighSetpointScaled(v float64) *DiveSettings {
-	m.CcrHighSetpoint = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.CcrHighSetpoint = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.CcrHighSetpoint = uint8(unscaled)
 	return m
 }
 
@@ -698,7 +727,12 @@ func (m *DiveSettings) SetCcrHighSetpointDepth(v uint32) *DiveSettings {
 //
 // Scale: 1000; Units: m; Depth to switch to high setpoint in automatic mode
 func (m *DiveSettings) SetCcrHighSetpointDepthScaled(v float64) *DiveSettings {
-	m.CcrHighSetpointDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.CcrHighSetpointDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.CcrHighSetpointDepth = uint32(unscaled)
 	return m
 }
 
@@ -739,7 +773,12 @@ func (m *DiveSettings) SetLastStopMultiple(v uint8) *DiveSettings {
 //
 // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 func (m *DiveSettings) SetLastStopMultipleScaled(v float64) *DiveSettings {
-	m.LastStopMultiple = uint8(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.LastStopMultiple = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.LastStopMultiple = uint8(unscaled)
 	return m
 }
 

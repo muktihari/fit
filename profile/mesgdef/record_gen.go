@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -24,7 +23,6 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type Record struct {
 	Timestamp                     time.Time // Units: s
-	CompressedSpeedDistance       []byte    // Array: [3]; Units: m/s,m
 	Speed1S                       []uint8   // Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
 	LeftPowerPhase                []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
 	LeftPowerPhasePeak            []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
@@ -79,6 +77,7 @@ type Record struct {
 	VolumeSac                     uint16    // Scale: 100; Units: L/min; Volumetric surface air consumption
 	Rmv                           uint16    // Scale: 100; Units: L/min; Respiratory minute volume
 	CoreTemperature               uint16    // Scale: 100; Units: C
+	CompressedSpeedDistance       [3]byte   // Units: m/s,m
 	HeartRate                     uint8     // Units: bpm
 	Cadence                       uint8     // Units: rpm
 	Resistance                    uint8     // Relative. 0 is none 254 is Max.
@@ -108,7 +107,7 @@ type Record struct {
 	EbikeAssistLevelPercent       uint8 // Units: percent
 	Po2                           uint8 // Scale: 100; Units: percent; Current partial pressure of oxygen
 
-	IsExpandedFields [109]bool // Used for tracking expanded fields, field.Num as index.
+	state [14]uint8 // Used for tracking expanded fields.
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -119,16 +118,17 @@ type Record struct {
 // If mesg is nil, it will return Record with all fields being set to its corresponding invalid value.
 func NewRecord(mesg *proto.Message) *Record {
 	vals := [254]proto.Value{}
-	isExpandedFields := [109]bool{}
 
+	var state [14]uint8
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num >= byte(len(vals)) {
 				continue
 			}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < 109 && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num / 8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
@@ -136,16 +136,24 @@ func NewRecord(mesg *proto.Message) *Record {
 	}
 
 	return &Record{
-		Timestamp:                     datetime.ToTime(vals[253].Uint32()),
-		PositionLat:                   vals[0].Int32(),
-		PositionLong:                  vals[1].Int32(),
-		Altitude:                      vals[2].Uint16(),
-		HeartRate:                     vals[3].Uint8(),
-		Cadence:                       vals[4].Uint8(),
-		Distance:                      vals[5].Uint32(),
-		Speed:                         vals[6].Uint16(),
-		Power:                         vals[7].Uint16(),
-		CompressedSpeedDistance:       vals[8].SliceUint8(),
+		Timestamp:    datetime.ToTime(vals[253].Uint32()),
+		PositionLat:  vals[0].Int32(),
+		PositionLong: vals[1].Int32(),
+		Altitude:     vals[2].Uint16(),
+		HeartRate:    vals[3].Uint8(),
+		Cadence:      vals[4].Uint8(),
+		Distance:     vals[5].Uint32(),
+		Speed:        vals[6].Uint16(),
+		Power:        vals[7].Uint16(),
+		CompressedSpeedDistance: func() (arr [3]uint8) {
+			arr = [3]uint8{
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+				basetype.ByteInvalid,
+			}
+			copy(arr[:], vals[8].SliceUint8())
+			return arr
+		}(),
 		Grade:                         vals[9].Int16(),
 		Resistance:                    vals[10].Uint8(),
 		TimeFromCourse:                vals[11].Int32(),
@@ -221,7 +229,7 @@ func NewRecord(mesg *proto.Message) *Record {
 		Po2:                           vals[129].Uint8(),
 		CoreTemperature:               vals[139].Uint16(),
 
-		IsExpandedFields: isExpandedFields,
+		state: state,
 
 		DeveloperFields: developerFields,
 	}
@@ -273,26 +281,35 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Cadence)
 		fields = append(fields, field)
 	}
-	if m.Distance != basetype.Uint32Invalid && ((m.IsExpandedFields[5] && options.IncludeExpandedFields) || !m.IsExpandedFields[5]) {
-		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(m.Distance)
-		field.IsExpandedField = m.IsExpandedFields[5]
-		fields = append(fields, field)
+	if m.Distance != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(5); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 5)
+			field.Value = proto.Uint32(m.Distance)
+			field.IsExpandedField = m.IsExpandedField(5)
+			fields = append(fields, field)
+		}
 	}
-	if m.Speed != basetype.Uint16Invalid && ((m.IsExpandedFields[6] && options.IncludeExpandedFields) || !m.IsExpandedFields[6]) {
-		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint16(m.Speed)
-		field.IsExpandedField = m.IsExpandedFields[6]
-		fields = append(fields, field)
+	if m.Speed != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(6); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 6)
+			field.Value = proto.Uint16(m.Speed)
+			field.IsExpandedField = m.IsExpandedField(6)
+			fields = append(fields, field)
+		}
 	}
 	if m.Power != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint16(m.Power)
 		fields = append(fields, field)
 	}
-	if m.CompressedSpeedDistance != nil {
+	if m.CompressedSpeedDistance != [3]uint8{
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+		basetype.ByteInvalid,
+	} {
 		field := fac.CreateField(mesg.Num, 8)
-		field.Value = proto.SliceUint8(m.CompressedSpeedDistance)
+		copied := m.CompressedSpeedDistance
+		field.Value = proto.SliceUint8(copied[:])
 		fields = append(fields, field)
 	}
 	if m.Grade != basetype.Sint16Invalid {
@@ -330,22 +347,26 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Cycles)
 		fields = append(fields, field)
 	}
-	if m.TotalCycles != basetype.Uint32Invalid && ((m.IsExpandedFields[19] && options.IncludeExpandedFields) || !m.IsExpandedFields[19]) {
-		field := fac.CreateField(mesg.Num, 19)
-		field.Value = proto.Uint32(m.TotalCycles)
-		field.IsExpandedField = m.IsExpandedFields[19]
-		fields = append(fields, field)
+	if m.TotalCycles != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(19); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 19)
+			field.Value = proto.Uint32(m.TotalCycles)
+			field.IsExpandedField = m.IsExpandedField(19)
+			fields = append(fields, field)
+		}
 	}
 	if m.CompressedAccumulatedPower != basetype.Uint16Invalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = proto.Uint16(m.CompressedAccumulatedPower)
 		fields = append(fields, field)
 	}
-	if m.AccumulatedPower != basetype.Uint32Invalid && ((m.IsExpandedFields[29] && options.IncludeExpandedFields) || !m.IsExpandedFields[29]) {
-		field := fac.CreateField(mesg.Num, 29)
-		field.Value = proto.Uint32(m.AccumulatedPower)
-		field.IsExpandedField = m.IsExpandedFields[29]
-		fields = append(fields, field)
+	if m.AccumulatedPower != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(29); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 29)
+			field.Value = proto.Uint32(m.AccumulatedPower)
+			field.IsExpandedField = m.IsExpandedField(29)
+			fields = append(fields, field)
+		}
 	}
 	if uint8(m.LeftRightBalance) != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 30)
@@ -507,17 +528,21 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.RightPowerPhasePeak)
 		fields = append(fields, field)
 	}
-	if m.EnhancedSpeed != basetype.Uint32Invalid && ((m.IsExpandedFields[73] && options.IncludeExpandedFields) || !m.IsExpandedFields[73]) {
-		field := fac.CreateField(mesg.Num, 73)
-		field.Value = proto.Uint32(m.EnhancedSpeed)
-		field.IsExpandedField = m.IsExpandedFields[73]
-		fields = append(fields, field)
+	if m.EnhancedSpeed != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(73); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 73)
+			field.Value = proto.Uint32(m.EnhancedSpeed)
+			field.IsExpandedField = m.IsExpandedField(73)
+			fields = append(fields, field)
+		}
 	}
-	if m.EnhancedAltitude != basetype.Uint32Invalid && ((m.IsExpandedFields[78] && options.IncludeExpandedFields) || !m.IsExpandedFields[78]) {
-		field := fac.CreateField(mesg.Num, 78)
-		field.Value = proto.Uint32(m.EnhancedAltitude)
-		field.IsExpandedField = m.IsExpandedFields[78]
-		fields = append(fields, field)
+	if m.EnhancedAltitude != basetype.Uint32Invalid {
+		if expanded := m.IsExpandedField(78); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 78)
+			field.Value = proto.Uint32(m.EnhancedAltitude)
+			field.IsExpandedField = m.IsExpandedField(78)
+			fields = append(fields, field)
+		}
 	}
 	if m.BatterySoc != basetype.Uint8Invalid {
 		field := fac.CreateField(mesg.Num, 81)
@@ -594,11 +619,13 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.RespirationRate)
 		fields = append(fields, field)
 	}
-	if m.EnhancedRespirationRate != basetype.Uint16Invalid && ((m.IsExpandedFields[108] && options.IncludeExpandedFields) || !m.IsExpandedFields[108]) {
-		field := fac.CreateField(mesg.Num, 108)
-		field.Value = proto.Uint16(m.EnhancedRespirationRate)
-		field.IsExpandedField = m.IsExpandedFields[108]
-		fields = append(fields, field)
+	if m.EnhancedRespirationRate != basetype.Uint16Invalid {
+		if expanded := m.IsExpandedField(108); !expanded || (expanded && options.IncludeExpandedFields) {
+			field := fac.CreateField(mesg.Num, 108)
+			field.Value = proto.Uint16(m.EnhancedRespirationRate)
+			field.IsExpandedField = m.IsExpandedField(108)
+			fields = append(fields, field)
+		}
 	}
 	if math.Float32bits(m.Grit) != basetype.Float32Invalid {
 		field := fac.CreateField(mesg.Num, 114)
@@ -690,7 +717,7 @@ func (m *Record) AltitudeScaled() float64 {
 	if m.Altitude == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Altitude, 5, 500)
+	return float64(m.Altitude)/5 - 500
 }
 
 // DistanceScaled return Distance in its scaled value.
@@ -701,7 +728,7 @@ func (m *Record) DistanceScaled() float64 {
 	if m.Distance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Distance, 100, 0)
+	return float64(m.Distance)/100 - 0
 }
 
 // SpeedScaled return Speed in its scaled value.
@@ -712,7 +739,7 @@ func (m *Record) SpeedScaled() float64 {
 	if m.Speed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Speed, 1000, 0)
+	return float64(m.Speed)/1000 - 0
 }
 
 // GradeScaled return Grade in its scaled value.
@@ -723,7 +750,7 @@ func (m *Record) GradeScaled() float64 {
 	if m.Grade == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Grade, 100, 0)
+	return float64(m.Grade)/100 - 0
 }
 
 // TimeFromCourseScaled return TimeFromCourse in its scaled value.
@@ -734,7 +761,7 @@ func (m *Record) TimeFromCourseScaled() float64 {
 	if m.TimeFromCourse == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TimeFromCourse, 1000, 0)
+	return float64(m.TimeFromCourse)/1000 - 0
 }
 
 // CycleLengthScaled return CycleLength in its scaled value.
@@ -745,7 +772,7 @@ func (m *Record) CycleLengthScaled() float64 {
 	if m.CycleLength == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CycleLength, 100, 0)
+	return float64(m.CycleLength)/100 - 0
 }
 
 // Speed1SScaled return Speed1S in its scaled value.
@@ -756,7 +783,15 @@ func (m *Record) Speed1SScaled() []float64 {
 	if m.Speed1S == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Speed1S, 16, 0)
+	var vals = make([]float64, len(m.Speed1S))
+	for i := range m.Speed1S {
+		if m.Speed1S[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Speed1S[i])/16 - 0
+	}
+	return vals
 }
 
 // VerticalSpeedScaled return VerticalSpeed in its scaled value.
@@ -767,7 +802,7 @@ func (m *Record) VerticalSpeedScaled() float64 {
 	if m.VerticalSpeed == basetype.Sint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.VerticalSpeed, 1000, 0)
+	return float64(m.VerticalSpeed)/1000 - 0
 }
 
 // VerticalOscillationScaled return VerticalOscillation in its scaled value.
@@ -778,7 +813,7 @@ func (m *Record) VerticalOscillationScaled() float64 {
 	if m.VerticalOscillation == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.VerticalOscillation, 10, 0)
+	return float64(m.VerticalOscillation)/10 - 0
 }
 
 // StanceTimePercentScaled return StanceTimePercent in its scaled value.
@@ -789,7 +824,7 @@ func (m *Record) StanceTimePercentScaled() float64 {
 	if m.StanceTimePercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.StanceTimePercent, 100, 0)
+	return float64(m.StanceTimePercent)/100 - 0
 }
 
 // StanceTimeScaled return StanceTime in its scaled value.
@@ -800,7 +835,7 @@ func (m *Record) StanceTimeScaled() float64 {
 	if m.StanceTime == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.StanceTime, 10, 0)
+	return float64(m.StanceTime)/10 - 0
 }
 
 // LeftTorqueEffectivenessScaled return LeftTorqueEffectiveness in its scaled value.
@@ -811,7 +846,7 @@ func (m *Record) LeftTorqueEffectivenessScaled() float64 {
 	if m.LeftTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LeftTorqueEffectiveness, 2, 0)
+	return float64(m.LeftTorqueEffectiveness)/2 - 0
 }
 
 // RightTorqueEffectivenessScaled return RightTorqueEffectiveness in its scaled value.
@@ -822,7 +857,7 @@ func (m *Record) RightTorqueEffectivenessScaled() float64 {
 	if m.RightTorqueEffectiveness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.RightTorqueEffectiveness, 2, 0)
+	return float64(m.RightTorqueEffectiveness)/2 - 0
 }
 
 // LeftPedalSmoothnessScaled return LeftPedalSmoothness in its scaled value.
@@ -833,7 +868,7 @@ func (m *Record) LeftPedalSmoothnessScaled() float64 {
 	if m.LeftPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.LeftPedalSmoothness, 2, 0)
+	return float64(m.LeftPedalSmoothness)/2 - 0
 }
 
 // RightPedalSmoothnessScaled return RightPedalSmoothness in its scaled value.
@@ -844,7 +879,7 @@ func (m *Record) RightPedalSmoothnessScaled() float64 {
 	if m.RightPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.RightPedalSmoothness, 2, 0)
+	return float64(m.RightPedalSmoothness)/2 - 0
 }
 
 // CombinedPedalSmoothnessScaled return CombinedPedalSmoothness in its scaled value.
@@ -855,7 +890,7 @@ func (m *Record) CombinedPedalSmoothnessScaled() float64 {
 	if m.CombinedPedalSmoothness == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CombinedPedalSmoothness, 2, 0)
+	return float64(m.CombinedPedalSmoothness)/2 - 0
 }
 
 // Time128Scaled return Time128 in its scaled value.
@@ -866,7 +901,7 @@ func (m *Record) Time128Scaled() float64 {
 	if m.Time128 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Time128, 128, 0)
+	return float64(m.Time128)/128 - 0
 }
 
 // BallSpeedScaled return BallSpeed in its scaled value.
@@ -877,7 +912,7 @@ func (m *Record) BallSpeedScaled() float64 {
 	if m.BallSpeed == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BallSpeed, 100, 0)
+	return float64(m.BallSpeed)/100 - 0
 }
 
 // Cadence256Scaled return Cadence256 in its scaled value.
@@ -888,7 +923,7 @@ func (m *Record) Cadence256Scaled() float64 {
 	if m.Cadence256 == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Cadence256, 256, 0)
+	return float64(m.Cadence256)/256 - 0
 }
 
 // FractionalCadenceScaled return FractionalCadence in its scaled value.
@@ -899,7 +934,7 @@ func (m *Record) FractionalCadenceScaled() float64 {
 	if m.FractionalCadence == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.FractionalCadence, 128, 0)
+	return float64(m.FractionalCadence)/128 - 0
 }
 
 // TotalHemoglobinConcScaled return TotalHemoglobinConc in its scaled value.
@@ -910,7 +945,7 @@ func (m *Record) TotalHemoglobinConcScaled() float64 {
 	if m.TotalHemoglobinConc == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalHemoglobinConc, 100, 0)
+	return float64(m.TotalHemoglobinConc)/100 - 0
 }
 
 // TotalHemoglobinConcMinScaled return TotalHemoglobinConcMin in its scaled value.
@@ -921,7 +956,7 @@ func (m *Record) TotalHemoglobinConcMinScaled() float64 {
 	if m.TotalHemoglobinConcMin == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalHemoglobinConcMin, 100, 0)
+	return float64(m.TotalHemoglobinConcMin)/100 - 0
 }
 
 // TotalHemoglobinConcMaxScaled return TotalHemoglobinConcMax in its scaled value.
@@ -932,7 +967,7 @@ func (m *Record) TotalHemoglobinConcMaxScaled() float64 {
 	if m.TotalHemoglobinConcMax == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalHemoglobinConcMax, 100, 0)
+	return float64(m.TotalHemoglobinConcMax)/100 - 0
 }
 
 // SaturatedHemoglobinPercentScaled return SaturatedHemoglobinPercent in its scaled value.
@@ -943,7 +978,7 @@ func (m *Record) SaturatedHemoglobinPercentScaled() float64 {
 	if m.SaturatedHemoglobinPercent == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SaturatedHemoglobinPercent, 10, 0)
+	return float64(m.SaturatedHemoglobinPercent)/10 - 0
 }
 
 // SaturatedHemoglobinPercentMinScaled return SaturatedHemoglobinPercentMin in its scaled value.
@@ -954,7 +989,7 @@ func (m *Record) SaturatedHemoglobinPercentMinScaled() float64 {
 	if m.SaturatedHemoglobinPercentMin == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMin, 10, 0)
+	return float64(m.SaturatedHemoglobinPercentMin)/10 - 0
 }
 
 // SaturatedHemoglobinPercentMaxScaled return SaturatedHemoglobinPercentMax in its scaled value.
@@ -965,7 +1000,7 @@ func (m *Record) SaturatedHemoglobinPercentMaxScaled() float64 {
 	if m.SaturatedHemoglobinPercentMax == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.SaturatedHemoglobinPercentMax, 10, 0)
+	return float64(m.SaturatedHemoglobinPercentMax)/10 - 0
 }
 
 // LeftPowerPhaseScaled return LeftPowerPhase in its scaled value.
@@ -976,7 +1011,15 @@ func (m *Record) LeftPowerPhaseScaled() []float64 {
 	if m.LeftPowerPhase == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.LeftPowerPhase, 0.7111111, 0)
+	var vals = make([]float64, len(m.LeftPowerPhase))
+	for i := range m.LeftPowerPhase {
+		if m.LeftPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.LeftPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // LeftPowerPhasePeakScaled return LeftPowerPhasePeak in its scaled value.
@@ -987,7 +1030,15 @@ func (m *Record) LeftPowerPhasePeakScaled() []float64 {
 	if m.LeftPowerPhasePeak == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.LeftPowerPhasePeak, 0.7111111, 0)
+	var vals = make([]float64, len(m.LeftPowerPhasePeak))
+	for i := range m.LeftPowerPhasePeak {
+		if m.LeftPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.LeftPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // RightPowerPhaseScaled return RightPowerPhase in its scaled value.
@@ -998,7 +1049,15 @@ func (m *Record) RightPowerPhaseScaled() []float64 {
 	if m.RightPowerPhase == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.RightPowerPhase, 0.7111111, 0)
+	var vals = make([]float64, len(m.RightPowerPhase))
+	for i := range m.RightPowerPhase {
+		if m.RightPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.RightPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // RightPowerPhasePeakScaled return RightPowerPhasePeak in its scaled value.
@@ -1009,7 +1068,15 @@ func (m *Record) RightPowerPhasePeakScaled() []float64 {
 	if m.RightPowerPhasePeak == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.RightPowerPhasePeak, 0.7111111, 0)
+	var vals = make([]float64, len(m.RightPowerPhasePeak))
+	for i := range m.RightPowerPhasePeak {
+		if m.RightPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.RightPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
 }
 
 // EnhancedSpeedScaled return EnhancedSpeed in its scaled value.
@@ -1020,7 +1087,7 @@ func (m *Record) EnhancedSpeedScaled() float64 {
 	if m.EnhancedSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedSpeed, 1000, 0)
+	return float64(m.EnhancedSpeed)/1000 - 0
 }
 
 // EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
@@ -1031,7 +1098,7 @@ func (m *Record) EnhancedAltitudeScaled() float64 {
 	if m.EnhancedAltitude == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedAltitude, 5, 500)
+	return float64(m.EnhancedAltitude)/5 - 500
 }
 
 // BatterySocScaled return BatterySoc in its scaled value.
@@ -1042,7 +1109,7 @@ func (m *Record) BatterySocScaled() float64 {
 	if m.BatterySoc == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.BatterySoc, 2, 0)
+	return float64(m.BatterySoc)/2 - 0
 }
 
 // VerticalRatioScaled return VerticalRatio in its scaled value.
@@ -1053,7 +1120,7 @@ func (m *Record) VerticalRatioScaled() float64 {
 	if m.VerticalRatio == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.VerticalRatio, 100, 0)
+	return float64(m.VerticalRatio)/100 - 0
 }
 
 // StanceTimeBalanceScaled return StanceTimeBalance in its scaled value.
@@ -1064,7 +1131,7 @@ func (m *Record) StanceTimeBalanceScaled() float64 {
 	if m.StanceTimeBalance == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.StanceTimeBalance, 100, 0)
+	return float64(m.StanceTimeBalance)/100 - 0
 }
 
 // StepLengthScaled return StepLength in its scaled value.
@@ -1075,7 +1142,7 @@ func (m *Record) StepLengthScaled() float64 {
 	if m.StepLength == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.StepLength, 10, 0)
+	return float64(m.StepLength)/10 - 0
 }
 
 // CycleLength16Scaled return CycleLength16 in its scaled value.
@@ -1086,7 +1153,7 @@ func (m *Record) CycleLength16Scaled() float64 {
 	if m.CycleLength16 == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CycleLength16, 100, 0)
+	return float64(m.CycleLength16)/100 - 0
 }
 
 // DepthScaled return Depth in its scaled value.
@@ -1097,7 +1164,7 @@ func (m *Record) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Depth, 1000, 0)
+	return float64(m.Depth)/1000 - 0
 }
 
 // NextStopDepthScaled return NextStopDepth in its scaled value.
@@ -1108,7 +1175,7 @@ func (m *Record) NextStopDepthScaled() float64 {
 	if m.NextStopDepth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.NextStopDepth, 1000, 0)
+	return float64(m.NextStopDepth)/1000 - 0
 }
 
 // EnhancedRespirationRateScaled return EnhancedRespirationRate in its scaled value.
@@ -1119,7 +1186,7 @@ func (m *Record) EnhancedRespirationRateScaled() float64 {
 	if m.EnhancedRespirationRate == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.EnhancedRespirationRate, 100, 0)
+	return float64(m.EnhancedRespirationRate)/100 - 0
 }
 
 // CurrentStressScaled return CurrentStress in its scaled value.
@@ -1130,7 +1197,7 @@ func (m *Record) CurrentStressScaled() float64 {
 	if m.CurrentStress == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CurrentStress, 100, 0)
+	return float64(m.CurrentStress)/100 - 0
 }
 
 // PressureSacScaled return PressureSac in its scaled value.
@@ -1141,7 +1208,7 @@ func (m *Record) PressureSacScaled() float64 {
 	if m.PressureSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.PressureSac, 100, 0)
+	return float64(m.PressureSac)/100 - 0
 }
 
 // VolumeSacScaled return VolumeSac in its scaled value.
@@ -1152,7 +1219,7 @@ func (m *Record) VolumeSacScaled() float64 {
 	if m.VolumeSac == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.VolumeSac, 100, 0)
+	return float64(m.VolumeSac)/100 - 0
 }
 
 // RmvScaled return Rmv in its scaled value.
@@ -1163,7 +1230,7 @@ func (m *Record) RmvScaled() float64 {
 	if m.Rmv == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Rmv, 100, 0)
+	return float64(m.Rmv)/100 - 0
 }
 
 // AscentRateScaled return AscentRate in its scaled value.
@@ -1174,7 +1241,7 @@ func (m *Record) AscentRateScaled() float64 {
 	if m.AscentRate == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AscentRate, 1000, 0)
+	return float64(m.AscentRate)/1000 - 0
 }
 
 // Po2Scaled return Po2 in its scaled value.
@@ -1185,7 +1252,7 @@ func (m *Record) Po2Scaled() float64 {
 	if m.Po2 == basetype.Uint8Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Po2, 100, 0)
+	return float64(m.Po2)/100 - 0
 }
 
 // CoreTemperatureScaled return CoreTemperature in its scaled value.
@@ -1196,7 +1263,7 @@ func (m *Record) CoreTemperatureScaled() float64 {
 	if m.CoreTemperature == basetype.Uint16Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.CoreTemperature, 100, 0)
+	return float64(m.CoreTemperature)/100 - 0
 }
 
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
@@ -1268,7 +1335,12 @@ func (m *Record) SetAltitude(v uint16) *Record {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Record) SetAltitudeScaled(v float64) *Record {
-	m.Altitude = uint16(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Altitude = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Altitude = uint16(unscaled)
 	return m
 }
 
@@ -1301,7 +1373,12 @@ func (m *Record) SetDistance(v uint32) *Record {
 //
 // Scale: 100; Units: m
 func (m *Record) SetDistanceScaled(v float64) *Record {
-	m.Distance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Distance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Distance = uint32(unscaled)
 	return m
 }
 
@@ -1318,7 +1395,12 @@ func (m *Record) SetSpeed(v uint16) *Record {
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetSpeedScaled(v float64) *Record {
-	m.Speed = uint16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Speed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Speed = uint16(unscaled)
 	return m
 }
 
@@ -1332,8 +1414,8 @@ func (m *Record) SetPower(v uint16) *Record {
 
 // SetCompressedSpeedDistance sets CompressedSpeedDistance value.
 //
-// Array: [3]; Units: m/s,m
-func (m *Record) SetCompressedSpeedDistance(v []byte) *Record {
+// Units: m/s,m
+func (m *Record) SetCompressedSpeedDistance(v [3]byte) *Record {
 	m.CompressedSpeedDistance = v
 	return m
 }
@@ -1351,7 +1433,12 @@ func (m *Record) SetGrade(v int16) *Record {
 //
 // Scale: 100; Units: %
 func (m *Record) SetGradeScaled(v float64) *Record {
-	m.Grade = int16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.Grade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.Grade = int16(unscaled)
 	return m
 }
 
@@ -1376,7 +1463,12 @@ func (m *Record) SetTimeFromCourse(v int32) *Record {
 //
 // Scale: 1000; Units: s
 func (m *Record) SetTimeFromCourseScaled(v float64) *Record {
-	m.TimeFromCourse = int32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+		m.TimeFromCourse = int32(basetype.Sint32Invalid)
+		return m
+	}
+	m.TimeFromCourse = int32(unscaled)
 	return m
 }
 
@@ -1393,7 +1485,12 @@ func (m *Record) SetCycleLength(v uint8) *Record {
 //
 // Scale: 100; Units: m
 func (m *Record) SetCycleLengthScaled(v float64) *Record {
-	m.CycleLength = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.CycleLength = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.CycleLength = uint8(unscaled)
 	return m
 }
 
@@ -1418,7 +1515,19 @@ func (m *Record) SetSpeed1S(v []uint8) *Record {
 //
 // Array: [N]; Scale: 16; Units: m/s; Speed at 1s intervals. Timestamp field indicates time of last array element.
 func (m *Record) SetSpeed1SScaled(vs []float64) *Record {
-	m.Speed1S = scaleoffset.DiscardSlice[uint8](vs, 16, 0)
+	if vs == nil {
+		m.Speed1S = nil
+		return m
+	}
+	m.Speed1S = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 16
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.Speed1S[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.Speed1S[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -1481,7 +1590,12 @@ func (m *Record) SetVerticalSpeed(v int16) *Record {
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetVerticalSpeedScaled(v float64) *Record {
-	m.VerticalSpeed = int16(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.VerticalSpeed = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.VerticalSpeed = int16(unscaled)
 	return m
 }
 
@@ -1506,7 +1620,12 @@ func (m *Record) SetVerticalOscillation(v uint16) *Record {
 //
 // Scale: 10; Units: mm
 func (m *Record) SetVerticalOscillationScaled(v float64) *Record {
-	m.VerticalOscillation = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.VerticalOscillation = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.VerticalOscillation = uint16(unscaled)
 	return m
 }
 
@@ -1523,7 +1642,12 @@ func (m *Record) SetStanceTimePercent(v uint16) *Record {
 //
 // Scale: 100; Units: percent
 func (m *Record) SetStanceTimePercentScaled(v float64) *Record {
-	m.StanceTimePercent = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.StanceTimePercent = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.StanceTimePercent = uint16(unscaled)
 	return m
 }
 
@@ -1540,7 +1664,12 @@ func (m *Record) SetStanceTime(v uint16) *Record {
 //
 // Scale: 10; Units: ms
 func (m *Record) SetStanceTimeScaled(v float64) *Record {
-	m.StanceTime = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.StanceTime = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.StanceTime = uint16(unscaled)
 	return m
 }
 
@@ -1563,7 +1692,12 @@ func (m *Record) SetLeftTorqueEffectiveness(v uint8) *Record {
 //
 // Scale: 2; Units: percent
 func (m *Record) SetLeftTorqueEffectivenessScaled(v float64) *Record {
-	m.LeftTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.LeftTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.LeftTorqueEffectiveness = uint8(unscaled)
 	return m
 }
 
@@ -1580,7 +1714,12 @@ func (m *Record) SetRightTorqueEffectiveness(v uint8) *Record {
 //
 // Scale: 2; Units: percent
 func (m *Record) SetRightTorqueEffectivenessScaled(v float64) *Record {
-	m.RightTorqueEffectiveness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.RightTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.RightTorqueEffectiveness = uint8(unscaled)
 	return m
 }
 
@@ -1597,7 +1736,12 @@ func (m *Record) SetLeftPedalSmoothness(v uint8) *Record {
 //
 // Scale: 2; Units: percent
 func (m *Record) SetLeftPedalSmoothnessScaled(v float64) *Record {
-	m.LeftPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.LeftPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.LeftPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -1614,7 +1758,12 @@ func (m *Record) SetRightPedalSmoothness(v uint8) *Record {
 //
 // Scale: 2; Units: percent
 func (m *Record) SetRightPedalSmoothnessScaled(v float64) *Record {
-	m.RightPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.RightPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.RightPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -1631,7 +1780,12 @@ func (m *Record) SetCombinedPedalSmoothness(v uint8) *Record {
 //
 // Scale: 2; Units: percent
 func (m *Record) SetCombinedPedalSmoothnessScaled(v float64) *Record {
-	m.CombinedPedalSmoothness = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.CombinedPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.CombinedPedalSmoothness = uint8(unscaled)
 	return m
 }
 
@@ -1648,7 +1802,12 @@ func (m *Record) SetTime128(v uint8) *Record {
 //
 // Scale: 128; Units: s
 func (m *Record) SetTime128Scaled(v float64) *Record {
-	m.Time128 = uint8(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Time128 = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Time128 = uint8(unscaled)
 	return m
 }
 
@@ -1677,7 +1836,12 @@ func (m *Record) SetBallSpeed(v uint16) *Record {
 //
 // Scale: 100; Units: m/s
 func (m *Record) SetBallSpeedScaled(v float64) *Record {
-	m.BallSpeed = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.BallSpeed = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.BallSpeed = uint16(unscaled)
 	return m
 }
 
@@ -1694,7 +1858,12 @@ func (m *Record) SetCadence256(v uint16) *Record {
 //
 // Scale: 256; Units: rpm; Log cadence and fractional cadence for backwards compatibility
 func (m *Record) SetCadence256Scaled(v float64) *Record {
-	m.Cadence256 = uint16(scaleoffset.Discard(v, 256, 0))
+	unscaled := (v + 0) * 256
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Cadence256 = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Cadence256 = uint16(unscaled)
 	return m
 }
 
@@ -1711,7 +1880,12 @@ func (m *Record) SetFractionalCadence(v uint8) *Record {
 //
 // Scale: 128; Units: rpm
 func (m *Record) SetFractionalCadenceScaled(v float64) *Record {
-	m.FractionalCadence = uint8(scaleoffset.Discard(v, 128, 0))
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.FractionalCadence = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.FractionalCadence = uint8(unscaled)
 	return m
 }
 
@@ -1728,7 +1902,12 @@ func (m *Record) SetTotalHemoglobinConc(v uint16) *Record {
 //
 // Scale: 100; Units: g/dL; Total saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConcScaled(v float64) *Record {
-	m.TotalHemoglobinConc = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.TotalHemoglobinConc = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.TotalHemoglobinConc = uint16(unscaled)
 	return m
 }
 
@@ -1745,7 +1924,12 @@ func (m *Record) SetTotalHemoglobinConcMin(v uint16) *Record {
 //
 // Scale: 100; Units: g/dL; Min saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConcMinScaled(v float64) *Record {
-	m.TotalHemoglobinConcMin = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.TotalHemoglobinConcMin = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.TotalHemoglobinConcMin = uint16(unscaled)
 	return m
 }
 
@@ -1762,7 +1946,12 @@ func (m *Record) SetTotalHemoglobinConcMax(v uint16) *Record {
 //
 // Scale: 100; Units: g/dL; Max saturated and unsaturated hemoglobin
 func (m *Record) SetTotalHemoglobinConcMaxScaled(v float64) *Record {
-	m.TotalHemoglobinConcMax = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.TotalHemoglobinConcMax = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.TotalHemoglobinConcMax = uint16(unscaled)
 	return m
 }
 
@@ -1779,7 +1968,12 @@ func (m *Record) SetSaturatedHemoglobinPercent(v uint16) *Record {
 //
 // Scale: 10; Units: %; Percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercentScaled(v float64) *Record {
-	m.SaturatedHemoglobinPercent = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.SaturatedHemoglobinPercent = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.SaturatedHemoglobinPercent = uint16(unscaled)
 	return m
 }
 
@@ -1796,7 +1990,12 @@ func (m *Record) SetSaturatedHemoglobinPercentMin(v uint16) *Record {
 //
 // Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercentMinScaled(v float64) *Record {
-	m.SaturatedHemoglobinPercentMin = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.SaturatedHemoglobinPercentMin = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.SaturatedHemoglobinPercentMin = uint16(unscaled)
 	return m
 }
 
@@ -1813,7 +2012,12 @@ func (m *Record) SetSaturatedHemoglobinPercentMax(v uint16) *Record {
 //
 // Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
 func (m *Record) SetSaturatedHemoglobinPercentMaxScaled(v float64) *Record {
-	m.SaturatedHemoglobinPercentMax = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.SaturatedHemoglobinPercentMax = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.SaturatedHemoglobinPercentMax = uint16(unscaled)
 	return m
 }
 
@@ -1852,7 +2056,19 @@ func (m *Record) SetLeftPowerPhase(v []uint8) *Record {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetLeftPowerPhaseScaled(vs []float64) *Record {
-	m.LeftPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.LeftPowerPhase = nil
+		return m
+	}
+	m.LeftPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.LeftPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.LeftPowerPhase[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -1869,7 +2085,19 @@ func (m *Record) SetLeftPowerPhasePeak(v []uint8) *Record {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Left power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetLeftPowerPhasePeakScaled(vs []float64) *Record {
-	m.LeftPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.LeftPowerPhasePeak = nil
+		return m
+	}
+	m.LeftPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.LeftPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.LeftPowerPhasePeak[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -1886,7 +2114,19 @@ func (m *Record) SetRightPowerPhase(v []uint8) *Record {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetRightPowerPhaseScaled(vs []float64) *Record {
-	m.RightPowerPhase = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.RightPowerPhase = nil
+		return m
+	}
+	m.RightPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.RightPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.RightPowerPhase[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -1903,7 +2143,19 @@ func (m *Record) SetRightPowerPhasePeak(v []uint8) *Record {
 //
 // Array: [N]; Scale: 0.7111111; Units: degrees; Right power phase peak angles. Data value indexes defined by power_phase_type.
 func (m *Record) SetRightPowerPhasePeakScaled(vs []float64) *Record {
-	m.RightPowerPhasePeak = scaleoffset.DiscardSlice[uint8](vs, 0.7111111, 0)
+	if vs == nil {
+		m.RightPowerPhasePeak = nil
+		return m
+	}
+	m.RightPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.RightPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.RightPowerPhasePeak[i] = uint8(unscaled)
+	}
 	return m
 }
 
@@ -1920,7 +2172,12 @@ func (m *Record) SetEnhancedSpeed(v uint32) *Record {
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetEnhancedSpeedScaled(v float64) *Record {
-	m.EnhancedSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedSpeed = uint32(unscaled)
 	return m
 }
 
@@ -1937,7 +2194,12 @@ func (m *Record) SetEnhancedAltitude(v uint32) *Record {
 //
 // Scale: 5; Offset: 500; Units: m
 func (m *Record) SetEnhancedAltitudeScaled(v float64) *Record {
-	m.EnhancedAltitude = uint32(scaleoffset.Discard(v, 5, 500))
+	unscaled := (v + 500) * 5
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.EnhancedAltitude = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.EnhancedAltitude = uint32(unscaled)
 	return m
 }
 
@@ -1954,7 +2216,12 @@ func (m *Record) SetBatterySoc(v uint8) *Record {
 //
 // Scale: 2; Units: percent; lev battery state of charge
 func (m *Record) SetBatterySocScaled(v float64) *Record {
-	m.BatterySoc = uint8(scaleoffset.Discard(v, 2, 0))
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.BatterySoc = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.BatterySoc = uint8(unscaled)
 	return m
 }
 
@@ -1979,7 +2246,12 @@ func (m *Record) SetVerticalRatio(v uint16) *Record {
 //
 // Scale: 100; Units: percent
 func (m *Record) SetVerticalRatioScaled(v float64) *Record {
-	m.VerticalRatio = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.VerticalRatio = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.VerticalRatio = uint16(unscaled)
 	return m
 }
 
@@ -1996,7 +2268,12 @@ func (m *Record) SetStanceTimeBalance(v uint16) *Record {
 //
 // Scale: 100; Units: percent
 func (m *Record) SetStanceTimeBalanceScaled(v float64) *Record {
-	m.StanceTimeBalance = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.StanceTimeBalance = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.StanceTimeBalance = uint16(unscaled)
 	return m
 }
 
@@ -2013,7 +2290,12 @@ func (m *Record) SetStepLength(v uint16) *Record {
 //
 // Scale: 10; Units: mm
 func (m *Record) SetStepLengthScaled(v float64) *Record {
-	m.StepLength = uint16(scaleoffset.Discard(v, 10, 0))
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.StepLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.StepLength = uint16(unscaled)
 	return m
 }
 
@@ -2030,7 +2312,12 @@ func (m *Record) SetCycleLength16(v uint16) *Record {
 //
 // Scale: 100; Units: m; Supports larger cycle sizes needed for paddlesports. Max cycle size: 655.35
 func (m *Record) SetCycleLength16Scaled(v float64) *Record {
-	m.CycleLength16 = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.CycleLength16 = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.CycleLength16 = uint16(unscaled)
 	return m
 }
 
@@ -2055,7 +2342,12 @@ func (m *Record) SetDepth(v uint32) *Record {
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Record) SetDepthScaled(v float64) *Record {
-	m.Depth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Depth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Depth = uint32(unscaled)
 	return m
 }
 
@@ -2072,7 +2364,12 @@ func (m *Record) SetNextStopDepth(v uint32) *Record {
 //
 // Scale: 1000; Units: m; 0 if above water
 func (m *Record) SetNextStopDepthScaled(v float64) *Record {
-	m.NextStopDepth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.NextStopDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.NextStopDepth = uint32(unscaled)
 	return m
 }
 
@@ -2137,7 +2434,12 @@ func (m *Record) SetEnhancedRespirationRate(v uint16) *Record {
 //
 // Scale: 100; Units: Breaths/min
 func (m *Record) SetEnhancedRespirationRateScaled(v float64) *Record {
-	m.EnhancedRespirationRate = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.EnhancedRespirationRate = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.EnhancedRespirationRate = uint16(unscaled)
 	return m
 }
 
@@ -2170,7 +2472,12 @@ func (m *Record) SetCurrentStress(v uint16) *Record {
 //
 // Scale: 100; Current Stress value
 func (m *Record) SetCurrentStressScaled(v float64) *Record {
-	m.CurrentStress = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.CurrentStress = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.CurrentStress = uint16(unscaled)
 	return m
 }
 
@@ -2227,7 +2534,12 @@ func (m *Record) SetPressureSac(v uint16) *Record {
 //
 // Scale: 100; Units: bar/min; Pressure-based surface air consumption
 func (m *Record) SetPressureSacScaled(v float64) *Record {
-	m.PressureSac = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.PressureSac = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.PressureSac = uint16(unscaled)
 	return m
 }
 
@@ -2244,7 +2556,12 @@ func (m *Record) SetVolumeSac(v uint16) *Record {
 //
 // Scale: 100; Units: L/min; Volumetric surface air consumption
 func (m *Record) SetVolumeSacScaled(v float64) *Record {
-	m.VolumeSac = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.VolumeSac = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.VolumeSac = uint16(unscaled)
 	return m
 }
 
@@ -2261,7 +2578,12 @@ func (m *Record) SetRmv(v uint16) *Record {
 //
 // Scale: 100; Units: L/min; Respiratory minute volume
 func (m *Record) SetRmvScaled(v float64) *Record {
-	m.Rmv = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.Rmv = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.Rmv = uint16(unscaled)
 	return m
 }
 
@@ -2278,7 +2600,12 @@ func (m *Record) SetAscentRate(v int32) *Record {
 //
 // Scale: 1000; Units: m/s
 func (m *Record) SetAscentRateScaled(v float64) *Record {
-	m.AscentRate = int32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+		m.AscentRate = int32(basetype.Sint32Invalid)
+		return m
+	}
+	m.AscentRate = int32(unscaled)
 	return m
 }
 
@@ -2295,7 +2622,12 @@ func (m *Record) SetPo2(v uint8) *Record {
 //
 // Scale: 100; Units: percent; Current partial pressure of oxygen
 func (m *Record) SetPo2Scaled(v float64) *Record {
-	m.Po2 = uint8(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.Po2 = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.Po2 = uint8(unscaled)
 	return m
 }
 
@@ -2312,7 +2644,12 @@ func (m *Record) SetCoreTemperature(v uint16) *Record {
 //
 // Scale: 100; Units: C
 func (m *Record) SetCoreTemperatureScaled(v float64) *Record {
-	m.CoreTemperature = uint16(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.CoreTemperature = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.CoreTemperature = uint16(unscaled)
 	return m
 }
 
@@ -2320,4 +2657,32 @@ func (m *Record) SetCoreTemperatureScaled(v float64) *Record {
 func (m *Record) SetDeveloperFields(developerFields ...proto.DeveloperField) *Record {
 	m.DeveloperFields = developerFields
 	return m
+}
+
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: 5, 6, 19, 29, 73, 78, 108.
+func (m *Record) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case 5, 6, 19, 29, 73, 78, 108:
+	default:
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: 5, 6, 19, 29, 73, 78, 108.
+func (m *Record) IsExpandedField(fieldNum byte) bool {
+	if fieldNum >= 109 {
+		return false
+	}
+	pos := fieldNum / 8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos]&bit == bit
 }

@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -179,7 +178,7 @@ func (m *SplitSummary) TotalTimerTimeScaled() float64 {
 	if m.TotalTimerTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalTimerTime, 1000, 0)
+	return float64(m.TotalTimerTime)/1000 - 0
 }
 
 // TotalDistanceScaled return TotalDistance in its scaled value.
@@ -190,7 +189,7 @@ func (m *SplitSummary) TotalDistanceScaled() float64 {
 	if m.TotalDistance == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalDistance, 100, 0)
+	return float64(m.TotalDistance)/100 - 0
 }
 
 // AvgSpeedScaled return AvgSpeed in its scaled value.
@@ -201,7 +200,7 @@ func (m *SplitSummary) AvgSpeedScaled() float64 {
 	if m.AvgSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgSpeed, 1000, 0)
+	return float64(m.AvgSpeed)/1000 - 0
 }
 
 // MaxSpeedScaled return MaxSpeed in its scaled value.
@@ -212,7 +211,7 @@ func (m *SplitSummary) MaxSpeedScaled() float64 {
 	if m.MaxSpeed == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.MaxSpeed, 1000, 0)
+	return float64(m.MaxSpeed)/1000 - 0
 }
 
 // AvgVertSpeedScaled return AvgVertSpeed in its scaled value.
@@ -223,7 +222,7 @@ func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 	if m.AvgVertSpeed == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.AvgVertSpeed, 1000, 0)
+	return float64(m.AvgVertSpeed)/1000 - 0
 }
 
 // TotalMovingTimeScaled return TotalMovingTime in its scaled value.
@@ -234,7 +233,7 @@ func (m *SplitSummary) TotalMovingTimeScaled() float64 {
 	if m.TotalMovingTime == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.TotalMovingTime, 1000, 0)
+	return float64(m.TotalMovingTime)/1000 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -268,7 +267,12 @@ func (m *SplitSummary) SetTotalTimerTime(v uint32) *SplitSummary {
 //
 // Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalTimerTimeScaled(v float64) *SplitSummary {
-	m.TotalTimerTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalTimerTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalTimerTime = uint32(unscaled)
 	return m
 }
 
@@ -285,7 +289,12 @@ func (m *SplitSummary) SetTotalDistance(v uint32) *SplitSummary {
 //
 // Scale: 100; Units: m
 func (m *SplitSummary) SetTotalDistanceScaled(v float64) *SplitSummary {
-	m.TotalDistance = uint32(scaleoffset.Discard(v, 100, 0))
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalDistance = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalDistance = uint32(unscaled)
 	return m
 }
 
@@ -302,7 +311,12 @@ func (m *SplitSummary) SetAvgSpeed(v uint32) *SplitSummary {
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgSpeedScaled(v float64) *SplitSummary {
-	m.AvgSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgSpeed = uint32(unscaled)
 	return m
 }
 
@@ -319,7 +333,12 @@ func (m *SplitSummary) SetMaxSpeed(v uint32) *SplitSummary {
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetMaxSpeedScaled(v float64) *SplitSummary {
-	m.MaxSpeed = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxSpeed = uint32(unscaled)
 	return m
 }
 
@@ -368,7 +387,12 @@ func (m *SplitSummary) SetAvgVertSpeed(v int32) *SplitSummary {
 //
 // Scale: 1000; Units: m/s
 func (m *SplitSummary) SetAvgVertSpeedScaled(v float64) *SplitSummary {
-	m.AvgVertSpeed = int32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+		m.AvgVertSpeed = int32(basetype.Sint32Invalid)
+		return m
+	}
+	m.AvgVertSpeed = int32(unscaled)
 	return m
 }
 
@@ -393,7 +417,12 @@ func (m *SplitSummary) SetTotalMovingTime(v uint32) *SplitSummary {
 //
 // Scale: 1000; Units: s
 func (m *SplitSummary) SetTotalMovingTimeScaled(v float64) *SplitSummary {
-	m.TotalMovingTime = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalMovingTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalMovingTime = uint32(unscaled)
 	return m
 }
 

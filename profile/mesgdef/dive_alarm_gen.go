@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -177,7 +176,7 @@ func (m *DiveAlarm) DepthScaled() float64 {
 	if m.Depth == basetype.Uint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Depth, 1000, 0)
+	return float64(m.Depth)/1000 - 0
 }
 
 // SpeedScaled return Speed in its scaled value.
@@ -188,7 +187,7 @@ func (m *DiveAlarm) SpeedScaled() float64 {
 	if m.Speed == basetype.Sint32Invalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
-	return scaleoffset.Apply(m.Speed, 1000, 0)
+	return float64(m.Speed)/1000 - 0
 }
 
 // SetMessageIndex sets MessageIndex value.
@@ -212,7 +211,12 @@ func (m *DiveAlarm) SetDepth(v uint32) *DiveAlarm {
 //
 // Scale: 1000; Units: m; Depth setting (m) for depth type alarms
 func (m *DiveAlarm) SetDepthScaled(v float64) *DiveAlarm {
-	m.Depth = uint32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.Depth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.Depth = uint32(unscaled)
 	return m
 }
 
@@ -309,7 +313,12 @@ func (m *DiveAlarm) SetSpeed(v int32) *DiveAlarm {
 //
 // Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
 func (m *DiveAlarm) SetSpeedScaled(v float64) *DiveAlarm {
-	m.Speed = int32(scaleoffset.Discard(v, 1000, 0))
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint32Invalid) {
+		m.Speed = int32(basetype.Sint32Invalid)
+		return m
+	}
+	m.Speed = int32(unscaled)
 	return m
 }
 

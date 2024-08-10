@@ -8,9 +8,10 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/kit/scaleoffset"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 )
 
 // Hrv is a Hrv message.
@@ -86,7 +87,15 @@ func (m *Hrv) TimeScaled() []float64 {
 	if m.Time == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.Time, 1000, 0)
+	var vals = make([]float64, len(m.Time))
+	for i := range m.Time {
+		if m.Time[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.Time[i])/1000 - 0
+	}
+	return vals
 }
 
 // SetTime sets Time value.
@@ -102,7 +111,19 @@ func (m *Hrv) SetTime(v []uint16) *Hrv {
 //
 // Array: [N]; Scale: 1000; Units: s; Time between beats
 func (m *Hrv) SetTimeScaled(vs []float64) *Hrv {
-	m.Time = scaleoffset.DiscardSlice[uint16](vs, 1000, 0)
+	if vs == nil {
+		m.Time = nil
+		return m
+	}
+	m.Time = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 1000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.Time[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.Time[i] = uint16(unscaled)
+	}
 	return m
 }
 

@@ -9,10 +9,10 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 	"unsafe"
 )
@@ -135,7 +135,15 @@ func (m *MonitoringInfo) CyclesToDistanceScaled() []float64 {
 	if m.CyclesToDistance == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.CyclesToDistance, 5000, 0)
+	var vals = make([]float64, len(m.CyclesToDistance))
+	for i := range m.CyclesToDistance {
+		if m.CyclesToDistance[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.CyclesToDistance[i])/5000 - 0
+	}
+	return vals
 }
 
 // CyclesToCaloriesScaled return CyclesToCalories in its scaled value.
@@ -146,7 +154,15 @@ func (m *MonitoringInfo) CyclesToCaloriesScaled() []float64 {
 	if m.CyclesToCalories == nil {
 		return nil
 	}
-	return scaleoffset.ApplySlice(m.CyclesToCalories, 5000, 0)
+	var vals = make([]float64, len(m.CyclesToCalories))
+	for i := range m.CyclesToCalories {
+		if m.CyclesToCalories[i] == basetype.Uint16Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.CyclesToCalories[i])/5000 - 0
+	}
+	return vals
 }
 
 // SetTimestamp sets Timestamp value.
@@ -186,7 +202,19 @@ func (m *MonitoringInfo) SetCyclesToDistance(v []uint16) *MonitoringInfo {
 //
 // Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
 func (m *MonitoringInfo) SetCyclesToDistanceScaled(vs []float64) *MonitoringInfo {
-	m.CyclesToDistance = scaleoffset.DiscardSlice[uint16](vs, 5000, 0)
+	if vs == nil {
+		m.CyclesToDistance = nil
+		return m
+	}
+	m.CyclesToDistance = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 5000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.CyclesToDistance[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.CyclesToDistance[i] = uint16(unscaled)
+	}
 	return m
 }
 
@@ -203,7 +231,19 @@ func (m *MonitoringInfo) SetCyclesToCalories(v []uint16) *MonitoringInfo {
 //
 // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
 func (m *MonitoringInfo) SetCyclesToCaloriesScaled(vs []float64) *MonitoringInfo {
-	m.CyclesToCalories = scaleoffset.DiscardSlice[uint16](vs, 5000, 0)
+	if vs == nil {
+		m.CyclesToCalories = nil
+		return m
+	}
+	m.CyclesToCalories = make([]uint16, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 5000
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+			m.CyclesToCalories[i] = uint16(basetype.Uint16Invalid)
+			continue
+		}
+		m.CyclesToCalories[i] = uint16(unscaled)
+	}
 	return m
 }
 
