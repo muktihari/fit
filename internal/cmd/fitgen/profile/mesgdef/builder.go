@@ -37,7 +37,16 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 	return &mesgdefBuilder{
 		template: template.Must(template.New("main").
 			Funcs(template.FuncMap{
-				"stringsJoin": strings.Join,
+				"stringsJoin":   strings.Join,
+				"stringReplace": strings.Replace,
+				"byteDiv":       func(a, b byte) byte { return a / b },
+				"byteAdd":       func(a, b byte) byte { return a + b },
+				"extractExactlyType": func(s string) string {
+					if !strings.HasPrefix(s, "[") {
+						return s
+					}
+					return strings.TrimSuffix(strings.Split(s, "]")[1], "]")
+				},
 			}).
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
 		templateExec: "mesgdef",
@@ -64,22 +73,38 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 				maxFieldNum = parserField.Num
 			}
 
+			var fixedArraySize uint8
+			if len(parserField.Array) > 1 && parserField.Array[1] != 'N' {
+				n := strings.TrimFunc(parserField.Array, func(r rune) bool {
+					return r == '[' || r == ']'
+				})
+				v, err := strconv.ParseInt(n, 10, 8)
+				if err != nil {
+					return nil, fmt.Errorf("could not parse array size: %w", err)
+				}
+				fixedArraySize = uint8(v)
+			}
+
+			baseType := b.lookup.BaseType(parserField.Type)
+
 			field := Field{
-				Num:            parserField.Num,
-				Name:           strutil.ToTitle(parserField.Name),
-				String:         parserField.Name,
-				ProfileType:    parserField.Type,
-				BaseType:       b.lookup.BaseType(parserField.Type).String(),
-				Type:           b.transformType(parserField.Type, parserField.Array),
-				TypedValue:     b.transformTypedValue(parserField.Num, parserField.Type, parserField.Array),
-				PrimitiveValue: b.transformPrimitiveValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
-				ProtoValue:     b.transformToProtoValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
-				InvalidValue:   b.invalidValueOf(parserField.Type, parserField.Array),
-				Comment:        parserField.Comment,
-				Scale:          1,
-				Offset:         0,
-				Array:          parserField.Array != "",
-				Units:          parserField.Units,
+				Num:             parserField.Num,
+				Name:            strutil.ToTitle(parserField.Name),
+				String:          parserField.Name,
+				ProfileType:     parserField.Type,
+				BaseType:        baseType.String(),
+				BaseTypeInvalid: fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(baseType.String())),
+				Type:            b.transformType(parserField.Type, parserField.Array, fixedArraySize),
+				TypedValue:      b.transformTypedValue(parserField.Num, parserField.Type, parserField.Array, fixedArraySize),
+				PrimitiveValue:  b.transformPrimitiveValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
+				ProtoValue:      b.transformToProtoValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
+				InvalidValue:    b.invalidValueOf(parserField.Type, parserField.Array, fixedArraySize),
+				Comment:         parserField.Comment,
+				Scale:           1,
+				Offset:          0,
+				Array:           parserField.Array != "",
+				FixedArraySize:  fixedArraySize,
+				Units:           parserField.Units,
 			}
 			field.ComparableValue = b.transformComparableValue(parserField.Type, parserField.Array, field.PrimitiveValue)
 
@@ -97,6 +122,10 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 
 			if len(parserField.Offsets) <= 1 { // Multiple offsets only for components
 				field.Offset = offsetOrDefault(parserField.Offsets, 0)
+			}
+
+			if field.FixedArraySize > 0 && (field.Scale != 1 || field.Offset != 0) {
+				field.InvalidArrayValueScaled = b.invalidArrayValueScaled(field.FixedArraySize)
 			}
 
 			field.Comment = createComment(&field, parserField.Array)
@@ -203,10 +232,6 @@ func createComment(field *Field, array string) string {
 }
 
 func appendImports(imports map[string]struct{}, field *Field, profileType string) map[string]struct{} {
-	if field.Scale != 1 || field.Offset != 0 {
-		imports["github.com/muktihari/fit/kit/scaleoffset"] = struct{}{}
-	}
-
 	if strings.HasPrefix(field.Type, "basetype") || strings.HasPrefix(field.InvalidValue, "basetype") {
 		imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
 	}
@@ -215,8 +240,9 @@ func appendImports(imports map[string]struct{}, field *Field, profileType string
 		imports["github.com/muktihari/fit/kit/datetime"] = struct{}{}
 	}
 
-	if (field.Scale != 1 || field.Offset != 0) && !field.Array {
+	if field.Scale != 1 || field.Offset != 0 {
 		imports["math"] = struct{}{}
+		imports["github.com/muktihari/fit/profile/basetype"] = struct{}{}
 	}
 
 	if strings.HasPrefix(field.ComparableValue, "math") {
@@ -252,7 +278,7 @@ func (b *mesgdefBuilder) createDynamicField(mesgName string, field *Field, parse
 		if scale != 1 || offset != 0 {
 			condValue.ReturnValue.Value = fmt.Sprintf("(float64(m.%s) * %g) - %g", field.Name, scale, offset)
 		} else {
-			condValue.ReturnValue.Value = fmt.Sprintf("%s(m.%s)", b.transformType(subField.Type, ""), field.Name)
+			condValue.ReturnValue.Value = fmt.Sprintf("%s(m.%s)", b.transformType(subField.Type, "", field.FixedArraySize), field.Name)
 		}
 
 		for i, refValueName := range subField.RefFieldNames {
@@ -274,7 +300,7 @@ func (b *mesgdefBuilder) createDynamicField(mesgName string, field *Field, parse
 			condValue = rawSwitchCases[fieldRef.Name][valOrder]
 			condValue.Conds = append(condValue.Conds,
 				fmt.Sprintf("%s%s",
-					b.transformType(fieldRef.Type, fieldRef.Array), strutil.ToTitle(subField.RefFieldValue[i])))
+					b.transformType(fieldRef.Type, fieldRef.Array, field.FixedArraySize), strutil.ToTitle(subField.RefFieldValue[i])))
 
 			rawSwitchCases[fieldRef.Name][valOrder] = condValue
 		}
@@ -304,27 +330,49 @@ func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
 	// If the size is a multply of 8, set 8.
 	for i := range fields {
 		if strings.HasPrefix(fields[i].Type, "[]") { // Slice
-			fields[i].Size = 8 // 24 bytes (pointer to array (8 bytes), len (8 bytes), cap (8 bytes))
+			fields[i].Size = 24 // pointer to array (8 bytes), len (8 bytes), cap (8 bytes)
+		} else if strings.HasPrefix(fields[i].Type, "[") { // Array
+			size := basetype.FromString(fields[i].BaseType).Size() * fields[i].FixedArraySize
+			rem := size % 8
+			if rem == 0 {
+				fields[i].Size = size
+			} else if rem%4 == 0 {
+				fields[i].Size = 4
+			} else if rem%2 == 0 {
+				fields[i].Size = 2
+			} else {
+				fields[i].Size = 1
+			}
 		} else if isTypeTime(fields[i].ProfileType) { // time.Time
-			fields[i].Size = 8 // 24 bytes (wall (8 bytes), ext (8 bytes), *loc (8 bytes))
+			fields[i].Size = 24 // wall (8 bytes), ext (8 bytes), *loc (8 bytes)
 		} else if fields[i].BaseType == "string" {
-			fields[i].Size = 8 // 16 bytes (pointer to array (8 bytes) + len (8 bytes))
+			fields[i].Size = 16 // pointer to array (8 bytes) + len (8 bytes)
 		} else { // Everything else, 8 bytes or lower.
 			fields[i].Size = basetype.FromString(fields[i].BaseType).Size()
 		}
 	}
 	// Order by the size desc.
 	slices.SortStableFunc(fields, func(a, b Field) int {
+		if a.Size%8 == 0 && b.Size%8 == 0 {
+			return 0
+		}
 		if a.Size > b.Size {
 			return -1
 		} else if a.Size < b.Size {
+			return 1
+		}
+		if a.Array && b.Array {
+			return 0
+		} else if a.Array {
+			return -1
+		} else if b.Array {
 			return 1
 		}
 		return 0
 	})
 }
 
-func (b *mesgdefBuilder) transformType(fieldType, fieldArray string) string {
+func (b *mesgdefBuilder) transformType(fieldType, fieldArray string, fixedArraySize byte) string {
 	if isTypeTime(fieldType) {
 		return "time.Time"
 	}
@@ -342,6 +390,10 @@ func (b *mesgdefBuilder) transformType(fieldType, fieldArray string) string {
 
 	if fieldArray == "" {
 		return typ
+	}
+
+	if fixedArraySize > 0 {
+		return fmt.Sprintf("[%d]%s", fixedArraySize, typ)
 	}
 
 	return fmt.Sprintf("[]%s", typ)
@@ -410,22 +462,18 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 
 }
 
-func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) string {
+func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string, fixedArraySize uint8) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToTime(vals[%d].Uint32())", num)
 	}
 
-	if fieldType == "fit_base_type" {
-		baseType := b.lookup.BaseType(fieldType).String()
-		typ := strutil.ToTitle(baseType)
-		typ = baseTypeReplacer.Replace(typ)
+	baseType := b.lookup.BaseType(fieldType).String()
+	baseTypeTitleCase := strutil.ToTitle(baseType)
+	typ := baseTypeReplacer.Replace(baseTypeTitleCase)
 
+	if fieldType == "fit_base_type" {
 		return fmt.Sprintf("basetype.BaseType((vals[%d]).%s())", num, typ)
 	}
-
-	baseType := b.lookup.BaseType(fieldType).String()
-	typ := strutil.ToTitle(baseType)
-	typ = baseTypeReplacer.Replace(typ)
 
 	if array != "" && strings.HasSuffix(typ, "z") {
 		typ = strings.TrimSuffix(typ, "z")
@@ -438,6 +486,22 @@ func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) 
 	var value string
 	if array == "" {
 		value = fmt.Sprintf("vals[%d].%s()", num, typ)
+	} else if fixedArraySize > 0 { // Array
+		goTyp := strings.ToLower(strings.TrimSuffix(typ, "z"))
+		value = fmt.Sprintf(`func() (arr [%d]%s) {
+			arr = [%d]%s{
+				%s
+			}
+			copy(arr[:], %s)
+			return arr
+		}()`, fixedArraySize, goTyp,
+			fixedArraySize, goTyp,
+			strings.Repeat(
+				fmt.Sprintf("basetype.%sInvalid,\n", baseTypeTitleCase),
+				int(fixedArraySize),
+			),
+			fmt.Sprintf("vals[%d].Slice%s()", num, typ),
+		)
 	} else {
 		value = fmt.Sprintf("vals[%d].Slice%s()", num, typ)
 	}
@@ -457,7 +521,6 @@ func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string) 
 			ptr := unsafe.SliceData(sliceValue)
 			return unsafe.Slice((*%s)(ptr), len(sliceValue))
 		}()`, typdef, value, typdef)
-
 }
 
 func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveValue string) string {
@@ -473,17 +536,46 @@ func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveVal
 	return primitiveValue
 }
 
-func (b *mesgdefBuilder) invalidValueOf(fieldType, array string) string {
+func (b *mesgdefBuilder) invalidValueOf(fieldType, array string, fixedArraySize byte) string {
 	if fieldType == "bool" {
 		return "false"
 	}
 
 	if array != "" {
-		return "nil"
+		if fixedArraySize == 0 { // Slice
+			return "nil"
+		}
+
+		baseType := b.lookup.BaseType(fieldType).String()
+		baseTypeTitleCase := strutil.ToTitle(baseType)
+		typ := baseTypeReplacer.Replace(baseTypeTitleCase)
+		typ = strings.TrimSuffix(typ, "z")
+		goTyp := strings.ToLower(typ)
+
+		return fmt.Sprintf(`[%d]%s{
+			%s
+		}`, fixedArraySize, goTyp,
+			strings.Repeat(
+				fmt.Sprintf("basetype.%sInvalid,\n", baseTypeTitleCase),
+				int(fixedArraySize),
+			),
+		)
 	}
 
 	return fmt.Sprintf("basetype.%sInvalid",
 		strutil.ToTitle(b.lookup.BaseType(fieldType).String()))
+}
+
+func (b *mesgdefBuilder) invalidArrayValueScaled(fixedArraySize byte) string {
+	return fmt.Sprintf(`[%d]float64{
+		%s
+	}`,
+		fixedArraySize,
+		strings.Repeat(
+			"math.Float64frombits(basetype.Float64Invalid),\n",
+			int(fixedArraySize),
+		),
+	)
 }
 
 // Profile.xlsx says unless otherwise specified, scale of 1 is assumed.

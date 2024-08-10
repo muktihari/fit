@@ -27,9 +27,9 @@ type {{ .Name }} struct {
 	{{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
 	{{ end }}
 
-	{{ if gt .MaxFieldExpandNum 1 }}
-	IsExpandedFields [{{ .MaxFieldExpandNum }}]bool // Used for tracking expanded fields, field.Num as index.
-	{{ end -}}
+	{{ if gt .MaxFieldExpandNum 1 -}}
+	state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8 // Used for tracking expanded fields.
+	{{ end }}
 
 	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 	// Developer Fields are dynamic, can't be mapped as struct's fields. 
@@ -42,9 +42,10 @@ type {{ .Name }} struct {
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
     vals := [{{ .MaxFieldNum }}]proto.Value{}
+
 	{{ if gt .MaxFieldExpandNum 1 -}}
-	isExpandedFields := [{{ .MaxFieldExpandNum }}]bool{}
-	{{ end }}
+	var state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
+	{{ end -}}
 
     {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
         var developerFields []proto.DeveloperField
@@ -55,8 +56,9 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
                 continue
             }
 			{{ if gt $.MaxFieldExpandNum 1 -}}
-			if mesg.Fields[i].Num < byte(len(isExpandedFields)) {
-				isExpandedFields[mesg.Fields[i].Num] = mesg.Fields[i].IsExpandedField
+			if mesg.Fields[i].Num < {{ .MaxFieldExpandNum }} && mesg.Fields[i].IsExpandedField {
+				pos := mesg.Fields[i].Num/8
+				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			{{ end -}}
             vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
@@ -72,7 +74,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 			{{ .Name }}: {{ .TypedValue }},
 		{{ end }}
 		{{ if gt .MaxFieldExpandNum 1 -}}
-		IsExpandedFields: isExpandedFields,
+		state: state,
 		{{ end }}
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 		DeveloperFields: developerFields,
@@ -97,13 +99,24 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
     mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
 	
     {{ range .Fields -}}
-        if {{ .ComparableValue }} != {{ .InvalidValue }} {{ if eq .CanExpand true -}} && ((m.IsExpandedFields[{{ .Num }}] && options.IncludeExpandedFields) || !m.IsExpandedFields[{{ .Num }}]) {{ end }} {
+        if {{ .ComparableValue }} != {{ .InvalidValue -}} {
+			{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
 			field := fac.CreateField(mesg.Num, {{ .Num }})
+			{{ if gt .FixedArraySize 0 -}}
+			{{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
+				the struct since we promote the array from the same memory block as the struct. We must copy the array
+				to local variable, so it will be promoted instead (we only need the local variable to escape to the heap),
+				only then the struct can be garbage-collected on next GC's cycle. */ -}}
+			copied := m.{{ .Name }}
+			field.Value = {{ stringReplace .ProtoValue (printf "m.%s" .Name) "copied[:]" -1 }}
+			{{ else -}}
 			field.Value = {{ .ProtoValue }}
+			{{ end -}}
 			{{ if eq .CanExpand true -}}
-				field.IsExpandedField = m.IsExpandedFields[{{ .Num }}]
+				field.IsExpandedField = m.IsExpandedField({{ .Num }})
 			{{ end -}}
 			fields = append(fields, field)
+			{{ if eq .CanExpand true -}} } {{ end -}}
         }
 	{{ end }}
 
@@ -151,15 +164,35 @@ func (m *{{ $.Name }}) {{ .Name }}Uint32() uint32 { return datetime.ToUint32(m.{
 {{ range .Fields -}}
 {{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) }}
 // {{ .Name }}Scaled return {{ .Name }} in its scaled value.
-// If {{ .Name }} value is invalid,{{ if eq .Array true }} nil {{ else }} float64 invalid value {{ end -}} will be returned.
+// If {{ .Name }} value is invalid,{{ if .Array }} nil {{ else }} float64 invalid value {{ end -}} will be returned.
 // 
 // {{ .Comment }}
-func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if eq .Array true }} []float64 {{ else }} float64 {{ end -}} {
+func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if gt .FixedArraySize 0 }} [{{ .FixedArraySize }}]float64 {{ else if .Array }} []float64 {{ else }} float64 {{ end -}} {
 	if {{ .ComparableValue }} == {{ .InvalidValue }} {
-		return {{ if eq .Array true }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
+		return {{ if gt .FixedArraySize 0 }} {{ .InvalidArrayValueScaled }} {{ else if .Array }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
 	}
-	{{ if eq .Array true }} return scaleoffset.ApplySlice(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
-	{{ else }} return scaleoffset.Apply(m.{{ .Name }}, {{ .Scale }}, {{ .Offset }})
+	{{- if gt .FixedArraySize 0 }}
+		var vals [{{ .FixedArraySize }}]float64
+		for i := range m.{{ .Name }} {
+			if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
+				vals[i] = math.Float64frombits(basetype.Float64Invalid)
+				continue
+			}
+			vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} -{{ .Offset }}
+		}
+		return vals
+	{{- else if .Array }}
+		var vals = make([]float64, len(m.{{ .Name }}))
+		for i := range m.{{ .Name }} {
+			if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
+				vals[i] = math.Float64frombits(basetype.Float64Invalid)
+				continue
+			}
+			vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} - {{ .Offset }}
+		}
+		return vals
+	{{- else }}
+		return float64(m.{{ .Name }}) / {{ .Scale }} - {{ .Offset }}
 	{{ end -}}
 }
 {{ end }}
@@ -193,12 +226,39 @@ func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
 // This method automatically converts the given value to its {{ .Type }} form, discarding any applied scale and offset.
 // 
 // {{ .Comment }}
-func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if .Array }} vs []float64 {{ else }} v float64 {{ end }}) *{{ $.Name }} {
-    {{ if .Array -}}
-    m.{{ .Name }} = scaleoffset.DiscardSlice[{{ printf "%s" (slice .Type 2) }}](vs, {{ .Scale }}, {{ .Offset }})
+func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if gt .FixedArraySize 0 }} vs [{{ .FixedArraySize }}]float64 {{ else if .Array }} vs []float64 {{ else }} v float64 {{ end }}) *{{ $.Name }} {
+	{{ if gt .FixedArraySize 0 -}}
+	m.{{ .Name }} = {{ .InvalidValue }}
+	for i := range vs {
+		unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+			continue
+		}
+		m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
+	}
+	{{ else if .Array -}}
+	if vs == {{ .InvalidValue }} {
+		m.{{ .Name }} = {{ .InvalidValue }}
+		return m
+	}
+	m.{{ .Name }} = make({{ .Type }}, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+			m.{{ .Name }}[i] = {{ extractExactlyType .Type }}({{ .BaseTypeInvalid }})
+			continue
+		}
+		m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
+	}
     {{ else -}}
-    m.{{ .Name }} = {{ .Type }}(scaleoffset.Discard(v, {{ .Scale }}, {{ .Offset }}))
+	unscaled := (v + {{ .Offset }}) * {{ .Scale }}
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+		m.{{ .Name }} = {{ .Type }}({{ .BaseTypeInvalid }})
+		return m
+	}
+	m.{{ .Name }} = {{ .Type }}(unscaled)
     {{ end -}}
+
     return m
 }
 {{ end -}}
@@ -222,4 +282,45 @@ func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperFiel
 }
 {{ end }}
 
+{{ if gt .MaxFieldExpandNum 1 -}}
+// MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
+// generated through a component expansion). Eligible for field number: {{- template "eligible_for_expanded_fields" . }}.
+func (m *{{ $.Name }}) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
+	switch fieldNum {
+	case {{ template "eligible_for_expanded_fields" . }}:
+	default:
+		return false
+	}
+	pos := fieldNum/8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	m.state[pos] &^= bit
+	if flag {
+		m.state[pos] |= bit
+	}
+	return true
+}
+
+// IsExpandedField checks whether given fieldNum is a field generated through
+// a component expansion. Eligible for field number: {{- template "eligible_for_expanded_fields" . }}.
+func (m *{{ $.Name }}) IsExpandedField(fieldNum byte) bool {
+	{{/* Simple check is enough since we validate on marking */ -}}
+	if fieldNum >= {{ .MaxFieldExpandNum }} {
+		return false
+	}
+	pos := fieldNum/8
+	bit := uint8(1) << (fieldNum - (8 * pos))
+	return m.state[pos] & bit == bit
+}
+{{ end }}
+
+{{ end }}
+
+{{ define "eligible_for_expanded_fields" }}
+{{- $first := true -}}
+{{ range $i, $v := .Fields -}}
+	{{- if .CanExpand -}}
+		{{- if $first -}} {{ $first = false }} {{ .Num }}
+		{{- else -}}, {{ .Num }} {{- end }}
+	{{- end -}}
+{{- end -}}
 {{ end }}
