@@ -795,7 +795,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(110); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 110)
 			field.Value = proto.Uint32(m.EnhancedAvgSpeed)
-			field.IsExpandedField = m.IsExpandedField(110)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -803,7 +803,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(111); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 111)
 			field.Value = proto.Uint32(m.EnhancedMaxSpeed)
-			field.IsExpandedField = m.IsExpandedField(111)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -811,7 +811,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(112); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 112)
 			field.Value = proto.Uint32(m.EnhancedAvgAltitude)
-			field.IsExpandedField = m.IsExpandedField(112)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -819,7 +819,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(113); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 113)
 			field.Value = proto.Uint32(m.EnhancedMinAltitude)
-			field.IsExpandedField = m.IsExpandedField(113)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -827,7 +827,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(114); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 114)
 			field.Value = proto.Uint32(m.EnhancedMaxAltitude)
-			field.IsExpandedField = m.IsExpandedField(114)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -885,7 +885,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(136); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 136)
 			field.Value = proto.Uint16(m.EnhancedAvgRespirationRate)
-			field.IsExpandedField = m.IsExpandedField(136)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -893,7 +893,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(137); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 137)
 			field.Value = proto.Uint16(m.EnhancedMaxRespirationRate)
-			field.IsExpandedField = m.IsExpandedField(137)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

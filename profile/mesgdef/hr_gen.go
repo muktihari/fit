@@ -95,7 +95,7 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(0); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 0)
 			field.Value = proto.Uint16(m.FractionalTimestamp)
-			field.IsExpandedField = m.IsExpandedField(0)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -113,7 +113,7 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(9); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 9)
 			field.Value = proto.SliceUint32(m.EventTimestamp)
-			field.IsExpandedField = m.IsExpandedField(9)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

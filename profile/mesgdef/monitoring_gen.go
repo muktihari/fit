@@ -179,7 +179,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(5); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 5)
 			field.Value = proto.Uint8(byte(m.ActivityType))
-			field.IsExpandedField = m.IsExpandedField(5)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -272,7 +272,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(28); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 28)
 			field.Value = proto.Uint8(m.Intensity)
-			field.IsExpandedField = m.IsExpandedField(28)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

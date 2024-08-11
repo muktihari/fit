@@ -729,7 +729,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(91); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 91)
 			field.Value = proto.Uint32(m.EnhancedAvgAltitude)
-			field.IsExpandedField = m.IsExpandedField(91)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -737,7 +737,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(92); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 92)
 			field.Value = proto.Uint32(m.EnhancedMaxAltitude)
-			field.IsExpandedField = m.IsExpandedField(92)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -745,7 +745,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(93); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 93)
 			field.Value = proto.Uint32(m.EnhancedMinAltitude)
-			field.IsExpandedField = m.IsExpandedField(93)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

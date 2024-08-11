@@ -121,7 +121,7 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(6); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 6)
 			field.Value = proto.Uint32(m.EnhancedAltitude)
-			field.IsExpandedField = m.IsExpandedField(6)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
