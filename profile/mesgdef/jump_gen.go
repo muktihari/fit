@@ -144,7 +144,7 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(8); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 8)
 			field.Value = proto.Uint32(m.EnhancedSpeed)
-			field.IsExpandedField = m.IsExpandedField(8)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

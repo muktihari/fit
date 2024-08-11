@@ -107,7 +107,7 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 2)
 			field.Value = proto.Uint8(m.FieldId)
-			field.IsExpandedField = m.IsExpandedField(2)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -115,7 +115,7 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint8(m.ConceptIndex)
-			field.IsExpandedField = m.IsExpandedField(3)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

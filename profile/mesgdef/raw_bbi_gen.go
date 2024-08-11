@@ -104,7 +104,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 2)
 			field.Value = proto.SliceUint16(m.Time)
-			field.IsExpandedField = m.IsExpandedField(2)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -112,7 +112,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 3)
 			field.Value = proto.SliceUint8(m.Quality)
-			field.IsExpandedField = m.IsExpandedField(3)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -120,7 +120,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 4)
 			field.Value = proto.SliceUint8(m.Gap)
-			field.IsExpandedField = m.IsExpandedField(4)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

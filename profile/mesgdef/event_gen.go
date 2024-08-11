@@ -136,7 +136,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint32(m.Data)
-			field.IsExpandedField = m.IsExpandedField(3)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -149,7 +149,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(7); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 7)
 			field.Value = proto.Uint16(m.Score)
-			field.IsExpandedField = m.IsExpandedField(7)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -157,7 +157,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(8); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 8)
 			field.Value = proto.Uint16(m.OpponentScore)
-			field.IsExpandedField = m.IsExpandedField(8)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -165,7 +165,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(9); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 9)
 			field.Value = proto.Uint8(m.FrontGearNum)
-			field.IsExpandedField = m.IsExpandedField(9)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -173,7 +173,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(10); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 10)
 			field.Value = proto.Uint8(m.FrontGear)
-			field.IsExpandedField = m.IsExpandedField(10)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -181,7 +181,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(11); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 11)
 			field.Value = proto.Uint8(m.RearGearNum)
-			field.IsExpandedField = m.IsExpandedField(11)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -189,7 +189,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(12); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 12)
 			field.Value = proto.Uint8(m.RearGear)
-			field.IsExpandedField = m.IsExpandedField(12)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -212,7 +212,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(21); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 21)
 			field.Value = proto.Uint8(byte(m.RadarThreatLevelMax))
-			field.IsExpandedField = m.IsExpandedField(21)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -220,7 +220,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(22); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 22)
 			field.Value = proto.Uint8(m.RadarThreatCount)
-			field.IsExpandedField = m.IsExpandedField(22)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -228,7 +228,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(23); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 23)
 			field.Value = proto.Uint8(m.RadarThreatAvgApproachSpeed)
-			field.IsExpandedField = m.IsExpandedField(23)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -236,7 +236,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(24); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 24)
 			field.Value = proto.Uint8(m.RadarThreatMaxApproachSpeed)
-			field.IsExpandedField = m.IsExpandedField(24)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}

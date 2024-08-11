@@ -110,7 +110,7 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint8(m.ChannelNumber)
-			field.IsExpandedField = m.IsExpandedField(3)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
@@ -118,7 +118,7 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 4)
 			field.Value = proto.SliceUint8(m.Data)
-			field.IsExpandedField = m.IsExpandedField(4)
+			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
