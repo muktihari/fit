@@ -60,7 +60,7 @@ var ( // cache for CreateMesg method
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	once.Do(func() { // populate data for the first invocation.
-		protoMesgs = make([]proto.Message, len(mesgs))
+		protoMesgs = make([]proto.Message, {{ .LenMesgs }})
 		var i int
 		var fieldBases *[256]*proto.FieldBase
 		for i, fieldBases = range mesgs {
@@ -103,7 +103,7 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	})
 
 	var mesg proto.Message
-	if num < typedef.MesgNum(len(protoMesgs)) {
+	if num < {{ .LenMesgs }} {
 		mesg = protoMesgs[num]
 	}
 	if mesg.Num != num {
@@ -127,14 +127,13 @@ func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
 
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
-	if mesgNum < typedef.MesgNum(len(mesgs)) && mesgs[mesgNum] != nil {
+	if mesgNum < {{ .LenMesgs }} && mesgs[mesgNum] != nil {
 		fieldBase := mesgs[mesgNum][num]
 		if fieldBase != nil {
 			return proto.Field{FieldBase: fieldBase}
 		}
 		return createUnknownField(num)
 	}
-
 	if mesg, ok := f.registeredMesgs[mesgNum]; ok {
 		for i := range mesg.Fields {
 			if mesg.Fields[i].Num == num {
@@ -142,7 +141,6 @@ func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 			}
 		}
 	}
-
 	return createUnknownField(num)
 }
 
@@ -155,19 +153,15 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 	if f.registeredMesgs == nil {
 		f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
 	}
-
 	if mesg.Num > typedef.MesgNumMfgRangeMax {
 		return fmt.Errorf("could not register outside max range: %d: %w", 
 			typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
 	}
-
-	if mesg.Num < typedef.MesgNum(len(mesgs)) && mesgs[mesg.Num] != nil {
+	if mesg.Num < {{ .LenMesgs }} && mesgs[mesg.Num] != nil {
 		return fmt.Errorf("could not register on reserved predefined message, mesg.Num %d (%s) is already exist: %w",
 			mesg.Num, mesg.Num, ErrRegisterForbidden)
 	}
-
 	f.registeredMesgs[mesg.Num] = mesg
-
 	return nil
 }
 
