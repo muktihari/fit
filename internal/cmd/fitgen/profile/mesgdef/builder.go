@@ -41,6 +41,7 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 				"stringReplace": strings.Replace,
 				"byteDiv":       func(a, b byte) byte { return a / b },
 				"byteAdd":       func(a, b byte) byte { return a + b },
+				"byteSub":       func(a, b byte) byte { return a - b },
 				"extractExactlyType": func(s string) string {
 					if !strings.HasPrefix(s, "[") {
 						return s

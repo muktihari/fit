@@ -52,7 +52,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
     {{ end -}}
     if mesg != nil {
         for i := range mesg.Fields {
-            if mesg.Fields[i].Num >= byte(len(vals)) {
+            if mesg.Fields[i].Num > {{ byteSub .MaxFieldNum 1 }} {
                 continue
             }
 			{{ if gt $.MaxFieldExpandNum 1 -}}
