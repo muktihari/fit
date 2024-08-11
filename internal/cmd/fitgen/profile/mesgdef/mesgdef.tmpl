@@ -113,7 +113,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 			field.Value = {{ .ProtoValue }}
 			{{ end -}}
 			{{ if eq .CanExpand true -}}
-				field.IsExpandedField = m.IsExpandedField({{ .Num }})
+				field.IsExpandedField = expanded
 			{{ end -}}
 			fields = append(fields, field)
 			{{ if eq .CanExpand true -}} } {{ end -}}
