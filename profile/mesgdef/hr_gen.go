@@ -44,7 +44,7 @@ func NewHr(mesg *proto.Message) *Hr {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 253 {
 				continue
 			}
 			if mesg.Fields[i].Num < 10 && mesg.Fields[i].IsExpandedField {

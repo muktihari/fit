@@ -39,7 +39,7 @@ func NewCameraEvent(mesg *proto.Message) *CameraEvent {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 253 {
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value

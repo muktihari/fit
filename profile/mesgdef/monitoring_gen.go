@@ -67,7 +67,7 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 253 {
 				continue
 			}
 			if mesg.Fields[i].Num < 29 && mesg.Fields[i].IsExpandedField {

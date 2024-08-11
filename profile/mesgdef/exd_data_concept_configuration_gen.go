@@ -46,7 +46,7 @@ func NewExdDataConceptConfiguration(mesg *proto.Message) *ExdDataConceptConfigur
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 11 {
 				continue
 			}
 			if mesg.Fields[i].Num < 4 && mesg.Fields[i].IsExpandedField {

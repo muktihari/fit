@@ -55,7 +55,7 @@ func NewSplit(mesg *proto.Message) *Split {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 254 {
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
