@@ -8,4 +8,5 @@ package factory
 type Data struct {
 	Package  string // Package name
 	Messages string // string formated struct [...]message{...}
+	LenMesgs uint16
 }

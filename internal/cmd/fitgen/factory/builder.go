@@ -15,6 +15,7 @@ import (
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
+	"github.com/muktihari/fit/profile/typedef"
 )
 
 type ( // type aliasing for better code reading.
@@ -83,9 +84,13 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	// This way, we don't depend on generated value such as types and profile package to be able to generate factory.
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
 
+	var maxNum typedef.MesgNum
 	var strbuf strings.Builder
 	strbuf.WriteString("[...]*[256]*proto.FieldBase{\n")
 	for _, message := range b.messages {
+		if num := typedef.MesgNumFromString(message.Name); num > maxNum {
+			maxNum = num
+		}
 		strbuf.WriteString(b.transformMesgnum(message.Name) + ": {\n") // indexed to create fixed-size slice.
 		strbuf.WriteString(b.makeFieldBases(message))
 		strbuf.WriteString("},\n")
@@ -101,6 +106,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 			Data: Data{
 				Package:  "factory",
 				Messages: strbuf.String(),
+				LenMesgs: maxNum.Uint16() + 1,
 			},
 		},
 		{
