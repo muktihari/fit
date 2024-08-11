@@ -123,7 +123,7 @@ func NewRecord(mesg *proto.Message) *Record {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 253 {
 				continue
 			}
 			if mesg.Fields[i].Num < 109 && mesg.Fields[i].IsExpandedField {

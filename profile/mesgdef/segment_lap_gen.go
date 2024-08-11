@@ -134,7 +134,7 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num >= byte(len(vals)) {
+			if mesg.Fields[i].Num > 254 {
 				continue
 			}
 			if mesg.Fields[i].Num < 94 && mesg.Fields[i].IsExpandedField {
