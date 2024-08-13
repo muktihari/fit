@@ -12,7 +12,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// Listener is Message Listener.
+// Listener is a common file types listener that implement decoder.MesgListener
 type Listener struct {
 	options options
 	file    File
@@ -27,20 +27,12 @@ type Listener struct {
 type FileSets = map[typedef.File]func() File
 
 type options struct {
-	fileSets      FileSets
+	fileSets      [256]func() File
 	channelBuffer uint
 }
 
-func defaultOptions() options {
-	return options{
-		fileSets:      PredefinedFileSet(),
-		channelBuffer: 128,
-	}
-}
-
-// PredefinedFileSet is a list of default filesets used in listener, it's exported so user can append their own types and register it as an option.
-func PredefinedFileSet() FileSets {
-	return FileSets{
+func defaultFileSets() [256]func() File {
+	return [256]func() File{
 		typedef.FileActivity:        func() File { return NewActivity() },
 		typedef.FileActivitySummary: func() File { return NewActivitySummary() },
 		typedef.FileBloodPressure:   func() File { return NewBloodPressure() },
@@ -61,6 +53,22 @@ func PredefinedFileSet() FileSets {
 	}
 }
 
+func defaultOptions() options {
+	return options{
+		fileSets:      defaultFileSets(),
+		channelBuffer: 128,
+	}
+}
+
+// PredefinedFileSet is a list of default filesets used in listener, it's exported so user can append their own types and register it as an option.
+func PredefinedFileSet() FileSets {
+	m := make(map[typedef.File]func() File)
+	for i, v := range defaultFileSets() {
+		m[typedef.File(i)] = v
+	}
+	return m
+}
+
 // Option is Listener's option.
 type Option func(o *options)
 
@@ -70,19 +78,27 @@ func WithChannelBuffer(size uint) Option {
 }
 
 // WithFileSets sets what kind of file listener should listen to, when we encounter a file type that is not listed in fileset,
-// that file type will be skipped. This will replace the default filesets registered in listener, if you intend to append your own
-// file types, please call PredefinedFileSet() and add your file types.
+// that file type will be skipped. This will replace the default listener's filesets, if you intend to append your own
+// file types, please call PredefinedFileSet() and add your file type before using this option; or use WithFileFunc instead.
 func WithFileSets(fileSets FileSets) Option {
 	return func(o *options) {
-		if o.fileSets != nil {
-			o.fileSets = fileSets
+		o.fileSets = [256]func() File{} // Clear all.
+		for file, fn := range fileSets {
+			o.fileSets[file] = fn
 		}
 	}
 }
 
+// WithFileFunc sets File with its File creator function. It overrides the default options.
+func WithFileFunc(f typedef.File, fn func() File) Option {
+	return func(o *options) { o.fileSets[f] = fn }
+}
+
 var _ decoder.MesgListener = (*Listener)(nil)
 
-// NewListener creates mesg listener.
+// NewListener creates new common file types listener that implement decoder.MesgListener.
+// This will handle message conversion from proto.Message received from Decoder into
+// mesgdef's structure and group it by its correspoding defined file types.
 func NewListener(opts ...Option) *Listener {
 	l := &Listener{
 		options: defaultOptions(),
@@ -114,12 +130,12 @@ func (l *Listener) loop() {
 
 func (l *Listener) processMesg(mesg proto.Message) {
 	if mesg.Num == mesgnum.FileId {
-		fileType := typedef.File(mesg.FieldValueByNum(fieldnum.FileIdType).Uint8())
-		fnNew, ok := l.options.fileSets[fileType]
-		if !ok {
+		fileType := mesg.FieldValueByNum(fieldnum.FileIdType).Uint8()
+		fn := l.options.fileSets[fileType]
+		if fn == nil {
 			return
 		}
-		l.file = fnNew()
+		l.file = fn()
 	}
 	if l.file == nil {
 		return // No file is created since not defined in fileSets. Skip.

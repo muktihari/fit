@@ -14,6 +14,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -33,6 +34,13 @@ func createFloat64Comparer() cmp.Option {
 		return math.Float64bits(f1) == math.Float64bits(f2)
 	})
 }
+
+type dummyFile struct{}
+
+func (dummyFile) Add(mesg proto.Message)             {}
+func (dummyFile) ToFIT(o *mesgdef.Options) proto.FIT { return proto.FIT{} }
+
+var _ filedef.File = (*dummyFile)(nil)
 
 func TestListenerForSingleFitFile(t *testing.T) {
 	type table struct {
@@ -128,6 +136,24 @@ func TestListenerForSingleFitFile(t *testing.T) {
 			name:   "default listener for workout",
 			mesgs:  newWorkoutMessageForTest(now),
 			result: filedef.NewWorkout(newWorkoutMessageForTest(now)...),
+		},
+		{
+			name:   "replace activity with dummy file; PredefinedFileSet",
+			mesgs:  newActivityMessageForTest(now),
+			result: new(dummyFile),
+			options: func() []filedef.Option {
+				sets := filedef.PredefinedFileSet()
+				sets[typedef.FileActivity] = func() filedef.File { return new(dummyFile) }
+				return []filedef.Option{filedef.WithFileSets(sets)}
+			}(),
+		},
+		{
+			name:   "replace activity with dummy file; WithFileFunc",
+			mesgs:  newActivityMessageForTest(now),
+			result: new(dummyFile),
+			options: []filedef.Option{
+				filedef.WithFileFunc(typedef.FileActivity, func() filedef.File { return new(dummyFile) }),
+			},
 		},
 		{
 			name: "listener for not specified fileset, course",
