@@ -5,6 +5,7 @@ Table of Contents:
 1. [Dicoding](./usage.md#Decoding)
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
    - [Decode to Common File Types](#Decode-to-Common-File-Types)
+     - [Using your own custom File Types](#Using-your-own-custom-File-Types)
    - [Peek FileHeader](#Peek-FileHeader)
    - [Peek FileId](#Peek-FileId)
    - [Discard FIT File Sequences](#Discard-FIT-File-Sequences)
@@ -227,7 +228,101 @@ func main() {
 }
 ```
 
-**The ability to broadcast every message as soon as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.**
+#### Using your own custom File Types
+
+The ability to broadcast every message as soon as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [decoder.Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.
+
+Not only does [filedef.Listener](https://github.com/muktihari/fit/blob/master/profile/filedef/listener.go#L16C1-L23C2) implements [decoder.Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface, but it also allows you to create your own custom File as long as it satisfies [filedef.File](https://github.com/muktihari/fit/blob/master/profile/filedef/filedef.go#L17C1-L22C2) interface. For example, if you only want to retrieve some messages, you can build your own custom Activity File like this instead of using our default predefined [Activity File](https://github.com/muktihari/fit/blob/master/profile/filedef/activity.go#L19C1-L46C2):
+
+```go
+package main
+
+import (
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/filedef"
+    "github.com/muktihari/fit/profile/mesgdef"
+    "github.com/muktihari/fit/profile/typedef"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
+)
+
+var _ filedef.File = (*Activity)(nil)
+
+type Activity struct {
+    FileId   mesgdef.FileId
+    Activity *mesgdef.Activity
+    Sessions []*mesgdef.Session
+    Laps     []*mesgdef.Lap
+    Records  []*mesgdef.Record
+}
+
+func (f *Activity) Add(mesg proto.Message) {
+    switch mesg.Num {
+    case mesgnum.FileId:
+        f.FileId = *mesgdef.NewFileId(&mesg)
+    case mesgnum.Activity:
+        f.Activity = mesgdef.NewActivity(&mesg)
+    case mesgnum.Session:
+        f.Sessions = append(f.Sessions, mesgdef.NewSession(&mesg))
+    case mesgnum.Lap:
+        f.Laps = append(f.Laps, mesgdef.NewLap(&mesg))
+    case mesgnum.Record:
+        f.Records = append(f.Records, mesgdef.NewRecord(&mesg))
+    }
+}
+
+func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
+    size := 2 + len(f.Sessions) + len(f.Laps) + len(f.Records)
+    fit := proto.FIT{Messages: make([]proto.Message, 0, size)}
+    fit.Messages = append(fit.Messages, f.FileId.ToMesg(options))
+    if f.Activity != nil {
+        fit.Messages = append(fit.Messages, f.Activity.ToMesg(options))
+    }
+    for i := range f.Sessions {
+        fit.Messages = append(fit.Messages, f.Sessions[i].ToMesg(options))
+    }
+    for i := range f.Laps {
+        fit.Messages = append(fit.Messages, f.Laps[i].ToMesg(options))
+    }
+    for i := range f.Records {
+        fit.Messages = append(fit.Messages, f.Records[i].ToMesg(options))
+    }
+    filedef.SortMessagesByTimestamp(fit.Messages)
+    return fit
+}
+
+func main() {
+    f, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    lis := filedef.NewListener(
+        // Replace default filedef.Activity with our custom Activity.
+        filedef.WithFileFunc(typedef.FileActivity,
+            func() filedef.File { return new(Activity) }),
+    )
+    defer lis.Close()
+
+    dec := decoder.New(f,
+        decoder.WithMesgListener(lis),
+        decoder.WithBroadcastOnly(),
+    )
+
+    _, err = dec.Decode()
+    if err != nil {
+        panic(err)
+    }
+
+    // The resulting File will be *Activity instead of *filedef.Activity.
+    file := lis.File().(*Activity)
+    fmt.Printf("Distance: %.2f km\n",
+        file.Sessions[0].TotalDistanceScaled()/1000)
+}
+```
 
 ### Peek FileHeader
 
