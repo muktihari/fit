@@ -240,16 +240,22 @@ func (d *Decoder) reset() {
 	d.sequenceCompleted = false
 	d.err = nil
 	d.fileHeader = proto.FileHeader{}
-	d.messages = nil
 	d.crc = 0
 	d.fileId = nil
-	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
 	d.developerDataIndexes = d.developerDataIndexes[:0]
-
-	for i := range d.fieldDescriptions {
-		d.fieldDescriptions[i] = nil // avoid memory leaks
-	}
 	d.fieldDescriptions = d.fieldDescriptions[:0]
+}
+
+// releaseTemporaryObjects releases objects that being created on a single decode process
+// by stops referencing those objects so it can be released on next GC cycle.
+func (d *Decoder) releaseTemporaryObjects() {
+	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
+	d.fieldsArray = [255]proto.Field{}
+	d.developerFieldsArray = [255]proto.DeveloperField{}
+	d.messages = nil
+	for i := range d.fieldDescriptions {
+		d.fieldDescriptions[i] = nil
+	}
 }
 
 // CheckIntegrity checks all FIT sequences of given reader are valid determined by these following checks:
@@ -383,6 +389,7 @@ func (d *Decoder) Decode() (*proto.FIT, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return nil, d.err
 	}
+	defer d.releaseTemporaryObjects()
 	if d.err = d.decodeMessages(); d.err != nil {
 		return nil, d.err
 	}
@@ -990,6 +997,7 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return nil, d.err
 	}
+	defer d.releaseTemporaryObjects()
 	if d.err = d.decodeMessagesWithContext(ctx); d.err != nil {
 		return nil, d.err
 	}
