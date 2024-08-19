@@ -420,18 +420,20 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 		if e.w == io.Discard {
 			// NOTE: Only for calculating data size (Early Check Strategy)
 			var timestampField proto.Field
-			if field := mesg.FieldByNum(proto.FieldNumTimestamp); field != nil {
-				timestampField = *field
+			var i int
+			for i = range mesg.Fields {
+				if mesg.Fields[i].Num == proto.FieldNumTimestamp {
+					timestampField = mesg.Fields[i]
+					break
+				}
 			}
-
 			prevLen := len(mesg.Fields)
 			e.compressTimestampIntoHeader(mesg)
-
-			if prevLen != len(mesg.Fields) {
-				defer func() { // Revert: put timestamp field back
+			if prevLen > len(mesg.Fields) {
+				defer func() { // Revert: put timestamp field back at original index
 					mesg.Fields = mesg.Fields[:prevLen]
-					copy(mesg.Fields[1:], mesg.Fields[:len(mesg.Fields)])
-					mesg.Fields[0] = timestampField
+					copy(mesg.Fields[i+1:], mesg.Fields[i:])
+					mesg.Fields[i] = timestampField
 				}()
 			}
 		} else {
