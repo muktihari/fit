@@ -8,16 +8,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/muktihari/fit/proto"
 )
-
-var bufPool = sync.Pool{
-	New: func() any {
-		return &strings.Builder{}
-	},
-}
 
 // format formats given val into string
 //
@@ -120,16 +113,12 @@ func format(val proto.Value) string {
 }
 
 func concat[S []E, E any](s S, formatFn func(v E) string) string {
-	strbldr := bufPool.Get().(*strings.Builder)
-	defer bufPool.Put(strbldr)
-	strbldr.Reset()
-
+	var buf strings.Builder
 	for i := range s {
-		strbldr.WriteString(formatFn(s[i]))
+		buf.WriteString(formatFn(s[i]))
 		if i < len(s)-1 {
-			strbldr.WriteByte('|')
+			buf.WriteByte('|')
 		}
 	}
-
-	return strbldr.String()
+	return buf.String()
 }
