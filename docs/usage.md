@@ -91,7 +91,7 @@ If you are uncertain if it's a chained fit file. Create a loop and use dec.Next(
 
 Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and [more](../profile/filedef/doc.go), which group protocol messages based on specific purposes.
 
-1. To get started, the simpliest way to create an common file type is to decode the FIT file in its raw protocol messages then pass the messages to create the desired common file type.
+1. To get started, the simpliest (but least efficient) way to create an common file type is to decode the FIT file in its raw protocol messages then pass the messages to create the desired common file type.
 
 ```go
 package main
@@ -152,7 +152,7 @@ func main() {
 }
 ```
 
-2. While the previous example is work for most use cases and probably can be your goto choice to use for small scale, it's slightly inefficient as we only utilize one goroutine (the main goroutine) and also we need to allocate the `fit.Messages` before creating the `activity` file itself. For bigger scale, or in scale that require a streaming process, we can define `filedef's Listener` to create the `activity` file. This not only reduce the need to allocate `fit.Messages` but also we can receive the message as soon as it is decoded in other goroutine. As the decoder decodes the message, we can create the message in another process concurrently.
+2. The better way to decode common file types using our building block is by using `filedef.Listener` then register it to the `Decoder`, the listener will process every message that being broadcasted by the `Decoder` concurrently.
 
 ```go
 package main
@@ -190,6 +190,8 @@ func main() {
 
         // The resulting File can be retrieved after decoding process completed.
         // filedef.File is just an interface, we can do type assertion like this.
+        // Alternatively, use:
+        //   file, ok := lis.File().(*filedef.Activity)
         switch file := lis.File().(type) {
         case *filedef.Course:
             // do something if it's a course file
