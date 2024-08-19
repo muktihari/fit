@@ -228,7 +228,7 @@ func (b *mesgdefBuilder) componentExpansionAbility(mesg *parser.Message) (canExp
 func createComment(field *Field, array string) string {
 	buf := new(strings.Builder)
 
-	if strings.HasPrefix(field.Type, "[]") {
+	if strings.HasPrefix(field.Type, "[") {
 		buf.WriteString("Array: ")
 		buf.WriteString(array)
 		buf.WriteString("; ")
