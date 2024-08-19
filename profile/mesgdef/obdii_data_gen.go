@@ -76,15 +76,14 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumObdiiData}
 
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
+	if !m.Timestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
@@ -117,9 +116,9 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint32(m.SystemTime)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
+	if !m.StartTimestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
+		field.Value = proto.Uint32(uint32(m.StartTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
@@ -130,6 +129,7 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

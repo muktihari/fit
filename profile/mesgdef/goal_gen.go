@@ -84,10 +84,9 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumGoal}
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
@@ -105,14 +104,14 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.StartDate) != basetype.Uint32Invalid {
+	if !m.StartDate.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartDate))
+		field.Value = proto.Uint32(uint32(m.StartDate.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.EndDate) != basetype.Uint32Invalid {
+	if !m.EndDate.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(datetime.ToUint32(m.EndDate))
+		field.Value = proto.Uint32(uint32(m.EndDate.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if byte(m.Type) != basetype.EnumInvalid {
@@ -158,6 +157,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

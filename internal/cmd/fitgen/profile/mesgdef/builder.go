@@ -24,6 +24,8 @@ type mesgdefBuilder struct {
 	template     *template.Template
 	templateExec string
 
+	packageName string
+
 	path string // path to generate the file
 
 	lookup   *lookup.Lookup
@@ -51,6 +53,7 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 			}).
 			ParseFiles(filepath.Join(cd, "mesgdef.tmpl"))),
 		templateExec: "mesgdef",
+		packageName:  "mesgdef",
 		path:         filepath.Join(path, "profile", "mesgdef"),
 		lookup:       lookup,
 		messages:     message,
@@ -60,9 +63,13 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 
 func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 	dataBuilders := make([]builder.Data, 0, len(b.messages))
+	var maxLenFields int
 	for _, mesg := range b.messages {
 		canExpand, maxFieldExpandNum := b.componentExpansionAbility(&mesg)
 
+		if len(mesg.Fields) > maxLenFields {
+			maxLenFields = len(mesg.Fields)
+		}
 		var (
 			maxFieldNum   byte
 			dynamicFields []DynamicField
@@ -109,6 +116,13 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			}
 			field.ComparableValue = b.transformComparableValue(parserField.Type, parserField.Array, field.PrimitiveValue)
 
+			// Special case
+			if isTypeTime(parserField.Type) {
+				field.IsValidValue = fmt.Sprintf("!m.%s.Before(datetime.Epoch())", field.Name)
+			} else {
+				field.IsValidValue = fmt.Sprintf("%s != %s", field.ComparableValue, field.InvalidValue)
+			}
+
 			if _, ok := canExpand[parserField.Name]; ok {
 				field.CanExpand = true
 			}
@@ -147,7 +161,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		b.simpleMemoryAlignment(optimizedFields)
 
 		data := Data{
-			Package:           "mesgdef",
+			Package:           b.packageName,
 			Imports:           []string{},
 			Name:              strutil.ToTitle(mesg.Name),
 			Fields:            fields,
@@ -161,16 +175,27 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 			data.Imports = append(data.Imports, k)
 		}
 
-		dataBuilder := builder.Data{
-			Template:     b.template,
-			TemplateExec: b.templateExec,
-			Path:         b.path,
-			Filename:     strutil.ToSnake(mesg.Name) + "_gen.go",
-			Data:         data,
-		}
-
-		dataBuilders = append(dataBuilders, dataBuilder)
+		dataBuilders = append(dataBuilders,
+			builder.Data{
+				Template:     b.template,
+				TemplateExec: b.templateExec,
+				Path:         b.path,
+				Filename:     strutil.ToSnake(mesg.Name) + "_gen.go",
+				Data:         data,
+			},
+		)
 	}
+
+	dataBuilders = append(dataBuilders, builder.Data{
+		Template:     b.template,
+		TemplateExec: "util",
+		Path:         b.path,
+		Filename:     fmt.Sprintf("%s_util_gen.go", b.packageName),
+		Data: UtilData{
+			Package:      b.packageName,
+			MaxLenFields: byte(maxLenFields),
+		},
+	})
 
 	return dataBuilders, nil
 }
@@ -417,7 +442,7 @@ var baseTypeReplacer = strings.NewReplacer(
 
 func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
-		return fmt.Sprintf("proto.Uint32(datetime.ToUint32(m.%s))", fieldName)
+		return fmt.Sprintf("proto.Uint32(uint32(m.%s.Sub(datetime.Epoch()).Seconds()))", fieldName)
 	}
 
 	baseType := b.lookup.BaseType(fieldType).String()

@@ -72,10 +72,9 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSchedule}
 
 	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
@@ -93,9 +92,9 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
+	if !m.TimeCreated.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
+		field.Value = proto.Uint32(uint32(m.TimeCreated.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.Completed != false {
@@ -108,14 +107,15 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.ScheduledTime) != basetype.Uint32Invalid {
+	if !m.ScheduledTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 6)
-		field.Value = proto.Uint32(datetime.ToUint32(m.ScheduledTime))
+		field.Value = proto.Uint32(uint32(m.ScheduledTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

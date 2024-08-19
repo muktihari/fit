@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"math"
 	"testing"
+	"time"
 
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
+	"github.com/muktihari/fit/proto"
 )
 
 func BenchmarkNewRecord(b *testing.B) {
@@ -20,7 +24,9 @@ func BenchmarkNewRecord(b *testing.B) {
 }
 
 func BenchmarkRecordToMesg(b *testing.B) {
-	mesg := factory.CreateMesg(mesgnum.Record)
+	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
+		fieldnum.RecordTimestamp: datetime.ToUint32(time.Now()),
+	})
 	record := NewRecord(&mesg)
 	b.ResetTimer()
 
@@ -167,5 +173,26 @@ func BenchmarkRecordMarkAsExpandedField(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = r.MarkAsExpandedField(19, true)
+	}
+}
+
+func TestRecordToMesgTimestampCorrectness(t *testing.T) {
+	now := time.Now()
+
+	r := NewRecord(nil)
+	r.Timestamp = now
+	mesg := r.ToMesg(nil)
+	field := mesg.FieldByNum(proto.FieldNumTimestamp)
+
+	if expected := datetime.ToUint32(now); field.Value.Uint32() != expected {
+		t.Fatalf("expected: %d, got: %d", expected, field.Value.Uint32())
+	}
+
+	r.Timestamp = time.Time{}
+	mesg = r.ToMesg(nil)
+	field = mesg.FieldByNum(proto.FieldNumTimestamp)
+	if field != nil {
+		t.Fatalf("field should be nil, got: fieldNum: %d, value: %d",
+			field.Num, field.Value.Uint32())
 	}
 }

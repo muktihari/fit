@@ -64,10 +64,9 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumFileId}
 
 	if byte(m.Type) != basetype.EnumInvalid {
@@ -90,9 +89,9 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.TimeCreated) != basetype.Uint32Invalid {
+	if !m.TimeCreated.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 4)
-		field.Value = proto.Uint32(datetime.ToUint32(m.TimeCreated))
+		field.Value = proto.Uint32(uint32(m.TimeCreated.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.Number != basetype.Uint16Invalid {
@@ -100,7 +99,7 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Number)
 		fields = append(fields, field)
 	}
-	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
+	if m.ProductName != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.ProductName)
 		fields = append(fields, field)
@@ -108,6 +107,7 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	return mesg
 }

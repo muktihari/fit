@@ -70,30 +70,29 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWeatherAlert}
 
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
+	if !m.Timestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if m.ReportId != basetype.StringInvalid && m.ReportId != "" {
+	if m.ReportId != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.ReportId)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.IssueTime) != basetype.Uint32Invalid {
+	if !m.IssueTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint32(datetime.ToUint32(m.IssueTime))
+		field.Value = proto.Uint32(uint32(m.IssueTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.ExpireTime) != basetype.Uint32Invalid {
+	if !m.ExpireTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 2)
-		field.Value = proto.Uint32(datetime.ToUint32(m.ExpireTime))
+		field.Value = proto.Uint32(uint32(m.ExpireTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if byte(m.Severity) != basetype.EnumInvalid {
@@ -109,6 +108,7 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 
