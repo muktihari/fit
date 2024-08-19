@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestTrimUTF8NullTerminatedString(t *testing.T) {
+func TestTrimRightZero(t *testing.T) {
 	tt := []struct {
 		str      string
 		expected string
@@ -22,7 +22,7 @@ func TestTrimUTF8NullTerminatedString(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.str, func(t *testing.T) {
-			res := trimUTF8NullTerminatedString([]byte(tc.str))
+			res := trimRightZero([]byte(tc.str))
 			if string(res) != tc.expected {
 				t.Fatalf("expected: %s, got: %s", tc.expected, res)
 			}
@@ -30,13 +30,13 @@ func TestTrimUTF8NullTerminatedString(t *testing.T) {
 	}
 }
 
-func BenchmarkTrimUTF8NullTerminatedString(b *testing.B) {
+func BenchmarkTrimRightZero(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = trimUTF8NullTerminatedString([]byte(""))
-		_ = trimUTF8NullTerminatedString([]byte("\x00"))
-		_ = trimUTF8NullTerminatedString([]byte("Open Water"))
-		_ = trimUTF8NullTerminatedString([]byte("Open Water\x00"))
-		_ = trimUTF8NullTerminatedString([]byte("Open Water\x00\x00"))
+		_ = trimRightZero([]byte(""))
+		_ = trimRightZero([]byte("\x00"))
+		_ = trimRightZero([]byte("Open Water"))
+		_ = trimRightZero([]byte("Open Water\x00"))
+		_ = trimRightZero([]byte("Open Water\x00\x00"))
 	}
 }
 
@@ -50,7 +50,7 @@ func TestUTF8String(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		out := utf8String([]byte(tc.in))
+		out := utf8String(tc.in)
 		if out != tc.out {
 			t.Fatalf("expected: %q, got: %q", tc.out, out)
 		}
