@@ -2,7 +2,7 @@
 
 Table of Contents:
 
-1. [Dicoding](./usage.md#Decoding)
+1. [Decoding](#Decoding)
    - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
    - [Decode to Common File Types](#Decode-to-Common-File-Types)
      - [Using your own custom File Types](#Using-your-own-custom-File-Types)
