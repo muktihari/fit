@@ -470,8 +470,7 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
 	}
 
-	if !strings.HasSuffix(fieldType, "z") &&
-		b.lookup.BaseType(fieldType).String() == fieldType {
+	if b.lookup.BaseType(fieldType).String() == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
 
