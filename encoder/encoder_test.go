@@ -775,6 +775,41 @@ func TestEncodeMessage(t *testing.T) {
 			}
 		})
 	}
+
+	// Tests that does not fit in test table:
+	t.Run("encode message with early check must place timestamp field back to its original index", func(t *testing.T) {
+		pivotTime := time.Now()
+		mesg := proto.Message{
+			Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(80)),
+				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(pivotTime)),
+				factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((166.0 + 500.0) * 5.0)),
+			},
+		}
+		expected := mesg.Clone()
+
+		enc := New(io.Discard,
+			WithCompressedTimestampHeader(),
+			WithMessageValidator(fnValidateOK),
+			WithWriteBufferSize(0), // Direct write
+		)
+		enc.timestampReference = datetime.ToUint32(pivotTime)
+
+		err := enc.encodeMessage(&mesg)
+		if err != nil {
+			t.Fatalf("expected err: nil, got: %v", err)
+		}
+
+		if diff := cmp.Diff(mesg, expected,
+			cmp.Transformer("Message", func(m proto.Message) proto.Message {
+				m.Header = 0 // Clear
+				return m
+			}),
+			cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+		); diff != "" {
+			t.Fatal(diff)
+		}
+	})
 }
 
 func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
