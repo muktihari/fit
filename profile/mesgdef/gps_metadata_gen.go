@@ -28,7 +28,7 @@ type GpsMetadata struct {
 	PositionLong     int32     // Units: semicircles
 	EnhancedAltitude uint32    // Scale: 5; Offset: 500; Units: m
 	EnhancedSpeed    uint32    // Scale: 1000; Units: m/s
-	Velocity         [3]int16  // Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+	Velocity         [3]int16  // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	Heading          uint16    // Scale: 100; Units: degrees
 
@@ -193,7 +193,7 @@ func (m *GpsMetadata) HeadingScaled() float64 {
 // VelocityScaled return Velocity in its scaled value.
 // If Velocity value is invalid, nil will be returned.
 //
-// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 func (m *GpsMetadata) VelocityScaled() [3]float64 {
 	if m.Velocity == [3]int16{
 		basetype.Sint16Invalid,
@@ -357,7 +357,7 @@ func (m *GpsMetadata) SetUtcTimestamp(v time.Time) *GpsMetadata {
 
 // SetVelocity sets Velocity value.
 //
-// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 func (m *GpsMetadata) SetVelocity(v [3]int16) *GpsMetadata {
 	m.Velocity = v
 	return m
@@ -366,7 +366,7 @@ func (m *GpsMetadata) SetVelocity(v [3]int16) *GpsMetadata {
 // SetVelocityScaled is similar to SetVelocity except it accepts a scaled value.
 // This method automatically converts the given value to its [3]int16 form, discarding any applied scale and offset.
 //
-// Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
+// Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 func (m *GpsMetadata) SetVelocityScaled(vs [3]float64) *GpsMetadata {
 	m.Velocity = [3]int16{
 		basetype.Sint16Invalid,

@@ -151,22 +151,22 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Odometer)
 		fields = append(fields, field)
 	}
-	if uint16(m.BikeSpdAntId) != basetype.Uint16zInvalid {
+	if m.BikeSpdAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint16(m.BikeSpdAntId)
 		fields = append(fields, field)
 	}
-	if uint16(m.BikeCadAntId) != basetype.Uint16zInvalid {
+	if m.BikeCadAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.BikeCadAntId)
 		fields = append(fields, field)
 	}
-	if uint16(m.BikeSpdcadAntId) != basetype.Uint16zInvalid {
+	if m.BikeSpdcadAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint16(m.BikeSpdcadAntId)
 		fields = append(fields, field)
 	}
-	if uint16(m.BikePowerAntId) != basetype.Uint16zInvalid {
+	if m.BikePowerAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint16(m.BikePowerAntId)
 		fields = append(fields, field)
@@ -191,12 +191,12 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.PowerCalFactor)
 		fields = append(fields, field)
 	}
-	if m.AutoWheelCal != false {
+	{
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.AutoWheelCal)
 		fields = append(fields, field)
 	}
-	if m.AutoPowerZero != false {
+	{
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Bool(m.AutoPowerZero)
 		fields = append(fields, field)
@@ -206,22 +206,22 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Id)
 		fields = append(fields, field)
 	}
-	if m.SpdEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Bool(m.SpdEnabled)
 		fields = append(fields, field)
 	}
-	if m.CadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = proto.Bool(m.CadEnabled)
 		fields = append(fields, field)
 	}
-	if m.SpdcadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 17)
 		field.Value = proto.Bool(m.SpdcadEnabled)
 		fields = append(fields, field)
 	}
-	if m.PowerEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = proto.Bool(m.PowerEnabled)
 		fields = append(fields, field)
@@ -231,27 +231,27 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.CrankLength)
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
-	if uint8(m.BikeSpdAntIdTransType) != basetype.Uint8zInvalid {
+	if m.BikeSpdAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint8(m.BikeSpdAntIdTransType)
 		fields = append(fields, field)
 	}
-	if uint8(m.BikeCadAntIdTransType) != basetype.Uint8zInvalid {
+	if m.BikeCadAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = proto.Uint8(m.BikeCadAntIdTransType)
 		fields = append(fields, field)
 	}
-	if uint8(m.BikeSpdcadAntIdTransType) != basetype.Uint8zInvalid {
+	if m.BikeSpdcadAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = proto.Uint8(m.BikeSpdcadAntIdTransType)
 		fields = append(fields, field)
 	}
-	if uint8(m.BikePowerAntIdTransType) != basetype.Uint8zInvalid {
+	if m.BikePowerAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = proto.Uint8(m.BikePowerAntIdTransType)
 		fields = append(fields, field)
@@ -261,7 +261,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.OdometerRollover)
 		fields = append(fields, field)
 	}
-	if uint8(m.FrontGearNum) != basetype.Uint8zInvalid {
+	if m.FrontGearNum != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 38)
 		field.Value = proto.Uint8(m.FrontGearNum)
 		fields = append(fields, field)
@@ -271,7 +271,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.FrontGear)
 		fields = append(fields, field)
 	}
-	if uint8(m.RearGearNum) != basetype.Uint8zInvalid {
+	if m.RearGearNum != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 40)
 		field.Value = proto.Uint8(m.RearGearNum)
 		fields = append(fields, field)
@@ -281,7 +281,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.RearGear)
 		fields = append(fields, field)
 	}
-	if m.ShimanoDi2Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 44)
 		field.Value = proto.Bool(m.ShimanoDi2Enabled)
 		fields = append(fields, field)

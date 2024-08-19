@@ -87,17 +87,17 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumConnectivity}
 
-	if m.BluetoothEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.BluetoothEnabled)
 		fields = append(fields, field)
 	}
-	if m.BluetoothLeEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Bool(m.BluetoothLeEnabled)
 		fields = append(fields, field)
 	}
-	if m.AntEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.AntEnabled)
 		fields = append(fields, field)
@@ -107,47 +107,47 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	if m.LiveTrackingEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.LiveTrackingEnabled)
 		fields = append(fields, field)
 	}
-	if m.WeatherConditionsEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Bool(m.WeatherConditionsEnabled)
 		fields = append(fields, field)
 	}
-	if m.WeatherAlertsEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Bool(m.WeatherAlertsEnabled)
 		fields = append(fields, field)
 	}
-	if m.AutoActivityUploadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Bool(m.AutoActivityUploadEnabled)
 		fields = append(fields, field)
 	}
-	if m.CourseDownloadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.CourseDownloadEnabled)
 		fields = append(fields, field)
 	}
-	if m.WorkoutDownloadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.WorkoutDownloadEnabled)
 		fields = append(fields, field)
 	}
-	if m.GpsEphemerisDownloadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.GpsEphemerisDownloadEnabled)
 		fields = append(fields, field)
 	}
-	if m.IncidentDetectionEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Bool(m.IncidentDetectionEnabled)
 		fields = append(fields, field)
 	}
-	if m.GrouptrackEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.GrouptrackEnabled)
 		fields = append(fields, field)

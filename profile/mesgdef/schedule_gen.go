@@ -87,7 +87,7 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+	if m.SerialNumber != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
@@ -97,7 +97,7 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.TimeCreated.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if m.Completed != false {
+	{
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.Completed)
 		fields = append(fields, field)

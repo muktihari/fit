@@ -95,7 +95,7 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Product)
 		fields = append(fields, field)
 	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+	if m.SerialNumber != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)

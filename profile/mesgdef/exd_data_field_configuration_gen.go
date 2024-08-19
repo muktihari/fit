@@ -18,7 +18,7 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ExdDataFieldConfiguration struct {
-	Title        [32]string
+	Title        [32]string // Array: [32]
 	ScreenIndex  uint8
 	ConceptField byte
 	FieldId      uint8
@@ -230,6 +230,8 @@ func (m *ExdDataFieldConfiguration) SetDisplayType(v typedef.ExdDisplayType) *Ex
 }
 
 // SetTitle sets Title value.
+//
+// Array: [32]
 func (m *ExdDataFieldConfiguration) SetTitle(v [32]string) *ExdDataFieldConfiguration {
 	m.Title = v
 	return m

@@ -189,7 +189,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Po2Deco)
 		fields = append(fields, field)
 	}
-	if m.SafetyStopEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.SafetyStopEnabled)
 		fields = append(fields, field)
@@ -204,7 +204,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.BottomTime)
 		fields = append(fields, field)
 	}
-	if m.ApneaCountdownEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.ApneaCountdownEnabled)
 		fields = append(fields, field)
@@ -289,7 +289,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.GasConsumptionDisplay))
 		fields = append(fields, field)
 	}
-	if m.UpKeyEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = proto.Bool(m.UpKeyEnabled)
 		fields = append(fields, field)

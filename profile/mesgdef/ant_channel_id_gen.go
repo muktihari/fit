@@ -76,17 +76,17 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.ChannelNumber)
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceType) != basetype.Uint8zInvalid {
+	if m.DeviceType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.DeviceType)
 		fields = append(fields, field)
 	}
-	if uint16(m.DeviceNumber) != basetype.Uint16zInvalid {
+	if m.DeviceNumber != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.DeviceNumber)
 		fields = append(fields, field)
 	}
-	if uint8(m.TransmissionType) != basetype.Uint8zInvalid {
+	if m.TransmissionType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.TransmissionType)
 		fields = append(fields, field)

@@ -148,7 +148,7 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Descriptor))
 		fields = append(fields, field)
 	}
-	if m.IsSigned != false {
+	{
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Bool(m.IsSigned)
 		fields = append(fields, field)

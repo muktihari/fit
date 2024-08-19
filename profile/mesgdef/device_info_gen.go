@@ -122,7 +122,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
 	}
-	if uint32(m.SerialNumber) != basetype.Uint32zInvalid {
+	if m.SerialNumber != basetype.Uint32zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.SerialNumber)
 		fields = append(fields, field)
@@ -167,12 +167,12 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Descriptor)
 		fields = append(fields, field)
 	}
-	if uint8(m.AntTransmissionType) != basetype.Uint8zInvalid {
+	if m.AntTransmissionType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = proto.Uint8(m.AntTransmissionType)
 		fields = append(fields, field)
 	}
-	if uint16(m.AntDeviceNumber) != basetype.Uint16zInvalid {
+	if m.AntDeviceNumber != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint16(m.AntDeviceNumber)
 		fields = append(fields, field)

@@ -77,7 +77,7 @@ type Record struct {
 	VolumeSac                     uint16    // Scale: 100; Units: L/min; Volumetric surface air consumption
 	Rmv                           uint16    // Scale: 100; Units: L/min; Respiratory minute volume
 	CoreTemperature               uint16    // Scale: 100; Units: C
-	CompressedSpeedDistance       [3]byte   // Units: m/s,m
+	CompressedSpeedDistance       [3]byte   // Array: [3]; Units: m/s,m
 	HeartRate                     uint8     // Units: bpm
 	Cadence                       uint8     // Units: rpm
 	Resistance                    uint8     // Relative. 0 is none 254 is Max.
@@ -1414,7 +1414,7 @@ func (m *Record) SetPower(v uint16) *Record {
 
 // SetCompressedSpeedDistance sets CompressedSpeedDistance value.
 //
-// Units: m/s,m
+// Array: [3]; Units: m/s,m
 func (m *Record) SetCompressedSpeedDistance(v [3]byte) *Record {
 	m.CompressedSpeedDistance = v
 	return m

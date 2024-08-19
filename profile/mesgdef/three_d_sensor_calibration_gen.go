@@ -22,8 +22,8 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type ThreeDSensorCalibration struct {
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
-	OffsetCal          [3]int32           // Internal calibration factors, one for each: xy, yx, zx
-	OrientationMatrix  [9]int32           // Scale: 65535; 3 x 3 rotation matrix (row major)
+	OffsetCal          [3]int32           // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
+	OrientationMatrix  [9]int32           // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
@@ -185,7 +185,7 @@ func (m *ThreeDSensorCalibration) TimestampUint32() uint32 { return datetime.ToU
 // OrientationMatrixScaled return OrientationMatrix in its scaled value.
 // If OrientationMatrix value is invalid, nil will be returned.
 //
-// Scale: 65535; 3 x 3 rotation matrix (row major)
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 func (m *ThreeDSensorCalibration) OrientationMatrixScaled() [9]float64 {
 	if m.OrientationMatrix == [9]int32{
 		basetype.Sint32Invalid,
@@ -263,7 +263,7 @@ func (m *ThreeDSensorCalibration) SetLevelShift(v uint32) *ThreeDSensorCalibrati
 
 // SetOffsetCal sets OffsetCal value.
 //
-// Internal calibration factors, one for each: xy, yx, zx
+// Array: [3]; Internal calibration factors, one for each: xy, yx, zx
 func (m *ThreeDSensorCalibration) SetOffsetCal(v [3]int32) *ThreeDSensorCalibration {
 	m.OffsetCal = v
 	return m
@@ -271,7 +271,7 @@ func (m *ThreeDSensorCalibration) SetOffsetCal(v [3]int32) *ThreeDSensorCalibrat
 
 // SetOrientationMatrix sets OrientationMatrix value.
 //
-// Scale: 65535; 3 x 3 rotation matrix (row major)
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 func (m *ThreeDSensorCalibration) SetOrientationMatrix(v [9]int32) *ThreeDSensorCalibration {
 	m.OrientationMatrix = v
 	return m
@@ -280,7 +280,7 @@ func (m *ThreeDSensorCalibration) SetOrientationMatrix(v [9]int32) *ThreeDSensor
 // SetOrientationMatrixScaled is similar to SetOrientationMatrix except it accepts a scaled value.
 // This method automatically converts the given value to its [9]int32 form, discarding any applied scale and offset.
 //
-// Scale: 65535; 3 x 3 rotation matrix (row major)
+// Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
 func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs [9]float64) *ThreeDSensorCalibration {
 	m.OrientationMatrix = [9]int32{
 		basetype.Sint32Invalid,
