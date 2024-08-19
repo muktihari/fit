@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math"
-	"sync"
 	"unicode/utf8"
 
 	"github.com/muktihari/fit/profile"
@@ -222,27 +221,20 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceString(vals), nil
 		}
-		b = trimUTF8NullTerminatedString(b)
+		b = trimRightZero(b)
 		return String(utf8String(b)), nil
 	}
 
 	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", baseType, baseType, ErrTypeNotSupported)
 }
 
-// trimUTF8NullTerminatedString trims all utf8 null-terminated string including the paddings.
-func trimUTF8NullTerminatedString(b []byte) []byte {
-	pos := len(b)
-	for i := pos - 1; i >= 0; i-- {
-		if b[i] != '\x00' {
-			return b[:i+1]
-		}
-		pos = i
+// trimRightZero returns a subslice of b by slicing off all trailing zero.
+func trimRightZero(b []byte) []byte {
+	for len(b) > 0 && b[len(b)-1] == 0 {
+		b = b[:len(b)-1]
 	}
-	return b[:pos]
+	return b
 }
-
-// smallpool is an [255]byte array pool.
-var smallpool = sync.Pool{New: func() any { return new([255]byte) }}
 
 // utf8String converts b into a valid utf8 string.
 // Any invalid utf8 character will be converted into utf8.RuneError.
@@ -250,9 +242,7 @@ func utf8String(b []byte) string {
 	if utf8.Valid(b) { // Fast path
 		return string(b)
 	}
-	arr := smallpool.Get().(*[255]byte)
-	defer smallpool.Put(arr)
-	buf := arr[:0]
+	buf := make([]byte, 0, 255)
 	for len(b) > 0 {
 		r, size := utf8.DecodeRune(b)
 		buf = utf8.AppendRune(buf, r)
