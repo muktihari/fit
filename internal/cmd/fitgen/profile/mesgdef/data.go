@@ -27,6 +27,7 @@ type Field struct {
 	TypedValue      string
 	PrimitiveValue  string
 	ProtoValue      string
+	IsValidValue    string
 	ComparableValue string
 	InvalidValue    string
 	Comment         string
@@ -60,4 +61,9 @@ type ReturnValue struct {
 	Name  string
 	Units string
 	Value string
+}
+
+type UtilData struct {
+	Package      string
+	MaxLenFields byte
 }

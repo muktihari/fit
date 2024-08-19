@@ -97,15 +97,14 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumDeviceInfo}
 
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
+	if !m.Timestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
@@ -163,7 +162,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.SensorPosition))
 		fields = append(fields, field)
 	}
-	if m.Descriptor != basetype.StringInvalid && m.Descriptor != "" {
+	if m.Descriptor != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = proto.String(m.Descriptor)
 		fields = append(fields, field)
@@ -188,7 +187,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.SourceType))
 		fields = append(fields, field)
 	}
-	if m.ProductName != basetype.StringInvalid && m.ProductName != "" {
+	if m.ProductName != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 27)
 		field.Value = proto.String(m.ProductName)
 		fields = append(fields, field)
@@ -201,6 +200,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

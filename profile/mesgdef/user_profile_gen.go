@@ -126,10 +126,9 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumUserProfile}
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
@@ -137,7 +136,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if m.FriendlyName != basetype.StringInvalid && m.FriendlyName != "" {
+	if m.FriendlyName != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.FriendlyName)
 		fields = append(fields, field)
@@ -288,6 +287,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

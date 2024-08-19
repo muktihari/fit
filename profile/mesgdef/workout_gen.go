@@ -73,10 +73,9 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWorkout}
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
@@ -99,7 +98,7 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.NumValidSteps)
 		fields = append(fields, field)
 	}
-	if m.WktName != basetype.StringInvalid && m.WktName != "" {
+	if m.WktName != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.WktName)
 		fields = append(fields, field)
@@ -122,6 +121,7 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

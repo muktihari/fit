@@ -72,10 +72,9 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumVideoClip}
 
 	if m.ClipNumber != basetype.Uint16Invalid {
@@ -83,9 +82,9 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ClipNumber)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.StartTimestamp) != basetype.Uint32Invalid {
+	if !m.StartTimestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 1)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartTimestamp))
+		field.Value = proto.Uint32(uint32(m.StartTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
@@ -93,9 +92,9 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.StartTimestampMs)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.EndTimestamp) != basetype.Uint32Invalid {
+	if !m.EndTimestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 3)
-		field.Value = proto.Uint32(datetime.ToUint32(m.EndTimestamp))
+		field.Value = proto.Uint32(uint32(m.EndTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
@@ -116,6 +115,7 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

@@ -92,15 +92,14 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumWeatherConditions}
 
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
+	if !m.Timestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if byte(m.WeatherReport) != basetype.EnumInvalid {
@@ -143,14 +142,14 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.RelativeHumidity)
 		fields = append(fields, field)
 	}
-	if m.Location != basetype.StringInvalid && m.Location != "" {
+	if m.Location != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.Location)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.ObservedAtTime) != basetype.Uint32Invalid {
+	if !m.ObservedAtTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint32(datetime.ToUint32(m.ObservedAtTime))
+		field.Value = proto.Uint32(uint32(m.ObservedAtTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.ObservedLocationLat != basetype.Sint32Invalid {
@@ -181,6 +180,7 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

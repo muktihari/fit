@@ -75,15 +75,14 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumActivity}
 
-	if datetime.ToUint32(m.Timestamp) != basetype.Uint32Invalid {
+	if !m.Timestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 253)
-		field.Value = proto.Uint32(datetime.ToUint32(m.Timestamp))
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TotalTimerTime != basetype.Uint32Invalid {
@@ -111,9 +110,9 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.LocalTimestamp) != basetype.Uint32Invalid {
+	if !m.LocalTimestamp.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 5)
-		field.Value = proto.Uint32(datetime.ToUint32(m.LocalTimestamp))
+		field.Value = proto.Uint32(uint32(m.LocalTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.EventGroup != basetype.Uint8Invalid {
@@ -124,6 +123,7 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

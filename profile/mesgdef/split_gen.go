@@ -98,10 +98,9 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumSplit}
 
 	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
@@ -134,9 +133,9 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.AvgSpeed)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.StartTime) != basetype.Uint32Invalid {
+	if !m.StartTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 9)
-		field.Value = proto.Uint32(datetime.ToUint32(m.StartTime))
+		field.Value = proto.Uint32(uint32(m.StartTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TotalAscent != basetype.Uint16Invalid {
@@ -179,9 +178,9 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.AvgVertSpeed)
 		fields = append(fields, field)
 	}
-	if datetime.ToUint32(m.EndTime) != basetype.Uint32Invalid {
+	if !m.EndTime.Before(datetime.Epoch()) {
 		field := fac.CreateField(mesg.Num, 27)
-		field.Value = proto.Uint32(datetime.ToUint32(m.EndTime))
+		field.Value = proto.Uint32(uint32(m.EndTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TotalCalories != basetype.Uint32Invalid {
@@ -202,6 +201,7 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

@@ -9,16 +9,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
-	"github.com/muktihari/fit/proto"
 )
-
-func TestFieldPool(t *testing.T) {
-	arr, ok := pool.Get().(*[255]proto.Field)
-	if !ok {
-		t.Fatalf("expected ok, got not ok")
-	}
-	defer pool.Put(arr)
-}
 
 func TestDefaultOptions(t *testing.T) {
 	options := DefaultOptions()

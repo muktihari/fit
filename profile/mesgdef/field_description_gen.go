@@ -76,10 +76,9 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[255]proto.Field)
-	defer pool.Put(arr)
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 
-	fields := arr[:0] // Create slice from array with zero len.
 	mesg := proto.Message{Num: typedef.MesgNumFieldDescription}
 
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
@@ -107,7 +106,7 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Array)
 		fields = append(fields, field)
 	}
-	if m.Components != basetype.StringInvalid && m.Components != "" {
+	if m.Components != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.Components)
 		fields = append(fields, field)
@@ -127,12 +126,12 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceString(m.Units)
 		fields = append(fields, field)
 	}
-	if m.Bits != basetype.StringInvalid && m.Bits != "" {
+	if m.Bits != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.String(m.Bits)
 		fields = append(fields, field)
 	}
-	if m.Accumulate != basetype.StringInvalid && m.Accumulate != "" {
+	if m.Accumulate != basetype.StringInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.String(m.Accumulate)
 		fields = append(fields, field)
@@ -155,6 +154,7 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	return mesg
 }
