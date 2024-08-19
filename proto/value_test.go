@@ -874,7 +874,7 @@ func TestLen(t *testing.T) {
 		sizeInBytes int
 	}{
 		{value: Value{}, sizeInBytes: 0},
-		{value: Value{any: TypeInvalid}, sizeInBytes: 0},
+		{value: Value{typ: TypeInvalid}, sizeInBytes: 0},
 		{value: Bool(true), sizeInBytes: 1},
 		{value: Int8(10), sizeInBytes: 1},
 		{value: Uint8(10), sizeInBytes: 1},
@@ -922,7 +922,7 @@ func TestLen(t *testing.T) {
 	}
 }
 
-func BenchmarkSliceBool(b *testing.B) {
+func BenchmarkValueSliceBool(b *testing.B) {
 	s := []bool{true, false}
 
 	b.Run("[]bool", func(b *testing.B) {
@@ -933,7 +933,18 @@ func BenchmarkSliceBool(b *testing.B) {
 	})
 }
 
-func BenchmarkValid(b *testing.B) {
+func BenchmarkValueSliceString(b *testing.B) {
+	s := []string{"go", "fit", "sdk"}
+
+	b.Run("[]string", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			v := SliceString(s)
+			_ = v.SliceString()
+		}
+	})
+}
+
+func BenchmarkValueValid(b *testing.B) {
 	v := Uint32(10)
 
 	for i := 0; i < b.N; i++ {
