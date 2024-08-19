@@ -98,6 +98,13 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
     mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
 	
     {{ range .Fields -}}
+        {{ if and (eq .Type "bool") (eq .FixedArraySize 0) -}} 
+		{
+			field := fac.CreateField(mesg.Num, {{ .Num }})
+			field.Value = {{ .ProtoValue }}
+			fields = append(fields, field)
+		}
+		{{ else -}}
         if {{ .IsValidValue -}} {
 			{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
 			field := fac.CreateField(mesg.Num, {{ .Num }})
@@ -117,6 +124,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 			{{ if eq .CanExpand true -}} } {{ end -}}
         }
+        {{ end -}}
 	{{ end }}
 
     mesg.Fields = make([]proto.Field, len(fields))
