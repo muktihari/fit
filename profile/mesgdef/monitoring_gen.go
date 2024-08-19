@@ -23,7 +23,7 @@ import (
 type Monitoring struct {
 	Timestamp                    time.Time           // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	LocalTimestamp               time.Time           // Must align to logging interval, for example, time must be 00:00:00 for daily log.
-	ActivityTime                 [8]uint16           // Units: minutes; Indexed using minute_activity_level enum
+	ActivityTime                 [8]uint16           // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 	Distance                     uint32              // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	Cycles                       uint32              // Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	ActiveTime                   uint32              // Scale: 1000; Units: s
@@ -646,7 +646,7 @@ func (m *Monitoring) SetTemperatureMaxScaled(v float64) *Monitoring {
 
 // SetActivityTime sets ActivityTime value.
 //
-// Units: minutes; Indexed using minute_activity_level enum
+// Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 func (m *Monitoring) SetActivityTime(v [8]uint16) *Monitoring {
 	m.ActivityTime = v
 	return m

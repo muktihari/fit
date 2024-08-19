@@ -147,7 +147,7 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.BacklightMode))
 		fields = append(fields, field)
 	}
-	if m.ActivityTrackerEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 36)
 		field.Value = proto.Bool(m.ActivityTrackerEnabled)
 		fields = append(fields, field)
@@ -162,7 +162,7 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.PagesEnabled)
 		fields = append(fields, field)
 	}
-	if m.MoveAlertEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 46)
 		field.Value = proto.Bool(m.MoveAlertEnabled)
 		fields = append(fields, field)
@@ -197,12 +197,12 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.AutosyncMinTime)
 		fields = append(fields, field)
 	}
-	if m.LactateThresholdAutodetectEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 80)
 		field.Value = proto.Bool(m.LactateThresholdAutodetectEnabled)
 		fields = append(fields, field)
 	}
-	if m.BleAutoUploadEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 86)
 		field.Value = proto.Bool(m.BleAutoUploadEnabled)
 		fields = append(fields, field)

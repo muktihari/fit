@@ -94,7 +94,7 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)

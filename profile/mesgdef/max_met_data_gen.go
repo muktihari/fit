@@ -105,7 +105,7 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.MaxMetCategory))
 		fields = append(fields, field)
 	}
-	if m.CalibratedData != false {
+	{
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.CalibratedData)
 		fields = append(fields, field)

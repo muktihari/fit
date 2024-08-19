@@ -84,7 +84,7 @@ func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(byte(m.Layout))
 		fields = append(fields, field)
 	}
-	if m.ScreenEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.ScreenEnabled)
 		fields = append(fields, field)

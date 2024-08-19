@@ -116,7 +116,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	if m.Favorite != false {
+	{
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.Favorite)
 		fields = append(fields, field)

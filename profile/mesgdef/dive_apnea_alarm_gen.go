@@ -108,7 +108,7 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.Time)
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -133,22 +133,22 @@ func (m *DiveApneaAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Id)
 		fields = append(fields, field)
 	}
-	if m.PopupEnabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Bool(m.PopupEnabled)
 		fields = append(fields, field)
 	}
-	if m.TriggerOnDescent != false {
+	{
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.TriggerOnDescent)
 		fields = append(fields, field)
 	}
-	if m.TriggerOnAscent != false {
+	{
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.TriggerOnAscent)
 		fields = append(fields, field)
 	}
-	if m.Repeating != false {
+	{
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Repeating)
 		fields = append(fields, field)

@@ -76,22 +76,22 @@ func (m *HrmProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
-	if uint16(m.HrmAntId) != basetype.Uint16zInvalid {
+	if m.HrmAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.HrmAntId)
 		fields = append(fields, field)
 	}
-	if m.LogHrv != false {
+	{
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.LogHrv)
 		fields = append(fields, field)
 	}
-	if uint8(m.HrmAntIdTransType) != basetype.Uint8zInvalid {
+	if m.HrmAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.HrmAntIdTransType)
 		fields = append(fields, field)

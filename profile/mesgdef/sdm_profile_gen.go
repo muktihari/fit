@@ -83,12 +83,12 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
-	if uint16(m.SdmAntId) != basetype.Uint16zInvalid {
+	if m.SdmAntId != basetype.Uint16zInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.SdmAntId)
 		fields = append(fields, field)
@@ -103,12 +103,12 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Odometer)
 		fields = append(fields, field)
 	}
-	if m.SpeedSource != false {
+	{
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.SpeedSource)
 		fields = append(fields, field)
 	}
-	if uint8(m.SdmAntIdTransType) != basetype.Uint8zInvalid {
+	if m.SdmAntIdTransType != basetype.Uint8zInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(m.SdmAntIdTransType)
 		fields = append(fields, field)

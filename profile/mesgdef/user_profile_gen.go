@@ -23,7 +23,7 @@ type UserProfile struct {
 	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
 	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
 	DiveCount                  uint32
-	GlobalId                   [6]byte
+	GlobalId                   [6]byte // Array: [6]
 	MessageIndex               typedef.MessageIndex
 	Weight                     uint16 // Scale: 10; Units: kg
 	LocalId                    typedef.UserLocalId
@@ -509,6 +509,8 @@ func (m *UserProfile) SetLocalId(v typedef.UserLocalId) *UserProfile {
 }
 
 // SetGlobalId sets GlobalId value.
+//
+// Array: [6]
 func (m *UserProfile) SetGlobalId(v [6]byte) *UserProfile {
 	m.GlobalId = v
 	return m

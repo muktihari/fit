@@ -160,7 +160,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if uint8(m.FrontGearNum) != basetype.Uint8zInvalid {
+	if m.FrontGearNum != basetype.Uint8zInvalid {
 		if expanded := m.IsExpandedField(9); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 9)
 			field.Value = proto.Uint8(m.FrontGearNum)
@@ -168,7 +168,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if uint8(m.FrontGear) != basetype.Uint8zInvalid {
+	if m.FrontGear != basetype.Uint8zInvalid {
 		if expanded := m.IsExpandedField(10); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 10)
 			field.Value = proto.Uint8(m.FrontGear)
@@ -176,7 +176,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if uint8(m.RearGearNum) != basetype.Uint8zInvalid {
+	if m.RearGearNum != basetype.Uint8zInvalid {
 		if expanded := m.IsExpandedField(11); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 11)
 			field.Value = proto.Uint8(m.RearGearNum)
@@ -184,7 +184,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if uint8(m.RearGear) != basetype.Uint8zInvalid {
+	if m.RearGear != basetype.Uint8zInvalid {
 		if expanded := m.IsExpandedField(12); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 12)
 			field.Value = proto.Uint8(m.RearGear)

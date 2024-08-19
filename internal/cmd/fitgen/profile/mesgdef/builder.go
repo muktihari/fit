@@ -228,7 +228,7 @@ func (b *mesgdefBuilder) componentExpansionAbility(mesg *parser.Message) (canExp
 func createComment(field *Field, array string) string {
 	buf := new(strings.Builder)
 
-	if strings.HasPrefix(field.Type, "[]") {
+	if strings.HasPrefix(field.Type, "[") {
 		buf.WriteString("Array: ")
 		buf.WriteString(array)
 		buf.WriteString("; ")
@@ -470,8 +470,7 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
 	}
 
-	if !strings.HasSuffix(fieldType, "z") &&
-		b.lookup.BaseType(fieldType).String() == fieldType {
+	if b.lookup.BaseType(fieldType).String() == fieldType {
 		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
 	}
 

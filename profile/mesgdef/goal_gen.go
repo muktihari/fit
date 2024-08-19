@@ -124,7 +124,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Value)
 		fields = append(fields, field)
 	}
-	if m.Repeat != false {
+	{
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Bool(m.Repeat)
 		fields = append(fields, field)
@@ -144,7 +144,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.RecurrenceValue)
 		fields = append(fields, field)
 	}
-	if m.Enabled != false {
+	{
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
