@@ -276,6 +276,13 @@ func TestString(t *testing.T) {
 			t.Fatalf("expected: %v, got: %v", input, v.String())
 		}
 	})
+	t.Run("empty string", func(t *testing.T) {
+		value := String("")
+		result := value.String()
+		if result != "" {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		v := Value{}
 		if v.String() != basetype.StringInvalid {
@@ -303,6 +310,13 @@ func TestSliceBool(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceBool([]bool(nil))
+		result := value.SliceBool()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
@@ -335,6 +349,13 @@ func TestSliceInt8(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceInt8([]int8(nil))
+		result := value.SliceInt8()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceInt8()
@@ -363,6 +384,13 @@ func TestSliceUint8(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceUint8([]uint8(nil))
+		result := value.SliceUint8()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
@@ -395,6 +423,13 @@ func TestSliceInt16(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceInt16([]int16(nil))
+		result := value.SliceInt16()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceInt16()
@@ -423,6 +458,13 @@ func TestSliceUint16(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceUint16([]uint16(nil))
+		result := value.SliceUint16()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
@@ -455,6 +497,13 @@ func TestSliceInt32(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceInt32([]int32(nil))
+		result := value.SliceInt32()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceInt32()
@@ -483,6 +532,13 @@ func TestSliceUint32(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceUint32([]uint32(nil))
+		result := value.SliceUint32()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
@@ -515,6 +571,13 @@ func TestSliceInt64(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceInt64([]int64(nil))
+		result := value.SliceInt64()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceInt64()
@@ -543,6 +606,13 @@ func TestSliceUint64(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceUint64([]uint64(nil))
+		result := value.SliceUint64()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
@@ -575,6 +645,13 @@ func TestSliceFloat32(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceFloat32([]float32(nil))
+		result := value.SliceFloat32()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceFloat32()
@@ -605,6 +682,13 @@ func TestSliceFloat64(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceFloat64([]float64(nil))
+		result := value.SliceFloat64()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
+		}
+	})
 	t.Run("invalid", func(t *testing.T) {
 		value := Value{}
 		result := value.SliceFloat64()
@@ -633,6 +717,13 @@ func TestSliceString(t *testing.T) {
 		}
 		if diff := cmp.Diff(expected, result); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+	t.Run("nil value", func(t *testing.T) {
+		value := SliceString([]string(nil))
+		result := value.SliceString()
+		if result != nil {
+			t.Fatalf("expected nil, got: %v", result)
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
