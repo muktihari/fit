@@ -7,7 +7,9 @@ package proto
 import (
 	"fmt"
 	"math"
+	"runtime"
 	"testing"
+	"time"
 	"unsafe"
 
 	"github.com/google/go-cmp/cmp"
@@ -1010,6 +1012,76 @@ func TestLen(t *testing.T) {
 				t.Fatalf("expected: %d, got: %d", tc.sizeInBytes, size)
 			}
 		})
+	}
+}
+
+func TestSliceDataLiveness(t *testing.T) {
+	// NOTE: This may not be necessary; however, it gives us more
+	// confidence that an unsafe.Pointer inside a Value will never be
+	// garbage-collected as long as the Value is still reachable.
+
+	// compile time type-assertion, this test only valid when ptr is an unsafe.Pointer.
+	var _ unsafe.Pointer = Value{}.ptr
+
+	const n = 1 << 16
+	const timeout = 100 * time.Millisecond
+
+	var makeslice = func(n int) []uint64 {
+		vs := make([]uint64, n)
+		for i := range vs {
+			vs[i] = uint64(i)
+		}
+		return vs
+	}
+
+	var (
+		// z must be garbage-collected on first GC() phase.
+		z          = makeslice(n)
+		zptr       = unsafe.SliceData(z)
+		zcollected = make(chan struct{})
+
+		vals      = makeslice(n)
+		ptr       = unsafe.SliceData(vals)
+		uptr      = uintptr(unsafe.Pointer(ptr))
+		value     = SliceUint64(vals)
+		collected = make(chan struct{})
+
+		expected = append(vals[:0:0], vals...)
+	)
+
+	runtime.SetFinalizer(zptr, func(_ *uint64) { close(zcollected) })
+	runtime.SetFinalizer(ptr, func(_ *uint64) { close(collected) })
+
+	// Make sure `vals` stays alive.
+	runtime.GC()
+	runtime.GC()
+
+	<-zcollected // Must be garbage-collected.
+
+	select {
+	case <-collected:
+		t.Fatalf("object at address 0x%x has been garbage-collected", uptr)
+	case <-time.After(timeout):
+	}
+
+	retrieved := value.SliceUint64()
+	if diff := cmp.Diff(retrieved, expected); diff != "" {
+		t.Fatal(diff)
+	}
+
+	collected = make(chan struct{})
+	runtime.SetFinalizer(ptr, nil)
+	runtime.SetFinalizer(ptr, func(_ *uint64) { close(collected) })
+
+	// Make sure `vals` has been garbage-collected
+	// as `value` is no longer reachable.
+	runtime.GC()
+	runtime.GC()
+
+	select {
+	case <-collected:
+	case <-time.After(timeout):
+		t.Errorf("ptr finalizer never be invoked after %s, object at 0x%x is still alive", timeout, uptr)
 	}
 }
 
