@@ -15,6 +15,7 @@ import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
+	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
@@ -241,13 +242,14 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 			value, err := parseValue(
 				sliceValues[i],
 				field.BaseType,
+				field.Type,
 				field.Scale,
 				field.Offset,
 				units,
 			)
 			if err != nil {
-				return field, fmt.Errorf("%q: [%d]: could not parse %q into %s ",
-					field.Name, i, sliceValues[i], field.BaseType.GoType())
+				return field, fmt.Errorf("%q: [%d]: could not parse %q into %s: %v",
+					field.Name, i, sliceValues[i], field.BaseType.GoType(), err)
 			}
 			protoValues = append(protoValues, value)
 		}
@@ -258,13 +260,14 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 	field.Value, err = parseValue(
 		strValue,
 		field.BaseType,
+		field.Type,
 		field.Scale,
 		field.Offset,
 		units,
 	)
 	if err != nil {
-		err = fmt.Errorf("%q: could not parse %q into %s",
-			field.Name, strValue, field.BaseType.GoType())
+		err = fmt.Errorf("%q: could not parse %q into %s: %v",
+			field.Name, strValue, field.BaseType.GoType(), err)
 	}
 
 	return
@@ -302,6 +305,7 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 			value, err := parseValue(
 				sliceValues[i],
 				fieldDesc.FitBaseTypeId,
+				profile.ProfileTypeFromBaseType(fieldDesc.FitBaseTypeId),
 				scale,
 				offset,
 				units,
@@ -319,6 +323,7 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 	devField.Value, err = parseValue(
 		strValue,
 		fieldDesc.FitBaseTypeId,
+		profile.ProfileTypeFromBaseType(fieldDesc.FitBaseTypeId),
 		scale,
 		offset,
 		units,
@@ -348,6 +353,7 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 					fieldRef.Value, err = parseValue(
 						ref.value,
 						fieldRef.BaseType,
+						fieldRef.Type,
 						fieldRef.Scale,
 						fieldRef.Offset,
 						fieldRef.Units,
@@ -397,8 +403,8 @@ func removeExpandedComponents(mesg *proto.Message) {
 	}
 }
 
-func parseValue(strValue string, baseType basetype.BaseType, scale, offset float64, units string) (value proto.Value, err error) {
-	if units == "degrees" { // Special case
+func parseValue(strValue string, baseType basetype.BaseType, profileType profile.ProfileType, scale, offset float64, units string) (value proto.Value, err error) {
+	if units == "degrees" && baseType == basetype.Sint32 { // Special case
 		degrees, err := strconv.ParseFloat(strValue, 64)
 		if err != nil {
 			return value, err
@@ -406,15 +412,22 @@ func parseValue(strValue string, baseType basetype.BaseType, scale, offset float
 		return proto.Int32(semicircles.ToSemicircles(degrees)), nil
 	}
 
-	var scaledValue float64
-	var isScaled bool
-	if scale != 1 || offset != 0 {
-		var v float64
-		v, err = strconv.ParseFloat(strValue, 64)
-		if err == nil {
-			scaledValue = scaleoffset.Discard(v, scale, offset)
-			isScaled = true
+	if profileType == profile.Bool {
+		v, err := strconv.ParseBool(strValue)
+		if err != nil {
+			return value, err
 		}
+		return proto.Bool(v), nil
+	}
+
+	var scaledValue float64
+	var isScaled bool = strings.Contains(strValue, ".")
+	if isScaled {
+		scaledValue, err = strconv.ParseFloat(strValue, 64)
+		if err != nil {
+			return value, err
+		}
+		scaledValue = scaleoffset.Discard(scaledValue, scale, offset)
 	}
 
 	switch baseType {
@@ -461,7 +474,7 @@ func parseValue(strValue string, baseType basetype.BaseType, scale, offset float
 		return proto.Uint16(uint16(v)), nil
 	case basetype.Sint32:
 		if isScaled {
-			return proto.Int16(int16(scaledValue)), nil
+			return proto.Int32(int32(scaledValue)), nil
 		}
 		var v int64
 		v, err = strconv.ParseInt(strValue, 0, 32)
