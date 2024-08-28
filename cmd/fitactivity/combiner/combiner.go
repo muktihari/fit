@@ -79,6 +79,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 		}
 	}
 
+	lastDistance := getLastDistanceOrZero(fitResult.Messages)
 	for i := 1; i < len(fits); i++ {
 		var (
 			nextFitSessions = sessionsByFIT[i]
@@ -90,16 +91,26 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 				i, curSes.Sport, nextSes.Sport, ErrSportMismatch)
 		}
 
+		var lastDist uint32
 		for _, mesg := range fits[i].Messages {
 			switch mesg.Num {
 			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
 				continue // skip
 			case mesgnum.SplitSummary:
 				continue // TODO: Still failed to upload to Garmin Connect if we include this message.
+			case mesgnum.Record:
+				// Accumulate distance
+				field := mesg.FieldByNum(fieldnum.RecordDistance)
+				if field != nil && field.Value.Uint32() != basetype.Uint32Invalid {
+					lastDist = field.Value.Uint32() + lastDistance
+					field.Value = proto.Uint32(lastDist)
+				}
+				fallthrough
 			default:
 				fitResult.Messages = append(fitResult.Messages, mesg)
 			}
 		}
+		lastDistance = lastDist
 
 		combineSession(curSes, nextSes)
 		sessionMesgs[len(sessionMesgs)-1] = curSes.ToMesg(nil) // Update Session
@@ -182,6 +193,20 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 	fitResult.Messages = append(fitResult.Messages, activityMesg)
 
 	return fitResult, nil
+}
+
+func getLastDistanceOrZero(mesgs []proto.Message) uint32 {
+	for i := len(mesgs) - 1; i >= 0; i-- {
+		if mesgs[i].Num != mesgnum.Record {
+			continue
+		}
+		v := mesgs[i].FieldValueByNum(fieldnum.RecordDistance).Uint32()
+		if v == basetype.Uint32Invalid {
+			continue
+		}
+		return v
+	}
+	return 0
 }
 
 // combineSession combines s2 into s1.
