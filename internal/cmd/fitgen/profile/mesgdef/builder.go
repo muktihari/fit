@@ -12,7 +12,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
+	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
@@ -20,7 +20,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type mesgdefBuilder struct {
+type Builder struct {
 	template     *template.Template
 	templateExec string
 
@@ -33,10 +33,12 @@ type mesgdefBuilder struct {
 	types    []parser.Type
 }
 
-func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) builder.Builder {
+var _ generator.Builder = (*Builder)(nil)
+
+func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) *Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	return &mesgdefBuilder{
+	return &Builder{
 		template: template.Must(template.New("main").
 			Funcs(template.FuncMap{
 				"stringsJoin":   strings.Join,
@@ -61,8 +63,8 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 	}
 }
 
-func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
-	dataBuilders := make([]builder.Data, 0, len(b.messages))
+func (b *Builder) Build() ([]generator.Data, error) {
+	dataBuilders := make([]generator.Data, 0, len(b.messages))
 	var maxLenFields int
 	for _, mesg := range b.messages {
 		canExpand, maxFieldExpandNum := b.componentExpansionAbility(&mesg)
@@ -176,7 +178,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		}
 
 		dataBuilders = append(dataBuilders,
-			builder.Data{
+			generator.Data{
 				Template:     b.template,
 				TemplateExec: b.templateExec,
 				Path:         b.path,
@@ -186,7 +188,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 		)
 	}
 
-	dataBuilders = append(dataBuilders, builder.Data{
+	dataBuilders = append(dataBuilders, generator.Data{
 		Template:     b.template,
 		TemplateExec: "util",
 		Path:         b.path,
@@ -202,7 +204,7 @@ func (b *mesgdefBuilder) Build() ([]builder.Data, error) {
 
 // componentExpansionAbility checks whether fields or subfields have components that can be expanded.
 // If they do, retrieve the largest field's number.
-func (b *mesgdefBuilder) componentExpansionAbility(mesg *parser.Message) (canExpand map[string]byte, maxFieldExpandNum byte) {
+func (b *Builder) componentExpansionAbility(mesg *parser.Message) (canExpand map[string]byte, maxFieldExpandNum byte) {
 	canExpand = make(map[string]byte)
 	for _, field := range mesg.Fields {
 		for _, component := range field.Components {
@@ -285,7 +287,7 @@ func appendImports(imports map[string]struct{}, field *Field, profileType string
 	return imports
 }
 
-func (b *mesgdefBuilder) createDynamicField(mesgName string, field *Field, parserField *parser.Field) DynamicField {
+func (b *Builder) createDynamicField(mesgName string, field *Field, parserField *parser.Field) DynamicField {
 	var (
 		rawSwitchCases      = make(map[string][]CondValue)
 		rawSwitchCasesOrder = make(map[string]int)
@@ -351,7 +353,7 @@ func (b *mesgdefBuilder) createDynamicField(mesgName string, field *Field, parse
 	}
 }
 
-func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
+func (b *Builder) simpleMemoryAlignment(fields []Field) {
 	// In 64 bits machine, the layout is per 8 bytes.
 	// If the size is a multply of 8, set 8.
 	for i := range fields {
@@ -398,7 +400,7 @@ func (b *mesgdefBuilder) simpleMemoryAlignment(fields []Field) {
 	})
 }
 
-func (b *mesgdefBuilder) transformType(fieldType, fieldArray string, fixedArraySize byte) string {
+func (b *Builder) transformType(fieldType, fieldArray string, fixedArraySize byte) string {
 	if isTypeTime(fieldType) {
 		return "time.Time"
 	}
@@ -440,7 +442,7 @@ var baseTypeReplacer = strings.NewReplacer(
 	"Byte", "Uint8",
 )
 
-func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array string) string {
+func (b *Builder) transformToProtoValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("proto.Uint32(uint32(m.%s.Sub(datetime.Epoch()).Seconds()))", fieldName)
 	}
@@ -465,7 +467,7 @@ func (b *mesgdefBuilder) transformToProtoValue(fieldName, fieldType, array strin
 	return fmt.Sprintf("proto.%s(%s)", typ, val)
 }
 
-func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array string) string {
+func (b *Builder) transformPrimitiveValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
 	}
@@ -487,7 +489,7 @@ func (b *mesgdefBuilder) transformPrimitiveValue(fieldName, fieldType, array str
 
 }
 
-func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string, fixedArraySize uint8) string {
+func (b *Builder) transformTypedValue(num byte, fieldType, array string, fixedArraySize uint8) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToTime(vals[%d].Uint32())", num)
 	}
@@ -548,7 +550,7 @@ func (b *mesgdefBuilder) transformTypedValue(num byte, fieldType, array string, 
 		}()`, typdef, value, typdef)
 }
 
-func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveValue string) string {
+func (b *Builder) transformComparableValue(fieldType, array, primitiveValue string) string {
 	if array == "" {
 		switch b.lookup.BaseType(fieldType).String() {
 		case "float32":
@@ -561,7 +563,7 @@ func (b *mesgdefBuilder) transformComparableValue(fieldType, array, primitiveVal
 	return primitiveValue
 }
 
-func (b *mesgdefBuilder) invalidValueOf(fieldType, array string, fixedArraySize byte) string {
+func (b *Builder) invalidValueOf(fieldType, array string, fixedArraySize byte) string {
 	if fieldType == "bool" {
 		return "false"
 	}
@@ -591,7 +593,7 @@ func (b *mesgdefBuilder) invalidValueOf(fieldType, array string, fixedArraySize 
 		strutil.ToTitle(b.lookup.BaseType(fieldType).String()))
 }
 
-func (b *mesgdefBuilder) invalidArrayValueScaled(fixedArraySize byte) string {
+func (b *Builder) invalidArrayValueScaled(fixedArraySize byte) string {
 	return fmt.Sprintf(`[%d]float64{
 		%s
 	}`,

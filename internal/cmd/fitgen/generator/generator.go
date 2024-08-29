@@ -10,18 +10,38 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
+	"text/template"
 )
 
+// Builder is template data builder
+type Builder interface {
+	// Build returns slice of template data and an error
+	Build() ([]Data, error)
+}
+
+// Data wraps template and data for generating proto.
+type Data struct {
+	Template     *template.Template
+	TemplateExec string
+	Path         string
+	Filename     string
+	Data         any
+}
+
 // New return a generator
-func New(verbose bool) *Generator { return &Generator{verbose: verbose} }
+func New(verbose bool) *Generator {
+	return &Generator{
+		verbose: verbose,
+		buf:     bytes.NewBuffer(nil),
+	}
+}
 
 type Generator struct {
 	verbose bool
+	buf     *bytes.Buffer
 }
 
-func (g *Generator) Generate(builders []builder.Builder, perm os.FileMode) error {
+func (g *Generator) Generate(builders []Builder, perm os.FileMode) error {
 	for _, builder := range builders {
 		dataBuilders, err := builder.Build()
 		if err != nil {
@@ -37,12 +57,12 @@ func (g *Generator) Generate(builders []builder.Builder, perm os.FileMode) error
 		}
 
 		for path := range paths { // format all files in the path
+			g.buf.Reset()
 			path = abspath(path)
-			stderr := new(bytes.Buffer)
 			cmd := exec.Command("gofmt", "-s", "-w", path)
-			cmd.Stderr = stderr
+			cmd.Stderr = g.buf
 			if err := cmd.Run(); err != nil {
-				fmt.Printf("gofmt -s -w %q, stderr: \n%s\n", path, stderr.String())
+				fmt.Printf("gofmt -s -w %q, stderr: \n%s\n", path, g.buf.String())
 				return fmt.Errorf("cmd err: %w", err)
 			}
 		}
@@ -51,19 +71,19 @@ func (g *Generator) Generate(builders []builder.Builder, perm os.FileMode) error
 	return nil
 }
 
-func (g *Generator) GenerateTemplateData(dataBuilder builder.Data, perm os.FileMode) error {
+func (g *Generator) GenerateTemplateData(dataBuilder Data, perm os.FileMode) error {
 	if err := os.MkdirAll(dataBuilder.Path, 0755); err != nil {
 		return fmt.Errorf("mkdir %q: %w", dataBuilder.Path, err)
 	}
 	name := filepath.Join(dataBuilder.Path, dataBuilder.Filename)
 	name = abspath(name)
 
-	buf := new(bytes.Buffer)
-	if err := dataBuilder.Template.ExecuteTemplate(buf, dataBuilder.TemplateExec, dataBuilder.Data); err != nil {
+	g.buf.Reset()
+	if err := dataBuilder.Template.ExecuteTemplate(g.buf, dataBuilder.TemplateExec, dataBuilder.Data); err != nil {
 		return fmt.Errorf("template exec templ %q: %w", name, err)
 	}
 
-	if err := os.WriteFile(name, buf.Bytes(), perm); err != nil {
+	if err := os.WriteFile(name, g.buf.Bytes(), perm); err != nil {
 		return fmt.Errorf("write file %q: %w", name, err)
 	}
 

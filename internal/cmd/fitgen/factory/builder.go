@@ -11,7 +11,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
+	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
@@ -23,7 +23,7 @@ type ( // type aliasing for better code reading.
 	FieldName   = string
 )
 
-type factoryBuilder struct {
+type Builder struct {
 	template *template.Template
 
 	mesgnumPackageName string
@@ -36,10 +36,12 @@ type factoryBuilder struct {
 	types    []parser.Type
 }
 
-func NewBuilder(path string, lookup *lookup.Lookup, types []parser.Type, messages []parser.Message) builder.Builder {
+var _ generator.Builder = (*Builder)(nil)
+
+func NewBuilder(path string, lookup *lookup.Lookup, types []parser.Type, messages []parser.Message) *Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	f := &factoryBuilder{
+	f := &Builder{
 		template:           template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
 		path:               filepath.Join(path, "factory"),
 		mesgnumPackageName: "typedef",
@@ -52,7 +54,7 @@ func NewBuilder(path string, lookup *lookup.Lookup, types []parser.Type, message
 	return f
 }
 
-func (b *factoryBuilder) preproccessMessageField() {
+func (b *Builder) preproccessMessageField() {
 	// Prepare lookup table for field indexes
 	fieldIndexMapByMessageNameByFieldName := make(map[MessageName]map[FieldName]int)
 	for _, message := range b.messages {
@@ -79,7 +81,7 @@ func (b *factoryBuilder) preproccessMessageField() {
 	}
 }
 
-func (b *factoryBuilder) Build() ([]builder.Data, error) {
+func (b *Builder) Build() ([]generator.Data, error) {
 	// Create message/field lookup structure as string using strings.Builder{},
 	// This way, we don't depend on generated value such as types and profile package to be able to generate factory.
 	// And also we don't need to process the data in the template which is a bit painful for complex data structure.
@@ -97,7 +99,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	}
 	strbuf.WriteString("}")
 
-	return []builder.Data{
+	return []generator.Data{
 		{
 			Template:     b.template,
 			TemplateExec: "factory",
@@ -121,7 +123,7 @@ func (b *factoryBuilder) Build() ([]builder.Data, error) {
 	}, nil
 }
 
-func (b *factoryBuilder) makeFieldBases(message parser.Message) string {
+func (b *Builder) makeFieldBases(message parser.Message) string {
 	if len(message.Fields) == 0 {
 		return "nil"
 	}
@@ -158,7 +160,7 @@ func (b *factoryBuilder) makeFieldBases(message parser.Message) string {
 	return strbuf.String()
 }
 
-func (b *factoryBuilder) makeComponents(compField parser.ComponentField, messageName string) string {
+func (b *Builder) makeComponents(compField parser.ComponentField, messageName string) string {
 	if len(compField.GetComponents()) == 0 {
 		return "nil"
 	}
@@ -184,7 +186,7 @@ func (b *factoryBuilder) makeComponents(compField parser.ComponentField, message
 	return strbuf.String()
 }
 
-func (b *factoryBuilder) makeSubFields(field parser.Field, messageName string) string {
+func (b *Builder) makeSubFields(field parser.Field, messageName string) string {
 	if len(field.SubFields) == 0 {
 		return "nil"
 	}
@@ -213,7 +215,7 @@ func (b *factoryBuilder) makeSubFields(field parser.Field, messageName string) s
 	return strbuf.String()
 }
 
-func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName string) string {
+func (b *Builder) makeSubFieldMaps(subfield parser.SubField, messageName string) string {
 	if len(subfield.RefFieldNames) == 0 {
 		return "nil"
 	}
@@ -233,16 +235,16 @@ func (b *factoryBuilder) makeSubFieldMaps(subfield parser.SubField, messageName 
 	return strbuf.String()
 }
 
-func (b *factoryBuilder) transformProfileType(fieldType string) string {
+func (b *Builder) transformProfileType(fieldType string) string {
 	return b.profilePackageName + "." + strutil.ToTitle(fieldType) // profile.Uint8
 }
 
-func (b *factoryBuilder) transformBaseType(fieldType string) string {
+func (b *Builder) transformBaseType(fieldType string) string {
 	baseType := b.lookup.BaseType(fieldType)
 	return "basetype." + strutil.ToTitle(baseType.String()) // basetype.Uint16z
 }
 
-func (b *factoryBuilder) transformMesgnum(s string) string {
+func (b *Builder) transformMesgnum(s string) string {
 	return "mesgnum." + strutil.ToTitle(s) // mesgnum.FileId
 }
 

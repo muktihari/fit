@@ -4,7 +4,7 @@
 
 package profile
 
-import "github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+import "github.com/muktihari/fit/internal/cmd/fitgen/shared"
 
 // ProfileData is data representative of profile.tmpl
 type ProfileData struct {

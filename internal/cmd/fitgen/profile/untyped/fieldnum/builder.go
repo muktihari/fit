@@ -12,15 +12,15 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
+	"github.com/muktihari/fit/internal/cmd/fitgen/shared"
 	"golang.org/x/exp/slices"
 )
 
-type fieldnumBuilder struct {
+type Builder struct {
 	template     *template.Template
 	templateExec string
 
@@ -31,15 +31,17 @@ type fieldnumBuilder struct {
 	types    []parser.Type
 }
 
-func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) builder.Builder {
+var _ generator.Builder = (*Builder)(nil)
+
+func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, types []parser.Type) *Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	return &fieldnumBuilder{
+	return &Builder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
 			ParseFiles(
 				filepath.Join(cd, "fieldnum.tmpl"),
-				filepath.Join(cd, "..", "..", "..", "builder", "shared", "untyped_constant.tmpl"))),
+				filepath.Join(cd, "..", "..", "..", "shared", "untyped_constant.tmpl"))),
 		templateExec: "fieldnum",
 		path:         filepath.Join(path, "profile", "untyped", "fieldnum"),
 		lookup:       lookup,
@@ -48,7 +50,7 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 	}
 }
 
-func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
+func (b *Builder) Build() ([]generator.Data, error) {
 	constants := make([]shared.Constant, 0)
 	for _, mesg := range b.messages {
 		for _, field := range mesg.Fields {
@@ -82,7 +84,7 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 		String: "invalid",
 	})
 
-	dataBuilder := builder.Data{
+	dataBuilder := generator.Data{
 		Template:     b.template,
 		TemplateExec: b.templateExec,
 		Path:         b.path,
@@ -93,7 +95,7 @@ func (b *fieldnumBuilder) Build() ([]builder.Data, error) {
 		},
 	}
 
-	return []builder.Data{dataBuilder}, nil
+	return []generator.Data{dataBuilder}, nil
 }
 
 func createComment(mesgName string, field *parser.Field, baseType string) string {
