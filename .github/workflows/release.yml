@@ -30,10 +30,10 @@ jobs:
       - name: Build [macOS]
         if: matrix.os == 'macOS'
         run: |
-          CGO=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          zip -q $cli-$os-amd64.zip $cli
-          CGO=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          zip -q $cli-$os-arm64.zip $cli
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
+          zip -9q $cli-$os-amd64.zip $cli
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
+          zip -9q $cli-$os-arm64.zip $cli
           rm $cli
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-arm64.zip)"
@@ -44,8 +44,8 @@ jobs:
       - name: Build [windows]
         if: matrix.os == 'windows'
         run: |
-          CGO=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli.exe cmd/$cli/main.go
-          zip -q $cli-$os-amd64.zip $cli.exe
+          CGO_ENABLED=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli.exe cmd/$cli/main.go
+          zip -9q $cli-$os-amd64.zip $cli.exe
           rm $cli.exe
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
         env:
@@ -55,8 +55,8 @@ jobs:
       - name: Build [linux]
         if: matrix.os == 'linux'
         run: |
-          CGO=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          tar -czf $cli-$os-amd64.tar.gz $cli
+          CGO_ENABLED=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
+          tar -I 'gzip -9' -cf $cli-$os-amd64.tar.gz $cli
           rm $cli
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.tar.gz)"
         env:
