@@ -497,9 +497,17 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		return invalidCount != len(vals)
 	case TypeSliceUint8:
 		vals := v.SliceUint8()
-		for i := range vals {
-			if vals[i] == basetype.Uint8Invalid {
-				invalidCount++
+		if t == basetype.Uint8z {
+			for i := range vals {
+				if vals[i] == basetype.Uint8zInvalid {
+					invalidCount++
+				}
+			}
+		} else {
+			for i := range vals {
+				if vals[i] == basetype.Uint8Invalid {
+					invalidCount++
+				}
 			}
 		}
 		return invalidCount != len(vals)
@@ -513,9 +521,17 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		return invalidCount != len(vals)
 	case TypeSliceUint16:
 		vals := v.SliceUint16()
-		for i := range vals {
-			if vals[i] == basetype.Uint16Invalid {
-				invalidCount++
+		if t == basetype.Uint16z {
+			for i := range vals {
+				if vals[i] == basetype.Uint16zInvalid {
+					invalidCount++
+				}
+			}
+		} else {
+			for i := range vals {
+				if vals[i] == basetype.Uint16Invalid {
+					invalidCount++
+				}
 			}
 		}
 		return invalidCount != len(vals)
@@ -529,9 +545,17 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		return invalidCount != len(vals)
 	case TypeSliceUint32:
 		vals := v.SliceUint32()
-		for i := range vals {
-			if vals[i] == basetype.Uint32Invalid {
-				invalidCount++
+		if t == basetype.Uint32z {
+			for i := range vals {
+				if vals[i] == basetype.Uint32zInvalid {
+					invalidCount++
+				}
+			}
+		} else {
+			for i := range vals {
+				if vals[i] == basetype.Uint32Invalid {
+					invalidCount++
+				}
 			}
 		}
 		return invalidCount != len(vals)
@@ -561,9 +585,17 @@ func (v Value) Valid(t basetype.BaseType) bool {
 		return invalidCount != len(vals)
 	case TypeSliceUint64:
 		vals := v.SliceUint64()
-		for i := range vals {
-			if vals[i] == basetype.Uint64Invalid {
-				invalidCount++
+		if t == basetype.Uint64z {
+			for i := range vals {
+				if vals[i] == basetype.Uint64zInvalid {
+					invalidCount++
+				}
+			}
+		} else {
+			for i := range vals {
+				if vals[i] == basetype.Uint64Invalid {
+					invalidCount++
+				}
 			}
 		}
 		return invalidCount != len(vals)
