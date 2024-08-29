@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -47,6 +48,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 
 	var sessionMesgs []proto.Message
 	var activityMesg proto.Message
+	var splitSummaryHist = make(map[typedef.SplitType]*mesgdef.SplitSummary)
 
 	sessionsByFIT := make([][]proto.Message, len(fits))
 	for i := range fits {
@@ -61,6 +63,16 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 					j--
 				}
 				sessionsByFIT[i] = append(sessionsByFIT[i], mesg)
+			case mesgnum.SplitSummary:
+				s2 := mesgdef.NewSplitSummary(&mesg)
+				s1, ok := splitSummaryHist[s2.SplitType]
+				if !ok {
+					splitSummaryHist[s2.SplitType] = s2
+				} else {
+					combineSplitSummary(s1, s2)
+				}
+				fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all split summaries from result
+				j--
 			case mesgnum.Activity:
 				if activityMesg.Num != mesgnum.Activity {
 					activityMesg = mesg
@@ -96,8 +108,6 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 			switch mesg.Num {
 			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
 				continue // skip
-			case mesgnum.SplitSummary:
-				continue // TODO: Still failed to upload to Garmin Connect if we include this message.
 			case mesgnum.Record:
 				// Accumulate distance
 				field := mesg.FieldByNum(fieldnum.RecordDistance)
@@ -141,6 +151,16 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 			lastTimestamp = timestamp
 			break
 		}
+	}
+
+	for _, splitSummary := range splitSummaryHist {
+		mesg := splitSummary.ToMesg(nil)
+		mesg.Fields = append([]proto.Field{
+			// Split Summary does not have timestamp, but we found a case where
+			// it may contains timestamp, so let's create one.
+			factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(lastTimestamp),
+		}, mesg.Fields...)
+		fitResult.Messages = append(fitResult.Messages, mesg)
 	}
 
 	for _, sesMesg := range sessionMesgs {
@@ -247,7 +267,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgSpeed != basetype.Uint16Invalid && s2.AvgSpeed != basetype.Uint16Invalid {
-		s1.AvgSpeed = (s1.AvgSpeed + s2.AvgSpeed) / 2
+		s1.AvgSpeed = uint16((uint32(s1.AvgSpeed) + uint32(s2.AvgSpeed)) / 2)
 	} else if s1.AvgSpeed == basetype.Uint16Invalid {
 		s1.AvgSpeed = s2.AvgSpeed
 	}
@@ -261,7 +281,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgHeartRate != basetype.Uint8Invalid && s2.AvgHeartRate != basetype.Uint8Invalid {
-		s1.AvgHeartRate = (s1.AvgHeartRate + s2.AvgHeartRate) / 2
+		s1.AvgHeartRate = uint8((uint16(s1.AvgHeartRate) + uint16(s2.AvgHeartRate)) / 2)
 	} else if s1.AvgHeartRate == basetype.Uint8Invalid {
 		s1.AvgHeartRate = s2.AvgHeartRate
 	}
@@ -275,7 +295,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgCadence != basetype.Uint8Invalid && s2.AvgCadence != basetype.Uint8Invalid {
-		s1.AvgCadence = (s1.AvgCadence + s2.AvgCadence) / 2
+		s1.AvgCadence = uint8((uint16(s1.AvgCadence) + uint16(s2.AvgCadence)) / 2)
 	} else if s1.AvgCadence == basetype.Uint8Invalid {
 		s1.AvgCadence = s2.AvgCadence
 	}
@@ -289,7 +309,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgPower != basetype.Uint16Invalid && s2.AvgPower != basetype.Uint16Invalid {
-		s1.AvgPower = (s1.AvgPower + s2.AvgPower) / 2
+		s1.AvgPower = uint16((uint32(s1.AvgPower) + uint32(s2.AvgPower)) / 2)
 	} else if s1.AvgPower == basetype.Uint16Invalid {
 		s1.AvgPower = s2.AvgPower
 	}
@@ -303,7 +323,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgTemperature != basetype.Sint8Invalid && s2.AvgTemperature != basetype.Sint8Invalid {
-		s1.AvgTemperature = (s1.AvgTemperature + s2.AvgTemperature) / 2
+		s1.AvgTemperature = int8((int16(s1.AvgTemperature) + int16(s2.AvgTemperature)) / 2)
 	} else if s1.AvgTemperature == basetype.Sint8Invalid {
 		s1.AvgTemperature = s2.AvgTemperature
 	}
@@ -317,7 +337,7 @@ func combineSession(s1, s2 *mesgdef.Session) {
 	}
 
 	if s1.AvgAltitude != basetype.Uint16Invalid && s2.AvgAltitude != basetype.Uint16Invalid {
-		s1.AvgAltitude = (s1.AvgAltitude + s2.AvgAltitude) / 2
+		s1.AvgAltitude = uint16((uint32(s1.AvgAltitude) + uint32(s2.AvgAltitude)) / 2)
 	} else if s1.AvgAltitude == basetype.Uint16Invalid {
 		s1.AvgAltitude = s2.AvgAltitude
 	}
@@ -328,5 +348,73 @@ func combineSession(s1, s2 *mesgdef.Session) {
 		}
 	} else if s1.MaxAltitude == basetype.Uint16Invalid {
 		s1.MaxAltitude = s2.MaxAltitude
+	}
+}
+
+// combineSplitSummary combines s2 into s1. Only valid if it has the same Split Type.
+func combineSplitSummary(s1, s2 *mesgdef.SplitSummary) {
+	if s1.TotalTimerTime != basetype.Uint32Invalid && s2.TotalTimerTime != basetype.Uint32Invalid {
+		s1.TotalTimerTime += s2.TotalTimerTime
+	} else if s2.TotalTimerTime != basetype.Uint32Invalid {
+		s1.TotalTimerTime = s2.TotalTimerTime
+	}
+	if s1.TotalDistance != basetype.Uint32Invalid && s2.TotalDistance != basetype.Uint32Invalid {
+		s1.TotalDistance += s2.TotalDistance
+	} else if s2.TotalDistance != basetype.Uint32Invalid {
+		s1.TotalDistance = s2.TotalDistance
+	}
+	if s1.AvgSpeed != basetype.Uint32Invalid && s2.AvgSpeed != basetype.Uint32Invalid {
+		s1.AvgSpeed = uint32((uint64(s1.AvgSpeed) + uint64(s2.AvgSpeed)) / 2)
+	} else if s2.AvgSpeed != basetype.Uint32Invalid {
+		s1.AvgSpeed = s2.AvgSpeed
+	}
+	if s1.MaxSpeed != basetype.Uint32Invalid && s2.MaxSpeed != basetype.Uint32Invalid {
+		if s1.MaxSpeed < s2.MaxSpeed {
+			s1.MaxSpeed = s2.MaxSpeed
+		}
+	} else if s2.MaxSpeed != basetype.Uint32Invalid {
+		s1.MaxSpeed = s2.MaxSpeed
+	}
+	if s1.AvgVertSpeed != basetype.Sint32Invalid && s2.AvgVertSpeed != basetype.Sint32Invalid {
+		s1.AvgVertSpeed = int32((int64(s1.AvgVertSpeed) + int64(s2.AvgVertSpeed)) / 2)
+	} else if s2.AvgVertSpeed != basetype.Sint32Invalid {
+		s1.AvgVertSpeed = s2.AvgVertSpeed
+	}
+	if s1.TotalCalories != basetype.Uint32Invalid && s2.TotalCalories != basetype.Uint32Invalid {
+		s1.TotalCalories += s2.TotalCalories
+	} else if s2.TotalCalories != basetype.Uint32Invalid {
+		s1.TotalCalories = s2.TotalCalories
+	}
+	if s1.TotalMovingTime != basetype.Uint32Invalid && s2.TotalMovingTime != basetype.Uint32Invalid {
+		s1.TotalMovingTime += s2.TotalMovingTime
+	} else if s2.TotalMovingTime != basetype.Uint32Invalid {
+		s1.TotalMovingTime = s2.TotalMovingTime
+	}
+	if s1.NumSplits != basetype.Uint16Invalid && s2.NumSplits != basetype.Uint16Invalid {
+		s1.NumSplits += s2.NumSplits
+	} else if s2.NumSplits != basetype.Uint16Invalid {
+		s1.NumSplits = s2.NumSplits
+	}
+	if s1.TotalAscent != basetype.Uint16Invalid && s2.TotalAscent != basetype.Uint16Invalid {
+		s1.TotalAscent += s2.TotalAscent
+	} else if s2.TotalAscent != basetype.Uint16Invalid {
+		s1.TotalAscent = s2.TotalAscent
+	}
+	if s1.TotalDescent != basetype.Uint16Invalid && s2.TotalDescent != basetype.Uint16Invalid {
+		s1.TotalDescent += s2.TotalDescent
+	} else if s2.TotalDescent != basetype.Uint16Invalid {
+		s1.TotalDescent = s2.TotalDescent
+	}
+	if s1.AvgHeartRate != basetype.Uint8Invalid && s2.AvgHeartRate != basetype.Uint8Invalid {
+		s1.AvgHeartRate = uint8((uint16(s1.AvgHeartRate) + uint16(s2.AvgHeartRate)) / 2)
+	} else if s2.AvgHeartRate != basetype.Uint8Invalid {
+		s1.AvgHeartRate = s2.AvgHeartRate
+	}
+	if s1.MaxHeartRate != basetype.Uint8Invalid && s2.MaxHeartRate != basetype.Uint8Invalid {
+		if s1.MaxHeartRate < s2.MaxHeartRate {
+			s1.MaxHeartRate = s2.MaxHeartRate
+		}
+	} else if s2.MaxHeartRate != basetype.Uint8Invalid {
+		s1.MaxHeartRate = s2.MaxHeartRate
 	}
 }
