@@ -1,8 +1,10 @@
 # Security Policy
 
+We include only the essential dependencies to minimize the chance of a supply-chain attack. To ensure that we don’t expose ourselves to that vulnerability, all commits will be scanned by [OpenSSF Scorecard](https://github.com/ossf/scorecard) during PR reviews, upon merging to the master branch, and on a weekly basis (every Tuesday).
+
 ## Supported Versions
 
-Currently, only the latest version is supported. See [Releases](https://github.com/muktihari/fit/releases).
+Currently, only the latest version and master branch will be supported. See [Releases](https://github.com/muktihari/fit/releases).
 
 ## Reporting a Vulnerability
 
