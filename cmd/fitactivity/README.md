@@ -25,14 +25,11 @@ The first file will be the base for the resulting file and we will combine these
 - Record: field `distance` will be calculated before append, the rest will be appended as it is
 - Event: append as it is
 - Lap: field `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` will be removed only if conceal option is specified, the rest will be appended as it is.
+- SplitSummary: combine split summary only if it has the same `split_type`.
 
   Why lap positions must be removed? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
 
 Other messages from the next FIT files will be appended as it is except **FileId** and **FileCreator**.
-
-### Limitation
-
-- We will not include SplitSummary messages from the next FIT files, as doing so causes the resulting FIT file to be unable to be uploaded to Garmin Connect.
 
 ### Calculated Session Fields:
 
