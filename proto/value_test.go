@@ -939,17 +939,21 @@ func TestValueValid(t *testing.T) {
 		{value: SliceBool([]bool{false, false}), baseType: basetype.Enum, expected: true}, // true even it all false.
 		{value: SliceInt8([]int8{0, basetype.Sint8Invalid}), baseType: basetype.Sint8, expected: true},
 		{value: SliceUint8([]uint8{0, basetype.Uint8Invalid}), baseType: basetype.Uint8, expected: true},
+		{value: SliceUint8([]uint8{1, basetype.Uint8zInvalid}), baseType: basetype.Uint8z, expected: true},
 		{value: SliceInt16([]int16{0, basetype.Sint16Invalid}), baseType: basetype.Sint16, expected: true},
 		{value: SliceUint16([]uint16{0, basetype.Uint16Invalid}), baseType: basetype.Uint16, expected: true},
+		{value: SliceUint16([]uint16{1, basetype.Uint16zInvalid}), baseType: basetype.Uint16z, expected: true},
 		{value: SliceInt32([]int32{0, basetype.Sint32Invalid}), baseType: basetype.Sint32, expected: true},
 		{value: SliceString([]string{"FIT SDK Go"}), baseType: basetype.String, expected: true},
 		{value: SliceString([]string{""}), baseType: basetype.String, expected: false},
 		{value: SliceString([]string{"\x00"}), baseType: basetype.String, expected: false},
 		{value: SliceUint32([]uint32{0, basetype.Uint32Invalid}), baseType: basetype.Uint32, expected: true},
+		{value: SliceUint32([]uint32{1, basetype.Uint32zInvalid}), baseType: basetype.Uint32z, expected: true},
 		{value: SliceFloat32([]float32{0.2, math.Float32frombits(basetype.Float32Invalid)}), baseType: basetype.Float32, expected: true},
 		{value: SliceFloat64([]float64{0.5, math.Float64frombits(basetype.Float64Invalid)}), baseType: basetype.Float64, expected: true},
 		{value: SliceInt64([]int64{0, basetype.Sint64Invalid}), baseType: basetype.Sint64, expected: true},
 		{value: SliceUint64([]uint64{0, basetype.Uint64Invalid}), baseType: basetype.Uint64, expected: true},
+		{value: SliceUint64([]uint64{1, basetype.Uint64zInvalid}), baseType: basetype.Uint64z, expected: true},
 	}
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %v (%T)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
