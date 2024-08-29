@@ -11,10 +11,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
+	"github.com/muktihari/fit/internal/cmd/fitgen/shared"
 	"github.com/muktihari/fit/profile/basetype"
 )
 
@@ -22,7 +22,7 @@ const (
 	FitBaseType string = "fit_base_type"
 )
 
-type typebuilder struct {
+type Builder struct {
 	template     *template.Template
 	templateExec string
 
@@ -30,23 +30,25 @@ type typebuilder struct {
 	types []parser.Type // type parsed from profile.xlsx
 }
 
-func NewBuilder(path string, types []parser.Type) builder.Builder {
+var _ generator.Builder = (*Builder)(nil)
+
+func NewBuilder(path string, types []parser.Type) *Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	return &typebuilder{
+	return &Builder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
 			ParseFiles(
 				filepath.Join(cd, "typedef.tmpl"),
-				filepath.Join(cd, "..", "..", "builder", "shared", "constant.tmpl"))),
+				filepath.Join(cd, "..", "..", "shared", "constant.tmpl"))),
 		templateExec: "typedef",
 		path:         filepath.Join(path, "profile", "typedef"),
 		types:        types,
 	}
 }
 
-func (b *typebuilder) Build() ([]builder.Data, error) {
-	dataBuilders := make([]builder.Data, 0, len(b.types))
+func (b *Builder) Build() ([]generator.Data, error) {
+	dataBuilders := make([]generator.Data, 0, len(b.types))
 	for _, t := range b.types {
 		if t.Name == FitBaseType {
 			continue // ignore, manual creation, see [profile/basetype] package.
@@ -97,7 +99,7 @@ func (b *typebuilder) Build() ([]builder.Data, error) {
 			}
 		}
 
-		dataBuilders = append(dataBuilders, builder.Data{
+		dataBuilders = append(dataBuilders, generator.Data{
 			Template:     b.template,
 			TemplateExec: b.templateExec,
 			Path:         b.path,

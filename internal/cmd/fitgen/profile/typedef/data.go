@@ -4,7 +4,7 @@
 
 package typedef
 
-import "github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+import "github.com/muktihari/fit/internal/cmd/fitgen/shared"
 
 // Data is data representative of *.tmpl
 type Data struct {

@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
 	"github.com/muktihari/fit/internal/cmd/fitgen/factory"
 	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
@@ -138,14 +137,14 @@ func main() {
 		mesgdefb = mesgdef.NewBuilder(generatePath, lookup, parsedmesgs, parsedtypes)
 	)
 
-	var builders []builder.Builder
+	var builders []generator.Builder
 	whichBuilders := strings.Split(strutil.TrimRepeatedChar(whichBuilder, ','), ",")
 
 loop:
 	for _, selected := range whichBuilders {
 		switch s := strings.TrimSpace(selected); s {
 		case "", "all":
-			builders = []builder.Builder{typedefb, profileb, factoryb, mesgnumb, fielnumb, mesgdefb}
+			builders = []generator.Builder{typedefb, profileb, factoryb, mesgnumb, fielnumb, mesgdefb}
 			break loop
 		case "typedef":
 			builders = append(builders, typedefb)

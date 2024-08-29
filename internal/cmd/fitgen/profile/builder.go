@@ -13,10 +13,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder"
-	"github.com/muktihari/fit/internal/cmd/fitgen/builder/shared"
+	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
+	"github.com/muktihari/fit/internal/cmd/fitgen/shared"
 	"github.com/muktihari/fit/profile/basetype"
 )
 
@@ -25,7 +25,7 @@ const (
 	FitBaseType string = "fit_base_type"
 )
 
-type profilebuilder struct {
+type Builder struct {
 	template *template.Template
 
 	path           string        // path to generate the file
@@ -33,29 +33,31 @@ type profilebuilder struct {
 	types          []parser.Type // type parsed from profile.xlsx
 }
 
-func NewBuilder(path, profileVersion string, types []parser.Type) builder.Builder {
+var _ generator.Builder = (*Builder)(nil)
+
+func NewBuilder(path, profileVersion string, types []parser.Type) *Builder {
 	_, filename, _, _ := runtime.Caller(0)
 	cd := filepath.Dir(filename)
-	return &profilebuilder{
+	return &Builder{
 		template: template.Must(template.New("main").
 			Funcs(shared.FuncMap()).
 			ParseFiles(
 				filepath.Join(cd, "profile.tmpl"),
-				filepath.Join(cd, "..", "builder", "shared", "constant.tmpl"))),
+				filepath.Join(cd, "..", "shared", "constant.tmpl"))),
 		path:           filepath.Join(path, "profile"),
 		profileVersion: profileVersion,
 		types:          types,
 	}
 }
 
-func (b *profilebuilder) Build() ([]builder.Data, error) {
+func (b *Builder) Build() ([]generator.Data, error) {
 	profileDataBuilder := b.buildProfile()
 	versionDataBuilder := b.buildVersion()
 
-	return []builder.Data{profileDataBuilder, versionDataBuilder}, nil
+	return []generator.Data{profileDataBuilder, versionDataBuilder}, nil
 }
 
-func (b *profilebuilder) buildProfile() builder.Data {
+func (b *Builder) buildProfile() generator.Data {
 	constants := make([]shared.Constant, 0, len(b.types))
 	mappingProfileTypeToBaseTypes := make([]ProfileTypeBaseType, 0, len(b.types))
 	var mappingBaseTypeToProfileTypes []ProfileTypeBaseType
@@ -122,7 +124,7 @@ func (b *profilebuilder) buildProfile() builder.Data {
 		Comment: "INVALID",
 	}
 
-	return builder.Data{
+	return generator.Data{
 		Template:     b.template,
 		TemplateExec: "profile",
 		Path:         b.path,
@@ -135,8 +137,8 @@ func (b *profilebuilder) buildProfile() builder.Data {
 	}
 }
 
-func (b *profilebuilder) buildVersion() builder.Data {
-	return builder.Data{
+func (b *Builder) buildVersion() generator.Data {
+	return generator.Data{
 		Template:     b.template,
 		TemplateExec: "version",
 		Path:         b.path,
