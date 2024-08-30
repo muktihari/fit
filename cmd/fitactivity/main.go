@@ -134,6 +134,8 @@ func combineAndConcealPosition(paths []string, opts *options) error {
 		return fmt.Errorf("could not combine: %v", err)
 	}
 
+	protocolVersion := latestProtocolVersion(fits)
+
 	if err := concealer.ConcealPosition(fit, opts.concealStart, opts.concealEnd); err != nil {
 		return fmt.Errorf("could not conceal: %v", err)
 	}
@@ -150,7 +152,7 @@ func combineAndConcealPosition(paths []string, opts *options) error {
 	}
 
 	enc := encoder.New(fout,
-		encoder.WithProtocolVersion(proto.V2),
+		encoder.WithProtocolVersion(protocolVersion),
 		opts.encoderHeaderOption,
 	)
 
@@ -159,6 +161,16 @@ func combineAndConcealPosition(paths []string, opts *options) error {
 	}
 
 	return nil
+}
+
+func latestProtocolVersion(fits []*proto.FIT) proto.Version {
+	var version = byte(proto.V1)
+	for i := range fits {
+		if fits[i].FileHeader.ProtocolVersion > version {
+			version = fits[i].FileHeader.ProtocolVersion
+		}
+	}
+	return proto.Version(version)
 }
 
 func openAndConcealPosition(path string, opts *options) error {
@@ -196,7 +208,7 @@ func openAndConcealPosition(path string, opts *options) error {
 	defer fout.Close()
 
 	enc := encoder.New(fout,
-		encoder.WithProtocolVersion(proto.V2),
+		encoder.WithProtocolVersion(latestProtocolVersion(fits)),
 		opts.encoderHeaderOption,
 	)
 
