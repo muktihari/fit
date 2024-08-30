@@ -88,7 +88,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 
 	for i := range sessionsByFIT {
 		if len(sessionsByFIT[i]) == 0 {
-			return nil, fmt.Errorf("fits[i]: %w", ErrNoSessionFound)
+			return nil, fmt.Errorf("fits[%d]: %w", i, ErrNoSessionFound)
 		}
 	}
 
