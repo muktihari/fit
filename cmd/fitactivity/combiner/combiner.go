@@ -30,12 +30,12 @@ const (
 	ErrSportMismatch  = errorString("sport mismatch")
 )
 
-func Combine(fits ...proto.FIT) (*proto.FIT, error) {
+func Combine(fits ...*proto.FIT) (*proto.FIT, error) {
 	if len(fits) < 2 {
 		return nil, fmt.Errorf("provide at least 2 fits to combine: %w", ErrMinimalCombine)
 	}
 
-	slices.SortStableFunc(fits, func(f1, f2 proto.FIT) int {
+	slices.SortStableFunc(fits, func(f1, f2 *proto.FIT) int {
 		if len(f1.Messages) == 0 || len(f2.Messages) == 0 {
 			return 0
 		}
@@ -53,7 +53,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 
 	sessionsByFIT := make([][]proto.Message, len(fits))
 	for i := range fits {
-		fit := &fits[i]
+		fit := fits[i]
 		for j := 0; j < len(fit.Messages); j++ {
 			mesg := fit.Messages[j]
 			switch mesg.Num {
@@ -84,7 +84,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 		}
 	}
 
-	fitResult := &fits[0]
+	fitResult := fits[0]
 
 	for i := range sessionsByFIT {
 		if len(sessionsByFIT[i]) == 0 {

@@ -15,7 +15,7 @@ import (
 )
 
 // Open opens all given paths concurrently.
-func Open(paths ...string) ([]proto.FIT, error) {
+func Open(paths ...string) ([]*proto.FIT, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -33,12 +33,12 @@ func Open(paths ...string) ([]proto.FIT, error) {
 		close(resultc)
 	}()
 
-	fits := make([]proto.FIT, 0, len(paths))
+	fits := make([]*proto.FIT, 0, len(paths))
 	for res := range resultc {
 		if res.err != nil {
 			return nil, res.err
 		}
-		fits = append(fits, *res.fit)
+		fits = append(fits, res.fit)
 	}
 
 	return fits, nil
