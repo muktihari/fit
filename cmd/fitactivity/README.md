@@ -1,6 +1,6 @@
 # FIT Activity CLI
 
-A program to combine multiple FIT activity files (\*.fit) and conceal its position (Lat & Long at specified distance). Available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
+A program to combine multiple FIT (\*.fit) activity files into one continuous activity and conceal its position (Lat & Long at specified distance) for privacy. Available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
 TLDR: [Usage](#Usage)
 
@@ -19,48 +19,32 @@ Strava Specification: [https://developers.strava.com/docs/uploads](https://devel
 ## How We Combine
 
 First, we will order the files by `FileId.TimeCreated`.
-The first file will be the base for the resulting file and we will combine these following messages from the next FIT files into the resulting file:
+The first file will be the base for the resulting file and we will combine all messages from the next FIT files into the resulting file except: **FileId**, **FileCreator**, **Activity**.
 
-- Session: combine session by calculating some fields (list fields will be shown after this)
-- Record: field `distance` will be calculated before append, the rest will be appended as it is
+The common messages in an Activity File:
+
+- Activity: we use activity message from first FIT file then update it accordingly.
+- Session: fields will be aggregated with the correspoding session of the next FIT file.
+- Lap: append as it is.
 - Event: append as it is
-- Lap: field `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` will be removed only if conceal option is specified, the rest will be appended as it is.
-- SplitSummary: combine split summary only if it has the same `split_type`.
+- Record: field `distance` will be accumulated before append, the rest will be appended as it is
+- SplitSummary: fields will be aggregated with the split summary of the next FIT file that has the same `split_type`.
 
-  Why lap positions must be removed? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
+The rest of the messages from the next FIT files will be appended as it is.
 
-Other messages from the next FIT files will be appended as it is except **FileId** and **FileCreator**.
+### Aggregating Fields:
 
-### Calculated Session Fields:
+We will aggregate fields depends on the prefix and suffix of the field name:
 
-Currently we only care these following session fields:
+- prefix **'total**': sum of the two values. (e.g. **total_elapsed_time**)
+- prefix **'num**' and suffix **'s**': sum of the two values. (e.g. **num_splits**)
+- prefix **'max**': max value between two values. (e.g. **max_heart_rate**)
+- prefix **'min**': min value between two values. (e.g. **min_cadence**)
+- prefix **'avg**': average of the two values. (e.g. **avg_temperature**)
 
-- sport (is used to match two sessions)
-- sub_sport (is not used since different devices may have different value)
-- start_time (is used to calculate time gap between two sessions, add time gap to total_elapsed_time)
-- end_position_lat (will be replaced with next files session's end_position_lat)
-- end_position_long (will be replaced with next files session's end_position_long)
-- total_elapsed_time
-- total_timer_time
-- total_distance
-- total_ascent
-- total_descent
-- total_cycles
-- total_calories
-- avg_speed
-- max_speed
-- avg_heart_rate
-- max_heart_rate
-- avg_cadence
-- max_cadence
-- avg_power
-- max_power
-- avg_temperature
-- max_temperature
-- avg_altitude
-- max_altitude
+Otherwise, they will be assigned with value from the corresponding field only if they are invalid.
 
-### Combine process
+### The process
 
 We will combine last session group (include record, event, and lap) of the first file with the first session group of the next file (and so on).
 
@@ -89,6 +73,8 @@ _NOTE: Combining FIT activity files is NOT the same as merging multiple files in
    We will iterate from the beginning of FIT Messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `start_position_lat` and `start_position_long`.
 1. Conceal End Position
    We will backward-iterate from the end of the FIT messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `end_position_lat` and `end_position_long`.
+
+We will remove `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` fields from Laps. But why? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
 
 ## Build or Install
 

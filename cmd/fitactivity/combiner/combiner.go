@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/muktihari/fit/cmd/fitactivity/aggregator"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
@@ -69,7 +70,7 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 				if !ok {
 					splitSummaryHist[s2.SplitType] = s2
 				} else {
-					combineSplitSummary(s1, s2)
+					aggregator.Aggregate(s1, s2)
 				}
 				fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all split summaries from result
 				j--
@@ -122,7 +123,13 @@ func Combine(fits ...proto.FIT) (*proto.FIT, error) {
 		}
 		lastDistance = lastDist
 
-		combineSession(curSes, nextSes)
+		// Add time gap
+		endTime := curSes.StartTime.Add(time.Duration(curSes.TotalElapsedTime/1000) * time.Second)
+		gap := uint32(nextSes.StartTime.Sub(endTime).Seconds() * 1000)
+		curSes.TotalElapsedTime += gap
+		curSes.TotalTimerTime += gap
+		aggregator.Aggregate(curSes, nextSes)
+
 		sessionMesgs[len(sessionMesgs)-1] = curSes.ToMesg(nil) // Update Session
 
 		if len(nextFitSessions) > 1 { // append the rest of the sessions
@@ -227,194 +234,4 @@ func getLastDistanceOrZero(mesgs []proto.Message) uint32 {
 		return v
 	}
 	return 0
-}
-
-// combineSession combines s2 into s1.
-func combineSession(s1, s2 *mesgdef.Session) {
-	s1EndTime := s1.StartTime.Add(time.Duration(s1.TotalElapsedTime/1000) * time.Second)
-	gap := s2.StartTime.Sub(s1EndTime).Seconds() * 1000
-	s1.TotalElapsedTime += uint32(gap)
-	s1.TotalTimerTime += uint32(gap)
-
-	s1.TotalElapsedTime += s2.TotalElapsedTime
-	s1.TotalTimerTime += s2.TotalTimerTime
-	s1.TotalDistance += s2.TotalDistance
-	s1.EndPositionLat = s2.EndPositionLat
-	s1.EndPositionLong = s2.EndPositionLong
-
-	if s1.TotalAscent != basetype.Uint16Invalid && s2.TotalAscent != basetype.Uint16Invalid {
-		s1.TotalAscent += s2.TotalAscent
-	} else if s1.TotalAscent == basetype.Uint16Invalid {
-		s1.TotalAscent = s2.TotalAscent
-	}
-
-	if s1.TotalDescent != basetype.Uint16Invalid && s2.TotalDescent != basetype.Uint16Invalid {
-		s1.TotalDescent += s2.TotalDescent
-	} else if s1.TotalDescent == basetype.Uint16Invalid {
-		s1.TotalDescent = s2.TotalDescent
-	}
-
-	if s1.TotalCycles != basetype.Uint32Invalid && s2.TotalCycles != basetype.Uint32Invalid {
-		s1.TotalCycles += s2.TotalCycles
-	} else if s1.TotalCycles == basetype.Uint32Invalid {
-		s1.TotalCycles = s2.TotalCycles
-	}
-
-	if s1.TotalCalories != basetype.Uint16Invalid && s2.TotalCalories != basetype.Uint16Invalid {
-		s1.TotalCalories += s2.TotalCalories
-	} else if s1.TotalCalories == basetype.Uint16Invalid {
-		s1.TotalCalories = s2.TotalCalories
-	}
-
-	if s1.AvgSpeed != basetype.Uint16Invalid && s2.AvgSpeed != basetype.Uint16Invalid {
-		s1.AvgSpeed = uint16((uint32(s1.AvgSpeed) + uint32(s2.AvgSpeed)) / 2)
-	} else if s1.AvgSpeed == basetype.Uint16Invalid {
-		s1.AvgSpeed = s2.AvgSpeed
-	}
-
-	if s1.MaxSpeed != basetype.Uint16Invalid && s2.MaxSpeed != basetype.Uint16Invalid {
-		if s1.MaxSpeed < s2.MaxSpeed {
-			s1.MaxSpeed = s2.MaxSpeed
-		}
-	} else if s1.MaxSpeed == basetype.Uint16Invalid {
-		s1.MaxSpeed = s2.MaxSpeed
-	}
-
-	if s1.AvgHeartRate != basetype.Uint8Invalid && s2.AvgHeartRate != basetype.Uint8Invalid {
-		s1.AvgHeartRate = uint8((uint16(s1.AvgHeartRate) + uint16(s2.AvgHeartRate)) / 2)
-	} else if s1.AvgHeartRate == basetype.Uint8Invalid {
-		s1.AvgHeartRate = s2.AvgHeartRate
-	}
-
-	if s1.MaxHeartRate != basetype.Uint8Invalid && s2.MaxHeartRate != basetype.Uint8Invalid {
-		if s1.MaxHeartRate < s2.MaxHeartRate {
-			s1.MaxHeartRate = s2.MaxHeartRate
-		}
-	} else if s1.MaxHeartRate == basetype.Uint8Invalid {
-		s1.MaxHeartRate = s2.MaxHeartRate
-	}
-
-	if s1.AvgCadence != basetype.Uint8Invalid && s2.AvgCadence != basetype.Uint8Invalid {
-		s1.AvgCadence = uint8((uint16(s1.AvgCadence) + uint16(s2.AvgCadence)) / 2)
-	} else if s1.AvgCadence == basetype.Uint8Invalid {
-		s1.AvgCadence = s2.AvgCadence
-	}
-
-	if s1.MaxCadence != basetype.Uint8Invalid && s2.MaxCadence != basetype.Uint8Invalid {
-		if s1.MaxCadence < s2.MaxCadence {
-			s1.MaxCadence = s2.MaxCadence
-		}
-	} else if s1.MaxCadence == basetype.Uint8Invalid {
-		s1.MaxCadence = s2.MaxCadence
-	}
-
-	if s1.AvgPower != basetype.Uint16Invalid && s2.AvgPower != basetype.Uint16Invalid {
-		s1.AvgPower = uint16((uint32(s1.AvgPower) + uint32(s2.AvgPower)) / 2)
-	} else if s1.AvgPower == basetype.Uint16Invalid {
-		s1.AvgPower = s2.AvgPower
-	}
-
-	if s1.MaxPower != basetype.Uint16Invalid && s2.MaxPower != basetype.Uint16Invalid {
-		if s1.MaxPower < s2.MaxPower {
-			s1.MaxPower = s2.MaxPower
-		}
-	} else if s1.MaxPower == basetype.Uint16Invalid {
-		s1.MaxPower = s2.MaxPower
-	}
-
-	if s1.AvgTemperature != basetype.Sint8Invalid && s2.AvgTemperature != basetype.Sint8Invalid {
-		s1.AvgTemperature = int8((int16(s1.AvgTemperature) + int16(s2.AvgTemperature)) / 2)
-	} else if s1.AvgTemperature == basetype.Sint8Invalid {
-		s1.AvgTemperature = s2.AvgTemperature
-	}
-
-	if s1.MaxTemperature != basetype.Sint8Invalid && s2.MaxTemperature != basetype.Sint8Invalid {
-		if s1.MaxTemperature < s2.MaxTemperature {
-			s1.MaxTemperature = s2.MaxTemperature
-		}
-	} else if s1.MaxTemperature == basetype.Sint8Invalid {
-		s1.MaxTemperature = s2.MaxTemperature
-	}
-
-	if s1.AvgAltitude != basetype.Uint16Invalid && s2.AvgAltitude != basetype.Uint16Invalid {
-		s1.AvgAltitude = uint16((uint32(s1.AvgAltitude) + uint32(s2.AvgAltitude)) / 2)
-	} else if s1.AvgAltitude == basetype.Uint16Invalid {
-		s1.AvgAltitude = s2.AvgAltitude
-	}
-
-	if s1.MaxAltitude != basetype.Uint16Invalid && s2.MaxAltitude != basetype.Uint16Invalid {
-		if s1.MaxAltitude < s2.MaxAltitude {
-			s1.MaxAltitude = s2.MaxAltitude
-		}
-	} else if s1.MaxAltitude == basetype.Uint16Invalid {
-		s1.MaxAltitude = s2.MaxAltitude
-	}
-}
-
-// combineSplitSummary combines s2 into s1. Only valid if it has the same Split Type.
-func combineSplitSummary(s1, s2 *mesgdef.SplitSummary) {
-	if s1.TotalTimerTime != basetype.Uint32Invalid && s2.TotalTimerTime != basetype.Uint32Invalid {
-		s1.TotalTimerTime += s2.TotalTimerTime
-	} else if s2.TotalTimerTime != basetype.Uint32Invalid {
-		s1.TotalTimerTime = s2.TotalTimerTime
-	}
-	if s1.TotalDistance != basetype.Uint32Invalid && s2.TotalDistance != basetype.Uint32Invalid {
-		s1.TotalDistance += s2.TotalDistance
-	} else if s2.TotalDistance != basetype.Uint32Invalid {
-		s1.TotalDistance = s2.TotalDistance
-	}
-	if s1.AvgSpeed != basetype.Uint32Invalid && s2.AvgSpeed != basetype.Uint32Invalid {
-		s1.AvgSpeed = uint32((uint64(s1.AvgSpeed) + uint64(s2.AvgSpeed)) / 2)
-	} else if s2.AvgSpeed != basetype.Uint32Invalid {
-		s1.AvgSpeed = s2.AvgSpeed
-	}
-	if s1.MaxSpeed != basetype.Uint32Invalid && s2.MaxSpeed != basetype.Uint32Invalid {
-		if s1.MaxSpeed < s2.MaxSpeed {
-			s1.MaxSpeed = s2.MaxSpeed
-		}
-	} else if s2.MaxSpeed != basetype.Uint32Invalid {
-		s1.MaxSpeed = s2.MaxSpeed
-	}
-	if s1.AvgVertSpeed != basetype.Sint32Invalid && s2.AvgVertSpeed != basetype.Sint32Invalid {
-		s1.AvgVertSpeed = int32((int64(s1.AvgVertSpeed) + int64(s2.AvgVertSpeed)) / 2)
-	} else if s2.AvgVertSpeed != basetype.Sint32Invalid {
-		s1.AvgVertSpeed = s2.AvgVertSpeed
-	}
-	if s1.TotalCalories != basetype.Uint32Invalid && s2.TotalCalories != basetype.Uint32Invalid {
-		s1.TotalCalories += s2.TotalCalories
-	} else if s2.TotalCalories != basetype.Uint32Invalid {
-		s1.TotalCalories = s2.TotalCalories
-	}
-	if s1.TotalMovingTime != basetype.Uint32Invalid && s2.TotalMovingTime != basetype.Uint32Invalid {
-		s1.TotalMovingTime += s2.TotalMovingTime
-	} else if s2.TotalMovingTime != basetype.Uint32Invalid {
-		s1.TotalMovingTime = s2.TotalMovingTime
-	}
-	if s1.NumSplits != basetype.Uint16Invalid && s2.NumSplits != basetype.Uint16Invalid {
-		s1.NumSplits += s2.NumSplits
-	} else if s2.NumSplits != basetype.Uint16Invalid {
-		s1.NumSplits = s2.NumSplits
-	}
-	if s1.TotalAscent != basetype.Uint16Invalid && s2.TotalAscent != basetype.Uint16Invalid {
-		s1.TotalAscent += s2.TotalAscent
-	} else if s2.TotalAscent != basetype.Uint16Invalid {
-		s1.TotalAscent = s2.TotalAscent
-	}
-	if s1.TotalDescent != basetype.Uint16Invalid && s2.TotalDescent != basetype.Uint16Invalid {
-		s1.TotalDescent += s2.TotalDescent
-	} else if s2.TotalDescent != basetype.Uint16Invalid {
-		s1.TotalDescent = s2.TotalDescent
-	}
-	if s1.AvgHeartRate != basetype.Uint8Invalid && s2.AvgHeartRate != basetype.Uint8Invalid {
-		s1.AvgHeartRate = uint8((uint16(s1.AvgHeartRate) + uint16(s2.AvgHeartRate)) / 2)
-	} else if s2.AvgHeartRate != basetype.Uint8Invalid {
-		s1.AvgHeartRate = s2.AvgHeartRate
-	}
-	if s1.MaxHeartRate != basetype.Uint8Invalid && s2.MaxHeartRate != basetype.Uint8Invalid {
-		if s1.MaxHeartRate < s2.MaxHeartRate {
-			s1.MaxHeartRate = s2.MaxHeartRate
-		}
-	} else if s2.MaxHeartRate != basetype.Uint8Invalid {
-		s1.MaxHeartRate = s2.MaxHeartRate
-	}
 }
