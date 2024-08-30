@@ -16,6 +16,8 @@ import (
 //   - "Max": max value between the two values.
 //   - "Min": min value between the two values.
 //   - "Avg": avg of the two values.
+//   - "Num" and ends with "s": sum of the two values.
+//     (e.g. NumSplits, NumLaps, NumSessions)
 //   - Otherwise: fill with src's Value only if dst's Value is invalid.
 func Aggregate[T any](dst, src T) {
 	dv := reflect.Indirect(reflect.ValueOf(dst))
