@@ -75,8 +75,8 @@ type Encoder struct {
 
 type options struct {
 	messageValidator         MessageValidator
-	protocolVersion          proto.Version
 	writeBufferSize          int
+	protocolVersion          proto.Version
 	endianness               byte
 	headerOption             headerOption
 	multipleLocalMessageType byte
