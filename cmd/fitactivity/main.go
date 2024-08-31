@@ -208,7 +208,6 @@ func openAndConcealPosition(path string, opts *options) error {
 	defer fout.Close()
 
 	enc := encoder.New(fout,
-		encoder.WithProtocolVersion(latestProtocolVersion(fits)),
 		opts.encoderHeaderOption,
 	)
 
