@@ -84,7 +84,6 @@ type options struct {
 
 func defaultOptions() options {
 	return options{
-		protocolVersion: proto.V1,
 		endianness:      littleEndian,
 		headerOption:    headerOptionNormal,
 		writeBufferSize: defaultWriteBufferSize,
@@ -94,8 +93,12 @@ func defaultOptions() options {
 // Option is Encoder's option.
 type Option func(o *options)
 
-// WithProtocolVersion directs the Encoder to use specific Protocol Version (default: proto.V1).
-// If the given protocolVersion is not supported, the Protocol Version will not be changed.
+// WithProtocolVersion directs the Encoder to use specific ProtocolVersion for the entire encoding.
+// By default, Encoder will use ProtocolVersion in FileHeader for each FIT file, if it's not specified,
+// it will use proto.V1. This option overrides the FileHeader's ProtocolVersion and forces all FIT
+// files to use this ProtocolVersion during encoding.
+//
+// NOTE: If the given protocolVersion is not supported, the Protocol Version will not be changed.
 // Please validate using proto.Validate when putting user-defined Protocol Version to check
 // whether it is supported or not. Or just use predefined Protocol Version constants such as
 // proto.V1, proto.V2, etc, which the validity is ensured.
@@ -229,8 +232,8 @@ func (e *Encoder) reset() {
 
 // Encode encodes FIT into the dest writer. Only FIT's Messages is required, while FileHeader and CRC will be
 // filled automatically by the Encoder. However, we allow for custom FileHeader, such as when a user intentionally
-// specifies a FileHeader's Size as 12 (legacy) or a custom FileHeader's ProfileVersion.
-// In these cases, those two values will be encoded as-is, irrespective of the current SDK profile version.
+// specifies a Size as 12 (legacy), a custom ProfileVersion or a custom ProtocolVersion.
+// In these cases, those values will be encoded as-is, irrespective of the current SDK profile version.
 //
 // Multiple FIT files can be chained together into a single FIT file by calling Encode for each FIT data.
 //
@@ -307,7 +310,12 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 		header.ProfileVersion = profile.Version
 	}
 
-	header.ProtocolVersion = byte(e.options.protocolVersion)
+	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
+		header.ProtocolVersion = byte(e.options.protocolVersion)
+	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
+		header.ProtocolVersion = byte(proto.V1)
+	}
+
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
 
