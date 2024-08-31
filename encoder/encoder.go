@@ -331,7 +331,7 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	return err
 }
 
-var errInternal = errorString("encoder internal error")
+const errInternal = errorString("encoder internal error")
 
 // updateFileHeader updates the FileHeader if the DataSize is changed.
 // The caller MUST ensure that e.w is either an io.WriterAt or an io.WriteSeeker.
