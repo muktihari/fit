@@ -19,30 +19,9 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-type writerAtStub struct {
-	b *[]byte
-}
-
-var _ io.Writer = (*writerAtStub)(nil)
-
-func (w *writerAtStub) Write(p []byte) (n int, err error) {
-	*w.b = append(*w.b, p...)
-	return len(p), nil
-}
-
-var _ io.WriterAt = (*writerAtStub)(nil)
-
-func (w *writerAtStub) WriteAt(p []byte, pos int64) (int, error) {
-	for i := 0; i < len(p); i++ {
-		(*w.b)[pos] = p[i]
-		pos++
-	}
-	return len(p), nil
-}
-
 func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
-	var result []byte
-	enc := New(&writerAtStub{&result})
+	w := &writerAtStub{}
+	enc := New(w)
 	streamEnc, err := enc.StreamEncoder()
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +57,7 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 		Messages: []proto.Message{fileIdMesg, recordMesg},
 	})
 
-	if diff := cmp.Diff(result, expected.Bytes()); diff != "" {
+	if diff := cmp.Diff(w.buf, expected.Bytes()); diff != "" {
 		t.Fatal(diff)
 	}
 
@@ -169,8 +148,8 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 }
 
 func TestStreamEncoderWithoutWriteBuffer(t *testing.T) {
-	var result []byte
-	enc := New(&writerAtStub{&result}, WithWriteBufferSize(0))
+	w := &writerAtStub{}
+	enc := New(w, WithWriteBufferSize(0))
 	streamEnc, err := enc.StreamEncoder()
 	if err != nil {
 		t.Fatal(err)
