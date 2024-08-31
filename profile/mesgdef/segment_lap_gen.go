@@ -1297,72 +1297,48 @@ func (m *SegmentLap) EnhancedMinAltitudeScaled() float64 {
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
 // If StartPositionLat value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) StartPositionLatDegrees() float64 {
-	if m.StartPositionLat == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.StartPositionLat)
 }
 
 // StartPositionLongDegrees returns StartPositionLong in degrees instead of semicircles.
 // If StartPositionLong value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) StartPositionLongDegrees() float64 {
-	if m.StartPositionLong == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.StartPositionLong)
 }
 
 // EndPositionLatDegrees returns EndPositionLat in degrees instead of semicircles.
 // If EndPositionLat value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) EndPositionLatDegrees() float64 {
-	if m.EndPositionLat == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.EndPositionLat)
 }
 
 // EndPositionLongDegrees returns EndPositionLong in degrees instead of semicircles.
 // If EndPositionLong value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) EndPositionLongDegrees() float64 {
-	if m.EndPositionLong == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.EndPositionLong)
 }
 
 // NecLatDegrees returns NecLat in degrees instead of semicircles.
 // If NecLat value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) NecLatDegrees() float64 {
-	if m.NecLat == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.NecLat)
 }
 
 // NecLongDegrees returns NecLong in degrees instead of semicircles.
 // If NecLong value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) NecLongDegrees() float64 {
-	if m.NecLong == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.NecLong)
 }
 
 // SwcLatDegrees returns SwcLat in degrees instead of semicircles.
 // If SwcLat value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) SwcLatDegrees() float64 {
-	if m.SwcLat == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.SwcLat)
 }
 
 // SwcLongDegrees returns SwcLong in degrees instead of semicircles.
 // If SwcLong value is invalid, float64 invalid value will be returned.
 func (m *SegmentLap) SwcLongDegrees() float64 {
-	if m.SwcLong == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.SwcLong)
 }
 
