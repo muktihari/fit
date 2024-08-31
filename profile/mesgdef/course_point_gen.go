@@ -148,18 +148,12 @@ func (m *CoursePoint) DistanceScaled() float64 {
 // PositionLatDegrees returns PositionLat in degrees instead of semicircles.
 // If PositionLat value is invalid, float64 invalid value will be returned.
 func (m *CoursePoint) PositionLatDegrees() float64 {
-	if m.PositionLat == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.PositionLat)
 }
 
 // PositionLongDegrees returns PositionLong in degrees instead of semicircles.
 // If PositionLong value is invalid, float64 invalid value will be returned.
 func (m *CoursePoint) PositionLongDegrees() float64 {
-	if m.PositionLong == basetype.Sint32Invalid {
-		return math.Float64frombits(basetype.Float64Invalid)
-	}
 	return semicircles.ToDegrees(m.PositionLong)
 }
 

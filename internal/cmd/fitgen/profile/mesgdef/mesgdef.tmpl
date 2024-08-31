@@ -8,14 +8,14 @@
 package {{ .Package }}
 
 import (
-    "github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	{{- if .Imports -}}
-        {{ range $_, $v := .Imports }}
-            {{ printf "%q" $v -}}
-        {{ end }}
-    {{ end }}
+		{{ range $_, $v := .Imports }}
+			{{ printf "%q" $v -}}
+		{{ end }}
+	{{ end }}
 )
 
 // {{ .Name }} is a {{ .Name }} message.
@@ -41,32 +41,32 @@ type {{ .Name }} struct {
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
-    vals := [{{ .MaxFieldNum }}]proto.Value{}
+	vals := [{{ .MaxFieldNum }}]proto.Value{}
 
 	{{ if gt .MaxFieldExpandNum 1 -}}
 	var state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
 	{{ end -}}
 
-    {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
-        var developerFields []proto.DeveloperField
-    {{ end -}}
-    if mesg != nil {
-        for i := range mesg.Fields {
-            if mesg.Fields[i].Num > {{ byteSub .MaxFieldNum 1 }} {
-                continue
-            }
+	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
+		var developerFields []proto.DeveloperField
+	{{ end -}}
+	if mesg != nil {
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Num > {{ byteSub .MaxFieldNum 1 }} {
+				continue
+			}
 			{{ if gt $.MaxFieldExpandNum 1 -}}
 			if mesg.Fields[i].Num < {{ .MaxFieldExpandNum }} && mesg.Fields[i].IsExpandedField {
 				pos := mesg.Fields[i].Num/8
 				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
 			{{ end -}}
-            vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
-        }
-        {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-            developerFields = mesg.DeveloperFields
-        {{ end -}}
-    }
+			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+		}
+		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+			developerFields = mesg.DeveloperFields
+		{{ end -}}
+	}
 
 
 	return &{{ .Name }}{
@@ -87,25 +87,25 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
 	} else if options.Factory == nil {
-        options.Factory = factory.StandardFactory()
-    }
+		options.Factory = factory.StandardFactory()
+	}
 
-    fac := options.Factory
+	fac := options.Factory
 
-    arr := pool.Get().(*[poolsize]proto.Field)
-    fields := arr[:0]
-    
-    mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
+	arr := pool.Get().(*[poolsize]proto.Field)
+	fields := arr[:0]
 	
-    {{ range .Fields -}}
-        {{ if and (eq .Type "bool") (eq .FixedArraySize 0) -}} 
+	mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
+	
+	{{ range .Fields -}}
+		{{ if and (eq .Type "bool") (eq .FixedArraySize 0) -}} 
 		{
 			field := fac.CreateField(mesg.Num, {{ .Num }})
 			field.Value = {{ .ProtoValue }}
 			fields = append(fields, field)
 		}
 		{{ else -}}
-        if {{ .IsValidValue -}} {
+		if {{ .IsValidValue -}} {
 			{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
 			field := fac.CreateField(mesg.Num, {{ .Num }})
 			{{ if gt .FixedArraySize 0 -}}
@@ -123,13 +123,13 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 			{{ end -}}
 			fields = append(fields, field)
 			{{ if eq .CanExpand true -}} } {{ end -}}
-        }
-        {{ end -}}
+		}
+		{{ end -}}
 	{{ end }}
 
-    mesg.Fields = make([]proto.Field, len(fields))
-    copy(mesg.Fields, fields)
-    pool.Put(arr)
+	mesg.Fields = make([]proto.Field, len(fields))
+	copy(mesg.Fields, fields)
+	pool.Put(arr)
 
 	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 	mesg.DeveloperFields = m.DeveloperFields
@@ -212,11 +212,8 @@ func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if gt .FixedArraySize 0 }} [{{ .Fi
 // {{ .Name }}Degrees returns {{ .Name }} in degrees instead of semicircles.
 // If {{ .Name }} value is invalid, float64 invalid value will be returned.
 func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 { 
-    if {{ .ComparableValue }} == {{ .InvalidValue }} {
-        return math.Float64frombits(basetype.Float64Invalid)
-    }
-    return semicircles.ToDegrees(m.{{ .Name }})
- }
+	return semicircles.ToDegrees(m.{{ .Name }})
+}
 {{ end }}
 {{ end }}
 
@@ -225,8 +222,8 @@ func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 {
 //
 // {{ .Comment }}
 func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
-    m.{{ .Name }} = v
-    return m
+	m.{{ .Name }} = v
+	return m
 }
 
 {{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) -}}
@@ -258,16 +255,16 @@ func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if gt .FixedArraySize 0 }} vs [{{
 		}
 		m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
 	}
-    {{ else -}}
+	{{ else -}}
 	unscaled := (v + {{ .Offset }}) * {{ .Scale }}
 	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
 		m.{{ .Name }} = {{ .Type }}({{ .BaseTypeInvalid }})
 		return m
 	}
 	m.{{ .Name }} = {{ .Type }}(unscaled)
-    {{ end -}}
+	{{ end -}}
 
-    return m
+	return m
 }
 {{ end -}}
 
@@ -275,8 +272,8 @@ func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if gt .FixedArraySize 0 }} vs [{{
 // Set{{ .Name }}Degrees is similar to Set{{ .Name }} except it accepts a value in degrees.
 // This method will automatically convert given degrees value to semicircles ({{ .Type }}) form.
 func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
-    m.{{ .Name }} = semicircles.ToSemicircles(degrees)
-    return m
+	m.{{ .Name }} = semicircles.ToSemicircles(degrees)
+	return m
 }
 {{ end -}}
 
@@ -285,8 +282,8 @@ func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
 {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 // SetDeveloperFields {{ $.Name }}'s DeveloperFields.
 func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperField) *{{ $.Name }} {
-    m.DeveloperFields = developerFields
-    return m
+	m.DeveloperFields = developerFields
+	return m
 }
 {{ end }}
 
@@ -343,8 +340,8 @@ func (m *{{ $.Name }}) IsExpandedField(fieldNum byte) bool {
 package {{ .Package }}
 
 import (
-    "github.com/muktihari/fit/proto"
-    "sync"
+	"github.com/muktihari/fit/proto"
+	"sync"
 )
 
 const poolsize = {{ .MaxLenFields }} // Max fields' length from the entire messages.
