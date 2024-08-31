@@ -798,7 +798,7 @@ func main() {
 
 Note:
 
-- By default, Encoder use protocol version 1.0 (proto.V1), if you want to use protocol version 2.0 (proto.V2), please specify it using Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
+- By default, Encoder will use protocol version in FileHeader for each FIT file, if it's not specified, it will use protocol version 1.0 (proto.V1). If you want to use specific protocol version for the entire encoding regardless the value in FileHeader, please use this Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
 - Encoder already implements efficient io.Writer buffering, DO NOT wrap io.Writer (such as \*os.File) with buffer such as using \*bufio.Writer; Doing so will greatly reduce performance.
 
 ### Encode RAW Protocol Messages
@@ -1008,7 +1008,7 @@ func main() {
 
 ### Available Encode Options
 
-1. **WithProtocolVersion**: directs the Encoder to use specific Protocol Version (default: proto.V1).
+1. **WithProtocolVersion**: directs the Encoder to use specific ProtocolVersion for the entire encoding. By default, Encoder will use ProtocolVersion in FileHeader for each FIT file, if it's not specified, it will use proto.V1. This option overrides the FileHeader's ProtocolVersion and forces all FIT files to use this ProtocolVersion during encoding.
 
    Example:
 

@@ -243,7 +243,6 @@ func TestOptions(t *testing.T) {
 			expected: options{
 				multipleLocalMessageType: 0,
 				endianness:               0,
-				protocolVersion:          proto.V1,
 				messageValidator:         NewMessageValidator(),
 				writeBufferSize:          defaultWriteBufferSize,
 			},
