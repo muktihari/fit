@@ -161,17 +161,20 @@ func WithWriteBufferSize(size int) Option {
 // be correct after everything is written.
 //
 // There are two strategies to achieve that and it depends on what kind of [io.Writer] is provided:
-//   - [io.WriterAt] or [io.WriteSeeker]: Encoder will update the FileHeader's DataSize and CRC after
+//
+//   - [io.WriteSeeker] or [io.WriterAt]: Encoder will update the FileHeader's DataSize and CRC after
 //     the encoding process is completed since we can write at a specific byte position, making it more
-//     ideal and efficient.
+//     ideal and efficient. If the given [io.Writer] implements both of them, it will be treated as [io.WriteSeeker].
 //   - [io.Writer]: Encoder needs to iterate through the messages once to calculate the FileHeader's DataSize
 //     and CRC by writing to [io.Discard], then re-iterate through the messages again for the actual writing.
 //
-// Loading everything in memory and then writing it all later should preferably be avoided. While a FIT file
-// is commonly small-sized, but by design, it can hold up to approximately 4GB. This is because the DataSize
-// is of type uint32, and its maximum value is around that number. And also The FIT protocol allows for
-// multiple FIT files to be chained together in a single FIT file. Each FIT file in the chain must be a properly
-// formatted FIT file (FileHeader, Messages, CRC), making it more dynamic in size.
+// Caveats:
+//
+//   - If [io.Writer] is an [*os.File] opened with O_APPEND, the behavior of the Encoder is not specified.
+//     If you intend to append the encoding result to an existing file to create a chained FIT file,
+//     open the file without O_APPEND then file.Seek(0, io.SeekEnd) before putting the file into the Encoder.
+//   - When using [io.WriterAt], the given [io.Writer] is expected to be empty (brand new), otherwise, the resulting
+//     data will be corrupted.
 //
 // Note: Encoder already implements efficient io.Writer buffering, so there's no need to wrap 'w' with a buffer;
 // doing so will only reduce performance. If you don't want the Encoder to buffer the writing, please direct the
@@ -328,9 +331,11 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	return err
 }
 
+const errInternal = errorString("encoder internal error")
+
 // updateFileHeader updates the FileHeader if the DataSize is changed.
 // The caller MUST ensure that e.w is either an io.WriterAt or an io.WriteSeeker.
-func (e *Encoder) updateFileHeader(header *proto.FileHeader) error {
+func (e *Encoder) updateFileHeader(header *proto.FileHeader) (err error) {
 	if header.DataSize == e.dataSize {
 		return nil
 	}
@@ -347,11 +352,9 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) error {
 	}
 
 	switch w := e.w.(type) {
-	case io.WriterAt:
-		_, err := w.WriteAt(b, e.lastFileHeaderPos)
-		return err
 	case io.WriteSeeker:
-		_, err := w.Seek(e.lastFileHeaderPos, io.SeekStart)
+		// Relative to EOF, ensure that we only write in our own data.
+		_, err = w.Seek(-e.n+e.lastFileHeaderPos, io.SeekEnd)
 		if err != nil {
 			return err
 		}
@@ -360,11 +363,16 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) error {
 			return err
 		}
 		_, err = w.Seek(0, io.SeekEnd)
-		if err != nil {
-			return err
-		}
+		return err
+	case io.WriterAt:
+		// This might write at the wrong offset if the writer was not
+		// empty before being assigned to the Encoder. We only track
+		// our own data and do not have context beyond it.
+		_, err = w.WriteAt(b, e.lastFileHeaderPos)
+		return err
+	default:
+		return errInternal // should not reach here except we code wrong implementation.
 	}
-	return fmt.Errorf("encoder internal error") // should not reach here except we code wrong implementation.
 }
 
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.

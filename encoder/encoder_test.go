@@ -66,33 +66,159 @@ func TestEncodeRealFiles(t *testing.T) {
 		},
 	}
 
-	f := new(bytes.Buffer)
+	f := &writeSeekerStub{}
 	enc := New(f, WithWriteBufferSize(0))
 	if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
-	testEncodeFit, err := os.Open(filepath.Join(testdata, "TestEncode.fit"))
-	if err != nil {
-		panic(err)
-	}
-	defer testEncodeFit.Close()
-
-	b, err := io.ReadAll(testEncodeFit)
+	testEncode, err := os.ReadFile(filepath.Join(testdata, "TestEncode.fit"))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	resultb := f.Bytes()
-
 	// Ignore profile version and crc checksum since it will change when we update the Profile.xlsx
-	b[2], b[3] = resultb[2], resultb[3]
-	b[12], b[13] = resultb[12], resultb[13]
+	testEncode[2], testEncode[3] = f.buf[2], f.buf[3]
+	testEncode[12], testEncode[13] = f.buf[12], f.buf[13]
 
 	// Compare with the actual file
-	if diff := cmp.Diff(resultb, b); diff != "" {
+	if diff := cmp.Diff(f.buf, testEncode); diff != "" {
 		t.Fatal(diff)
 	}
+
+	t.Run("Encode to existing file using WriteSeeker: OK", func(t *testing.T) {
+		triathlon, err := os.ReadFile(filepath.Join(testdata, "from_garmin_forums", "triathlon_summary_last.fit"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		expected := append(triathlon, testEncode...) // Chained FIT File
+
+		f := &writeSeekerStub{buf: triathlon}
+		_, err = f.Seek(0, io.SeekEnd)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fit.FileHeader.DataSize = 0 // Must reset
+		enc.Reset(f, WithWriteBufferSize(0))
+		if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(f.buf, expected); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
+	t.Run("Encode to existing file using WriterAt: Corrupt", func(t *testing.T) {
+		triathlon, err := os.ReadFile(filepath.Join(testdata, "from_garmin_forums", "triathlon_summary_last.fit"))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		f := &writerAtStub{buf: triathlon}
+
+		fit.FileHeader.DataSize = 0 // Must reset
+		enc.Reset(f, WithWriteBufferSize(0))
+
+		// This will overwrite the content of the existing file,
+		// as updateHeader will write at offset 0, corrupting the file.
+		if err := enc.EncodeWithContext(context.Background(), fit); err != nil {
+			t.Fatal(err)
+		}
+
+		// triathlon's header part is overwritten.
+		if diff := cmp.Diff(f.buf[:12], testEncode[:12]); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+}
+
+type writeSeekerStub struct {
+	buf []byte
+	off int64
+}
+
+var _ io.Writer = (*writeSeekerStub)(nil)
+var _ io.Seeker = (*writeSeekerStub)(nil)
+
+func (f *writeSeekerStub) Write(p []byte) (n int, err error) {
+	if len(f.buf[f.off:]) < len(p) {
+		buf := make([]byte, f.off+int64(len(p)))
+		copy(buf, f.buf)
+		f.buf = buf
+	}
+	n = copy(f.buf[f.off:], p)
+	f.off += int64(len(p))
+	return n, nil
+}
+
+func (f *writeSeekerStub) Seek(off int64, whence int) (int64, error) {
+	switch whence {
+	case io.SeekCurrent:
+		l := int64(len(f.buf))
+		l2 := l + off
+		if l2 < 0 {
+			return 0, os.ErrInvalid
+		}
+		if l2 > l {
+			buf := make([]byte, l2)
+			copy(buf, f.buf)
+			f.buf = buf
+		}
+		f.off = l2
+	case io.SeekStart:
+		l := int64(len(f.buf))
+		if off < 0 {
+			return 0, os.ErrInvalid
+		}
+		if off > l {
+			buf := make([]byte, off)
+			copy(buf, f.buf)
+			f.buf = buf
+		}
+		f.off = off
+	case io.SeekEnd:
+		l := int64(len(f.buf))
+		l2 := l + off
+		if l2 < 0 {
+			return 0, os.ErrInvalid
+		}
+		if l2 > l {
+			buf := make([]byte, l2)
+			copy(buf, f.buf)
+			f.buf = buf
+		}
+		f.off = l2
+	default:
+		return 0, os.ErrInvalid
+	}
+	return off, nil
+}
+
+type writerAtStub struct{ buf []byte }
+
+var _ io.Writer = (*writerAtStub)(nil)
+var _ io.WriterAt = (*writerAtStub)(nil)
+
+func (w *writerAtStub) Write(p []byte) (n int, err error) {
+	w.buf = append(w.buf, p...)
+	return len(p), nil
+}
+
+func (w *writerAtStub) WriteAt(p []byte, pos int64) (int, error) {
+	if pos < 0 {
+		return 0, os.ErrInvalid
+	}
+	l := int64(len(w.buf))
+	l2 := int64(len(p)) + pos
+	if l2 > l {
+		buf := make([]byte, l2)
+		copy(buf, w.buf)
+		w.buf = buf
+	}
+	n := copy(w.buf[pos:], p)
+	return n, nil
 }
 
 type fnValidate func(mesg *proto.Message) error
@@ -464,37 +590,100 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 
 func TestUpdateHeader(t *testing.T) {
 	tt := []struct {
-		name   string
-		header proto.FileHeader
-		w      io.Writer
+		name      string
+		w         io.Writer
+		n         int64
+		dataSize  uint32
+		header    proto.FileHeader
+		headerPos int64
+		expect    []byte
+		err       error
 	}{
 		{
-			name: "data size not changed",
-			w:    nil,
+			name:     "data size not changed",
+			dataSize: 1000,
+			header:   proto.FileHeader{DataSize: 1000},
+			w:        nil,
 		},
 		{
-			name:   "writerAt flow",
-			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
-			w:      mockWriterAt{fnWriteOK, fnWriteAtOK},
+			name:     "writerAt flow",
+			header:   proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT},
+			w:        mockWriterAt{fnWriteOK, fnWriteAtOK},
+			dataSize: 1,
 		},
 		{
-			name:   "writeSeeker happy flow",
-			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
-			w:      mockWriteSeeker{fnWriteOK, fnSeekOK},
+			name: "writeSeeker using stub",
+			header: proto.FileHeader{
+				Size:            12,
+				ProtocolVersion: byte(proto.V1),
+				ProfileVersion:  profile.Version,
+				DataType:        proto.DataTypeFIT,
+			},
+			n:         12 + 4,
+			headerPos: 4,
+			dataSize:  2,
+			w: &writeSeekerStub{
+				buf: make([]byte, 12+4), // n
+				off: 12 + 4,             // n
+			},
+			expect: func() []byte {
+				h := proto.FileHeader{
+					Size:            12,
+					ProtocolVersion: byte(proto.V1),
+					ProfileVersion:  profile.Version,
+					DataType:        proto.DataTypeFIT,
+					DataSize:        2, // updated
+				}
+				b, _ := h.MarshalAppend(make([]byte, 4)) // headerPos = 4
+				return b
+			}(),
 		},
 		{
-			name:   "writeSeeker error on seek",
-			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
-			w:      mockWriteSeeker{fnWriteOK, fnSeekErr},
+			name: "writerAt using stub",
+			header: proto.FileHeader{
+				Size:            12,
+				ProtocolVersion: byte(proto.V1),
+				ProfileVersion:  profile.Version,
+				DataType:        proto.DataTypeFIT,
+			},
+			headerPos: 2,
+			dataSize:  2,
+			w:         &writerAtStub{},
+			expect: func() []byte {
+				h := proto.FileHeader{
+					Size:            12,
+					ProtocolVersion: byte(proto.V1),
+					ProfileVersion:  profile.Version,
+					DataType:        proto.DataTypeFIT,
+					DataSize:        2, // updated
+				}
+				b, _ := h.MarshalAppend(make([]byte, 2)) // headerPos = 2
+				return b
+			}(),
 		},
 		{
-			name:   "writeSeeker error on write",
-			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
-			w:      mockWriteSeeker{fnWriteErr, fnSeekOK},
+			name:     "writeSeeker happy flow",
+			header:   proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT},
+			w:        mockWriteSeeker{fnWriteOK, fnSeekOK},
+			dataSize: 1,
+		},
+		{
+			name:     "writeSeeker error on seek",
+			header:   proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT},
+			w:        mockWriteSeeker{fnWriteOK, fnSeekErr},
+			dataSize: 1,
+			err:      io.EOF,
+		},
+		{
+			name:     "writeSeeker error on write",
+			header:   proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT},
+			w:        mockWriteSeeker{fnWriteErr, fnSeekOK},
+			dataSize: 1,
+			err:      io.EOF,
 		},
 		{
 			name:   "writeSeeker error on seek for resetting offset",
-			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
+			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT},
 			w: func() io.Writer {
 				fnSeeks := []io.Seeker{fnSeekOK, fnSeekErr}
 				index := 0
@@ -508,18 +697,38 @@ func TestUpdateHeader(t *testing.T) {
 					}),
 				}
 			}(),
+			dataSize: 1,
+			err:      io.EOF,
 		},
 		{
 			name:   "encoder internal error caused by bad implementation",
 			header: proto.FileHeader{Size: 14, DataType: proto.DataTypeFIT, DataSize: 1},
 			w:      nil,
+			err:    errInternal,
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w, WithWriteBufferSize(0))
-			_ = enc.updateFileHeader(&tc.header)
+			enc.n = tc.n
+			enc.dataSize = tc.dataSize
+			enc.lastFileHeaderPos = tc.headerPos
+
+			err := enc.updateFileHeader(&tc.header)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
+			switch w := tc.w.(type) {
+			case *writeSeekerStub:
+				if string(w.buf) != string(tc.expect) {
+					t.Fatalf("\n%v\n%v", w.buf, tc.expect)
+				}
+			case *writerAtStub:
+				if string(w.buf) != string(tc.expect) {
+					t.Fatalf("\n%v\n%v", w.buf, tc.expect)
+				}
+			}
 		})
 	}
 }

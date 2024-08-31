@@ -21,10 +21,10 @@ func newWriteBuffer(w io.Writer, size int) io.Writer {
 	}
 	bw := bufio.NewWriterSize(w, size)
 	switch wr := w.(type) {
-	case io.WriterAt:
-		return &writerAt{Writer: bw, WriterAt: wr}
 	case io.WriteSeeker:
 		return &writeSeeker{Writer: bw, Seeker: wr}
+	case io.WriterAt:
+		return &writerAt{Writer: bw, WriterAt: wr}
 	default:
 		return bw
 	}
