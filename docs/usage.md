@@ -3,9 +3,10 @@
 Table of Contents:
 
 1. [Decoding](#Decoding)
-   - [Decode RAW Protocol Messages](#Decode-RAW-Protocol-Messages)
-   - [Decode to Common File Types](#Decode-to-Common-File-Types)
+   - [Decode Protocol Messages](#Decode-Protocol-Messages)
+   - [Decode into Common File Types](#Decode-into-Common-File-Types)
      - [Using your own custom File Types](#Using-your-own-custom-File-Types)
+   - [Decode Chained FIT Files](#Decode-Chained-FIT-Files)
    - [Peek FileHeader](#Peek-FileHeader)
    - [Peek FileId](#Peek-FileId)
    - [Discard FIT File Sequences](#Discard-FIT-File-Sequences)
@@ -14,7 +15,7 @@ Table of Contents:
    - [Advance Decoder Usage](#Advance-Decoder-Usage)
    - [RawDecoder (Low-Level Abstraction)](#RawDecoder-Low-Level-Abstraction)
 2. [Encoding](#Encoding)
-   - [Encode RAW Protocol Messages](#Encode-RAW-Protocol-Messages)
+   - [Encode Protocol Messages](#Encode-Protocol-Messages)
    - [Encode Common File Types](#Encode-Common-File-Types)
    - [Available Encode Options](#Available-Encode-Options)
    - [Stream Encoder](#Stream-Encoder)
@@ -24,10 +25,9 @@ Table of Contents:
 
 NOTE: Decoder already implements efficient io.Reader buffering, so there's no need to wrap io.Reader (such as *os.File) using *bufio.Reader. Doing so will only reduce performance.
 
-### Decode RAW Protocol Messages
+### Decode Protocol Messages
 
-Decode as RAW Protocol Messages allows us to interact with FIT files through their original protocol message structures
-without the needs to do conversions.
+Decode protocol messages allows us to interact with FIT files directly through their original protocol messages' structure.
 
 ```go
 package main
@@ -68,30 +68,11 @@ func main() {
 }
 ```
 
-#### Decode Chained FIT FIle
+### Decode into Common File Types
 
-If you are uncertain if it's a chained fit file. Create a loop and use dec.Next() to check whether next sequence of bytes are still a valid FIT sequence.
+Decode into Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and [more](../profile/filedef/doc.go), which group protocol messages based on specific purposes.
 
-```go
-    ...
-
-    dec := decoder.New(f)
-    for dec.Next() {
-        fit, err := dec.Decode()
-        if err != nil {
-            return err
-        }
-        // do something with fit variable
-    }
-
-    ...
-```
-
-### Decode to Common File Types
-
-Decode to Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and [more](../profile/filedef/doc.go), which group protocol messages based on specific purposes.
-
-1. To get started, the simpliest (but least efficient) way to create an common file type is to decode the FIT file in its raw protocol messages then pass the messages to create the desired common file type.
+1. To get started, the simpliest (but least efficient) way to create an common file type is to decode the FIT file in its protocol messages then pass the messages to create the desired common file type.
 
 ```go
 package main
@@ -113,42 +94,40 @@ func main() {
 
     dec := decoder.New(f)
 
-    for dec.Next() {
-        fit, err := dec.Decode()
-        if err != nil {
-            panic(err)
-        }
-
-        activity := filedef.NewActivity(fit.Messages...)
-
-        fmt.Printf("File Type: %s\n", activity.FileId.Type)
-        fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
-        fmt.Printf("Laps count: %d\n", len(activity.Laps))
-        fmt.Printf("Records count: %d\n", len(activity.Records))
-
-        i := 100
-        fmt.Printf("\nSample value of record[%d]:\n", i)
-        fmt.Printf("  Distance: %g m\n", activity.Records[i].DistanceScaled())
-        fmt.Printf("  Lat: %d semicircles\n", activity.Records[i].PositionLat)
-        fmt.Printf("  Long: %d semicircles\n", activity.Records[i].PositionLong)
-        fmt.Printf("  Speed: %g m/s\n", activity.Records[i].SpeedScaled())
-        fmt.Printf("  HeartRate: %d bpm\n", activity.Records[i].HeartRate)
-        fmt.Printf("  Cadence: %d rpm\n", activity.Records[i].Cadence)
-
-        // Output:
-        // File Type: activity
-        // Sessions count: 1
-        // Laps count: 1
-        // Records count: 3601
-        //
-        // Sample value of record[100]:
-        //   Distance: 100 m
-        //   Lat: 0 semicircles
-        //   Long: 10717 semicircles
-        //   Speed: 1 m/s
-        //   HeartRate: 126 bpm
-        //   Cadence: 100 rpm
+    fit, err := dec.Decode()
+    if err != nil {
+        panic(err)
     }
+
+    activity := filedef.NewActivity(fit.Messages...)
+
+    fmt.Printf("File Type: %s\n", activity.FileId.Type)
+    fmt.Printf("Sessions count: %d\n", len(activity.Sessions))
+    fmt.Printf("Laps count: %d\n", len(activity.Laps))
+    fmt.Printf("Records count: %d\n", len(activity.Records))
+
+    i := 100
+    fmt.Printf("\nSample value of record[%d]:\n", i)
+    fmt.Printf("  Distance: %g m\n", activity.Records[i].DistanceScaled())
+    fmt.Printf("  Lat: %d semicircles\n", activity.Records[i].PositionLat)
+    fmt.Printf("  Long: %d semicircles\n", activity.Records[i].PositionLong)
+    fmt.Printf("  Speed: %g m/s\n", activity.Records[i].SpeedScaled())
+    fmt.Printf("  HeartRate: %d bpm\n", activity.Records[i].HeartRate)
+    fmt.Printf("  Cadence: %d rpm\n", activity.Records[i].Cadence)
+
+    // Output:
+    // File Type: activity
+    // Sessions count: 1
+    // Laps count: 1
+    // Records count: 3601
+    //
+    // Sample value of record[100]:
+    //   Distance: 100 m
+    //   Lat: 0 semicircles
+    //   Long: 10717 semicircles
+    //   Speed: 1 m/s
+    //   HeartRate: 126 bpm
+    //   Cadence: 100 rpm
 }
 ```
 
@@ -182,51 +161,44 @@ func main() {
         decoder.WithBroadcastOnly(),   // Direct the decoder to only broadcast the messages without retaining them.
     )
 
-    for dec.Next() {
-        _, err = dec.Decode()
-        if err != nil {
-            panic(err)
-        }
-
-        // The resulting File can be retrieved after decoding process completed.
-        // filedef.File is just an interface, we can do type assertion like this.
-        // Alternatively, use:
-        //   file, ok := lis.File().(*filedef.Activity)
-        switch file := lis.File().(type) {
-        case *filedef.Course:
-            // do something if it's a course file
-        case *filedef.Workout:
-            // do something if it's a workout file
-        case *filedef.Activity:
-            fmt.Printf("File Type: %s\n", file.FileId.Type)
-            fmt.Printf("Sessions count: %d\n", len(file.Sessions))
-            fmt.Printf("Laps count: %d\n", len(file.Laps))
-            fmt.Printf("Records count: %d\n", len(file.Records))
-
-            i := 100
-            fmt.Printf("\nSample value of record[%d]:\n", i)
-            fmt.Printf("  Distance: %g m\n", file.Records[i].DistanceScaled())
-            fmt.Printf("  Lat: %g degrees\n", file.Records[i].PositionLatDegrees())
-            fmt.Printf("  Long: %g degrees\n", file.Records[i].PositionLongDegrees())
-            fmt.Printf("  Speed: %g m/s\n", file.Records[i].SpeedScaled())
-            fmt.Printf("  HeartRate: %d bpm\n", file.Records[i].HeartRate)
-            fmt.Printf("  Cadence: %d rpm\n", file.Records[i].Cadence)
-
-            // Output:
-            // File Type: activity
-            // Sessions count: 1
-            // Laps count: 1
-            // Records count: 3601
-            //
-            // Sample value of record[100]:
-            //   Distance: 100 m
-            //   Lat: 0 degrees
-            //   Long: 0.0008982885628938675 degrees
-            //   Speed: 1 m/s
-            //   HeartRate: 126 bpm
-            //   Cadence: 100 rpm
-        }
+    _, err = dec.Decode()
+    if err != nil {
+        panic(err)
     }
+
+    // The resulting File can be retrieved after decoding process completed.
+    // filedef.File is just an interface, we can do type assertion like this.
+    file, ok := lis.File().(*filedef.Activity)
+    if !ok {
+        fmt.Printf("%T is not an Activity File\n", lis.File())
+        return
+    }
+
+    fmt.Printf("File Type: %s\n", file.FileId.Type)
+    fmt.Printf("Sessions count: %d\n", len(file.Sessions))
+    fmt.Printf("Laps count: %d\n", len(file.Laps))
+    fmt.Printf("Records count: %d\n", len(file.Records))
+    i := 100
+    fmt.Printf("\nSample value of record[%d]:\n", i)
+    fmt.Printf("  Distance: %g m\n", file.Records[i].DistanceScaled())
+    fmt.Printf("  Lat: %g degrees\n", file.Records[i].PositionLatDegrees())
+    fmt.Printf("  Long: %g degrees\n", file.Records[i].PositionLongDegrees())
+    fmt.Printf("  Speed: %g m/s\n", file.Records[i].SpeedScaled())
+    fmt.Printf("  HeartRate: %d bpm\n", file.Records[i].HeartRate)
+    fmt.Printf("  Cadence: %d rpm\n", file.Records[i].Cadence)
+    // Output:
+    // File Type: activity
+    // Sessions count: 1
+    // Laps count: 1
+    // Records count: 3601
+    //
+    // Sample value of record[100]:
+    //   Distance: 100 m
+    //   Lat: 0 degrees
+    //   Long: 0.0008982885628938675 degrees
+    //   Speed: 1 m/s
+    //   HeartRate: 126 bpm
+    //   Cadence: 100 rpm
 }
 ```
 
@@ -326,6 +298,50 @@ func main() {
 }
 ```
 
+### Decode Chained FIT Files
+
+A single invocation of `Decode()` will process exactly one FIT sequence. To decode chained FIT files, wrap the decode process with a loop and use `dec.Next()` to check whether next sequence of bytes are still a valid FIT sequence.
+
+```go
+    ...
+    dec := decoder.New(f)
+    for dec.Next() {
+        fit, err := dec.Decode()
+        if err != nil {
+            return err
+        }
+        // do something with fit variable
+    }
+    ...
+```
+
+```go
+    ...
+    lis := filedef.NewListener()
+    defer lis.Close()
+
+    dec := decoder.New(f,
+        decoder.WithMesgListener(lis),
+        decoder.WithBroadcastOnly(),
+    )
+
+    for dec.Next() {
+        _, err := dec.Decode()
+        if err != nil {
+            return err
+        }
+
+        file, ok := lis.File().(*filedef.Activity)
+        if !ok {
+            return
+        }
+        // do something with file variable
+    }
+    ...
+```
+
+You can also use [PeekFileHeader()](#-Peek-FileHeader), [PeekFileId()](#Peek-FileId) and [Discard()](#Discard-FIT-File-Sequences) methods below inside the loop.
+
 ### Peek FileHeader
 
 We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero. This method is idempotent and can be invoked even after Decode has been invoked.
@@ -423,7 +439,7 @@ func main() {
 
 ### Discard FIT File Sequences
 
-When handling a chained fit file, sometimes we only want to decode a certain file type, let's say a Course File, while discarding other file types. Instead of unecessarily decode all the file types but we don't use all of them, we can just discard it. Discard directs the Decoder to efficiently just discard the bytes without doing unnecessary work.
+When handling a chained FIT file, sometimes we only want to decode a certain file type, let's say a Course File, while discarding other file types. Instead of unecessarily decode all the file types but we don't use all of them, we can just discard it. Discard directs the Decoder to efficiently just discard the bytes without doing unnecessary work.
 
 ```go
     ...
@@ -467,6 +483,7 @@ import (
     "os"
 
     "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/typedef"
 )
 
 func main() {
@@ -478,9 +495,17 @@ func main() {
 
     dec := decoder.New(f)
 
-    // Fyi, we can invoke PeekFileId() first to check the type of the first FIT File sequence before checking the integrity.
-    // For most cases, we wouldn't want to check integrity of Activity File.
-    // However, you can only Peek FileId of the first FIT sequence if it's a chained FIT files.
+    // If needed, we can invoke PeekFileId() first to check the type of FIT File.
+    // Checking the integrity of an Activity File is generally not mandatory in most cases.
+    // However, we can only peek the first FIT sequence if it's a chained FIT files.
+    fileId, err := dec.PeekFileId()
+    if err != nil {
+        panic(err)
+    }
+    if fileId.Type == typedef.FileActivity {
+        return // Skip
+    }
+
     if _, err := dec.CheckIntegrity(); err != nil {
         panic(err)
     }
@@ -639,7 +664,6 @@ func main() {
     srv.HandleFunc("/decode", func(w http.ResponseWriter, r *http.Request) {
         dec := pool.Get().(*decoder.Decoder)
         defer pool.Put(dec)  // put decoder back to the pool
-        defer dec.Reset(nil) // avoid memory leaks, remove any pointer ref
 
         lis := lispool.Get().(*filedef.Listener)
         defer lispool.Put(lis) // put listener back to the pool
@@ -801,9 +825,9 @@ Note:
 - By default, Encoder will use protocol version in FileHeader for each FIT file, if it's not specified, it will use protocol version 1.0 (proto.V1). If you want to use specific protocol version for the entire encoding regardless the value in FileHeader, please use this Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
 - Encoder already implements efficient io.Writer buffering, DO NOT wrap io.Writer (such as \*os.File) with buffer such as using \*bufio.Writer; Doing so will greatly reduce performance.
 
-### Encode RAW Protocol Messages
+### Encode Protocol Messages
 
-Example of encoding fit by self declaring the protocol messages, this is to show how we can compose the message using this SDK.
+Example of encoding FIT by self declaring the protocol messages, this is to show how we can compose the message using this SDK.
 
 ```go
 package main
@@ -834,8 +858,9 @@ func main() {
                 fieldnum.FileIdProduct: uint16(1901), // Bryton Rider 420
                 fieldnum.FileIdProductName:  "Bryton Rider 420",
             }),
-            // For better performance, consider using factory.CreateMesgOnly or other alternatives listed below,
-            // as these only allocate the specified fields. However, you can not use WithFieldValues method.
+            // For better performance, consider using factory.CreateMesgOnly
+            // or other alternatives listed below, as these only allocate the
+            // specified fields. However, you can not use WithFieldValues method.
             factory.CreateMesgOnly(mesgnum.Activity).WithFields(
                 factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityManual.Byte()),
                 factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
@@ -847,11 +872,12 @@ func main() {
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgCadence).WithValue(uint8(78)),
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgHeartRate).WithValue(uint8(100)),
             ),
-            // Alternative #2: Compose like this, which is as performant as the two examples above.
+            // Alternative #2: Compose like this, which is as performant as
+            // the two examples above.
             proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
-                factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-                factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
-                factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
+                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).FieldBase, Value: proto.Uint16(1000)},
+                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).FieldBase, Value: proto.Uint8(78)},
+                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).FieldBase, Value: proto.Uint8(100)},
             }},
         },
     }
@@ -862,7 +888,7 @@ func main() {
     }
     defer f.Close()
 
-    enc := encoder.New(f) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
+    enc := encoder.New(f)
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -871,7 +897,7 @@ func main() {
 
 ### Encode Common File Types
 
-Example of encoding fit by self declaring the protocol messages but using common File Types building block.
+Example of encoding FIT created using Common File Types building block.
 
 ```go
 package main
@@ -942,7 +968,7 @@ func main() {
     }
     defer f.Close()
 
-    enc := encoder.New(f) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
+    enc := encoder.New(f)
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -985,11 +1011,12 @@ func main() {
 
     activity := lis.File().(*filedef.Activity)
 
-    /* Do something with the Activity File, for example changing manufacturer and product like this */
+    // Do something with the Activity File, for example
+    // changing manufacturer and product like this
     activity.FileId.Manufacturer = typedef.ManufacturerGarmin
     activity.FileId.Product = typedef.GarminProductEdge530.Uint16()
 
-    // Convert back to RAW Protocol Messages
+    // Convert back to Protocol Messages
     fit := activity.ToFIT(nil)
 
     fout, err := os.OpenFile("NewActivity.fit", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
@@ -998,8 +1025,7 @@ func main() {
     }
     defer fout.Close()
 
-    // Encode FIT to file
-    enc := encoder.New(fout) // By default, the Encoder uses a buffer of size 4096 to write to the writer.
+    enc := encoder.New(fout)
     if err := enc.Encode(&fit); err != nil {
         panic(err)
     }
@@ -1059,7 +1085,8 @@ func main() {
    - If you love to live dangerously, you can always bypass the message validator. It might speed up the encoding process, but be warned—it's prone to errors. So, only go for it if you know what you're doing!
 
    ```go
-     // Define your own message validator, for example this validator will always return nil error.
+     // Define your own message validator, for example
+     // this validator will always return nil error.
      type messageValidatorBypass struct{}
 
      func (messageValidatorBypass) Validate(mesg *proto.Message) error { return nil }
@@ -1131,7 +1158,6 @@ func main() {
     }
     defer f.Close()
 
-    // By default, the Encoder uses a buffer of size 4096 to write to the writer.
     streamEnc, err := encoder.New(f).StreamEncoder()
     if err != nil {
         panic(err)
@@ -1146,15 +1172,16 @@ func main() {
     )
 
     // Write per message, we can use this to write message as it arrives.
-    // For example, message retrieved from decoder's Listener can be write right away
-    // without waiting all messages to be received.
+    // For example, message retrieved from decoder's Listener can be
+    // write right away without waiting all messages to be received.
     if err := streamEnc.WriteMessage(&mesg); err != nil {
         panic(err)
     }
 
     /* Write more messages */
 
-    // This should be invoked for every sequence of FIT File (not every message) to finalize.
+    // This should be invoked for every sequence of FIT File
+    // (not every message) to finalize.
     if err := streamEnc.SequenceCompleted(); err != nil {
         panic(err)
     }
@@ -1193,7 +1220,6 @@ func main() {
     srv.HandleFunc("/encode", func(w http.ResponseWriter, r *http.Request) {
         enc := pool.Get().(*encoder.Encoder)
         defer pool.Put(enc)  // put encoder back to the pool
-        defer enc.Reset(nil) // avoid memory leaks, remove any pointer ref
 
         // Inmem writer for faster encoding since w does not
         // implement io.WriterAt or io.WriteSeeker.
