@@ -1225,6 +1225,7 @@ func main() {
         // implement io.WriterAt or io.WriteSeeker.
         buf := bufpool.Get().(*bufferAt)
         defer bufpool.Put(buf)
+        buf.Reset()
 
         // Assign writer and options just like
         // when using encoder.New().
