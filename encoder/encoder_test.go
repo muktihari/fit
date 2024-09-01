@@ -157,7 +157,7 @@ func (f *writeSeekerStub) Seek(off int64, whence int) (int64, error) {
 	switch whence {
 	case io.SeekCurrent:
 		l := int64(len(f.buf))
-		l2 := l + off
+		l2 := f.off + off
 		if l2 < 0 {
 			return 0, os.ErrInvalid
 		}

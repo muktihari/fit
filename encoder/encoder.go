@@ -361,16 +361,18 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) (err error) {
 
 	switch w := e.w.(type) {
 	case io.WriteSeeker:
-		// Relative to EOF, ensure that we only write in our own data.
-		_, err = w.Seek(-e.n+e.lastFileHeaderPos, io.SeekEnd)
+		// Ensure that we only write in our own data.
+		size := e.n - e.lastFileHeaderPos
+		_, err = w.Seek(-size, io.SeekCurrent)
 		if err != nil {
 			return err
 		}
-		_, err = w.Write(b)
+		var n int
+		n, err = w.Write(b)
 		if err != nil {
 			return err
 		}
-		_, err = w.Seek(0, io.SeekEnd)
+		_, err = w.Seek(size-int64(n), io.SeekCurrent)
 		return err
 	case io.WriterAt:
 		// This might write at the wrong offset if the writer was not
