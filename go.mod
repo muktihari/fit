@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/thedatashed/xlsxreader v1.2.8
 	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc
-	golang.org/x/text v0.17.0
+	golang.org/x/text v0.18.0
 )
 
 require github.com/stretchr/testify v1.9.0 // indirect
