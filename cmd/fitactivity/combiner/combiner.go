@@ -30,196 +30,159 @@ const (
 	ErrSportMismatch  = errorString("sport mismatch")
 )
 
-func Combine(fits ...*proto.FIT) (*proto.FIT, error) {
+func Combine(fits ...*proto.FIT) (result *proto.FIT, err error) {
+	for i := 0; i < len(fits); i++ {
+		if len(fits[i].Messages) == 0 {
+			fits = append(fits[:i], fits[i+1:]...)
+			i--
+		}
+	}
+
 	if len(fits) < 2 {
-		return nil, fmt.Errorf("provide at least 2 fits to combine: %w", ErrMinimalCombine)
+		return nil, fmt.Errorf("provide at least 2 valid FIT files to combine: %w",
+			ErrMinimalCombine)
 	}
 
 	slices.SortStableFunc(fits, func(f1, f2 *proto.FIT) int {
-		if len(f1.Messages) == 0 || len(f2.Messages) == 0 {
-			return 0
-		}
 		timeCreated1 := f1.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).Uint32()
 		timeCreated2 := f2.Messages[0].FieldValueByNum(fieldnum.FileIdTimeCreated).Uint32()
 		if timeCreated1 < timeCreated2 {
 			return -1
+		} else if timeCreated1 > timeCreated2 {
+			return 1
 		}
-		return 1
+		return 0
 	})
 
-	var sessionMesgs []proto.Message
-	var activityMesg proto.Message
-	var splitSummaryHist = make(map[typedef.SplitType]*mesgdef.SplitSummary)
+	var (
+		splitSummaries  []*mesgdef.SplitSummary
+		sessionsByIndex = make([][]*mesgdef.Session, len(fits))
+		activities      = make([]*mesgdef.Activity, 0, len(fits))
+	)
 
-	sessionsByFIT := make([][]proto.Message, len(fits))
-	for i := range fits {
-		fit := fits[i]
-		for j := 0; j < len(fit.Messages); j++ {
-			mesg := fit.Messages[j]
+	result = fits[0]
+
+	for i, fit := range fits {
+		var valid int
+		for j, mesg := range fit.Messages {
 			switch mesg.Num {
 			case mesgnum.Session:
-				if i == 0 { // First FIT as base
-					sessionMesgs = append(sessionMesgs, mesg)
-					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all sessions from result
-					j--
-				}
-				sessionsByFIT[i] = append(sessionsByFIT[i], mesg)
+				sessionsByIndex[i] = append(sessionsByIndex[i], mesgdef.NewSession(&mesg))
+				continue
 			case mesgnum.SplitSummary:
-				s2 := mesgdef.NewSplitSummary(&mesg)
-				s1, ok := splitSummaryHist[s2.SplitType]
+				m := mesgdef.NewSplitSummary(&mesg)
+				var ok bool
+				for _, v := range splitSummaries {
+					if v.SplitType == m.SplitType {
+						aggregator.Aggregate(v, m)
+						ok = true
+						break
+					}
+				}
 				if !ok {
-					splitSummaryHist[s2.SplitType] = s2
-				} else {
-					aggregator.Aggregate(s1, s2)
+					splitSummaries = append(splitSummaries, m)
 				}
-				fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove all split summaries from result
-				j--
+				continue
 			case mesgnum.Activity:
-				if activityMesg.Num != mesgnum.Activity {
-					activityMesg = mesg
-					fit.Messages = append(fit.Messages[:j], fit.Messages[j+1:]...) // remove activity from result
-					j--
-				}
+				activities = append(activities, mesgdef.NewActivity(&mesg))
+				continue
 			}
+			if j != valid {
+				fit.Messages[valid], fit.Messages[j] = fit.Messages[j], fit.Messages[valid]
+			}
+			valid++
 		}
-	}
-
-	fitResult := fits[0]
-
-	for i := range sessionsByFIT {
-		if len(sessionsByFIT[i]) == 0 {
+		if len(sessionsByIndex[i]) == 0 {
 			return nil, fmt.Errorf("fits[%d]: %w", i, ErrNoSessionFound)
 		}
+		fit.Messages = fit.Messages[:valid]
 	}
 
-	lastDistance := getLastDistanceOrZero(fitResult.Messages)
+	sessions := sessionsByIndex[0]
+	lastPrevDistance := getLastDistanceOrZero(result.Messages)
 	for i := 1; i < len(fits); i++ {
 		var (
-			nextFitSessions = sessionsByFIT[i]
-			curSes          = mesgdef.NewSession(&sessionMesgs[len(sessionMesgs)-1])
-			nextSes         = mesgdef.NewSession(&nextFitSessions[0])
+			nextFitSessions = sessionsByIndex[i]
+			ses             = sessions[len(sessions)-1]
+			nextSes         = nextFitSessions[0]
 		)
-		if curSes.Sport != nextSes.Sport {
+		if ses.Sport != nextSes.Sport {
 			return nil, fmt.Errorf("fits[%d] %q != %q: %w",
-				i, curSes.Sport, nextSes.Sport, ErrSportMismatch)
+				i, ses.Sport, nextSes.Sport, ErrSportMismatch)
 		}
 
-		var lastDist uint32
+		var lastDistance uint32
 		for _, mesg := range fits[i].Messages {
 			switch mesg.Num {
-			case mesgnum.FileId, mesgnum.FileCreator, mesgnum.Activity, mesgnum.Session:
+			case mesgnum.FileId, mesgnum.FileCreator:
 				continue // skip
 			case mesgnum.Record:
 				// Accumulate distance
 				field := mesg.FieldByNum(fieldnum.RecordDistance)
 				if field != nil && field.Value.Uint32() != basetype.Uint32Invalid {
-					lastDist = field.Value.Uint32() + lastDistance
-					field.Value = proto.Uint32(lastDist)
+					lastDistance = field.Value.Uint32() + lastPrevDistance
+					field.Value = proto.Uint32(lastDistance)
 				}
 				fallthrough
 			default:
-				fitResult.Messages = append(fitResult.Messages, mesg)
+				result.Messages = append(result.Messages, mesg)
 			}
 		}
-		lastDistance = lastDist
+		lastPrevDistance = lastDistance
 
 		// Add time gap
-		endTime := curSes.StartTime.Add(time.Duration(curSes.TotalElapsedTime/1000) * time.Second)
+		endTime := ses.StartTime.Add(time.Duration(ses.TotalElapsedTime/1000) * time.Second)
 		gap := uint32(nextSes.StartTime.Sub(endTime).Seconds() * 1000)
-		curSes.TotalElapsedTime += gap
-		curSes.TotalTimerTime += gap
-		aggregator.Aggregate(curSes, nextSes)
-
-		sessionMesgs[len(sessionMesgs)-1] = curSes.ToMesg(nil) // Update Session
+		ses.TotalElapsedTime += gap
+		ses.TotalTimerTime += gap
+		aggregator.Aggregate(ses, nextSes)
 
 		if len(nextFitSessions) > 1 { // append the rest of the sessions
-			sessionMesgs = append(sessionMesgs, nextFitSessions[1:]...)
+			sessions = append(sessions, nextFitSessions[1:]...)
 		}
 	}
 
-	// Now that all messages has been appended, let's update the session messages and
-	// activity message and place it at the end of the resulting FIT (Sessions Last Summary).
+	// Summarize
 
-	firstTimestamp := basetype.Uint32Invalid
-	for _, mesg := range fitResult.Messages {
-		if firstTimestamp == basetype.Uint32Invalid {
-			timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-			if timestamp != basetype.Uint32Invalid {
-				firstTimestamp = timestamp
-				break
-			}
-		}
-	}
+	firstTimestamp := getFirstTimestamp(result.Messages)
+	lastTimestamp := getLastTimestamp(result.Messages)
 
-	lastTimestamp := basetype.Uint32Invalid
-	for i := len(fitResult.Messages) - 1; i > 0; i-- {
-		timestamp := fitResult.Messages[i].FieldValueByNum(proto.FieldNumTimestamp).Uint32()
-		if timestamp != basetype.Uint32Invalid {
-			lastTimestamp = timestamp
-			break
-		}
-	}
-
-	for _, splitSummary := range splitSummaryHist {
-		mesg := splitSummary.ToMesg(nil)
+	for _, v := range splitSummaries {
+		mesg := v.ToMesg(nil)
+		// Split Summary does not have timestamp, but we found a case where it may contains
+		// timestamp on FIT files produced by Garmin Devices, so let's create one.
 		mesg.Fields = append([]proto.Field{
-			// Split Summary does not have timestamp, but we found a case where
-			// it may contains timestamp, so let's create one.
 			factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(lastTimestamp),
 		}, mesg.Fields...)
-		fitResult.Messages = append(fitResult.Messages, mesg)
+		result.Messages = append(result.Messages, mesg)
 	}
 
-	for _, sesMesg := range sessionMesgs {
-		field := sesMesg.FieldByNum(proto.FieldNumTimestamp)
-		if field == nil {
-			sesMesg.Fields = append(sesMesg.Fields, factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp))
-			field = &sesMesg.Fields[len(sesMesg.Fields)-1]
-		}
-		field.Value = proto.Uint32(lastTimestamp) // Update session timestamp
-		fitResult.Messages = append(fitResult.Messages, sesMesg)
+	for _, v := range sessions {
+		v.Timestamp = datetime.ToTime(lastTimestamp)
+		result.Messages = append(result.Messages, v.ToMesg(nil))
 	}
 
-	// Update activity.Timestamp & activity.LocalTimestamp
-	timestampField := activityMesg.FieldByNum(proto.FieldNumTimestamp)
-	if timestampField == nil {
-		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, proto.FieldNumTimestamp))
-		timestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	timezone := getTimezone(activities)
+
+	var activity *mesgdef.Activity
+	if len(activities) > 0 {
+		activity = activities[0]
+	} else {
+		activity = mesgdef.NewActivity(nil)
 	}
 
-	localTimestampField := activityMesg.FieldByNum(fieldnum.ActivityLocalTimestamp)
-	if localTimestampField == nil {
-		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp))
-		localTimestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
+	if activity.Type == typedef.Activity(basetype.EnumInvalid) {
+		activity.Type = typedef.ActivityAutoMultiSport
 	}
 
-	tzOffsetHour := datetime.TzOffsetHours(
-		datetime.ToTime(localTimestampField.Value.Uint32()),
-		datetime.ToTime(timestampField.Value.Uint32()),
-	)
+	activity.Timestamp = datetime.ToTime(lastTimestamp)
+	activity.LocalTimestamp = activity.Timestamp.Add(time.Duration(timezone) * time.Hour)
+	activity.TotalTimerTime = uint32((lastTimestamp - firstTimestamp) * 1000) // Scale: 1000
+	activity.NumSessions = uint16(len(sessions))
 
-	timestampField.Value = proto.Uint32(lastTimestamp)
-	localTimestampField.Value = proto.Uint32(uint32(int64(lastTimestamp) + int64(tzOffsetHour*3600)))
+	result.Messages = append(result.Messages, activity.ToMesg(nil))
 
-	// Update activity.TotalTimerTime
-	timestampField = activityMesg.FieldByNum(fieldnum.ActivityTotalTimerTime)
-	if timestampField == nil {
-		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime))
-		timestampField = &activityMesg.Fields[len(activityMesg.Fields)-1]
-	}
-	timestampField.Value = proto.Uint32((lastTimestamp - firstTimestamp) * 1000) // Scale: 1000, Offset: 0
-
-	// Update activity.NumSessions
-	numSessions := activityMesg.FieldByNum(fieldnum.ActivityNumSessions)
-	if numSessions == nil {
-		activityMesg.Fields = append(activityMesg.Fields, factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions))
-		numSessions = &activityMesg.Fields[len(activityMesg.Fields)-1]
-	}
-	numSessions.Value = proto.Uint16(uint16(len(sessionMesgs)))
-
-	fitResult.Messages = append(fitResult.Messages, activityMesg)
-
-	return fitResult, nil
+	return result, nil
 }
 
 func getLastDistanceOrZero(mesgs []proto.Message) uint32 {
@@ -234,4 +197,37 @@ func getLastDistanceOrZero(mesgs []proto.Message) uint32 {
 		return v
 	}
 	return 0
+}
+
+func getFirstTimestamp(mesgs []proto.Message) uint32 {
+	for i := range mesgs {
+		timestamp := mesgs[i].FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp != basetype.Uint32Invalid {
+			return timestamp
+		}
+	}
+	return basetype.Uint32Invalid
+}
+
+func getLastTimestamp(mesgs []proto.Message) uint32 {
+	for i := len(mesgs) - 1; i >= 0; i-- {
+		timestamp := mesgs[i].FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+		if timestamp != basetype.Uint32Invalid {
+			return timestamp
+		}
+	}
+	return basetype.Uint32Invalid
+}
+
+func getTimezone(activities []*mesgdef.Activity) (timezone int) {
+	for _, activity := range activities {
+		if activity.Timestamp.IsZero() || activity.LocalTimestamp.IsZero() {
+			continue
+		}
+		timezone = datetime.TzOffsetHours(activity.LocalTimestamp, activity.Timestamp)
+		if timezone != 0 {
+			return timezone
+		}
+	}
+	return timezone
 }
