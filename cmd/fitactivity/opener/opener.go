@@ -15,7 +15,7 @@ import (
 )
 
 // Open opens all given paths concurrently.
-func Open(paths ...string) ([]*proto.FIT, error) {
+func Open(paths []string) ([]*proto.FIT, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -59,7 +59,7 @@ func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.Wa
 	}
 	defer f.Close()
 
-	dec := decoder.New(f, decoder.WithNoComponentExpansion())
+	dec := decoder.New(f)
 
 	for dec.Next() {
 		fileId, err := dec.PeekFileId()

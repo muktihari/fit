@@ -25,22 +25,17 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	ErrMinimalCombine = errorString("minimal combine")
-	ErrNoSessionFound = errorString("no session found")
-	ErrSportMismatch  = errorString("sport mismatch")
+	errNoSessionFound = errorString("no session found")
+	errSportMismatch  = errorString("sport mismatch")
 )
 
-func Combine(fits ...*proto.FIT) (result *proto.FIT, err error) {
+// Combine combines multiple FIT activities into one continous activity.
+func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 	for i := 0; i < len(fits); i++ {
 		if len(fits[i].Messages) == 0 {
 			fits = append(fits[:i], fits[i+1:]...)
 			i--
 		}
-	}
-
-	if len(fits) < 2 {
-		return nil, fmt.Errorf("provide at least 2 valid FIT files to combine: %w",
-			ErrMinimalCombine)
 	}
 
 	slices.SortStableFunc(fits, func(f1, f2 *proto.FIT) int {
@@ -93,7 +88,7 @@ func Combine(fits ...*proto.FIT) (result *proto.FIT, err error) {
 			valid++
 		}
 		if len(sessionsByIndex[i]) == 0 {
-			return nil, fmt.Errorf("fits[%d]: %w", i, ErrNoSessionFound)
+			return nil, fmt.Errorf("fits[%d]: %w", i, errNoSessionFound)
 		}
 		fit.Messages = fit.Messages[:valid]
 	}
@@ -108,7 +103,7 @@ func Combine(fits ...*proto.FIT) (result *proto.FIT, err error) {
 		)
 		if ses.Sport != nextSes.Sport {
 			return nil, fmt.Errorf("fits[%d] %q != %q: %w",
-				i, ses.Sport, nextSes.Sport, ErrSportMismatch)
+				i, ses.Sport, nextSes.Sport, errSportMismatch)
 		}
 
 		var lastDistance uint32

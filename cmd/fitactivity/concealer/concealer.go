@@ -12,18 +12,22 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// ConcealPosition removes coordinates (lat, long) as far as start distance and end distance from the given FIT file.
+// Conceal removes coordinates (lat, long) as far as start distance and end distance from the given FIT file.
 // If startDistance and endDistance == 0, it will not do anything, nil will be returned.
-func ConcealPosition(fit *proto.FIT, startDistance, endDistance uint32) error {
-	if err := ConcealPositionStart(fit, startDistance); err != nil {
+// This will also remove StartPositionLat, StartPositionLong, EndPositionLat and EndPositionLong from any lap messages.
+func Conceal(fit *proto.FIT, startDistance, endDistance uint32) error {
+	if err := concealPositionStart(fit, startDistance); err != nil {
 		return err
 	}
-	return ConcealPositionEnd(fit, endDistance)
+	if err := concealPositionEnd(fit, endDistance); err != nil {
+		return err
+	}
+	return nil
 }
 
-// ConcealPositionStart removes coordinates (lat, long) as far as start distance from the given FIT file.
+// concealPositionStart removes coordinates (lat, long) as far as start distance from the given FIT file.
 // If concealDistance == 0, it will not do anything, nil will be returned.
-func ConcealPositionStart(fit *proto.FIT, concealDistance uint32) error {
+func concealPositionStart(fit *proto.FIT, concealDistance uint32) error {
 	if concealDistance == 0 {
 		return nil
 	}
@@ -34,6 +38,9 @@ func ConcealPositionStart(fit *proto.FIT, concealDistance uint32) error {
 loop:
 	for i := range fit.Messages {
 		switch fit.Messages[i].Num {
+		case mesgnum.Lap:
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLong)
 		case mesgnum.Session:
 			if sessionIndex == -1 {
 				sessionIndex = i
@@ -107,9 +114,9 @@ loop:
 	return nil
 }
 
-// ConcealPositionEnd removes coordinates (lat, long) as far as end distance from the given FIT file.
+// concealPositionEnd removes coordinates (lat, long) as far as end distance from the given FIT file.
 // If concealDistance == 0, it will not do anything, nil will be returned.
-func ConcealPositionEnd(fit *proto.FIT, concealDistance uint32) error {
+func concealPositionEnd(fit *proto.FIT, concealDistance uint32) error {
 	if concealDistance == 0 {
 		return nil
 	}
@@ -121,6 +128,9 @@ func ConcealPositionEnd(fit *proto.FIT, concealDistance uint32) error {
 loop:
 	for i := len(fit.Messages) - 1; i >= 0; i-- {
 		switch fit.Messages[i].Num {
+		case mesgnum.Lap:
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLat)
+			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLong)
 		case mesgnum.Session:
 			if sessionIndex == -1 {
 				sessionIndex = i
@@ -196,16 +206,4 @@ loop:
 	}
 
 	return nil
-}
-
-// ConcealLapStartAndEndPosition removes StartPositionLat, StartPositionLong, EndPositionLat and EndPositionLong from any lap messages.
-func ConcealLapStartAndEndPosition(fit *proto.FIT) {
-	for i := range fit.Messages {
-		if fit.Messages[i].Num == mesgnum.Lap {
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLong)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLong)
-		}
-	}
 }

@@ -158,7 +158,7 @@ func TestCombine(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			fit, err := Combine(tc.fits...)
+			fit, err := Combine(tc.fits)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}

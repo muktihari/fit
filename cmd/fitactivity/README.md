@@ -1,6 +1,15 @@
 # FIT Activity CLI
 
-A program to combine multiple FIT (\*.fit) activity files into one continuous activity and conceal its position (Lat & Long at specified distance) for privacy. Available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
+A program to handle FIT files based on provided command:
+
+1. **combine**: combine multiple activities into one continous activity.
+1. **conceal**: conceal first or last x meters GPS positions for privacy.
+1. **reduce**: reduce the size of record messages, available methods:
+   - Based on GPS points using RDP [Ramer-Douglas-Peucker]
+   - Based on distance interval in meters
+   - Based on time interval in seconds
+
+This program is available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
 TLDR: [Usage](#Usage)
 
@@ -16,7 +25,7 @@ FIT Activity File Structure Ref: [https://developer.garmin.com/fit/file-types/ac
 
 Strava Specification: [https://developers.strava.com/docs/uploads](https://developers.strava.com/docs/uploads/)
 
-## How We Combine
+## How We Combine Multiple Files
 
 First, we will order the files by `FileId.TimeCreated`.
 The first file will be the base for the resulting file and we will combine all messages from the next FIT files into the resulting file except: **FileId**, **FileCreator**, **Activity**.
@@ -76,6 +85,24 @@ _NOTE: Combining FIT activity files is NOT the same as merging multiple files in
 
 We will remove `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` fields from Laps. But why? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
 
+## How We Reduce Record Messages
+
+We reduce record messages based on provided method, you can only select one of the following methods:
+
+1. Based on GPS points using [Ramer–Douglas–Peucker algorithm](https://w.wiki/B6U3) algorithm
+
+   This method simplifies a curve with fewer points, the precision depends on given epsilon (tolerance). Library that we use [github.com/muktihari/carto](https://github.com/muktihari/carto).
+
+1. Based on distance interval in meters
+
+   This method ensures that the distance gap between two records does not exceed the given distance interval. If the gap is already greater than the interval, no records will be removed.
+
+1. Based on time interval in seconds
+
+   This method ensures that the timestamp gap between two records does not exceed the given time interval. If the gap is already greater than the interval, no records will be removed.
+
+The reduced record messages are simply removed; no aggregation is performed.
+
 ## Build or Install
 
 _Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/install)_
@@ -111,96 +138,148 @@ go install .
 
 ## Usage
 
-After the program has been built or installed, you can call the fitactivity executable in terminal (_or command prompt, if you are using windows, use fitactivity.exe instead_)
+After the program has been built or installed, you can call the fitactivity executable in terminal (_or command prompt, if you are using windows, use fitactivity.exe instead_).
+
+You can start with run the CLI without any argument, it will print help text to guide you using this CLI.
+
+```sh
+fitactivity
+```
+
+Output:
+
+```sh
+About:
+  fitactivity is a program to handle FIT files based on provided command.
+
+Usage:
+  fitactivity [command]
+
+Available Commands:
+  combine    combine multiple activities into one continous activity
+  conceal    conceal first or last x meters GPS positions for privacy
+  reduce     reduce the size of record messages, available methods:
+             1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
+             2. Based on distance interval in meters
+             3. Based on time interval in seconds
+
+Flags:
+  -h, --help       Print help
+  -v, --version    Print version
+```
+
+Every command may have subcommands and its own flags, just run the command to print its help. e.g. `fitactivity combine`.
 
 ### Combine Multiple FIT Activity files
 
-1. Using -o argument
-   ```sh
-   fitactivity --combine -o result.fit part1.fit part2.fit
-   ```
-2. Using redirection pipe '>'
-   ```sh
-   fitactivity --combine part1.fit part2.fit > result.fit
-   ```
+```sh
+fitactivity combine
+```
+
+Output:
+
+```sh
+About:
+  combine multiple activities into one continous activity
+
+Usage:
+  fitactivity combine [subcommands] [flags] [files]
+
+Available Subcommands (optional):
+  conceal    conceal first or last x meters GPS positions for privacy
+  reduce     reduce the size of record messages, available methods:
+             1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
+             2. Based on distance interval in meters
+             3. Based on time interval in seconds
+
+Flags:
+  (required):
+  -o, --out  string    combine output file
+
+  (optional):
+  -i, --interleave  uint8    max interleave for message definition [valid: 0-15, default: 15]
+  -c, --compress    bool     compress timestamp into message header [default: false; this overrides interleave]
+
+Subcommand Flags (only if subcommand is provided):
+  conceal: (select at least one)
+   --first  uint32    conceal distance: first x meters
+   --last   uint32    conceal distance: last x meters
+
+  reduce: (select only one)
+   --rdp       float64    reduce method: RDP [Ramer-Douglas-Peucker] based on GPS points, epsilon > 0
+   --distance  float64    reduce method: distance interval in meters
+   --time      uint32     reduce method: time interval in seconds
+
+Examples:
+  fitactivity combine -o result.fit part1.fit part2.fit
+  fitactivity combine reduce -o result.fit --rdp 0.0001 part1.fit part2.fit
+  fitactivity combine conceal -o result.fit --first 1000 part1.fit part2.fit
+  fitactivity combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
+```
 
 ### Conceal GPS Position (Latitude and Longitude)
 
 Note: conceal value is in meters
 
-1. Conceal GPS position for 1km away from the actual start position for each files.
-
-   ```sh
-   fitactivity --conceal-start 1000 file1.fit file2.fit
-
-   # ls output
-   # file1.fit file1_concealed_1000_0.fit file2.fit file2_concealed_1000_0.fit
-   ```
-
-2. Conceal GPS position for 1km away from the actual end position for each files.
-
-   ```sh
-   fitactivity --conceal-end 1000 file1.fit file2.fit
-
-   # ls output
-   # file1.fit file1_concealed_0_1000.fit file2.fit file2_concealed_0_1000.fit
-   ```
-
-3. Conceal GPS position for 1km away from both start and end position for each files
-
-   ```sh
-   fitactivity --conceal-start 1000 --conceal-end 1000 file1.fit file2.fit
-
-   # ls output
-   # file1.fit file1_concealed_1000_1000.fit file2.fit file2_concealed_1000_1000.fit
-   ```
-
-### Combine Multiple Files and Conceal GPS Position of the Resulting File.
-
-This will combine the FIT activity files, `part1.fit` and `part2.fit`, into one continues FIT activity file `result.fit` and then concealing the start and end GPS position of `result.fit` for 1km away from the actual start and end position.
-
 ```sh
-fitactivity --combine --conceal-start 1000 --conceal-end 1000 part1.fit part2.fit > result.fit
-
-# ls output
-# part1.fit part2.fit result.fit
+fitactivity conceal
 ```
 
-### Available Options
-
-NOTE: We can only use either `interleave` or `compress` at a time.
-
-<table class="table table-bordered table-hover table-condensed">
-<thead>
-<tr>
-    <th style="width: 80px">Option</th>
-    <th>Type</th>
-    <th>Default</th>
-    <th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-    <td>-interleave</td>
-    <td>uint</td>
-    <th>15</th>
-    <td>Max interleave allowed to reduce writing the same message definition on encoding process. Valid value: 0-15. <strong>NOTE: If your target is an embedded device, consider using smaller value or just use 0, since its RAM is relatively small.</strong></td>
-</tr>
-<tr>
-    <td>-compress</td>
-    <td>boolean</td>
-    <th>false</th>
-    <td>Compress timestamp in message header. Save 7 bytes per message for every message written in 31s interval.</td>
-</tr>
-</tbody>
-</table>
-
-Example using options:
+Output:
 
 ```sh
-fitactivity --combine -o result.fit --interleave 7 part1.fit part2.fit
+About:
+  conceal first or last x meters GPS positions for privacy
+
+Usage:
+  fitactivity conceal [flags] [files]
+
+Flags:
+  (select at least one):
+    --start         uint32     conceal distance: first x meters
+    --end           uint32     conceal distance: last x meters
+
+  (optional):
+  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
+  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+
+Examples:
+  fitactivity conceal --first 1000 a.fit b.fit
+  fitactivity conceal --first 1000 --last 1000 a.fit b.fit
 ```
 
+### Reduce Record Messages by Simplifying GPS Points Using Ramer-Douglas-Peucker Algorithm.
+
 ```sh
-fitactivity --combine -o result.fit --compress part1.fit part2.fit
+fitactivity reduce
+```
+
+Output:
+
+```sh
+About:
+  reduce the size of record messages, available methods:
+  1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
+  2. Based on distance interval in meters
+  3. Based on time interval in seconds
+
+
+Usage:
+  fitactivity reduce [flags] [files]
+
+Flags:
+  (select only one):
+    --rdp           float64    reduce method: RDP [Ramer-Douglas-Peucker] based on GPS points, epsilon > 0
+    --distance      float64    reduce method: distance interval in meters
+    --time          uint32     reduce method: time interval in seconds
+
+  (optional):
+  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
+  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+
+
+Examples:
+  fitactivity reduce --rdp 0.0001 a.fit b.fit
+  fitactivity reduce --distance 0.5 a.fit b.fit
+  fitactivity reduce --time 5 a.fit b.fit
 ```
