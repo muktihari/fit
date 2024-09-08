@@ -29,7 +29,7 @@ const (
 	errSportMismatch  = errorString("sport mismatch")
 )
 
-// Combine combines multiple FIT activities into one continous activity.
+// Combine combines multiple FIT activities into one continuous activity.
 func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 	for i := 0; i < len(fits); i++ {
 		if len(fits[i].Messages) == 0 {

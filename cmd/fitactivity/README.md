@@ -2,7 +2,7 @@
 
 A program to handle FIT files based on provided command:
 
-1. **combine**: combine multiple activities into one continous activity.
+1. **combine**: combine multiple activities into one continuous activity.
 1. **conceal**: conceal first or last x meters GPS positions for privacy.
 1. **reduce**: reduce the size of record messages, available methods:
    - Based on GPS points using RDP [Ramer-Douglas-Peucker]
@@ -157,7 +157,7 @@ Usage:
   fitactivity [command]
 
 Available Commands:
-  combine    combine multiple activities into one continous activity
+  combine    combine multiple activities into one continuous activity
   conceal    conceal first or last x meters GPS positions for privacy
   reduce     reduce the size of record messages, available methods:
              1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
@@ -182,7 +182,7 @@ Output:
 
 ```sh
 About:
-  combine multiple activities into one continous activity
+  combine multiple activities into one continuous activity
 
 Usage:
   fitactivity combine [subcommands] [flags] [files]

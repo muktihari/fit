@@ -149,7 +149,7 @@ func reduceByRDP(fit *proto.FIT, epsilon float64) error {
 	return nil
 }
 
-// findFragments finds ommited records based on RDP result and returning the index as fragments.
+// findFragments finds omitted records based on RDP result and returning the index as fragments.
 func findFragments(recordIndexes []int, points []rdp.Point) (fragments []int) {
 	var i, j int
 	// Reslicing is safe as index will always move forward
@@ -202,7 +202,7 @@ func reduceByDistanceInterval(fit *proto.FIT, threshold uint32) error {
 				if d != basetype.Uint32Invalid {
 					last = d
 				}
-				valid++ // Perserve first record
+				valid++ // Preserve first record
 				continue
 			}
 			if d == basetype.Uint32Invalid {
@@ -237,7 +237,7 @@ func reduceByTimeInterval(fit *proto.FIT, threshold uint32) error {
 				if t != basetype.Uint32Invalid {
 					last = t
 				}
-				valid++ // Perserve first record
+				valid++ // Preserve first record
 				continue
 			}
 			if t == basetype.Uint32Invalid {
