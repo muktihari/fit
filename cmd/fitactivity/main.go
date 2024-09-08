@@ -43,7 +43,7 @@ var (
 )
 
 const (
-	combineDesc = "combine multiple activities into one continous activity"
+	combineDesc = "combine multiple activities into one continuous activity"
 	concealDesc = "conceal first or last x meters GPS positions for privacy"
 	reduceDesc  = `reduce the size of record messages, available methods:
              1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
