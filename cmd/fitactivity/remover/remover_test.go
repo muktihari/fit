@@ -43,13 +43,15 @@ func TestRemove(t *testing.T) {
 					{Num: mesgnum.MfgRangeMin},
 					{Num: mesgnum.MfgRangeMax},
 					{Num: mesgnum.Record},
+					{Num: mesgnum.GpsMetadata},
 					{Num: mesgnum.Lap},
 					{Num: mesgnum.Record},
 					{Num: mesgnum.Session},
 				},
 			},
 			opts: []Option{WithRemoveMesgNums(map[typedef.MesgNum]struct{}{
-				mesgnum.Record: {},
+				mesgnum.Record:      {},
+				mesgnum.GpsMetadata: {},
 			})},
 			expected: &proto.FIT{
 				Messages: []proto.Message{
@@ -62,7 +64,7 @@ func TestRemove(t *testing.T) {
 			},
 		},
 		{
-			name: "remove user-defined messages only",
+			name: "remove developer data only",
 			fit: &proto.FIT{
 				Messages: []proto.Message{
 					{Num: mesgnum.FileId},
