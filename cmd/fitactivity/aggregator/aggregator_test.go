@@ -48,16 +48,34 @@ func TestAggregate(t *testing.T) {
 			exp:  mesgdef.NewSession(nil).SetMaxAltitude(2000),
 		},
 		{
+			name: "EnhancedMax",
+			dst:  mesgdef.NewSession(nil).SetEnhancedMaxAltitude(1000),
+			src:  mesgdef.NewSession(nil).SetEnhancedMaxAltitude(2000),
+			exp:  mesgdef.NewSession(nil).SetEnhancedMaxAltitude(2000),
+		},
+		{
 			name: "Min",
 			dst:  mesgdef.NewSession(nil).SetMinHeartRate(60),
 			src:  mesgdef.NewSession(nil).SetMinHeartRate(80),
 			exp:  mesgdef.NewSession(nil).SetMinHeartRate(60),
 		},
 		{
+			name: "EnhancedMin",
+			dst:  mesgdef.NewSession(nil).SetEnhancedMinAltitude(60),
+			src:  mesgdef.NewSession(nil).SetEnhancedMinAltitude(80),
+			exp:  mesgdef.NewSession(nil).SetEnhancedMinAltitude(60),
+		},
+		{
 			name: "Avg",
 			dst:  mesgdef.NewSession(nil).SetAvgTemperature(20),
 			src:  mesgdef.NewSession(nil).SetAvgTemperature(22),
 			exp:  mesgdef.NewSession(nil).SetAvgTemperature(21),
+		},
+		{
+			name: "EnhancedAvg",
+			dst:  mesgdef.NewSession(nil).SetEnhancedAvgAltitude(60),
+			src:  mesgdef.NewSession(nil).SetEnhancedAvgAltitude(80),
+			exp:  mesgdef.NewSession(nil).SetEnhancedAvgAltitude(70),
 		},
 		{
 			name: "Fill dst invalid",

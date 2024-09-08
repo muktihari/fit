@@ -48,9 +48,9 @@ We will aggregate fields depends on the prefix and suffix of the field name:
 
 - prefix **'total**': sum of the two values. (e.g. **total_elapsed_time**)
 - prefix **'num**' and suffix **'s**': sum of the two values. (e.g. **num_splits**)
-- prefix **'max**': max value between two values. (e.g. **max_heart_rate**)
-- prefix **'min**': min value between two values. (e.g. **min_cadence**)
-- prefix **'avg**': average of the two values. (e.g. **avg_temperature**)
+- prefix **'max**' or **'enhanced_max'**: max value between two values. (e.g. **max_heart_rate**, **enhanced_max_respiration_rate**)
+- prefix **'min**' or **'enhanced_min'**: min value between two values. (e.g. **min_cadence**, **enhanced_min_altitude**)
+- prefix **'avg**' or **'enhanced_avg'**: average of the two values. (e.g. **avg_temperature**, **enhanced_avg_speed**)
 
 Otherwise, they will be assigned with value from the corresponding field only if they are invalid.
 
