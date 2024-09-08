@@ -104,11 +104,29 @@ We reduce record messages based on provided method, you can only select one of t
 
 The reduced record messages are simply removed; no aggregation is performed.
 
-## Build or Install
+## Install or Build
 
 _Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/install)_
 
-### Build
+### Install
+
+Install the program directly from the remote repository without manually cloning it. The executable will be saved in $GOPATH/bin, enabling you to call it across directory as long as $GOPATH is exported.
+
+```sh
+go install github.com/muktihari/fit/cmd/fitactivity@latest
+```
+
+#### Install from local folder:
+
+Clone the repository first, then go to "cmd/fitactivity" folder.
+
+```sh
+go install .
+```
+
+### Manual Build
+
+Clone the repository first, then go to "cmd/fitactivity" folder.
 
 1. MacOS
    ```sh
@@ -126,14 +144,6 @@ _Prerequisite: Install golang: [https://go.dev/doc/install](https://go.dev/doc/i
    ```
 
 More: [How to build Go Executable for Multiple Platforms](https://www.digitalocean.com/community/tutorials/how-to-build-go-executables-for-multiple-platforms-on-ubuntu-16-04)
-
-### Install
-
-Or you can install the program instead of manual build, this will build base on your current OS and CPU architecture and save the executable in $GOPATH/bin, enabling you to call it across directory as long as $GOPATH is exported.
-
-```sh
-go install .
-```
 
 **Alternatively, now you can just download the the binary from [Release's Assets](https://github.com/muktihari/fit/releases)**
 
