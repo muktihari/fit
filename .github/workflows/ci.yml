@@ -52,7 +52,7 @@ jobs:
           go-version: stable
 
       - name: Set up misspell
-        run: go install github.com/client9/misspell/cmd/misspell@latest
+        run: go install github.com/client9/misspell/cmd/misspell@b90dc15cfd220ecf8bbc9043ecb928cef381f011 # v0.3.4
 
       - name: Test misspelled words
         run: misspell -error .
