@@ -284,13 +284,12 @@ loop:
 		return fmt.Errorf("conceal: no distance is provided: %w", errBadArgument)
 	}
 
-	var removeMesgNums map[typedef.MesgNum]struct{}
+	removeMesgNums := make(map[typedef.MesgNum]struct{})
 	if subcommandProvided(subcommands, subcommandRemove) {
 		if countSelectedFlag(fs, flagNameRemoveUnknown, flagNameRemoveMesgNums, flagNameRemoveDevData) == 0 {
 			return fmt.Errorf("remove: argument is provided: %w", errBadArgument)
 		}
 		parts := strings.Split(removeNums, ",")
-		removeMesgNums := make(map[typedef.MesgNum]struct{})
 		for _, part := range parts {
 			u16, err := strconv.ParseUint(part, 10, 16)
 			if err != nil {
