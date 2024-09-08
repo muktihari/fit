@@ -18,9 +18,11 @@ import (
 	"github.com/muktihari/fit/cmd/fitactivity/concealer"
 	"github.com/muktihari/fit/cmd/fitactivity/opener"
 	"github.com/muktihari/fit/cmd/fitactivity/reducer"
+	"github.com/muktihari/fit/cmd/fitactivity/remover"
 	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/encoder"
 	"github.com/muktihari/fit/profile"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -47,6 +49,7 @@ const (
              1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
              2. Based on distance interval in meters
              3. Based on time interval in seconds`
+	removeDesc = "remove messages based on given message numbers and other parameters"
 
 	perm = 0o644
 )
@@ -61,6 +64,7 @@ Available Commands:
   combine    ` + combineDesc + `
   conceal    ` + concealDesc + `
   reduce     ` + reduceDesc + `
+  remove     ` + removeDesc + `
 
 Flags:
   -h, --help       Print help
@@ -100,6 +104,9 @@ func main() {
 	case "reduce":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
 		printerror(fs, command, reduce(fs, args[1:]))
+	case "remove":
+		fs := flag.NewFlagSet(command, flag.ExitOnError)
+		printerror(fs, command, remove(fs, args[1:]))
 	default:
 		printerror(fs, command, fmt.Errorf("command provided but not defined: %s", command))
 	}
@@ -133,6 +140,9 @@ const (
 	reduceByPointsRdpDesc = "reduce method: RDP [Ramer-Douglas-Peucker] based on GPS points, epsilon > 0"
 	reduceByDistanceDesc  = "reduce method: distance interval in meters"
 	reduceByTimeDesc      = "reduce method: time interval in seconds"
+	removeUnknownDesc     = "remove unknown messages"
+	removeMesgNumsDesc    = "remove message numbers (value separated by comma)"
+	removeDevDataDesc     = "remove developer data"
 )
 
 var combineUsage = `About:
@@ -144,6 +154,7 @@ Usage:
 Available Subcommands (optional):
   conceal    ` + concealDesc + `
   reduce     ` + reduceDesc + `
+  remove     ` + removeDesc + `
 
 Flags:
   (required):
@@ -163,28 +174,35 @@ Subcommand Flags (only if subcommand is provided):
    --distance  float64    ` + reduceByDistanceDesc + `
    --time      uint32     ` + reduceByTimeDesc + `
 
+  remove: (select at least one)
+   --unknown   bool       ` + removeUnknownDesc + `
+   --nums      string     ` + removeMesgNumsDesc + `
+   --devdata   bool       ` + removeDevDataDesc + `
+
 Examples:
   ` + cli + ` combine -o result.fit part1.fit part2.fit
   ` + cli + ` combine reduce -o result.fit --rdp 0.0001 part1.fit part2.fit
   ` + cli + ` combine conceal -o result.fit --first 1000 part1.fit part2.fit
+  ` + cli + ` combine remove -o result.fit --unknown --nums 160,164 part1.fit part2.fit
   ` + cli + ` combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
 `
 
 func combine(fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, combineUsage) }
 
-	const subcommandConceal = "conceal"
-	const subcommandReduce = "reduce"
+	const (
+		subcommandConceal = "conceal"
+		subcommandReduce  = "reduce"
+		subcommandRemove  = "remove"
+	)
 
 	subcommands := make([]string, 0, 2)
 	var i int
 loop:
 	for i = range args {
 		switch args[i] { // Subcommands
-		case subcommandConceal:
-			subcommands = append(subcommands, subcommandConceal)
-		case subcommandReduce:
-			subcommands = append(subcommands, subcommandReduce)
+		case subcommandConceal, subcommandReduce, subcommandRemove:
+			subcommands = append(subcommands, args[i])
 		default:
 			if !strings.HasPrefix(args[i], "-") {
 				return fmt.Errorf("subcommand provided but not defined: %s: %w", args[i], errBadArgument)
@@ -225,6 +243,18 @@ loop:
 	var concealLast uint
 	fs.UintVar(&concealLast, flagNameLast, 0, concealLastDesc)
 
+	const flagNameRemoveUnknown = "unknown"
+	var removeUnknown bool
+	fs.BoolVar(&removeUnknown, flagNameRemoveUnknown, false, removeUnknownDesc)
+
+	const flagNameRemoveMesgNums = "nums"
+	var removeNums string
+	fs.StringVar(&removeNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
+
+	const flagNameRemoveDevData = "devdata"
+	var removeDevData bool
+	fs.BoolVar(&removeDevData, flagNameRemoveDevData, false, removeDevDataDesc)
+
 	fs.Parse(args[i:])
 
 	var flagSpecified bool
@@ -242,15 +272,32 @@ loop:
 	}
 
 	if subcommandProvided(subcommands, subcommandReduce) {
-		if count := countSelectedFlag(fs, flagNameRdp, flagNameDistance, flagNameTime); count == 0 || count > 1 {
+		if countSelectedFlag(fs, flagNameRdp, flagNameDistance, flagNameTime) != 1 {
 			return fmt.Errorf("reduce: please select (only) one method: %w", errBadArgument)
 		}
 		if reduceByRdp == 0 && reduceByDistance == 0 && reduceByTime == 0 {
 			return fmt.Errorf("reduce: input value could not be zero: %w", errBadArgument)
 		}
 	}
+
 	if subcommandProvided(subcommands, subcommandConceal) && countSelectedFlag(fs, flagNameFirst, flagNameLast) == 0 {
 		return fmt.Errorf("conceal: no distance is provided: %w", errBadArgument)
+	}
+
+	var removeMesgNums map[typedef.MesgNum]struct{}
+	if subcommandProvided(subcommands, subcommandRemove) {
+		if countSelectedFlag(fs, flagNameRemoveUnknown, flagNameRemoveMesgNums, flagNameRemoveDevData) == 0 {
+			return fmt.Errorf("remove: argument is provided: %w", errBadArgument)
+		}
+		parts := strings.Split(removeNums, ",")
+		removeMesgNums := make(map[typedef.MesgNum]struct{})
+		for _, part := range parts {
+			u16, err := strconv.ParseUint(part, 10, 16)
+			if err != nil {
+				return err
+			}
+			removeMesgNums[typedef.MesgNum(u16)] = struct{}{}
+		}
 	}
 
 	files := fs.Args()
@@ -320,6 +367,32 @@ loop:
 			}
 
 			fmt.Fprintf(os.Stderr, "  # messages are reduced from %s into %s\n",
+				formatThousand(prevLen), formatThousand(len(fit.Messages)))
+		case subcommandRemove:
+			var opts []remover.Option
+			if removeUnknown {
+				opts = append(opts, remover.WithRemoveUnknown())
+			}
+			if len(removeMesgNums) > 0 {
+				opts = append(opts, remover.WithRemoveMesgNums(removeMesgNums))
+			}
+			if removeDevData {
+				opts = append(opts, remover.WithRemoveDeveloperData())
+			}
+
+			prevLen := len(fit.Messages)
+
+			msg := fmt.Sprintf("Removing [unknown: %t, nums: %s, devdata: %t]",
+				removeUnknown, removeNums, removeDevData)
+			verboserun(msg, func() {
+				remover.Remove(fit, opts...)
+			})
+
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(os.Stderr, "  # messages are removed from %s into %s\n",
 				formatThousand(prevLen), formatThousand(len(fit.Messages)))
 		}
 	}
@@ -548,7 +621,7 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 		return errPrintUsageAndExit
 	}
 
-	if count := countSelectedFlag(fs, flagNameRdp, flagNameDistance, flagNameTime); count == 0 || count > 1 {
+	if countSelectedFlag(fs, flagNameRdp, flagNameDistance, flagNameTime) != 1 {
 		return fmt.Errorf("please select (only) one method: %w", errBadArgument)
 	}
 
@@ -644,6 +717,190 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 
 		verboserun(fmt.Sprintf("[%d] Encoding [%s]", i, headerInfo), func() {
 			name := fmt.Sprintf("%s_reduced_%s.fit",
+				strings.TrimSuffix(path, filepath.Ext(path)), nameSuffix)
+
+			var f *os.File
+			f, err = os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
+			if err != nil {
+				return
+			}
+			defer f.Close()
+
+			enc.Reset(f, headerOption)
+
+			for _, fit := range fits {
+				if err = enc.Encode(fit); err != nil {
+					return
+				}
+			}
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+var removeUsage = `About:
+  ` + removeDesc + `
+
+Usage:
+  ` + cli + ` remove [flags] [files]
+
+Flags:
+  (select at least one):
+    --unknown   bool       ` + removeUnknownDesc + `
+    --nums      string     ` + removeMesgNumsDesc + `
+    --devdata   bool       ` + removeDevDataDesc + `
+
+  (optional):
+  -i, --interleave  uint8      ` + interleaveDesc + `
+  -c, --compress    bool       ` + compressDesc + `
+
+
+Examples:
+  ` + cli + ` remove --unknown a.fit b.fit
+  ` + cli + ` remove --nums 160,162 a.fit b.fit
+  ` + cli + ` remove --devdata a.fit b.fit
+  ` + cli + ` remove --unknown --nums 160,162 --devdata a.fit b.fit
+`
+
+func remove(fs *flag.FlagSet, args []string) (err error) {
+	fs.Usage = func() { fmt.Fprint(os.Stderr, removeUsage) }
+
+	var interleave int
+	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
+	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
+
+	var compress bool
+	fs.BoolVar(&compress, "c", false, compressDesc)
+	fs.BoolVar(&compress, "compress", false, compressDesc)
+
+	const flagNameRemoveUnknown = "unknown"
+	var removeUnknown bool
+	fs.BoolVar(&removeUnknown, flagNameRemoveUnknown, false, removeUnknownDesc)
+
+	const flagNameRemoveMesgNums = "nums"
+	var mesgNums string
+	fs.StringVar(&mesgNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
+
+	const flagNameRemoveDevData = "devdata"
+	var removeDevData bool
+	fs.BoolVar(&removeDevData, flagNameRemoveDevData, false, removeDevDataDesc)
+
+	fs.Parse(args)
+
+	var flagSpecified bool
+	fs.Visit(func(f *flag.Flag) { flagSpecified = true })
+	if !flagSpecified {
+		return errPrintUsageAndExit
+	}
+
+	if countSelectedFlag(fs, flagNameRemoveUnknown, flagNameRemoveMesgNums) == 0 {
+		return fmt.Errorf("please select (only) one method: %w", errBadArgument)
+	}
+
+	parts := strings.Split(mesgNums, ",")
+	removeMesgNums := make(map[typedef.MesgNum]struct{})
+	for _, part := range parts {
+		u16, err := strconv.ParseUint(part, 10, 16)
+		if err != nil {
+			return err
+		}
+		removeMesgNums[typedef.MesgNum(u16)] = struct{}{}
+	}
+
+	if interleave < 0 || interleave > 15 {
+		return fmt.Errorf("interleave: valid value is between 0 to 15, got: %d: %w", interleave, errBadArgument)
+	}
+
+	files := fs.Args()
+	if len(files) == 0 {
+		return fmt.Errorf("provide at least 1 FIT files to conceal: %w", errBadArgument)
+	}
+
+	if err = expectdotfit(files); err != nil {
+		return err
+	}
+
+	headerInfo := fmt.Sprintf("interleave: %d", interleave)
+	headerOption := encoder.WithNormalHeader(byte(interleave))
+	if compress {
+		headerInfo = "compress"
+		headerOption = encoder.WithCompressedTimestampHeader()
+	}
+
+	var nameSuffix string
+	if removeUnknown {
+		nameSuffix = "unknown"
+	}
+	if mesgNums != "" {
+		nameSuffix = fmt.Sprintf("%s_%s",
+			nameSuffix, strings.ReplaceAll(mesgNums, ",", "_"))
+	}
+
+	fmt.Fprintf(os.Stderr, "- Removing %d file(s) [unknown: %t, nums: %s, devdata: %t]\n",
+		len(files), removeUnknown, mesgNums, removeDevData)
+
+	var dec = decoder.New(nil)
+	var enc = encoder.New(nil)
+	for i, path := range files {
+		var fits []*proto.FIT
+		verboserun(fmt.Sprintf("[%d] Decoding", i), func() {
+			var f *os.File
+			f, err = os.Open(path)
+			if err != nil {
+				return
+			}
+			defer f.Close()
+
+			dec.Reset(f)
+
+			var fit *proto.FIT
+			for dec.Next() {
+				fit, err = dec.Decode()
+				if err != nil {
+					return
+				}
+				fits = append(fits, fit)
+			}
+		})
+		if err != nil {
+			return err
+		}
+
+		var msgs []string
+		verboserun(fmt.Sprintf("[%d] Removing", i), func() {
+			for _, fit := range fits {
+				var opts []remover.Option
+				if removeUnknown {
+					opts = append(opts, remover.WithRemoveUnknown())
+				}
+				if len(removeMesgNums) > 0 {
+					opts = append(opts, remover.WithRemoveMesgNums(removeMesgNums))
+				}
+				if removeDevData {
+					opts = append(opts, remover.WithRemoveDeveloperData())
+				}
+
+				prevLen := len(fit.Messages)
+
+				remover.Remove(fit, opts...)
+
+				msgs = append(msgs, fmt.Sprintf("# messages are removed from %s into %s",
+					formatThousand(prevLen), formatThousand(len(fit.Messages))))
+			}
+		})
+		if err != nil {
+			return err
+		}
+		for _, msg := range msgs {
+			fmt.Fprintf(os.Stderr, "      %s\n", msg)
+		}
+
+		verboserun(fmt.Sprintf("[%d] Encoding [%s]", i, headerInfo), func() {
+			name := fmt.Sprintf("%s_removed_%s.fit",
 				strings.TrimSuffix(path, filepath.Ext(path)), nameSuffix)
 
 			var f *os.File

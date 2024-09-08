@@ -8,6 +8,7 @@ A program to handle FIT files based on provided command:
    - Based on GPS points using RDP [Ramer-Douglas-Peucker]
    - Based on distance interval in meters
    - Based on time interval in seconds
+1. **remove**: remove messages based on given message numbers and other parameters
 
 This program is available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
@@ -162,6 +163,7 @@ Available Commands:
              1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
              2. Based on distance interval in meters
              3. Based on time interval in seconds
+  remove     remove messages based on given message numbers and other parameters
 
 Flags:
   -h, --help       Print help
@@ -191,6 +193,7 @@ Available Subcommands (optional):
              1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
              2. Based on distance interval in meters
              3. Based on time interval in seconds
+  remove     remove messages based on given message numbers and other parameters
 
 Flags:
   (required):
@@ -209,11 +212,16 @@ Subcommand Flags (only if subcommand is provided):
    --rdp       float64    reduce method: RDP [Ramer-Douglas-Peucker] based on GPS points, epsilon > 0
    --distance  float64    reduce method: distance interval in meters
    --time      uint32     reduce method: time interval in seconds
+  remove: (select at least one)
+   --unknown   bool       remove unknown messages
+   --nums      string     remove message numbers (value separated by comma)
+   --devdata   bool       remove developer data
 
 Examples:
   fitactivity combine -o result.fit part1.fit part2.fit
   fitactivity combine reduce -o result.fit --rdp 0.0001 part1.fit part2.fit
   fitactivity combine conceal -o result.fit --first 1000 part1.fit part2.fit
+  fitactivity combine remove -o result.fit --unknown --nums 160,164 part1.fit part2.fit
   fitactivity combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
 ```
 
@@ -248,7 +256,7 @@ Examples:
   fitactivity conceal --first 1000 --last 1000 a.fit b.fit
 ```
 
-### Reduce Record Messages by Simplifying GPS Points Using Ramer-Douglas-Peucker Algorithm.
+### Reduce Record Messages
 
 ```sh
 fitactivity reduce
@@ -282,4 +290,37 @@ Examples:
   fitactivity reduce --rdp 0.0001 a.fit b.fit
   fitactivity reduce --distance 0.5 a.fit b.fit
   fitactivity reduce --time 5 a.fit b.fit
+```
+
+### Remove Messages
+
+```sh
+fitactivity remove
+```
+
+Output:
+
+```sh
+About:
+  remove messages based on given message numbers and other parameters
+
+Usage:
+  fitactivity remove [flags] [files]
+
+Flags:
+  (select at least one):
+    --unknown   bool       remove unknown messages
+    --nums      string     remove message numbers (value separated by comma)
+    --devdata   bool       remove developer data
+
+  (optional):
+  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
+  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+
+
+Examples:
+  fitactivity remove --unknown a.fit b.fit
+  fitactivity remove --nums 160,162 a.fit b.fit
+  fitactivity remove --devdata a.fit b.fit
+  fitactivity remove --unknown --nums 160,162 --devdata a.fit b.fit
 ```

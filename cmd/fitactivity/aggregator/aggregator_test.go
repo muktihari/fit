@@ -5,6 +5,7 @@
 package aggregator_test
 
 import (
+	"fmt"
 	"math"
 	"reflect"
 	"testing"
@@ -133,10 +134,7 @@ func TestAggregate(t *testing.T) {
 	}
 
 	for i, tc := range tt {
-		if i != len(tt)-1 {
-			continue
-		}
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			aggregator.Aggregate(tc.dst, tc.src)
 
 			if diff := cmp.Diff(tc.dst, tc.exp,
