@@ -17,9 +17,9 @@ import (
 // should be a pointer to a struct, otherwise, it panics.
 // The logic depends on the prefix of the Field's Name; If it starts with:
 //   - "Total": sum of the two values.
-//   - "Max": max value between the two values.
-//   - "Min": min value between the two values.
-//   - "Avg": avg of the two values.
+//   - "Max" or "EnhancedMax": max value between the two values.
+//   - "Min" or "EnhancedMin": min value between the two values.
+//   - "Avg" or "EnhancedAvg": avg of the two values.
 //   - "Num" and ends with "s": sum of the two values.
 //     (e.g. NumSplits, NumLaps, NumSessions)
 //   - Otherwise: fill with src's Value only if dst's Value is invalid.
@@ -41,12 +41,12 @@ func Aggregate[T any](dst, src T) {
 			sum(dv.Field(i), sv.Field(i)) // TotalElapsedTime, TotalCycles, etc.
 		case strings.HasPrefix(f.Name, "Num") && strings.HasSuffix(f.Name, "s"):
 			sum(dv.Field(i), sv.Field(i)) // NumSessions, NumLaps, NumSplits, etc.
-		case strings.HasPrefix(f.Name, "Max"):
-			max(dv.Field(i), sv.Field(i)) // MaxHeartRate, MaxCadence, etc.
-		case strings.HasPrefix(f.Name, "Min"):
-			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, etc.
-		case strings.HasPrefix(f.Name, "Avg"):
-			avg(dv.Field(i), sv.Field(i)) // AvgHeartRate, AvgCadence, etc.
+		case strings.HasPrefix(f.Name, "Max") || strings.HasPrefix(f.Name, "EnhancedMax"):
+			max(dv.Field(i), sv.Field(i)) // MaxHeartRate, MaxCadence, EnhancedMaxRespirationRate, etc.
+		case strings.HasPrefix(f.Name, "Min") || strings.HasPrefix(f.Name, "EnhancedMin"):
+			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, EnhancedAltitude, etc.
+		case strings.HasPrefix(f.Name, "Avg") || strings.HasPrefix(f.Name, "EnhancedAvg"):
+			avg(dv.Field(i), sv.Field(i)) // AvgHeartRate, AvgCadence, EnhancedAvgSpeed, etc..
 		default:
 			fill(dv.Field(i), sv.Field(i)) // Timestamp, Sport, Event, etc.
 		}
