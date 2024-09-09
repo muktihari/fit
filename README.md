@@ -5,7 +5,6 @@
 [![CodeCov](https://codecov.io/gh/muktihari/fit/branch/master/graph/badge.svg)](https://codecov.io/gh/muktihari/fit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/muktihari/fit)](https://goreportcard.com/report/github.com/muktihari/fit)
 [![Profile Version](https://img.shields.io/badge/profile-v21.141-lightblue.svg?style=flat)](https://developer.garmin.com/fit/download)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8731/badge)](https://www.bestpractices.dev/projects/8731)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
 This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) protocol](https://developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).
@@ -14,7 +13,7 @@ This project hosts the Go implementation for [The Flexible and Interoperable Dat
 
 The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK.
 
-One of the key semantics they are missing is the ability for users to retrieve raw protocol messages; instead, they decode directly into predefined message structs grouped by [common file types](https://developer.garmin.com/fit/file-types) which makes users unable to extend some functionalities. Furthermore, existing third-party libraries do not seem to fully support FIT Protocol V2, and their ability to produce variant options of the FIT protocol is limited. For instance, creating FIT files with compressed timestamps or FIT files with multiple local message types, which significantly reduces the resulting FIT files' size, is missing.
+One of the key semantics they are missing is the ability for users to retrieve protocol messages. Instead, these messages are unmarshalled directly into predefined structures based on [common file types](https://developer.garmin.com/fit/file-types). This results in the loss of the message arrival order, inability to handle 'unknown messages', and limits the ability to extend certain functionalities. Furthermore, existing third-party libraries do not seem to fully support FIT Protocol V2, and their ability to produce variant options of the FIT protocol is limited. For instance, creating FIT files with compressed timestamps or FIT files with multiple local message types, which significantly reduces the resulting FIT files' size, is missing.
 
 Without diminishing respect for the existing libraries created nearly a decade ago, at a time when the capabilities of Go were limited, we believe a new approach is necessary. This is where this SDK comes in, bridging the gap and enabling Go developers to seamlessly interact with the FIT protocol.
 
@@ -292,7 +291,7 @@ Here is the sample of what **Developer Fields** would look like in a **.fit** th
 
 We provide some CLI programs to interact with FIT files that can be found in [cmd](/cmd/doc.go) folder.
 
-1. **fitactivity**: Combines multiple FIT activity files into one continuous FIT activity (and conceal the start and end GPS positions for privacy). [README.md](/cmd/fitactivity/README.md)
+1. **fitactivity**: A program to manage FIT activity files, including combining multiple FIT activity files into a single continuous activity, concealing start and end GPS positions for privacy, and reducing or removing messages. [README.md](/cmd/fitactivity/README.md)
 2. **fitconv**: Converts FIT files to CSV format, enabling us to read the FIT data in a human-readable format. Conversely, it also converts CSV files back to FIT format, enabling us to create or edit FIT files in CSV form. The programs is designed to work seamlessly with CSVs produced by the Official FIT SDK's _FitCSVTool.jar_. [README.md](/cmd/fitconv/README.md)
 3. **fitprint**: Generates comprehensive human-readable **\*.txt** file containing details extracted from FIT files. [README.md](/cmd/fitprint/README.md)
 4. **fitdump**: Dumps the FIT file(s) into segmented bytes in a **\*.txt** file format. [README.md](/cmd/fitdump/README.md)

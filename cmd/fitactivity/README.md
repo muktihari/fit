@@ -1,6 +1,8 @@
 # FIT Activity CLI
 
-A program to handle FIT files based on provided command:
+A program to manage FIT activity files, including combining multiple FIT activity files into a single continuous activity, concealing start and end GPS positions for privacy, and reducing or removing messages.
+
+Available commands:
 
 1. **combine**: combine multiple activities into one continuous activity.
 1. **conceal**: conceal first or last x meters GPS positions for privacy.
