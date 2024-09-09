@@ -1876,10 +1876,19 @@ func TestExpandComponents(t *testing.T) {
 			components:           factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).Components,
 			nFieldAfterExpansion: 2,
 		},
+		{
+			name: "expand components do not expand when containing field's value is invalid",
+			mesg: factory.CreateMesgOnly(mesgnum.Session).WithFields(
+				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+			),
+			containingField:      factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+			components:           factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).Components,
+			nFieldAfterExpansion: 1,
+		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(nil)
 			dec.expandComponents(&tc.mesg, &tc.containingField, tc.components)
 			if len(tc.mesg.Fields) != tc.nFieldAfterExpansion {
