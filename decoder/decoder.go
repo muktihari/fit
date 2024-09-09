@@ -782,11 +782,11 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 }
 
 func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
-	if len(components) == 0 {
+	if !containingField.Value.Valid(containingField.BaseType) {
 		return
 	}
 
-	if !containingField.Value.Valid(containingField.BaseType) {
+	if len(components) == 0 {
 		return
 	}
 
