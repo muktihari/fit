@@ -786,6 +786,10 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		return
 	}
 
+	if !containingField.Value.Valid(containingField.BaseType) {
+		return
+	}
+
 	bitVal, ok := bitsFromValue(containingField.Value)
 	if !ok {
 		return
