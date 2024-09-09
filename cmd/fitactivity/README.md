@@ -82,11 +82,11 @@ _NOTE: Combining FIT activity files is NOT the same as merging multiple files in
 ## How We Conceal GPS Positions
 
 1. Conceal Start Position
-   We will iterate from the beginning of FIT Messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `start_position_lat` and `start_position_long`.
+   We will iterate from the beginning of FIT Messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields.
 1. Conceal End Position
-   We will backward-iterate from the end of the FIT messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields. And also, we will update the corresponding session fields: `end_position_lat` and `end_position_long`.
+   We will backward-iterate from the end of the FIT messages up to the desired conceal distance and for every record found, we will remove the `position_lat` and `position_long` fields.
 
-We will remove `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` fields from Laps. But why? GPS Positions saved in lap messages can be vary, user may set new lap every 500m or new lap every 1 hour for example, we don't know the exact distance for each lap. If user want to conceal 1km, we need to find all laps within the conceal distance and decide whether to remove it or change it with new positions, this will add complexity. So, let's just remove it for now, if our upload target is Strava, they don't specify positions in lap message anyway.
+For Laps and Sessions, we will update these following fields: `start_position_lat`, `start_position_long`, `end_position_lat`, and `end_position_long` to match the new desired positions.
 
 ## How We Reduce Record Messages
 
@@ -105,6 +105,10 @@ We reduce record messages based on provided method, you can only select one of t
    This method ensures that the timestamp gap between two records does not exceed the given time interval. If the gap is already greater than the interval, no records will be removed.
 
 The reduced record messages are simply removed; no aggregation is performed.
+
+## How We Remove Messages
+
+Removing messages in straightforward, we will remove messages based on given message numbers. For instance, giving **160** as input will remove **gps_metadata** message ([List os message numbers ](../../profile/typedef/mesg_num_gen.go)). For unknown messages, we consider message that are not defined by Global Profile (Profile.xlsx) as unknown messages. For developer data, we will remove `developer_data_id` and `field_description` messages, additionally all `DeveloperFields` in all messages will be removed as well.
 
 ## Install or Build
 

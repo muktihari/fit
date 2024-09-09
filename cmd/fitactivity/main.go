@@ -55,7 +55,7 @@ const (
 )
 
 var mainUsage = `About:
-  ` + cli + ` is a program to handle FIT files based on provided command.
+  ` + cli + ` is a program to manage FIT activity files based on provided command.
 	
 Usage:
   ` + cli + ` [command] 
@@ -334,7 +334,7 @@ loop:
 				formatThousand(int(concealFirst)), formatThousand(int(concealLast)))
 
 			verboserun(msg, func() {
-				err = concealer.Conceal(fit, uint32(concealFirst)*100, uint32(concealLast)*100)
+				concealer.Conceal(fit.Messages, uint32(concealFirst)*100, uint32(concealLast)*100)
 			})
 			if err != nil {
 				return err
@@ -521,9 +521,7 @@ func conceal(fs *flag.FlagSet, args []string) (err error) {
 
 		verboserun(fmt.Sprintf("[%d] Concealing", i), func() {
 			for _, fit := range fits {
-				if err = concealer.Conceal(fit, uint32(first)*100, uint32(last)*100); err != nil {
-					return
-				}
+				concealer.Conceal(fit.Messages, uint32(first)*100, uint32(last)*100)
 			}
 		})
 		if err != nil {

@@ -5,205 +5,196 @@
 package concealer
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
-// Conceal removes coordinates (lat, long) as far as start distance and end distance from the given FIT file.
-// If startDistance and endDistance == 0, it will not do anything, nil will be returned.
-// This will also remove StartPositionLat, StartPositionLong, EndPositionLat and EndPositionLong from any lap messages.
-func Conceal(fit *proto.FIT, startDistance, endDistance uint32) error {
-	if err := concealPositionStart(fit, startDistance); err != nil {
-		return err
+// Conceal removes Latitude and Longitude data of first and last <inputs> meters.
+// Affected Laps and Sessions will be updated accordingly.
+func Conceal(mesgs []proto.Message, first, last uint32) {
+	var lapIndices, sessionIndices []int
+	for i := range mesgs {
+		switch mesgs[i].Num {
+		case mesgnum.Lap:
+			lapIndices = append(lapIndices, i)
+		case mesgnum.Session:
+			sessionIndices = append(sessionIndices, i)
+		}
 	}
-	if err := concealPositionEnd(fit, endDistance); err != nil {
-		return err
-	}
-	return nil
+	lastIndex := concealStartPosition(mesgs, lapIndices, sessionIndices, first)
+	concealEndPosition(mesgs, lapIndices, sessionIndices, lastIndex, last)
 }
 
-// concealPositionStart removes coordinates (lat, long) as far as start distance from the given FIT file.
-// If concealDistance == 0, it will not do anything, nil will be returned.
-func concealPositionStart(fit *proto.FIT, concealDistance uint32) error {
-	if concealDistance == 0 {
-		return nil
-	}
-
-	var sessionIndex = -1
-	var newStartRecordIndex = -1
-
-loop:
-	for i := range fit.Messages {
-		switch fit.Messages[i].Num {
-		case mesgnum.Lap:
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapStartPositionLong)
-		case mesgnum.Session:
-			if sessionIndex == -1 {
-				sessionIndex = i
-			}
-		case mesgnum.Record:
-			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32() == basetype.Sint32Invalid ||
-				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32() == basetype.Sint32Invalid {
-				continue loop
-			}
-
-			distance := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).Uint32()
-			if distance != basetype.Uint32Invalid {
-				continue loop
-			}
-			if distance > concealDistance {
-				newStartRecordIndex = i
-				break loop
-			}
-
-			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
-		}
-	}
-
-	if sessionIndex == -1 { // no session found during first iteration
-		for i := newStartRecordIndex + 1; i < len(fit.Messages); i++ {
-			if fit.Messages[i].Num == mesgnum.Session {
-				sessionIndex = i
-				break
-			}
-		}
-		if sessionIndex == -1 {
-			return nil // no session found to update
-		}
-	}
-
-	if newStartRecordIndex == -1 { // all record are concealed
-		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLat)
-		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
-	} else {
-		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
-		for i := newStartRecordIndex; i < len(fit.Messages); i++ { // find new start record that has newLat and long
-			newLat = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32()
-			newLong = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32()
-			if newLat != basetype.Sint32Invalid && newLong != basetype.Sint32Invalid {
-				break
-			}
-		}
-
-		fieldStartPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionStartPositionLat)
-		if fieldStartPositionLat == nil {
-			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
-				factory.CreateField(mesgnum.Session, fieldnum.SessionStartPositionLat),
-			)
-			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
-			fieldStartPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
-		}
-		fieldStartPositionLat.Value = proto.Int32(newLat)
-
-		fieldStartPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionStartPositionLong)
-		if fieldStartPositionLong == nil {
-			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
-				factory.CreateField(mesgnum.Session, fieldnum.SessionStartPositionLong),
-			)
-			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
-			fieldStartPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
-		}
-		fieldStartPositionLong.Value = proto.Int32(newLong)
-	}
-
-	return nil
+// placeholder for replacing Lap and Session field numbers since both share
+// the same field name but have different field numbers.
+type placeholder struct {
+	startTime         byte
+	totalTimerTime    byte
+	startPositionLat  byte
+	startPositionLong byte
+	endPositionLat    byte
+	endPositionLong   byte
 }
 
-// concealPositionEnd removes coordinates (lat, long) as far as end distance from the given FIT file.
-// If concealDistance == 0, it will not do anything, nil will be returned.
-func concealPositionEnd(fit *proto.FIT, concealDistance uint32) error {
-	if concealDistance == 0 {
-		return nil
+var lapPlaceholder = placeholder{
+	startTime:         fieldnum.LapStartTime,
+	totalTimerTime:    fieldnum.LapTotalTimerTime,
+	startPositionLat:  fieldnum.LapStartPositionLat,
+	startPositionLong: fieldnum.LapStartPositionLong,
+	endPositionLat:    fieldnum.LapEndPositionLat,
+	endPositionLong:   fieldnum.LapEndPositionLong,
+}
+
+var sessionPlaceholder = placeholder{
+	startTime:         fieldnum.SessionStartTime,
+	totalTimerTime:    fieldnum.SessionTotalTimerTime,
+	startPositionLat:  fieldnum.SessionStartPositionLat,
+	startPositionLong: fieldnum.SessionStartPositionLong,
+	endPositionLat:    fieldnum.SessionEndPositionLat,
+	endPositionLong:   fieldnum.SessionEndPositionLong,
+}
+
+func concealStartPosition(mesgs []proto.Message, lapIndices, sessionIndices []int, threshold uint32) (lastConcealStartIndex int) {
+	if threshold == 0 {
+		return 0
 	}
 
-	var sessionIndex = -1
-	var newEndRecordIndex = -1
-	var lastDistance uint32
-
-loop:
-	for i := len(fit.Messages) - 1; i >= 0; i-- {
-		switch fit.Messages[i].Num {
-		case mesgnum.Lap:
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.LapEndPositionLong)
-		case mesgnum.Session:
-			if sessionIndex == -1 {
-				sessionIndex = i
+	lastConcealStartIndex = -1
+	for i := range mesgs {
+		mesg := &mesgs[i]
+		if mesg.Num == mesgnum.Record {
+			d := mesg.FieldValueByNum(fieldnum.RecordDistance).Uint32()
+			if d < threshold {
+				mesg.RemoveFieldByNum(fieldnum.RecordPositionLat)
+				mesg.RemoveFieldByNum(fieldnum.RecordPositionLong)
+				continue
 			}
-		case mesgnum.Record:
-			if fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32() == basetype.Sint32Invalid ||
-				fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32() == basetype.Sint32Invalid {
-				continue loop
-			}
-			distance := fit.Messages[i].FieldValueByNum(fieldnum.RecordDistance).Uint32()
-			if distance != basetype.Uint32Invalid {
-				continue loop
-			}
-
-			if lastDistance == 0 { // first valid last distance
-				lastDistance = distance
-			}
-
-			if lastDistance-distance > concealDistance {
-				newEndRecordIndex = i
-				break loop
-			}
-
-			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLat)
-			fit.Messages[i].RemoveFieldByNum(fieldnum.RecordPositionLong)
+			lastConcealStartIndex = i
+			break
 		}
 	}
 
-	if sessionIndex == -1 { // no session found during first iteration
-		for i := newEndRecordIndex - 1; i >= 0; i-- { // find session to update
-			if fit.Messages[i].Num == mesgnum.Session {
-				sessionIndex = i
-				break
-			}
+	updateStartPosition(mesgs, lapIndices, lapPlaceholder, lastConcealStartIndex)         // Update Laps
+	updateStartPosition(mesgs, sessionIndices, sessionPlaceholder, lastConcealStartIndex) // Update Sessions
+
+	return lastConcealStartIndex
+}
+
+// updateStartPosition update start position of Laps or Sessions.
+func updateStartPosition(mesgs []proto.Message, indices []int, ph placeholder, recordIndex int) {
+	var rec proto.Message
+	if recordIndex != -1 {
+		rec = mesgs[recordIndex]
+	}
+
+	var (
+		recTimestamp = rec.FieldValueByNum(fieldnum.RecordTimestamp).Uint32()
+		recLat       = rec.FieldValueByNum(fieldnum.RecordPositionLat).Int32()
+		recLong      = rec.FieldValueByNum(fieldnum.RecordPositionLong).Int32()
+	)
+	for i := range indices {
+		var (
+			mesg           = &mesgs[indices[i]]
+			startTime      = mesg.FieldValueByNum(ph.startTime).Uint32()
+			totalTimerTime = mesg.FieldValueByNum(ph.totalTimerTime).Uint32()
+		)
+		if startTime == basetype.Uint32Invalid || totalTimerTime == basetype.Uint32Invalid ||
+			startTime+totalTimerTime < recTimestamp {
+			mesg.RemoveFieldByNum(ph.startPositionLat)
+			mesg.RemoveFieldByNum(ph.startPositionLong)
+			mesg.RemoveFieldByNum(ph.endPositionLat)
+			mesg.RemoveFieldByNum(ph.endPositionLong)
+			continue
 		}
-		if sessionIndex == -1 {
-			return nil // no session found to update
+
+		if recLat == basetype.Sint32Invalid {
+			mesg.RemoveFieldByNum(ph.startPositionLat)
+		} else if field := mesg.FieldByNum(ph.startPositionLat); field != nil {
+			field.Value = proto.Int32(recLat)
+		}
+
+		if recLong == basetype.Sint32Invalid {
+			mesg.RemoveFieldByNum(ph.startPositionLong)
+		} else if field := mesg.FieldByNum(ph.startPositionLong); field != nil {
+			field.Value = proto.Int32(recLong)
+		}
+		break
+	}
+}
+
+func concealEndPosition(mesgs []proto.Message, lapIndices, sessionIndices []int, lastConcealStartIndex int, threshold uint32) {
+	if threshold == 0 {
+		return
+	}
+
+	var (
+		lastConcealEndIndex = -1
+		lastRecDist         = basetype.Uint32Invalid
+	)
+	for i := len(mesgs) - 1; i >= 0; i-- {
+		mesg := &mesgs[i]
+		if mesg.Num == mesgnum.Record {
+			d := mesg.FieldValueByNum(fieldnum.RecordDistance).Uint32()
+			if lastRecDist == basetype.Uint32Invalid {
+				lastRecDist = d
+			}
+			if lastRecDist-d < threshold {
+				mesg.RemoveFieldByNum(fieldnum.RecordPositionLat)
+				mesg.RemoveFieldByNum(fieldnum.RecordPositionLong)
+				continue
+			}
+			lastConcealEndIndex = i
+			break
 		}
 	}
 
-	if newEndRecordIndex == -1 { // all record are concealed
-		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLat)
-		fit.Messages[sessionIndex].RemoveFieldByNum(fieldnum.SessionEndPositionLong)
-	} else {
-		newLat, newLong := basetype.Sint32Invalid, basetype.Sint32Invalid
-		for i := newEndRecordIndex; i > 0; i++ { // find new end record that has newLat and long
-			newLat = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLat).Int32()
-			newLong = fit.Messages[i].FieldValueByNum(fieldnum.RecordPositionLong).Int32()
-			if newLat != basetype.Sint32Invalid && newLong != basetype.Sint32Invalid {
-				break
-			}
-		}
+	updateEndPosition(mesgs, lapIndices, lapPlaceholder, lastConcealStartIndex, lastConcealEndIndex)         // Update Laps
+	updateEndPosition(mesgs, sessionIndices, sessionPlaceholder, lastConcealStartIndex, lastConcealEndIndex) // Update Sessions
+}
 
-		fieldEndPositionLat := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLat)
-		if fieldEndPositionLat == nil {
-			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
-				factory.CreateField(mesgnum.Session, fieldnum.SessionEndPositionLat),
-			)
-			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
-			fieldEndPositionLat = &fit.Messages[sessionIndex].Fields[lastIndex]
-		}
-		fieldEndPositionLat.Value = proto.Int32(newLat)
-
-		fieldEndPositionLong := fit.Messages[sessionIndex].FieldByNum(fieldnum.SessionEndPositionLong)
-		if fieldEndPositionLong == nil {
-			fit.Messages[sessionIndex].Fields = append(fit.Messages[sessionIndex].Fields,
-				factory.CreateField(mesgnum.Session, fieldnum.SessionEndPositionLong),
-			)
-			lastIndex := len(fit.Messages[sessionIndex].Fields) - 1
-			fieldEndPositionLong = &fit.Messages[sessionIndex].Fields[lastIndex]
-		}
-		fieldEndPositionLong.Value = proto.Int32(newLong)
+// updateEndPosition update end position of Laps or Sessions.
+func updateEndPosition(mesgs []proto.Message, indices []int, ph placeholder, lastConcealStartIndex, recordIndex int) {
+	var rec proto.Message
+	if recordIndex != -1 {
+		rec = mesgs[recordIndex]
 	}
 
-	return nil
+	var (
+		recTimestamp = rec.FieldValueByNum(fieldnum.RecordTimestamp).Uint32()
+		recLat       = rec.FieldValueByNum(fieldnum.RecordPositionLat).Int32()
+		recLong      = rec.FieldValueByNum(fieldnum.RecordPositionLong).Int32()
+	)
+	for i := len(indices) - 1; i >= 0; i-- {
+		var (
+			mesg      = &mesgs[indices[i]]
+			startTime = mesg.FieldValueByNum(ph.startTime).Uint32()
+		)
+		if startTime == basetype.Uint32Invalid || startTime > recTimestamp {
+			mesg.RemoveFieldByNum(ph.startPositionLat)
+			mesg.RemoveFieldByNum(ph.startPositionLong)
+			mesg.RemoveFieldByNum(ph.endPositionLat)
+			mesg.RemoveFieldByNum(ph.endPositionLong)
+			continue
+		}
+
+		if lastConcealStartIndex > recordIndex { // Overlap
+			mesg.RemoveFieldByNum(ph.startPositionLat)
+			mesg.RemoveFieldByNum(ph.startPositionLong)
+		}
+
+		if recLat == basetype.Sint32Invalid {
+			mesg.RemoveFieldByNum(ph.endPositionLat)
+		} else if field := mesg.FieldByNum(ph.endPositionLat); field != nil {
+			field.Value = proto.Int32(recLat)
+		}
+
+		if recLong == basetype.Sint32Invalid {
+			mesg.RemoveFieldByNum(ph.endPositionLong)
+		} else if field := mesg.FieldByNum(ph.endPositionLong); field != nil {
+			field.Value = proto.Int32(recLong)
+		}
+		break
+	}
 }
