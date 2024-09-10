@@ -196,7 +196,7 @@ func combine(fs *flag.FlagSet, args []string) (err error) {
 		subcommandRemove  = "remove"
 	)
 
-	subcommands := make([]string, 0, 2)
+	var subcommands []string
 	var i int
 loop:
 	for i = range args {
