@@ -62,15 +62,15 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 
 	now := datetime.ToTime(uint32(1062766519))
 	fit := &proto.FIT{Messages: []proto.Message{
-		factory.CreateMesgOnly(typedef.MesgNumFileId).WithFields(
+		{Num: typedef.MesgNumFileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("something ss"),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerBryton),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(typedef.MesgNumActivity).WithFields(
+		}},
+		{Num: typedef.MesgNumActivity, Fields: []proto.Field{
 			factory.CreateField(typedef.MesgNumActivity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
-		),
+		}},
 		factory.CreateMesg(typedef.MesgNumRecord).WithFieldValues(map[byte]any{
 			fieldnum.RecordTimestamp: datetime.ToUint32(now),
 			fieldnum.RecordHeartRate: uint8(112),

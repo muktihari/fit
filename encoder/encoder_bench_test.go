@@ -81,17 +81,17 @@ func createFitForBenchmark(recodSize int) *proto.FIT {
 	for i := 0; i < recodSize-len(fit.Messages); i++ {
 		now = now.Add(time.Second) // only time is moving forward
 		if i%100 == 0 {            // add event every 100 message
-			fit.Messages = append(fit.Messages, factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			fit.Messages = append(fit.Messages, proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStop)),
-			))
+			}})
 			now = now.Add(10 * time.Second) // gap
-			fit.Messages = append(fit.Messages, factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			fit.Messages = append(fit.Messages, proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
-			))
+			}})
 			now = now.Add(time.Second) // gap
 		}
 

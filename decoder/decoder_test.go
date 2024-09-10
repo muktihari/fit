@@ -25,7 +25,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/internal/kit"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
@@ -610,45 +609,43 @@ func createFitForTest() (proto.FIT, []byte) {
 	fit := proto.FIT{
 		FileHeader: headerForTest(),
 		Messages: []proto.Message{
-			factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			{Num: mesgnum.FileId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
-			),
-			factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+			}},
+			{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
 				factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
-			),
-			factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+			}},
+			{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue([]string{"Heart Rate"}),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 				factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-			),
-			factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			}},
+			{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-			),
-			factory.CreateMesgOnly(mesgnum.Record).
-				WithFields(
-					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(0)),
-					factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(77)),
-				).
-				WithDeveloperFields(
-					proto.DeveloperField{
-						DeveloperDataIndex: 0,
-						Num:                0,
-						Value:              proto.Uint8(100),
-					},
-				),
+			}},
+			{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(0)),
+				factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(77)),
+			}, DeveloperFields: []proto.DeveloperField{
+				{
+					DeveloperDataIndex: 0,
+					Num:                0,
+					Value:              proto.Uint8(100),
+				},
+			}},
 		},
 	}
 
 	for i := 0; i < 100; i++ {
 		fit.Messages = append(fit.Messages,
-			factory.CreateMesgOnly(mesgnum.Record).WithFields(
-				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32((i+1)*1000)),
+			proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32((i + 1) * 1000)),
 				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-			),
+			}},
 		)
 	}
 
@@ -1820,18 +1817,18 @@ func TestExpandComponents(t *testing.T) {
 	}{
 		{
 			name: "expand components single happy flow",
-			mesg: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			),
+			}},
 			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
 			nFieldAfterExpansion: 2, // 1 for speed, +1 expand field enhanced_speed
 		},
 		{
 			name: "expand components multiple happy flow",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
-			),
+			}},
 			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
 			components: func() []proto.Component {
 				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
@@ -1846,9 +1843,9 @@ func TestExpandComponents(t *testing.T) {
 		},
 		{
 			name: "expand components run out bits for the last component",
-			mesg: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
-			),
+			}},
 			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00010E08)),
 			components: func() []proto.Component {
 				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
@@ -1863,27 +1860,27 @@ func TestExpandComponents(t *testing.T) {
 		},
 		{
 			name: "expand components containing field value mismatch",
-			mesg: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
-			),
+			}},
 			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
 			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
 			nFieldAfterExpansion: 1,
 		},
 		{
 			name: "expand components accumulate",
-			mesg: factory.CreateMesgOnly(mesgnum.Hr).WithFields(
+			mesg: proto.Message{Num: mesgnum.Hr, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue(uint8(10)),
-			),
+			}},
 			containingField:      factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
 			components:           factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).Components,
 			nFieldAfterExpansion: 2,
 		},
 		{
 			name: "expand components do not expand when containing field's value is invalid",
-			mesg: factory.CreateMesgOnly(mesgnum.Session).WithFields(
+			mesg: proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
-			),
+			}},
 			containingField:      factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
 			components:           factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).Components,
 			nFieldAfterExpansion: 1,
@@ -1906,7 +1903,7 @@ func TestExpandMutipleComponents(t *testing.T) {
 	compressedSepeedDistanceField := factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).
 		WithValue([]byte{0, 4, 1})
 
-	mesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(compressedSepeedDistanceField)
+	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{compressedSepeedDistanceField}}
 	dec := New(nil)
 	dec.expandComponents(&mesg, &compressedSepeedDistanceField, compressedSepeedDistanceField.Components)
 
@@ -2007,10 +2004,10 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 		},
 	)
 
-	mesg := fac.CreateMesgOnly(customMesgNum).WithFields(
+	mesg := proto.Message{Num: customMesgNum, Fields: []proto.Field{
 		fac.CreateField(customMesgNum, 0).WithValue(uint8(10)),  // event
 		fac.CreateField(customMesgNum, 2).WithValue(uint32(10)), // compressed_data
-	)
+	}}
 
 	dec := New(nil, WithFactory(fac))
 	fieldToExpand := mesg.FieldByNum(2)
@@ -2047,14 +2044,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				0,
 			},
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2073,14 +2070,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields missing fieldDescription with developer data index 1",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2099,14 +2096,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields missing field description number",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2125,14 +2122,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields missing field description number but unable to read acquired bytes",
 			r:    fnReaderErr,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2152,14 +2149,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields got io.EOF",
 			r:    fnReaderErr,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2179,14 +2176,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer field, devField def's size is zero, skip",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2211,14 +2208,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer field, devField def's size 1 < 4 size of uint32 ",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint32)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2248,14 +2245,14 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			name: "decode developer fields field description has invalid basetype",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
-				kit.Ptr(factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(255)),
-				)),
+				}},
 			),
 			mesgDef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,

@@ -135,7 +135,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "mesg contain expanded field",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 					func() proto.Field {
 						field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
@@ -143,23 +143,23 @@ func TestMessageValidatorValidate(t *testing.T) {
 						field.Value = proto.Uint32(1000)
 						return field
 					}(),
-				),
+				}},
 			},
 		},
 		{
 			name: "mesg contain field with scaled value",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue((float64(37304) / 5) - 500), // 6960.8m
-				),
+				}},
 			},
 		},
 		{
 			name: "mesg contain field value type not align",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint32(1000)), // should be uint16
-				),
+				}},
 			},
 			errs: []error{ErrValueTypeMismatch},
 		},
@@ -202,21 +202,21 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "invalid utf-8 string",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("\xbd"),
-				),
+				}},
 			},
 			errs: []error{ErrInvalidUTF8String},
 		},
 		{
 			name: "invalid utf-8 []string",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("valid utf-8 string"),
-				),
-				factory.CreateMesg(mesgnum.SegmentFile).WithFields(
+				}},
+				{Num: mesgnum.SegmentFile, Fields: []proto.Field{
 					factory.CreateField(mesgnum.SegmentFile, fieldnum.SegmentFileLeaderActivityIdString).WithValue([]string{"valid utf-8", "\xbd"}), // valid and invalid string in array
-				),
+				}},
 			},
 			errs: []error{nil, ErrInvalidUTF8String},
 		},
@@ -282,9 +282,9 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "field value size exceed max allowed",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue(strings.Repeat("a", 256)),
-				),
+				}},
 			},
 			errs: []error{ErrExceedMaxAllowed},
 		},
@@ -308,13 +308,13 @@ func TestMessageValidatorValidate(t *testing.T) {
 				return mesgValidator
 			}(),
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.FileId).WithDeveloperFields(
-					proto.DeveloperField{
+				{Num: mesgnum.FileId, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                1,
 						Value:              proto.String(strings.Repeat("a", 256)),
 					},
-				),
+				}},
 			},
 			errs: []error{ErrExceedMaxAllowed},
 		},
@@ -522,7 +522,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 func BenchmarkValidate(b *testing.B) {
 	b.StopTimer()
 	mesgValidator := NewMessageValidator()
-	mesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(
+	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(10000)),
 		func() proto.Field {
@@ -543,7 +543,7 @@ func BenchmarkValidate(b *testing.B) {
 			field.Value = proto.Uint32(1000)
 			return field
 		}(),
-	)
+	}}
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {

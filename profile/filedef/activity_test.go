@@ -60,93 +60,93 @@ func newActivityMessageForTest(now time.Time) []proto.Message {
 
 func newActivityMessagesWithExpectedOrder(now time.Time) (mesgs []proto.Message, ordered []proto.Message) {
 	mesgs = []proto.Message{
-		0: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		0: {Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		1: factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		1: {Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		2: factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		2: {Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue([]string{"Heart Rate"}),
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-		),
-		3: factory.CreateMesgOnly(mesgnum.DeviceInfo).WithFields(
+		}},
+		3: {Num: mesgnum.DeviceInfo, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeviceInfo, fieldnum.DeviceInfoManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-		),
-		4: factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+		}},
+		4: {Num: mesgnum.UserProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileFriendlyName).WithValue("Mary Jane"),
 			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileAge).WithValue(uint8(21)),
-		),
-		5: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		5: {Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 			factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
 			factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
-		),
-		6: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		6: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		7: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		7: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		8: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		8: {Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		9: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		9: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		10: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		10: {Num: mesgnum.Event, Fields: []proto.Field{
 			// Intentionally using same timestamp as last message.
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now)),
-		),
-		11: factory.CreateMesgOnly(mesgnum.Lap).WithFields(
+		}},
+		11: {Num: mesgnum.Lap, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		12: factory.CreateMesgOnly(mesgnum.Session).WithFields(
+		}},
+		12: {Num: mesgnum.Session, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		13: factory.CreateMesgOnly(mesgnum.Activity).WithFields(
+		}},
+		13: {Num: mesgnum.Activity, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 		// Unordered optional Messages
-		14: factory.CreateMesgOnly(mesgnum.Length).WithFields(
+		14: {Num: mesgnum.Length, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Length, fieldnum.LengthAvgSpeed).WithValue(uint16(1000)),
-		),
-		15: factory.CreateMesgOnly(mesgnum.SegmentLap).WithFields(
+		}},
+		15: {Num: mesgnum.SegmentLap, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SegmentLap, fieldnum.SegmentLapAvgCadence).WithValue(uint8(100)),
-		),
-		16: factory.CreateMesgOnly(mesgnum.ZonesTarget).WithFields(
+		}},
+		16: {Num: mesgnum.ZonesTarget, Fields: []proto.Field{
 			factory.CreateField(mesgnum.ZonesTarget, fieldnum.ZonesTargetMaxHeartRate).WithValue(uint8(190)),
-		),
-		17: factory.CreateMesgOnly(mesgnum.Workout).WithFields(
+		}},
+		17: {Num: mesgnum.Workout, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Workout, fieldnum.WorkoutSport).WithValue(uint8(typedef.SportCycling)),
-		),
-		18: factory.CreateMesgOnly(mesgnum.WorkoutStep).WithFields(
+		}},
+		18: {Num: mesgnum.WorkoutStep, Fields: []proto.Field{
 			factory.CreateField(mesgnum.WorkoutStep, fieldnum.WorkoutStepIntensity).WithValue(uint8(typedef.IntensityActive)),
-		),
-		19: factory.CreateMesgOnly(mesgnum.Hr).WithFields(
+		}},
+		19: {Num: mesgnum.Hr, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Hr, fieldnum.HrTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		20: factory.CreateMesgOnly(mesgnum.Hrv).WithFields(
+		}},
+		20: {Num: mesgnum.Hrv, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Hrv, fieldnum.HrvTime).WithValue([]uint16{uint16(1000)}),
-		),
+		}},
 		// Unrelated messages
-		21: factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		21: {Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 		// Special case:
 		// 1. CoursePoint's Timestamp Num is 1
 		// 2. Set's Timestamp Num is 254
-		22: factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		22: {Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		23: factory.CreateMesgOnly(mesgnum.Set).WithFields(
+		}},
+		23: {Num: mesgnum.Set, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Set, fieldnum.SetTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 
 	ordered = []proto.Message{

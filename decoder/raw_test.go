@@ -197,9 +197,9 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
@@ -221,15 +221,16 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef n developer fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
-						DeveloperDataIndex: 0,
-						Num:                0,
-						Value:              proto.Uint8(100),
-					},
-				)
+				mesg := proto.Message{Num: mesgnum.Record,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					}, DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Value:              proto.Uint8(100),
+						},
+					}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
@@ -251,15 +252,15 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef developer fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
+				}, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                0,
 						Value:              proto.Uint8(100),
 					},
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
@@ -281,15 +282,15 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef fn return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
+				}, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                0,
 						Value:              proto.Uint8(100),
 					},
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
@@ -316,9 +317,9 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesg, mesgDef not found",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgb, _ := mesg.MarshalAppend(nil)
@@ -339,9 +340,9 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesg, read return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
@@ -384,9 +385,9 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode crc return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)

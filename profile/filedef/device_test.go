@@ -19,42 +19,42 @@ import (
 
 func newDeviceMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileDevice)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.Software).WithFields(
+		}},
+		{Num: mesgnum.Software, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Software, fieldnum.SoftwareMessageIndex).WithValue(uint16(typedef.MessageIndexReserved)),
-		),
-		factory.CreateMesgOnly(mesgnum.Capabilities).WithFields(
+		}},
+		{Num: mesgnum.Capabilities, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Capabilities, fieldnum.CapabilitiesSports).WithValue([]uint8{
 				uint8(typedef.SportBits0Basketball),
 				uint8(typedef.SportBits1AmericanFootball),
 				uint8(typedef.SportBits2Paddling),
 			}),
-		),
-		factory.CreateMesgOnly(mesgnum.FileCapabilities).WithFields(
+		}},
+		{Num: mesgnum.FileCapabilities, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileCapabilities, fieldnum.FileCapabilitiesType).WithValue(uint8(typedef.FileActivity)),
-		),
-		factory.CreateMesgOnly(mesgnum.MesgCapabilities).WithFields(
+		}},
+		{Num: mesgnum.MesgCapabilities, Fields: []proto.Field{
 			factory.CreateField(mesgnum.MesgCapabilities, fieldnum.MesgCapabilitiesFile).WithValue(uint8(typedef.FileActivity)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldCapabilities).WithFields(
+		}},
+		{Num: mesgnum.FieldCapabilities, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldCapabilities, fieldnum.FieldCapabilitiesFile).WithValue(uint8(typedef.FileActivity)),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

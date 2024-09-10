@@ -43,26 +43,26 @@ func TestEncodeRealFiles(t *testing.T) {
 	now := time.Date(2023, 9, 15, 6, 0, 0, 0, time.UTC)
 	fit := &proto.FIT{
 		Messages: []proto.Message{
-			factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+			{Num: mesgnum.FileId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerBryton),
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("Bryton Active App"),
-			),
-			factory.CreateMesgOnly(mesgnum.Activity).WithFields(
+			}},
+			{Num: mesgnum.Activity, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityTypeCycling),
 				factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
 				factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
-			),
-			factory.CreateMesgOnly(mesgnum.Session).WithFields(
+			}},
+			{Num: mesgnum.Session, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(1000)),
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgCadence).WithValue(uint8(78)),
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgHeartRate).WithValue(uint8(100)),
-			),
-			factory.CreateMesgOnly(mesgnum.Record).WithFields(
+			}},
+			{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 				factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
 				factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
-			),
+			}},
 		},
 	}
 
@@ -398,9 +398,9 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 		{
 			name: "happy flow coverage",
 			fit: &proto.FIT{Messages: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				),
+				}},
 			}},
 			w: mockWriterAt{fnWriteOK, fnWriteAtOK},
 		},
@@ -419,9 +419,9 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 		{
 			name: "encode crc error",
 			fit: &proto.FIT{Messages: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				),
+				}},
 			}},
 			w: func() io.Writer {
 				fnWrites := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
@@ -441,9 +441,9 @@ func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestC
 		{
 			name: "update error",
 			fit: &proto.FIT{FileHeader: proto.FileHeader{Size: 14, DataSize: 100, DataType: proto.DataTypeFIT}, Messages: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				),
+				}},
 			}},
 			w:   mockWriterAt{fnWriteOK, fnWriteAtErr},
 			err: io.EOF,
@@ -510,9 +510,9 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 		{
 			name: "encode header error",
 			fit: &proto.FIT{Messages: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-				),
+				}},
 			}},
 			w:   fnWriteErr,
 			err: io.EOF,
@@ -520,9 +520,9 @@ func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
 		{
 			name: "encode messages error",
 			fit: &proto.FIT{Messages: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-				),
+				}},
 			}},
 			w: func() io.Writer {
 				fnInstances := []io.Writer{fnWriteOK, fnWriteErr}
@@ -1120,10 +1120,10 @@ func makeEncodeMessagesTableTest() []encodeMessagesTestCase {
 			name:          "encode messages happy flow",
 			mesgValidator: fnValidateOK,
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(typedef.GarminProductEdge1030)),
-				),
+				}},
 			},
 		},
 		{
@@ -1387,9 +1387,9 @@ func TestEncodeMessagesWithContext(t *testing.T) {
 	cancel()
 
 	mesgs := []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivity)),
-		),
+		}},
 	}
 	enc := New(nil, WithWriteBufferSize(0))
 	err := enc.encodeMessagesWithContext(ctx, mesgs)

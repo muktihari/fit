@@ -170,12 +170,6 @@ type Message struct {
 	DeveloperFields []DeveloperField // List of DeveloperField
 }
 
-// WithFields puts the provided fields into the message's fields.
-func (m Message) WithFields(fields ...Field) Message {
-	m.Fields = fields
-	return m
-}
-
 // WithFieldValues assigns the values of the targeted fields with the given map,
 // where map[byte]any represents the field numbers and their respective values.
 // If the Message does not have a corresponding field number match in the Fields, no value will be assigned or added.
@@ -189,12 +183,6 @@ func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
 			m.Fields[i].Value = Any(value)
 		}
 	}
-	return m
-}
-
-// WithFields puts the provided fields into the message's fields.
-func (m Message) WithDeveloperFields(developerFields ...DeveloperField) Message {
-	m.DeveloperFields = developerFields
 	return m
 }
 
