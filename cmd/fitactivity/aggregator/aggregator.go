@@ -44,7 +44,7 @@ func Aggregate[T any](dst, src T) {
 		case strings.HasPrefix(f.Name, "Max") || strings.HasPrefix(f.Name, "EnhancedMax"):
 			max(dv.Field(i), sv.Field(i)) // MaxHeartRate, MaxCadence, EnhancedMaxRespirationRate, etc.
 		case strings.HasPrefix(f.Name, "Min") || strings.HasPrefix(f.Name, "EnhancedMin"):
-			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, EnhancedAltitude, etc.
+			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, EnhancedMinAltitude, etc.
 		case strings.HasPrefix(f.Name, "Avg") || strings.HasPrefix(f.Name, "EnhancedAvg"):
 			avg(dv.Field(i), sv.Field(i)) // AvgHeartRate, AvgCadence, EnhancedAvgSpeed, etc..
 		default:
