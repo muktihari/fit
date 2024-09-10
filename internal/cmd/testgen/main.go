@@ -61,7 +61,7 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 	type Uint16 uint16
 
 	now := datetime.ToTime(uint32(1062766519))
-	fit := new(proto.FIT).WithMessages(
+	fit := &proto.FIT{Messages: []proto.Message{
 		factory.CreateMesgOnly(typedef.MesgNumFileId).WithFields(
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("something ss"),
@@ -80,7 +80,7 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 			// fieldnum.RecordAltitude: uint16((150 + 500) * 5), // input scaled value
 			// fieldnum.RecordAltitude: "something", // input scaled value
 		}),
-	)
+	}}
 
 	enc := encoder.New(f)
 	if err := enc.EncodeWithContext(ctx, fit); err != nil {

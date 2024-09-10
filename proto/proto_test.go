@@ -50,23 +50,23 @@ func TestFitWithMessages(t *testing.T) {
 		{
 			name: "withMessages",
 			messages: []proto.Message{
-				factory.CreateMesg(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordCadence),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate),
-				),
-				factory.CreateMesg(mesgnum.Record).WithFields(
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordCadence),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate),
-				),
+				}},
 			},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			fit := new(proto.FIT).WithMessages(tc.messages...)
+			fit := &proto.FIT{Messages: tc.messages}
 			if diff := cmp.Diff(fit.Messages, tc.messages,
 				cmp.Transformer("Value", func(v proto.Value) any {
 					return v.Any()
@@ -138,17 +138,17 @@ func TestMessageFieldByNum(t *testing.T) {
 	}{
 		{
 			name: "FieldByNum found",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				sharedField,
-			),
+			}},
 			fieldNum: fieldnum.EventEventType,
 			field:    &sharedField,
 		},
 		{
 			name: "FieldByNum not found",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				sharedField,
-			),
+			}},
 			fieldNum: fieldnum.EventData,
 			field:    nil,
 		},
@@ -177,17 +177,17 @@ func TestMessageFieldValueByNum(t *testing.T) {
 	}{
 		{
 			name: "FieldValueByNum found",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
-			),
+			}},
 			fieldNum: fieldnum.EventEventType,
 			value:    proto.Uint8(uint8(typedef.EventTypeStart)),
 		},
 		{
 			name: "FieldValueByNum not found",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
-			),
+			}},
 			fieldNum: fieldnum.EventData,
 			value:    proto.Value{},
 		},
@@ -213,18 +213,18 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 	}{
 		{
 			name: "remove existing field",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
-			),
+			}},
 			fieldNum: fieldnum.EventEventType,
 			field:    nil,
 			size:     0,
 		},
 		{
 			name: "remove field that is not exist",
-			mesg: proto.Message{Num: mesgnum.Event}.WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
-			),
+			}},
 			fieldNum: fieldnum.EventData,
 			field:    nil,
 			size:     1,
@@ -246,17 +246,18 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 }
 
 func TestMessageClone(t *testing.T) {
-	mesg := factory.CreateMesg(mesgnum.Session).WithFieldValues(map[byte]any{
-		fieldnum.SessionAvgAltitude: proto.Uint16(1000),
-		fieldnum.SessionAvgSpeed:    proto.Uint16(1000),
-	}).WithDeveloperFields(
-		proto.DeveloperField{
-			Num:                0,
-			DeveloperDataIndex: 0,
-			Value:              proto.Uint8(1),
-		},
-		proto.DeveloperField{},
-	)
+	mesg := proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
+		factory.CreateField(mesgnum.Session, fieldnum.SessionAvgAltitude).WithValue(uint16(1000)),
+		factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(1000)),
+	},
+		DeveloperFields: []proto.DeveloperField{
+			{
+				Num:                0,
+				DeveloperDataIndex: 0,
+				Value:              proto.Uint8(1),
+			},
+			{},
+		}}
 
 	cloned := mesg.Clone()
 	cloned.Fields[0].Num = 100
@@ -281,26 +282,26 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 	}{
 		{
 			name: "SubFieldSubtitution ok, main field can be interpreted.",
-			mesg: factory.CreateMesg(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(10)),
-			),
+			}},
 			field:        factory.CreateField(mesgnum.Event, fieldnum.EventData),
 			subfieldName: "course_point_index",
 			ok:           true,
 		},
 		{
 			name: "SubFieldSubtitution not ok, can't interpret main field.",
-			mesg: factory.CreateMesg(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(100)),
-			),
+			}},
 			field: factory.CreateField(mesgnum.Event, fieldnum.EventData),
 			ok:    false,
 		},
 		{
 			name: "SubFieldSubtitution field reference not found",
-			mesg: factory.CreateMesg(mesgnum.Event).WithFields(
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventActivityType).WithValue(uint8(10)),
-			),
+			}},
 			field: factory.CreateField(mesgnum.Event, fieldnum.EventData),
 			ok:    false,
 		},
@@ -336,6 +337,18 @@ func TestFieldClone(t *testing.T) {
 		t.Fatalf("expected deep cloned, but some data still being referenced.")
 	}
 
+	field = factory.CreateField(mesgnum.Session, fieldnum.SessionTotalCycles)
+	cloned = field.Clone()
+	field.SubFields[0].Name = "FIT SDK for Go"
+
+	if diff := cmp.Diff(field, cloned,
+		cmp.Transformer("Value", func(v proto.Value) any {
+			return v.Any()
+		}),
+	); diff == "" {
+		t.Fatalf("should not changed")
+	}
+
 	field = proto.Field{}
 	cloned = field.Clone()
 
@@ -344,179 +357,6 @@ func TestFieldClone(t *testing.T) {
 			return v.Any()
 		}),
 	); diff != "" {
-		t.Fatalf("should not changed")
-	}
-}
-
-func TestCreateMessageDefinition(t *testing.T) {
-	tt := []struct {
-		name    string
-		mesg    proto.Message
-		mesgDef proto.MessageDefinition
-	}{
-		{
-			name: "fields only with non-array values",
-			mesg: proto.Message{Num: mesgnum.FileId}.WithFields(
-				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-			),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: mesgnum.FileId,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.FileIdType,
-						Size:     1,
-						BaseType: basetype.Enum,
-					},
-				},
-			},
-		},
-		{
-			name: "fields only with mesg architecture big-endian",
-			mesg: func() proto.Message {
-				mesg := proto.Message{Num: mesgnum.FileId}.WithFields(
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				)
-				mesg.Architecture = 1 // big-endian
-				return mesg
-			}(),
-			mesgDef: proto.MessageDefinition{
-				Header:       proto.MesgDefinitionMask,
-				Architecture: 1, // big-endian
-				MesgNum:      mesgnum.FileId,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.FileIdType,
-						Size:     1,
-						BaseType: basetype.Enum,
-					},
-				},
-			},
-		},
-		{
-			name: "fields only with string value",
-			mesg: proto.Message{Num: mesgnum.FileId}.WithFields(
-				factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("FIT SDK Go"),
-			),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: mesgnum.FileId,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.FileIdProductName,
-						Size:     1 * 11, // len("FIT SDK Go") == 10 + '0x00'
-						BaseType: basetype.String,
-					},
-				},
-			},
-		},
-		{
-			name: "fields only with array of byte",
-			mesg: proto.Message{Num: mesgnum.UserProfile}.WithFields(
-				factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{2, 9}),
-			),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: mesgnum.UserProfile,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.UserProfileGlobalId,
-						Size:     2,
-						BaseType: basetype.Byte,
-					},
-				},
-			},
-		},
-
-		{
-			name: "developer fields",
-			mesg: proto.Message{Num: mesgnum.UserProfile}.
-				WithFields(
-					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
-				WithDeveloperFields(
-					proto.DeveloperField{
-						Num: 0, DeveloperDataIndex: 0, Value: proto.Uint8(1),
-					},
-				),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
-				MesgNum: mesgnum.UserProfile,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.UserProfileGlobalId,
-						Size:     2,
-						BaseType: basetype.Byte,
-					},
-				},
-				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
-					{
-						Num: 0, Size: 1, DeveloperDataIndex: 0,
-					},
-				},
-			},
-		},
-		{
-			name: "developer fields with string value \"FIT SDK Go\", size should be 11",
-			mesg: proto.Message{Num: mesgnum.UserProfile}.
-				WithFields(
-					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
-				WithDeveloperFields(
-					proto.DeveloperField{
-						Num: 0, DeveloperDataIndex: 0, Value: proto.String("FIT SDK Go"),
-					},
-				),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
-				MesgNum: mesgnum.UserProfile,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.UserProfileGlobalId,
-						Size:     2,
-						BaseType: basetype.Byte,
-					},
-				},
-				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
-					{
-						Num: 0, Size: 11, DeveloperDataIndex: 0,
-					},
-				},
-			},
-		},
-		{
-			name: "developer fields with value []uint16{1,2,3}, size should be 3*2 = 6",
-			mesg: proto.Message{Num: mesgnum.UserProfile}.
-				WithFields(
-					factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileGlobalId).WithValue([]byte{byte(2), byte(9)})).
-				WithDeveloperFields(
-					proto.DeveloperField{
-						Num: 0, DeveloperDataIndex: 0, Value: proto.SliceUint16([]uint16{1, 2, 3}),
-					},
-				),
-			mesgDef: proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
-				MesgNum: mesgnum.UserProfile,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      fieldnum.UserProfileGlobalId,
-						Size:     2,
-						BaseType: basetype.Byte,
-					},
-				},
-				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
-					{
-						Num: 0, Size: 6, DeveloperDataIndex: 0,
-					},
-				},
-			},
-		},
-	}
-
-	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			mesgDef := proto.CreateMessageDefinition(&tc.mesg)
-			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
-				t.Fatal(diff)
-			}
-		})
+		t.Fatalf("empty field base, field should be returned as is: %v", diff)
 	}
 }

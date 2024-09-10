@@ -72,12 +72,8 @@ func TestValueMarshalAppend(t *testing.T) {
 	for i, tc := range tt {
 		for arch := byte(0); arch <= 1; arch++ {
 			t.Run(fmt.Sprintf("[%d] %T(%v))", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
-				arr := pool.Get().(*[MaxBytesPerMessage]byte)
-				defer pool.Put(arr)
-				b := arr[:0]
-
 				var err error
-				*tc.b, err = tc.value.MarshalAppend(b, arch)
+				*tc.b, err = tc.value.MarshalAppend(nil, arch)
 				if !errors.Is(err, tc.err) {
 					t.Fatalf("expected err: %v, got: %v", tc.err, err)
 				}

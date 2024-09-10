@@ -5,6 +5,8 @@
 package proto
 
 import (
+	"fmt"
+
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -44,74 +46,11 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 	FieldNumTimestamp = 253
 )
 
-// LocalMesgNum extracts LocalMesgNum from message header.
-func LocalMesgNum(header byte) byte {
-	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
-		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
-	}
-	return header & LocalMesgNumMask
-}
-
-// CreateMessageDefinition creates new MessageDefinition base on given Message.
-// It will panic if mesg is nil. And mesg must be validated first, for instance
-// if field.Value's size is more than 255 bytes, overflow will occurs.
-func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
-	CreateMessageDefinitionTo(&mesgDef, mesg)
-	return
-}
-
-// CreateMessageDefinitionTo create MessageDefinition base on given Message and put it at target object to avoid allocation.
-// It will panic if either target or mesg is nil. And mesg must be validated first, for instance
-// if field.Value's size is more than 255 bytes, overflow will occurs.
-func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
-	target.Header = MesgDefinitionMask
-	target.Reserved = mesg.Reserved
-	target.Architecture = mesg.Architecture
-	target.MesgNum = mesg.Num
-
-	target.FieldDefinitions = target.FieldDefinitions[:0]
-	if cap(target.FieldDefinitions) < len(mesg.Fields) {
-		target.FieldDefinitions = make([]FieldDefinition, 0, len(mesg.Fields))
-	}
-
-	for i := range mesg.Fields {
-		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
-			Num:      mesg.Fields[i].Num,
-			Size:     byte(Sizeof(mesg.Fields[i].Value)),
-			BaseType: mesg.Fields[i].BaseType,
-		})
-	}
-
-	if len(mesg.DeveloperFields) == 0 {
-		return
-	}
-
-	target.Header |= DevDataMask
-
-	target.DeveloperFieldDefinitions = target.DeveloperFieldDefinitions[:0]
-	if cap(target.DeveloperFieldDefinitions) < len(mesg.DeveloperFields) {
-		target.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
-	}
-	for i := range mesg.DeveloperFields {
-		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
-			Num:                mesg.DeveloperFields[i].Num,
-			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value)),
-			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
-		})
-	}
-}
-
 // FIT represents a structure for FIT Files.
 type FIT struct {
 	FileHeader FileHeader // File Header contains either 12 or 14 bytes
 	Messages   []Message  // Messages.
 	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
-}
-
-// WithMessages set Messages and return the pointer to the FIT.
-func (f *FIT) WithMessages(messages ...Message) *FIT {
-	f.Messages = messages
-	return f
 }
 
 // FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
@@ -132,6 +71,72 @@ type MessageDefinition struct {
 	MesgNum                   typedef.MesgNum            // Global Message Number defined by factory (retrieved from Profile.xslx). (endianness of this 2 Byte value is defined in the Architecture byte)
 	FieldDefinitions          []FieldDefinition          // List of the field definition
 	DeveloperFieldDefinitions []DeveloperFieldDefinition // List of the developer field definition (only if Developer Data Flag is set in Header)
+}
+
+// LocalMesgNum extracts LocalMesgNum from message header.
+func LocalMesgNum(header byte) byte {
+	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
+		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
+	}
+	return header & LocalMesgNumMask
+}
+
+const (
+	errNilMesg            = errorString("mesg is nil")
+	errValueSizeExceed255 = errorString("value's size exceed 255")
+)
+
+// NewMessageDefinition returns a new MessageDefinition based on the given Message or an error if one occurs.
+//
+// This serves as a testing helper and is for documentation purposes only.
+func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
+	if mesg == nil {
+		return nil, errNilMesg
+	}
+
+	const maxValueSize = 255
+
+	mesgDef := &MessageDefinition{
+		Header:           MesgDefinitionMask,
+		Reserved:         mesg.Reserved,
+		Architecture:     mesg.Architecture,
+		MesgNum:          mesg.Num,
+		FieldDefinitions: make([]FieldDefinition, 0, len(mesg.Fields)),
+	}
+
+	for i := range mesg.Fields {
+		size := Sizeof(mesg.Fields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be < %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     byte(size),
+			BaseType: mesg.Fields[i].BaseType,
+		})
+	}
+
+	if len(mesg.DeveloperFields) == 0 {
+		return mesgDef, nil
+	}
+
+	mesgDef.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
+	mesgDef.Header |= DevDataMask
+	for i := range mesg.DeveloperFields {
+		size := Sizeof(mesg.DeveloperFields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be < %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               byte(size),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+		})
+	}
+
+	return mesgDef, nil
 }
 
 // Clone clones MessageDefinition

@@ -489,7 +489,7 @@ func TestCheckIntegrity(t *testing.T) {
 					DataSize:        0,
 					DataType:        proto.DataTypeFIT,
 				}
-				b, _ := h.MarshalBinary()
+				b, _ := h.MarshalAppend(nil)
 				crc := crc16.New(nil)
 				crc.Write(b[:12])
 				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
@@ -568,7 +568,7 @@ func TestCheckIntegrity(t *testing.T) {
 				// Chained FIT File but with next sequence header is
 				b := append(b[:0:0], b...)
 				h := headerForTest()
-				nextb, _ := h.MarshalBinary()
+				nextb, _ := h.MarshalAppend(nil)
 				nextb[0] = 100 // alter FileHeader's Size
 				b = append(b, nextb...)
 				return bytes.NewReader(b)
@@ -653,19 +653,19 @@ func createFitForTest() (proto.FIT, []byte) {
 	}
 
 	bytesbuffer := new(bytes.Buffer)
-	b, _ := fit.FileHeader.MarshalBinary()
+	b, _ := fit.FileHeader.MarshalAppend(nil)
 	bytesbuffer.Write(b)
 
 	// Marshal and calculate data size and crc checksum
 	crc16checker := crc16.New(nil)
 	for i := range fit.Messages {
 		mesg := fit.Messages[i]
-		mesgDef := proto.CreateMessageDefinition(&mesg)
-		b, _ := mesgDef.MarshalBinary()
+		mesgDef, _ := proto.NewMessageDefinition(&mesg)
+		b, _ := mesgDef.MarshalAppend(nil)
 		bytesbuffer.Write(b)
 		crc16checker.Write(b)
 
-		b, err := mesg.MarshalBinary()
+		b, err := mesg.MarshalAppend(nil)
 		if err != nil {
 			panic(err)
 		}
@@ -851,7 +851,7 @@ func TestNext(t *testing.T) {
 
 	// New header of the next chained FIT sequences.
 	header := headerForTest()
-	b, _ := header.MarshalBinary()
+	b, _ := header.MarshalAppend(nil)
 	buf = append(buf, b...)
 
 	r := func() io.Reader {
@@ -1274,7 +1274,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 		r       io.Reader
 		opts    []Option
 		header  byte
-		mesgDef proto.MessageDefinition
+		mesgDef *proto.MessageDefinition
 		err     error
 	}{
 		{
@@ -1297,8 +1297,11 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			opts: []Option{
 				WithMesgDefListener(fnMesgDefListener(func(mesgDef proto.MessageDefinition) {})),
 			},
-			header:  proto.MesgDefinitionMask,
-			mesgDef: proto.CreateMessageDefinition(&fit.Messages[0]), // file_id
+			header: proto.MesgDefinitionMask,
+			mesgDef: func() *proto.MessageDefinition {
+				mesgDef, _ := proto.NewMessageDefinition(&fit.Messages[0]) // file_id
+				return mesgDef
+			}(),
 		},
 		{
 			name: "decode read return io.EOF when retrieving init data",
@@ -1406,7 +1409,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			if err != nil {
 				return
 			}
-			mesgDef := *dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
+			mesgDef := dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
 			if len(mesgDef.DeveloperFieldDefinitions) == 0 {
 				mesgDef.DeveloperFieldDefinitions = nil
 			}
@@ -1709,7 +1712,7 @@ func TestDecodeFields(t *testing.T) {
 						},
 					},
 				}
-				mesgb, _ := mesg.MarshalBinary()
+				mesgb, _ := mesg.MarshalAppend(nil)
 				mesgb = mesgb[1:] // splice mesg header
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -1752,7 +1755,7 @@ func TestDecodeFields(t *testing.T) {
 						},
 					},
 				}
-				mesgb, _ := mesg.MarshalBinary()
+				mesgb, _ := mesg.MarshalAppend(nil)
 				mesgb = mesgb[1:] // splice mesg header
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -2645,8 +2648,11 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTemperature).WithValue(int8(32)),
 		},
 	}
-	mesgDef := proto.CreateMessageDefinition(&mesg)
-	mesgb, err := mesg.MarshalBinary()
+	mesgDef, err := proto.NewMessageDefinition(&mesg)
+	if err != nil {
+		b.Fatal(err)
+	}
+	mesgb, err := mesg.MarshalAppend(nil)
 	if err != nil {
 		b.Fatalf("marshal binary: %v", err)
 	}
@@ -2662,7 +2668,7 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	})
 
 	dec := New(r, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
-	dec.localMessageDefinitions[0] = &mesgDef
+	dec.localMessageDefinitions[0] = mesgDef
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {

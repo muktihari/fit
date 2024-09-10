@@ -463,12 +463,12 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		}
 	}
 
-	proto.CreateMessageDefinitionTo(&e.mesgDef, mesg)
-	if err := e.protocolValidator.ValidateMessageDefinition(&e.mesgDef); err != nil {
+	mesgDef := e.createMessageDefinition(mesg)
+	if err := e.protocolValidator.ValidateMessageDefinition(mesgDef); err != nil {
 		return err
 	}
 
-	b, _ := e.mesgDef.MarshalAppend(e.buf[:0])
+	b, _ := mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 	if e.options.headerOption == headerOptionNormal {
 		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
@@ -528,6 +528,38 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
 	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
+}
+
+func (e *Encoder) createMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
+	e.mesgDef.Header = proto.MesgDefinitionMask
+	e.mesgDef.Reserved = mesg.Reserved
+	e.mesgDef.Architecture = mesg.Architecture
+	e.mesgDef.MesgNum = mesg.Num
+
+	e.mesgDef.FieldDefinitions = e.mesgDef.FieldDefinitions[:0]
+	for i := range mesg.Fields {
+		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions, proto.FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     byte(proto.Sizeof(mesg.Fields[i].Value)),
+			BaseType: mesg.Fields[i].BaseType,
+		})
+	}
+
+	if len(mesg.DeveloperFields) == 0 {
+		return &e.mesgDef
+	}
+
+	e.mesgDef.Header |= proto.DevDataMask
+	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
+	for i := range mesg.DeveloperFields {
+		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               byte(proto.Sizeof(mesg.DeveloperFields[i].Value)),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+		})
+	}
+
+	return &e.mesgDef
 }
 
 func (e *Encoder) encodeCRC() error {
