@@ -7,80 +7,104 @@ package opener
 import (
 	"context"
 	"os"
+	"runtime"
 	"sync"
 
 	"github.com/muktihari/fit/decoder"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
 
-// Open opens all given paths concurrently.
-func Open(paths []string) ([]*proto.FIT, error) {
+var numCPU = runtime.NumCPU()
+
+// Open opens all paths concurrently using a number of workers equal to the lesser value of len(paths) or runtime.NumCPU().
+func Open(paths []string) (fits []*proto.FIT, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	resultc := make(chan result, len(paths))
-	var wg sync.WaitGroup
+	n := len(paths)
+	if n > numCPU {
+		n = numCPU
+	}
 
-	wg.Add(len(paths))
-	for i := range paths {
-		path := paths[i]
-		go worker(ctx, path, resultc, &wg)
+	var (
+		jobs    = make(chan string, n)
+		results = make(chan result, n)
+	)
+
+	for i := 0; i < n; i++ {
+		go worker(ctx, jobs, results)
 	}
 
 	go func() {
-		wg.Wait()
-		close(resultc)
+		for _, path := range paths {
+			jobs <- path
+		}
+		close(jobs)
 	}()
 
-	fits := make([]*proto.FIT, 0, len(paths))
-	for res := range resultc {
+	// Most files has one sequence of FIT activity, grow as needed.
+	fits = make([]*proto.FIT, 0, len(paths))
+	for i := 0; i < len(paths); i++ {
+		res := <-results
 		if res.err != nil {
 			return nil, res.err
 		}
-		fits = append(fits, res.fit)
+		fits = append(fits, res.fits...)
 	}
 
 	return fits, nil
 }
 
 type result struct {
-	fit *proto.FIT
-	err error
+	fits []*proto.FIT
+	err  error
 }
 
-func worker(ctx context.Context, path string, resultc chan<- result, wg *sync.WaitGroup) {
-	defer wg.Done()
+func worker(ctx context.Context, jobs <-chan string, results chan<- result) {
+	for path := range jobs {
+		fits, err := decode(ctx, path)
+		results <- result{fits: fits, err: err}
+	}
+}
 
+var pool = sync.Pool{New: func() interface{} { return decoder.New(nil) }}
+
+func decode(ctx context.Context, path string) (fits []*proto.FIT, err error) {
 	f, err := os.Open(path)
 	if err != nil {
-		resultc <- result{err: err}
 		return
 	}
 	defer f.Close()
 
-	dec := decoder.New(f)
+	dec := pool.Get().(*decoder.Decoder)
+	defer pool.Put(dec)
+
+	dec.Reset(f)
 
 	for dec.Next() {
-		fileId, err := dec.PeekFileId()
+		var fileId *mesgdef.FileId
+		fileId, err = dec.PeekFileId()
 		if err != nil {
-			resultc <- result{err: err}
 			return
 		}
 
 		if fileId.Type != typedef.FileActivity {
-			if err := dec.Discard(); err != nil {
-				resultc <- result{err: err}
+			if err = dec.Discard(); err != nil {
+				return
 			}
 			continue
 		}
 
-		fit, err := dec.DecodeWithContext(ctx)
+		var fit *proto.FIT
+		fit, err = dec.DecodeWithContext(ctx)
 		if err != nil {
-			resultc <- result{err: err}
 			return
 		}
 
-		resultc <- result{fit: fit}
+		fits = append(fits, fit)
 	}
+
+	return
 }
