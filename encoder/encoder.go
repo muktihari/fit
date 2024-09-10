@@ -69,8 +69,11 @@ type Encoder struct {
 	// and will change every rollover event occurrence.
 	timestampReference uint32
 
-	mesgDef    proto.MessageDefinition        // Temporary message definition to reduce alloc.
-	bytesArray [proto.MaxBytesPerMessage]byte // General purpose array for encoding process.
+	mesgDef proto.MessageDefinition // Temporary message definition to reduce alloc.
+
+	// Dynamic-sized buffer for encoding, starting at 1537 bytes (the maximum size of Message Definition).
+	// It starts small but grows as needed and may only grow when using Message's MarshalAppend.
+	buf []byte
 }
 
 type options struct {
@@ -187,6 +190,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		crc16:             crc16.New(nil),
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
+		buf:               make([]byte, 0, proto.MaxBytesPerMessageDefinition),
 	}
 	e.Reset(w, opts...)
 	return e
@@ -319,7 +323,7 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
 
-	b, _ := header.MarshalAppend(e.bytesArray[:0])
+	b, _ := header.MarshalAppend(e.buf[:0])
 
 	if header.Size != 14 {
 		n, err := e.w.Write(b[:header.Size])
@@ -350,7 +354,7 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) (err error) {
 
 	header.DataSize = e.dataSize
 
-	b, _ := header.MarshalAppend(e.bytesArray[:0])
+	b, _ := header.MarshalAppend(e.buf[:0])
 
 	if header.Size == 14 {
 		_, _ = e.crc16.Write(b[:12]) // recalculate CRC Checksum since FileHeader is changed.
@@ -426,11 +430,11 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 }
 
 // encodeMessage marshals and encodes message definition and its message into w.
-func (e *Encoder) encodeMessage(mesg *proto.Message) error {
+func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	mesg.Header = proto.MesgNormalHeaderMask
 	mesg.Architecture = e.options.endianness
 
-	if err := e.options.messageValidator.Validate(mesg); err != nil {
+	if err = e.options.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
 	}
 
@@ -464,15 +468,16 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 		return err
 	}
 
-	b, _ := e.mesgDef.MarshalAppend(e.bytesArray[:0])
+	b, _ := e.mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 	if e.options.headerOption == headerOptionNormal {
 		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
 		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
 	}
 
+	var n int
 	if isNewMesgDef {
-		n, err := e.w.Write(b)
+		n, err = e.w.Write(b)
 		e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 		if err != nil {
 			return fmt.Errorf("write message definition failed: %w", err)
@@ -480,17 +485,18 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) error {
 		_, _ = e.crc16.Write(b)
 	}
 
-	b, err := mesg.MarshalAppend(e.bytesArray[:0])
+	// At this point, e.buf may grow. Re-assign e.buf in case slice has grown.
+	e.buf, err = mesg.MarshalAppend(e.buf[:0])
 	if err != nil {
 		return fmt.Errorf("marshal mesg failed: %w", err)
 	}
 
-	n, err := e.w.Write(b)
+	n, err = e.w.Write(e.buf)
 	e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 	if err != nil {
 		return fmt.Errorf("write message failed: %w", err)
 	}
-	_, _ = e.crc16.Write(b)
+	_, _ = e.crc16.Write(e.buf)
 
 	return nil
 }
@@ -525,7 +531,7 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 }
 
 func (e *Encoder) encodeCRC() error {
-	b := e.bytesArray[:2]
+	b := e.buf[:2]
 	binary.LittleEndian.PutUint16(b, e.crc16.Sum16())
 
 	n, err := e.w.Write(b)
