@@ -5,10 +5,12 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -72,6 +74,18 @@ Flags:
 `
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
+	go func() {
+		sig := <-quit
+		cancel()
+		fmt.Printf(" %v ", sig)
+	}()
+
 	fs := flag.NewFlagSet("main", flag.ExitOnError)
 	fs.Usage = func() { fmt.Fprint(os.Stderr, mainUsage) }
 
@@ -97,16 +111,16 @@ func main() {
 	switch command {
 	case "combine":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, combine(fs, args[1:]))
+		printerror(fs, command, combine(ctx, fs, args[1:]))
 	case "conceal":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, conceal(fs, args[1:]))
+		printerror(fs, command, conceal(ctx, fs, args[1:]))
 	case "reduce":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, reduce(fs, args[1:]))
+		printerror(fs, command, reduce(ctx, fs, args[1:]))
 	case "remove":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, remove(fs, args[1:]))
+		printerror(fs, command, remove(ctx, fs, args[1:]))
 	default:
 		printerror(fs, command, fmt.Errorf("command provided but not defined: %s", command))
 	}
@@ -187,7 +201,7 @@ Examples:
   ` + cli + ` combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
 `
 
-func combine(fs *flag.FlagSet, args []string) (err error) {
+func combine(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, combineUsage) }
 
 	const (
@@ -310,10 +324,16 @@ loop:
 
 	var fits []*proto.FIT
 	verboserun(fmt.Sprintf("Decoding %d files", len(files)), func() {
-		fits, err = opener.Open(files)
+		fits, err = opener.Open(ctx, files)
 	})
 	if err != nil {
 		return err
+	}
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
 	}
 
 	var fit *proto.FIT
@@ -328,6 +348,12 @@ loop:
 	fit.FileHeader.ProfileVersion = latestProfileVersion(fits)
 
 	for _, subcommand := range subcommands {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		switch subcommand {
 		case subcommandConceal:
 			msg := fmt.Sprintf("Concealing [start: %sm, end: %sm]",
@@ -403,6 +429,12 @@ loop:
 		headerOption = encoder.WithCompressedTimestampHeader()
 	}
 
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
 	msg := fmt.Sprintf("Encoding [%s]", headerInfo)
 	verboserun(msg, func() {
 		var f *os.File
@@ -412,7 +444,10 @@ loop:
 		}
 		defer f.Close()
 		enc := encoder.New(f, headerOption)
-		err = enc.Encode(fit)
+		err = enc.EncodeWithContext(ctx, fit)
+		if err != nil {
+			_ = os.Remove(out)
+		}
 	})
 
 	return err
@@ -438,7 +473,7 @@ Examples:
   ` + cli + ` conceal --first 1000 --last 1000 a.fit b.fit
 `
 
-func conceal(fs *flag.FlagSet, args []string) (err error) {
+func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, concealUsage) }
 
 	var interleave int
@@ -508,7 +543,7 @@ func conceal(fs *flag.FlagSet, args []string) (err error) {
 
 			var fit *proto.FIT
 			for dec.Next() {
-				fit, err = dec.Decode()
+				fit, err = dec.DecodeWithContext(ctx)
 				if err != nil {
 					return
 				}
@@ -519,6 +554,12 @@ func conceal(fs *flag.FlagSet, args []string) (err error) {
 			return err
 		}
 
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		verboserun(fmt.Sprintf("[%d] Concealing", i), func() {
 			for _, fit := range fits {
 				concealer.Conceal(fit.Messages, uint32(first)*100, uint32(last)*100)
@@ -526,6 +567,12 @@ func conceal(fs *flag.FlagSet, args []string) (err error) {
 		})
 		if err != nil {
 			return err
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
 		}
 
 		verboserun(fmt.Sprintf("[%d] Encoding [%s]", i, headerInfo), func() {
@@ -542,7 +589,8 @@ func conceal(fs *flag.FlagSet, args []string) (err error) {
 			enc.Reset(f, headerOption)
 
 			for _, fit := range fits {
-				if err = enc.Encode(fit); err != nil {
+				if err = enc.EncodeWithContext(ctx, fit); err != nil {
+					_ = os.Remove(name)
 					return
 				}
 			}
@@ -587,7 +635,7 @@ Examples:
   ` + cli + ` reduce --time 5 a.fit b.fit
 `
 
-func reduce(fs *flag.FlagSet, args []string) (err error) {
+func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, reduceUsage) }
 
 	var interleave int
@@ -683,7 +731,7 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 
 			var fit *proto.FIT
 			for dec.Next() {
-				fit, err = dec.Decode()
+				fit, err = dec.DecodeWithContext(ctx)
 				if err != nil {
 					return
 				}
@@ -692,6 +740,12 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 		})
 		if err != nil {
 			return err
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
 		}
 
 		var msgs []string
@@ -712,6 +766,12 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 			fmt.Fprintf(os.Stderr, "      %s\n", msg)
 		}
 
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		verboserun(fmt.Sprintf("[%d] Encoding [%s]", i, headerInfo), func() {
 			name := fmt.Sprintf("%s_reduced_%s.fit",
 				strings.TrimSuffix(path, filepath.Ext(path)), nameSuffix)
@@ -726,7 +786,8 @@ func reduce(fs *flag.FlagSet, args []string) (err error) {
 			enc.Reset(f, headerOption)
 
 			for _, fit := range fits {
-				if err = enc.Encode(fit); err != nil {
+				if err = enc.EncodeWithContext(ctx, fit); err != nil {
+					_ = os.Remove(name)
 					return
 				}
 			}
@@ -763,7 +824,7 @@ Examples:
   ` + cli + ` remove --unknown --nums 160,162 --devdata a.fit b.fit
 `
 
-func remove(fs *flag.FlagSet, args []string) (err error) {
+func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, removeUsage) }
 
 	var interleave int
@@ -856,7 +917,7 @@ func remove(fs *flag.FlagSet, args []string) (err error) {
 
 			var fit *proto.FIT
 			for dec.Next() {
-				fit, err = dec.Decode()
+				fit, err = dec.DecodeWithContext(ctx)
 				if err != nil {
 					return
 				}
@@ -865,6 +926,12 @@ func remove(fs *flag.FlagSet, args []string) (err error) {
 		})
 		if err != nil {
 			return err
+		}
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
 		}
 
 		var msgs []string
@@ -896,6 +963,12 @@ func remove(fs *flag.FlagSet, args []string) (err error) {
 			fmt.Fprintf(os.Stderr, "      %s\n", msg)
 		}
 
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		verboserun(fmt.Sprintf("[%d] Encoding [%s]", i, headerInfo), func() {
 			name := fmt.Sprintf("%s_removed_%s.fit",
 				strings.TrimSuffix(path, filepath.Ext(path)), nameSuffix)
@@ -910,7 +983,8 @@ func remove(fs *flag.FlagSet, args []string) (err error) {
 			enc.Reset(f, headerOption)
 
 			for _, fit := range fits {
-				if err = enc.Encode(fit); err != nil {
+				if err = enc.EncodeWithContext(ctx, fit); err != nil {
+					_ = os.Remove(name)
 					return
 				}
 			}

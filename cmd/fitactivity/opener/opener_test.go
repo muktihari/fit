@@ -1,6 +1,7 @@
 package opener
 
 import (
+	"context"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -24,7 +25,7 @@ func TestOpen(t *testing.T) {
 		filepath.Join(fromOfficialSDK, "Activity.fit"),
 	}
 
-	fits, err := Open(paths)
+	fits, err := Open(context.Background(), paths)
 	if err != nil {
 		t.Fatalf("expected error nil, got: %v", err)
 	}

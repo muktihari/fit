@@ -19,8 +19,8 @@ import (
 var numCPU = runtime.NumCPU()
 
 // Open opens all paths concurrently using a number of workers equal to the lesser value of len(paths) or runtime.NumCPU().
-func Open(paths []string) (fits []*proto.FIT, err error) {
-	ctx, cancel := context.WithCancel(context.Background())
+func Open(ctx context.Context, paths []string) (fits []*proto.FIT, err error) {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	n := len(paths)
