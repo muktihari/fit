@@ -481,7 +481,7 @@ func (d *Decoder) decodeFileHeader() error {
 
 	d.fileHeader = proto.FileHeader{
 		Size:            size,
-		ProtocolVersion: b[0],
+		ProtocolVersion: proto.Version(b[0]),
 		ProfileVersion:  binary.LittleEndian.Uint16(b[1:3]),
 		DataSize:        binary.LittleEndian.Uint32(b[3:7]),
 		DataType:        proto.DataTypeFIT,

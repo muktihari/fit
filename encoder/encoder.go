@@ -107,7 +107,7 @@ type Option func(o *options)
 // proto.V1, proto.V2, etc, which the validity is ensured.
 func WithProtocolVersion(protocolVersion proto.Version) Option {
 	return func(o *options) {
-		if proto.Validate(byte(protocolVersion)) == nil {
+		if proto.Validate(protocolVersion) == nil {
 			o.protocolVersion = protocolVersion
 		}
 	}
@@ -318,11 +318,11 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	}
 
 	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
-		header.ProtocolVersion = byte(e.options.protocolVersion)
+		header.ProtocolVersion = e.options.protocolVersion
 	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
-		header.ProtocolVersion = byte(proto.V1)
+		header.ProtocolVersion = proto.V1
 	}
-	e.protocolValidator.SetProtocolVersion(proto.Version(header.ProtocolVersion))
+	e.protocolValidator.SetProtocolVersion(header.ProtocolVersion)
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated

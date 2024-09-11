@@ -483,7 +483,7 @@ func TestCheckIntegrity(t *testing.T) {
 			r: func() io.Reader {
 				h := proto.FileHeader{
 					Size:            14,
-					ProtocolVersion: byte(proto.V2),
+					ProtocolVersion: proto.V2,
 					ProfileVersion:  profile.Version,
 					DataSize:        0,
 					DataType:        proto.DataTypeFIT,

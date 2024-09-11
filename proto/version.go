@@ -29,19 +29,19 @@ func CreateVersion(major, minor byte) (Version, bool) {
 }
 
 // Validate checks whether given version is a valid version.
-func Validate(version byte) error {
-	if VersionMajor(version) > VersionMajor(byte(Vmax)) {
+func Validate(version Version) error {
+	if VersionMajor(version) > VersionMajor(Vmax) {
 		return ErrProtocolVersionNotSupported
 	}
 	return nil
 }
 
 // VersionMajor returns major value of given version
-func VersionMajor(version byte) byte {
-	return version >> MajorVersionShift
+func VersionMajor(version Version) byte {
+	return byte(version >> MajorVersionShift)
 }
 
 // VersionMinor returns minor value of given version
-func VersionMinor(version byte) byte {
-	return version & MinorVersionMask
+func VersionMinor(version Version) byte {
+	return byte(version & MinorVersionMask)
 }

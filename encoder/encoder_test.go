@@ -614,7 +614,7 @@ func TestUpdateHeader(t *testing.T) {
 			name: "writeSeeker using stub",
 			header: proto.FileHeader{
 				Size:            12,
-				ProtocolVersion: byte(proto.V1),
+				ProtocolVersion: proto.V1,
 				ProfileVersion:  profile.Version,
 				DataType:        proto.DataTypeFIT,
 			},
@@ -628,7 +628,7 @@ func TestUpdateHeader(t *testing.T) {
 			expect: func() []byte {
 				h := proto.FileHeader{
 					Size:            12,
-					ProtocolVersion: byte(proto.V1),
+					ProtocolVersion: proto.V1,
 					ProfileVersion:  profile.Version,
 					DataType:        proto.DataTypeFIT,
 					DataSize:        2, // updated
@@ -641,7 +641,7 @@ func TestUpdateHeader(t *testing.T) {
 			name: "writerAt using stub",
 			header: proto.FileHeader{
 				Size:            12,
-				ProtocolVersion: byte(proto.V1),
+				ProtocolVersion: proto.V1,
 				ProfileVersion:  profile.Version,
 				DataType:        proto.DataTypeFIT,
 			},
@@ -651,7 +651,7 @@ func TestUpdateHeader(t *testing.T) {
 			expect: func() []byte {
 				h := proto.FileHeader{
 					Size:            12,
-					ProtocolVersion: byte(proto.V1),
+					ProtocolVersion: proto.V1,
 					ProfileVersion:  profile.Version,
 					DataType:        proto.DataTypeFIT,
 					DataSize:        2, // updated
@@ -830,7 +830,7 @@ func TestEncodeHeader(t *testing.T) {
 			},
 			header: proto.FileHeader{
 				Size:            14,
-				ProtocolVersion: byte(proto.V1),
+				ProtocolVersion: proto.V1,
 				ProfileVersion:  2135,
 				DataSize:        136830,
 				DataType:        ".FIT",

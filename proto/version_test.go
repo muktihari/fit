@@ -52,7 +52,7 @@ func TestCreateVersion(t *testing.T) {
 
 func TestValidateVersion(t *testing.T) {
 	tt := []struct {
-		version byte
+		version proto.Version
 		err     error
 	}{
 		{version: 32, err: nil},

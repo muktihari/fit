@@ -55,12 +55,12 @@ type FIT struct {
 
 // FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
 type FileHeader struct {
-	Size            byte   // File header size either 12 (legacy) or 14.
-	ProtocolVersion byte   // The FIT Protocol version which is being used to encode the FIT file.
-	ProfileVersion  uint16 // The FIT Profile Version (associated with data defined in Global FIT Profile).
-	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
-	DataType        string // ".FIT" (a string constant)
-	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity of the file header. (this field will be automatically updated by the encoder)
+	Size            byte    // File header size either 12 (legacy) or 14.
+	ProtocolVersion Version // The FIT Protocol version which is being used to encode the FIT file.
+	ProfileVersion  uint16  // The FIT Profile Version (associated with data defined in Global FIT Profile).
+	DataSize        uint32  // The size of the messages in bytes (this field will be automatically updated by the encoder)
+	DataType        string  // ".FIT" (a string constant)
+	CRC             uint16  // Cyclic Redundancy Check 16-bit value to ensure the integrity of the file header. (this field will be automatically updated by the encoder)
 }
 
 // MessageDefinition is the definition of the upcoming data messages.
