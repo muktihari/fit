@@ -344,7 +344,7 @@ You can also use [PeekFileHeader()](#-Peek-FileHeader), [PeekFileId()](#Peek-Fil
 
 ### Peek FileHeader
 
-We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero. This method is idempotent and can be invoked even after Decode has been invoked.
+We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 
 ```go
 package main
@@ -849,35 +849,32 @@ func main() {
     now := time.Now()
     fit := proto.FIT{
         Messages: []proto.Message{
-            // Use factory.CreateMesg if performance is not your main concern,
-            // it's slightly slower as it allocates all of the message's fields.
-            factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-                fieldnum.FileIdType: typedef.FileActivity,
-                fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-                fieldnum.FileIdManufacturer: typedef.ManufacturerBryton,
-                fieldnum.FileIdProduct: uint16(1901), // Bryton Rider 420
-                fieldnum.FileIdProductName:  "Bryton Rider 420",
-            }),
-            // For better performance, consider using factory.CreateMesgOnly
-            // or other alternatives listed below, as these only allocate the
-            // specified fields. However, you can not use WithFieldValues method.
-            factory.CreateMesgOnly(mesgnum.Activity).WithFields(
-                factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityManual.Byte()),
-                factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
-                factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
-            ),
-            // Alternative #1: Directly compose like this, which is the same as above.
-            proto.Message{Num: mesgnum.Session}.WithFields(
+            {Num: mesgnum.FileId, Fields: []proto.Field{
+                factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
+                factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+                factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerBryton.Uint16()),
+                factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(1901)), // Bryton Rider 420
+                factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("Bryton Rider 420"),
+            }},
+            {Num: mesgnum.Record, Fields: []proto.Field{
+                factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(78)),
+                factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(100)),
+            }},
+            {Num: mesgnum.Session, Fields: []proto.Field{
+                factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now)),
+                factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(100)),
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(1000)),
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgCadence).WithValue(uint8(78)),
                 factory.CreateField(mesgnum.Session, fieldnum.SessionAvgHeartRate).WithValue(uint8(100)),
-            ),
-            // Alternative #2: Compose like this, which is as performant as
-            // the two examples above.
-            proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
-                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).FieldBase, Value: proto.Uint16(1000)},
-                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).FieldBase, Value: proto.Uint8(78)},
-                {FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).FieldBase, Value: proto.Uint8(100)},
+            }},
+            {Num: mesgnum.Activity, Fields: []proto.Field{
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityManual.Byte()),
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp).WithValue(datetime.ToUint32(now.Add(7 * time.Hour))), // GMT+7
+                factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
             }},
         },
     }
@@ -1147,8 +1144,10 @@ import (
     "github.com/muktihari/fit/encoder"
     "github.com/muktihari/fit/factory"
     "github.com/muktihari/fit/kit/datetime"
+    "github.com/muktihari/fit/profile/typedef"
     "github.com/muktihari/fit/profile/untyped/fieldnum"
     "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
 )
 
 func main() {
@@ -1164,12 +1163,12 @@ func main() {
     }
 
     // Simplified example, writing only this mesg.
-    mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+    mesg := proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
         factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
         factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
         factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(0)),
         factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
-    )
+    }}
 
     // Write per message, we can use this to write message as it arrives.
     // For example, message retrieved from decoder's Listener can be
@@ -1180,8 +1179,7 @@ func main() {
 
     /* Write more messages */
 
-    // This should be invoked for every sequence of FIT File
-    // (not every message) to finalize.
+    // After all messages have been written, invoke this to finalize.
     if err := streamEnc.SequenceCompleted(); err != nil {
         panic(err)
     }

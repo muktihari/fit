@@ -167,7 +167,7 @@ Output:
 
 ```sh
 About:
-  fitactivity is a program to handle FIT files based on provided command.
+  fitactivity is a program to manage FIT files based on provided command.
 
 Usage:
   fitactivity [command]
@@ -228,6 +228,7 @@ Subcommand Flags (only if subcommand is provided):
    --rdp       float64    reduce method: RDP [Ramer-Douglas-Peucker] based on GPS points, epsilon > 0
    --distance  float64    reduce method: distance interval in meters
    --time      uint32     reduce method: time interval in seconds
+
   remove: (select at least one)
    --unknown   bool       remove unknown messages
    --nums      string     remove message numbers (value separated by comma)
