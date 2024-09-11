@@ -191,6 +191,10 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
 		buf:               make([]byte, 0, 1536),
+		mesgDef: proto.MessageDefinition{
+			FieldDefinitions:          make([]proto.FieldDefinition, 255),
+			DeveloperFieldDefinitions: make([]proto.DeveloperFieldDefinition, 255),
+		},
 	}
 	e.Reset(w, opts...)
 	return e
@@ -463,7 +467,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		}
 	}
 
-	mesgDef := e.createMessageDefinition(mesg)
+	mesgDef := e.newMessageDefinition(mesg)
 	if err := e.protocolValidator.ValidateMessageDefinition(mesgDef); err != nil {
 		return err
 	}
@@ -530,7 +534,7 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 }
 
-func (e *Encoder) createMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
+func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
 	e.mesgDef.Header = proto.MesgDefinitionMask
 	e.mesgDef.Reserved = mesg.Reserved
 	e.mesgDef.Architecture = mesg.Architecture

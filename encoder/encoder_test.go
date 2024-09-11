@@ -1300,6 +1300,178 @@ func TestCompressTimestampInHeader(t *testing.T) {
 	}
 }
 
+func TestNewMessageDefinition(t *testing.T) {
+	tt := []struct {
+		name    string
+		mesg    *proto.Message
+		mesgDef *proto.MessageDefinition
+	}{
+		{
+			name: "fields only with non-array values",
+			mesg: &proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{Num: fieldnum.FileIdType, BaseType: basetype.Enum}, Value: proto.Uint8(typedef.FileActivity.Byte())},
+			}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.FileId,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.FileIdType,
+						Size:     1,
+						BaseType: basetype.Enum,
+					},
+				},
+			},
+		},
+		{
+			name: "fields only with mesg architecture big-endian",
+			mesg: func() *proto.Message {
+				mesg := &proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+					{FieldBase: &proto.FieldBase{Num: fieldnum.FileIdType, BaseType: basetype.Enum}, Value: proto.Uint8(typedef.FileActivity.Byte())},
+				}}
+				mesg.Architecture = 1 // big-endian
+				return mesg
+			}(),
+			mesgDef: &proto.MessageDefinition{
+				Header:       proto.MesgDefinitionMask,
+				Architecture: 1, // big-endian
+				MesgNum:      mesgnum.FileId,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.FileIdType,
+						Size:     1,
+						BaseType: basetype.Enum,
+					},
+				},
+			},
+		},
+		{
+			name: "fields only with string value",
+			mesg: &proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{Num: fieldnum.FileIdProductName, BaseType: basetype.String}, Value: proto.String("FIT SDK Go")},
+			}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.FileId,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.FileIdProductName,
+						Size:     1 * 11, // len("FIT SDK Go") == 10 + '0x00'
+						BaseType: basetype.String,
+					},
+				},
+			},
+		},
+		{
+			name: "fields only with array of byte",
+			mesg: &proto.Message{Num: mesgnum.UserProfile, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{Num: fieldnum.UserProfileGlobalId, BaseType: basetype.Byte}, Value: proto.SliceUint8([]byte{2, 9})},
+			}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+			},
+		},
+
+		{
+			name: "developer fields",
+			mesg: &proto.Message{Num: mesgnum.UserProfile,
+				Fields: []proto.Field{
+					{FieldBase: &proto.FieldBase{Num: fieldnum.UserProfileGlobalId, BaseType: basetype.Byte}, Value: proto.SliceUint8([]byte{2, 9})},
+				},
+				DeveloperFields: []proto.DeveloperField{
+					{Num: 0, DeveloperDataIndex: 0, Value: proto.Uint8(1)},
+				}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num: 0, Size: 1, DeveloperDataIndex: 0,
+					},
+				},
+			},
+		},
+		{
+			name: "developer fields with string value \"FIT SDK Go\", size should be 11",
+			mesg: &proto.Message{Num: mesgnum.UserProfile,
+				Fields: []proto.Field{
+					{FieldBase: &proto.FieldBase{Num: fieldnum.UserProfileGlobalId, BaseType: basetype.Byte}, Value: proto.SliceUint8([]byte{2, 9})},
+				},
+				DeveloperFields: []proto.DeveloperField{
+					{
+						Num: 0, DeveloperDataIndex: 0, Value: proto.String("FIT SDK Go"),
+					},
+				}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num: 0, Size: 11, DeveloperDataIndex: 0,
+					},
+				},
+			},
+		},
+		{
+			name: "developer fields with value []uint16{1,2,3}, size should be 3*2 = 6",
+			mesg: &proto.Message{Num: mesgnum.UserProfile,
+				Fields: []proto.Field{
+					{FieldBase: &proto.FieldBase{Num: fieldnum.UserProfileGlobalId, BaseType: basetype.Byte}, Value: proto.SliceUint8([]byte{2, 9})},
+				},
+				DeveloperFields: []proto.DeveloperField{
+					{Num: 0, DeveloperDataIndex: 0, Value: proto.SliceUint16([]uint16{1, 2, 3})},
+				}},
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.UserProfile,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.UserProfileGlobalId,
+						Size:     2,
+						BaseType: basetype.Byte,
+					},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num: 0, Size: 6, DeveloperDataIndex: 0,
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			mesgDef := (&Encoder{}).newMessageDefinition(tc.mesg)
+			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
 // bufferAt wraps bytes.Buffer to enable WriteAt for faster encoding.
 type bufferAt struct{ *bytes.Buffer }
 
