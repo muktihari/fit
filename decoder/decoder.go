@@ -610,7 +610,10 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	d.localMessageDefinitions[localMesgNum] = mesgDef
 
 	if len(d.options.mesgDefListeners) > 0 {
-		mesgDef := mesgDef.Clone() // Clone since we don't have control of the object lifecycle outside Decoder.
+		// Clone since we don't have control of the object lifecycle outside Decoder.
+		mesgDef := *mesgDef
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions[:0:0], mesgDef.FieldDefinitions...)
+		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions[:0:0], mesgDef.DeveloperFieldDefinitions...)
 		for i := range d.options.mesgDefListeners {
 			d.options.mesgDefListeners[i].OnMesgDef(mesgDef) // blocking or non-blocking depends on listeners' implementation.
 		}

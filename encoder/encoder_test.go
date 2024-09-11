@@ -1024,7 +1024,9 @@ func TestEncodeMessage(t *testing.T) {
 				factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((166.0 + 500.0) * 5.0)),
 			},
 		}
-		expected := mesg.Clone()
+		expected := proto.Message{
+			Fields: append(mesg.Fields[:0:0], mesg.Fields...),
+		}
 
 		enc := New(io.Discard,
 			WithCompressedTimestampHeader(),
@@ -1072,7 +1074,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 
 		mesgs := append(mesgs[:0:0], mesgs...)
 		for i := range mesgs {
-			mesgs[i] = mesgs[i].Clone()
+			mesgs[i].Fields = append(mesgs[i].Fields[:0:0], mesgs[i].Fields...)
 		}
 
 		buf := new(bytes.Buffer)

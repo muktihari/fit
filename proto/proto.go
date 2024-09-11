@@ -139,13 +139,6 @@ func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
 	return mesgDef, nil
 }
 
-// Clone clones MessageDefinition
-func (m MessageDefinition) Clone() MessageDefinition {
-	m.FieldDefinitions = append(m.FieldDefinitions[:0:0], m.FieldDefinitions...)
-	m.DeveloperFieldDefinitions = append(m.DeveloperFieldDefinitions[:0:0], m.DeveloperFieldDefinitions...)
-	return m
-}
-
 // FieldDefinition is the definition of the upcoming field within the message's structure.
 type FieldDefinition struct {
 	Num      byte              // The field definition number
@@ -198,19 +191,6 @@ func (m *Message) RemoveFieldByNum(num byte) {
 			return
 		}
 	}
-}
-
-// Clone clones Message.
-func (m Message) Clone() Message {
-	m.Fields = append(m.Fields[:0:0], m.Fields...)
-	for i := range m.Fields {
-		m.Fields[i] = m.Fields[i].Clone()
-	}
-	m.DeveloperFields = append(m.DeveloperFields[:0:0], m.DeveloperFields...)
-	for i := range m.DeveloperFields {
-		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
-	}
-	return m
 }
 
 // FieldBase acts as a fundamental representation of a field as defined in the Global FIT Profile.
@@ -292,23 +272,6 @@ func convertToInt64(val Value) (int64, bool) {
 	return 0, false
 }
 
-// Clone clones Field
-func (f Field) Clone() Field {
-	if f.FieldBase == nil {
-		return f
-	}
-
-	fieldBase := *f.FieldBase // also include FieldBase, clone is meant to be a deep copy
-	fieldBase.Components = append(fieldBase.Components[:0:0], fieldBase.Components...)
-	fieldBase.SubFields = append(fieldBase.SubFields[:0:0], fieldBase.SubFields...)
-	for i := range fieldBase.SubFields {
-		fieldBase.SubFields[i] = fieldBase.SubFields[i].Clone()
-	}
-	f.FieldBase = &fieldBase
-
-	return f
-}
-
 // DeveloperField is a way to add custom data fields to existing messages. Developer Data Fields can be added
 // to any message at runtime by providing a self-describing FieldDefinition messages prior to that message.
 // The combination of the DeveloperDataIndex and FieldDefinitionNumber create a unique id for each FieldDescription.
@@ -321,11 +284,6 @@ type DeveloperField struct {
 	Num                byte // Maps to `field_definition_number` of a `field_description` message.
 	DeveloperDataIndex byte // Maps to `developer_data_index` of a `developer_data_id` and a `field_description` messages.
 	Value              Value
-}
-
-// Clone clones DeveloperField
-func (f DeveloperField) Clone() DeveloperField {
-	return f
 }
 
 // Component is a way of compressing one or more fields into a bit field expressed in a single containing field.
@@ -347,13 +305,6 @@ type SubField struct {
 	Units      string
 	Maps       []SubFieldMap
 	Components []Component
-}
-
-// Clone clones SubField
-func (s SubField) Clone() SubField {
-	s.Components = append(s.Components[:0:0], s.Components...)
-	s.Maps = append(s.Maps[:0:0], s.Maps...)
-	return s
 }
 
 // SubFieldMap is the mapping between SubField and the corresponding main Field in a Message.

@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -75,26 +74,6 @@ func TestFitWithMessages(t *testing.T) {
 				t.Fatal(diff)
 			}
 		})
-	}
-}
-
-func TestMessageDefinitionClone(t *testing.T) {
-	mesgDef := proto.MessageDefinition{
-		FieldDefinitions: []proto.FieldDefinition{
-			{Num: fieldnum.RecordCadence, Size: 1, BaseType: basetype.Uint8},
-			{Num: fieldnum.RecordHeartRate, Size: 1, BaseType: basetype.Uint8},
-		},
-		DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
-			{Num: 0, DeveloperDataIndex: 0, Size: 1},
-		},
-	}
-
-	cloned := mesgDef.Clone()
-	cloned.FieldDefinitions[0].Num = 100
-	cloned.DeveloperFieldDefinitions[0].Num = 100
-
-	if diff := cmp.Diff(mesgDef, cloned); diff == "" {
-		t.Fatalf("expected deep cloned, but some data still being referenced.")
 	}
 }
 
@@ -216,33 +195,6 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 	}
 }
 
-func TestMessageClone(t *testing.T) {
-	mesg := proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
-		factory.CreateField(mesgnum.Session, fieldnum.SessionAvgAltitude).WithValue(uint16(1000)),
-		factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(1000)),
-	},
-		DeveloperFields: []proto.DeveloperField{
-			{
-				Num:                0,
-				DeveloperDataIndex: 0,
-				Value:              proto.Uint8(1),
-			},
-			{},
-		}}
-
-	cloned := mesg.Clone()
-	cloned.Fields[0].Num = 100
-	cloned.DeveloperFields[0].Num = 100
-
-	if diff := cmp.Diff(mesg, cloned,
-		cmp.Transformer("Value", func(v proto.Value) any {
-			return v.Any()
-		}),
-	); diff == "" {
-		t.Fatalf("expected deep cloned, but some data still being referenced.")
-	}
-}
-
 func TestFieldSubFieldSubtitution(t *testing.T) {
 	tt := []struct {
 		name         string
@@ -291,43 +243,5 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 				t.Fatalf("expected: %s, got: %s", tc.subfieldName, subfield.Name)
 			}
 		})
-	}
-}
-
-func TestFieldClone(t *testing.T) {
-	field := factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed)
-
-	cloned := field.Clone()
-	cloned.Components[0].Scale = 777
-
-	if diff := cmp.Diff(field, cloned,
-		cmp.Transformer("Value", func(v proto.Value) any {
-			return v.Any()
-		}),
-	); diff == "" {
-		t.Fatalf("expected deep cloned, but some data still being referenced.")
-	}
-
-	field = factory.CreateField(mesgnum.Session, fieldnum.SessionTotalCycles)
-	cloned = field.Clone()
-	field.SubFields[0].Name = "FIT SDK for Go"
-
-	if diff := cmp.Diff(field, cloned,
-		cmp.Transformer("Value", func(v proto.Value) any {
-			return v.Any()
-		}),
-	); diff == "" {
-		t.Fatalf("should not changed")
-	}
-
-	field = proto.Field{}
-	cloned = field.Clone()
-
-	if diff := cmp.Diff(field, cloned,
-		cmp.Transformer("Value", func(v proto.Value) any {
-			return v.Any()
-		}),
-	); diff != "" {
-		t.Fatalf("empty field base, field should be returned as is: %v", diff)
 	}
 }
