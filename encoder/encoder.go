@@ -71,7 +71,7 @@ type Encoder struct {
 
 	mesgDef proto.MessageDefinition // Temporary message definition to reduce alloc.
 
-	// Dynamic-sized buffer for encoding, starting at 1537 bytes (the maximum size of Message Definition).
+	// Dynamic-sized buffer for encoding, starting at 1536 bytes (see PR #415 and #416 for details).
 	// It starts small but grows as needed and may only grow when using Message's MarshalAppend.
 	buf []byte
 }
@@ -190,7 +190,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		crc16:             crc16.New(nil),
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
-		buf:               make([]byte, 0, proto.MaxBytesPerMessageDefinition),
+		buf:               make([]byte, 0, 1536),
 	}
 	e.Reset(w, opts...)
 	return e
