@@ -62,24 +62,21 @@ func createValidFitOnlyContainFileId(ctx context.Context) error {
 
 	now := datetime.ToTime(uint32(1062766519))
 	fit := &proto.FIT{Messages: []proto.Message{
-		{Num: typedef.MesgNumFileId, Fields: []proto.Field{
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("something ss"),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerBryton),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
 		}},
-		{Num: typedef.MesgNumActivity, Fields: []proto.Field{
-			factory.CreateField(typedef.MesgNumActivity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
+		{Num: mesgnum.Activity, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now)),
 		}},
-		factory.CreateMesg(typedef.MesgNumRecord).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(now),
-			fieldnum.RecordHeartRate: uint8(112),
-			fieldnum.RecordCadence:   uint8(80),
-			// fieldnum.RecordAltitude:  float64(150), // input scaled value
-			fieldnum.RecordAltitude: Uint16((150 + 500) * 5), // input scaled value
-			// fieldnum.RecordAltitude: uint16((150 + 500) * 5), // input scaled value
-			// fieldnum.RecordAltitude: "something", // input scaled value
-		}),
+		{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(112)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(80)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(Uint16((150 + 500) * 5)),
+		}},
 	}}
 
 	enc := encoder.New(f)

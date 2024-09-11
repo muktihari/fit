@@ -20,7 +20,7 @@ const MaxBytesPerMessage = 1 + (255*255)*2
 const MaxBytesPerMessageDefinition = 5 + 1 + (255 * 3) + 1 + (255 * 3)
 
 // MarshalAppend appends the FIT format encoding of FileHeader to b, returning the result.
-func (h FileHeader) MarshalAppend(b []byte) ([]byte, error) {
+func (h *FileHeader) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, h.Size, h.ProtocolVersion)
 	b = binary.LittleEndian.AppendUint16(b, h.ProfileVersion)
 	b = binary.LittleEndian.AppendUint32(b, h.DataSize)
@@ -32,7 +32,7 @@ func (h FileHeader) MarshalAppend(b []byte) ([]byte, error) {
 }
 
 // MarshalAppend appends the FIT format encoding of MessageDefinition to b, returning the result.
-func (m MessageDefinition) MarshalAppend(b []byte) ([]byte, error) {
+func (m *MessageDefinition) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, m.Header)
 	b = append(b, m.Reserved)
 	b = append(b, m.Architecture)
@@ -67,7 +67,7 @@ func (m MessageDefinition) MarshalAppend(b []byte) ([]byte, error) {
 }
 
 // MarshalAppend appends the FIT format encoding of Message to b, returning the result.
-func (m Message) MarshalAppend(b []byte) ([]byte, error) {
+func (m *Message) MarshalAppend(b []byte) ([]byte, error) {
 	b = append(b, m.Header)
 
 	var err error

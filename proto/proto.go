@@ -170,22 +170,6 @@ type Message struct {
 	DeveloperFields []DeveloperField // List of DeveloperField
 }
 
-// WithFieldValues assigns the values of the targeted fields with the given map,
-// where map[byte]any represents the field numbers and their respective values.
-// If the Message does not have a corresponding field number match in the Fields, no value will be assigned or added.
-func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
-	for i := range m.Fields {
-		value, ok := fieldNumValues[m.Fields[i].Num]
-		if !ok {
-			continue
-		}
-		if value != nil { // only accept non-nil value.
-			m.Fields[i].Value = Any(value)
-		}
-	}
-	return m
-}
-
 // FieldByNum returns a pointer to the Field in a Message, if not found return nil.
 func (m *Message) FieldByNum(num byte) *Field {
 	for i := range m.Fields {

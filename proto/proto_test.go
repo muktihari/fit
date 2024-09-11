@@ -98,35 +98,6 @@ func TestMessageDefinitionClone(t *testing.T) {
 	}
 }
 
-func TestMessageWithFieldValues(t *testing.T) {
-	tt := []struct {
-		name        string
-		fieldValues map[byte]any
-	}{
-		{
-			name: "withFieldValues",
-			fieldValues: map[byte]any{
-				fieldnum.RecordSpeed:   uint16(1000),
-				fieldnum.RecordCadence: uint16(100),
-			},
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			mesg := factory.CreateMesg(mesgnum.Record)
-			mesg.WithFieldValues(tc.fieldValues)
-			for i := range mesg.Fields {
-				if value, ok := tc.fieldValues[mesg.Fields[i].Num]; ok {
-					if mesg.Fields[i].Value.Any() != value {
-						t.Errorf("expected %T(%v), got: %T(%v)", value, value, mesg.Fields[i].Value, mesg.Fields[i].Value)
-					}
-				}
-			}
-		})
-	}
-}
-
 func TestMessageFieldByNum(t *testing.T) {
 	sharedField := factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart)
 

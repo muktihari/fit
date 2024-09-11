@@ -876,16 +876,16 @@ func TestEncodeMessage(t *testing.T) {
 	}{
 		{
 			name: "encode message with default header option happy flow",
-			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-				fieldnum.FileIdType: typedef.FileActivity,
-			}),
+			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+			}},
 			w: fnWriteOK,
 		},
 		{
 			name: "encode message with big-endian",
-			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-				fieldnum.FileIdType: typedef.FileActivity,
-			}),
+			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+			}},
 			w:          fnWriteOK,
 			opts:       []Option{WithBigEndian()},
 			endianness: bigEndian,
@@ -895,9 +895,9 @@ func TestEncodeMessage(t *testing.T) {
 			opts: []Option{
 				WithNormalHeader(2),
 			},
-			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-				fieldnum.FileIdType: typedef.FileActivity,
-			}),
+			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+			}},
 			w: fnWriteOK,
 		},
 		{
@@ -905,9 +905,9 @@ func TestEncodeMessage(t *testing.T) {
 			opts: []Option{
 				WithCompressedTimestampHeader(),
 			},
-			mesg: factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-				fieldnum.FileIdType: typedef.FileActivity,
-			}),
+			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+			}},
 			w: fnWriteOK,
 		},
 		{
@@ -1053,17 +1053,17 @@ func TestEncodeMessage(t *testing.T) {
 func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 	now := time.Now()
 	mesgs := []proto.Message{
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(now),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(time.Second)),
-			fieldnum.RecordHeartRate: uint8(70),
-		}),
-		factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(2 * time.Second)),
-			fieldnum.RecordSpeed:     uint16(1000),
-		}),
+		{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+		}},
+		{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(time.Second))),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(70)),
+		}},
+		{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+		}},
 	}
 
 	t.Run("multiple local mesg type", func(t *testing.T) {
@@ -1092,9 +1092,9 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 		}
 
 		// add 4th mesg, header should be 0, reset.
-		mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-			fieldnum.RecordTimestamp: datetime.ToUint32(now),
-		})
+		mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+		}}
 		buf.Reset()
 		if err := enc.encodeMessage(&mesg); err != nil {
 			t.Fatal(err)
@@ -1139,7 +1139,7 @@ func makeEncodeMessagesTableTest() []encodeMessagesTestCase {
 		},
 		{
 			name:  "missing file_id mesg",
-			mesgs: []proto.Message{factory.CreateMesg(mesgnum.Record)},
+			mesgs: []proto.Message{{Num: mesgnum.Record}},
 			err:   ErrMissingFileId,
 		},
 	}
@@ -1183,22 +1183,22 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		{
 			name: "compress timestamp in header happy flow",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
-					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(time.Second)), // +1s
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(2 * time.Second)), // +2s
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(32 * time.Second)), // +32 rollover
-				}),
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(time.Second))), // +1),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))), // +2),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(32 * time.Second))), // +32 rollove),
+				}},
 			},
 			headers: []byte{
 				proto.MesgNormalHeaderMask, // file_id: has no timestamp
@@ -1211,19 +1211,19 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		{
 			name: "compress timestamp in header happy flow: roll over occurred exactly after 32 seconds",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
-					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(32 * time.Second)),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: datetime.ToUint32(now.Add(33 * time.Second)),
-				}),
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(32 * time.Second))),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(33 * time.Second))),
+				}},
 			},
 			headers: []byte{
 				proto.MesgNormalHeaderMask, // file_id: has no timestamp
@@ -1235,13 +1235,13 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		{
 			name: "timestamp less than DateTimeMin",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
-					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: uint32(1234),
-				}),
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(1234)),
+				}},
 			},
 			headers: []byte{
 				proto.MesgNormalHeaderMask,
@@ -1251,13 +1251,13 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		{
 			name: "timestamp wrong type not uint32 or typedef.DateTime",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
-					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: typedef.DateTime(datetime.ToUint32(now)),
-				}),
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(typedef.DateTime(datetime.ToUint32(now))),
+				}},
 			},
 			headers: []byte{
 				proto.MesgNormalHeaderMask,
@@ -1267,13 +1267,13 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		{
 			name: "timestamp wrong type not uint32 or typedef.DateTime",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFieldValues(map[byte]any{
-					fieldnum.FileIdManufacturer: typedef.ManufacturerGarmin,
-					fieldnum.FileIdTimeCreated:  datetime.ToUint32(now),
-				}),
-				factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-					fieldnum.RecordTimestamp: now, // time.Time{}
-				}),
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(now), // time.Time{),
+				}},
 			},
 			headers: []byte{
 				proto.MesgNormalHeaderMask,

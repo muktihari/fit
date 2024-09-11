@@ -120,11 +120,6 @@ func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
 	return mesg
 }
 
-{{ template "create_mesg_only_doc" -}}
-func (f *Factory) CreateMesgOnly(num typedef.MesgNum) proto.Message {
-	return proto.Message{Num: num}
-}
-
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	if mesgNum < {{ .LenMesgs }} && mesgs[mesgNum] != nil {
@@ -191,11 +186,6 @@ func CreateMesg(num typedef.MesgNum) proto.Message {
 	return std.CreateMesg(num)
 }
 
-{{- template "create_mesg_only_doc" -}}
-func CreateMesgOnly(num typedef.MesgNum) proto.Message{
-	return std.CreateMesgOnly(num)
-}
-
 {{ template "create_field_doc" -}}
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
 	return std.CreateField(mesgNum, num)
@@ -218,10 +208,6 @@ func RegisterMesg(mesg proto.Message) error {
 // NOTE: This method is not used by either the Decoder or the Encoder, and the data will only be populated once upon the first invocation.
 // Unless you need most of the returned fields, it's recommended create an empty proto.Message{Num: num} then fill only the necessary fields 
 // using CreateField method.
-{{ end }}
-
-{{ define "create_mesg_only_doc" }}
-// CreateMesgOnly is a syntax sugar for creating proto.Message{Num: num}.
 {{ end }}
 
 {{ define "create_field_doc" }}
