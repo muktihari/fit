@@ -287,7 +287,7 @@ func BenchmarkMessageDefinitionMarshalAppend(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	arr := [proto.MaxBytesPerMessageDefinition]byte{}
+	arr := make([]byte, 6+len(mesg.Fields)*3+len(mesg.DeveloperFields)*3)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {

@@ -13,15 +13,9 @@ const littleEndian = 0
 
 // Marshaler should only do one thing: marshaling to its bytes representation, any validation should be done outside.
 
-// Header + ((max n Fields) * (n value)) + ((max n DeveloperFields) * (n value))
-const MaxBytesPerMessage = 1 + (255*255)*2
-
-// Header + Reserved + Architecture + MesgNum (2 bytes) + n Fields + (Max n Fields * 3) + n DevFields + (Max n DevFields * 3).
-const MaxBytesPerMessageDefinition = 5 + 1 + (255 * 3) + 1 + (255 * 3)
-
 // MarshalAppend appends the FIT format encoding of FileHeader to b, returning the result.
 func (h *FileHeader) MarshalAppend(b []byte) ([]byte, error) {
-	b = append(b, h.Size, h.ProtocolVersion)
+	b = append(b, h.Size, byte(h.ProtocolVersion))
 	b = binary.LittleEndian.AppendUint16(b, h.ProfileVersion)
 	b = binary.LittleEndian.AppendUint32(b, h.DataSize)
 	b = append(b, h.DataType[:4]...)
