@@ -215,7 +215,6 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	}
 
 	e.reset()
-	e.protocolValidator.SetProtocolVersion(e.options.protocolVersion)
 
 	var lruSize byte = 1
 	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
@@ -319,6 +318,7 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
 		header.ProtocolVersion = byte(proto.V1)
 	}
+	e.protocolValidator.SetProtocolVersion(proto.Version(header.ProtocolVersion))
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
