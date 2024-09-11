@@ -887,8 +887,8 @@ func TestNext(t *testing.T) {
 		t.Fatalf("should have next, return false")
 	}
 
-	if len(dec.accumulator.AccumulatedValues) != 0 {
-		t.Fatalf("expected accumulator's AccumulatedValues is 0, got: %d", len(dec.accumulator.AccumulatedValues))
+	if len(dec.accumulator.values) != 0 {
+		t.Fatalf("expected accumulator's AccumulatedValues is 0, got: %d", len(dec.accumulator.values))
 	}
 
 	if dec.crc16.Sum16() != 0 { // not necessary since reset every decode header anyway, but let's just add it
@@ -2584,6 +2584,7 @@ func TestReset(t *testing.T) {
 			dec.Reset(buf, tc.opts...)
 
 			if diff := cmp.Diff(dec, tc.dec,
+				cmp.AllowUnexported(Accumulator{}),
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
 				cmp.AllowUnexported(readBuffer{}),
