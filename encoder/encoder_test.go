@@ -735,6 +735,7 @@ func TestUpdateHeader(t *testing.T) {
 func TestEncodeHeader(t *testing.T) {
 	tt := []struct {
 		name            string
+		opts            []Option
 		protocolVersion proto.Version
 		header          proto.FileHeader
 		b               []byte
@@ -760,6 +761,7 @@ func TestEncodeHeader(t *testing.T) {
 
 				return b
 			}(),
+			protocolVersion: proto.V1,
 		},
 		{
 			name:            "header 12 legacy",
@@ -820,19 +822,44 @@ func TestEncodeHeader(t *testing.T) {
 				247, 38,
 			},
 		},
+		{
+			name:            "force use protocol version from Option",
+			protocolVersion: proto.V2,
+			opts: []Option{
+				WithProtocolVersion(proto.V2),
+			},
+			header: proto.FileHeader{
+				Size:            14,
+				ProtocolVersion: byte(proto.V1),
+				ProfileVersion:  2135,
+				DataSize:        136830,
+				DataType:        ".FIT",
+				CRC:             21830,
+			},
+			b: []byte{
+				14,
+				32, // Previously 16
+				87, 8,
+				126, 22, 2, 0,
+				46, 70, 73, 84,
+				185, 85, // Previously was 70, 85,
+			},
+		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			bytebuf := new(bytes.Buffer)
-			enc := New(bytebuf, WithWriteBufferSize(0))
-			if tc.protocolVersion != 0 {
-				enc.options.protocolVersion = tc.protocolVersion
-			}
+			enc := New(bytebuf, append(tc.opts, WithWriteBufferSize(0))...)
 			_ = enc.encodeFileHeader(&tc.header)
 
 			if diff := cmp.Diff(bytebuf.Bytes(), tc.b); diff != "" {
 				t.Fatal(diff)
+			}
+
+			if enc.protocolValidator.ProtocolVersion() != tc.protocolVersion {
+				t.Fatalf("expected protocol version: %v, got: %v",
+					tc.protocolVersion, enc.options.protocolVersion)
 			}
 		})
 	}
@@ -970,6 +997,9 @@ func TestEncodeMessage(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.opts = append(tc.opts, WithWriteBufferSize(0))
 			enc := New(tc.w, tc.opts...)
+			// Protocol Version now is set on encodeFileHeader as we allow dynamic protocol version
+			// based on FileHeader. This by pass it since we don't encode file header.
+			enc.protocolValidator.SetProtocolVersion(enc.options.protocolVersion)
 			err := enc.encodeMessage(&tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
