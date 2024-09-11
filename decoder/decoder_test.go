@@ -573,7 +573,7 @@ func TestCheckIntegrity(t *testing.T) {
 				return bytes.NewReader(b)
 			}(),
 			n:   1,
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 	}
 
@@ -981,7 +981,7 @@ func makeDecodeTableTest() []decodeTestCase {
 					return
 				})
 			}(),
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "decode messages return error",
@@ -1124,7 +1124,7 @@ func TestDecodeFileHeader(t *testing.T) {
 					return
 				})
 			}(),
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "decode header invalid size",
@@ -1184,7 +1184,7 @@ func TestDecodeFileHeader(t *testing.T) {
 					return
 				})
 			}(),
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "decode crc == 0x000",

@@ -114,7 +114,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				})
 			}(),
 			fn:  fnDecodeRawOK,
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "unexpected EOF when decode header",
@@ -146,7 +146,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				})
 			}(),
 			fn:  fnDecodeRawOK,
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "fn FileHeader returns io.EOF",

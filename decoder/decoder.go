@@ -30,7 +30,7 @@ func (e errorString) Error() string { return string(e) }
 
 const (
 	// Integrity errors
-	ErrNotAFitFile         = errorString("not a FIT file")
+	ErrNotFITFile          = errorString("not a FIT file")
 	ErrDataSizeZero        = errorString("data size zero")
 	ErrCRCChecksumMismatch = errorString("crc checksum mismatch")
 
@@ -464,7 +464,7 @@ func (d *Decoder) decodeFileHeader() error {
 	size := b[0]
 
 	if size != 12 && size != 14 { // current spec is either 12 or 14
-		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotAFitFile)
+		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotFITFile)
 	}
 	_, _ = d.crc16.Write(b)
 
@@ -477,7 +477,7 @@ func (d *Decoder) decodeFileHeader() error {
 
 	// PERF: Neither string(b[7:11]) nor assigning proto.DataTypeFIT constant to a variable escape to the heap.
 	if string(b[7:11]) != proto.DataTypeFIT {
-		return ErrNotAFitFile
+		return ErrNotFITFile
 	}
 
 	d.fileHeader = proto.FileHeader{

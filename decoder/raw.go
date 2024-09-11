@@ -107,7 +107,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 
 		fileHeaderSize := d.BytesArray[0]
 		if fileHeaderSize != 12 && fileHeaderSize != 14 {
-			return n, fmt.Errorf("file header's size [%d]: %w", fileHeaderSize, ErrNotAFitFile)
+			return n, fmt.Errorf("file header's size [%d]: %w", fileHeaderSize, ErrNotFITFile)
 		}
 
 		nr, err = io.ReadFull(r, d.BytesArray[1:fileHeaderSize])
@@ -117,7 +117,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 		}
 
 		if string(d.BytesArray[8:12]) != proto.DataTypeFIT {
-			return n, ErrNotAFitFile
+			return n, ErrNotFITFile
 		}
 
 		fileHeaderDataSize := binary.LittleEndian.Uint32(d.BytesArray[4:8])
