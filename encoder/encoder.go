@@ -192,8 +192,8 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		localMesgNumLRU:   new(lru),
 		buf:               make([]byte, 0, 1536),
 		mesgDef: proto.MessageDefinition{
-			FieldDefinitions:          make([]proto.FieldDefinition, 255),
-			DeveloperFieldDefinitions: make([]proto.DeveloperFieldDefinition, 255),
+			FieldDefinitions:          make([]proto.FieldDefinition, 0, 255),
+			DeveloperFieldDefinitions: make([]proto.DeveloperFieldDefinition, 0, 255),
 		},
 	}
 	e.Reset(w, opts...)
@@ -539,8 +539,9 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 	e.mesgDef.Reserved = mesg.Reserved
 	e.mesgDef.Architecture = mesg.Architecture
 	e.mesgDef.MesgNum = mesg.Num
-
 	e.mesgDef.FieldDefinitions = e.mesgDef.FieldDefinitions[:0]
+	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
+
 	for i := range mesg.Fields {
 		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions, proto.FieldDefinition{
 			Num:      mesg.Fields[i].Num,
@@ -554,7 +555,6 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 	}
 
 	e.mesgDef.Header |= proto.DevDataMask
-	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
 	for i := range mesg.DeveloperFields {
 		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
 			Num:                mesg.DeveloperFields[i].Num,
