@@ -147,6 +147,18 @@ func newActivityMessagesWithExpectedOrder(now time.Time) (mesgs []proto.Message,
 		23: {Num: mesgnum.Set, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Set, fieldnum.SetTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 		}},
+		24: {Num: mesgnum.GpsMetadata, Fields: []proto.Field{
+			factory.CreateField(mesgnum.GpsMetadata, fieldnum.GpsMetadataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		}},
+		25: {Num: mesgnum.TimeInZone, Fields: []proto.Field{
+			factory.CreateField(mesgnum.TimeInZone, fieldnum.TimeInZoneTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
+		}},
+		26: {Num: mesgnum.Split, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Split, fieldnum.SplitTotalDistance).WithValue(uint32(10000)),
+		}},
+		27: {Num: mesgnum.SplitSummary, Fields: []proto.Field{
+			factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeAscentSplit.Byte()),
+		}},
 	}
 
 	ordered = []proto.Message{
@@ -161,19 +173,23 @@ func newActivityMessagesWithExpectedOrder(now time.Time) (mesgs []proto.Message,
 		8:  mesgs[17],
 		9:  mesgs[18],
 		10: mesgs[20],
-		11: mesgs[5],
-		12: mesgs[6],
-		13: mesgs[7],
-		14: mesgs[8],
-		15: mesgs[9],
-		16: mesgs[10],
-		17: mesgs[11],
-		18: mesgs[12],
-		19: mesgs[13],
-		20: mesgs[19],
-		21: mesgs[21],
-		22: mesgs[22],
-		23: mesgs[23],
+		11: mesgs[26],
+		12: mesgs[27],
+		13: mesgs[5],
+		14: mesgs[6],
+		15: mesgs[7],
+		16: mesgs[8],
+		17: mesgs[9],
+		18: mesgs[10],
+		19: mesgs[11],
+		20: mesgs[12],
+		21: mesgs[13],
+		22: mesgs[19],
+		23: mesgs[21],
+		24: mesgs[22],
+		25: mesgs[23],
+		26: mesgs[24],
+		27: mesgs[25],
 	}
 	return
 }

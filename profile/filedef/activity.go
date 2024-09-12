@@ -30,16 +30,20 @@ type Activity struct {
 	Records  []*mesgdef.Record  // required fields: timestamp
 
 	// Optional Messages
-	UserProfile  *mesgdef.UserProfile
-	DeviceInfos  []*mesgdef.DeviceInfo // required fields: timestamp
-	Events       []*mesgdef.Event
-	Lengths      []*mesgdef.Length // required fields: timestamp, event, event_type
-	SegmentLaps  []*mesgdef.SegmentLap
-	ZonesTargets []*mesgdef.ZonesTarget
-	Workouts     []*mesgdef.Workout
-	WorkoutSteps []*mesgdef.WorkoutStep
-	HRs          []*mesgdef.Hr
-	HRVs         []*mesgdef.Hrv // required fields: time
+	UserProfile    *mesgdef.UserProfile
+	DeviceInfos    []*mesgdef.DeviceInfo // required fields: timestamp
+	Events         []*mesgdef.Event
+	Lengths        []*mesgdef.Length // required fields: timestamp, event, event_type
+	SegmentLaps    []*mesgdef.SegmentLap
+	ZonesTargets   []*mesgdef.ZonesTarget
+	Workouts       []*mesgdef.Workout
+	WorkoutSteps   []*mesgdef.WorkoutStep
+	HRs            []*mesgdef.Hr
+	HRVs           []*mesgdef.Hrv // required fields: time
+	GpsMetadatas   []*mesgdef.GpsMetadata
+	TimeInZones    []*mesgdef.TimeInZone
+	Splits         []*mesgdef.Split
+	SplitSummaries []*mesgdef.SplitSummary // entries must be unique within each split_type
 
 	// Messages not related to Activity
 	UnrelatedMessages []proto.Message
@@ -73,10 +77,10 @@ func (f *Activity) Add(mesg proto.Message) {
 		f.Laps = append(f.Laps, mesgdef.NewLap(&mesg))
 	case mesgnum.Record:
 		f.Records = append(f.Records, mesgdef.NewRecord(&mesg))
-	case mesgnum.DeviceInfo:
-		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(&mesg))
 	case mesgnum.UserProfile:
 		f.UserProfile = mesgdef.NewUserProfile(&mesg)
+	case mesgnum.DeviceInfo:
+		f.DeviceInfos = append(f.DeviceInfos, mesgdef.NewDeviceInfo(&mesg))
 	case mesgnum.Event:
 		f.Events = append(f.Events, mesgdef.NewEvent(&mesg))
 	case mesgnum.Length:
@@ -93,6 +97,14 @@ func (f *Activity) Add(mesg proto.Message) {
 		f.HRs = append(f.HRs, mesgdef.NewHr(&mesg))
 	case mesgnum.Hrv:
 		f.HRVs = append(f.HRVs, mesgdef.NewHrv(&mesg))
+	case mesgnum.GpsMetadata:
+		f.GpsMetadatas = append(f.GpsMetadatas, mesgdef.NewGpsMetadata(&mesg))
+	case mesgnum.TimeInZone:
+		f.TimeInZones = append(f.TimeInZones, mesgdef.NewTimeInZone(&mesg))
+	case mesgnum.Split:
+		f.Splits = append(f.Splits, mesgdef.NewSplit(&mesg))
+	case mesgnum.SplitSummary:
+		f.SplitSummaries = append(f.SplitSummaries, mesgdef.NewSplitSummary(&mesg))
 	default:
 		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
@@ -103,10 +115,11 @@ func (f *Activity) Add(mesg proto.Message) {
 func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 3 // non slice fields
 
-	size += len(f.Sessions) + len(f.Laps) + len(f.Records) + len(f.DeviceInfos) +
-		len(f.Events) + len(f.Lengths) + len(f.SegmentLaps) + len(f.ZonesTargets) +
-		len(f.Workouts) + len(f.WorkoutSteps) + len(f.HRs) + len(f.HRVs) +
-		len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.UnrelatedMessages)
+	size += len(f.DeveloperDataIds) + len(f.FieldDescriptions) + len(f.Sessions) +
+		len(f.Laps) + len(f.Records) + len(f.DeviceInfos) + len(f.Events) +
+		len(f.Lengths) + len(f.SegmentLaps) + len(f.ZonesTargets) + len(f.Workouts) +
+		len(f.WorkoutSteps) + len(f.HRs) + len(f.HRVs) + len(f.GpsMetadatas) +
+		len(f.TimeInZones) + len(f.Splits) + len(f.SplitSummaries) + len(f.UnrelatedMessages)
 
 	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
@@ -163,6 +176,18 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 	}
 	for i := range f.HRVs {
 		fit.Messages = append(fit.Messages, f.HRVs[i].ToMesg(options))
+	}
+	for i := range f.GpsMetadatas {
+		fit.Messages = append(fit.Messages, f.GpsMetadatas[i].ToMesg(options))
+	}
+	for i := range f.TimeInZones {
+		fit.Messages = append(fit.Messages, f.TimeInZones[i].ToMesg(options))
+	}
+	for i := range f.Splits {
+		fit.Messages = append(fit.Messages, f.Splits[i].ToMesg(options))
+	}
+	for i := range f.SplitSummaries {
+		fit.Messages = append(fit.Messages, f.SplitSummaries[i].ToMesg(options))
 	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
