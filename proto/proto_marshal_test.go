@@ -243,7 +243,7 @@ func TestMessageMarshaler(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := tc.mesg.MarshalAppend(nil)
+			b, err := tc.mesg.MarshalAppend(nil, proto.LittleEndian)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -316,7 +316,7 @@ func BenchmarkMessageMarshalAppend(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, err := mesg.MarshalAppend(buf[:0])
+		_, err := mesg.MarshalAppend(buf[:0], proto.LittleEndian)
 		if err != nil {
 			b.Fatal(err)
 		}

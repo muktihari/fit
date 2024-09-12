@@ -242,7 +242,7 @@ func TestOptions(t *testing.T) {
 			opts: nil,
 			expected: options{
 				multipleLocalMessageType: 0,
-				endianness:               0,
+				endianness:               proto.LittleEndian,
 				messageValidator:         NewMessageValidator(),
 				writeBufferSize:          defaultWriteBufferSize,
 			},
@@ -258,7 +258,7 @@ func TestOptions(t *testing.T) {
 			},
 			expected: options{
 				multipleLocalMessageType: 15,
-				endianness:               1,
+				endianness:               proto.BigEndian,
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionNormal,
@@ -275,7 +275,7 @@ func TestOptions(t *testing.T) {
 			},
 			expected: options{
 				multipleLocalMessageType: 0,
-				endianness:               1,
+				endianness:               proto.BigEndian,
 				protocolVersion:          proto.V2,
 				messageValidator:         fnValidateOK,
 				headerOption:             headerOptionCompressedTimestamp,
@@ -888,7 +888,7 @@ func TestEncodeMessage(t *testing.T) {
 			}},
 			w:          fnWriteOK,
 			opts:       []Option{WithBigEndian()},
-			endianness: bigEndian,
+			endianness: proto.BigEndian,
 		},
 		{
 			name: "encode message with header normal multiple local message type happy flow",
@@ -1008,8 +1008,8 @@ func TestEncodeMessage(t *testing.T) {
 				t.Fatalf("message header should not contain Developer Data Flag")
 			}
 
-			if tc.mesg.Architecture != tc.endianness {
-				t.Fatalf("expected endianness: %d, got: %d", tc.endianness, tc.mesg.Architecture)
+			if enc.mesgDef.Architecture != tc.endianness {
+				t.Fatalf("expected endianness: %d, got: %d", tc.endianness, enc.mesgDef.Architecture)
 			}
 		})
 	}
@@ -1304,6 +1304,7 @@ func TestNewMessageDefinition(t *testing.T) {
 	tt := []struct {
 		name    string
 		mesg    *proto.Message
+		arch    byte
 		mesgDef *proto.MessageDefinition
 	}{
 		{
@@ -1329,12 +1330,12 @@ func TestNewMessageDefinition(t *testing.T) {
 				mesg := &proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 					{FieldBase: &proto.FieldBase{Num: fieldnum.FileIdType, BaseType: basetype.Enum}, Value: proto.Uint8(typedef.FileActivity.Byte())},
 				}}
-				mesg.Architecture = 1 // big-endian
 				return mesg
 			}(),
+			arch: 1,
 			mesgDef: &proto.MessageDefinition{
 				Header:       proto.MesgDefinitionMask,
-				Architecture: 1, // big-endian
+				Architecture: proto.BigEndian,
 				MesgNum:      mesgnum.FileId,
 				FieldDefinitions: []proto.FieldDefinition{
 					{
@@ -1464,8 +1465,18 @@ func TestNewMessageDefinition(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			mesgDef := (&Encoder{}).newMessageDefinition(tc.mesg)
-			if diff := cmp.Diff(mesgDef, tc.mesgDef); diff != "" {
+			enc := New(nil)
+			enc.options.endianness = tc.arch
+			mesgDef := enc.newMessageDefinition(tc.mesg)
+			if diff := cmp.Diff(mesgDef, tc.mesgDef,
+				cmp.Transformer("DeveloperFieldDefinitions",
+					func(devFields []proto.DeveloperFieldDefinition) []proto.DeveloperFieldDefinition {
+						if len(devFields) == 0 {
+							return nil
+						}
+						return devFields
+					}),
+			); diff != "" {
 				t.Fatal(diff)
 			}
 		})

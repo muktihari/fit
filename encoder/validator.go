@@ -108,8 +108,6 @@ func (v *messageValidator) Reset() {
 }
 
 func (v *messageValidator) Validate(mesg *proto.Message) error {
-	mesg.Header = proto.MesgNormalHeaderMask // reset default
-
 	var valid int
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]

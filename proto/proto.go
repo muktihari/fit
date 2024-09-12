@@ -29,6 +29,9 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 
 	CompressedBitShift = 5 // Used for right-shifting the 5 least significant bits (lsb) of compressed time.
 
+	LittleEndian = 0
+	BigEndian    = 1
+
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
 
@@ -87,6 +90,7 @@ const (
 )
 
 // NewMessageDefinition returns a new MessageDefinition based on the given Message or an error if one occurs.
+// This will set Reserved and Architecture with 0 value. It's up to the caller to change the returning value.
 //
 // This serves as a testing helper and is for documentation purposes only.
 func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
@@ -98,8 +102,8 @@ func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
 
 	mesgDef := &MessageDefinition{
 		Header:           MesgDefinitionMask,
-		Reserved:         mesg.Reserved,
-		Architecture:     mesg.Architecture,
+		Reserved:         0,
+		Architecture:     LittleEndian,
 		MesgNum:          mesg.Num,
 		FieldDefinitions: make([]FieldDefinition, 0, len(mesg.Fields)),
 	}
@@ -107,7 +111,7 @@ func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
 	for i := range mesg.Fields {
 		size := Sizeof(mesg.Fields[i].Value)
 		if size > maxValueSize {
-			return nil, fmt.Errorf("Fields[%d].Value's size should be < %d: %w",
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
 				i, maxValueSize, errValueSizeExceed255)
 		}
 		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, FieldDefinition{
@@ -126,7 +130,7 @@ func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
 	for i := range mesg.DeveloperFields {
 		size := Sizeof(mesg.DeveloperFields[i].Value)
 		if size > maxValueSize {
-			return nil, fmt.Errorf("Fields[%d].Value's size should be < %d: %w",
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
 				i, maxValueSize, errValueSizeExceed255)
 		}
 		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, DeveloperFieldDefinition{
@@ -157,8 +161,6 @@ type DeveloperFieldDefinition struct { // 3 bits
 type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
 	Num             typedef.MesgNum  // Global Message Number defined in Global FIT Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
-	Reserved        byte             // Currently undetermined; the default value is 0.
-	Architecture    byte             // Architecture type / Endianness.
 	Fields          []Field          // List of Field
 	DeveloperFields []DeveloperField // List of DeveloperField
 }

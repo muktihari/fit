@@ -155,6 +155,6 @@ func BenchmarkValueMarshalAppend(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = value.MarshalAppend(buf, littleEndian)
+		_, _ = value.MarshalAppend(buf, LittleEndian)
 	}
 }

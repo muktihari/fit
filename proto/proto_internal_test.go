@@ -61,28 +61,6 @@ func TestNewMessageDefinition(t *testing.T) {
 			},
 		},
 		{
-			name: "fields only with mesg architecture big-endian",
-			mesg: func() *Message {
-				mesg := &Message{Num: mesgnum.FileId, Fields: []Field{
-					{FieldBase: &FieldBase{Num: fieldnum.FileIdType, BaseType: basetype.Enum}, Value: Uint8(typedef.FileActivity.Byte())},
-				}}
-				mesg.Architecture = 1 // big-endian
-				return mesg
-			}(),
-			mesgDef: &MessageDefinition{
-				Header:       MesgDefinitionMask,
-				Architecture: 1, // big-endian
-				MesgNum:      mesgnum.FileId,
-				FieldDefinitions: []FieldDefinition{
-					{
-						Num:      fieldnum.FileIdType,
-						Size:     1,
-						BaseType: basetype.Enum,
-					},
-				},
-			},
-		},
-		{
 			name: "fields only with string value",
 			mesg: &Message{Num: mesgnum.FileId, Fields: []Field{
 				{FieldBase: &FieldBase{Num: fieldnum.FileIdProductName, BaseType: basetype.String}, Value: String("FIT SDK Go")},

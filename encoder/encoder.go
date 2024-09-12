@@ -34,9 +34,6 @@ const (
 type headerOption byte
 
 const (
-	littleEndian = 0
-	bigEndian    = 1
-
 	// headerOptionNormal is the default header option.
 	// This option has two sub-option to select from:
 	//   1. LocalMessageTypeZero [Default]
@@ -87,7 +84,7 @@ type options struct {
 
 func defaultOptions() options {
 	return options{
-		endianness:      littleEndian,
+		endianness:      proto.LittleEndian,
 		headerOption:    headerOptionNormal,
 		writeBufferSize: defaultWriteBufferSize,
 	}
@@ -124,7 +121,7 @@ func WithMessageValidator(validator MessageValidator) Option {
 
 // WithBigEndian directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 func WithBigEndian() Option {
-	return func(o *options) { o.endianness = bigEndian }
+	return func(o *options) { o.endianness = proto.BigEndian }
 }
 
 // WithCompressedTimestampHeader directs the Encoder to compress timestamp in header to reduce file size.
@@ -436,7 +433,6 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	mesg.Header = proto.MesgNormalHeaderMask
-	mesg.Architecture = e.options.endianness
 
 	if err = e.options.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
@@ -490,7 +486,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	// At this point, e.buf may grow. Re-assign e.buf in case slice has grown.
-	e.buf, err = mesg.MarshalAppend(e.buf[:0])
+	e.buf, err = mesg.MarshalAppend(e.buf[:0], mesgDef.Architecture)
 	if err != nil {
 		return fmt.Errorf("marshal mesg failed: %w", err)
 	}
@@ -536,8 +532,8 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 
 func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
 	e.mesgDef.Header = proto.MesgDefinitionMask
-	e.mesgDef.Reserved = mesg.Reserved
-	e.mesgDef.Architecture = mesg.Architecture
+	e.mesgDef.Reserved = 0
+	e.mesgDef.Architecture = e.options.endianness
 	e.mesgDef.MesgNum = mesg.Num
 	e.mesgDef.FieldDefinitions = e.mesgDef.FieldDefinitions[:0]
 	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]

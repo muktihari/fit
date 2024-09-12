@@ -662,7 +662,7 @@ func createFitForTest() (proto.FIT, []byte) {
 		bytesbuffer.Write(b)
 		crc16checker.Write(b)
 
-		b, err := mesg.MarshalAppend(nil)
+		b, err := mesg.MarshalAppend(nil, proto.LittleEndian)
 		if err != nil {
 			panic(err)
 		}
@@ -1296,7 +1296,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			},
 			header: proto.MesgDefinitionMask,
 			mesgDef: func() *proto.MessageDefinition {
-				mesgDef, _ := proto.NewMessageDefinition(&fit.Messages[0]) // file_id
+				mesgDef, _ := proto.NewMessageDefinition(&fit.Messages[0]) // file_i, proto.LittleEndiand
 				return mesgDef
 			}(),
 		},
@@ -1709,7 +1709,7 @@ func TestDecodeFields(t *testing.T) {
 						},
 					},
 				}
-				mesgb, _ := mesg.MarshalAppend(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				mesgb = mesgb[1:] // splice mesg header
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -1752,7 +1752,7 @@ func TestDecodeFields(t *testing.T) {
 						},
 					},
 				}
-				mesgb, _ := mesg.MarshalAppend(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				mesgb = mesgb[1:] // splice mesg header
 				cur := 0
 				return fnReader(func(b []byte) (n int, err error) {
@@ -2650,7 +2650,7 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	mesgb, err := mesg.MarshalAppend(nil)
+	mesgb, err := mesg.MarshalAppend(nil, proto.LittleEndian)
 	if err != nil {
 		b.Fatalf("marshal binary: %v", err)
 	}

@@ -322,7 +322,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				}}
 				h := headerForTest()
 				buf, _ := h.MarshalAppend(nil)
-				mesgb, _ := mesg.MarshalAppend(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				buf = append(buf, mesgb...)
 
 				cur := 0
@@ -393,7 +393,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				mesgDef, _ := proto.NewMessageDefinition(&mesg)
 				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
-				mesgb, _ := mesg.MarshalAppend(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				buf = append(buf, mesgb...)
 
 				binary.LittleEndian.PutUint32(buf[4:8], uint32(len(buf)-14))

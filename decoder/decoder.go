@@ -40,8 +40,6 @@ const (
 	ErrInvalidBaseType        = errorString("invalid basetype")
 )
 
-const littleEndian = 0
-
 // Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
 	readBuffer  *readBuffer // read from io.Reader with buffer without extra copying.
@@ -555,7 +553,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	mesgDef.Header = header
 	mesgDef.Reserved = b[0]
 	mesgDef.Architecture = b[1]
-	if mesgDef.Architecture == littleEndian {
+	if mesgDef.Architecture == proto.LittleEndian {
 		mesgDef.MesgNum = typedef.MesgNum(binary.LittleEndian.Uint16(b[2:4]))
 	} else {
 		mesgDef.MesgNum = typedef.MesgNum(binary.BigEndian.Uint16(b[2:4]))
@@ -633,8 +631,6 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 
 	mesg := proto.Message{Num: mesgDef.MesgNum}
 	mesg.Header = header
-	mesg.Reserved = mesgDef.Reserved
-	mesg.Architecture = mesgDef.Architecture
 	mesg.Fields = d.fieldsArray[:0]
 
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
