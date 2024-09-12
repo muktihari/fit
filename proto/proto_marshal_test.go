@@ -254,7 +254,7 @@ func TestMessageMarshaler(t *testing.T) {
 	}
 }
 
-func BenchmarkHeaderMarshalAppend(b *testing.B) {
+func BenchmarkFileHeaderMarshalAppend(b *testing.B) {
 	b.StopTimer()
 	header := proto.FileHeader{
 		Size:            14,
@@ -287,11 +287,11 @@ func BenchmarkMessageDefinitionMarshalAppend(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	arr := make([]byte, 6+len(mesg.Fields)*3+len(mesg.DeveloperFields)*3)
+	buf := make([]byte, 6+len(mesg.Fields)*3+len(mesg.DeveloperFields)*3)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = mesgDef.MarshalAppend(arr[:0])
+		_, _ = mesgDef.MarshalAppend(buf[:0])
 	}
 }
 
