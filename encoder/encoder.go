@@ -563,8 +563,7 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 }
 
 func (e *Encoder) encodeCRC() error {
-	b := e.buf[:2]
-	binary.LittleEndian.PutUint16(b, e.crc16.Sum16())
+	b := binary.LittleEndian.AppendUint16(e.buf[:0], e.crc16.Sum16())
 
 	n, err := e.w.Write(b)
 	e.n += int64(n)
