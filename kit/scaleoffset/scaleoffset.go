@@ -7,11 +7,10 @@ package scaleoffset
 import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/constraints"
 )
 
 type Numeric interface {
-	constraints.Integer | constraints.Float
+	~int8 | ~int16 | ~int32 | ~int64 | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64
 }
 
 // Apply applies scale and offset on value.

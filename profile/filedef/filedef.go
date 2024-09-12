@@ -5,11 +5,12 @@
 package filedef
 
 import (
+	"slices"
+
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 // File is an interface for defining common type file, any defined common file type should implement

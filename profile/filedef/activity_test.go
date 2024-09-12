@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"slices"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
@@ -18,7 +20,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 func sortFields(mesgs []proto.Message) {

@@ -12,12 +12,13 @@ import (
 	"strings"
 	"text/template"
 
+	"slices"
+
 	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
 	"github.com/muktihari/fit/profile/basetype"
-	"golang.org/x/exp/slices"
 )
 
 type Builder struct {
