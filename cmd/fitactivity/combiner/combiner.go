@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"slices"
+
 	"github.com/muktihari/fit/cmd/fitactivity/aggregator"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
@@ -17,7 +19,6 @@ import (
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
-	"golang.org/x/exp/slices"
 )
 
 type errorString string
