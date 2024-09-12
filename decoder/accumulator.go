@@ -48,7 +48,7 @@ func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val
 	return val
 }
 
-// Reset resets the accumulator. Tt retains the underlying storage for use by
+// Reset resets the accumulator. It retains the underlying storage for use by
 // future use to reduce memory allocs.
 func (a *Accumulator) Reset() { a.values = a.values[:0] }
 
