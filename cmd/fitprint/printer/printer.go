@@ -74,6 +74,7 @@ func Print(path string) error {
 	defer p.Close()
 
 	dec := decoder.New(f,
+		decoder.WithMesgDefListener(p),
 		decoder.WithMesgListener(p),
 		decoder.WithBroadcastOnly(),
 		decoder.WithIgnoreChecksum(),
@@ -127,14 +128,21 @@ File Header:
 const channelBuffer = 1000
 
 type printer struct {
-	w      io.Writer
-	poolc  chan proto.Message
-	mesgc  chan proto.Message
-	done   chan struct{}
-	active bool
-	count  int
+	w                       io.Writer
+	localMessageDefinitions [proto.LocalMesgNumMask + 1]proto.MessageDefinition
+	poolc                   chan proto.Message
+	messagec                chan message
+	done                    chan struct{}
+	active                  bool
+	count                   int
 
 	fieldDescriptions []*mesgdef.FieldDescription
+}
+
+type message struct {
+	proto.Message
+	Reserved     byte
+	Architecture byte
 }
 
 func New(w io.Writer) *printer {
@@ -151,20 +159,20 @@ func New(w io.Writer) *printer {
 }
 
 func (p *printer) loop() {
-	for mesg := range p.mesgc {
-		switch mesg.Num {
+	for m := range p.messagec {
+		switch m.Num {
 		case mesgnum.FieldDescription:
-			p.fieldDescriptions = append(p.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
+			p.fieldDescriptions = append(p.fieldDescriptions, mesgdef.NewFieldDescription(&m.Message))
 		}
-		p.print(mesg)
-		p.poolc <- mesg
+		p.print(m)
+		p.poolc <- m.Message
 		p.count++
 	}
 	close(p.done)
 }
 
 func (p *printer) reset() {
-	p.mesgc = make(chan proto.Message, channelBuffer)
+	p.messagec = make(chan message, channelBuffer)
 	p.done = make(chan struct{})
 	p.count = 0
 	p.active = true
@@ -174,7 +182,7 @@ func (p *printer) Wait() {
 	if !p.active {
 		return
 	}
-	close(p.mesgc)
+	close(p.messagec)
 	<-p.done
 	p.active = false
 }
@@ -182,6 +190,12 @@ func (p *printer) Wait() {
 func (p *printer) Close() {
 	p.Wait()
 	close(p.poolc)
+}
+
+var _ decoder.MesgDefListener = (*printer)(nil)
+
+func (p *printer) OnMesgDef(mesgDef proto.MessageDefinition) {
+	p.localMessageDefinitions[proto.LocalMesgNum(mesgDef.Header)] = mesgDef
 }
 
 var _ decoder.MesgListener = (*printer)(nil)
@@ -192,10 +206,10 @@ func (p *printer) OnMesg(mesg proto.Message) {
 		go p.loop()
 		p.active = true
 	}
-	p.mesgc <- p.prep(mesg)
+	p.messagec <- p.prep(mesg)
 }
 
-func (p *printer) prep(mesg proto.Message) proto.Message {
+func (p *printer) prep(mesg proto.Message) message {
 	m := <-p.poolc
 
 	if cap(m.Fields) < len(mesg.Fields) {
@@ -212,20 +226,22 @@ func (p *printer) prep(mesg proto.Message) proto.Message {
 	copy(m.DeveloperFields, mesg.DeveloperFields)
 	mesg.DeveloperFields = m.DeveloperFields
 
-	return mesg
+	mesgDef := p.localMessageDefinitions[proto.LocalMesgNum(mesg.Header)]
+
+	return message{Message: mesg, Reserved: mesgDef.Reserved, Architecture: mesgDef.Architecture}
 }
 
-func (p *printer) print(mesg proto.Message) {
-	numstr := mesg.Num.String()
+func (p *printer) print(m message) {
+	numstr := m.Num.String()
 	if strings.HasPrefix(numstr, "MesgNumInvalid") {
 		numstr = factory.NameUnknown
 	}
 
 	fmt.Fprintf(p.w, "%s (num: %d, arch: %d, fields[-]: %d, developerFields[+]: %d) [%d]:\n",
-		numstr, mesg.Num, mesg.Architecture, len(mesg.Fields), len(mesg.DeveloperFields), p.count)
+		numstr, m.Num, m.Architecture, len(m.Fields), len(m.DeveloperFields), p.count)
 
-	for j := range mesg.Fields {
-		field := &mesg.Fields[j]
+	for j := range m.Fields {
+		field := &m.Fields[j]
 
 		var (
 			isDynamicField = false
@@ -237,7 +253,7 @@ func (p *printer) print(mesg proto.Message) {
 			units          = field.Units
 		)
 
-		if subField := field.SubFieldSubtitution(&mesg); subField != nil {
+		if subField := field.SubFieldSubtitution(&m.Message); subField != nil {
 			isDynamicField = true
 			name = subField.Name
 			baseType = subField.Type.BaseType()
@@ -291,8 +307,8 @@ func (p *printer) print(mesg proto.Message) {
 		)
 	}
 
-	for i := range mesg.DeveloperFields {
-		devField := &mesg.DeveloperFields[i]
+	for i := range m.DeveloperFields {
+		devField := &m.DeveloperFields[i]
 		fieldDesc := p.getFieldDescription(devField.DeveloperDataIndex, devField.Num)
 		if fieldDesc == nil {
 			continue

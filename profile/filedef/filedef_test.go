@@ -42,36 +42,36 @@ func TestSortMessagesByTimestamp(t *testing.T) {
 	// 1. CoursePoint's Timestamp Num is 1
 	// 2. Set's Timestamp Num is 254
 	messages := []proto.Message{
-		0: factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		0: {Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
-		),
-		1: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		1: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
-		),
-		2: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		2: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
-		),
-		3: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		3: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(1 * time.Second))),
-		),
-		4: factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		4: {Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
-		),
-		5: factory.CreateMesgOnly(mesgnum.Session).WithFields(
+		}},
+		5: {Num: mesgnum.Session, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
-		),
-		6: factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+		}},
+		6: {Num: mesgnum.UserProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileFriendlyName).WithValue("muktihari"),
-		),
-		7: factory.CreateMesgOnly(mesgnum.Set).WithFields(
+		}},
+		7: {Num: mesgnum.Set, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Set, fieldnum.SetTimestamp).WithValue(datetime.ToUint32(now.Add(4 * time.Second))),
-		),
-		8: factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		8: {Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(2 * time.Second))),
-		),
-		9: factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		9: {Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(now.Add(3 * time.Second))),
-		),
+		}},
 	}
 
 	expected := []proto.Message{

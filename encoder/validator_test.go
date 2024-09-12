@@ -106,18 +106,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "valid message with developer fields happy flow",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -135,7 +135,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "mesg contain expanded field",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 					func() proto.Field {
 						field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
@@ -143,33 +143,33 @@ func TestMessageValidatorValidate(t *testing.T) {
 						field.Value = proto.Uint32(1000)
 						return field
 					}(),
-				),
+				}},
 			},
 		},
 		{
 			name: "mesg contain field with scaled value",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue((float64(37304) / 5) - 500), // 6960.8m
-				),
+				}},
 			},
 		},
 		{
 			name: "mesg contain field value type not align",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.Record).WithFields(
+				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint32(1000)), // should be uint16
-				),
+				}},
 			},
 			errs: []error{ErrValueTypeMismatch},
 		},
 		{
 			name: "valid message with developer data index not found in previous message sequence",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-				}),
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -184,10 +184,10 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "valid message with field description not found in previous message sequence",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -202,21 +202,21 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "invalid utf-8 string",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("\xbd"),
-				),
+				}},
 			},
 			errs: []error{ErrInvalidUTF8String},
 		},
 		{
 			name: "invalid utf-8 []string",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("valid utf-8 string"),
-				),
-				factory.CreateMesg(mesgnum.SegmentFile).WithFields(
+				}},
+				{Num: mesgnum.SegmentFile, Fields: []proto.Field{
 					factory.CreateField(mesgnum.SegmentFile, fieldnum.SegmentFileLeaderActivityIdString).WithValue([]string{"valid utf-8", "\xbd"}), // valid and invalid string in array
-				),
+				}},
 			},
 			errs: []error{nil, ErrInvalidUTF8String},
 		},
@@ -248,18 +248,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "n developer fields exceed allowed",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
+				}},
 				{
 					Num: mesgnum.Record,
 					Fields: []proto.Field{
@@ -282,9 +282,9 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "field value size exceed max allowed",
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue(strings.Repeat("a", 256)),
-				),
+				}},
 			},
 			errs: []error{ErrExceedMaxAllowed},
 		},
@@ -308,31 +308,31 @@ func TestMessageValidatorValidate(t *testing.T) {
 				return mesgValidator
 			}(),
 			mesgs: []proto.Message{
-				factory.CreateMesgOnly(mesgnum.FileId).WithDeveloperFields(
-					proto.DeveloperField{
+				{Num: mesgnum.FileId, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                1,
 						Value:              proto.String(strings.Repeat("a", 256)),
 					},
-				),
+				}},
 			},
 			errs: []error{ErrExceedMaxAllowed},
 		},
 		{
 			name: "valid message with developer fields invalid value",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -350,20 +350,20 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "mesg contain developer field value scaled",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Custom Distance",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(basetype.Uint16Invalid),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(basetype.Uint8Invalid),
-					fieldnum.FieldDescriptionScale:                 uint8(100),
-					fieldnum.FieldDescriptionOffset:                int8(0),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Custom Distance"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(basetype.Uint16Invalid)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(basetype.Uint8Invalid)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionScale).WithValue(uint8(100)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionOffset).WithValue(int8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint16)),
+				}},
 				{
 					Num: mesgnum.Record,
 					Fields: []proto.Field{
@@ -382,18 +382,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "mesg contain developer field with native value scaled",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Altitude",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordAltitude),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Altitude"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordAltitude)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint16)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -411,18 +411,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "mesg contain developer field with unknown native",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "??",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(255),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint16),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("??"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(255)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint16)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -462,18 +462,18 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "valid message with developer fields has invalid value",
 			mesgs: []proto.Message{
-				factory.CreateMesg(mesgnum.DeveloperDataId).WithFieldValues(map[byte]any{
-					fieldnum.DeveloperDataIdDeveloperDataIndex: uint8(0),
-					fieldnum.DeveloperDataIdApplicationId:      []byte{0, 1, 2, 3},
-				}),
-				factory.CreateMesg(mesgnum.FieldDescription).WithFieldValues(map[byte]any{
-					fieldnum.FieldDescriptionDeveloperDataIndex:    uint8(0),
-					fieldnum.FieldDescriptionFieldDefinitionNumber: uint8(0),
-					fieldnum.FieldDescriptionFieldName:             "Heart Rate",
-					fieldnum.FieldDescriptionNativeMesgNum:         uint16(mesgnum.Record),
-					fieldnum.FieldDescriptionNativeFieldNum:        uint8(fieldnum.RecordHeartRate),
-					fieldnum.FieldDescriptionFitBaseTypeId:         uint8(basetype.Uint8),
-				}),
+				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
+				}},
+				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
+				}},
 				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
@@ -522,7 +522,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 func BenchmarkValidate(b *testing.B) {
 	b.StopTimer()
 	mesgValidator := NewMessageValidator()
-	mesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(
+	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(10000)),
 		func() proto.Field {
@@ -543,7 +543,7 @@ func BenchmarkValidate(b *testing.B) {
 			field.Value = proto.Uint32(1000)
 			return field
 		}(),
-	)
+	}}
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {

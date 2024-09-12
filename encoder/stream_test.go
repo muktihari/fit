@@ -27,12 +27,12 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fileIdMesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+	fileIdMesg := proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
-	)
-	recordMesg := factory.CreateMesgOnly(mesgnum.Record).WithFields(
+	}}
+	recordMesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1000)),
-	)
+	}}
 
 	err = streamEnc.WriteMessage(&fileIdMesg)
 	if err != nil {
@@ -72,9 +72,9 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	enc := New(mockWriterAt{Writer: fnWriteErr}, WithWriteBufferSize(0))
 	streamEnc, _ := enc.StreamEncoder()
 
-	mesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+	mesg := proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
-	)
+	}}
 	err := streamEnc.WriteMessage(&mesg)
 	if !errors.Is(err, io.EOF) {
 		t.Fatalf("expected err: %v, got: %v", io.EOF, err)
@@ -155,9 +155,9 @@ func TestStreamEncoderWithoutWriteBuffer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fileIdMesg := factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+	fileIdMesg := proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
-	)
+	}}
 
 	err = streamEnc.WriteMessage(&fileIdMesg)
 	if err != nil {

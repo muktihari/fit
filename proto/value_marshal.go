@@ -50,7 +50,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		b = append(b, v.SliceUint8()...)
 		return b, nil
 	case TypeInt16:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
@@ -58,7 +58,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceInt16:
 		vals := v.SliceInt16()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint16(b, uint16(vals[i]))
 			}
@@ -69,7 +69,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeUint16:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
@@ -77,7 +77,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceUint16:
 		vals := v.SliceUint16()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint16(b, vals[i])
 			}
@@ -88,7 +88,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeInt32:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
@@ -96,7 +96,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceInt32:
 		vals := v.SliceInt32()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint32(b, uint32(vals[i]))
 			}
@@ -107,7 +107,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeUint32:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
@@ -115,7 +115,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceUint32:
 		vals := v.SliceUint32()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint32(b, vals[i])
 			}
@@ -126,7 +126,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeInt64:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint64(b, uint64(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint64(b, uint64(v.num))
@@ -134,7 +134,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceInt64:
 		vals := v.SliceInt64()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint64(b, uint64(vals[i]))
 			}
@@ -145,7 +145,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeUint64:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint64(b, v.num)
 		} else {
 			b = binary.BigEndian.AppendUint64(b, v.num)
@@ -153,7 +153,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceUint64:
 		vals := v.SliceUint64()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint64(b, vals[i])
 			}
@@ -164,7 +164,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeFloat32:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
 		} else {
 			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
@@ -172,7 +172,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceFloat32:
 		vals := v.SliceFloat32()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint32(b, math.Float32bits(vals[i]))
 			}
@@ -183,7 +183,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		}
 		return b, nil
 	case TypeFloat64:
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			b = binary.LittleEndian.AppendUint64(b, v.num)
 		} else {
 			b = binary.BigEndian.AppendUint64(b, v.num)
@@ -191,7 +191,7 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeSliceFloat64:
 		vals := v.SliceFloat64()
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			for i := range vals {
 				b = binary.LittleEndian.AppendUint64(b, math.Float64bits(vals[i]))
 			}

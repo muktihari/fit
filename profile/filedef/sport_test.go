@@ -19,44 +19,44 @@ import (
 
 func newSportMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileSport)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.ZonesTarget).WithFields(
+		}},
+		{Num: mesgnum.ZonesTarget, Fields: []proto.Field{
 			factory.CreateField(mesgnum.ZonesTarget, fieldnum.ZonesTargetMaxHeartRate).WithValue(uint8(190)),
-		),
-		factory.CreateMesgOnly(mesgnum.Sport).WithFields(
+		}},
+		{Num: mesgnum.Sport, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Sport, fieldnum.SportSport).WithValue(uint8(typedef.SportAmericanFootball)),
-		),
-		factory.CreateMesgOnly(mesgnum.HrZone).WithFields(
+		}},
+		{Num: mesgnum.HrZone, Fields: []proto.Field{
 			factory.CreateField(mesgnum.HrZone, fieldnum.HrZoneHighBpm).WithValue(uint8(177)),
-		),
-		factory.CreateMesgOnly(mesgnum.PowerZone).WithFields(
+		}},
+		{Num: mesgnum.PowerZone, Fields: []proto.Field{
 			factory.CreateField(mesgnum.PowerZone, fieldnum.PowerZoneHighValue).WithValue(uint16(200)),
-		),
-		factory.CreateMesgOnly(mesgnum.MetZone).WithFields(
+		}},
+		{Num: mesgnum.MetZone, Fields: []proto.Field{
 			factory.CreateField(mesgnum.MetZone, fieldnum.MetZoneHighBpm).WithValue(uint8(178)),
-		),
-		factory.CreateMesgOnly(mesgnum.SpeedZone).WithFields(
+		}},
+		{Num: mesgnum.SpeedZone, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SpeedZone, fieldnum.SpeedZoneHighValue).WithValue(uint16(10000)),
-		),
-		factory.CreateMesgOnly(mesgnum.CadenceZone).WithFields(
+		}},
+		{Num: mesgnum.CadenceZone, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CadenceZone, fieldnum.CadenceZoneHighValue).WithValue(uint8(100)),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

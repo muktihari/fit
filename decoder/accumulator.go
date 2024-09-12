@@ -8,53 +8,60 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 )
 
+// Accumulator is value accumulator.
 type Accumulator struct {
-	AccumulatedValues []AccumulatedValue // use slice over map since len(values) is relatively small
+	values []value // use slice over map since len(values) is relatively small
 }
 
+// NewAccumulator creates new accumulator.
 func NewAccumulator() *Accumulator {
-	return &Accumulator{} // No need to make AccumulatedValues as it will be created on append anyway.
+	return &Accumulator{}
 }
 
-func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, value uint32) {
-	for i := range a.AccumulatedValues {
-		field := &a.AccumulatedValues[i]
-		if field.MesgNum == mesgNum && field.DestFieldNum == destFieldNum {
-			field.Value = value
-			field.Last = value
+// Collect collects value, it will either append the value when not exist or replace existing one.
+func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, val uint32) {
+	for i := range a.values {
+		av := &a.values[i]
+		if av.mesgNum == mesgNum && av.fieldNum == destFieldNum {
+			av.value = val
+			av.last = val
 			return
 		}
 	}
-	a.AccumulatedValues = append(a.AccumulatedValues, AccumulatedValue{
-		MesgNum:      mesgNum,
-		DestFieldNum: destFieldNum,
-		Value:        value,
-		Last:         value,
+	a.values = append(a.values, value{
+		mesgNum:  mesgNum,
+		fieldNum: destFieldNum,
+		value:    val,
+		last:     val,
 	})
 }
 
-func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, value uint32, bits byte) uint32 {
-	for i := range a.AccumulatedValues {
-		av := &a.AccumulatedValues[i]
-		if av.MesgNum == mesgNum && av.DestFieldNum == destFieldNum {
-			return av.Accumulate(value, bits)
+// Accumulate calculates the accumulated value and update accordingly. It returns the original value
+// when the corresponding value does not exist.
+func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val uint32, bits byte) uint32 {
+	for i := range a.values {
+		av := &a.values[i]
+		if av.mesgNum == mesgNum && av.fieldNum == destFieldNum {
+			return av.accumulate(val, bits)
 		}
 	}
-	return value
+	return val
 }
 
-func (a *Accumulator) Reset() { a.AccumulatedValues = a.AccumulatedValues[:0] }
+// Reset resets the accumulator. Tt retains the underlying storage for use by
+// future use to reduce memory allocs.
+func (a *Accumulator) Reset() { a.values = a.values[:0] }
 
-type AccumulatedValue struct {
-	MesgNum      typedef.MesgNum
-	DestFieldNum byte
-	Last         uint32
-	Value        uint32
+type value struct {
+	mesgNum  typedef.MesgNum
+	fieldNum byte
+	last     uint32
+	value    uint32
 }
 
-func (a *AccumulatedValue) Accumulate(value uint32, bits byte) uint32 {
+func (a *value) accumulate(val uint32, bits byte) uint32 {
 	var mask uint32 = (1 << bits) - 1
-	a.Value += (value - a.Last) & mask
-	a.Last = value
-	return a.Value
+	a.value += (val - a.last) & mask
+	a.last = val
+	return a.value
 }

@@ -19,38 +19,38 @@ import (
 
 func newSettingsMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileSettings)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.UserProfile).WithFields(
+		}},
+		{Num: mesgnum.UserProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.UserProfile, fieldnum.UserProfileAge).WithValue(uint8(29)),
-		),
-		factory.CreateMesgOnly(mesgnum.HrmProfile).WithFields(
+		}},
+		{Num: mesgnum.HrmProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.HrmProfile, fieldnum.HrmProfileEnabled).WithValue(true),
-		),
-		factory.CreateMesgOnly(mesgnum.SdmProfile).WithFields(
+		}},
+		{Num: mesgnum.SdmProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SdmProfile, fieldnum.SdmProfileEnabled).WithValue(true),
-		),
-		factory.CreateMesgOnly(mesgnum.BikeProfile).WithFields(
+		}},
+		{Num: mesgnum.BikeProfile, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BikeProfile, fieldnum.BikeProfileEnabled).WithValue(true),
-		),
-		factory.CreateMesgOnly(mesgnum.DeviceSettings).WithFields(
+		}},
+		{Num: mesgnum.DeviceSettings, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeviceSettings, fieldnum.DeviceSettingsBacklightMode).WithValue(uint8(typedef.BacklightModeAutoBrightness)),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

@@ -344,7 +344,7 @@ loop:
 		return err
 	}
 
-	fit.FileHeader.ProtocolVersion = byte(latestProtocolVersion(fits))
+	fit.FileHeader.ProtocolVersion = latestProtocolVersion(fits)
 	fit.FileHeader.ProfileVersion = latestProfileVersion(fits)
 
 	for _, subcommand := range subcommands {
@@ -1050,14 +1050,14 @@ func formatThousand(v int) string {
 	return result.String()
 }
 
-func latestProtocolVersion(fits []*proto.FIT) byte {
-	var version = byte(proto.V1)
+func latestProtocolVersion(fits []*proto.FIT) proto.Version {
+	var version = proto.V1
 	for i := range fits {
 		if fits[i].FileHeader.ProtocolVersion > version {
 			version = fits[i].FileHeader.ProtocolVersion
 		}
 	}
-	return byte(proto.Version(version))
+	return version
 }
 
 func latestProfileVersion(fits []*proto.FIT) uint16 {

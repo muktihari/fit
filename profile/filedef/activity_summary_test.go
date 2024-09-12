@@ -19,32 +19,32 @@ import (
 
 func newActivitySummaryMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileActivitySummary)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
+		}},
+		{Num: mesgnum.Lap, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.Session).WithFields(
+		}},
+		{Num: mesgnum.Session, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Activity).WithFields(
+		}},
+		{Num: mesgnum.Activity, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

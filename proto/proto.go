@@ -5,6 +5,8 @@
 package proto
 
 import (
+	"fmt"
+
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -27,6 +29,9 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 
 	CompressedBitShift = 5 // Used for right-shifting the 5 least significant bits (lsb) of compressed time.
 
+	LittleEndian = 0
+	BigEndian    = 1
+
 	DefaultFileHeaderSize byte   = 14     // The preferred size is 14
 	DataTypeFIT           string = ".FIT" // FIT is a constant string ".FIT"
 
@@ -44,63 +49,6 @@ const ( // header is 1 byte ->	 0bxxxxxxxx
 	FieldNumTimestamp = 253
 )
 
-// LocalMesgNum extracts LocalMesgNum from message header.
-func LocalMesgNum(header byte) byte {
-	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
-		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
-	}
-	return header & LocalMesgNumMask
-}
-
-// CreateMessageDefinition creates new MessageDefinition base on given Message.
-// It will panic if mesg is nil. And mesg must be validated first, for instance
-// if field.Value's size is more than 255 bytes, overflow will occurs.
-func CreateMessageDefinition(mesg *Message) (mesgDef MessageDefinition) {
-	CreateMessageDefinitionTo(&mesgDef, mesg)
-	return
-}
-
-// CreateMessageDefinitionTo create MessageDefinition base on given Message and put it at target object to avoid allocation.
-// It will panic if either target or mesg is nil. And mesg must be validated first, for instance
-// if field.Value's size is more than 255 bytes, overflow will occurs.
-func CreateMessageDefinitionTo(target *MessageDefinition, mesg *Message) {
-	target.Header = MesgDefinitionMask
-	target.Reserved = mesg.Reserved
-	target.Architecture = mesg.Architecture
-	target.MesgNum = mesg.Num
-
-	target.FieldDefinitions = target.FieldDefinitions[:0]
-	if cap(target.FieldDefinitions) < len(mesg.Fields) {
-		target.FieldDefinitions = make([]FieldDefinition, 0, len(mesg.Fields))
-	}
-
-	for i := range mesg.Fields {
-		target.FieldDefinitions = append(target.FieldDefinitions, FieldDefinition{
-			Num:      mesg.Fields[i].Num,
-			Size:     byte(Sizeof(mesg.Fields[i].Value)),
-			BaseType: mesg.Fields[i].BaseType,
-		})
-	}
-
-	if len(mesg.DeveloperFields) == 0 {
-		return
-	}
-
-	target.Header |= DevDataMask
-
-	target.DeveloperFieldDefinitions = target.DeveloperFieldDefinitions[:0]
-	if cap(target.DeveloperFieldDefinitions) < len(mesg.DeveloperFields) {
-		target.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
-	}
-	for i := range mesg.DeveloperFields {
-		target.DeveloperFieldDefinitions = append(target.DeveloperFieldDefinitions, DeveloperFieldDefinition{
-			Num:                mesg.DeveloperFields[i].Num,
-			Size:               byte(Sizeof(mesg.DeveloperFields[i].Value)),
-			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
-		})
-	}
-}
-
 // FIT represents a structure for FIT Files.
 type FIT struct {
 	FileHeader FileHeader // File Header contains either 12 or 14 bytes
@@ -108,20 +56,14 @@ type FIT struct {
 	CRC        uint16     // Cyclic Redundancy Check 16-bit value to ensure the integrity of the messages.
 }
 
-// WithMessages set Messages and return the pointer to the FIT.
-func (f *FIT) WithMessages(messages ...Message) *FIT {
-	f.Messages = messages
-	return f
-}
-
 // FileHeader is a FIT's FileHeader with either 12 bytes size without CRC or a 14 bytes size with CRC, while 14 bytes size is the preferred size.
 type FileHeader struct {
-	Size            byte   // File header size either 12 (legacy) or 14.
-	ProtocolVersion byte   // The FIT Protocol version which is being used to encode the FIT file.
-	ProfileVersion  uint16 // The FIT Profile Version (associated with data defined in Global FIT Profile).
-	DataSize        uint32 // The size of the messages in bytes (this field will be automatically updated by the encoder)
-	DataType        string // ".FIT" (a string constant)
-	CRC             uint16 // Cyclic Redundancy Check 16-bit value to ensure the integrity of the file header. (this field will be automatically updated by the encoder)
+	Size            byte    // File header size either 12 (legacy) or 14.
+	ProtocolVersion Version // The FIT Protocol version which is being used to encode the FIT file.
+	ProfileVersion  uint16  // The FIT Profile Version (associated with data defined in Global FIT Profile).
+	DataSize        uint32  // The size of the messages in bytes (this field will be automatically updated by the encoder)
+	DataType        string  // ".FIT" (a string constant)
+	CRC             uint16  // Cyclic Redundancy Check 16-bit value to ensure the integrity of the file header. (this field will be automatically updated by the encoder)
 }
 
 // MessageDefinition is the definition of the upcoming data messages.
@@ -132,13 +74,6 @@ type MessageDefinition struct {
 	MesgNum                   typedef.MesgNum            // Global Message Number defined by factory (retrieved from Profile.xslx). (endianness of this 2 Byte value is defined in the Architecture byte)
 	FieldDefinitions          []FieldDefinition          // List of the field definition
 	DeveloperFieldDefinitions []DeveloperFieldDefinition // List of the developer field definition (only if Developer Data Flag is set in Header)
-}
-
-// Clone clones MessageDefinition
-func (m MessageDefinition) Clone() MessageDefinition {
-	m.FieldDefinitions = append(m.FieldDefinitions[:0:0], m.FieldDefinitions...)
-	m.DeveloperFieldDefinitions = append(m.DeveloperFieldDefinitions[:0:0], m.DeveloperFieldDefinitions...)
-	return m
 }
 
 // FieldDefinition is the definition of the upcoming field within the message's structure.
@@ -159,38 +94,8 @@ type DeveloperFieldDefinition struct { // 3 bits
 type Message struct {
 	Header          byte             // Message Header serves to distinguish whether the message is a Normal Data or a Compressed Timestamp Data. Unlike MessageDefinition, Message's Header should not contain Developer Data Flag.
 	Num             typedef.MesgNum  // Global Message Number defined in Global FIT Profile, except number within range 0xFF00 - 0xFFFE are manufacturer specific number.
-	Reserved        byte             // Currently undetermined; the default value is 0.
-	Architecture    byte             // Architecture type / Endianness.
 	Fields          []Field          // List of Field
 	DeveloperFields []DeveloperField // List of DeveloperField
-}
-
-// WithFields puts the provided fields into the message's fields.
-func (m Message) WithFields(fields ...Field) Message {
-	m.Fields = fields
-	return m
-}
-
-// WithFieldValues assigns the values of the targeted fields with the given map,
-// where map[byte]any represents the field numbers and their respective values.
-// If the Message does not have a corresponding field number match in the Fields, no value will be assigned or added.
-func (m Message) WithFieldValues(fieldNumValues map[byte]any) Message {
-	for i := range m.Fields {
-		value, ok := fieldNumValues[m.Fields[i].Num]
-		if !ok {
-			continue
-		}
-		if value != nil { // only accept non-nil value.
-			m.Fields[i].Value = Any(value)
-		}
-	}
-	return m
-}
-
-// WithFields puts the provided fields into the message's fields.
-func (m Message) WithDeveloperFields(developerFields ...DeveloperField) Message {
-	m.DeveloperFields = developerFields
-	return m
 }
 
 // FieldByNum returns a pointer to the Field in a Message, if not found return nil.
@@ -221,19 +126,6 @@ func (m *Message) RemoveFieldByNum(num byte) {
 			return
 		}
 	}
-}
-
-// Clone clones Message.
-func (m Message) Clone() Message {
-	m.Fields = append(m.Fields[:0:0], m.Fields...)
-	for i := range m.Fields {
-		m.Fields[i] = m.Fields[i].Clone()
-	}
-	m.DeveloperFields = append(m.DeveloperFields[:0:0], m.DeveloperFields...)
-	for i := range m.DeveloperFields {
-		m.DeveloperFields[i] = m.DeveloperFields[i].Clone()
-	}
-	return m
 }
 
 // FieldBase acts as a fundamental representation of a field as defined in the Global FIT Profile.
@@ -315,23 +207,6 @@ func convertToInt64(val Value) (int64, bool) {
 	return 0, false
 }
 
-// Clone clones Field
-func (f Field) Clone() Field {
-	if f.FieldBase == nil {
-		return f
-	}
-
-	fieldBase := *f.FieldBase // also include FieldBase, clone is meant to be a deep copy
-	fieldBase.Components = append(fieldBase.Components[:0:0], fieldBase.Components...)
-	fieldBase.SubFields = append(fieldBase.SubFields[:0:0], fieldBase.SubFields...)
-	for i := range fieldBase.SubFields {
-		fieldBase.SubFields[i] = fieldBase.SubFields[i].Clone()
-	}
-	f.FieldBase = &fieldBase
-
-	return f
-}
-
 // DeveloperField is a way to add custom data fields to existing messages. Developer Data Fields can be added
 // to any message at runtime by providing a self-describing FieldDefinition messages prior to that message.
 // The combination of the DeveloperDataIndex and FieldDefinitionNumber create a unique id for each FieldDescription.
@@ -344,11 +219,6 @@ type DeveloperField struct {
 	Num                byte // Maps to `field_definition_number` of a `field_description` message.
 	DeveloperDataIndex byte // Maps to `developer_data_index` of a `developer_data_id` and a `field_description` messages.
 	Value              Value
-}
-
-// Clone clones DeveloperField
-func (f DeveloperField) Clone() DeveloperField {
-	return f
 }
 
 // Component is a way of compressing one or more fields into a bit field expressed in a single containing field.
@@ -372,17 +242,77 @@ type SubField struct {
 	Components []Component
 }
 
-// Clone clones SubField
-func (s SubField) Clone() SubField {
-	s.Components = append(s.Components[:0:0], s.Components...)
-	s.Maps = append(s.Maps[:0:0], s.Maps...)
-	return s
-}
-
 // SubFieldMap is the mapping between SubField and the corresponding main Field in a Message.
 // When any Field in a Message has Field.Num == RefFieldNum and Field.Value == RefFieldValue, then the SubField containing
 // this mapping can be interpreted as the main Field's properties (name, scale, type etc.)
 type SubFieldMap struct {
 	RefFieldNum   byte
 	RefFieldValue int64
+}
+
+// LocalMesgNum extracts LocalMesgNum from message header.
+func LocalMesgNum(header byte) byte {
+	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
+		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
+	}
+	return header & LocalMesgNumMask
+}
+
+const (
+	errNilMesg            = errorString("mesg is nil")
+	errValueSizeExceed255 = errorString("value's size exceed 255")
+)
+
+// NewMessageDefinition returns a new MessageDefinition based on the given Message or an error if one occurs.
+// This will set Reserved and Architecture with 0 value. It's up to the caller to change the returning value.
+//
+// This serves as a testing helper and is for documentation purposes only.
+func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
+	if mesg == nil {
+		return nil, errNilMesg
+	}
+
+	const maxValueSize = 255
+
+	mesgDef := &MessageDefinition{
+		Header:           MesgDefinitionMask,
+		Reserved:         0,
+		Architecture:     LittleEndian,
+		MesgNum:          mesg.Num,
+		FieldDefinitions: make([]FieldDefinition, 0, len(mesg.Fields)),
+	}
+
+	for i := range mesg.Fields {
+		size := Sizeof(mesg.Fields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     byte(size),
+			BaseType: mesg.Fields[i].BaseType,
+		})
+	}
+
+	if len(mesg.DeveloperFields) == 0 {
+		return mesgDef, nil
+	}
+
+	mesgDef.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
+	mesgDef.Header |= DevDataMask
+	for i := range mesg.DeveloperFields {
+		size := Sizeof(mesg.DeveloperFields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               byte(size),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+		})
+	}
+
+	return mesgDef, nil
 }

@@ -30,7 +30,7 @@ func (e errorString) Error() string { return string(e) }
 
 const (
 	// Integrity errors
-	ErrNotAFitFile         = errorString("not a FIT file")
+	ErrNotFITFile          = errorString("not a FIT file")
 	ErrDataSizeZero        = errorString("data size zero")
 	ErrCRCChecksumMismatch = errorString("crc checksum mismatch")
 
@@ -39,8 +39,6 @@ const (
 	ErrFieldValueTypeMismatch = errorString("field value type mismatch")
 	ErrInvalidBaseType        = errorString("invalid basetype")
 )
-
-const littleEndian = 0
 
 // Decoder is FIT file decoder. See New() for details.
 type Decoder struct {
@@ -81,7 +79,8 @@ type Decoder struct {
 
 // Factory defines a contract that any Factory containing these method can be used by the Decoder.
 type Factory interface {
-	// CreateField create new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
+	// CreateField creates new field based on defined messages in the factory.
+	// If not found, it returns new field with "unknown" name.
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 
@@ -183,7 +182,8 @@ func WithReadBufferSize(size int) Option {
 // The FIT protocol allows for multiple FIT files to be chained together in a single FIT file.
 // Each FIT file in the chain must be a properly formatted FIT file (header, data records, CRC).
 //
-// To decode chained FIT files, use Next() to check if r hasn't reach EOF and next bytes are still a valid FIT sequences.
+// To decode a chained FIT file containing multiple FIT data, invoke Decode() or DecodeWithContext()
+// method multiple times. For convenience, we can wrap it with the Next() method as follows (optional):
 //
 //	for dec.Next() {
 //	   fit, err := dec.Decode()
@@ -327,8 +327,7 @@ func (d *Decoder) discardMessages() (err error) {
 
 // PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader.
 //
-// After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
-// This method is idempotent and can be invoked even after Decode has been invoked.
+// If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 	if d.err != nil {
 		return nil, d.err
@@ -342,8 +341,7 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
 // FileId message should be the first message of any FIT file, otherwise return an error.
 //
-// After this method is invoked, Decode picks up where this left then continue decoding next messages instead of starting from zero.
-// This method is idempotent and can be invoked even after Decode has been invoked.
+// If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err != nil {
 		return nil, d.err
@@ -367,14 +365,14 @@ func (d *Decoder) Next() bool {
 	if !d.sequenceCompleted {
 		return true
 	}
-	d.reset() // reset values for the next chained FIT file
+	d.sequenceCompleted = false
 	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeFileHeaderOnce() == nil
 }
 
 // Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or
 // an error if it occurs. To decode a chained FIT file containing multiple FIT data, invoke this
-// method multiple times, however, the invocation must be wrapped with Next() method as follows:
+// method multiple times. For convenience, we can wrap it with the Next() method as follows (optional):
 //
 //	for dec.Next() {
 //	     fit, err := dec.Decode()
@@ -396,12 +394,14 @@ func (d *Decoder) Decode() (*proto.FIT, error) {
 	if d.err = d.decodeCRC(); d.err != nil {
 		return nil, d.err
 	}
-	d.sequenceCompleted = true
-	return &proto.FIT{
+	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
-	}, nil
+	}
+	d.reset()
+	d.sequenceCompleted = true
+	return fit, nil
 }
 
 // Discard discards a single FIT file sequence and returns any error encountered. This method directs the Decoder to
@@ -443,6 +443,7 @@ func (d *Decoder) Discard() error {
 	if _, d.err = d.readN(2); d.err != nil { // Discard File CRC
 		return d.err
 	}
+	d.reset()
 	d.sequenceCompleted = true
 	return d.err
 }
@@ -463,7 +464,7 @@ func (d *Decoder) decodeFileHeader() error {
 	size := b[0]
 
 	if size != 12 && size != 14 { // current spec is either 12 or 14
-		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotAFitFile)
+		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotFITFile)
 	}
 	_, _ = d.crc16.Write(b)
 
@@ -476,12 +477,12 @@ func (d *Decoder) decodeFileHeader() error {
 
 	// PERF: Neither string(b[7:11]) nor assigning proto.DataTypeFIT constant to a variable escape to the heap.
 	if string(b[7:11]) != proto.DataTypeFIT {
-		return ErrNotAFitFile
+		return ErrNotFITFile
 	}
 
 	d.fileHeader = proto.FileHeader{
 		Size:            size,
-		ProtocolVersion: b[0],
+		ProtocolVersion: proto.Version(b[0]),
 		ProfileVersion:  binary.LittleEndian.Uint16(b[1:3]),
 		DataSize:        binary.LittleEndian.Uint32(b[3:7]),
 		DataType:        proto.DataTypeFIT,
@@ -556,7 +557,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	mesgDef.Header = header
 	mesgDef.Reserved = b[0]
 	mesgDef.Architecture = b[1]
-	if mesgDef.Architecture == littleEndian {
+	if mesgDef.Architecture == proto.LittleEndian {
 		mesgDef.MesgNum = typedef.MesgNum(binary.LittleEndian.Uint16(b[2:4]))
 	} else {
 		mesgDef.MesgNum = typedef.MesgNum(binary.BigEndian.Uint16(b[2:4]))
@@ -610,7 +611,10 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	d.localMessageDefinitions[localMesgNum] = mesgDef
 
 	if len(d.options.mesgDefListeners) > 0 {
-		mesgDef := mesgDef.Clone() // Clone since we don't have control of the object lifecycle outside Decoder.
+		// Clone since we don't have control of the object lifecycle outside Decoder.
+		mesgDef := *mesgDef
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions[:0:0], mesgDef.FieldDefinitions...)
+		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions[:0:0], mesgDef.DeveloperFieldDefinitions...)
 		for i := range d.options.mesgDefListeners {
 			d.options.mesgDefListeners[i].OnMesgDef(mesgDef) // blocking or non-blocking depends on listeners' implementation.
 		}
@@ -631,8 +635,6 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 
 	mesg := proto.Message{Num: mesgDef.MesgNum}
 	mesg.Header = header
-	mesg.Reserved = mesgDef.Reserved
-	mesg.Architecture = mesgDef.Architecture
 	mesg.Fields = d.fieldsArray[:0]
 
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask { // Compressed Timestamp Message Data
@@ -1011,12 +1013,14 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 	if d.err = d.decodeCRC(); d.err != nil {
 		return nil, d.err
 	}
-	d.sequenceCompleted = true
-	return &proto.FIT{
+	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
-	}, nil
+	}
+	d.reset()
+	d.sequenceCompleted = true
+	return fit, nil
 }
 
 func checkContext(ctx context.Context) error {

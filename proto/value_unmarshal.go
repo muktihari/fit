@@ -49,7 +49,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 2
 			vals := make([]int16, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int16(binary.LittleEndian.Uint16(b[:n])))
 				}
@@ -60,7 +60,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceInt16(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Int16(int16(binary.LittleEndian.Uint16(b))), nil
 		}
 		return Int16(int16(binary.BigEndian.Uint16(b))), nil
@@ -68,7 +68,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 2
 			vals := make([]uint16, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint16(b[:n]))
 				}
@@ -79,7 +79,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceUint16(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Uint16(binary.LittleEndian.Uint16(b)), nil
 		}
 		return Uint16(binary.BigEndian.Uint16(b)), nil
@@ -87,7 +87,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 4
 			vals := make([]int32, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int32(binary.LittleEndian.Uint32(b[:n])))
 				}
@@ -98,7 +98,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceInt32(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Int32(int32(binary.LittleEndian.Uint32(b))), nil
 		}
 		return Int32(int32(binary.BigEndian.Uint32(b))), nil
@@ -106,7 +106,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 4
 			vals := make([]uint32, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint32(b[:n]))
 				}
@@ -117,7 +117,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceUint32(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Uint32(binary.LittleEndian.Uint32(b)), nil
 		}
 		return Uint32(binary.BigEndian.Uint32(b)), nil
@@ -125,7 +125,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 8
 			vals := make([]int64, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, int64(binary.LittleEndian.Uint64(b[:n])))
 				}
@@ -136,7 +136,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceInt64(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Int64(int64(binary.LittleEndian.Uint64(b))), nil
 		}
 		return Int64(int64(binary.BigEndian.Uint64(b))), nil
@@ -144,7 +144,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 8
 			vals := make([]uint64, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, binary.LittleEndian.Uint64(b[:n]))
 				}
@@ -155,7 +155,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceUint64(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Uint64(binary.LittleEndian.Uint64(b)), nil
 		}
 		return Uint64(binary.BigEndian.Uint64(b)), nil
@@ -163,7 +163,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 4
 			vals := make([]float32, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, math.Float32frombits(binary.LittleEndian.Uint32(b[:n])))
 				}
@@ -174,7 +174,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceFloat32(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Float32(math.Float32frombits(binary.LittleEndian.Uint32(b))), nil
 		}
 		return Float32(math.Float32frombits(binary.BigEndian.Uint32(b))), nil
@@ -182,7 +182,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		if isArray {
 			const n = 8
 			vals := make([]float64, 0, len(b)/n)
-			if arch == littleEndian {
+			if arch == LittleEndian {
 				for ; len(b) >= n; b = b[n:] {
 					vals = append(vals, math.Float64frombits(binary.LittleEndian.Uint64(b[:n])))
 				}
@@ -193,7 +193,7 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceFloat64(vals), nil
 		}
-		if arch == littleEndian {
+		if arch == LittleEndian {
 			return Float64(math.Float64frombits(binary.LittleEndian.Uint64(b))), nil
 		}
 		return Float64(math.Float64frombits(binary.BigEndian.Uint64(b))), nil

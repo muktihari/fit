@@ -28,9 +28,13 @@ func BenchmarkNewRecord(b *testing.B) {
 }
 
 func BenchmarkRecordToMesg(b *testing.B) {
-	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.RecordTimestamp: datetime.ToUint32(time.Now()),
-	})
+	mesg := factory.CreateMesg(mesgnum.Record)
+	for i := range mesg.Fields {
+		if mesg.Fields[i].Num == fieldnum.RecordTimestamp {
+			mesg.Fields[i].Value = proto.Uint32(datetime.ToUint32(time.Now()))
+			break
+		}
+	}
 	record := NewRecord(&mesg)
 	b.ResetTimer()
 

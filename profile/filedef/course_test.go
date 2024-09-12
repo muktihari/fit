@@ -19,50 +19,50 @@ import (
 
 func newCourseMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileCourse)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.Course).WithFields(
+		}},
+		{Num: mesgnum.Course, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Course, fieldnum.CourseSport).WithValue(uint8(typedef.SportRunning)),
-		),
-		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		{Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
 			factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventActivity)),
 			factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(uint8(typedef.EventTypeStart)),
-		),
-		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		{Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Record).WithFields(
+		}},
+		{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Event).WithFields(
+		}},
+		{Num: mesgnum.Event, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.Lap).WithFields(
+		}},
+		{Num: mesgnum.Lap, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Lap, fieldnum.LapTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 		// Unordered optional Messages
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

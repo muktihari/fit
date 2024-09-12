@@ -12,7 +12,8 @@ import (
 
 // Factory defines a contract that any Factory containing these method can be used by mesgdef's structs.
 type Factory interface {
-	// CreateField create new field based on defined messages in the factory. If not found, it returns new field with "unknown" name.
+	// CreateField creates new field based on defined messages in the factory.
+	// If not found, it returns new field with "unknown" name.
 	CreateField(mesgNum typedef.MesgNum, num byte) proto.Field
 }
 

@@ -34,9 +34,6 @@ const (
 type headerOption byte
 
 const (
-	littleEndian = 0
-	bigEndian    = 1
-
 	// headerOptionNormal is the default header option.
 	// This option has two sub-option to select from:
 	//   1. LocalMessageTypeZero [Default]
@@ -87,7 +84,7 @@ type options struct {
 
 func defaultOptions() options {
 	return options{
-		endianness:      littleEndian,
+		endianness:      proto.LittleEndian,
 		headerOption:    headerOptionNormal,
 		writeBufferSize: defaultWriteBufferSize,
 	}
@@ -107,7 +104,7 @@ type Option func(o *options)
 // proto.V1, proto.V2, etc, which the validity is ensured.
 func WithProtocolVersion(protocolVersion proto.Version) Option {
 	return func(o *options) {
-		if proto.Validate(byte(protocolVersion)) == nil {
+		if proto.Validate(protocolVersion) == nil {
 			o.protocolVersion = protocolVersion
 		}
 	}
@@ -124,7 +121,7 @@ func WithMessageValidator(validator MessageValidator) Option {
 
 // WithBigEndian directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
 func WithBigEndian() Option {
-	return func(o *options) { o.endianness = bigEndian }
+	return func(o *options) { o.endianness = proto.BigEndian }
 }
 
 // WithCompressedTimestampHeader directs the Encoder to compress timestamp in header to reduce file size.
@@ -191,6 +188,10 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
 		buf:               make([]byte, 0, 1536),
+		mesgDef: proto.MessageDefinition{
+			FieldDefinitions:          make([]proto.FieldDefinition, 0, 255),
+			DeveloperFieldDefinitions: make([]proto.DeveloperFieldDefinition, 0, 255),
+		},
 	}
 	e.Reset(w, opts...)
 	return e
@@ -314,11 +315,11 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	}
 
 	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
-		header.ProtocolVersion = byte(e.options.protocolVersion)
+		header.ProtocolVersion = e.options.protocolVersion
 	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
-		header.ProtocolVersion = byte(proto.V1)
+		header.ProtocolVersion = proto.V1
 	}
-	e.protocolValidator.SetProtocolVersion(proto.Version(header.ProtocolVersion))
+	e.protocolValidator.SetProtocolVersion(header.ProtocolVersion)
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
@@ -432,7 +433,6 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	mesg.Header = proto.MesgNormalHeaderMask
-	mesg.Architecture = e.options.endianness
 
 	if err = e.options.messageValidator.Validate(mesg); err != nil {
 		return fmt.Errorf("message validation failed: %w", err)
@@ -463,12 +463,12 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		}
 	}
 
-	proto.CreateMessageDefinitionTo(&e.mesgDef, mesg)
-	if err := e.protocolValidator.ValidateMessageDefinition(&e.mesgDef); err != nil {
+	mesgDef := e.newMessageDefinition(mesg)
+	if err := e.protocolValidator.ValidateMessageDefinition(mesgDef); err != nil {
 		return err
 	}
 
-	b, _ := e.mesgDef.MarshalAppend(e.buf[:0])
+	b, _ := mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 	if e.options.headerOption == headerOptionNormal {
 		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
@@ -486,7 +486,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	// At this point, e.buf may grow. Re-assign e.buf in case slice has grown.
-	e.buf, err = mesg.MarshalAppend(e.buf[:0])
+	e.buf, err = mesg.MarshalAppend(e.buf[:0], mesgDef.Architecture)
 	if err != nil {
 		return fmt.Errorf("marshal mesg failed: %w", err)
 	}
@@ -530,9 +530,40 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 }
 
+func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
+	e.mesgDef.Header = proto.MesgDefinitionMask
+	e.mesgDef.Reserved = 0
+	e.mesgDef.Architecture = e.options.endianness
+	e.mesgDef.MesgNum = mesg.Num
+	e.mesgDef.FieldDefinitions = e.mesgDef.FieldDefinitions[:0]
+	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
+
+	for i := range mesg.Fields {
+		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions, proto.FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     byte(proto.Sizeof(mesg.Fields[i].Value)),
+			BaseType: mesg.Fields[i].BaseType,
+		})
+	}
+
+	if len(mesg.DeveloperFields) == 0 {
+		return &e.mesgDef
+	}
+
+	e.mesgDef.Header |= proto.DevDataMask
+	for i := range mesg.DeveloperFields {
+		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               byte(proto.Sizeof(mesg.DeveloperFields[i].Value)),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+		})
+	}
+
+	return &e.mesgDef
+}
+
 func (e *Encoder) encodeCRC() error {
-	b := e.buf[:2]
-	binary.LittleEndian.PutUint16(b, e.crc16.Sum16())
+	b := binary.LittleEndian.AppendUint16(e.buf[:0], e.crc16.Sum16())
 
 	n, err := e.w.Write(b)
 	e.n += int64(n)

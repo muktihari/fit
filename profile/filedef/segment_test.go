@@ -19,35 +19,35 @@ import (
 
 func newSegmentMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
-		factory.CreateMesgOnly(mesgnum.FileId).WithFields(
+		{Num: mesgnum.FileId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(uint8(typedef.FileSegment)),
 			factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
-		),
-		factory.CreateMesgOnly(mesgnum.DeveloperDataId).WithFields(
+		}},
+		{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.FieldDescription).WithFields(
+		}},
+		{Num: mesgnum.FieldDescription, Fields: []proto.Field{
 			factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-		),
-		factory.CreateMesgOnly(mesgnum.SegmentId).WithFields(
+		}},
+		{Num: mesgnum.SegmentId, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SegmentId, fieldnum.SegmentIdEnabled).WithValue(true),
-		),
-		factory.CreateMesgOnly(mesgnum.SegmentLeaderboardEntry).WithFields(
+		}},
+		{Num: mesgnum.SegmentLeaderboardEntry, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SegmentLeaderboardEntry, fieldnum.SegmentLeaderboardEntryName).WithValue("entry test"),
-		),
-		factory.CreateMesgOnly(mesgnum.SegmentLap).WithFields(
+		}},
+		{Num: mesgnum.SegmentLap, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SegmentLap, fieldnum.SegmentLapName).WithValue("lap test"),
-		),
-		factory.CreateMesgOnly(mesgnum.SegmentPoint).WithFields(
+		}},
+		{Num: mesgnum.SegmentPoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.SegmentPoint, fieldnum.SegmentPointAltitude).WithValue(uint16(10000)),
-		),
+		}},
 		// Unrelated messages
-		factory.CreateMesgOnly(mesgnum.BarometerData).WithFields(
+		{Num: mesgnum.BarometerData, Fields: []proto.Field{
 			factory.CreateField(mesgnum.BarometerData, fieldnum.BarometerDataTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
-		factory.CreateMesgOnly(mesgnum.CoursePoint).WithFields(
+		}},
+		{Num: mesgnum.CoursePoint, Fields: []proto.Field{
 			factory.CreateField(mesgnum.CoursePoint, fieldnum.CoursePointTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-		),
+		}},
 	}
 }
 

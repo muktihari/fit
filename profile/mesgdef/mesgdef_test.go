@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
+	"github.com/muktihari/fit/proto"
 )
 
 func TestDefaultOptions(t *testing.T) {
@@ -34,9 +35,13 @@ func TestUnsafeCast(t *testing.T) {
 		typedef.AttitudeValidityHwFail,
 		typedef.AttitudeValiditySolutionCoasting,
 	}
-	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.AviationAttitudeValidity: attitudeValidities,
-	})
+	mesg := factory.CreateMesg(mesgnum.Record)
+	for i := range mesg.Fields {
+		if mesg.Fields[i].Num == fieldnum.AviationAttitudeValidity {
+			mesg.Fields[i].Value = proto.SliceUint16(attitudeValidities)
+			break
+		}
+	}
 
 	aviationAttitude := NewAviationAttitude(&mesg)
 	newMesg := aviationAttitude.ToMesg(nil)

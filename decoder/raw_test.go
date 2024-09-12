@@ -114,7 +114,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				})
 			}(),
 			fn:  fnDecodeRawOK,
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "unexpected EOF when decode header",
@@ -146,7 +146,7 @@ func TestRawDecoderDecode(t *testing.T) {
 				})
 			}(),
 			fn:  fnDecodeRawOK,
-			err: ErrNotAFitFile,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "fn FileHeader returns io.EOF",
@@ -197,13 +197,13 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
 
 				cur := 0
@@ -221,19 +221,20 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef n developer fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
-						DeveloperDataIndex: 0,
-						Num:                0,
-						Value:              proto.Uint8(100),
-					},
-				)
+				mesg := proto.Message{Num: mesgnum.Record,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
+					}, DeveloperFields: []proto.DeveloperField{
+						{
+							DeveloperDataIndex: 0,
+							Num:                0,
+							Value:              proto.Uint8(100),
+						},
+					}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
 
 				cur := 0
@@ -251,19 +252,19 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef developer fields return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
+				}, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                0,
 						Value:              proto.Uint8(100),
 					},
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
 
 				cur := 0
@@ -281,19 +282,19 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesgDef fn return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				).WithDeveloperFields(
-					proto.DeveloperField{
+				}, DeveloperFields: []proto.DeveloperField{
+					{
 						DeveloperDataIndex: 0,
 						Num:                0,
 						Value:              proto.Uint8(100),
 					},
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
 
 				cur := 0
@@ -316,12 +317,12 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesg, mesgDef not found",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgb, _ := mesg.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				buf = append(buf, mesgb...)
 
 				cur := 0
@@ -339,13 +340,13 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode mesg, read return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
 				buf = append(buf, mesgDefb[0]&proto.LocalMesgNumMask)
 
@@ -384,15 +385,15 @@ func TestRawDecoderDecode(t *testing.T) {
 		{
 			name: "decode crc return io.EOF",
 			r: func() io.Reader {
-				mesg := factory.CreateMesg(mesgnum.Record).WithFields(
+				mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-				)
+				}}
 				h := headerForTest()
-				buf, _ := h.MarshalBinary()
-				mesgDef := proto.CreateMessageDefinition(&mesg)
-				mesgDefb, _ := mesgDef.MarshalBinary()
+				buf, _ := h.MarshalAppend(nil)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
 				buf = append(buf, mesgDefb...)
-				mesgb, _ := mesg.MarshalBinary()
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
 				buf = append(buf, mesgb...)
 
 				binary.LittleEndian.PutUint32(buf[4:8], uint32(len(buf)-14))
@@ -469,13 +470,13 @@ func BenchmarkRawDecoderDecode(b *testing.B) {
 	// But since it's big, it's should be good to benchmark.
 	f, err := os.Open("../testdata/big_activity.fit")
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 	defer f.Close()
 
 	all, err := io.ReadAll(f)
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 
 	buf := bytes.NewBuffer(all)

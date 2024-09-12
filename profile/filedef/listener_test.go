@@ -169,17 +169,17 @@ func TestListenerForSingleFitFile(t *testing.T) {
 		func() table {
 			mesgs := newActivityMessageForTest(now)
 			mesgs = append(mesgs,
-				factory.CreateMesgOnly(mesgnum.Record).
-					WithFields(
+				proto.Message{Num: mesgnum.Record,
+					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(incrementSecond(&now))),
-					).
-					WithDeveloperFields(
-						proto.DeveloperField{
+					},
+					DeveloperFields: []proto.DeveloperField{
+						{
 							DeveloperDataIndex: 0,
 							Num:                0,
 							Value:              proto.Uint8(100),
 						},
-					),
+					}},
 			)
 			return table{
 				name:   "default listener for activity containing developer fields",

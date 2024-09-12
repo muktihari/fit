@@ -64,7 +64,7 @@ func TestHeaderMarshaler(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := tc.fileHeader.MarshalBinary()
+			b, err := tc.fileHeader.MarshalAppend(nil)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -148,7 +148,7 @@ func TestMessageDefinitionMarshaler(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			b, _ := tc.mesgdef.MarshalBinary()
+			b, _ := tc.mesgdef.MarshalAppend(nil)
 			if diff := cmp.Diff(b, tc.b); diff != "" {
 				t.Fatal(diff)
 			}
@@ -243,7 +243,7 @@ func TestMessageMarshaler(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := tc.mesg.MarshalBinary()
+			b, err := tc.mesg.MarshalAppend(nil, proto.LittleEndian)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
@@ -254,7 +254,7 @@ func TestMessageMarshaler(t *testing.T) {
 	}
 }
 
-func BenchmarkHeaderMarshalBinary(b *testing.B) {
+func BenchmarkFileHeaderMarshalAppend(b *testing.B) {
 	b.StopTimer()
 	header := proto.FileHeader{
 		Size:            14,
@@ -267,76 +267,58 @@ func BenchmarkHeaderMarshalBinary(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = header.MarshalBinary()
-	}
-}
-
-func BenchmarkHeaderMarshalAppend(b *testing.B) {
-	b.StopTimer()
-	header := proto.FileHeader{
-		Size:            14,
-		ProtocolVersion: 32,
-		ProfileVersion:  2132,
-		DataSize:        642262,
-		DataType:        ".FIT",
-		CRC:             12856,
-	}
-	arr := [proto.MaxBytesPerMessageDefinition]byte{}
-	b.StartTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, _ = header.MarshalAppend(arr[:0])
-	}
-}
-
-func BenchmarkMessageDefinitionMarshalBinary(b *testing.B) {
-	b.StopTimer()
-	mesg := factory.CreateMesg(mesgnum.Record)
-	mesgDef := proto.CreateMessageDefinition(&mesg)
-	b.StartTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, _ = mesgDef.MarshalBinary()
+		_, _ = header.MarshalAppend(make([]byte, 0, 14))
 	}
 }
 
 func BenchmarkMessageDefinitionMarshalAppend(b *testing.B) {
 	b.StopTimer()
-	mesg := factory.CreateMesg(mesgnum.Record)
-	mesgDef := proto.CreateMessageDefinition(&mesg)
-	arr := [proto.MaxBytesPerMessageDefinition]byte{}
-	b.StartTimer()
-
-	for i := 0; i < b.N; i++ {
-		_, _ = mesgDef.MarshalAppend(arr[:0])
+	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLat).WithValue(int32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLong).WithValue(int32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(70)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(300*5 - 500)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPower).WithValue(uint16(300)),
+	}}
+	mesgDef, err := proto.NewMessageDefinition(&mesg)
+	if err != nil {
+		b.Fatal(err)
 	}
-}
-
-func BenchmarkMessageMarshalBinary(b *testing.B) {
-	b.StopTimer()
-	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.RecordPositionLat:  proto.Int32(1000),
-		fieldnum.RecordPositionLong: proto.Int32(1000),
-		fieldnum.RecordSpeed:        proto.Uint16(1000),
-	})
+	buf := make([]byte, 6+len(mesg.Fields)*3+len(mesg.DeveloperFields)*3)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = mesg.MarshalBinary()
+		_, _ = mesgDef.MarshalAppend(buf[:0])
 	}
 }
 
 func BenchmarkMessageMarshalAppend(b *testing.B) {
 	b.StopTimer()
-	mesg := factory.CreateMesg(mesgnum.Record).WithFieldValues(map[byte]any{
-		fieldnum.RecordPositionLat:  proto.Int32(1000),
-		fieldnum.RecordPositionLong: proto.Int32(1000),
-		fieldnum.RecordSpeed:        proto.Uint16(1000),
-	})
-	arr := [proto.MaxBytesPerMessage]byte{}
+	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLat).WithValue(int32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPositionLong).WithValue(int32(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(70)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(300*5 - 500)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordPower).WithValue(uint16(300)),
+	}}
+
+	var size = 1
+	for i := range mesg.Fields {
+		size += proto.Sizeof(mesg.Fields[i].Value)
+	}
+	buf := make([]byte, size)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _ = mesg.MarshalAppend(arr[:0])
+		_, err := mesg.MarshalAppend(buf[:0], proto.LittleEndian)
+		if err != nil {
+			b.Fatal(err)
+		}
 	}
 }
