@@ -300,7 +300,7 @@ func main() {
 
 ### Decode Chained FIT Files
 
-A single invocation of `Decode()` will process exactly one FIT sequence. To decode chained FIT files, wrap the decode process with a loop and use `dec.Next()` to check whether next sequence of bytes are still a valid FIT sequence.
+A single invocation of `Decode()` will process exactly one FIT sequence. To decode a chained FIT file containing multiple FIT data, invoke Decode() or DecodeWithContext() method multiple times. For convenience, we can wrap it with the Next() method as follows (optional):
 
 ```go
     ...

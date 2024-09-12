@@ -182,7 +182,8 @@ func WithReadBufferSize(size int) Option {
 // The FIT protocol allows for multiple FIT files to be chained together in a single FIT file.
 // Each FIT file in the chain must be a properly formatted FIT file (header, data records, CRC).
 //
-// To decode chained FIT files, use Next() to check if r hasn't reach EOF and next bytes are still a valid FIT sequences.
+// To decode a chained FIT file containing multiple FIT data, invoke Decode() or DecodeWithContext()
+// method multiple times. For convenience, we can wrap it with the Next() method as follows (optional):
 //
 //	for dec.Next() {
 //	   fit, err := dec.Decode()
@@ -364,14 +365,14 @@ func (d *Decoder) Next() bool {
 	if !d.sequenceCompleted {
 		return true
 	}
-	d.reset() // reset values for the next chained FIT file
+	d.sequenceCompleted = false
 	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeFileHeaderOnce() == nil
 }
 
 // Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or
 // an error if it occurs. To decode a chained FIT file containing multiple FIT data, invoke this
-// method multiple times, however, the invocation must be wrapped with Next() method as follows:
+// method multiple times. For convenience, we can wrap it with the Next() method as follows (optional):
 //
 //	for dec.Next() {
 //	     fit, err := dec.Decode()
@@ -393,12 +394,14 @@ func (d *Decoder) Decode() (*proto.FIT, error) {
 	if d.err = d.decodeCRC(); d.err != nil {
 		return nil, d.err
 	}
-	d.sequenceCompleted = true
-	return &proto.FIT{
+	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
-	}, nil
+	}
+	d.reset()
+	d.sequenceCompleted = true
+	return fit, nil
 }
 
 // Discard discards a single FIT file sequence and returns any error encountered. This method directs the Decoder to
@@ -440,6 +443,7 @@ func (d *Decoder) Discard() error {
 	if _, d.err = d.readN(2); d.err != nil { // Discard File CRC
 		return d.err
 	}
+	d.reset()
 	d.sequenceCompleted = true
 	return d.err
 }
@@ -1009,12 +1013,14 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 	if d.err = d.decodeCRC(); d.err != nil {
 		return nil, d.err
 	}
-	d.sequenceCompleted = true
-	return &proto.FIT{
+	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
 		Messages:   d.messages,
 		CRC:        d.crc,
-	}, nil
+	}
+	d.reset()
+	d.sequenceCompleted = true
+	return fit, nil
 }
 
 func checkContext(ctx context.Context) error {
