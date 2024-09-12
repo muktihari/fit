@@ -9,12 +9,25 @@ import (
 	"strconv"
 )
 
-// BaseTypeNumMask used to get the index/order of the constants (start from 0, Enum).
-// Example: (Sint16 & BaseTypeNumMask) -> 3.
-const BaseTypeNumMask = 0x1F
-
 // BaseType is the base of all types used in FIT.
+//
+// Bits layout:
+//   - 7  : Endian Ability (0: for single byte data; 1: if base type has endianness)
+//   - 5–6: Reserved
+//   - 0–4: Base Type Number
 type BaseType byte
+
+const (
+	// BaseTypeNumMask is used to get the Base Type Number.
+	//
+	// Example: (Sint16 & BaseTypeNumMask) -> 3.
+	BaseTypeNumMask = 0b00011111
+
+	// EndianAbilityMask is used to get the Endian Ability.
+	//
+	// Example: (Sint32 & EndianAbilityMask == EndianAbilityMask) -> true
+	EndianAbilityMask = 0b10000000
+)
 
 const (
 	Enum    BaseType = 0x00
@@ -97,29 +110,6 @@ func FromString(s string) BaseType {
 	return 255
 }
 
-// List returns all constants.
-func List() []BaseType {
-	return []BaseType{
-		Enum,
-		Sint8,
-		Uint8,
-		Sint16,
-		Uint16,
-		Sint32,
-		Uint32,
-		String,
-		Float32,
-		Float64,
-		Uint8z,
-		Uint16z,
-		Uint32z,
-		Byte,
-		Sint64,
-		Uint64,
-		Uint64z,
-	}
-}
-
 // String returns string representation of t.
 func (t BaseType) String() string {
 	switch t {
@@ -186,6 +176,31 @@ func (t BaseType) Size() byte {
 	return sizes[t] // PERF: use array to optimize speed since this method is frequently used.
 }
 
+// Valid checks whether BaseType is valid or not.
+func (t BaseType) Valid() bool {
+	switch t {
+	case Enum,
+		Sint8,
+		Uint8,
+		Sint16,
+		Uint16,
+		Sint32,
+		Uint32,
+		String,
+		Float32,
+		Float64,
+		Uint8z,
+		Uint16z,
+		Uint32z,
+		Byte,
+		Sint64,
+		Uint64,
+		Uint64z:
+		return true
+	}
+	return false
+}
+
 // GoType returns go equivalent type in string.
 func (t BaseType) GoType() string {
 	switch t {
@@ -217,63 +232,6 @@ func (t BaseType) GoType() string {
 		return "uint64"
 	}
 	return "invalid(" + strconv.Itoa(int(t)) + ")"
-}
-
-// EndianAbility return whether t have endianness.
-func (t BaseType) EndianAbility() byte {
-	switch t {
-	case Enum, Byte, Uint8, Uint8z:
-		return 0
-	case Sint8:
-		return 0
-	case Sint16:
-		return 1
-	case Uint16, Uint16z:
-		return 1
-	case Sint32:
-		return 1
-	case Uint32, Uint32z:
-		return 1
-	case String:
-		return 0
-	case Float32:
-		return 1
-	case Float64:
-		return 1
-	case Sint64:
-		return 1
-	case Uint64, Uint64z:
-		return 1
-	}
-	return 0
-}
-
-func (t BaseType) IsInteger() bool {
-	switch t {
-	case Enum, Byte, Uint8, Uint8z:
-		return true
-	case Sint8:
-		return true
-	case Sint16:
-		return true
-	case Uint16, Uint16z:
-		return true
-	case Sint32:
-		return true
-	case Uint32, Uint32z:
-		return true
-	case String:
-		return false
-	case Float32:
-		return false
-	case Float64:
-		return false
-	case Sint64:
-		return true
-	case Uint64, Uint64z:
-		return true
-	}
-	return false
 }
 
 // Invalid returns invalid value of t. e.g. Byte is 255 (its highest value).
@@ -317,10 +275,10 @@ func (t BaseType) Invalid() any {
 	return "invalid"
 }
 
-// Valid checks whether BaseType is valid or not.
-func (t BaseType) Valid() bool {
-	switch t {
-	case Enum,
+// List returns all constants.
+func List() []BaseType {
+	return []BaseType{
+		Enum,
 		Sint8,
 		Uint8,
 		Sint16,
@@ -336,8 +294,6 @@ func (t BaseType) Valid() bool {
 		Byte,
 		Sint64,
 		Uint64,
-		Uint64z:
-		return true
+		Uint64z,
 	}
-	return false
 }
