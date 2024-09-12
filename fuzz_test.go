@@ -134,9 +134,11 @@ func FuzzDecodeEncodeRoundTrip(f *testing.F) {
 			return
 		}
 
-		if diff := cmp.Diff(sanitizeOutput(in), sanitizeOutput(encoded)); diff != "" {
-			fitdump("in", t, in)
-			fitdump("encoded", t, encoded)
+		sanitizedIn := sanitizeOutput(in)
+		sanitizedEncoded := sanitizeOutput(encoded)
+		if diff := cmp.Diff(sanitizedIn, sanitizedEncoded); diff != "" {
+			fitdump("in", t, sanitizedIn)
+			fitdump("encoded", t, sanitizedEncoded)
 			t.Fatal(diff)
 		}
 	})
@@ -236,6 +238,7 @@ func sanitizeOutput(in []byte) []byte {
 		case decoder.RawFlagMesgDef:
 			// the encoder used for test always use localMesgNum 0
 			b[0] = proto.MesgDefinitionMask
+			b[1] = 0 // Reserved
 		case decoder.RawFlagMesgData:
 			// the encoder used for test always use localMesgNum 0
 			b[0] = 0
