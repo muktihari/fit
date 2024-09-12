@@ -76,73 +76,6 @@ type MessageDefinition struct {
 	DeveloperFieldDefinitions []DeveloperFieldDefinition // List of the developer field definition (only if Developer Data Flag is set in Header)
 }
 
-// LocalMesgNum extracts LocalMesgNum from message header.
-func LocalMesgNum(header byte) byte {
-	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
-		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
-	}
-	return header & LocalMesgNumMask
-}
-
-const (
-	errNilMesg            = errorString("mesg is nil")
-	errValueSizeExceed255 = errorString("value's size exceed 255")
-)
-
-// NewMessageDefinition returns a new MessageDefinition based on the given Message or an error if one occurs.
-// This will set Reserved and Architecture with 0 value. It's up to the caller to change the returning value.
-//
-// This serves as a testing helper and is for documentation purposes only.
-func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
-	if mesg == nil {
-		return nil, errNilMesg
-	}
-
-	const maxValueSize = 255
-
-	mesgDef := &MessageDefinition{
-		Header:           MesgDefinitionMask,
-		Reserved:         0,
-		Architecture:     LittleEndian,
-		MesgNum:          mesg.Num,
-		FieldDefinitions: make([]FieldDefinition, 0, len(mesg.Fields)),
-	}
-
-	for i := range mesg.Fields {
-		size := Sizeof(mesg.Fields[i].Value)
-		if size > maxValueSize {
-			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
-				i, maxValueSize, errValueSizeExceed255)
-		}
-		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, FieldDefinition{
-			Num:      mesg.Fields[i].Num,
-			Size:     byte(size),
-			BaseType: mesg.Fields[i].BaseType,
-		})
-	}
-
-	if len(mesg.DeveloperFields) == 0 {
-		return mesgDef, nil
-	}
-
-	mesgDef.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
-	mesgDef.Header |= DevDataMask
-	for i := range mesg.DeveloperFields {
-		size := Sizeof(mesg.DeveloperFields[i].Value)
-		if size > maxValueSize {
-			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
-				i, maxValueSize, errValueSizeExceed255)
-		}
-		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, DeveloperFieldDefinition{
-			Num:                mesg.DeveloperFields[i].Num,
-			Size:               byte(size),
-			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
-		})
-	}
-
-	return mesgDef, nil
-}
-
 // FieldDefinition is the definition of the upcoming field within the message's structure.
 type FieldDefinition struct {
 	Num      byte              // The field definition number
@@ -315,4 +248,71 @@ type SubField struct {
 type SubFieldMap struct {
 	RefFieldNum   byte
 	RefFieldValue int64
+}
+
+// LocalMesgNum extracts LocalMesgNum from message header.
+func LocalMesgNum(header byte) byte {
+	if (header & MesgCompressedHeaderMask) == MesgCompressedHeaderMask {
+		return (header & CompressedLocalMesgNumMask) >> CompressedBitShift
+	}
+	return header & LocalMesgNumMask
+}
+
+const (
+	errNilMesg            = errorString("mesg is nil")
+	errValueSizeExceed255 = errorString("value's size exceed 255")
+)
+
+// NewMessageDefinition returns a new MessageDefinition based on the given Message or an error if one occurs.
+// This will set Reserved and Architecture with 0 value. It's up to the caller to change the returning value.
+//
+// This serves as a testing helper and is for documentation purposes only.
+func NewMessageDefinition(mesg *Message) (*MessageDefinition, error) {
+	if mesg == nil {
+		return nil, errNilMesg
+	}
+
+	const maxValueSize = 255
+
+	mesgDef := &MessageDefinition{
+		Header:           MesgDefinitionMask,
+		Reserved:         0,
+		Architecture:     LittleEndian,
+		MesgNum:          mesg.Num,
+		FieldDefinitions: make([]FieldDefinition, 0, len(mesg.Fields)),
+	}
+
+	for i := range mesg.Fields {
+		size := Sizeof(mesg.Fields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, FieldDefinition{
+			Num:      mesg.Fields[i].Num,
+			Size:     byte(size),
+			BaseType: mesg.Fields[i].BaseType,
+		})
+	}
+
+	if len(mesg.DeveloperFields) == 0 {
+		return mesgDef, nil
+	}
+
+	mesgDef.DeveloperFieldDefinitions = make([]DeveloperFieldDefinition, 0, len(mesg.DeveloperFields))
+	mesgDef.Header |= DevDataMask
+	for i := range mesg.DeveloperFields {
+		size := Sizeof(mesg.DeveloperFields[i].Value)
+		if size > maxValueSize {
+			return nil, fmt.Errorf("Fields[%d].Value's size should be <= %d: %w",
+				i, maxValueSize, errValueSizeExceed255)
+		}
+		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, DeveloperFieldDefinition{
+			Num:                mesg.DeveloperFields[i].Num,
+			Size:               byte(size),
+			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+		})
+	}
+
+	return mesgDef, nil
 }
