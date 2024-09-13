@@ -12,6 +12,7 @@ import (
 
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/typedef"
 )
 
 // UnmarshalValue unmarshals b into a proto.Value.
@@ -31,13 +32,13 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 		basetype.Uint8, basetype.Uint8z:
 		if profileType == profile.Bool { // Special Case
 			if isArray {
-				vals := make([]bool, 0, len(b))
+				vals := make([]typedef.Bool, 0, len(b))
 				for i := range b {
-					vals = append(vals, b[i] == 1)
+					vals = append(vals, typedef.Bool(b[i]))
 				}
 				return SliceBool(vals), nil
 			}
-			return Bool(b[0] == 1), nil
+			return Bool(typedef.Bool(b[0])), nil
 		}
 		if isArray {
 			vals := make([]byte, len(b))

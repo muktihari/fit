@@ -11,6 +11,7 @@ import (
 	"unsafe"
 
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/typedef"
 )
 
 // Type is Value's type
@@ -102,12 +103,12 @@ func (v Value) Int8() int8 {
 	return int8(v.num)
 }
 
-// Bool returns Value as bool, if it's not a valid bool value, it returns false.
-func (v Value) Bool() bool {
+// Bool returns Value as typedef.Bool, if it's not a valid typedef.Bool value, it returns typedef.BoolInvalid.
+func (v Value) Bool() typedef.Bool {
 	if v.typ != TypeBool {
-		return false
+		return typedef.BoolInvalid
 	}
-	return v.num == 1
+	return typedef.Bool(v.num)
 }
 
 // Uint8 returns Value as uint8, if it's not a valid uint8 value, it returns basetype.Uint8Invalid (0xFF).
@@ -226,11 +227,11 @@ func (v Value) String() string {
 // SliceBool returns Value as []bool, if it's not a valid []bool value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
-func (v Value) SliceBool() []bool {
+func (v Value) SliceBool() []typedef.Bool {
 	if v.typ != TypeSliceBool {
 		return nil
 	}
-	return unsafe.Slice((*bool)(v.ptr), v.num)
+	return unsafe.Slice((*typedef.Bool)(v.ptr), v.num)
 }
 
 // SliceInt8 returns Value as []int8, if it's not a valid []int8 value, it returns nil.
@@ -435,15 +436,12 @@ func (v Value) Align(t basetype.BaseType) bool {
 
 // Valid checks whether the Value is valid based on given basetype. This does not verify whether the Type of
 // the Value aligns with the provided BaseType. For slices, even though only one element is valid, the Value will be counted a valid value.
-//
-// Special case: bool or slice of bool will always be valid since bool type is often used as a flag and
-// there are only two possibility (true/false).
 func (v Value) Valid(t basetype.BaseType) bool {
 	var invalidCount int
 
 	switch v.Type() {
-	case TypeBool, TypeSliceBool:
-		return true // Mark as valid
+	case TypeBool:
+		return v.num < 2 // Only 0 (false) and 1 (true) is valid
 	case TypeInt8:
 		return int8(v.num) != basetype.Sint8Invalid
 	case TypeUint8:
@@ -487,6 +485,14 @@ func (v Value) Valid(t basetype.BaseType) bool {
 	case TypeString:
 		s := v.String()
 		return s != basetype.StringInvalid && s != "\x00"
+	case TypeSliceBool:
+		vals := v.SliceBool()
+		for i := range vals {
+			if vals[i] == typedef.BoolInvalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
 	case TypeSliceInt8:
 		vals := v.SliceInt8()
 		for i := range vals {
@@ -611,11 +617,11 @@ func (v Value) Valid(t basetype.BaseType) bool {
 	return false
 }
 
-// Bool converts bool as Value.
-func Bool(v bool) Value {
-	var num uint64
-	if v {
-		num = 1
+// Bool converts typedef.Bool as Value. If v > 1, it will be treated as typedef.BoolInvalid.
+func Bool(v typedef.Bool) Value {
+	num := uint64(v)
+	if v > 1 {
+		num = uint64(typedef.BoolInvalid)
 	}
 	return Value{num: num, typ: TypeBool}
 }
@@ -676,7 +682,7 @@ func String(v string) Value {
 }
 
 // SliceBool converts []bool as Value. This takes ownership of s, and the caller should not use s after this call.
-func SliceBool[S []E, E ~bool](s S) Value {
+func SliceBool[S []E, E typedef.Bool](s S) Value {
 	return Value{num: uint64(len(s)), typ: TypeSliceBool, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
 }
 
@@ -748,6 +754,11 @@ func Any(v any) Value {
 	case Value:
 		return val
 	case bool:
+		if val {
+			return Bool(typedef.BoolTrue)
+		}
+		return Bool(typedef.BoolFalse)
+	case typedef.Bool:
 		return Bool(val)
 	case int8:
 		return Int8(val)
@@ -772,6 +783,18 @@ func Any(v any) Value {
 	case string:
 		return String(val)
 	case []bool:
+		// Casting a bool to uint8 is not guaranteed to work correctly since bool and uint8 may not
+		// have the same memory layout. It's safer to allocate memory explicitly for the conversion.
+		bools := make([]typedef.Bool, len(val))
+		for i := range val {
+			if val[i] {
+				bools[i] = typedef.BoolTrue
+			} else {
+				bools[i] = typedef.BoolFalse
+			}
+		}
+		return SliceBool(bools)
+	case []typedef.Bool:
 		return SliceBool(val)
 	case []int8:
 		return SliceInt8(val)
@@ -801,7 +824,10 @@ func Any(v any) Value {
 	rv := reflect.Indirect(reflect.ValueOf(v))
 	switch rv.Kind() {
 	case reflect.Bool:
-		return Bool(rv.Bool())
+		if rv.Bool() {
+			return Bool(typedef.BoolTrue)
+		}
+		return Bool(typedef.BoolFalse)
 	case reflect.Int8:
 		return Int8(int8(rv.Int()))
 	case reflect.Uint8:
@@ -828,7 +854,16 @@ func Any(v any) Value {
 		ptr := rv.UnsafePointer()
 		switch rv.Type().Elem().Kind() {
 		case reflect.Bool:
-			return SliceBool(unsafe.Slice((*bool)(ptr), rv.Len()))
+			vals := unsafe.Slice((*bool)(ptr), rv.Len())
+			bools := make([]typedef.Bool, len(vals)) // See: case []bool for details on why we must allocate.
+			for i := range vals {
+				if vals[i] {
+					bools[i] = typedef.BoolTrue
+				} else {
+					bools[i] = typedef.BoolFalse
+				}
+			}
+			return SliceBool(bools)
 		case reflect.Int8:
 			return SliceInt8(unsafe.Slice((*int8)(ptr), rv.Len()))
 		case reflect.Uint8:

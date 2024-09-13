@@ -18,19 +18,20 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 	// NOTE: The size of the resulting bytes should align with Sizeof.
 	switch v.Type() {
 	case TypeBool:
-		if v.Bool() {
-			b = append(b, 1)
+		val := v.Bool()
+		if val > 1 {
+			b = append(b, 255)
 		} else {
-			b = append(b, 0)
+			b = append(b, byte(val))
 		}
 		return b, nil
 	case TypeSliceBool:
 		vals := v.SliceBool()
 		for i := range vals {
-			if vals[i] {
-				b = append(b, 1)
+			if vals[i] > 1 {
+				b = append(b, 255)
 			} else {
-				b = append(b, 0)
+				b = append(b, byte(vals[i]))
 			}
 		}
 		return b, nil
