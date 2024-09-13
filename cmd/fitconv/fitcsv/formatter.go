@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -22,7 +23,7 @@ import (
 func format(val proto.Value) string {
 	switch val.Type() { // fast path
 	case proto.TypeBool:
-		return strconv.FormatBool(val.Bool())
+		return strconv.FormatUint(uint64(val.Bool()), 10)
 	case proto.TypeInt8:
 		return strconv.FormatInt(int64(val.Int8()), 10)
 	case proto.TypeUint8:
@@ -54,8 +55,8 @@ func format(val proto.Value) string {
 	case proto.TypeString:
 		return val.String()
 	case proto.TypeSliceBool:
-		return concat(val.SliceBool(), func(v bool) string {
-			return strconv.FormatBool(v)
+		return concat(val.SliceBool(), func(v typedef.Bool) string {
+			return strconv.FormatUint(uint64(v), 10)
 		})
 	case proto.TypeSliceInt8:
 		return concat(val.SliceInt8(), func(v int8) string {

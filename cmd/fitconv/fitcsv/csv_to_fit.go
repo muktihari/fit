@@ -413,11 +413,11 @@ func parseValue(strValue string, baseType basetype.BaseType, profileType profile
 	}
 
 	if profileType == profile.Bool {
-		v, err := strconv.ParseBool(strValue)
+		v, err := strconv.ParseUint(strValue, 0, 8)
 		if err != nil {
 			return value, err
 		}
-		return proto.Bool(v), nil
+		return proto.Bool(typedef.Bool(v)), nil
 	}
 
 	var scaledValue float64
@@ -545,7 +545,7 @@ func packValues(vals []proto.Value) proto.Value {
 	}
 	switch vals[0].Type() {
 	case proto.TypeBool:
-		values := make([]bool, len(vals))
+		values := make([]typedef.Bool, len(vals))
 		for i := range vals {
 			values[i] = vals[i].Bool()
 		}
