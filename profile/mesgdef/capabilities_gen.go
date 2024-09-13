@@ -18,10 +18,10 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Capabilities struct {
-	Languages             []uint8              // Array: [N]; Use language_bits_x types where x is index of array.
-	Sports                []typedef.SportBits0 // Array: [N]; Use sport_bits_x types where x is index of array.
-	WorkoutsSupported     typedef.WorkoutCapabilities
-	ConnectivitySupported typedef.ConnectivityCapabilities
+	Languages             []uint8                          // Base: uint8z; Array: [N]; Use language_bits_x types where x is index of array.
+	Sports                []typedef.SportBits0             // Base: uint8z; Array: [N]; Use sport_bits_x types where x is index of array.
+	WorkoutsSupported     typedef.WorkoutCapabilities      // Base: uint32z
+	ConnectivitySupported typedef.ConnectivityCapabilities // Base: uint32z
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -105,7 +105,7 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 
 // SetLanguages sets Languages value.
 //
-// Array: [N]; Use language_bits_x types where x is index of array.
+// Base: uint8z; Array: [N]; Use language_bits_x types where x is index of array.
 func (m *Capabilities) SetLanguages(v []uint8) *Capabilities {
 	m.Languages = v
 	return m
@@ -113,19 +113,23 @@ func (m *Capabilities) SetLanguages(v []uint8) *Capabilities {
 
 // SetSports sets Sports value.
 //
-// Array: [N]; Use sport_bits_x types where x is index of array.
+// Base: uint8z; Array: [N]; Use sport_bits_x types where x is index of array.
 func (m *Capabilities) SetSports(v []typedef.SportBits0) *Capabilities {
 	m.Sports = v
 	return m
 }
 
 // SetWorkoutsSupported sets WorkoutsSupported value.
+//
+// Base: uint32z
 func (m *Capabilities) SetWorkoutsSupported(v typedef.WorkoutCapabilities) *Capabilities {
 	m.WorkoutsSupported = v
 	return m
 }
 
 // SetConnectivitySupported sets ConnectivitySupported value.
+//
+// Base: uint32z
 func (m *Capabilities) SetConnectivitySupported(v typedef.ConnectivityCapabilities) *Capabilities {
 	m.ConnectivitySupported = v
 	return m

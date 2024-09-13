@@ -19,10 +19,10 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HrmProfile struct {
 	MessageIndex      typedef.MessageIndex
-	HrmAntId          uint16
+	HrmAntId          uint16 // Base: uint16z
 	Enabled           typedef.Bool
 	LogHrv            typedef.Bool
-	HrmAntIdTransType uint8
+	HrmAntIdTransType uint8 // Base: uint8z
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -119,6 +119,8 @@ func (m *HrmProfile) SetEnabled(v typedef.Bool) *HrmProfile {
 }
 
 // SetHrmAntId sets HrmAntId value.
+//
+// Base: uint16z
 func (m *HrmProfile) SetHrmAntId(v uint16) *HrmProfile {
 	m.HrmAntId = v
 	return m
@@ -131,6 +133,8 @@ func (m *HrmProfile) SetLogHrv(v typedef.Bool) *HrmProfile {
 }
 
 // SetHrmAntIdTransType sets HrmAntIdTransType value.
+//
+// Base: uint8z
 func (m *HrmProfile) SetHrmAntIdTransType(v uint8) *HrmProfile {
 	m.HrmAntIdTransType = v
 	return m

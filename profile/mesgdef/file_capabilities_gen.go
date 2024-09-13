@@ -23,7 +23,7 @@ type FileCapabilities struct {
 	MessageIndex typedef.MessageIndex
 	MaxCount     uint16
 	Type         typedef.File
-	Flags        typedef.FileFlags
+	Flags        typedef.FileFlags // Base: uint8z
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -126,6 +126,8 @@ func (m *FileCapabilities) SetType(v typedef.File) *FileCapabilities {
 }
 
 // SetFlags sets Flags value.
+//
+// Base: uint8z
 func (m *FileCapabilities) SetFlags(v typedef.FileFlags) *FileCapabilities {
 	m.Flags = v
 	return m

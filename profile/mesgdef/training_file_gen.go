@@ -22,7 +22,7 @@ import (
 type TrainingFile struct {
 	Timestamp    time.Time
 	TimeCreated  time.Time
-	SerialNumber uint32
+	SerialNumber uint32 // Base: uint32z
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	Type         typedef.File
@@ -164,6 +164,8 @@ func (m *TrainingFile) SetProduct(v uint16) *TrainingFile {
 }
 
 // SetSerialNumber sets SerialNumber value.
+//
+// Base: uint32z
 func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
 	m.SerialNumber = v
 	return m

@@ -22,7 +22,7 @@ import (
 type FileId struct {
 	TimeCreated  time.Time // Only set for files that are can be created/erased.
 	ProductName  string    // Optional free form string to indicate the devices name or model
-	SerialNumber uint32
+	SerialNumber uint32    // Base: uint32z
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	Number       uint16 // Only set for files that are not created/erased.
@@ -152,6 +152,8 @@ func (m *FileId) SetProduct(v uint16) *FileId {
 }
 
 // SetSerialNumber sets SerialNumber value.
+//
+// Base: uint32z
 func (m *FileId) SetSerialNumber(v uint32) *FileId {
 	m.SerialNumber = v
 	return m

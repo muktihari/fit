@@ -19,7 +19,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type MemoGlob struct {
 	Memo        []byte               // Array: [N]; Deprecated. Use data field.
-	Data        []uint8              // Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+	Data        []uint8              // Base: uint8z; Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 	PartIndex   uint32               // Sequence number of memo blocks
 	MesgNum     typedef.MesgNum      // Message Number of the parent message
 	ParentIndex typedef.MessageIndex // Index of mesg that this glob is associated with.
@@ -155,7 +155,7 @@ func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
 
 // SetData sets Data value.
 //
-// Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
+// Base: uint8z; Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
 	m.Data = v
 	return m

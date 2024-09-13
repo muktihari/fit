@@ -18,10 +18,10 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type AntChannelId struct {
-	DeviceNumber     uint16
+	DeviceNumber     uint16 // Base: uint16z
 	ChannelNumber    uint8
-	DeviceType       uint8
-	TransmissionType uint8
+	DeviceType       uint8 // Base: uint8z
+	TransmissionType uint8 // Base: uint8z
 	DeviceIndex      typedef.DeviceIndex
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -113,18 +113,24 @@ func (m *AntChannelId) SetChannelNumber(v uint8) *AntChannelId {
 }
 
 // SetDeviceType sets DeviceType value.
+//
+// Base: uint8z
 func (m *AntChannelId) SetDeviceType(v uint8) *AntChannelId {
 	m.DeviceType = v
 	return m
 }
 
 // SetDeviceNumber sets DeviceNumber value.
+//
+// Base: uint16z
 func (m *AntChannelId) SetDeviceNumber(v uint16) *AntChannelId {
 	m.DeviceNumber = v
 	return m
 }
 
 // SetTransmissionType sets TransmissionType value.
+//
+// Base: uint8z
 func (m *AntChannelId) SetTransmissionType(v uint8) *AntChannelId {
 	m.TransmissionType = v
 	return m

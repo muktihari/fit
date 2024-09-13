@@ -22,7 +22,7 @@ import (
 type Schedule struct {
 	TimeCreated   time.Time // Corresponds to file_id of scheduled workout / course.
 	ScheduledTime time.Time
-	SerialNumber  uint32               // Corresponds to file_id of scheduled workout / course.
+	SerialNumber  uint32               // Base: uint32z; Corresponds to file_id of scheduled workout / course.
 	Manufacturer  typedef.Manufacturer // Corresponds to file_id of scheduled workout / course.
 	Product       uint16               // Corresponds to file_id of scheduled workout / course.
 	Completed     typedef.Bool         // TRUE if this activity has been started
@@ -164,7 +164,7 @@ func (m *Schedule) SetProduct(v uint16) *Schedule {
 
 // SetSerialNumber sets SerialNumber value.
 //
-// Corresponds to file_id of scheduled workout / course.
+// Base: uint32z; Corresponds to file_id of scheduled workout / course.
 func (m *Schedule) SetSerialNumber(v uint32) *Schedule {
 	m.SerialNumber = v
 	return m

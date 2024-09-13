@@ -21,12 +21,12 @@ import (
 type SdmProfile struct {
 	Odometer          uint32 // Scale: 100; Units: m
 	MessageIndex      typedef.MessageIndex
-	SdmAntId          uint16
+	SdmAntId          uint16 // Base: uint16z
 	SdmCalFactor      uint16 // Scale: 10; Units: %
 	Enabled           typedef.Bool
 	SpeedSource       typedef.Bool // Use footpod for speed source instead of GPS
-	SdmAntIdTransType uint8
-	OdometerRollover  uint8 // Rollover counter that can be used to extend the odometer
+	SdmAntIdTransType uint8        // Base: uint8z
+	OdometerRollover  uint8        // Rollover counter that can be used to extend the odometer
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -163,6 +163,8 @@ func (m *SdmProfile) SetEnabled(v typedef.Bool) *SdmProfile {
 }
 
 // SetSdmAntId sets SdmAntId value.
+//
+// Base: uint16z
 func (m *SdmProfile) SetSdmAntId(v uint16) *SdmProfile {
 	m.SdmAntId = v
 	return m
@@ -221,6 +223,8 @@ func (m *SdmProfile) SetSpeedSource(v typedef.Bool) *SdmProfile {
 }
 
 // SetSdmAntIdTransType sets SdmAntIdTransType value.
+//
+// Base: uint8z
 func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
 	m.SdmAntIdTransType = v
 	return m
