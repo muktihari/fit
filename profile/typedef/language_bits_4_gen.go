@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type LanguageBits4 uint8
+type LanguageBits4 uint8 // Base: uint8z
 
 const (
 	LanguageBits4BrazilianPortuguese LanguageBits4 = 0x01

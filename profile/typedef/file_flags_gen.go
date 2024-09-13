@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type FileFlags uint8
+type FileFlags uint8 // Base: uint8z
 
 const (
 	FileFlagsRead    FileFlags = 0x02

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type ConnectivityCapabilities uint32
+type ConnectivityCapabilities uint32 // Base: uint32z
 
 const (
 	ConnectivityCapabilitiesBluetooth                       ConnectivityCapabilities = 0x00000001

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type SportBits5 uint8
+type SportBits5 uint8 // Base: uint8z
 
 const (
 	SportBits5WaterSkiing SportBits5 = 0x01

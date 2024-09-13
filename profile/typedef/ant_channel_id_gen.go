@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type AntChannelId uint32
+type AntChannelId uint32 // Base: uint32z
 
 const (
 	AntChannelIdAntExtendedDeviceNumberUpperNibble AntChannelId = 0xF0000000
