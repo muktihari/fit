@@ -13,6 +13,7 @@ import (
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
+	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -502,16 +503,11 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 }
 
 func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
-	field := mesg.FieldByNum(proto.FieldNumTimestamp)
-	if field == nil {
-		return
-	}
-
-	if field.Value.Type() != proto.TypeUint32 {
+	timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
+	if timestamp == basetype.Uint32Invalid {
 		return // not supported
 	}
 
-	timestamp := field.Value.Uint32()
 	if timestamp < uint32(typedef.DateTimeMin) {
 		return
 	}
