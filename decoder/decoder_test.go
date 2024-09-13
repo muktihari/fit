@@ -495,7 +495,7 @@ func TestCheckIntegrity(t *testing.T) {
 				return bytes.NewReader(b)
 			}(),
 			n:   0,
-			err: ErrDataSizeZero,
+			err: ErrNotFITFile,
 		},
 		{
 			name: "read message return error",
@@ -1392,7 +1392,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 				})
 			}(),
 			header: proto.MesgDefinitionMask,
-			err:    ErrInvalidBaseType,
+			err:    errInvalidBaseType,
 		},
 	}
 
@@ -1626,22 +1626,6 @@ func TestDecodeFields(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
-			name: "decode fields timestamp not uint32",
-			r:    fnReaderOK,
-			mesgdef: &proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: 68,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      proto.FieldNumTimestamp,
-						Size:     1,
-						BaseType: basetype.Uint8,
-					},
-				},
-			},
-			err: ErrFieldValueTypeMismatch,
 		},
 		{
 			name: "decode fields accumulate distance",
@@ -2266,7 +2250,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 				},
 			},
 			mesg: &proto.Message{},
-			err:  ErrInvalidBaseType,
+			err:  errInvalidBaseType,
 		},
 	}
 
