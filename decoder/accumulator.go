@@ -42,7 +42,10 @@ func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val
 	for i := range a.values {
 		av := &a.values[i]
 		if av.mesgNum == mesgNum && av.fieldNum == destFieldNum {
-			return av.accumulate(val, bits)
+			var mask uint32 = (1 << bits) - 1
+			av.value += (val - av.last) & mask
+			av.last = val
+			return av.value
 		}
 	}
 	return val
@@ -57,11 +60,4 @@ type value struct {
 	fieldNum byte
 	last     uint32
 	value    uint32
-}
-
-func (a *value) accumulate(val uint32, bits byte) uint32 {
-	var mask uint32 = (1 << bits) - 1
-	a.value += (val - a.last) & mask
-	a.last = val
-	return a.value
 }
