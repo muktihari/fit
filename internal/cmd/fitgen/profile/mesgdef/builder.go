@@ -107,7 +107,7 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				BaseTypeInvalid: fmt.Sprintf("basetype.%sInvalid", strutil.ToTitle(baseType.String())),
 				Type:            b.transformType(parserField.Type, parserField.Array, fixedArraySize),
 				TypedValue:      b.transformTypedValue(parserField.Num, parserField.Type, parserField.Array, fixedArraySize),
-				PrimitiveValue:  b.transformPrimitiveValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
+				PrimitiveValue:  b.transformPrimitiveValue(strutil.ToTitle(parserField.Name), parserField.Type),
 				ProtoValue:      b.transformToProtoValue(strutil.ToTitle(parserField.Name), parserField.Type, parserField.Array),
 				InvalidValue:    b.invalidValueOf(parserField.Type, parserField.Array, fixedArraySize),
 				Comment:         parserField.Comment,
@@ -470,7 +470,7 @@ func (b *Builder) transformToProtoValue(fieldName, fieldType, array string) stri
 	return fmt.Sprintf("proto.%s(%s)", typ, val)
 }
 
-func (b *Builder) transformPrimitiveValue(fieldName, fieldType, array string) string {
+func (b *Builder) transformPrimitiveValue(fieldName, fieldType string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
 	}
