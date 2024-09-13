@@ -18,7 +18,7 @@ import (
 	{{ if .AllowRegister }}"fmt"{{ end }}
 )
 
-type {{ .Type }} {{ .Base }}
+type {{ .Type }} {{ .Base }} {{ .Comment }}
 
 const (
     {{ range .Constants -}}

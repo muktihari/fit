@@ -28,6 +28,7 @@ type ConstantData struct {
 	Imports       []string
 	AllowRegister bool
 	Type          string
+	Comment       string
 	Base          string
 	Constants     []Constant
 	Invalid       Constant

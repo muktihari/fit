@@ -99,6 +99,11 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			}
 		}
 
+		var typeComment string
+		if strings.HasSuffix(t.BaseType, "z") {
+			typeComment = fmt.Sprintf("// Base: %s", t.BaseType)
+		}
+
 		dataBuilders = append(dataBuilders, generator.Data{
 			Template:     b.template,
 			TemplateExec: b.templateExec,
@@ -109,6 +114,7 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				Imports:       []string{"strconv"},
 				Type:          typeName,
 				Base:          basetype.FromString(t.BaseType).GoType(),
+				Comment:       typeComment,
 				Constants:     constants,
 				AllowRegister: hasMfgRangeMin && hasMfgRangeMax,
 				Invalid: shared.Constant{
