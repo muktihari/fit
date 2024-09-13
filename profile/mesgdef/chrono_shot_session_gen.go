@@ -103,7 +103,7 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ShotCount)
 		fields = append(fields, field)
 	}
-	if byte(m.ProjectileType) != basetype.EnumInvalid {
+	if m.ProjectileType != typedef.ProjectileTypeInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.ProjectileType))
 		fields = append(fields, field)

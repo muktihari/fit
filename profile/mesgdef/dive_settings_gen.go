@@ -40,8 +40,8 @@ type DiveSettings struct {
 	Po2Warn                   uint8 // Scale: 100; Units: percent; Typically 1.40
 	Po2Critical               uint8 // Scale: 100; Units: percent; Typically 1.60
 	Po2Deco                   uint8 // Scale: 100; Units: percent
-	SafetyStopEnabled         bool
-	ApneaCountdownEnabled     bool
+	SafetyStopEnabled         typedef.Bool
+	ApneaCountdownEnabled     typedef.Bool
 	BacklightMode             typedef.DiveBacklightMode
 	BacklightBrightness       uint8
 	BacklightTimeout          typedef.BacklightTimeout
@@ -52,7 +52,7 @@ type DiveSettings struct {
 	CcrHighSetpointSwitchMode typedef.CcrSetpointSwitchMode  // If high PO2 should be switched to automatically
 	CcrHighSetpoint           uint8                          // Scale: 100; Units: percent; Target PO2 when using high setpoint
 	GasConsumptionDisplay     typedef.GasConsumptionRateType // Type of gas consumption rate to display. Some values are only valid if tank volume is known.
-	UpKeyEnabled              bool                           // Indicates whether the up key is enabled during dives
+	UpKeyEnabled              typedef.Bool                   // Indicates whether the up key is enabled during dives
 	DiveSounds                typedef.Tone                   // Sounds and vibration enabled or disabled in-dive
 	LastStopMultiple          uint8                          // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 	NoFlyTimeMode             typedef.NoFlyTimeMode          // Indicates which guidelines to use for no-fly surface interval.
@@ -139,7 +139,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -149,7 +149,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	if byte(m.Model) != basetype.EnumInvalid {
+	if m.Model != typedef.TissueModelTypeInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.Model))
 		fields = append(fields, field)
@@ -164,7 +164,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.GfHigh)
 		fields = append(fields, field)
 	}
-	if byte(m.WaterType) != basetype.EnumInvalid {
+	if m.WaterType != typedef.WaterTypeInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.WaterType))
 		fields = append(fields, field)
@@ -189,7 +189,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Po2Deco)
 		fields = append(fields, field)
 	}
-	{
+	if m.SafetyStopEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.SafetyStopEnabled)
 		fields = append(fields, field)
@@ -204,7 +204,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.BottomTime)
 		fields = append(fields, field)
 	}
-	{
+	if m.ApneaCountdownEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.ApneaCountdownEnabled)
 		fields = append(fields, field)
@@ -214,7 +214,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ApneaCountdownTime)
 		fields = append(fields, field)
 	}
-	if byte(m.BacklightMode) != basetype.EnumInvalid {
+	if m.BacklightMode != typedef.DiveBacklightModeInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint8(byte(m.BacklightMode))
 		fields = append(fields, field)
@@ -224,7 +224,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.BacklightBrightness)
 		fields = append(fields, field)
 	}
-	if uint8(m.BacklightTimeout) != basetype.Uint8Invalid {
+	if m.BacklightTimeout != typedef.BacklightTimeoutInvalid {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = proto.Uint8(uint8(m.BacklightTimeout))
 		fields = append(fields, field)
@@ -239,7 +239,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.SafetyStopTime)
 		fields = append(fields, field)
 	}
-	if byte(m.HeartRateSourceType) != basetype.EnumInvalid {
+	if m.HeartRateSourceType != typedef.SourceTypeInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = proto.Uint8(byte(m.HeartRateSourceType))
 		fields = append(fields, field)
@@ -249,12 +249,12 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.HeartRateSource)
 		fields = append(fields, field)
 	}
-	if uint16(m.TravelGas) != basetype.Uint16Invalid {
+	if m.TravelGas != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint16(uint16(m.TravelGas))
 		fields = append(fields, field)
 	}
-	if byte(m.CcrLowSetpointSwitchMode) != basetype.EnumInvalid {
+	if m.CcrLowSetpointSwitchMode != typedef.CcrSetpointSwitchModeInvalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = proto.Uint8(byte(m.CcrLowSetpointSwitchMode))
 		fields = append(fields, field)
@@ -269,7 +269,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.CcrLowSetpointDepth)
 		fields = append(fields, field)
 	}
-	if byte(m.CcrHighSetpointSwitchMode) != basetype.EnumInvalid {
+	if m.CcrHighSetpointSwitchMode != typedef.CcrSetpointSwitchModeInvalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(byte(m.CcrHighSetpointSwitchMode))
 		fields = append(fields, field)
@@ -284,17 +284,17 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.CcrHighSetpointDepth)
 		fields = append(fields, field)
 	}
-	if byte(m.GasConsumptionDisplay) != basetype.EnumInvalid {
+	if m.GasConsumptionDisplay != typedef.GasConsumptionRateTypeInvalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = proto.Uint8(byte(m.GasConsumptionDisplay))
 		fields = append(fields, field)
 	}
-	{
+	if m.UpKeyEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = proto.Bool(m.UpKeyEnabled)
 		fields = append(fields, field)
 	}
-	if byte(m.DiveSounds) != basetype.EnumInvalid {
+	if m.DiveSounds != typedef.ToneInvalid {
 		field := fac.CreateField(mesg.Num, 35)
 		field.Value = proto.Uint8(byte(m.DiveSounds))
 		fields = append(fields, field)
@@ -304,7 +304,7 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.LastStopMultiple)
 		fields = append(fields, field)
 	}
-	if byte(m.NoFlyTimeMode) != basetype.EnumInvalid {
+	if m.NoFlyTimeMode != typedef.NoFlyTimeModeInvalid {
 		field := fac.CreateField(mesg.Num, 37)
 		field.Value = proto.Uint8(byte(m.NoFlyTimeMode))
 		fields = append(fields, field)
@@ -549,7 +549,7 @@ func (m *DiveSettings) SetPo2DecoScaled(v float64) *DiveSettings {
 }
 
 // SetSafetyStopEnabled sets SafetyStopEnabled value.
-func (m *DiveSettings) SetSafetyStopEnabled(v bool) *DiveSettings {
+func (m *DiveSettings) SetSafetyStopEnabled(v typedef.Bool) *DiveSettings {
 	m.SafetyStopEnabled = v
 	return m
 }
@@ -567,7 +567,7 @@ func (m *DiveSettings) SetBottomTime(v uint32) *DiveSettings {
 }
 
 // SetApneaCountdownEnabled sets ApneaCountdownEnabled value.
-func (m *DiveSettings) SetApneaCountdownEnabled(v bool) *DiveSettings {
+func (m *DiveSettings) SetApneaCountdownEnabled(v typedef.Bool) *DiveSettings {
 	m.ApneaCountdownEnabled = v
 	return m
 }
@@ -747,7 +747,7 @@ func (m *DiveSettings) SetGasConsumptionDisplay(v typedef.GasConsumptionRateType
 // SetUpKeyEnabled sets UpKeyEnabled value.
 //
 // Indicates whether the up key is enabled during dives
-func (m *DiveSettings) SetUpKeyEnabled(v bool) *DiveSettings {
+func (m *DiveSettings) SetUpKeyEnabled(v typedef.Bool) *DiveSettings {
 	m.UpKeyEnabled = v
 	return m
 }

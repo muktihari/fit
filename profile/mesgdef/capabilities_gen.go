@@ -8,7 +8,6 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"unsafe"
@@ -84,12 +83,12 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.Sports)
 		fields = append(fields, field)
 	}
-	if uint32(m.WorkoutsSupported) != basetype.Uint32zInvalid {
+	if m.WorkoutsSupported != typedef.WorkoutCapabilitiesInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint32(uint32(m.WorkoutsSupported))
 		fields = append(fields, field)
 	}
-	if uint32(m.ConnectivitySupported) != basetype.Uint32zInvalid {
+	if m.ConnectivitySupported != typedef.ConnectivityCapabilitiesInvalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = proto.Uint32(uint32(m.ConnectivitySupported))
 		fields = append(fields, field)

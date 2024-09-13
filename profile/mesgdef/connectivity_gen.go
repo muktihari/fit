@@ -19,18 +19,18 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type Connectivity struct {
 	Name                        string
-	BluetoothEnabled            bool // Use Bluetooth for connectivity features
-	BluetoothLeEnabled          bool // Use Bluetooth Low Energy for connectivity features
-	AntEnabled                  bool // Use ANT for connectivity features
-	LiveTrackingEnabled         bool
-	WeatherConditionsEnabled    bool
-	WeatherAlertsEnabled        bool
-	AutoActivityUploadEnabled   bool
-	CourseDownloadEnabled       bool
-	WorkoutDownloadEnabled      bool
-	GpsEphemerisDownloadEnabled bool
-	IncidentDetectionEnabled    bool
-	GrouptrackEnabled           bool
+	BluetoothEnabled            typedef.Bool // Use Bluetooth for connectivity features
+	BluetoothLeEnabled          typedef.Bool // Use Bluetooth Low Energy for connectivity features
+	AntEnabled                  typedef.Bool // Use ANT for connectivity features
+	LiveTrackingEnabled         typedef.Bool
+	WeatherConditionsEnabled    typedef.Bool
+	WeatherAlertsEnabled        typedef.Bool
+	AutoActivityUploadEnabled   typedef.Bool
+	CourseDownloadEnabled       typedef.Bool
+	WorkoutDownloadEnabled      typedef.Bool
+	GpsEphemerisDownloadEnabled typedef.Bool
+	IncidentDetectionEnabled    typedef.Bool
+	GrouptrackEnabled           typedef.Bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -87,17 +87,17 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumConnectivity}
 
-	{
+	if m.BluetoothEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.BluetoothEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.BluetoothLeEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Bool(m.BluetoothLeEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.AntEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.AntEnabled)
 		fields = append(fields, field)
@@ -107,47 +107,47 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	{
+	if m.LiveTrackingEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.LiveTrackingEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.WeatherConditionsEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Bool(m.WeatherConditionsEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.WeatherAlertsEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Bool(m.WeatherAlertsEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.AutoActivityUploadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Bool(m.AutoActivityUploadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.CourseDownloadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.CourseDownloadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.WorkoutDownloadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.WorkoutDownloadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.GpsEphemerisDownloadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.GpsEphemerisDownloadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.IncidentDetectionEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Bool(m.IncidentDetectionEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.GrouptrackEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.GrouptrackEnabled)
 		fields = append(fields, field)
@@ -165,7 +165,7 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 // SetBluetoothEnabled sets BluetoothEnabled value.
 //
 // Use Bluetooth for connectivity features
-func (m *Connectivity) SetBluetoothEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetBluetoothEnabled(v typedef.Bool) *Connectivity {
 	m.BluetoothEnabled = v
 	return m
 }
@@ -173,7 +173,7 @@ func (m *Connectivity) SetBluetoothEnabled(v bool) *Connectivity {
 // SetBluetoothLeEnabled sets BluetoothLeEnabled value.
 //
 // Use Bluetooth Low Energy for connectivity features
-func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetBluetoothLeEnabled(v typedef.Bool) *Connectivity {
 	m.BluetoothLeEnabled = v
 	return m
 }
@@ -181,7 +181,7 @@ func (m *Connectivity) SetBluetoothLeEnabled(v bool) *Connectivity {
 // SetAntEnabled sets AntEnabled value.
 //
 // Use ANT for connectivity features
-func (m *Connectivity) SetAntEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetAntEnabled(v typedef.Bool) *Connectivity {
 	m.AntEnabled = v
 	return m
 }
@@ -193,55 +193,55 @@ func (m *Connectivity) SetName(v string) *Connectivity {
 }
 
 // SetLiveTrackingEnabled sets LiveTrackingEnabled value.
-func (m *Connectivity) SetLiveTrackingEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetLiveTrackingEnabled(v typedef.Bool) *Connectivity {
 	m.LiveTrackingEnabled = v
 	return m
 }
 
 // SetWeatherConditionsEnabled sets WeatherConditionsEnabled value.
-func (m *Connectivity) SetWeatherConditionsEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetWeatherConditionsEnabled(v typedef.Bool) *Connectivity {
 	m.WeatherConditionsEnabled = v
 	return m
 }
 
 // SetWeatherAlertsEnabled sets WeatherAlertsEnabled value.
-func (m *Connectivity) SetWeatherAlertsEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetWeatherAlertsEnabled(v typedef.Bool) *Connectivity {
 	m.WeatherAlertsEnabled = v
 	return m
 }
 
 // SetAutoActivityUploadEnabled sets AutoActivityUploadEnabled value.
-func (m *Connectivity) SetAutoActivityUploadEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetAutoActivityUploadEnabled(v typedef.Bool) *Connectivity {
 	m.AutoActivityUploadEnabled = v
 	return m
 }
 
 // SetCourseDownloadEnabled sets CourseDownloadEnabled value.
-func (m *Connectivity) SetCourseDownloadEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetCourseDownloadEnabled(v typedef.Bool) *Connectivity {
 	m.CourseDownloadEnabled = v
 	return m
 }
 
 // SetWorkoutDownloadEnabled sets WorkoutDownloadEnabled value.
-func (m *Connectivity) SetWorkoutDownloadEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetWorkoutDownloadEnabled(v typedef.Bool) *Connectivity {
 	m.WorkoutDownloadEnabled = v
 	return m
 }
 
 // SetGpsEphemerisDownloadEnabled sets GpsEphemerisDownloadEnabled value.
-func (m *Connectivity) SetGpsEphemerisDownloadEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetGpsEphemerisDownloadEnabled(v typedef.Bool) *Connectivity {
 	m.GpsEphemerisDownloadEnabled = v
 	return m
 }
 
 // SetIncidentDetectionEnabled sets IncidentDetectionEnabled value.
-func (m *Connectivity) SetIncidentDetectionEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetIncidentDetectionEnabled(v typedef.Bool) *Connectivity {
 	m.IncidentDetectionEnabled = v
 	return m
 }
 
 // SetGrouptrackEnabled sets GrouptrackEnabled value.
-func (m *Connectivity) SetGrouptrackEnabled(v bool) *Connectivity {
+func (m *Connectivity) SetGrouptrackEnabled(v typedef.Bool) *Connectivity {
 	m.GrouptrackEnabled = v
 	return m
 }

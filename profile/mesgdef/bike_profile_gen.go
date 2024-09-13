@@ -34,15 +34,15 @@ type BikeProfile struct {
 	PowerCalFactor           uint16 // Scale: 10; Units: %
 	Sport                    typedef.Sport
 	SubSport                 typedef.SubSport
-	AutoWheelCal             bool
-	AutoPowerZero            bool
+	AutoWheelCal             typedef.Bool
+	AutoPowerZero            typedef.Bool
 	Id                       uint8
-	SpdEnabled               bool
-	CadEnabled               bool
-	SpdcadEnabled            bool
-	PowerEnabled             bool
+	SpdEnabled               typedef.Bool
+	CadEnabled               typedef.Bool
+	SpdcadEnabled            typedef.Bool
+	PowerEnabled             typedef.Bool
 	CrankLength              uint8 // Scale: 2; Offset: -110; Units: mm
-	Enabled                  bool
+	Enabled                  typedef.Bool
 	BikeSpdAntIdTransType    uint8
 	BikeCadAntIdTransType    uint8
 	BikeSpdcadAntIdTransType uint8
@@ -50,7 +50,7 @@ type BikeProfile struct {
 	OdometerRollover         uint8 // Rollover counter that can be used to extend the odometer
 	FrontGearNum             uint8 // Number of front gears
 	RearGearNum              uint8 // Number of rear gears
-	ShimanoDi2Enabled        bool
+	ShimanoDi2Enabled        typedef.Bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -126,7 +126,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumBikeProfile}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -136,12 +136,12 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
@@ -191,12 +191,12 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.PowerCalFactor)
 		fields = append(fields, field)
 	}
-	{
+	if m.AutoWheelCal < 2 {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.AutoWheelCal)
 		fields = append(fields, field)
 	}
-	{
+	if m.AutoPowerZero < 2 {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Bool(m.AutoPowerZero)
 		fields = append(fields, field)
@@ -206,22 +206,22 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Id)
 		fields = append(fields, field)
 	}
-	{
+	if m.SpdEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Bool(m.SpdEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.CadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = proto.Bool(m.CadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.SpdcadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 17)
 		field.Value = proto.Bool(m.SpdcadEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.PowerEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = proto.Bool(m.PowerEnabled)
 		fields = append(fields, field)
@@ -231,7 +231,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.CrankLength)
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 20)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -281,7 +281,7 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.RearGear)
 		fields = append(fields, field)
 	}
-	{
+	if m.ShimanoDi2Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 44)
 		field.Value = proto.Bool(m.ShimanoDi2Enabled)
 		fields = append(fields, field)
@@ -521,13 +521,13 @@ func (m *BikeProfile) SetPowerCalFactorScaled(v float64) *BikeProfile {
 }
 
 // SetAutoWheelCal sets AutoWheelCal value.
-func (m *BikeProfile) SetAutoWheelCal(v bool) *BikeProfile {
+func (m *BikeProfile) SetAutoWheelCal(v typedef.Bool) *BikeProfile {
 	m.AutoWheelCal = v
 	return m
 }
 
 // SetAutoPowerZero sets AutoPowerZero value.
-func (m *BikeProfile) SetAutoPowerZero(v bool) *BikeProfile {
+func (m *BikeProfile) SetAutoPowerZero(v typedef.Bool) *BikeProfile {
 	m.AutoPowerZero = v
 	return m
 }
@@ -539,25 +539,25 @@ func (m *BikeProfile) SetId(v uint8) *BikeProfile {
 }
 
 // SetSpdEnabled sets SpdEnabled value.
-func (m *BikeProfile) SetSpdEnabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetSpdEnabled(v typedef.Bool) *BikeProfile {
 	m.SpdEnabled = v
 	return m
 }
 
 // SetCadEnabled sets CadEnabled value.
-func (m *BikeProfile) SetCadEnabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetCadEnabled(v typedef.Bool) *BikeProfile {
 	m.CadEnabled = v
 	return m
 }
 
 // SetSpdcadEnabled sets SpdcadEnabled value.
-func (m *BikeProfile) SetSpdcadEnabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetSpdcadEnabled(v typedef.Bool) *BikeProfile {
 	m.SpdcadEnabled = v
 	return m
 }
 
 // SetPowerEnabled sets PowerEnabled value.
-func (m *BikeProfile) SetPowerEnabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetPowerEnabled(v typedef.Bool) *BikeProfile {
 	m.PowerEnabled = v
 	return m
 }
@@ -585,7 +585,7 @@ func (m *BikeProfile) SetCrankLengthScaled(v float64) *BikeProfile {
 }
 
 // SetEnabled sets Enabled value.
-func (m *BikeProfile) SetEnabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetEnabled(v typedef.Bool) *BikeProfile {
 	m.Enabled = v
 	return m
 }
@@ -655,7 +655,7 @@ func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
 }
 
 // SetShimanoDi2Enabled sets ShimanoDi2Enabled value.
-func (m *BikeProfile) SetShimanoDi2Enabled(v bool) *BikeProfile {
+func (m *BikeProfile) SetShimanoDi2Enabled(v typedef.Bool) *BikeProfile {
 	m.ShimanoDi2Enabled = v
 	return m
 }

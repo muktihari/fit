@@ -83,7 +83,7 @@ func (m *Totals) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumTotals}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -108,7 +108,7 @@ func (m *Totals) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Calories)
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)

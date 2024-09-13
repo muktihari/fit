@@ -100,7 +100,7 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumWorkoutStep}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -110,7 +110,7 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.WktStepName)
 		fields = append(fields, field)
 	}
-	if byte(m.DurationType) != basetype.EnumInvalid {
+	if m.DurationType != typedef.WktStepDurationInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.DurationType))
 		fields = append(fields, field)
@@ -120,7 +120,7 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.DurationValue)
 		fields = append(fields, field)
 	}
-	if byte(m.TargetType) != basetype.EnumInvalid {
+	if m.TargetType != typedef.WktStepTargetInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.TargetType))
 		fields = append(fields, field)
@@ -140,7 +140,7 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.CustomTargetValueHigh)
 		fields = append(fields, field)
 	}
-	if byte(m.Intensity) != basetype.EnumInvalid {
+	if m.Intensity != typedef.IntensityInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.Intensity))
 		fields = append(fields, field)
@@ -150,12 +150,12 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Notes)
 		fields = append(fields, field)
 	}
-	if byte(m.Equipment) != basetype.EnumInvalid {
+	if m.Equipment != typedef.WorkoutEquipmentInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint8(byte(m.Equipment))
 		fields = append(fields, field)
 	}
-	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
+	if m.ExerciseCategory != typedef.ExerciseCategoryInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint16(uint16(m.ExerciseCategory))
 		fields = append(fields, field)
@@ -170,12 +170,12 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.ExerciseWeight)
 		fields = append(fields, field)
 	}
-	if uint16(m.WeightDisplayUnit) != basetype.Uint16Invalid {
+	if m.WeightDisplayUnit != typedef.FitBaseUnitInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint16(uint16(m.WeightDisplayUnit))
 		fields = append(fields, field)
 	}
-	if byte(m.SecondaryTargetType) != basetype.EnumInvalid {
+	if m.SecondaryTargetType != typedef.WktStepTargetInvalid {
 		field := fac.CreateField(mesg.Num, 19)
 		field.Value = proto.Uint8(byte(m.SecondaryTargetType))
 		fields = append(fields, field)

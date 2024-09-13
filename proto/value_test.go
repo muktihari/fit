@@ -14,6 +14,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/typedef"
 )
 
 func TestTypeString(t *testing.T) {
@@ -31,17 +32,26 @@ func TestTypeString(t *testing.T) {
 }
 
 func TestBool(t *testing.T) {
-	input := bool(true)
 	t.Run("valid", func(t *testing.T) {
+		input := typedef.BoolTrue
 		v := Bool(input)
+		if v.Bool() != input {
+			t.Fatalf("expected: %v, got: %v", input, v.Bool())
+		}
+		input = typedef.BoolFalse
+		v = Bool(input)
 		if v.Bool() != input {
 			t.Fatalf("expected: %v, got: %v", input, v.Bool())
 		}
 	})
 	t.Run("invalid", func(t *testing.T) {
 		v := Value{}
-		if v.Bool() != false {
-			t.Fatalf("expected: %v, got: %v", false, v.Bool())
+		if v.Bool() != typedef.BoolInvalid {
+			t.Fatalf("expected: %v, got: %v", typedef.BoolInvalid, v.Bool())
+		}
+		v = Bool(typedef.Bool(2))
+		if v.Bool() != typedef.BoolInvalid {
+			t.Fatalf("expected: %v, got: %v", typedef.BoolInvalid, v.Bool())
 		}
 	})
 }
@@ -295,27 +305,15 @@ func TestString(t *testing.T) {
 
 func TestSliceBool(t *testing.T) {
 	t.Run("correct", func(t *testing.T) {
-		slice := []bool{true, false}
+		slice := []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}
 		value := SliceBool(slice)
 		result := value.SliceBool()
 		if diff := cmp.Diff(slice, result); diff != "" {
 			t.Fatal(diff)
 		}
 	})
-	t.Run("correct custom type", func(t *testing.T) {
-		slice := []test_bool{true, false}
-		expected := unsafe.Slice(unsafe.SliceData(*(*[]bool)(unsafe.Pointer(&slice))), len(slice))
-		value := SliceBool(slice)
-		result := value.SliceBool()
-		if len(slice) != len(result) { // compare result to original slice to ensure the cast is work as intended
-			t.Fatalf("expected len: %d, got: %d", len(slice), len(result))
-		}
-		if diff := cmp.Diff(expected, result); diff != "" {
-			t.Fatal(diff)
-		}
-	})
 	t.Run("nil value", func(t *testing.T) {
-		value := SliceBool([]bool(nil))
+		value := SliceBool([]typedef.Bool(nil))
 		result := value.SliceBool()
 		if result != nil {
 			t.Fatalf("expected nil, got: %v", result)
@@ -761,9 +759,9 @@ func TestAny(t *testing.T) {
 		{value: []int{0}, expected: nil},
 		{value: []uint{0}, expected: nil},
 		{value: []any{0}, expected: nil},
-		{value: Bool(true), expected: true},
-		{value: bool(true), expected: bool(true)},
-		{value: bool(false), expected: bool(false)},
+		{value: Bool(typedef.BoolTrue), expected: typedef.BoolTrue},
+		{value: bool(true), expected: typedef.BoolTrue},
+		{value: bool(false), expected: typedef.BoolFalse},
 		{value: int8(10), expected: int8(10)},
 		{value: uint8(10), expected: uint8(10)},
 		{value: int16(10), expected: int16(10)},
@@ -775,7 +773,8 @@ func TestAny(t *testing.T) {
 		{value: float32(10), expected: float32(10)},
 		{value: float64(10), expected: float64(10)},
 		{value: string("fit"), expected: string("fit")},
-		{value: []bool{true, false}, expected: []bool{true, false}},
+		{value: []bool{true, false}, expected: []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}},
+		{value: []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}, expected: []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}},
 		{value: []int8{1, 2}, expected: []int8{1, 2}},
 		{value: []uint8{1, 2}, expected: []uint8{1, 2}},
 		{value: []int16{1, 2}, expected: []int16{1, 2}},
@@ -787,7 +786,7 @@ func TestAny(t *testing.T) {
 		{value: []float32{1, 2}, expected: []float32{1, 2}},
 		{value: []float64{1, 2}, expected: []float64{1, 2}},
 		{value: []string{"fit", "sdk"}, expected: []string{"fit", "sdk"}},
-		{value: []bool{}, expected: []bool{}},
+		{value: []bool{}, expected: []typedef.Bool{}},
 		{value: []int8{}, expected: []int8{}},
 		{value: []uint8{}, expected: []uint8{}},
 		{value: []int16{}, expected: []int16{}},
@@ -799,8 +798,8 @@ func TestAny(t *testing.T) {
 		{value: []float32{}, expected: []float32{}},
 		{value: []float64{}, expected: []float64{}},
 		{value: []string{}, expected: []string{}},
-		{value: test_bool(true), expected: bool(true)},
-		{value: test_bool(false), expected: bool(false)},
+		{value: test_bool(true), expected: typedef.BoolTrue},
+		{value: test_bool(false), expected: typedef.BoolFalse},
 		{value: test_int8(10), expected: int8(10)},
 		{value: test_uint8(10), expected: uint8(10)},
 		{value: test_int16(10), expected: int16(10)},
@@ -812,7 +811,7 @@ func TestAny(t *testing.T) {
 		{value: test_float32(10), expected: float32(10)},
 		{value: test_float64(10), expected: float64(10)},
 		{value: test_string("fit"), expected: string("fit")},
-		{value: []test_bool{true, false}, expected: []bool{true, false}},
+		{value: []test_bool{true, false}, expected: []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}},
 		{value: []test_int8{1, 2}, expected: []int8{1, 2}},
 		{value: []test_uint8{1, 2}, expected: []uint8{1, 2}},
 		{value: []test_int16{1, 2}, expected: []int16{1, 2}},
@@ -824,7 +823,7 @@ func TestAny(t *testing.T) {
 		{value: []test_float32{1, 2}, expected: []float32{1, 2}},
 		{value: []test_float64{1, 2}, expected: []float64{1, 2}},
 		{value: []test_string{"fit", "sdk"}, expected: []string{"fit", "sdk"}},
-		{value: []test_bool{}, expected: []bool{}},
+		{value: []test_bool{}, expected: []typedef.Bool{}},
 		{value: []test_int8{}, expected: []int8{}},
 		{value: []test_uint8{}, expected: []uint8{}},
 		{value: []test_int16{}, expected: []int16{}},
@@ -859,8 +858,8 @@ func TestValueAlign(t *testing.T) {
 		expected bool
 	}{
 		{value: Value{}, baseType: basetype.Sint8, expected: false},
-		{value: Bool(true), baseType: basetype.Enum, expected: true},
-		{value: SliceBool([]bool{true, false}), baseType: basetype.Enum, expected: true},
+		{value: Bool(typedef.BoolTrue), baseType: basetype.Enum, expected: true},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), baseType: basetype.Enum, expected: true},
 		{value: Int8(1), baseType: basetype.Sint8, expected: true},
 		{value: Uint8(1), baseType: basetype.Uint8, expected: true},
 		{value: Uint8(1), baseType: basetype.Uint8z, expected: true},
@@ -911,6 +910,9 @@ func TestValueValid(t *testing.T) {
 		expected bool
 	}{
 		{value: Value{}, baseType: basetype.Sint8, expected: false},
+		{value: Bool(typedef.BoolTrue), baseType: basetype.Sint8, expected: true},
+		{value: Bool(typedef.BoolFalse), baseType: basetype.Sint8, expected: true},
+		{value: Bool(typedef.BoolInvalid), baseType: basetype.Sint8, expected: false},
 		{value: Int8(0), baseType: basetype.Sint8, expected: true},
 		{value: Uint8(0), baseType: basetype.Uint8, expected: true},
 		{value: Uint8(0), baseType: basetype.Uint8z, expected: false},
@@ -935,8 +937,9 @@ func TestValueValid(t *testing.T) {
 		{value: Int64(0), baseType: basetype.Sint64, expected: true},
 		{value: Uint64(0), baseType: basetype.Uint64, expected: true},
 		{value: Uint64(0), baseType: basetype.Uint64z, expected: false},
-		{value: SliceBool([]bool{true, false}), baseType: basetype.Enum, expected: true},
-		{value: SliceBool([]bool{false, false}), baseType: basetype.Enum, expected: true}, // true even it all false.
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), baseType: basetype.Enum, expected: true},
+		{value: SliceBool([]typedef.Bool{typedef.BoolFalse, typedef.BoolFalse}), baseType: basetype.Enum, expected: true},
+		{value: SliceBool([]typedef.Bool{typedef.BoolInvalid, typedef.BoolInvalid}), baseType: basetype.Enum, expected: false},
 		{value: SliceInt8([]int8{0, basetype.Sint8Invalid}), baseType: basetype.Sint8, expected: true},
 		{value: SliceUint8([]uint8{0, basetype.Uint8Invalid}), baseType: basetype.Uint8, expected: true},
 		{value: SliceUint8([]uint8{1, basetype.Uint8zInvalid}), baseType: basetype.Uint8z, expected: true},
@@ -955,6 +958,7 @@ func TestValueValid(t *testing.T) {
 		{value: SliceUint64([]uint64{0, basetype.Uint64Invalid}), baseType: basetype.Uint64, expected: true},
 		{value: SliceUint64([]uint64{1, basetype.Uint64zInvalid}), baseType: basetype.Uint64z, expected: true},
 	}
+
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %v (%T)", i, tc.value.Any(), tc.value.Any()), func(t *testing.T) {
 			result := tc.value.Valid(tc.baseType)
@@ -972,7 +976,7 @@ func TestLen(t *testing.T) {
 	}{
 		{value: Value{}, sizeInBytes: 0},
 		{value: Value{typ: TypeInvalid}, sizeInBytes: 0},
-		{value: Bool(true), sizeInBytes: 1},
+		{value: Bool(typedef.BoolTrue), sizeInBytes: 1},
 		{value: Int8(10), sizeInBytes: 1},
 		{value: Uint8(10), sizeInBytes: 1},
 		{value: Int16(10), sizeInBytes: 2},
@@ -983,8 +987,8 @@ func TestLen(t *testing.T) {
 		{value: Float64(10), sizeInBytes: 8},
 		{value: Int64(10), sizeInBytes: 8},
 		{value: Uint64(10), sizeInBytes: 8},
-		{value: SliceBool([]bool{}), sizeInBytes: 0},
-		{value: SliceBool([]bool{true, false}), sizeInBytes: 2},
+		{value: SliceBool([]typedef.Bool{}), sizeInBytes: 0},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), sizeInBytes: 2},
 		{value: SliceInt8([]int8{10, 9, 8, 7}), sizeInBytes: 4},
 		{value: SliceUint8([]uint8{10, 9, 8, 7}), sizeInBytes: 4},
 		{value: SliceInt16([]int16{10, 9, 8, 7}), sizeInBytes: 4 * 2},
@@ -1090,7 +1094,7 @@ func TestSliceDataLiveness(t *testing.T) {
 }
 
 func BenchmarkValueSliceBool(b *testing.B) {
-	s := []bool{true, false}
+	s := []typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}
 
 	b.Run("[]bool", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {

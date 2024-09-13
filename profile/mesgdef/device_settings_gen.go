@@ -34,13 +34,13 @@ type DeviceSettings struct {
 	AutosyncMinTime                     uint16                     // Units: minutes; Minimum minutes before an autosync can occur
 	ActiveTimeZone                      uint8                      // Index into time zone arrays.
 	BacklightMode                       typedef.BacklightMode      // Mode for backlight
-	ActivityTrackerEnabled              bool                       // Enabled state of the activity tracker functionality
-	MoveAlertEnabled                    bool                       // Enabled state of the move alert
+	ActivityTrackerEnabled              typedef.Bool               // Enabled state of the activity tracker functionality
+	MoveAlertEnabled                    typedef.Bool               // Enabled state of the move alert
 	DateMode                            typedef.DateMode           // Display mode for the date
 	DisplayOrientation                  typedef.DisplayOrientation
 	MountingSide                        typedef.Side
-	LactateThresholdAutodetectEnabled   bool                       // Enable auto-detect setting for the lactate threshold feature.
-	BleAutoUploadEnabled                bool                       // Automatically upload using BLE
+	LactateThresholdAutodetectEnabled   typedef.Bool               // Enable auto-detect setting for the lactate threshold feature.
+	BleAutoUploadEnabled                typedef.Bool               // Automatically upload using BLE
 	AutoSyncFrequency                   typedef.AutoSyncFrequency  // Helps to conserve battery by changing modes
 	NumberOfScreens                     uint8                      // Number of screens configured to display
 	SmartNotificationDisplayOrientation typedef.DisplayOrientation // Smart Notification display orientation
@@ -142,12 +142,12 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceInt8(m.TimeZoneOffset)
 		fields = append(fields, field)
 	}
-	if byte(m.BacklightMode) != basetype.EnumInvalid {
+	if m.BacklightMode != typedef.BacklightModeInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.BacklightMode))
 		fields = append(fields, field)
 	}
-	{
+	if m.ActivityTrackerEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 36)
 		field.Value = proto.Bool(m.ActivityTrackerEnabled)
 		fields = append(fields, field)
@@ -162,22 +162,22 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.PagesEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.MoveAlertEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 46)
 		field.Value = proto.Bool(m.MoveAlertEnabled)
 		fields = append(fields, field)
 	}
-	if byte(m.DateMode) != basetype.EnumInvalid {
+	if m.DateMode != typedef.DateModeInvalid {
 		field := fac.CreateField(mesg.Num, 47)
 		field.Value = proto.Uint8(byte(m.DateMode))
 		fields = append(fields, field)
 	}
-	if byte(m.DisplayOrientation) != basetype.EnumInvalid {
+	if m.DisplayOrientation != typedef.DisplayOrientationInvalid {
 		field := fac.CreateField(mesg.Num, 55)
 		field.Value = proto.Uint8(byte(m.DisplayOrientation))
 		fields = append(fields, field)
 	}
-	if byte(m.MountingSide) != basetype.EnumInvalid {
+	if m.MountingSide != typedef.SideInvalid {
 		field := fac.CreateField(mesg.Num, 56)
 		field.Value = proto.Uint8(byte(m.MountingSide))
 		fields = append(fields, field)
@@ -197,22 +197,22 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.AutosyncMinTime)
 		fields = append(fields, field)
 	}
-	{
+	if m.LactateThresholdAutodetectEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 80)
 		field.Value = proto.Bool(m.LactateThresholdAutodetectEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.BleAutoUploadEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 86)
 		field.Value = proto.Bool(m.BleAutoUploadEnabled)
 		fields = append(fields, field)
 	}
-	if byte(m.AutoSyncFrequency) != basetype.EnumInvalid {
+	if m.AutoSyncFrequency != typedef.AutoSyncFrequencyInvalid {
 		field := fac.CreateField(mesg.Num, 89)
 		field.Value = proto.Uint8(byte(m.AutoSyncFrequency))
 		fields = append(fields, field)
 	}
-	if uint32(m.AutoActivityDetect) != basetype.Uint32Invalid {
+	if m.AutoActivityDetect != typedef.AutoActivityDetectInvalid {
 		field := fac.CreateField(mesg.Num, 90)
 		field.Value = proto.Uint32(uint32(m.AutoActivityDetect))
 		fields = append(fields, field)
@@ -222,17 +222,17 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.NumberOfScreens)
 		fields = append(fields, field)
 	}
-	if byte(m.SmartNotificationDisplayOrientation) != basetype.EnumInvalid {
+	if m.SmartNotificationDisplayOrientation != typedef.DisplayOrientationInvalid {
 		field := fac.CreateField(mesg.Num, 95)
 		field.Value = proto.Uint8(byte(m.SmartNotificationDisplayOrientation))
 		fields = append(fields, field)
 	}
-	if byte(m.TapInterface) != basetype.EnumInvalid {
+	if m.TapInterface != typedef.SwitchInvalid {
 		field := fac.CreateField(mesg.Num, 134)
 		field.Value = proto.Uint8(byte(m.TapInterface))
 		fields = append(fields, field)
 	}
-	if byte(m.TapSensitivity) != basetype.EnumInvalid {
+	if m.TapSensitivity != typedef.TapSensitivityInvalid {
 		field := fac.CreateField(mesg.Num, 174)
 		field.Value = proto.Uint8(byte(m.TapSensitivity))
 		fields = append(fields, field)
@@ -341,7 +341,7 @@ func (m *DeviceSettings) SetBacklightMode(v typedef.BacklightMode) *DeviceSettin
 // SetActivityTrackerEnabled sets ActivityTrackerEnabled value.
 //
 // Enabled state of the activity tracker functionality
-func (m *DeviceSettings) SetActivityTrackerEnabled(v bool) *DeviceSettings {
+func (m *DeviceSettings) SetActivityTrackerEnabled(v typedef.Bool) *DeviceSettings {
 	m.ActivityTrackerEnabled = v
 	return m
 }
@@ -365,7 +365,7 @@ func (m *DeviceSettings) SetPagesEnabled(v []uint16) *DeviceSettings {
 // SetMoveAlertEnabled sets MoveAlertEnabled value.
 //
 // Enabled state of the move alert
-func (m *DeviceSettings) SetMoveAlertEnabled(v bool) *DeviceSettings {
+func (m *DeviceSettings) SetMoveAlertEnabled(v typedef.Bool) *DeviceSettings {
 	m.MoveAlertEnabled = v
 	return m
 }
@@ -417,7 +417,7 @@ func (m *DeviceSettings) SetAutosyncMinTime(v uint16) *DeviceSettings {
 // SetLactateThresholdAutodetectEnabled sets LactateThresholdAutodetectEnabled value.
 //
 // Enable auto-detect setting for the lactate threshold feature.
-func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v bool) *DeviceSettings {
+func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v typedef.Bool) *DeviceSettings {
 	m.LactateThresholdAutodetectEnabled = v
 	return m
 }
@@ -425,7 +425,7 @@ func (m *DeviceSettings) SetLactateThresholdAutodetectEnabled(v bool) *DeviceSet
 // SetBleAutoUploadEnabled sets BleAutoUploadEnabled value.
 //
 // Automatically upload using BLE
-func (m *DeviceSettings) SetBleAutoUploadEnabled(v bool) *DeviceSettings {
+func (m *DeviceSettings) SetBleAutoUploadEnabled(v typedef.Bool) *DeviceSettings {
 	m.BleAutoUploadEnabled = v
 	return m
 }

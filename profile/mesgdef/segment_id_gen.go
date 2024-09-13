@@ -23,7 +23,7 @@ type SegmentId struct {
 	UserProfilePrimaryKey uint32                       // Primary key of the user that created the segment
 	DeviceId              uint32                       // ID of the device that created the segment
 	Sport                 typedef.Sport                // Sport associated with the segment
-	Enabled               bool                         // Segment enabled for evaluation
+	Enabled               typedef.Bool                 // Segment enabled for evaluation
 	DefaultRaceLeader     uint8                        // Index for the Leader Board entry selected as the default race participant
 	DeleteStatus          typedef.SegmentDeleteStatus  // Indicates if any segments should be deleted
 	SelectionType         typedef.SegmentSelectionType // Indicates how the segment was selected to be sent to the device
@@ -89,12 +89,12 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Uuid)
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -114,12 +114,12 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.DefaultRaceLeader)
 		fields = append(fields, field)
 	}
-	if byte(m.DeleteStatus) != basetype.EnumInvalid {
+	if m.DeleteStatus != typedef.SegmentDeleteStatusInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.DeleteStatus))
 		fields = append(fields, field)
 	}
-	if byte(m.SelectionType) != basetype.EnumInvalid {
+	if m.SelectionType != typedef.SegmentSelectionTypeInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.SelectionType))
 		fields = append(fields, field)
@@ -161,7 +161,7 @@ func (m *SegmentId) SetSport(v typedef.Sport) *SegmentId {
 // SetEnabled sets Enabled value.
 //
 // Segment enabled for evaluation
-func (m *SegmentId) SetEnabled(v bool) *SegmentId {
+func (m *SegmentId) SetEnabled(v typedef.Bool) *SegmentId {
 	m.Enabled = v
 	return m
 }

@@ -71,7 +71,7 @@ func (m *DiveGas) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumDiveGas}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -86,12 +86,12 @@ func (m *DiveGas) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.OxygenContent)
 		fields = append(fields, field)
 	}
-	if byte(m.Status) != basetype.EnumInvalid {
+	if m.Status != typedef.DiveGasStatusInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
 	}
-	if byte(m.Mode) != basetype.EnumInvalid {
+	if m.Mode != typedef.DiveGasModeInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.Mode))
 		fields = append(fields, field)

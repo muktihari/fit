@@ -26,13 +26,13 @@ type DiveAlarm struct {
 	Id               uint32                // Alarm ID
 	Speed            int32                 // Scale: 1000; Units: mps; Ascent/descent rate (mps) setting for speed type alarms
 	MessageIndex     typedef.MessageIndex  // Index of the alarm
-	Enabled          bool                  // Enablement flag
+	Enabled          typedef.Bool          // Enablement flag
 	AlarmType        typedef.DiveAlarmType // Alarm type setting
 	Sound            typedef.Tone          // Tone and Vibe setting for the alarm
-	PopupEnabled     bool                  // Show a visible pop-up for this alarm
-	TriggerOnDescent bool                  // Trigger the alarm on descent
-	TriggerOnAscent  bool                  // Trigger the alarm on ascent
-	Repeating        bool                  // Repeat alarm each time threshold is crossed?
+	PopupEnabled     typedef.Bool          // Show a visible pop-up for this alarm
+	TriggerOnDescent typedef.Bool          // Trigger the alarm on descent
+	TriggerOnAscent  typedef.Bool          // Trigger the alarm on ascent
+	Repeating        typedef.Bool          // Repeat alarm each time threshold is crossed?
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -93,7 +93,7 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumDiveAlarm}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -108,17 +108,17 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.Time)
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
-	if byte(m.AlarmType) != basetype.EnumInvalid {
+	if m.AlarmType != typedef.DiveAlarmTypeInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.AlarmType))
 		fields = append(fields, field)
 	}
-	if byte(m.Sound) != basetype.EnumInvalid {
+	if m.Sound != typedef.ToneInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Sound))
 		fields = append(fields, field)
@@ -133,22 +133,22 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Id)
 		fields = append(fields, field)
 	}
-	{
+	if m.PopupEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Bool(m.PopupEnabled)
 		fields = append(fields, field)
 	}
-	{
+	if m.TriggerOnDescent < 2 {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.TriggerOnDescent)
 		fields = append(fields, field)
 	}
-	{
+	if m.TriggerOnAscent < 2 {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.TriggerOnAscent)
 		fields = append(fields, field)
 	}
-	{
+	if m.Repeating < 2 {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Repeating)
 		fields = append(fields, field)
@@ -231,7 +231,7 @@ func (m *DiveAlarm) SetTime(v int32) *DiveAlarm {
 // SetEnabled sets Enabled value.
 //
 // Enablement flag
-func (m *DiveAlarm) SetEnabled(v bool) *DiveAlarm {
+func (m *DiveAlarm) SetEnabled(v typedef.Bool) *DiveAlarm {
 	m.Enabled = v
 	return m
 }
@@ -271,7 +271,7 @@ func (m *DiveAlarm) SetId(v uint32) *DiveAlarm {
 // SetPopupEnabled sets PopupEnabled value.
 //
 // Show a visible pop-up for this alarm
-func (m *DiveAlarm) SetPopupEnabled(v bool) *DiveAlarm {
+func (m *DiveAlarm) SetPopupEnabled(v typedef.Bool) *DiveAlarm {
 	m.PopupEnabled = v
 	return m
 }
@@ -279,7 +279,7 @@ func (m *DiveAlarm) SetPopupEnabled(v bool) *DiveAlarm {
 // SetTriggerOnDescent sets TriggerOnDescent value.
 //
 // Trigger the alarm on descent
-func (m *DiveAlarm) SetTriggerOnDescent(v bool) *DiveAlarm {
+func (m *DiveAlarm) SetTriggerOnDescent(v typedef.Bool) *DiveAlarm {
 	m.TriggerOnDescent = v
 	return m
 }
@@ -287,7 +287,7 @@ func (m *DiveAlarm) SetTriggerOnDescent(v bool) *DiveAlarm {
 // SetTriggerOnAscent sets TriggerOnAscent value.
 //
 // Trigger the alarm on ascent
-func (m *DiveAlarm) SetTriggerOnAscent(v bool) *DiveAlarm {
+func (m *DiveAlarm) SetTriggerOnAscent(v typedef.Bool) *DiveAlarm {
 	m.TriggerOnAscent = v
 	return m
 }
@@ -295,7 +295,7 @@ func (m *DiveAlarm) SetTriggerOnAscent(v bool) *DiveAlarm {
 // SetRepeating sets Repeating value.
 //
 // Repeat alarm each time threshold is crossed?
-func (m *DiveAlarm) SetRepeating(v bool) *DiveAlarm {
+func (m *DiveAlarm) SetRepeating(v typedef.Bool) *DiveAlarm {
 	m.Repeating = v
 	return m
 }

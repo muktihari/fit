@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -78,8 +79,8 @@ func TestUnmarshalValue(t *testing.T) {
 			isArray:  true,
 		},
 		{value: proto.Int8(0), baseType: basetype.FromString("invalid"), err: proto.ErrTypeNotSupported},
-		{value: proto.Bool(true), baseType: basetype.Enum, profileType: profile.Bool},
-		{value: proto.SliceBool([]bool{false, true, false}), baseType: basetype.Enum, profileType: profile.Bool, isArray: true},
+		{value: proto.Bool(typedef.BoolTrue), baseType: basetype.Enum, profileType: profile.Bool},
+		{value: proto.SliceBool([]typedef.Bool{typedef.BoolFalse, typedef.BoolTrue, typedef.BoolFalse}), baseType: basetype.Enum, profileType: profile.Bool, isArray: true},
 	}
 
 	for i, tc := range tt {
@@ -141,7 +142,7 @@ func TestUnmarshalValueSliceAlloc(t *testing.T) {
 		value       proto.Value
 		profileType profile.ProfileType
 	}{
-		{value: proto.SliceBool(make([]bool, 256)), profileType: profile.Bool},
+		{value: proto.SliceBool(make([]typedef.Bool, 256)), profileType: profile.Bool},
 		{value: proto.SliceUint8(make([]uint8, 256)), profileType: profile.Uint8},
 		{value: proto.SliceInt8(make([]int8, 256)), profileType: profile.Sint8},
 		{value: proto.SliceUint8(make([]uint8, 256)), profileType: profile.Uint8},

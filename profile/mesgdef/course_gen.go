@@ -69,7 +69,7 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumCourse}
 
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
@@ -79,12 +79,12 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	if uint32(m.Capabilities) != basetype.Uint32zInvalid {
+	if m.Capabilities != typedef.CourseCapabilitiesInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint32(uint32(m.Capabilities))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)

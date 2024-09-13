@@ -86,12 +86,12 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.FunctionalThresholdPower)
 		fields = append(fields, field)
 	}
-	if byte(m.HrCalcType) != basetype.EnumInvalid {
+	if m.HrCalcType != typedef.HrZoneCalcInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.HrCalcType))
 		fields = append(fields, field)
 	}
-	if byte(m.PwrCalcType) != basetype.EnumInvalid {
+	if m.PwrCalcType != typedef.PwrZoneCalcInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.PwrCalcType))
 		fields = append(fields, field)

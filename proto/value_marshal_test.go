@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/muktihari/fit/profile/typedef"
 )
 
 func TestValueMarshalAppend(t *testing.T) {
@@ -21,8 +22,9 @@ func TestValueMarshalAppend(t *testing.T) {
 		value Value
 		err   error
 	}{
-		{value: Bool(false)},
-		{value: Bool(true)},
+		{value: Bool(typedef.BoolFalse)},
+		{value: Bool(typedef.BoolTrue)},
+		{value: Bool(typedef.BoolInvalid)},
 		{value: Int8(-19)},
 		{value: Uint8(129)},
 		{value: Int16(1429)},
@@ -40,7 +42,8 @@ func TestValueMarshalAppend(t *testing.T) {
 		{value: Float64(-897912398989898.546734)},
 		{value: String("FIT SDK")},
 		{value: String("")},
-		{value: SliceBool([]bool{true, false})},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse})},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolInvalid})},
 		{value: SliceUint8([]byte{1, 2})},
 		{value: SliceUint8([]uint8{1, 2})},
 		{value: SliceInt8([]int8{-19})},

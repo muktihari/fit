@@ -131,7 +131,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumUserProfile}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -141,7 +141,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.FriendlyName)
 		fields = append(fields, field)
 	}
-	if byte(m.Gender) != basetype.EnumInvalid {
+	if m.Gender != typedef.GenderInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.Gender))
 		fields = append(fields, field)
@@ -161,17 +161,17 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Weight)
 		fields = append(fields, field)
 	}
-	if byte(m.Language) != basetype.EnumInvalid {
+	if m.Language != typedef.LanguageInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.Language))
 		fields = append(fields, field)
 	}
-	if byte(m.ElevSetting) != basetype.EnumInvalid {
+	if m.ElevSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(byte(m.ElevSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.WeightSetting) != basetype.EnumInvalid {
+	if m.WeightSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.WeightSetting))
 		fields = append(fields, field)
@@ -196,42 +196,42 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.DefaultMaxHeartRate)
 		fields = append(fields, field)
 	}
-	if byte(m.HrSetting) != basetype.EnumInvalid {
+	if m.HrSetting != typedef.DisplayHeartInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.HrSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.SpeedSetting) != basetype.EnumInvalid {
+	if m.SpeedSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint8(byte(m.SpeedSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.DistSetting) != basetype.EnumInvalid {
+	if m.DistSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint8(byte(m.DistSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.PowerSetting) != basetype.EnumInvalid {
+	if m.PowerSetting != typedef.DisplayPowerInvalid {
 		field := fac.CreateField(mesg.Num, 16)
 		field.Value = proto.Uint8(byte(m.PowerSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityClass) != basetype.EnumInvalid {
+	if m.ActivityClass != typedef.ActivityClassInvalid {
 		field := fac.CreateField(mesg.Num, 17)
 		field.Value = proto.Uint8(byte(m.ActivityClass))
 		fields = append(fields, field)
 	}
-	if byte(m.PositionSetting) != basetype.EnumInvalid {
+	if m.PositionSetting != typedef.DisplayPositionInvalid {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = proto.Uint8(byte(m.PositionSetting))
 		fields = append(fields, field)
 	}
-	if byte(m.TemperatureSetting) != basetype.EnumInvalid {
+	if m.TemperatureSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint8(byte(m.TemperatureSetting))
 		fields = append(fields, field)
 	}
-	if uint16(m.LocalId) != basetype.Uint16Invalid {
+	if m.LocalId != typedef.UserLocalIdInvalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = proto.Uint16(uint16(m.LocalId))
 		fields = append(fields, field)
@@ -249,17 +249,17 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(copied[:])
 		fields = append(fields, field)
 	}
-	if uint32(m.WakeTime) != basetype.Uint32Invalid {
+	if m.WakeTime != typedef.LocaltimeIntoDayInvalid {
 		field := fac.CreateField(mesg.Num, 28)
 		field.Value = proto.Uint32(uint32(m.WakeTime))
 		fields = append(fields, field)
 	}
-	if uint32(m.SleepTime) != basetype.Uint32Invalid {
+	if m.SleepTime != typedef.LocaltimeIntoDayInvalid {
 		field := fac.CreateField(mesg.Num, 29)
 		field.Value = proto.Uint32(uint32(m.SleepTime))
 		fields = append(fields, field)
 	}
-	if byte(m.HeightSetting) != basetype.EnumInvalid {
+	if m.HeightSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = proto.Uint8(byte(m.HeightSetting))
 		fields = append(fields, field)
@@ -274,7 +274,7 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.UserWalkingStepLength)
 		fields = append(fields, field)
 	}
-	if byte(m.DepthSetting) != basetype.EnumInvalid {
+	if m.DepthSetting != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 47)
 		field.Value = proto.Uint8(byte(m.DepthSetting))
 		fields = append(fields, field)

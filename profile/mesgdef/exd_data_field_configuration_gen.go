@@ -145,7 +145,7 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if byte(m.DisplayType) != basetype.EnumInvalid {
+	if m.DisplayType != typedef.ExdDisplayTypeInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.DisplayType))
 		fields = append(fields, field)

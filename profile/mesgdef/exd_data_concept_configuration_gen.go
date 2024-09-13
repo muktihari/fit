@@ -28,7 +28,7 @@ type ExdDataConceptConfiguration struct {
 	DataUnits    typedef.ExdDataUnits
 	Qualifier    typedef.ExdQualifiers
 	Descriptor   typedef.ExdDescriptors
-	IsSigned     bool
+	IsSigned     typedef.Bool
 
 	state [1]uint8 // Used for tracking expanded fields.
 
@@ -133,22 +133,22 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Scaling)
 		fields = append(fields, field)
 	}
-	if byte(m.DataUnits) != basetype.EnumInvalid {
+	if m.DataUnits != typedef.ExdDataUnitsInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.DataUnits))
 		fields = append(fields, field)
 	}
-	if byte(m.Qualifier) != basetype.EnumInvalid {
+	if m.Qualifier != typedef.ExdQualifiersInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint8(byte(m.Qualifier))
 		fields = append(fields, field)
 	}
-	if byte(m.Descriptor) != basetype.EnumInvalid {
+	if m.Descriptor != typedef.ExdDescriptorsInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint8(byte(m.Descriptor))
 		fields = append(fields, field)
 	}
-	{
+	if m.IsSigned < 2 {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Bool(m.IsSigned)
 		fields = append(fields, field)
@@ -224,7 +224,7 @@ func (m *ExdDataConceptConfiguration) SetDescriptor(v typedef.ExdDescriptors) *E
 }
 
 // SetIsSigned sets IsSigned value.
-func (m *ExdDataConceptConfiguration) SetIsSigned(v bool) *ExdDataConceptConfiguration {
+func (m *ExdDataConceptConfiguration) SetIsSigned(v typedef.Bool) *ExdDataConceptConfiguration {
 	m.IsSigned = v
 	return m
 }

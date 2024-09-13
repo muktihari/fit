@@ -103,12 +103,12 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
+	if m.ReferenceMesg != typedef.MesgNumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.ReferenceMesg))
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
+	if m.ReferenceIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(uint16(m.ReferenceIndex))
 		fields = append(fields, field)
@@ -153,7 +153,7 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.PowerZoneHighBoundary)
 		fields = append(fields, field)
 	}
-	if byte(m.HrCalcType) != basetype.EnumInvalid {
+	if m.HrCalcType != typedef.HrZoneCalcInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint8(byte(m.HrCalcType))
 		fields = append(fields, field)
@@ -173,7 +173,7 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.ThresholdHeartRate)
 		fields = append(fields, field)
 	}
-	if byte(m.PwrCalcType) != basetype.EnumInvalid {
+	if m.PwrCalcType != typedef.PwrZoneCalcInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint8(byte(m.PwrCalcType))
 		fields = append(fields, field)

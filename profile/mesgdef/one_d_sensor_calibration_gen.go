@@ -80,7 +80,7 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.SensorType) != basetype.EnumInvalid {
+	if m.SensorType != typedef.SensorTypeInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.SensorType))
 		fields = append(fields, field)

@@ -23,8 +23,8 @@ type SdmProfile struct {
 	MessageIndex      typedef.MessageIndex
 	SdmAntId          uint16
 	SdmCalFactor      uint16 // Scale: 10; Units: %
-	Enabled           bool
-	SpeedSource       bool // Use footpod for speed source instead of GPS
+	Enabled           typedef.Bool
+	SpeedSource       typedef.Bool // Use footpod for speed source instead of GPS
 	SdmAntIdTransType uint8
 	OdometerRollover  uint8 // Rollover counter that can be used to extend the odometer
 
@@ -78,12 +78,12 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSdmProfile}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -103,7 +103,7 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Odometer)
 		fields = append(fields, field)
 	}
-	{
+	if m.SpeedSource < 2 {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.SpeedSource)
 		fields = append(fields, field)
@@ -157,7 +157,7 @@ func (m *SdmProfile) SetMessageIndex(v typedef.MessageIndex) *SdmProfile {
 }
 
 // SetEnabled sets Enabled value.
-func (m *SdmProfile) SetEnabled(v bool) *SdmProfile {
+func (m *SdmProfile) SetEnabled(v typedef.Bool) *SdmProfile {
 	m.Enabled = v
 	return m
 }
@@ -215,7 +215,7 @@ func (m *SdmProfile) SetOdometerScaled(v float64) *SdmProfile {
 // SetSpeedSource sets SpeedSource value.
 //
 // Use footpod for speed source instead of GPS
-func (m *SdmProfile) SetSpeedSource(v bool) *SdmProfile {
+func (m *SdmProfile) SetSpeedSource(v typedef.Bool) *SdmProfile {
 	m.SpeedSource = v
 	return m
 }

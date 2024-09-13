@@ -111,7 +111,7 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Weight)
 		fields = append(fields, field)
 	}
-	if uint8(m.SetType) != basetype.Uint8Invalid {
+	if m.SetType != typedef.SetTypeInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(uint8(m.SetType))
 		fields = append(fields, field)
@@ -131,17 +131,17 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint16(m.CategorySubtype)
 		fields = append(fields, field)
 	}
-	if uint16(m.WeightDisplayUnit) != basetype.Uint16Invalid {
+	if m.WeightDisplayUnit != typedef.FitBaseUnitInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint16(uint16(m.WeightDisplayUnit))
 		fields = append(fields, field)
 	}
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
+	if m.WktStepIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)

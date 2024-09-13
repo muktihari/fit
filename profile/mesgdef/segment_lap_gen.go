@@ -264,7 +264,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSegmentLap}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -274,12 +274,12 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Event) != basetype.EnumInvalid {
+	if m.Event != typedef.EventInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
-	if byte(m.EventType) != basetype.EnumInvalid {
+	if m.EventType != typedef.EventTypeInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
@@ -389,7 +389,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.TotalDescent)
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
@@ -429,12 +429,12 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.NormalizedPower)
 		fields = append(fields, field)
 	}
-	if uint16(m.LeftRightBalance) != basetype.Uint16Invalid {
+	if m.LeftRightBalance != typedef.LeftRightBalance100Invalid {
 		field := fac.CreateField(mesg.Num, 31)
 		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 32)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
@@ -559,12 +559,12 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
-	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
+	if m.WktStepIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 57)
 		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)
 	}
-	if byte(m.SportEvent) != basetype.EnumInvalid {
+	if m.SportEvent != typedef.SportEventInvalid {
 		field := fac.CreateField(mesg.Num, 58)
 		field.Value = proto.Uint8(byte(m.SportEvent))
 		fields = append(fields, field)
@@ -594,7 +594,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
 		fields = append(fields, field)
 	}
-	if byte(m.Status) != basetype.EnumInvalid {
+	if m.Status != typedef.SegmentLapStatusInvalid {
 		field := fac.CreateField(mesg.Num, 64)
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
@@ -689,7 +689,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.MaxCadencePosition)
 		fields = append(fields, field)
 	}
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+	if m.Manufacturer != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 83)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)

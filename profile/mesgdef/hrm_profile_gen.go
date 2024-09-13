@@ -20,8 +20,8 @@ import (
 type HrmProfile struct {
 	MessageIndex      typedef.MessageIndex
 	HrmAntId          uint16
-	Enabled           bool
-	LogHrv            bool
+	Enabled           typedef.Bool
+	LogHrv            typedef.Bool
 	HrmAntIdTransType uint8
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -71,12 +71,12 @@ func (m *HrmProfile) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumHrmProfile}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -86,7 +86,7 @@ func (m *HrmProfile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.HrmAntId)
 		fields = append(fields, field)
 	}
-	{
+	if m.LogHrv < 2 {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Bool(m.LogHrv)
 		fields = append(fields, field)
@@ -113,7 +113,7 @@ func (m *HrmProfile) SetMessageIndex(v typedef.MessageIndex) *HrmProfile {
 }
 
 // SetEnabled sets Enabled value.
-func (m *HrmProfile) SetEnabled(v bool) *HrmProfile {
+func (m *HrmProfile) SetEnabled(v typedef.Bool) *HrmProfile {
 	m.Enabled = v
 	return m
 }
@@ -125,7 +125,7 @@ func (m *HrmProfile) SetHrmAntId(v uint16) *HrmProfile {
 }
 
 // SetLogHrv sets LogHrv value.
-func (m *HrmProfile) SetLogHrv(v bool) *HrmProfile {
+func (m *HrmProfile) SetLogHrv(v typedef.Bool) *HrmProfile {
 	m.LogHrv = v
 	return m
 }

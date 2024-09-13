@@ -94,7 +94,7 @@ func (m *ClimbPro) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
-	if byte(m.ClimbProEvent) != basetype.EnumInvalid {
+	if m.ClimbProEvent != typedef.ClimbProEventInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.ClimbProEvent))
 		fields = append(fields, field)

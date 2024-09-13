@@ -125,17 +125,17 @@ func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.HeartRate)
 		fields = append(fields, field)
 	}
-	if byte(m.HeartRateType) != basetype.EnumInvalid {
+	if m.HeartRateType != typedef.HrTypeInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.HeartRateType))
 		fields = append(fields, field)
 	}
-	if byte(m.Status) != basetype.EnumInvalid {
+	if m.Status != typedef.BpStatusInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
 	}
-	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
+	if m.UserProfileIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
 		fields = append(fields, field)

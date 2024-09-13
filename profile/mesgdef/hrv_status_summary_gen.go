@@ -115,7 +115,7 @@ func (m *HrvStatusSummary) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.BaselineBalancedUpper)
 		fields = append(fields, field)
 	}
-	if byte(m.Status) != basetype.EnumInvalid {
+	if m.Status != typedef.HrvStatusInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)

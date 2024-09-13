@@ -97,7 +97,7 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint16(m.Weight) != basetype.Uint16Invalid {
+	if m.Weight != typedef.WeightInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.Weight))
 		fields = append(fields, field)
@@ -152,7 +152,7 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.VisceralFatRating)
 		fields = append(fields, field)
 	}
-	if uint16(m.UserProfileIndex) != basetype.Uint16Invalid {
+	if m.UserProfileIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
 		fields = append(fields, field)
@@ -180,7 +180,7 @@ func (m *WeightScale) TimestampUint32() uint32 { return datetime.ToUint32(m.Time
 //
 // Scale: 100; Units: kg
 func (m *WeightScale) WeightScaled() float64 {
-	if uint16(m.Weight) == basetype.Uint16Invalid {
+	if m.Weight == typedef.WeightInvalid {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.Weight)/100 - 0

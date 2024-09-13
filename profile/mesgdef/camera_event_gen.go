@@ -83,7 +83,7 @@ func (m *CameraEvent) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
-	if byte(m.CameraEventType) != basetype.EnumInvalid {
+	if m.CameraEventType != typedef.CameraEventTypeInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.CameraEventType))
 		fields = append(fields, field)
@@ -93,7 +93,7 @@ func (m *CameraEvent) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.CameraFileUuid)
 		fields = append(fields, field)
 	}
-	if byte(m.CameraOrientation) != basetype.EnumInvalid {
+	if m.CameraOrientation != typedef.CameraOrientationTypeInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.CameraOrientation))
 		fields = append(fields, field)

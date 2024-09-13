@@ -86,7 +86,7 @@ func (m *Spo2Data) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.ReadingConfidence)
 		fields = append(fields, field)
 	}
-	if byte(m.Mode) != basetype.EnumInvalid {
+	if m.Mode != typedef.Spo2MeasurementTypeInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Mode))
 		fields = append(fields, field)
