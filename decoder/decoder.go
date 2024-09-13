@@ -29,16 +29,16 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	// ErrNotFITFile will be returned when the first byte every FIT sequence does not match
-	// with FIT FileHeader's Size specification (either 12 or 15), byte 8-12 is not ".FIT",
+	// ErrNotFITFile will be returned if the first byte of every FIT sequence does not match
+	// with FIT FileHeader's Size specification (either 12 or 14), byte 8-12 are not ".FIT",
 	// or byte 4-8 are all zero (FileHeader's DataSize == 0).
 	ErrNotFITFile = errorString("not a FIT file")
 
-	// ErrCRCChecksumMismatch will be returned when the CRC checksum is mismatch
-	// with the CRC in the file, whether on checking FileHeader or Messages integrity.
+	// ErrCRCChecksumMismatch will be returned if the CRC checksum does not match with
+	// the CRC in the file, whether during FileHeader or messages integrity checks.
 	ErrCRCChecksumMismatch = errorString("crc checksum mismatch")
 
-	// ErrMesgDefMissing will be returned when message definition for the incoming message data is missing.
+	// ErrMesgDefMissing will be returned if message definition for the incoming message data is missing.
 	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
 
 	errInvalidBaseType = errorString("invalid basetype")
