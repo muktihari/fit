@@ -29,15 +29,19 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	// Integrity errors
-	ErrNotFITFile          = errorString("not a FIT file")
-	ErrDataSizeZero        = errorString("data size zero")
+	// ErrNotFITFile will be returned when the first byte every FIT sequence does not match
+	// with FIT FileHeader's Size specification (either 12 or 15), byte 8-12 is not ".FIT",
+	// or byte 4-8 are all zero (FileHeader's DataSize == 0).
+	ErrNotFITFile = errorString("not a FIT file")
+
+	// ErrCRCChecksumMismatch will be returned when the CRC checksum is mismatch
+	// with the CRC in the file, whether on checking FileHeader or Messages integrity.
 	ErrCRCChecksumMismatch = errorString("crc checksum mismatch")
 
-	// Message-field related errors
-	ErrMesgDefMissing         = errorString("message definition missing")
-	ErrFieldValueTypeMismatch = errorString("field value type mismatch")
-	ErrInvalidBaseType        = errorString("invalid basetype")
+	// ErrMesgDefMissing will be returned when message definition for the incoming message data is missing.
+	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
+
+	errInvalidBaseType = errorString("invalid basetype")
 )
 
 // Decoder is FIT file decoder. See New() for details.
@@ -493,7 +497,7 @@ func (d *Decoder) decodeFileHeader() error {
 	}
 
 	if d.fileHeader.DataSize == 0 {
-		return ErrDataSizeZero
+		return fmt.Errorf("invalid data size: %w", ErrNotFITFile)
 	}
 
 	if size == 14 {
@@ -575,7 +579,7 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		baseType = basetype.BaseType(b[2])
 		if !baseType.Valid() {
 			return fmt.Errorf("message definition number: %s(%d): fields[%d].BaseType: %s: %w",
-				mesgDef.MesgNum, mesgDef.MesgNum, len(mesgDef.FieldDefinitions), baseType, ErrInvalidBaseType)
+				mesgDef.MesgNum, mesgDef.MesgNum, len(mesgDef.FieldDefinitions), baseType, errInvalidBaseType)
 		}
 		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions,
 			proto.FieldDefinition{
@@ -741,13 +745,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			val = valueFromBits(bitVal, field.BaseType)
 		}
 
-		if field.Num == proto.FieldNumTimestamp {
-			if val.Type() != proto.TypeUint32 {
-				// This can only happen when:
-				// 1. Profile.xlsx contain typo from official release or user add manufacturer specific message but specifying wrong type.
-				// 2. User register the message in the factory but using different type.
-				return fmt.Errorf("timestamp should be uint32, got: %T: %w", val.Any(), ErrFieldValueTypeMismatch)
-			}
+		if field.Num == proto.FieldNumTimestamp && val.Type() == proto.TypeUint32 {
 			timestamp := val.Uint32()
 			d.timestamp = timestamp
 			d.lastTimeOffset = byte(timestamp & proto.CompressedTimeMask)
@@ -882,7 +880,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 
 		if !fieldDesc.FitBaseTypeId.Valid() {
 			return fmt.Errorf("fieldDescription.FitBaseTypeId: %s: %w",
-				fieldDesc.FitBaseTypeId, ErrInvalidBaseType)
+				fieldDesc.FitBaseTypeId, errInvalidBaseType)
 		}
 
 		var isArray bool
