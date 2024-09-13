@@ -178,7 +178,7 @@ func TestInvalid(t *testing.T) {
 		{baseType: basetype.Uint64, invalid: basetype.Uint64Invalid},
 		{baseType: basetype.Uint64z, invalid: basetype.Uint64zInvalid},
 		{baseType: basetype.Float64, invalid: math.Float64frombits(basetype.Float64Invalid)},
-		{baseType: 255, invalid: "invalid"},
+		{baseType: 255, invalid: nil},
 	}
 	for _, tc := range tt {
 		t.Run(tc.baseType.String(), func(t *testing.T) {

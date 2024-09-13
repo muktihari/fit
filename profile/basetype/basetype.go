@@ -272,7 +272,7 @@ func (t BaseType) Invalid() any {
 	case Uint64z:
 		return Uint64zInvalid
 	}
-	return "invalid"
+	return nil
 }
 
 // List returns all constants.
