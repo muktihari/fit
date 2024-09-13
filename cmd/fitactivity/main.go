@@ -74,17 +74,8 @@ Flags:
 `
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-
-	go func() {
-		sig := <-quit
-		cancel()
-		fmt.Printf(" %v ", sig)
-	}()
 
 	fs := flag.NewFlagSet("main", flag.ExitOnError)
 	fs.Usage = func() { fmt.Fprint(os.Stderr, mainUsage) }
@@ -138,8 +129,10 @@ func printerror(fs *flag.FlagSet, command string, err error) {
 		fs.Usage()
 	} else if errors.Is(err, errPrintUsageAndExit) {
 		fs.Usage()
+	} else if errors.Is(err, context.Canceled) {
+		fmt.Fprintf(os.Stderr, "~ %s: %v\n", command, err)
 	} else {
-		fmt.Fprintf(os.Stderr, "~ %s: return with error: %v\n", command, err)
+		fmt.Fprintf(os.Stderr, "~ %s: error: %v\n", command, err)
 	}
 	os.Exit(1)
 }
