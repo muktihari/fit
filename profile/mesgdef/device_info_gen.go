@@ -24,19 +24,19 @@ type DeviceInfo struct {
 	Timestamp           time.Time // Units: s
 	Descriptor          string    // Used to describe the sensor or location
 	ProductName         string    // Optional free form string to indicate the devices name or model
-	SerialNumber        uint32
-	CumOperatingTime    uint32 // Units: s; Reset by new battery or charge.
+	SerialNumber        uint32    // Base: uint32z
+	CumOperatingTime    uint32    // Units: s; Reset by new battery or charge.
 	Manufacturer        typedef.Manufacturer
 	Product             uint16
 	SoftwareVersion     uint16 // Scale: 100
 	BatteryVoltage      uint16 // Scale: 256; Units: V
-	AntDeviceNumber     uint16
+	AntDeviceNumber     uint16 // Base: uint16z
 	DeviceIndex         typedef.DeviceIndex
 	DeviceType          uint8
 	HardwareVersion     uint8
 	BatteryStatus       typedef.BatteryStatus
 	SensorPosition      typedef.BodyLocation // Indicates the location of the sensor
-	AntTransmissionType uint8
+	AntTransmissionType uint8                // Base: uint8z
 	AntNetwork          typedef.AntNetwork
 	SourceType          typedef.SourceType
 	BatteryLevel        uint8 // Units: %
@@ -301,6 +301,8 @@ func (m *DeviceInfo) SetManufacturer(v typedef.Manufacturer) *DeviceInfo {
 }
 
 // SetSerialNumber sets SerialNumber value.
+//
+// Base: uint32z
 func (m *DeviceInfo) SetSerialNumber(v uint32) *DeviceInfo {
 	m.SerialNumber = v
 	return m
@@ -393,12 +395,16 @@ func (m *DeviceInfo) SetDescriptor(v string) *DeviceInfo {
 }
 
 // SetAntTransmissionType sets AntTransmissionType value.
+//
+// Base: uint8z
 func (m *DeviceInfo) SetAntTransmissionType(v uint8) *DeviceInfo {
 	m.AntTransmissionType = v
 	return m
 }
 
 // SetAntDeviceNumber sets AntDeviceNumber value.
+//
+// Base: uint16z
 func (m *DeviceInfo) SetAntDeviceNumber(v uint16) *DeviceInfo {
 	m.AntDeviceNumber = v
 	return m

@@ -21,9 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type TankUpdate struct {
-	Timestamp time.Time // Units: s
-	Sensor    typedef.AntChannelId
-	Pressure  uint16 // Scale: 100; Units: bar
+	Timestamp time.Time            // Units: s
+	Sensor    typedef.AntChannelId // Base: uint32z
+	Pressure  uint16               // Scale: 100; Units: bar
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -118,6 +118,8 @@ func (m *TankUpdate) SetTimestamp(v time.Time) *TankUpdate {
 }
 
 // SetSensor sets Sensor value.
+//
+// Base: uint32z
 func (m *TankUpdate) SetSensor(v typedef.AntChannelId) *TankUpdate {
 	m.Sensor = v
 	return m

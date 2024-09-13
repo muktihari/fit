@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type WorkoutCapabilities uint32
+type WorkoutCapabilities uint32 // Base: uint32z
 
 const (
 	WorkoutCapabilitiesInterval         WorkoutCapabilities = 0x00000001

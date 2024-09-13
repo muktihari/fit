@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type SupportedExdScreenLayouts uint32
+type SupportedExdScreenLayouts uint32 // Base: uint32z
 
 const (
 	SupportedExdScreenLayoutsFullScreen                SupportedExdScreenLayouts = 0x00000001

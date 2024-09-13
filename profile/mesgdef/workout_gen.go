@@ -20,7 +20,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type Workout struct {
 	WktName        string
-	Capabilities   typedef.WorkoutCapabilities
+	Capabilities   typedef.WorkoutCapabilities // Base: uint32z
 	MessageIndex   typedef.MessageIndex
 	NumValidSteps  uint16 // number of valid steps
 	PoolLength     uint16 // Scale: 100; Units: m
@@ -152,6 +152,8 @@ func (m *Workout) SetSport(v typedef.Sport) *Workout {
 }
 
 // SetCapabilities sets Capabilities value.
+//
+// Base: uint32z
 func (m *Workout) SetCapabilities(v typedef.WorkoutCapabilities) *Workout {
 	m.Capabilities = v
 	return m

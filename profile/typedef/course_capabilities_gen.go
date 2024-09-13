@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type CourseCapabilities uint32
+type CourseCapabilities uint32 // Base: uint32z
 
 const (
 	CourseCapabilitiesProcessed  CourseCapabilities = 0x00000001

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type LanguageBits3 uint8
+type LanguageBits3 uint8 // Base: uint8z
 
 const (
 	LanguageBits3Bulgarian LanguageBits3 = 0x01

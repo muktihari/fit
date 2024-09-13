@@ -233,6 +233,12 @@ func (b *Builder) componentExpansionAbility(mesg *parser.Message) (canExpand map
 func createComment(field *Field, array string) string {
 	buf := new(strings.Builder)
 
+	if strings.HasSuffix(field.BaseType, "z") {
+		buf.WriteString("Base: ")
+		buf.WriteString(field.BaseType)
+		buf.WriteString("; ")
+	}
+
 	if strings.HasPrefix(field.Type, "[") {
 		buf.WriteString("Array: ")
 		buf.WriteString(array)

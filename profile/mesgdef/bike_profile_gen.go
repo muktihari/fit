@@ -20,14 +20,14 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type BikeProfile struct {
 	Name                     string
-	FrontGear                []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
-	RearGear                 []uint8 // Array: [N]; Number of teeth on each gear 0 is innermost
+	FrontGear                []uint8 // Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
+	RearGear                 []uint8 // Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
 	Odometer                 uint32  // Scale: 100; Units: m
 	MessageIndex             typedef.MessageIndex
-	BikeSpdAntId             uint16
-	BikeCadAntId             uint16
-	BikeSpdcadAntId          uint16
-	BikePowerAntId           uint16
+	BikeSpdAntId             uint16 // Base: uint16z
+	BikeCadAntId             uint16 // Base: uint16z
+	BikeSpdcadAntId          uint16 // Base: uint16z
+	BikePowerAntId           uint16 // Base: uint16z
 	CustomWheelsize          uint16 // Scale: 1000; Units: m
 	AutoWheelsize            uint16 // Scale: 1000; Units: m
 	BikeWeight               uint16 // Scale: 10; Units: kg
@@ -43,13 +43,13 @@ type BikeProfile struct {
 	PowerEnabled             typedef.Bool
 	CrankLength              uint8 // Scale: 2; Offset: -110; Units: mm
 	Enabled                  typedef.Bool
-	BikeSpdAntIdTransType    uint8
-	BikeCadAntIdTransType    uint8
-	BikeSpdcadAntIdTransType uint8
-	BikePowerAntIdTransType  uint8
+	BikeSpdAntIdTransType    uint8 // Base: uint8z
+	BikeCadAntIdTransType    uint8 // Base: uint8z
+	BikeSpdcadAntIdTransType uint8 // Base: uint8z
+	BikePowerAntIdTransType  uint8 // Base: uint8z
 	OdometerRollover         uint8 // Rollover counter that can be used to extend the odometer
-	FrontGearNum             uint8 // Number of front gears
-	RearGearNum              uint8 // Number of rear gears
+	FrontGearNum             uint8 // Base: uint8z; Number of front gears
+	RearGearNum              uint8 // Base: uint8z; Number of rear gears
 	ShimanoDi2Enabled        typedef.Bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -409,24 +409,32 @@ func (m *BikeProfile) SetOdometerScaled(v float64) *BikeProfile {
 }
 
 // SetBikeSpdAntId sets BikeSpdAntId value.
+//
+// Base: uint16z
 func (m *BikeProfile) SetBikeSpdAntId(v uint16) *BikeProfile {
 	m.BikeSpdAntId = v
 	return m
 }
 
 // SetBikeCadAntId sets BikeCadAntId value.
+//
+// Base: uint16z
 func (m *BikeProfile) SetBikeCadAntId(v uint16) *BikeProfile {
 	m.BikeCadAntId = v
 	return m
 }
 
 // SetBikeSpdcadAntId sets BikeSpdcadAntId value.
+//
+// Base: uint16z
 func (m *BikeProfile) SetBikeSpdcadAntId(v uint16) *BikeProfile {
 	m.BikeSpdcadAntId = v
 	return m
 }
 
 // SetBikePowerAntId sets BikePowerAntId value.
+//
+// Base: uint16z
 func (m *BikeProfile) SetBikePowerAntId(v uint16) *BikeProfile {
 	m.BikePowerAntId = v
 	return m
@@ -591,24 +599,32 @@ func (m *BikeProfile) SetEnabled(v typedef.Bool) *BikeProfile {
 }
 
 // SetBikeSpdAntIdTransType sets BikeSpdAntIdTransType value.
+//
+// Base: uint8z
 func (m *BikeProfile) SetBikeSpdAntIdTransType(v uint8) *BikeProfile {
 	m.BikeSpdAntIdTransType = v
 	return m
 }
 
 // SetBikeCadAntIdTransType sets BikeCadAntIdTransType value.
+//
+// Base: uint8z
 func (m *BikeProfile) SetBikeCadAntIdTransType(v uint8) *BikeProfile {
 	m.BikeCadAntIdTransType = v
 	return m
 }
 
 // SetBikeSpdcadAntIdTransType sets BikeSpdcadAntIdTransType value.
+//
+// Base: uint8z
 func (m *BikeProfile) SetBikeSpdcadAntIdTransType(v uint8) *BikeProfile {
 	m.BikeSpdcadAntIdTransType = v
 	return m
 }
 
 // SetBikePowerAntIdTransType sets BikePowerAntIdTransType value.
+//
+// Base: uint8z
 func (m *BikeProfile) SetBikePowerAntIdTransType(v uint8) *BikeProfile {
 	m.BikePowerAntIdTransType = v
 	return m
@@ -624,7 +640,7 @@ func (m *BikeProfile) SetOdometerRollover(v uint8) *BikeProfile {
 
 // SetFrontGearNum sets FrontGearNum value.
 //
-// Number of front gears
+// Base: uint8z; Number of front gears
 func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
 	m.FrontGearNum = v
 	return m
@@ -632,7 +648,7 @@ func (m *BikeProfile) SetFrontGearNum(v uint8) *BikeProfile {
 
 // SetFrontGear sets FrontGear value.
 //
-// Array: [N]; Number of teeth on each gear 0 is innermost
+// Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
 func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
 	m.FrontGear = v
 	return m
@@ -640,7 +656,7 @@ func (m *BikeProfile) SetFrontGear(v []uint8) *BikeProfile {
 
 // SetRearGearNum sets RearGearNum value.
 //
-// Number of rear gears
+// Base: uint8z; Number of rear gears
 func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
 	m.RearGearNum = v
 	return m
@@ -648,7 +664,7 @@ func (m *BikeProfile) SetRearGearNum(v uint8) *BikeProfile {
 
 // SetRearGear sets RearGear value.
 //
-// Array: [N]; Number of teeth on each gear 0 is innermost
+// Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
 func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
 	m.RearGear = v
 	return m

@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type LanguageBits1 uint8
+type LanguageBits1 uint8 // Base: uint8z
 
 const (
 	LanguageBits1Dutch      LanguageBits1 = 0x01

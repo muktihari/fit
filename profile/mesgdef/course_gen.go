@@ -19,7 +19,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type Course struct {
 	Name         string
-	Capabilities typedef.CourseCapabilities
+	Capabilities typedef.CourseCapabilities // Base: uint32z
 	Sport        typedef.Sport
 	SubSport     typedef.SubSport
 
@@ -112,6 +112,8 @@ func (m *Course) SetName(v string) *Course {
 }
 
 // SetCapabilities sets Capabilities value.
+//
+// Base: uint32z
 func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
 	m.Capabilities = v
 	return m
