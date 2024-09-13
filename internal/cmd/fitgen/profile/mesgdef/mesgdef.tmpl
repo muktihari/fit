@@ -94,37 +94,29 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 
 	arr := pool.Get().(*[poolsize]proto.Field)
 	fields := arr[:0]
-	
+
 	mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
-	
+
 	{{ range .Fields -}}
-		{{ if and (eq .Type "bool") (eq .FixedArraySize 0) -}} 
-		{
-			field := fac.CreateField(mesg.Num, {{ .Num }})
-			field.Value = {{ .ProtoValue }}
-			fields = append(fields, field)
-		}
+	if {{ .IsValidValue -}} {
+		{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
+		field := fac.CreateField(mesg.Num, {{ .Num }})
+		{{ if gt .FixedArraySize 0 -}}
+		{{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
+			the struct since we promote the array from the same memory block as the struct. We must copy the array
+			to local variable, so it will be promoted instead (we only need the local variable to escape to the heap),
+			only then the struct can be garbage-collected on next GC's cycle. */ -}}
+		copied := m.{{ .Name }}
+		field.Value = {{ stringReplace .ProtoValue (printf "m.%s" .Name) "copied[:]" -1 }}
 		{{ else -}}
-		if {{ .IsValidValue -}} {
-			{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
-			field := fac.CreateField(mesg.Num, {{ .Num }})
-			{{ if gt .FixedArraySize 0 -}}
-			{{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
-				the struct since we promote the array from the same memory block as the struct. We must copy the array
-				to local variable, so it will be promoted instead (we only need the local variable to escape to the heap),
-				only then the struct can be garbage-collected on next GC's cycle. */ -}}
-			copied := m.{{ .Name }}
-			field.Value = {{ stringReplace .ProtoValue (printf "m.%s" .Name) "copied[:]" -1 }}
-			{{ else -}}
-			field.Value = {{ .ProtoValue }}
-			{{ end -}}
-			{{ if eq .CanExpand true -}}
-				field.IsExpandedField = expanded
-			{{ end -}}
-			fields = append(fields, field)
-			{{ if eq .CanExpand true -}} } {{ end -}}
-		}
+		field.Value = {{ .ProtoValue }}
 		{{ end -}}
+		{{ if eq .CanExpand true -}}
+			field.IsExpandedField = expanded
+		{{ end -}}
+		fields = append(fields, field)
+		{{ if eq .CanExpand true -}} } {{ end -}}
+	}
 	{{ end }}
 
 	mesg.Fields = make([]proto.Field, len(fields))

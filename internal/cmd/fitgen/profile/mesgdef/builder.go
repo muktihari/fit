@@ -122,6 +122,8 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			// Special case
 			if isTypeTime(parserField.Type) {
 				field.IsValidValue = fmt.Sprintf("!m.%s.Before(datetime.Epoch())", field.Name)
+			} else if parserField.Type == "bool" {
+				field.IsValidValue = fmt.Sprintf("%s < 2", field.ComparableValue)
 			} else {
 				field.IsValidValue = fmt.Sprintf("%s != %s", field.ComparableValue, field.InvalidValue)
 			}
@@ -411,7 +413,7 @@ func (b *Builder) transformType(fieldType, fieldArray string, fixedArraySize byt
 	}
 
 	var typ string
-	if v := b.lookup.BaseType(fieldType).String(); v == fieldType || fieldType == "bool" {
+	if v := b.lookup.BaseType(fieldType).String(); v == fieldType {
 		typ = b.lookup.GoType(fieldType)
 	} else {
 		typ = fmt.Sprintf("typedef.%s", strutil.ToTitle(fieldType))
@@ -471,19 +473,6 @@ func (b *Builder) transformToProtoValue(fieldName, fieldType, array string) stri
 func (b *Builder) transformPrimitiveValue(fieldName, fieldType, array string) string {
 	if isTypeTime(fieldType) {
 		return fmt.Sprintf("datetime.ToUint32(m.%s)", fieldName)
-	}
-
-	if b.lookup.BaseType(fieldType).String() == fieldType {
-		return fmt.Sprintf("m.%s", fieldName) // only for primitive go types.
-	}
-
-	goType := b.lookup.GoType(fieldType)
-	if goType == "bool" {
-		return fmt.Sprintf("m.%s", fieldName)
-	}
-
-	if array == "" {
-		return fmt.Sprintf("%s(m.%s)", goType, fieldName)
 	}
 
 	return fmt.Sprintf("m.%s", fieldName)
@@ -566,15 +555,16 @@ func (b *Builder) transformComparableValue(fieldType, array, primitiveValue stri
 
 func (b *Builder) invalidValueOf(fieldType, array string, fixedArraySize byte) string {
 	if fieldType == "bool" {
-		return "false"
+		return "typedef.BoolInvalid"
 	}
+
+	baseType := b.lookup.BaseType(fieldType).String()
 
 	if array != "" {
 		if fixedArraySize == 0 { // Slice
 			return "nil"
 		}
 
-		baseType := b.lookup.BaseType(fieldType).String()
 		baseTypeTitleCase := strutil.ToTitle(baseType)
 		typ := baseTypeReplacer.Replace(baseTypeTitleCase)
 		typ = strings.TrimSuffix(typ, "z")
@@ -589,9 +579,16 @@ func (b *Builder) invalidValueOf(fieldType, array string, fixedArraySize byte) s
 			),
 		)
 	}
+	if baseType == fieldType || fieldType == "bool" {
+		return fmt.Sprintf("basetype.%sInvalid",
+			strutil.ToTitle(b.lookup.BaseType(fieldType).String()))
+	}
 
-	return fmt.Sprintf("basetype.%sInvalid",
-		strutil.ToTitle(b.lookup.BaseType(fieldType).String()))
+	if fieldType == "fit_base_type" {
+		return "255"
+	}
+
+	return fmt.Sprintf("typedef.%sInvalid", strutil.ToTitle(fieldType))
 }
 
 func (b *Builder) invalidArrayValueScaled(fixedArraySize byte) string {
