@@ -21,7 +21,7 @@ type ExdScreenConfiguration struct {
 	ScreenIndex   uint8
 	FieldCount    uint8 // number of fields in screen
 	Layout        typedef.ExdLayout
-	ScreenEnabled bool
+	ScreenEnabled typedef.Bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -79,12 +79,12 @@ func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.FieldCount)
 		fields = append(fields, field)
 	}
-	if byte(m.Layout) != basetype.EnumInvalid {
+	if m.Layout != typedef.ExdLayoutInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Layout))
 		fields = append(fields, field)
 	}
-	{
+	if m.ScreenEnabled < 2 {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.ScreenEnabled)
 		fields = append(fields, field)
@@ -120,7 +120,7 @@ func (m *ExdScreenConfiguration) SetLayout(v typedef.ExdLayout) *ExdScreenConfig
 }
 
 // SetScreenEnabled sets ScreenEnabled value.
-func (m *ExdScreenConfiguration) SetScreenEnabled(v bool) *ExdScreenConfiguration {
+func (m *ExdScreenConfiguration) SetScreenEnabled(v typedef.Bool) *ExdScreenConfiguration {
 	m.ScreenEnabled = v
 	return m
 }

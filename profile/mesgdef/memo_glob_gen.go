@@ -83,12 +83,12 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.Memo)
 		fields = append(fields, field)
 	}
-	if uint16(m.MesgNum) != basetype.Uint16Invalid {
+	if m.MesgNum != typedef.MesgNumInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(uint16(m.MesgNum))
 		fields = append(fields, field)
 	}
-	if uint16(m.ParentIndex) != basetype.Uint16Invalid {
+	if m.ParentIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.ParentIndex))
 		fields = append(fields, field)

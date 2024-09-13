@@ -80,12 +80,12 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.FileInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+	if m.Manufacturer != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)

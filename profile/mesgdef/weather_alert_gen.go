@@ -95,12 +95,12 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.ExpireTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Severity) != basetype.EnumInvalid {
+	if m.Severity != typedef.WeatherSeverityInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.Severity))
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.WeatherSevereTypeInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)

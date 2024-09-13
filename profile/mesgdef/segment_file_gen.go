@@ -26,8 +26,8 @@ type SegmentFile struct {
 	LeaderActivityIdString []string                         // Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
 	UserProfilePrimaryKey  uint32                           // Primary key of the user that created the segment file
 	MessageIndex           typedef.MessageIndex
-	Enabled                bool  // Enabled state of the segment file
-	DefaultRaceLeader      uint8 // Index for the Leader Board entry selected as the default race participant
+	Enabled                typedef.Bool // Enabled state of the segment file
+	DefaultRaceLeader      uint8        // Index for the Leader Board entry selected as the default race participant
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -84,7 +84,7 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSegmentFile}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -94,7 +94,7 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.FileUuid)
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
@@ -156,7 +156,7 @@ func (m *SegmentFile) SetFileUuid(v string) *SegmentFile {
 // SetEnabled sets Enabled value.
 //
 // Enabled state of the segment file
-func (m *SegmentFile) SetEnabled(v bool) *SegmentFile {
+func (m *SegmentFile) SetEnabled(v typedef.Bool) *SegmentFile {
 	m.Enabled = v
 	return m
 }

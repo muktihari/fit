@@ -115,12 +115,12 @@ func (m *DiveSummary) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceMesg) != basetype.Uint16Invalid {
+	if m.ReferenceMesg != typedef.MesgNumInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.ReferenceMesg))
 		fields = append(fields, field)
 	}
-	if uint16(m.ReferenceIndex) != basetype.Uint16Invalid {
+	if m.ReferenceIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(uint16(m.ReferenceIndex))
 		fields = append(fields, field)

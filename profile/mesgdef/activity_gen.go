@@ -95,17 +95,17 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.NumSessions)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.ActivityInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
-	if byte(m.Event) != basetype.EnumInvalid {
+	if m.Event != typedef.EventInvalid {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
-	if byte(m.EventType) != basetype.EnumInvalid {
+	if m.EventType != typedef.EventTypeInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)

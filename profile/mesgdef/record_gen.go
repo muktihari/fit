@@ -367,7 +367,7 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if uint8(m.LeftRightBalance) != basetype.Uint8Invalid {
+	if m.LeftRightBalance != typedef.LeftRightBalanceInvalid {
 		field := fac.CreateField(mesg.Num, 30)
 		field.Value = proto.Uint8(uint8(m.LeftRightBalance))
 		fields = append(fields, field)
@@ -402,7 +402,7 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.StanceTime)
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityType) != basetype.EnumInvalid {
+	if m.ActivityType != typedef.ActivityTypeInvalid {
 		field := fac.CreateField(mesg.Num, 42)
 		field.Value = proto.Uint8(byte(m.ActivityType))
 		fields = append(fields, field)
@@ -437,7 +437,7 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.Time128)
 		fields = append(fields, field)
 	}
-	if byte(m.StrokeType) != basetype.EnumInvalid {
+	if m.StrokeType != typedef.StrokeTypeInvalid {
 		field := fac.CreateField(mesg.Num, 49)
 		field.Value = proto.Uint8(byte(m.StrokeType))
 		fields = append(fields, field)
@@ -492,7 +492,7 @@ func (m *Record) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.SaturatedHemoglobinPercentMax)
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+	if m.DeviceIndex != typedef.DeviceIndexInvalid {
 		field := fac.CreateField(mesg.Num, 62)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)

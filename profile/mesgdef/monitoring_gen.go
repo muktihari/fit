@@ -149,7 +149,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+	if m.DeviceIndex != typedef.DeviceIndexInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
@@ -174,7 +174,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityType) != basetype.EnumInvalid {
+	if m.ActivityType != typedef.ActivityTypeInvalid {
 		if expanded := m.IsExpandedField(5); !expanded || (expanded && options.IncludeExpandedFields) {
 			field := fac.CreateField(mesg.Num, 5)
 			field.Value = proto.Uint8(byte(m.ActivityType))
@@ -182,12 +182,12 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 			fields = append(fields, field)
 		}
 	}
-	if byte(m.ActivitySubtype) != basetype.EnumInvalid {
+	if m.ActivitySubtype != typedef.ActivitySubtypeInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(byte(m.ActivitySubtype))
 		fields = append(fields, field)
 	}
-	if byte(m.ActivityLevel) != basetype.EnumInvalid {
+	if m.ActivityLevel != typedef.ActivityLevelInvalid {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.ActivityLevel))
 		fields = append(fields, field)

@@ -26,7 +26,7 @@ type MaxMetData struct {
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	MaxMetCategory typedef.MaxMetCategory
-	CalibratedData bool                          // Indicates if calibrated data was used in the calculation
+	CalibratedData typedef.Bool                  // Indicates if calibrated data was used in the calculation
 	HrSource       typedef.MaxMetHeartRateSource // Indicates if the estimate was obtained using a chest strap or wrist heart rate
 	SpeedSource    typedef.MaxMetSpeedSource     // Indidcates if the estimate was obtained using onboard GPS or connected GPS
 
@@ -90,32 +90,32 @@ func (m *MaxMetData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.Vo2Max)
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
-	if byte(m.MaxMetCategory) != basetype.EnumInvalid {
+	if m.MaxMetCategory != typedef.MaxMetCategoryInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.MaxMetCategory))
 		fields = append(fields, field)
 	}
-	{
+	if m.CalibratedData < 2 {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Bool(m.CalibratedData)
 		fields = append(fields, field)
 	}
-	if byte(m.HrSource) != basetype.EnumInvalid {
+	if m.HrSource != typedef.MaxMetHeartRateSourceInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.HrSource))
 		fields = append(fields, field)
 	}
-	if byte(m.SpeedSource) != basetype.EnumInvalid {
+	if m.SpeedSource != typedef.MaxMetSpeedSourceInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint8(byte(m.SpeedSource))
 		fields = append(fields, field)
@@ -195,7 +195,7 @@ func (m *MaxMetData) SetMaxMetCategory(v typedef.MaxMetCategory) *MaxMetData {
 // SetCalibratedData sets CalibratedData value.
 //
 // Indicates if calibrated data was used in the calculation
-func (m *MaxMetData) SetCalibratedData(v bool) *MaxMetData {
+func (m *MaxMetData) SetCalibratedData(v typedef.Bool) *MaxMetData {
 	m.CalibratedData = v
 	return m
 }

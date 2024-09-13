@@ -79,7 +79,7 @@ func (m *TankSummary) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint32(m.Sensor) != basetype.Uint32zInvalid {
+	if m.Sensor != typedef.AntChannelIdInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint32(uint32(m.Sensor))
 		fields = append(fields, field)

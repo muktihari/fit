@@ -65,7 +65,7 @@ func (m *SlaveDevice) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSlaveDevice}
 
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+	if m.Manufacturer != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)

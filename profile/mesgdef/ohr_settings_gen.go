@@ -9,7 +9,6 @@ package mesgdef
 import (
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
-	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"time"
@@ -72,7 +71,7 @@ func (m *OhrSettings) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Enabled) != basetype.EnumInvalid {
+	if m.Enabled != typedef.SwitchInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Enabled))
 		fields = append(fields, field)

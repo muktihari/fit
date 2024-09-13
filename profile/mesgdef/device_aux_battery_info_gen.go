@@ -79,7 +79,7 @@ func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+	if m.DeviceIndex != typedef.DeviceIndexInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
@@ -89,7 +89,7 @@ func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.BatteryVoltage)
 		fields = append(fields, field)
 	}
-	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
+	if m.BatteryStatus != typedef.BatteryStatusInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(uint8(m.BatteryStatus))
 		fields = append(fields, field)

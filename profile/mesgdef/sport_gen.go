@@ -67,12 +67,12 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSport}
 
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)

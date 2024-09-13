@@ -29,9 +29,9 @@ type Goal struct {
 	Sport           typedef.Sport
 	SubSport        typedef.SubSport
 	Type            typedef.Goal
-	Repeat          bool
+	Repeat          typedef.Bool
 	Recurrence      typedef.GoalRecurrence
-	Enabled         bool
+	Enabled         typedef.Bool
 	Source          typedef.GoalSource
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -89,17 +89,17 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumGoal}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
@@ -114,7 +114,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.EndDate.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.GoalInvalid {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
@@ -124,7 +124,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Value)
 		fields = append(fields, field)
 	}
-	{
+	if m.Repeat < 2 {
 		field := fac.CreateField(mesg.Num, 6)
 		field.Value = proto.Bool(m.Repeat)
 		fields = append(fields, field)
@@ -134,7 +134,7 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TargetValue)
 		fields = append(fields, field)
 	}
-	if byte(m.Recurrence) != basetype.EnumInvalid {
+	if m.Recurrence != typedef.GoalRecurrenceInvalid {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.Recurrence))
 		fields = append(fields, field)
@@ -144,12 +144,12 @@ func (m *Goal) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.RecurrenceValue)
 		fields = append(fields, field)
 	}
-	{
+	if m.Enabled < 2 {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
-	if byte(m.Source) != basetype.EnumInvalid {
+	if m.Source != typedef.GoalSourceInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(byte(m.Source))
 		fields = append(fields, field)
@@ -213,7 +213,7 @@ func (m *Goal) SetValue(v uint32) *Goal {
 }
 
 // SetRepeat sets Repeat value.
-func (m *Goal) SetRepeat(v bool) *Goal {
+func (m *Goal) SetRepeat(v typedef.Bool) *Goal {
 	m.Repeat = v
 	return m
 }
@@ -237,7 +237,7 @@ func (m *Goal) SetRecurrenceValue(v uint16) *Goal {
 }
 
 // SetEnabled sets Enabled value.
-func (m *Goal) SetEnabled(v bool) *Goal {
+func (m *Goal) SetEnabled(v typedef.Bool) *Goal {
 	m.Enabled = v
 	return m
 }

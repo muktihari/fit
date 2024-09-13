@@ -69,12 +69,12 @@ func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumExerciseTitle}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if uint16(m.ExerciseCategory) != basetype.Uint16Invalid {
+	if m.ExerciseCategory != typedef.ExerciseCategoryInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.ExerciseCategory))
 		fields = append(fields, field)

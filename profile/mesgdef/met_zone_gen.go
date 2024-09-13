@@ -70,7 +70,7 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumMetZone}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)

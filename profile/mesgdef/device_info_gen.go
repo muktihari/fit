@@ -107,7 +107,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if uint8(m.DeviceIndex) != basetype.Uint8Invalid {
+	if m.DeviceIndex != typedef.DeviceIndexInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
@@ -117,7 +117,7 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.DeviceType)
 		fields = append(fields, field)
 	}
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+	if m.Manufacturer != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
@@ -152,12 +152,12 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.BatteryVoltage)
 		fields = append(fields, field)
 	}
-	if uint8(m.BatteryStatus) != basetype.Uint8Invalid {
+	if m.BatteryStatus != typedef.BatteryStatusInvalid {
 		field := fac.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(uint8(m.BatteryStatus))
 		fields = append(fields, field)
 	}
-	if byte(m.SensorPosition) != basetype.EnumInvalid {
+	if m.SensorPosition != typedef.BodyLocationInvalid {
 		field := fac.CreateField(mesg.Num, 18)
 		field.Value = proto.Uint8(byte(m.SensorPosition))
 		fields = append(fields, field)
@@ -177,12 +177,12 @@ func (m *DeviceInfo) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.AntDeviceNumber)
 		fields = append(fields, field)
 	}
-	if byte(m.AntNetwork) != basetype.EnumInvalid {
+	if m.AntNetwork != typedef.AntNetworkInvalid {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = proto.Uint8(byte(m.AntNetwork))
 		fields = append(fields, field)
 	}
-	if byte(m.SourceType) != basetype.EnumInvalid {
+	if m.SourceType != typedef.SourceTypeInvalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(byte(m.SourceType))
 		fields = append(fields, field)

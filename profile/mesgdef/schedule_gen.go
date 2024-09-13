@@ -25,7 +25,7 @@ type Schedule struct {
 	SerialNumber  uint32               // Corresponds to file_id of scheduled workout / course.
 	Manufacturer  typedef.Manufacturer // Corresponds to file_id of scheduled workout / course.
 	Product       uint16               // Corresponds to file_id of scheduled workout / course.
-	Completed     bool                 // TRUE if this activity has been started
+	Completed     typedef.Bool         // TRUE if this activity has been started
 	Type          typedef.Schedule
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
@@ -77,7 +77,7 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumSchedule}
 
-	if uint16(m.Manufacturer) != basetype.Uint16Invalid {
+	if m.Manufacturer != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.Manufacturer))
 		fields = append(fields, field)
@@ -97,12 +97,12 @@ func (m *Schedule) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.TimeCreated.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	{
+	if m.Completed < 2 {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.Completed)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.ScheduleInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
@@ -181,7 +181,7 @@ func (m *Schedule) SetTimeCreated(v time.Time) *Schedule {
 // SetCompleted sets Completed value.
 //
 // TRUE if this activity has been started
-func (m *Schedule) SetCompleted(v bool) *Schedule {
+func (m *Schedule) SetCompleted(v typedef.Bool) *Schedule {
 	m.Completed = v
 	return m
 }

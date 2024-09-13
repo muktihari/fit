@@ -91,7 +91,7 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.FieldDefinitionNumber)
 		fields = append(fields, field)
 	}
-	if uint8(m.FitBaseTypeId) != basetype.Uint8Invalid {
+	if m.FitBaseTypeId != 255 {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(uint8(m.FitBaseTypeId))
 		fields = append(fields, field)
@@ -136,12 +136,12 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Accumulate)
 		fields = append(fields, field)
 	}
-	if uint16(m.FitBaseUnitId) != basetype.Uint16Invalid {
+	if m.FitBaseUnitId != typedef.FitBaseUnitInvalid {
 		field := fac.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint16(uint16(m.FitBaseUnitId))
 		fields = append(fields, field)
 	}
-	if uint16(m.NativeMesgNum) != basetype.Uint16Invalid {
+	if m.NativeMesgNum != typedef.MesgNumInvalid {
 		field := fac.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint16(uint16(m.NativeMesgNum))
 		fields = append(fields, field)

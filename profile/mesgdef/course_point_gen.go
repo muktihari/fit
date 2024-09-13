@@ -29,7 +29,7 @@ type CoursePoint struct {
 	Distance     uint32 // Scale: 100; Units: m
 	MessageIndex typedef.MessageIndex
 	Type         typedef.CoursePoint
-	Favorite     bool
+	Favorite     typedef.Bool
 
 	// Developer Fields are dynamic, can't be mapped as struct's fields.
 	// [Added since protocol version 2.0]
@@ -81,7 +81,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumCoursePoint}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -106,7 +106,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.CoursePointInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
@@ -116,7 +116,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
-	{
+	if m.Favorite < 2 {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.Favorite)
 		fields = append(fields, field)
@@ -234,7 +234,7 @@ func (m *CoursePoint) SetName(v string) *CoursePoint {
 }
 
 // SetFavorite sets Favorite value.
-func (m *CoursePoint) SetFavorite(v bool) *CoursePoint {
+func (m *CoursePoint) SetFavorite(v typedef.Bool) *CoursePoint {
 	m.Favorite = v
 	return m
 }

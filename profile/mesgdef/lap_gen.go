@@ -320,7 +320,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumLap}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
@@ -330,12 +330,12 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.Event) != basetype.EnumInvalid {
+	if m.Event != typedef.EventInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Event))
 		fields = append(fields, field)
 	}
-	if byte(m.EventType) != basetype.EnumInvalid {
+	if m.EventType != typedef.EventTypeInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.EventType))
 		fields = append(fields, field)
@@ -445,17 +445,17 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.TotalDescent)
 		fields = append(fields, field)
 	}
-	if byte(m.Intensity) != basetype.EnumInvalid {
+	if m.Intensity != typedef.IntensityInvalid {
 		field := fac.CreateField(mesg.Num, 23)
 		field.Value = proto.Uint8(byte(m.Intensity))
 		fields = append(fields, field)
 	}
-	if byte(m.LapTrigger) != basetype.EnumInvalid {
+	if m.LapTrigger != typedef.LapTriggerInvalid {
 		field := fac.CreateField(mesg.Num, 24)
 		field.Value = proto.Uint8(byte(m.LapTrigger))
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
@@ -475,7 +475,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.NormalizedPower)
 		fields = append(fields, field)
 	}
-	if uint16(m.LeftRightBalance) != basetype.Uint16Invalid {
+	if m.LeftRightBalance != typedef.LeftRightBalance100Invalid {
 		field := fac.CreateField(mesg.Num, 34)
 		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
 		fields = append(fields, field)
@@ -490,12 +490,12 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.AvgStrokeDistance)
 		fields = append(fields, field)
 	}
-	if byte(m.SwimStroke) != basetype.EnumInvalid {
+	if m.SwimStroke != typedef.SwimStrokeInvalid {
 		field := fac.CreateField(mesg.Num, 38)
 		field.Value = proto.Uint8(byte(m.SwimStroke))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 39)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
@@ -620,7 +620,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint8(m.MinHeartRate)
 		fields = append(fields, field)
 	}
-	if uint16(m.WktStepIndex) != basetype.Uint16Invalid {
+	if m.WktStepIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 71)
 		field.Value = proto.Uint16(uint16(m.WktStepIndex))
 		fields = append(fields, field)

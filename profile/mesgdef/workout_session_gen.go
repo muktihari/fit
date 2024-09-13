@@ -76,17 +76,17 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumWorkoutSession}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if byte(m.Sport) != basetype.EnumInvalid {
+	if m.Sport != typedef.SportInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
-	if byte(m.SubSport) != basetype.EnumInvalid {
+	if m.SubSport != typedef.SubSportInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
@@ -106,7 +106,7 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
-	if byte(m.PoolLengthUnit) != basetype.EnumInvalid {
+	if m.PoolLengthUnit != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
 		fields = append(fields, field)

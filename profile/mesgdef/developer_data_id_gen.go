@@ -73,7 +73,7 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint8(m.ApplicationId)
 		fields = append(fields, field)
 	}
-	if uint16(m.ManufacturerId) != basetype.Uint16Invalid {
+	if m.ManufacturerId != typedef.ManufacturerInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.ManufacturerId))
 		fields = append(fields, field)

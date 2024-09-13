@@ -73,17 +73,17 @@ func (m *FileCapabilities) ToMesg(options *Options) proto.Message {
 
 	mesg := proto.Message{Num: typedef.MesgNumFileCapabilities}
 
-	if uint16(m.MessageIndex) != basetype.Uint16Invalid {
+	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := fac.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
-	if byte(m.Type) != basetype.EnumInvalid {
+	if m.Type != typedef.FileInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
-	if uint8(m.Flags) != basetype.Uint8zInvalid {
+	if m.Flags != typedef.FileFlagsInvalid {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(uint8(m.Flags))
 		fields = append(fields, field)

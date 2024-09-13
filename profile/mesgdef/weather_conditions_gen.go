@@ -102,7 +102,7 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
-	if byte(m.WeatherReport) != basetype.EnumInvalid {
+	if m.WeatherReport != typedef.WeatherReportInvalid {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.WeatherReport))
 		fields = append(fields, field)
@@ -112,7 +112,7 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int8(m.Temperature)
 		fields = append(fields, field)
 	}
-	if byte(m.Condition) != basetype.EnumInvalid {
+	if m.Condition != typedef.WeatherStatusInvalid {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Condition))
 		fields = append(fields, field)
@@ -162,7 +162,7 @@ func (m *WeatherConditions) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Int32(m.ObservedLocationLong)
 		fields = append(fields, field)
 	}
-	if byte(m.DayOfWeek) != basetype.EnumInvalid {
+	if m.DayOfWeek != typedef.DayOfWeekInvalid {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Uint8(byte(m.DayOfWeek))
 		fields = append(fields, field)
