@@ -16,13 +16,81 @@ const ErrTypeNotSupported = errorString("type is not supported")
 // If arch is 0, marshal in Little-Endian, otherwise marshal in Big-Endian.
 func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 	// NOTE: The size of the resulting bytes should align with Sizeof.
-	switch v.Type() {
+	switch v.typ {
 	case TypeBool:
 		val := v.Bool()
 		if val > 1 {
 			b = append(b, 255)
 		} else {
 			b = append(b, byte(val))
+		}
+		return b, nil
+	case TypeInt8:
+		return append(b, uint8(v.num)), nil
+	case TypeUint8:
+		return append(b, uint8(v.num)), nil
+	case TypeInt16:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
+		}
+		return b, nil
+	case TypeUint16:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
+		}
+		return b, nil
+	case TypeInt32:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
+		}
+		return b, nil
+	case TypeUint32:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
+		}
+		return b, nil
+	case TypeInt64:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint64(b, uint64(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint64(b, uint64(v.num))
+		}
+		return b, nil
+	case TypeUint64:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint64(b, v.num)
+		} else {
+			b = binary.BigEndian.AppendUint64(b, v.num)
+		}
+		return b, nil
+	case TypeFloat32:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
+		} else {
+			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
+		}
+		return b, nil
+	case TypeFloat64:
+		if arch == LittleEndian {
+			b = binary.LittleEndian.AppendUint64(b, v.num)
+		} else {
+			b = binary.BigEndian.AppendUint64(b, v.num)
+		}
+		return b, nil
+	case TypeString:
+		val := v.String()
+		n := len(val)
+		b = append(b, val...)
+		if n == 0 || val[n-1] != 0 {
+			b = append(b, 0) // add utf-8 null-terminated string
 		}
 		return b, nil
 	case TypeSliceBool:
@@ -35,28 +103,14 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			}
 		}
 		return b, nil
-	case TypeInt8:
-		b = append(b, uint8(v.num))
-		return b, nil
 	case TypeSliceInt8:
 		vals := v.SliceInt8()
 		for i := range vals {
 			b = append(b, uint8(vals[i]))
 		}
 		return b, nil
-	case TypeUint8:
-		b = append(b, uint8(v.num))
-		return b, nil
 	case TypeSliceUint8:
-		b = append(b, v.SliceUint8()...)
-		return b, nil
-	case TypeInt16:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
-		}
-		return b, nil
+		return append(b, v.SliceUint8()...), nil
 	case TypeSliceInt16:
 		vals := v.SliceInt16()
 		if arch == LittleEndian {
@@ -67,13 +121,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			for i := range vals {
 				b = binary.BigEndian.AppendUint16(b, uint16(vals[i]))
 			}
-		}
-		return b, nil
-	case TypeUint16:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint16(b, uint16(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint16(b, uint16(v.num))
 		}
 		return b, nil
 	case TypeSliceUint16:
@@ -88,13 +135,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			}
 		}
 		return b, nil
-	case TypeInt32:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
-		}
-		return b, nil
 	case TypeSliceInt32:
 		vals := v.SliceInt32()
 		if arch == LittleEndian {
@@ -105,13 +145,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			for i := range vals {
 				b = binary.BigEndian.AppendUint32(b, uint32(vals[i]))
 			}
-		}
-		return b, nil
-	case TypeUint32:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
 		}
 		return b, nil
 	case TypeSliceUint32:
@@ -126,13 +159,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			}
 		}
 		return b, nil
-	case TypeInt64:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint64(b, uint64(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint64(b, uint64(v.num))
-		}
-		return b, nil
 	case TypeSliceInt64:
 		vals := v.SliceInt64()
 		if arch == LittleEndian {
@@ -143,13 +169,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			for i := range vals {
 				b = binary.BigEndian.AppendUint64(b, uint64(vals[i]))
 			}
-		}
-		return b, nil
-	case TypeUint64:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint64(b, v.num)
-		} else {
-			b = binary.BigEndian.AppendUint64(b, v.num)
 		}
 		return b, nil
 	case TypeSliceUint64:
@@ -164,13 +183,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			}
 		}
 		return b, nil
-	case TypeFloat32:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint32(b, uint32(v.num))
-		} else {
-			b = binary.BigEndian.AppendUint32(b, uint32(v.num))
-		}
-		return b, nil
 	case TypeSliceFloat32:
 		vals := v.SliceFloat32()
 		if arch == LittleEndian {
@@ -181,13 +193,6 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			for i := range vals {
 				b = binary.BigEndian.AppendUint32(b, math.Float32bits(vals[i]))
 			}
-		}
-		return b, nil
-	case TypeFloat64:
-		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint64(b, v.num)
-		} else {
-			b = binary.BigEndian.AppendUint64(b, v.num)
 		}
 		return b, nil
 	case TypeSliceFloat64:
@@ -202,31 +207,17 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 			}
 		}
 		return b, nil
-	case TypeString:
-		val := v.String()
-		if len(val) == 0 {
-			b = append(b, 0x00)
-			return b, nil
-		}
-		b = append(b, val...)
-		if val[len(val)-1] != '\x00' {
-			b = append(b, '\x00') // add utf-8 null-terminated string
-		}
-		return b, nil
 	case TypeSliceString:
 		vals := v.SliceString()
 		for i := range vals {
-			if len(vals[i]) == 0 {
-				b = append(b, '\x00')
-				continue
-			}
+			n := len(vals[i])
 			b = append(b, vals[i]...)
-			if vals[i][len(vals[i])-1] != '\x00' {
-				b = append(b, '\x00')
+			if n == 0 || vals[i][n-1] != 0 {
+				b = append(b, 0) // add utf-8 null-terminated string
 			}
 		}
 		if len(vals) == 0 {
-			b = append(b, '\x00')
+			b = append(b, 0) // add utf-8 null-terminated string
 		}
 		return b, nil
 	default:
