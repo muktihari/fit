@@ -224,7 +224,7 @@ func (v Value) String() string {
 	return unsafe.String((*byte)(v.ptr), v.num)
 }
 
-// SliceBool returns Value as []bool, if it's not a valid []bool value, it returns nil.
+// SliceBool returns Value as []typedef.Bool, if it's not a valid []typedef.Bool value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceBool() []typedef.Bool {
@@ -347,7 +347,7 @@ func (v Value) SliceString() []string {
 // Any returns Value's underlying value. If the underlying value is a slice, the caller takes ownership of that slice value,
 // so Value should no longer be used after this call, except the returned value is copied and the copied value is used instead.
 func (v Value) Any() any {
-	switch v.Type() {
+	switch v.typ {
 	case TypeBool:
 		return v.Bool()
 	case TypeInt8:
@@ -402,7 +402,7 @@ func (v Value) Any() any {
 
 // Align checks whether Value's type is align with given basetype.
 func (v Value) Align(t basetype.BaseType) bool {
-	switch v.Type() {
+	switch v.typ {
 	case TypeBool, TypeSliceBool:
 		return t == basetype.Enum
 	case TypeInt8, TypeSliceInt8:
@@ -439,7 +439,7 @@ func (v Value) Align(t basetype.BaseType) bool {
 func (v Value) Valid(t basetype.BaseType) bool {
 	var invalidCount int
 
-	switch v.Type() {
+	switch v.typ {
 	case TypeBool:
 		return v.num < 2 // Only 0 (false) and 1 (true) is valid
 	case TypeInt8:
@@ -471,10 +471,6 @@ func (v Value) Valid(t basetype.BaseType) bool {
 			return uint32(v.num) != basetype.Uint32zInvalid
 		}
 		return uint32(v.num) != basetype.Uint32Invalid
-	case TypeFloat32:
-		return uint32(v.num) != basetype.Float32Invalid
-	case TypeFloat64:
-		return v.num != basetype.Float64Invalid
 	case TypeInt64:
 		return int64(v.num) != basetype.Sint64Invalid
 	case TypeUint64:
@@ -482,6 +478,10 @@ func (v Value) Valid(t basetype.BaseType) bool {
 			return v.num != basetype.Uint64zInvalid
 		}
 		return v.num != basetype.Uint64Invalid
+	case TypeFloat32:
+		return uint32(v.num) != basetype.Float32Invalid
+	case TypeFloat64:
+		return v.num != basetype.Float64Invalid
 	case TypeString:
 		s := v.String()
 		return s != basetype.StringInvalid && s != "\x00"
@@ -565,22 +565,6 @@ func (v Value) Valid(t basetype.BaseType) bool {
 			}
 		}
 		return invalidCount != len(vals)
-	case TypeSliceFloat32:
-		vals := v.SliceFloat32()
-		for i := range vals {
-			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
-	case TypeSliceFloat64:
-		vals := v.SliceFloat64()
-		for i := range vals {
-			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
-				invalidCount++
-			}
-		}
-		return invalidCount != len(vals)
 	case TypeSliceInt64:
 		vals := v.SliceInt64()
 		for i := range vals {
@@ -602,6 +586,22 @@ func (v Value) Valid(t basetype.BaseType) bool {
 				if vals[i] == basetype.Uint64Invalid {
 					invalidCount++
 				}
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceFloat32:
+		vals := v.SliceFloat32()
+		for i := range vals {
+			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
+				invalidCount++
+			}
+		}
+		return invalidCount != len(vals)
+	case TypeSliceFloat64:
+		vals := v.SliceFloat64()
+		for i := range vals {
+			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
+				invalidCount++
 			}
 		}
 		return invalidCount != len(vals)
@@ -913,13 +913,11 @@ func Sizeof(val Value) int {
 	switch val.typ {
 	case TypeString:
 		s := val.String()
-		if len(s) == 0 {
-			return 1 * sizes[TypeString] // utf-8 null terminated string
+		n := len(s)
+		if n == 0 || s[n-1] != '\x00' {
+			n += 1
 		}
-		if l := len(s); l > 0 && s[l-1] == '\x00' {
-			return l * sizes[TypeString]
-		}
-		return (len(s) + 1) * sizes[TypeString]
+		return n * sizes[TypeString]
 	case TypeSliceBool:
 		return int(val.num) * sizes[TypeBool]
 	case TypeSliceInt8:
@@ -946,15 +944,11 @@ func Sizeof(val Value) int {
 		vs := val.SliceString()
 		var size int
 		for i := range vs {
-			if len(vs[i]) == 0 {
-				size += 1 // utf-8 null terminated string
-				continue
+			n := len(vs[i])
+			if n == 0 || vs[i][n-1] != '\x00' {
+				n += 1 // utf-8 null terminated string
 			}
-			if l := len(vs[i]); l > 0 && vs[i][l-1] == '\x00' {
-				size += l
-				continue
-			}
-			size += len(vs[i]) + 1
+			size += n
 		}
 		if size == 0 {
 			return 1 * sizes[TypeString] // utf-8 null terminated string
