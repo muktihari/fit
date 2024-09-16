@@ -42,6 +42,7 @@ const (
 	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
 
 	errInvalidBaseType = errorString("invalid basetype")
+	errMissingFileId   = errorString("missing file_id")
 )
 
 // Decoder is FIT file decoder. See New() for details.
@@ -58,11 +59,10 @@ type Decoder struct {
 
 	options options
 
-	once              sync.Once // It is used to invoke decodeFileHeader exactly once. Must be reassigned on init/reset.
-	cur               uint32    // The current byte position relative to bytes of the messages, reset on next chained FIT file.
-	timestamp         uint32    // Active timestamp
-	lastTimeOffset    byte      // Last time offset
-	sequenceCompleted bool      // True after a decode is completed. Reset to false on Next().
+	once           sync.Once // It is used to invoke decodeFileHeader exactly once. Must be reassigned on init/reset.
+	cur            uint32    // The current byte position relative to bytes of the messages, reset on next chained FIT file.
+	timestamp      uint32    // Active timestamp
+	lastTimeOffset byte      // Last time offset
 
 	// FIT File Representation
 	fileHeader proto.FileHeader
@@ -241,9 +241,9 @@ func (d *Decoder) reset() {
 	d.cur = 0
 	d.timestamp = 0
 	d.lastTimeOffset = 0
-	d.sequenceCompleted = false
 	d.err = nil
 	d.fileHeader = proto.FileHeader{}
+	d.messages = nil
 	d.crc = 0
 	d.fileId = nil
 	d.developerDataIndexes = d.developerDataIndexes[:0]
@@ -353,10 +353,15 @@ func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return nil, d.err
 	}
-	for d.fileId == nil {
+	for len(d.messages) == 0 {
 		if d.err = d.decodeMessage(); d.err != nil {
 			return nil, d.err
 		}
+	}
+	if d.fileId == nil {
+		mesg := &d.messages[0]
+		return nil, fmt.Errorf("expect file_id as first mesg, got: %s(%d): %w",
+			mesg.Num, mesg.Num, errMissingFileId)
 	}
 	return d.fileId, nil
 }
@@ -366,11 +371,9 @@ func (d *Decoder) Next() bool {
 	if d.err != nil {
 		return false
 	}
-	if !d.sequenceCompleted {
+	if d.n == 0 {
 		return true
 	}
-	d.sequenceCompleted = false
-	// err is saved in the func, any exported will call this func anyway.
 	return d.decodeFileHeaderOnce() == nil
 }
 
@@ -404,7 +407,6 @@ func (d *Decoder) Decode() (*proto.FIT, error) {
 		CRC:        d.crc,
 	}
 	d.reset()
-	d.sequenceCompleted = true
 	return fit, nil
 }
 
@@ -448,7 +450,6 @@ func (d *Decoder) Discard() error {
 		return d.err
 	}
 	d.reset()
-	d.sequenceCompleted = true
 	return d.err
 }
 
@@ -1020,7 +1021,6 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 		CRC:        d.crc,
 	}
 	d.reset()
-	d.sequenceCompleted = true
 	return fit, nil
 }
 

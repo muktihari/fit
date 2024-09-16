@@ -432,6 +432,47 @@ func TestPeekFileId(t *testing.T) {
 			fileId: mesgdef.NewFileId(&fit.Messages[0]),
 			err:    io.EOF,
 		},
+		{
+			name: "peek file id returned non file_id message",
+			r: func() io.Reader {
+				fileId := mesgdef.NewRecord(nil).SetDistance(0)
+				mesg := fileId.ToMesg(nil)
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
+				mesgDef, _ := proto.NewMessageDefinition(&mesg)
+				mesgDefb, _ := mesgDef.MarshalAppend(nil)
+
+				fileHeaderb, _ := (&proto.FileHeader{
+					Size:            12,
+					ProtocolVersion: proto.V1,
+					ProfileVersion:  profile.Version,
+					DataSize:        uint32(len(mesgDefb) + len(mesgb)),
+					DataType:        proto.DataTypeFIT,
+				}).MarshalAppend(nil)
+
+				buf := append(mesgDefb, mesgb...)
+				crc := crc16.New(nil)
+				crc.Write(buf)
+
+				buf = append(fileHeaderb, buf...)
+				buf = binary.LittleEndian.AppendUint16(buf, crc.Sum16())
+
+				buf, cur := buf, 0
+				return fnReader(func(b []byte) (n int, err error) {
+					m := len(buf)
+					if cur >= m { // only decode header
+						return 0, io.EOF
+					}
+					if cur+len(b) < m {
+						m = cur + len(b)
+					}
+					n = copy(b, buf[cur:m])
+					cur += n
+					return
+				})
+			}(),
+			fileId: nil,
+			err:    errMissingFileId,
+		},
 	}
 
 	for i, tc := range tt {
@@ -782,13 +823,10 @@ func TestDiscard(t *testing.T) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
 			if err != nil {
-				if dec.sequenceCompleted {
-					t.Fatalf("sequenceCompleted should be false")
-				}
 				return
 			}
-			if !dec.sequenceCompleted {
-				t.Fatalf("sequenceCompleted should be true")
+			if dec.cur != 0 || dec.fileHeader.DataSize != 0 {
+				t.Fatalf("dec.cur and dec.fileHeader.DataSize should be resetted")
 			}
 		})
 	}
