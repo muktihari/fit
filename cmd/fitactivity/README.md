@@ -216,8 +216,8 @@ Flags:
   -o, --out  string    combine output file
 
   (optional):
-  -i, --interleave  uint8    max interleave for message definition [valid: 0-15, default: 15]
-  -c, --compress    bool     compress timestamp into message header [default: false; this overrides interleave]
+  -i, --interleave  uint8    normal header with valid local message type 0-15 [default: 15]
+  -c, --compress    uint8    compressed timestamp header with valid local message type 0-3 [default: not selected]
 
 Subcommand Flags (only if subcommand is provided):
   conceal: (select at least one)
@@ -231,14 +231,14 @@ Subcommand Flags (only if subcommand is provided):
 
   remove: (select at least one)
    --unknown   bool       remove unknown messages
-   --nums      string     remove message numbers (value separated by comma)
+   --mesgnums  string     remove message numbers (value separated by comma)
    --devdata   bool       remove developer data
 
 Examples:
   fitactivity combine -o result.fit part1.fit part2.fit
   fitactivity combine reduce -o result.fit --rdp 0.0001 part1.fit part2.fit
   fitactivity combine conceal -o result.fit --first 1000 part1.fit part2.fit
-  fitactivity combine remove -o result.fit --unknown --nums 160,164 part1.fit part2.fit
+  fitactivity combine remove -o result.fit --unknown --mesgnums 160,164 part1.fit part2.fit
   fitactivity combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
 ```
 
@@ -265,8 +265,8 @@ Flags:
     --end           uint32     conceal distance: last x meters
 
   (optional):
-  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
-  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+  -i, --interleave  uint8      normal header with valid local message type 0-15 [default: 15]
+  -c, --compress    uint8      compressed timestamp header with valid local message type 0-3 [default: not selected]
 
 Examples:
   fitactivity conceal --first 1000 a.fit b.fit
@@ -299,8 +299,8 @@ Flags:
     --time          uint32     reduce method: time interval in seconds
 
   (optional):
-  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
-  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+  -i, --interleave  uint8      normal header with valid local message type 0-15 [default: 15]
+  -c, --compress    uint8      compressed timestamp header with valid local message type 0-3 [default: not selected]
 
 
 Examples:
@@ -327,17 +327,17 @@ Usage:
 Flags:
   (select at least one):
     --unknown   bool       remove unknown messages
-    --nums      string     remove message numbers (value separated by comma)
+    --mesgnums  string     remove message numbers (value separated by comma)
     --devdata   bool       remove developer data
 
   (optional):
-  -i, --interleave  uint8      max interleave for message definition [valid: 0-15, default: 15]
-  -c, --compress    bool       compress timestamp into message header [default: false; this overrides interleave]
+  -i, --interleave  uint8      normal header with valid local message type 0-15 [default: 15]
+  -c, --compress    uint8      compressed timestamp header with valid local message type 0-3 [default: not selected]
 
 
 Examples:
   fitactivity remove --unknown a.fit b.fit
-  fitactivity remove --nums 160,162 a.fit b.fit
+  fitactivity remove --mesgnums 160,162 a.fit b.fit
   fitactivity remove --devdata a.fit b.fit
-  fitactivity remove --unknown --nums 160,162 --devdata a.fit b.fit
+  fitactivity remove --unknown --mesgnums 160,162 --devdata a.fit b.fit
 ```

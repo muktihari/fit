@@ -102,25 +102,25 @@ func main() {
 	switch command {
 	case "combine":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, combine(ctx, fs, args[1:]))
+		handleError(fs, command, combine(ctx, fs, args[1:]))
 	case "conceal":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, conceal(ctx, fs, args[1:]))
+		handleError(fs, command, conceal(ctx, fs, args[1:]))
 	case "reduce":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, reduce(ctx, fs, args[1:]))
+		handleError(fs, command, reduce(ctx, fs, args[1:]))
 	case "remove":
 		fs := flag.NewFlagSet(command, flag.ExitOnError)
-		printerror(fs, command, remove(ctx, fs, args[1:]))
+		handleError(fs, command, remove(ctx, fs, args[1:]))
 	default:
-		printerror(fs, command, fmt.Errorf("command provided but not defined: %s", command))
+		handleError(fs, command, fmt.Errorf("command provided but not defined: %s", command))
 	}
 
 	fmt.Fprintf(os.Stderr, "~ DONE! in %s\n", time.Since(begin))
 }
 
-// printerror prints error and exit if err != nil.
-func printerror(fs *flag.FlagSet, command string, err error) {
+// handleError prints error and exit if err != nil, do nothing when err == nil.
+func handleError(fs *flag.FlagSet, command string, err error) {
 	if err == nil {
 		return
 	}
@@ -139,8 +139,8 @@ func printerror(fs *flag.FlagSet, command string, err error) {
 
 const (
 	defaultInterleave     = 15
-	interleaveDesc        = "max interleave for message definition [valid: 0-15, default: 15]"
-	compressDesc          = "compress timestamp into message header [default: false; this overrides interleave]"
+	interleaveDesc        = "normal header with valid local message type 0-15 [default: 15]"
+	compressDesc          = "compressed timestamp header with valid local message type 0-3 [default: not selected]"
 	combineOutDesc        = "combine output file"
 	concealFirstDesc      = "conceal distance: first x meters"
 	concealLastDesc       = "conceal distance: last x meters"
@@ -169,7 +169,7 @@ Flags:
 
   (optional):
   -i, --interleave  uint8    ` + interleaveDesc + `
-  -c, --compress    bool     ` + compressDesc + `
+  -c, --compress    uint8    ` + compressDesc + `
 
 Subcommand Flags (only if subcommand is provided):
   conceal: (select at least one)
@@ -183,14 +183,14 @@ Subcommand Flags (only if subcommand is provided):
 
   remove: (select at least one)
    --unknown   bool       ` + removeUnknownDesc + `
-   --nums      string     ` + removeMesgNumsDesc + `
+   --mesgnums  string     ` + removeMesgNumsDesc + `
    --devdata   bool       ` + removeDevDataDesc + `
 
 Examples:
   ` + cli + ` combine -o result.fit part1.fit part2.fit
   ` + cli + ` combine reduce -o result.fit --rdp 0.0001 part1.fit part2.fit
   ` + cli + ` combine conceal -o result.fit --first 1000 part1.fit part2.fit
-  ` + cli + ` combine remove -o result.fit --unknown --nums 160,164 part1.fit part2.fit
+  ` + cli + ` combine remove -o result.fit --unknown --mesgnums 160,164 part1.fit part2.fit
   ` + cli + ` combine conceal reduce -o result.fit --last 1000 --time 5 part1.fit part2.fit
 `
 
@@ -226,9 +226,9 @@ loop:
 	fs.UintVar(&interleave, "i", defaultInterleave, interleaveDesc)
 	fs.UintVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
-	var compress bool
-	fs.BoolVar(&compress, "c", false, compressDesc)
-	fs.BoolVar(&compress, "compress", false, compressDesc)
+	var compress uint
+	fs.UintVar(&compress, "c", 0, compressDesc)
+	fs.UintVar(&compress, "compress", 0, compressDesc)
 
 	const flagNameRdp = "rdp"
 	var reduceByRdp float64
@@ -254,9 +254,9 @@ loop:
 	var removeUnknown bool
 	fs.BoolVar(&removeUnknown, flagNameRemoveUnknown, false, removeUnknownDesc)
 
-	const flagNameRemoveMesgNums = "nums"
-	var removeNums string
-	fs.StringVar(&removeNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
+	const flagNameRemoveMesgNums = "mesgnums"
+	var removeMesgNums string
+	fs.StringVar(&removeMesgNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
 
 	const flagNameRemoveDevData = "devdata"
 	var removeDevData bool
@@ -291,18 +291,18 @@ loop:
 		return fmt.Errorf("conceal: no distance is provided: %w", errBadArgument)
 	}
 
-	removeMesgNums := make(map[typedef.MesgNum]struct{})
+	removeMesgNumsSet := make(map[typedef.MesgNum]struct{})
 	if subcommandProvided(subcommands, subcommandRemove) {
 		if countSelectedFlag(fs, flagNameRemoveUnknown, flagNameRemoveMesgNums, flagNameRemoveDevData) == 0 {
 			return fmt.Errorf("remove: argument is provided: %w", errBadArgument)
 		}
-		parts := strings.Split(removeNums, ",")
+		parts := strings.Split(removeMesgNums, ",")
 		for _, part := range parts {
 			u16, err := strconv.ParseUint(part, 10, 16)
 			if err != nil {
 				return err
 			}
-			removeMesgNums[typedef.MesgNum(u16)] = struct{}{}
+			removeMesgNumsSet[typedef.MesgNum(u16)] = struct{}{}
 		}
 	}
 
@@ -391,8 +391,8 @@ loop:
 			if removeUnknown {
 				opts = append(opts, remover.WithRemoveUnknown())
 			}
-			if len(removeMesgNums) > 0 {
-				opts = append(opts, remover.WithRemoveMesgNums(removeMesgNums))
+			if len(removeMesgNumsSet) > 0 {
+				opts = append(opts, remover.WithRemoveMesgNums(removeMesgNumsSet))
 			}
 			if removeDevData {
 				opts = append(opts, remover.WithRemoveDeveloperData())
@@ -401,7 +401,7 @@ loop:
 			prevLen := len(fit.Messages)
 
 			msg := fmt.Sprintf("Removing [unknown: %t, nums: %s, devdata: %t]",
-				removeUnknown, removeNums, removeDevData)
+				removeUnknown, removeMesgNums, removeDevData)
 			verboserun(msg, func() {
 				remover.Remove(fit, opts...)
 			})
@@ -417,9 +417,9 @@ loop:
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
-	if compress {
+	if countSelectedFlag(fs, "c", "compress") > 0 {
 		headerInfo = "compress"
-		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
 	select {
@@ -459,7 +459,7 @@ Flags:
 
   (optional):
   -i, --interleave  uint8      ` + interleaveDesc + `
-  -c, --compress    bool       ` + compressDesc + `
+  -c, --compress    uint8      ` + compressDesc + `
 
 Examples:
   ` + cli + ` conceal --first 1000 a.fit b.fit
@@ -473,9 +473,9 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
 	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
-	var compress bool
-	fs.BoolVar(&compress, "c", false, compressDesc)
-	fs.BoolVar(&compress, "compress", false, compressDesc)
+	var compress uint
+	fs.UintVar(&compress, "c", 0, compressDesc)
+	fs.UintVar(&compress, "compress", 0, compressDesc)
 
 	const flagNameFirst = "first"
 	var first uint
@@ -512,9 +512,9 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
-	if compress {
+	if countSelectedFlag(fs, "c", "compress") > 0 {
 		headerInfo = "compress"
-		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
 	fmt.Fprintf(os.Stderr, "- Concealing %d file(s) [first: %s m; last: %s m]\n",
@@ -619,7 +619,7 @@ Flags:
 
   (optional):
   -i, --interleave  uint8      ` + interleaveDesc + `
-  -c, --compress    bool       ` + compressDesc + `
+  -c, --compress    uint8      ` + compressDesc + `
 
 
 Examples:
@@ -635,9 +635,9 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
 	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
-	var compress bool
-	fs.BoolVar(&compress, "c", false, compressDesc)
-	fs.BoolVar(&compress, "compress", false, compressDesc)
+	var compress uint
+	fs.UintVar(&compress, "c", 0, compressDesc)
+	fs.UintVar(&compress, "compress", 0, compressDesc)
 
 	const flagNameRdp = "rdp"
 	var reduceByRdp float64
@@ -700,9 +700,9 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
-	if compress {
+	if countSelectedFlag(fs, "c", "compress") > 0 {
 		headerInfo = "compress"
-		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
 	fmt.Fprintf(os.Stderr, "- Reducing %d file(s) [%s]\n",
@@ -802,19 +802,19 @@ Usage:
 Flags:
   (select at least one):
     --unknown   bool       ` + removeUnknownDesc + `
-    --nums      string     ` + removeMesgNumsDesc + `
+    --mesgnums  string     ` + removeMesgNumsDesc + `
     --devdata   bool       ` + removeDevDataDesc + `
 
   (optional):
   -i, --interleave  uint8      ` + interleaveDesc + `
-  -c, --compress    bool       ` + compressDesc + `
+  -c, --compress    uint8      ` + compressDesc + `
 
 
 Examples:
   ` + cli + ` remove --unknown a.fit b.fit
-  ` + cli + ` remove --nums 160,162 a.fit b.fit
+  ` + cli + ` remove --mesgnums 160,162 a.fit b.fit
   ` + cli + ` remove --devdata a.fit b.fit
-  ` + cli + ` remove --unknown --nums 160,162 --devdata a.fit b.fit
+  ` + cli + ` remove --unknown --mesgnums 160,162 --devdata a.fit b.fit
 `
 
 func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
@@ -824,17 +824,17 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
 	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
-	var compress bool
-	fs.BoolVar(&compress, "c", false, compressDesc)
-	fs.BoolVar(&compress, "compress", false, compressDesc)
+	var compress uint
+	fs.UintVar(&compress, "c", 0, compressDesc)
+	fs.UintVar(&compress, "compress", 0, compressDesc)
 
 	const flagNameRemoveUnknown = "unknown"
 	var removeUnknown bool
 	fs.BoolVar(&removeUnknown, flagNameRemoveUnknown, false, removeUnknownDesc)
 
 	const flagNameRemoveMesgNums = "nums"
-	var mesgNums string
-	fs.StringVar(&mesgNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
+	var removeMesgNums string
+	fs.StringVar(&removeMesgNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
 
 	const flagNameRemoveDevData = "devdata"
 	var removeDevData bool
@@ -852,14 +852,14 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 		return fmt.Errorf("please select (only) one method: %w", errBadArgument)
 	}
 
-	parts := strings.Split(mesgNums, ",")
-	removeMesgNums := make(map[typedef.MesgNum]struct{})
+	parts := strings.Split(removeMesgNums, ",")
+	removeMesgNumsSet := make(map[typedef.MesgNum]struct{})
 	for _, part := range parts {
 		u16, err := strconv.ParseUint(part, 10, 16)
 		if err != nil {
 			return err
 		}
-		removeMesgNums[typedef.MesgNum(u16)] = struct{}{}
+		removeMesgNumsSet[typedef.MesgNum(u16)] = struct{}{}
 	}
 
 	if interleave < 0 || interleave > 15 {
@@ -877,22 +877,22 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
-	if compress {
+	if countSelectedFlag(fs, "c", "compress") > 0 {
 		headerInfo = "compress"
-		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
 	var nameSuffix string
 	if removeUnknown {
 		nameSuffix = "unknown"
 	}
-	if mesgNums != "" {
+	if removeMesgNums != "" {
 		nameSuffix = fmt.Sprintf("%s_%s",
-			nameSuffix, strings.ReplaceAll(mesgNums, ",", "_"))
+			nameSuffix, strings.ReplaceAll(removeMesgNums, ",", "_"))
 	}
 
 	fmt.Fprintf(os.Stderr, "- Removing %d file(s) [unknown: %t, nums: %s, devdata: %t]\n",
-		len(files), removeUnknown, mesgNums, removeDevData)
+		len(files), removeUnknown, removeMesgNums, removeDevData)
 
 	var dec = decoder.New(nil)
 	var enc = encoder.New(nil)
@@ -934,8 +934,8 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 				if removeUnknown {
 					opts = append(opts, remover.WithRemoveUnknown())
 				}
-				if len(removeMesgNums) > 0 {
-					opts = append(opts, remover.WithRemoveMesgNums(removeMesgNums))
+				if len(removeMesgNumsSet) > 0 {
+					opts = append(opts, remover.WithRemoveMesgNums(removeMesgNumsSet))
 				}
 				if removeDevData {
 					opts = append(opts, remover.WithRemoveDeveloperData())
