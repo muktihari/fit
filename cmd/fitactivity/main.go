@@ -37,27 +37,31 @@ const (
 	errPrintUsageAndExit = errorString("print usage and exit")
 )
 
-// NOTE: This variables can be changed during build using -ldflags.
+// NOTE: This variable can be changed during build using -ldflags.
 // e.g. go build -ldflags="-X 'main.version=$(git describe --tags)'" -o fitactivity main.go
-var (
-	cli     = "fitactivity"
-	version = "dev"
-)
+var version = "dev"
 
 const (
-	combineDesc = "combine multiple activities into one continuous activity"
-	concealDesc = "conceal first or last x meters GPS positions for privacy"
-	reduceDesc  = `reduce the size of record messages, available methods:
-             1. Based on GPS points using RDP [Ramer-Douglas-Peucker]
-             2. Based on distance interval in meters
-             3. Based on time interval in seconds`
-	removeDesc = "remove messages based on given message numbers and other parameters"
+	cli = "fitactivity"
+
+	combineDesc              = "combine multiple activities into one continuous activity"
+	concealDesc              = "conceal first or last x meters GPS positions for privacy"
+	reduceDesc               = "reduce the size of record messages, available methods:"
+	reduceMethodRDPDesc      = "1. Based on GPS points using RDP [Ramer-Douglas-Peucker]"
+	reduceMethodDistanceDesc = "2. Based on distance interval in meters"
+	reduceMethodTimeDesc     = "3. Based on time interval in seconds`"
+	removeDesc               = "remove messages based on given message numbers and other parameters"
+
+	moreInfo    = "More info: https://github.com/muktihari/fit"
+	sponsorship = " ✨ Is this helpful? Buy me a coffee 🍵 https://github.com/sponsors/muktihari"
 
 	perm = 0o644
 )
 
-var mainUsage = `About:
+const mainUsage = `About:
   ` + cli + ` is a program to manage FIT activity files based on provided command.
+
+  ` + moreInfo + `
 	
 Usage:
   ` + cli + ` [command] 
@@ -71,6 +75,7 @@ Available Commands:
 Flags:
   -h, --help       Print help
   -v, --version    Print version
+  
 `
 
 func main() {
@@ -116,7 +121,8 @@ func main() {
 		handleError(fs, command, fmt.Errorf("command provided but not defined: %s", command))
 	}
 
-	fmt.Fprintf(os.Stderr, "~ DONE! in %s\n", time.Since(begin))
+	fmt.Fprintf(os.Stdout, "~ DONE! in %s\n\n", time.Since(begin))
+	fmt.Fprintln(os.Stdout, sponsorship)
 }
 
 // handleError prints error and exit if err != nil, do nothing when err == nil.
@@ -130,7 +136,7 @@ func handleError(fs *flag.FlagSet, command string, err error) {
 	} else if errors.Is(err, errPrintUsageAndExit) {
 		fs.Usage()
 	} else if errors.Is(err, context.Canceled) {
-		fmt.Fprintf(os.Stderr, "~ %s: %v\n", command, err)
+		fmt.Fprintf(os.Stdout, "~ %s: %v\n", command, err)
 	} else {
 		fmt.Fprintf(os.Stderr, "~ %s: error: %v\n", command, err)
 	}
@@ -152,15 +158,20 @@ const (
 	removeDevDataDesc     = "remove developer data"
 )
 
-var combineUsage = `About:
+const combineUsage = `About:
   ` + combineDesc + `
 
 Usage:
   ` + cli + ` combine [subcommands] [flags] [files]
 
+  ` + moreInfo + `
+
 Available Subcommands (optional):
   conceal    ` + concealDesc + `
   reduce     ` + reduceDesc + `
+             ` + reduceMethodRDPDesc + `
+             ` + reduceMethodDistanceDesc + `
+             ` + reduceMethodTimeDesc + `
   remove     ` + removeDesc + `
 
 Flags:
@@ -278,6 +289,10 @@ loop:
 		return fmt.Errorf("interleave: valid value is between 0 to 15, got: %d: %w", interleave, errBadArgument)
 	}
 
+	if compress > 3 {
+		return fmt.Errorf("compress: valid value is between 0 to 3, got: %d: %w", compress, errBadArgument)
+	}
+
 	if subcommandProvided(subcommands, subcommandReduce) {
 		if countSelectedFlag(fs, flagNameRdp, flagNameDistance, flagNameTime) != 1 {
 			return fmt.Errorf("reduce: please select (only) one method: %w", errBadArgument)
@@ -384,7 +399,7 @@ loop:
 				return err
 			}
 
-			fmt.Fprintf(os.Stderr, "  # messages are reduced from %s into %s\n",
+			fmt.Fprintf(os.Stdout, "  # messages are reduced from %s into %s\n",
 				formatThousand(prevLen), formatThousand(len(fit.Messages)))
 		case subcommandRemove:
 			var opts []remover.Option
@@ -410,7 +425,7 @@ loop:
 				return err
 			}
 
-			fmt.Fprintf(os.Stderr, "  # messages are removed from %s into %s\n",
+			fmt.Fprintf(os.Stdout, "  # messages are removed from %s into %s\n",
 				formatThousand(prevLen), formatThousand(len(fit.Messages)))
 		}
 	}
@@ -418,7 +433,7 @@ loop:
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if countSelectedFlag(fs, "c", "compress") > 0 {
-		headerInfo = "compress"
+		headerInfo = fmt.Sprintf("compress: %d", compress)
 		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
@@ -446,8 +461,10 @@ loop:
 	return err
 }
 
-var concealUsage = `About:
+const concealUsage = `About:
   ` + concealDesc + `
+
+  ` + moreInfo + `
 
 Usage:
   ` + cli + ` conceal [flags] [files]
@@ -469,9 +486,9 @@ Examples:
 func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, concealUsage) }
 
-	var interleave int
-	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
-	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
+	var interleave uint
+	fs.UintVar(&interleave, "i", defaultInterleave, interleaveDesc)
+	fs.UintVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
 	var compress uint
 	fs.UintVar(&compress, "c", 0, compressDesc)
@@ -497,8 +514,12 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 		return fmt.Errorf("conceal: no distance is specified: %w", errBadArgument)
 	}
 
-	if interleave < 0 || interleave > 15 {
+	if interleave > 15 {
 		return fmt.Errorf("interleave: valid value is between 0 to 15, got: %d: %w", interleave, errBadArgument)
+	}
+
+	if compress > 3 {
+		return fmt.Errorf("compress: valid value is between 0 to 3, got: %d: %w", compress, errBadArgument)
 	}
 
 	files := fs.Args()
@@ -513,11 +534,11 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if countSelectedFlag(fs, "c", "compress") > 0 {
-		headerInfo = "compress"
+		headerInfo = fmt.Sprintf("compress: %d", compress)
 		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
-	fmt.Fprintf(os.Stderr, "- Concealing %d file(s) [first: %s m; last: %s m]\n",
+	fmt.Fprintf(os.Stdout, "- Concealing %d file(s) [first: %s m; last: %s m]\n",
 		len(files), formatThousand(int(first)), formatThousand(int(last)))
 
 	var dec = decoder.New(nil)
@@ -595,18 +616,13 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	return nil
 }
 
-func trimSpaceAddPaddingPerLine(s string, paddingLeft int) string {
-	var b strings.Builder
-	for _, v := range strings.Split(s, "\n") {
-		b.WriteString(strings.Repeat(" ", paddingLeft))
-		b.WriteString(strings.TrimSpace(v))
-		b.WriteString("\n")
-	}
-	return b.String()
-}
+const reduceUsage = `About:
+ ` + reduceDesc + `
+ ` + reduceMethodRDPDesc + `
+ ` + reduceMethodDistanceDesc + `
+ ` + reduceMethodTimeDesc + `
 
-var reduceUsage = `About:
-` + trimSpaceAddPaddingPerLine(reduceDesc, 2) + `
+ ` + moreInfo + `
 
 Usage:
   ` + cli + ` reduce [flags] [files]
@@ -631,9 +647,9 @@ Examples:
 func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, reduceUsage) }
 
-	var interleave int
-	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
-	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
+	var interleave uint
+	fs.UintVar(&interleave, "i", defaultInterleave, interleaveDesc)
+	fs.UintVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
 	var compress uint
 	fs.UintVar(&compress, "c", 0, compressDesc)
@@ -667,8 +683,12 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 		return fmt.Errorf("input value could not be zero: %w", errBadArgument)
 	}
 
-	if interleave < 0 || interleave > 15 {
+	if interleave > 15 {
 		return fmt.Errorf("interleave: valid value is between 0 to 15, got: %d: %w", interleave, errBadArgument)
+	}
+
+	if compress > 3 {
+		return fmt.Errorf("compress: valid value is between 0 to 3, got: %d: %w", compress, errBadArgument)
 	}
 
 	files := fs.Args()
@@ -701,11 +721,11 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if countSelectedFlag(fs, "c", "compress") > 0 {
-		headerInfo = "compress"
+		headerInfo = fmt.Sprintf("compress: %d", compress)
 		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
-	fmt.Fprintf(os.Stderr, "- Reducing %d file(s) [%s]\n",
+	fmt.Fprintf(os.Stdout, "- Reducing %d file(s) [%s]\n",
 		len(files), methodInfo)
 
 	var dec = decoder.New(nil)
@@ -756,7 +776,7 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 			return err
 		}
 		for _, msg := range msgs {
-			fmt.Fprintf(os.Stderr, "      %s\n", msg)
+			fmt.Fprintf(os.Stdout, "      %s\n", msg)
 		}
 
 		select {
@@ -793,8 +813,10 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	return nil
 }
 
-var removeUsage = `About:
+const removeUsage = `About:
   ` + removeDesc + `
+
+  ` + moreInfo + `
 
 Usage:
   ` + cli + ` remove [flags] [files]
@@ -820,9 +842,9 @@ Examples:
 func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	fs.Usage = func() { fmt.Fprint(os.Stderr, removeUsage) }
 
-	var interleave int
-	fs.IntVar(&interleave, "i", defaultInterleave, interleaveDesc)
-	fs.IntVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
+	var interleave uint
+	fs.UintVar(&interleave, "i", defaultInterleave, interleaveDesc)
+	fs.UintVar(&interleave, "interleave", defaultInterleave, interleaveDesc)
 
 	var compress uint
 	fs.UintVar(&compress, "c", 0, compressDesc)
@@ -862,8 +884,12 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 		removeMesgNumsSet[typedef.MesgNum(u16)] = struct{}{}
 	}
 
-	if interleave < 0 || interleave > 15 {
+	if interleave > 15 {
 		return fmt.Errorf("interleave: valid value is between 0 to 15, got: %d: %w", interleave, errBadArgument)
+	}
+
+	if compress > 3 {
+		return fmt.Errorf("compress: valid value is between 0 to 3, got: %d: %w", compress, errBadArgument)
 	}
 
 	files := fs.Args()
@@ -878,7 +904,7 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
 	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if countSelectedFlag(fs, "c", "compress") > 0 {
-		headerInfo = "compress"
+		headerInfo = fmt.Sprintf("compress: %d", compress)
 		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, byte(compress))
 	}
 
@@ -891,7 +917,7 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 			nameSuffix, strings.ReplaceAll(removeMesgNums, ",", "_"))
 	}
 
-	fmt.Fprintf(os.Stderr, "- Removing %d file(s) [unknown: %t, nums: %s, devdata: %t]\n",
+	fmt.Fprintf(os.Stdout, "- Removing %d file(s) [unknown: %t, nums: %s, devdata: %t]\n",
 		len(files), removeUnknown, removeMesgNums, removeDevData)
 
 	var dec = decoder.New(nil)
@@ -953,7 +979,7 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 			return err
 		}
 		for _, msg := range msgs {
-			fmt.Fprintf(os.Stderr, "      %s\n", msg)
+			fmt.Fprintf(os.Stdout, "      %s\n", msg)
 		}
 
 		select {
@@ -993,9 +1019,9 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 // verboserun wraps and runs fn with printing msg and elapsed time of the running process.
 func verboserun(msg string, fn func()) {
 	begin := time.Now()
-	fmt.Fprintf(os.Stderr, "- %-52s ", msg)
+	fmt.Fprintf(os.Stdout, "- %-52s ", msg)
 	fn()
-	fmt.Fprintf(os.Stderr, "[took: %s]\n", time.Since(begin))
+	fmt.Fprintf(os.Stdout, "[took: %s]\n", time.Since(begin))
 }
 
 func countSelectedFlag(fs *flag.FlagSet, flagNames ...string) (count int) {
