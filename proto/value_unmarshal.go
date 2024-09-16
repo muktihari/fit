@@ -250,7 +250,7 @@ func utf8String(b []byte) string {
 	for len(b) > 0 {
 		r, size := utf8.DecodeRune(b)
 		if r != utf8.RuneError {
-			buf = append(buf, byte(r)) // normal append as r should be valid now
+			buf = utf8.AppendRune(buf, r)
 		}
 		b = b[size:]
 	}
