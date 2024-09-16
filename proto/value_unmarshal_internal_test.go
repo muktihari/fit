@@ -5,6 +5,7 @@
 package proto
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -18,6 +19,8 @@ func TestTrimRightZero(t *testing.T) {
 		{str: "Open Water", expected: "Open Water"},
 		{str: "Open Water\x00", expected: "Open Water"},
 		{str: "Open Water\x00\x00", expected: "Open Water"},
+		{str: "Walk or jog lightly.\x00��", expected: "Walk or jog lightly."},
+		{str: "Walk or jog lightly.��", expected: "Walk or jog lightly.��"},
 	}
 
 	for _, tc := range tt {
@@ -37,6 +40,7 @@ func BenchmarkTrimRightZero(b *testing.B) {
 		_ = trimRightZero([]byte("Open Water"))
 		_ = trimRightZero([]byte("Open Water\x00"))
 		_ = trimRightZero([]byte("Open Water\x00\x00"))
+		_ = trimRightZero([]byte("Walk or jog lightly.\x00��"))
 	}
 }
 
@@ -45,15 +49,18 @@ func TestUTF8String(t *testing.T) {
 		in  []byte
 		out string
 	}{
-		{in: []byte("0000000000000�0000000"), out: "0000000000000�0000000"},
-		{in: []byte("0000000000000\xe80000000"), out: "0000000000000�0000000"},
+		{in: []byte("Walk or jog lightly.��"), out: "Walk or jog lightly."},
+		{in: []byte("0000000000000�0000000"), out: "00000000000000000000"},
+		{in: []byte("0000000000000\xe80000000"), out: "00000000000000000000"},
 	}
 
-	for _, tc := range tt {
-		out := utf8String(tc.in)
-		if out != tc.out {
-			t.Fatalf("expected: %q, got: %q", tc.out, out)
-		}
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.in), func(t *testing.T) {
+			out := utf8String(tc.in)
+			if out != tc.out {
+				t.Fatalf("expected: %q, got: %q", tc.out, out)
+			}
+		})
 	}
 }
 

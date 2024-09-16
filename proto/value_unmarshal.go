@@ -215,7 +215,9 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			for i := range b {
 				if b[i] == '\x00' {
 					if last != i { // only if not an invalid string
-						vals = append(vals, utf8String(b[last:i]))
+						if s := utf8String(b[last:i]); len(s) > 0 {
+							vals = append(vals, s)
+						}
 					}
 					last = i + 1
 				}
@@ -229,24 +231,27 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", baseType, baseType, ErrTypeNotSupported)
 }
 
-// trimRightZero returns a subslice of b by slicing off all trailing zero.
+// trimRightZero returns a subslice of b up to the null-terminated
+// string ('\x00') and discard the remaining bytes, as these are likely
+// padding bytes used to meet the desired length.
 func trimRightZero(b []byte) []byte {
-	for len(b) > 0 && b[len(b)-1] == 0 {
-		b = b[:len(b)-1]
+	for i := range b {
+		if b[i] == 0 {
+			return b[:i]
+		}
 	}
 	return b
 }
 
-// utf8String converts b into a valid utf8 string.
-// Any invalid utf8 character will be converted into utf8.RuneError.
+// utf8String converts b into a valid UTF-8 string. If it encounters
+// utf8.RuneError character, it will discard that character.
 func utf8String(b []byte) string {
-	if utf8.Valid(b) { // Fast path
-		return string(b)
-	}
 	buf := make([]byte, 0, 255)
 	for len(b) > 0 {
 		r, size := utf8.DecodeRune(b)
-		buf = utf8.AppendRune(buf, r)
+		if r != utf8.RuneError {
+			buf = append(buf, byte(r)) // normal append as r should be valid now
+		}
 		b = b[size:]
 	}
 	return string(buf)
