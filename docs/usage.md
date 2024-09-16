@@ -1102,33 +1102,27 @@ func main() {
    enc := encoder.New(f, encoder.WithBigEndian())
    ```
 
-1. **WithCompressedTimestampHeader**: directs the Encoder to compress timestamp in header to reduce file size.  
-   Saves 7 bytes per message: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
+1. **WithHeaderOption**: directs the Encoder to use this option instead of default HeaderOptionNormal and local message type zero.
+
+   - If HeaderOptionNormal is selected, valid local message type value is 0-15; invalid values will be treated as 15.
+   - If HeaderOptionCompressedTimestamp is selected, valid local message type value is 0-3; invalid values will be treated as 3.
+
+     Saves 7 bytes per message when its timestamp is compressed: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
+
+   - Otherwise, no change will be made and the Encoder will use default values.
+
+   NOTE: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message type.
+   For instance, embedded devices may only support decoding data from local message type 0. Additionally,
+   multiple local message types should be avoided in file types like settings, where messages of the same type
+   can be grouped together.
 
    Example:
 
    ```go
-   enc := encoder.New(f, encoder.WithCompressedTimestampHeader())
+   enc := encoder.New(f, encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15)) // valid 0-15
+
+   enc := encoder.New(f, encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 3)) // valid 0-3
    ```
-
-1. **WithNormalHeader**: directs the Encoder to use NormalHeader for encoding the message using
-   specified multiple local message type. By default, the Encoder uses local message type 0.
-   This option allows users to specify values between 0-15 (while entering zero is equivalent to using
-   the default option, nothing is changed). Using multiple local message types optimizes file size by
-   avoiding the need to interleave different message definition.
-
-   Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of
-   local message types in a file. For instance, embedded devices may only support decoding data
-   from local message type 0. Additionally, multiple local message types should be avoided in
-   file types like settings, where messages of the same type can be grouped together.
-
-   Example:
-
-   ```go
-   enc := encoder.New(f, encoder.WithNormalHeader(4)) // 0-15
-   ```
-
-   Note: we can only use either WithCompressedTimestampHeader or WithNormalHeader, can't use both at the same time.
 
 ### Stream Encoder
 
