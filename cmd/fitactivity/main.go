@@ -416,10 +416,10 @@ loop:
 	}
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
-	headerOption := encoder.WithNormalHeader(byte(interleave))
+	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if compress {
 		headerInfo = "compress"
-		headerOption = encoder.WithCompressedTimestampHeader()
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
 	}
 
 	select {
@@ -511,10 +511,10 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	}
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
-	headerOption := encoder.WithNormalHeader(byte(interleave))
+	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if compress {
 		headerInfo = "compress"
-		headerOption = encoder.WithCompressedTimestampHeader()
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
 	}
 
 	fmt.Fprintf(os.Stderr, "- Concealing %d file(s) [first: %s m; last: %s m]\n",
@@ -699,10 +699,10 @@ func reduce(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	}
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
-	headerOption := encoder.WithNormalHeader(byte(interleave))
+	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if compress {
 		headerInfo = "compress"
-		headerOption = encoder.WithCompressedTimestampHeader()
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
 	}
 
 	fmt.Fprintf(os.Stderr, "- Reducing %d file(s) [%s]\n",
@@ -876,10 +876,10 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	}
 
 	headerInfo := fmt.Sprintf("interleave: %d", interleave)
-	headerOption := encoder.WithNormalHeader(byte(interleave))
+	headerOption := encoder.WithHeaderOption(encoder.HeaderOptionNormal, byte(interleave))
 	if compress {
 		headerInfo = "compress"
-		headerOption = encoder.WithCompressedTimestampHeader()
+		headerOption = encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0)
 	}
 
 	var nameSuffix string

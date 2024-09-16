@@ -48,7 +48,7 @@ type CSVToFITConv struct {
 func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
 	enc := encoder.New(fitWriter,
 		encoder.WithProtocolVersion(proto.V2),
-		encoder.WithNormalHeader(15),
+		encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15),
 	)
 
 	csvr := csv.NewReader(csvReader)
