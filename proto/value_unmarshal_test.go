@@ -16,7 +16,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-func TestUnmarshalValue(t *testing.T) {
+func TestValueMarshalUnmarshalRoundTrip(t *testing.T) {
 	tt := []struct {
 		value       proto.Value
 		baseType    basetype.BaseType
@@ -71,6 +71,7 @@ func TestUnmarshalValue(t *testing.T) {
 		{value: proto.SliceFloat32([]float32{1, -5.1}), baseType: basetype.Float32, profileType: profile.Float32, isArray: true},
 		{value: proto.SliceFloat64([]float64{1, 1.1}), baseType: basetype.Float64, profileType: profile.Float64, isArray: true},
 		{value: proto.SliceFloat64([]float64{1, -5.1}), baseType: basetype.Float64, profileType: profile.Float64, isArray: true},
+		{value: proto.SliceString([]string{"a", "b"}), baseType: basetype.String, profileType: profile.String, isArray: true},
 		{value: proto.SliceString([]string{"a", "b"}), baseType: basetype.String, profileType: profile.String, isArray: true},
 		{
 			value:    proto.SliceUint8(stringsToBytes([]string{"mobile_app_version", "\x00", "\x00"}...)),
@@ -137,7 +138,7 @@ func stringsToBytes(vals ...string) []byte {
 	return b
 }
 
-func TestUnmarshalValueSliceAlloc(t *testing.T) {
+func TestValueUnmarshalValueSliceAlloc(t *testing.T) {
 	tt := []struct {
 		value       proto.Value
 		profileType profile.ProfileType
@@ -169,6 +170,55 @@ func TestUnmarshalValueSliceAlloc(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func TestValueUnmarshalStringValue(t *testing.T) {
+	tt := []struct {
+		in    []byte
+		array bool
+		out   []string // if array is false, result must be placed on index zero
+		err   error
+	}{
+		{
+			in:    []byte("Walk or jog lightly.\x00��\x00"),
+			array: false,
+			out:   []string{"Walk or jog lightly."},
+		},
+		{
+			in:    []byte("Walk or jog lightly.\x00��\x00Another string\x00"),
+			array: false,
+			out:   []string{"Walk or jog lightly.", "Another string"},
+		},
+		{
+			in:    []byte("Walk or jog lightly.\x00��\x00"),
+			array: true,
+			out:   []string{"Walk or jog lightly."},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.in), func(t *testing.T) {
+			value, err := proto.UnmarshalValue(tc.in, proto.LittleEndian, basetype.String, profile.String, tc.array)
+			if !errors.Is(tc.err, err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+
+			if tc.array {
+				vs := value.SliceString()
+				if diff := cmp.Diff(vs, tc.out); diff != "" {
+					t.Fatal(diff)
+				}
+			} else {
+				v := value.String()
+				if diff := cmp.Diff(v, tc.out[0]); diff != "" {
+					t.Fatal(diff)
+				}
+			}
+		})
 	}
 }
 
