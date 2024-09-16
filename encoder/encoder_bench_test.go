@@ -134,20 +134,20 @@ func BenchmarkEncode(b *testing.B) {
 	})
 	b.Run("normal header 15", func(b *testing.B) {
 		b.StopTimer()
-		enc := encoder.New(io.Discard, encoder.WithNormalHeader(15))
+		enc := encoder.New(io.Discard, encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15))
 		b.StartTimer()
 		for i := 0; i < b.N; i++ {
 			_ = enc.Encode(fit)
-			enc.Reset(io.Discard, encoder.WithNormalHeader(15))
+			enc.Reset(io.Discard, encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15))
 		}
 	})
 	b.Run("compressed timestamp header", func(b *testing.B) {
 		b.StopTimer()
-		enc := encoder.New(io.Discard, encoder.WithCompressedTimestampHeader())
+		enc := encoder.New(io.Discard, encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0))
 		b.StartTimer()
 		for i := 0; i < b.N; i++ {
 			_ = enc.Encode(fit)
-			enc.Reset(io.Discard, encoder.WithCompressedTimestampHeader())
+			enc.Reset(io.Discard, encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0))
 		}
 	})
 }
@@ -168,20 +168,20 @@ func BenchmarkEncodeWriterAt(b *testing.B) {
 	})
 	b.Run("normal header 15", func(b *testing.B) {
 		b.StopTimer()
-		enc := encoder.New(DiscardAt, encoder.WithNormalHeader(15))
+		enc := encoder.New(DiscardAt, encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15))
 		b.StartTimer()
 		for i := 0; i < b.N; i++ {
 			_ = enc.Encode(fit)
-			enc.Reset(DiscardAt, encoder.WithNormalHeader(15))
+			enc.Reset(DiscardAt, encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15))
 		}
 	})
 	b.Run("compressed timestamp header", func(b *testing.B) {
 		b.StopTimer()
-		enc := encoder.New(DiscardAt, encoder.WithCompressedTimestampHeader())
+		enc := encoder.New(DiscardAt, encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0))
 		b.StartTimer()
 		for i := 0; i < b.N; i++ {
 			_ = enc.Encode(fit)
-			enc.Reset(DiscardAt, encoder.WithCompressedTimestampHeader())
+			enc.Reset(DiscardAt, encoder.WithHeaderOption(encoder.HeaderOptionCompressedTimestamp, 0))
 		}
 	})
 }

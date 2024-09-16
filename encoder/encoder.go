@@ -31,22 +31,18 @@ const (
 	ErrWriterAtOrWriteSeekerIsExpected = errorString("io.WriterAt or io.WriteSeeker is expected")
 )
 
-// headerOption is header option.
-type headerOption byte
+// HeaderOption is header option for encoding message's Header.
+type HeaderOption byte
 
 const (
-	// headerOptionNormal is the default header option.
-	// This option has two sub-option to select from:
-	//   1. LocalMessageTypeZero [Default]
-	// 		Optimized for all devices. It only use LocalMesgNum 0.
-	//   2. MultipleLocalMessageTypes
-	//      Using multiple local message types optimizes file size by avoiding the need to interleave different
-	//      message definition. The number of multiple local message type can be specified between 0-15.
-	headerOptionNormal headerOption = 0
+	// HeaderOptionNormal is the default header option. This option allow us to use local message type 0-15
+	// as the maximum number of allowed message definition interleave.
+	HeaderOptionNormal HeaderOption = 0
 
-	// Optimize file size by compressing timestamp's field in a message into its message header.
-	// When this enabled, LocalMesgNum 0 is automatically used since the 5 lsb is used for the timestamp.
-	headerOptionCompressedTimestamp headerOption = 1
+	// HeaderOptionCompressedTimestamp optimizes file size by compressing timestamp's field in a message into
+	// its message header. Saves 7 bytes per message when its timestamp is compressed: 3 bytes for field definition
+	// and 4 bytes for the uint32 timestamp value. When this option is selected, only local messages type 0-3 is available.
+	HeaderOptionCompressedTimestamp HeaderOption = 1
 )
 
 // Encoder is FIT file encoder. See New() for details.
@@ -75,18 +71,18 @@ type Encoder struct {
 }
 
 type options struct {
-	messageValidator         MessageValidator
-	writeBufferSize          int
-	protocolVersion          proto.Version
-	endianness               byte
-	headerOption             headerOption
-	multipleLocalMessageType byte
+	messageValidator MessageValidator
+	writeBufferSize  int
+	protocolVersion  proto.Version
+	endianness       byte
+	headerOption     HeaderOption
+	localMessageType byte
 }
 
 func defaultOptions() options {
 	return options{
 		endianness:      proto.LittleEndian,
-		headerOption:    headerOptionNormal,
+		headerOption:    HeaderOptionNormal,
 		writeBufferSize: defaultWriteBufferSize,
 	}
 }
@@ -125,28 +121,31 @@ func WithBigEndian() Option {
 	return func(o *options) { o.endianness = proto.BigEndian }
 }
 
-// WithCompressedTimestampHeader directs the Encoder to compress timestamp in header to reduce file size.
-// Saves 7 bytes per message: 3 bytes for field definition and 4 bytes for the uint32 timestamp value.
-func WithCompressedTimestampHeader() Option {
-	return func(o *options) { o.headerOption = headerOptionCompressedTimestamp }
-}
-
-// WithNormalHeader directs the Encoder to use NormalHeader for encoding the message using multiple local message types.
-// By default, the Encoder uses local message type 0. This option allows users to specify values between 0-15 (while
-// entering zero is equivalent to using the default option, nothing is changed). Using multiple local message types
-// optimizes file size by avoiding the need to interleave different message definition.
+// WithHeaderOption direct the Encoder to use this option instead of default HeaderOptionNormal and local message type zero.
+//   - If HeaderOptionNormal is selected, valid local message type value is 0-15; invalid values will be treated as 15.
+//   - If HeaderOptionCompressedTimestamp is selected, valid local message type value is 0-3; invalid values will be treated as 3.
+//   - Otherwise, no change will be made and the Encoder will use default values.
 //
-// Note: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message types.
+// NOTE: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message type.
 // For instance, embedded devices may only support decoding data from local message type 0. Additionally,
 // multiple local message types should be avoided in file types like settings, where messages of the same type
 // can be grouped together.
-func WithNormalHeader(multipleLocalMessageType byte) Option {
-	if multipleLocalMessageType > proto.LocalMesgNumMask {
-		multipleLocalMessageType = proto.LocalMesgNumMask
-	}
+func WithHeaderOption(headerOption HeaderOption, localMessageType byte) Option {
 	return func(o *options) {
-		o.headerOption = headerOptionNormal
-		o.multipleLocalMessageType = multipleLocalMessageType
+		switch headerOption {
+		case HeaderOptionNormal:
+			if localMessageType > 15 {
+				localMessageType = 15
+			}
+		case HeaderOptionCompressedTimestamp:
+			if localMessageType > 3 {
+				localMessageType = 3
+			}
+		default:
+			return
+		}
+		o.headerOption = headerOption
+		o.localMessageType = localMessageType
 	}
 }
 
@@ -218,11 +217,7 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 
 	e.reset()
 
-	var lruSize byte = 1
-	if e.options.headerOption == headerOptionNormal && e.options.multipleLocalMessageType > 0 {
-		lruSize = e.options.multipleLocalMessageType + 1
-	}
-	e.localMesgNumLRU.ResetWithNewSize(lruSize)
+	e.localMesgNumLRU.ResetWithNewSize(e.options.localMessageType + 1)
 }
 
 // reset resets the encoder's data that is being used for encoding,
@@ -440,7 +435,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	var compressed bool
-	if e.options.headerOption == headerOptionCompressedTimestamp {
+	if e.options.headerOption == HeaderOptionCompressedTimestamp {
 		if e.w == io.Discard {
 			// NOTE: Only for calculating data size (Early Check Strategy)
 			var timestampField proto.Field
@@ -453,7 +448,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 			}
 			prevLen := len(mesg.Fields)
 			compressed = e.compressTimestampIntoHeader(mesg)
-			if prevLen > len(mesg.Fields) {
+			if compressed {
 				defer func() { // Revert: put timestamp field back at original index
 					mesg.Fields = mesg.Fields[:prevLen]
 					copy(mesg.Fields[i+1:], mesg.Fields[i:])
@@ -475,7 +470,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 
 	b[0] |= localMesgNum // Update the message definition header.
 	if compressed {
-		// TODO: implement compressed timestamp with multiple local messages type.
+		mesg.Header |= (localMesgNum << proto.CompressedBitShift)
 	} else {
 		mesg.Header |= localMesgNum
 	}
@@ -524,7 +519,7 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) (ok bool) {
 	}
 
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
-	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
+	mesg.Header = proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 	return true
 }

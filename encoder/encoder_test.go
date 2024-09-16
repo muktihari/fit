@@ -241,28 +241,28 @@ func TestOptions(t *testing.T) {
 			name: "defaultOptions",
 			opts: nil,
 			expected: options{
-				multipleLocalMessageType: 0,
-				endianness:               proto.LittleEndian,
-				messageValidator:         NewMessageValidator(),
-				writeBufferSize:          defaultWriteBufferSize,
+				localMessageType: 0,
+				endianness:       proto.LittleEndian,
+				messageValidator: NewMessageValidator(),
+				writeBufferSize:  defaultWriteBufferSize,
 			},
 		},
 		{
 			name: "with options: normal header",
 			opts: []Option{
 				WithBigEndian(),
-				WithNormalHeader(20),
+				WithHeaderOption(HeaderOptionNormal, 16),
 				WithProtocolVersion(proto.V2),
 				WithMessageValidator(fnValidateOK),
 				WithWriteBufferSize(8192),
 			},
 			expected: options{
-				multipleLocalMessageType: 15,
-				endianness:               proto.BigEndian,
-				protocolVersion:          proto.V2,
-				messageValidator:         fnValidateOK,
-				headerOption:             headerOptionNormal,
-				writeBufferSize:          8192,
+				localMessageType: 0b00001111,
+				endianness:       proto.BigEndian,
+				protocolVersion:  proto.V2,
+				messageValidator: fnValidateOK,
+				headerOption:     HeaderOptionNormal,
+				writeBufferSize:  8192,
 			},
 		},
 		{
@@ -270,16 +270,33 @@ func TestOptions(t *testing.T) {
 			opts: []Option{
 				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
-				WithCompressedTimestampHeader(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 7),
 				WithMessageValidator(fnValidateOK),
 			},
 			expected: options{
-				multipleLocalMessageType: 0,
-				endianness:               proto.BigEndian,
-				protocolVersion:          proto.V2,
-				messageValidator:         fnValidateOK,
-				headerOption:             headerOptionCompressedTimestamp,
-				writeBufferSize:          defaultWriteBufferSize,
+				localMessageType: 0b00000011,
+				endianness:       proto.BigEndian,
+				protocolVersion:  proto.V2,
+				messageValidator: fnValidateOK,
+				headerOption:     HeaderOptionCompressedTimestamp,
+				writeBufferSize:  defaultWriteBufferSize,
+			},
+		},
+		{
+			name: "with options: header option invalid",
+			opts: []Option{
+				WithBigEndian(),
+				WithProtocolVersion(proto.V2),
+				WithHeaderOption(255, 7),
+				WithMessageValidator(fnValidateOK),
+			},
+			expected: options{
+				localMessageType: 0,
+				endianness:       proto.BigEndian,
+				protocolVersion:  proto.V2,
+				messageValidator: fnValidateOK,
+				headerOption:     HeaderOptionNormal,
+				writeBufferSize:  defaultWriteBufferSize,
 			},
 		},
 	}
@@ -893,7 +910,7 @@ func TestEncodeMessage(t *testing.T) {
 		{
 			name: "encode message with header normal multiple local message type happy flow",
 			opts: []Option{
-				WithNormalHeader(2),
+				WithHeaderOption(HeaderOptionNormal, 2),
 			},
 			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
@@ -903,7 +920,7 @@ func TestEncodeMessage(t *testing.T) {
 		{
 			name: "encode message with compressed timestamp header happy flow",
 			opts: []Option{
-				WithCompressedTimestampHeader(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
 			},
 			mesg: proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
@@ -938,7 +955,7 @@ func TestEncodeMessage(t *testing.T) {
 			name: "compressed timestamp header: protocol validator's validate message definition return error",
 			opts: []Option{
 				WithProtocolVersion(proto.V1),
-				WithCompressedTimestampHeader(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
 			},
 			mesg: proto.Message{Fields: []proto.Field{
 				{
@@ -1029,7 +1046,7 @@ func TestEncodeMessage(t *testing.T) {
 		}
 
 		enc := New(io.Discard,
-			WithCompressedTimestampHeader(),
+			WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
 			WithMessageValidator(fnValidateOK),
 			WithWriteBufferSize(0), // Direct write
 		)
@@ -1057,6 +1074,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 	mesgs := []proto.Message{
 		{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+			factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((1000 - 500) * 5)),
 		}},
 		{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(time.Second))),
@@ -1068,45 +1086,62 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 		}},
 	}
 
-	t.Run("multiple local mesg type", func(t *testing.T) {
-		// We have 3 messages with differents field definitions,
-		// this should produces different localMesgNum in header.
+	tt := []struct {
+		name string
+		opts []Option
+	}{
+		{
+			name: "normal header",
+			opts: []Option{WithHeaderOption(HeaderOptionNormal, 2)},
+		},
+		{
+			name: "compressed header",
+			opts: []Option{WithHeaderOption(HeaderOptionCompressedTimestamp, 2)},
+		},
+	}
 
-		mesgs := append(mesgs[:0:0], mesgs...)
-		for i := range mesgs {
-			mesgs[i].Fields = append(mesgs[i].Fields[:0:0], mesgs[i].Fields...)
-		}
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			// We have 3 messages with differents field definitions,
+			// this should produces different localMesgNum in header.
 
-		buf := new(bytes.Buffer)
-		enc := New(buf, WithNormalHeader(2), WithWriteBufferSize(0))
-		for i, mesg := range mesgs {
+			mesgs := append(mesgs[:0:0], mesgs...) // clone
+			for i := range mesgs {
+				mesgs[i].Fields = append(mesgs[i].Fields[:0:0], mesgs[i].Fields...)
+			}
+
+			buf := new(bytes.Buffer)
+			enc := New(buf, append(tc.opts, WithWriteBufferSize(0))...)
+			for i, mesg := range mesgs {
+				buf.Reset()
+				err := enc.encodeMessage(&mesg)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				mesgDefHeader := buf.Bytes()
+				expectedHeader := (mesgDefHeader[0] &^ proto.LocalMesgNumMask) | byte(i)
+				if mesgDefHeader[0] != expectedHeader {
+					t.Fatalf("[%d] expected 0b%08b, got: 0b%08b", i, expectedHeader, mesgDefHeader[0])
+				}
+			}
+
+			// add 4th mesg, header should be 0, reset.
+			mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now.Add(32 * time.Second))),
+				factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((1000 - 500) * 5)),
+			}}
 			buf.Reset()
-			err := enc.encodeMessage(&mesg)
-			if err != nil {
+			if err := enc.encodeMessage(&mesg); err != nil {
 				t.Fatal(err)
 			}
-
 			mesgDefHeader := buf.Bytes()
-			expectedHeader := (mesgDefHeader[0] &^ proto.LocalMesgNumMask) | byte(i)
-			if mesgDefHeader[0] != expectedHeader {
-				t.Fatalf("[%d] expected 0b%08b, got: 0b%08b", i, expectedHeader, mesgDefHeader[0])
+			expectedHeader := byte(0)
+			if header := mesgDefHeader[0] &^ proto.MesgCompressedHeaderMask; header != expectedHeader {
+				t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, header)
 			}
-		}
-
-		// add 4th mesg, header should be 0, reset.
-		mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
-			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
-		}}
-		buf.Reset()
-		if err := enc.encodeMessage(&mesg); err != nil {
-			t.Fatal(err)
-		}
-		mesgDefHeader := buf.Bytes()
-		expectedHeader := byte(0)
-		if mesgDefHeader[0] != expectedHeader {
-			t.Fatalf("expected 0b%08b, got: 0b%08b", expectedHeader, mesgDefHeader[0])
-		}
-	})
+		})
+	}
 }
 
 type encodeMessagesTestCase struct {
@@ -1597,7 +1632,7 @@ func TestEncodeWithCompressedTimestampHeader(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(tc.w,
-				WithCompressedTimestampHeader(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
 				WithWriteBufferSize(0),
 			)
 			if err := enc.Encode(&tc.fit); err != nil {
@@ -1679,13 +1714,13 @@ func TestReset(t *testing.T) {
 			opts: []Option{
 				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
-				WithNormalHeader(15),
+				WithHeaderOption(HeaderOptionNormal, 15),
 				WithMessageValidator(fnValidateOK),
 			},
 			expected: New(io.Discard,
 				WithBigEndian(),
 				WithProtocolVersion(proto.V2),
-				WithNormalHeader(15),
+				WithHeaderOption(HeaderOptionNormal, 15),
 				WithMessageValidator(fnValidateOK)),
 		},
 	}
