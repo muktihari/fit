@@ -1263,6 +1263,102 @@ func TestDecodeFileHeader(t *testing.T) {
 	}
 }
 
+func TestDecodeMessage(t *testing.T) {
+	now := time.Now()
+
+	tt := []struct {
+		name               string
+		r                  io.Reader // must consist of mesgDef and mesg
+		timestampReference uint32
+		mesgDef            *proto.MessageDefinition
+		mesg               proto.Message
+		err                error
+	}{
+		{
+			name: "header with compressed timestamp",
+			r: bytes.NewBuffer(append(
+				/* mesgDef */ []byte{67, 0, 0, 21, 0, 3, 3, 4, 134, 0, 1, 0, 1, 1, 0},
+				/* mesg    */ []byte{0b11100000 | byte(datetime.ToUint32(now)&proto.CompressedTimeMask), 0, 0, 0, 0, 0, 0}...,
+			)),
+			timestampReference: datetime.ToUint32(now),
+			mesgDef: &proto.MessageDefinition{
+				Header:       67,
+				Reserved:     0,
+				Architecture: 0,
+				MesgNum:      mesgnum.Event,
+				FieldDefinitions: []proto.FieldDefinition{
+					{Num: 3, Size: 4, BaseType: 134},
+					{Num: 0, Size: 1, BaseType: 0},
+					{Num: 1, Size: 1, BaseType: 0},
+				},
+			},
+			mesg: proto.Message{
+				Header: 0b11100000 | byte(datetime.ToUint32(now)&proto.CompressedTimeMask),
+				Num:    mesgnum.Event,
+				Fields: []proto.Field{
+					factory.CreateField(mesgnum.Event, fieldnum.EventTimestamp).
+						WithValue(datetime.ToUint32(now)),
+					factory.CreateField(mesgnum.Event, fieldnum.EventData).
+						WithValue(uint32(0)),
+					factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(typedef.EventTimer),
+					factory.CreateField(mesgnum.Event, fieldnum.EventEventType).WithValue(typedef.EventTypeStart),
+				},
+			},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			dec := New(tc.r)
+			dec.timestamp = tc.timestampReference
+			dec.lastTimeOffset = byte(tc.timestampReference & proto.CompressedTimeMask)
+			for i := 0; i < 2; i++ {
+				err := dec.decodeMessage()
+				if !errors.Is(err, tc.err) {
+					t.Fatalf("expected error: %v, got: %v", tc.err, err)
+				}
+				if err != nil {
+					return
+				}
+			}
+
+			var mesgDef *proto.MessageDefinition
+			for _, v := range dec.localMessageDefinitions {
+				if v != nil {
+					mesgDef = v
+					break
+				}
+			}
+			if diff := cmp.Diff(mesgDef, tc.mesgDef,
+				cmp.Transformer("MessageDefinition", func(m *proto.MessageDefinition) *proto.MessageDefinition {
+					if len(m.DeveloperFieldDefinitions) == 0 {
+						m.DeveloperFieldDefinitions = nil
+					}
+					return m
+				}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+
+			if len(dec.messages) == 0 {
+				t.Fatalf("no message is decoded")
+			}
+
+			if diff := cmp.Diff(dec.messages[0], tc.mesg,
+				cmp.Transformer("Message", func(m proto.Message) proto.Message {
+					if len(m.DeveloperFields) == 0 {
+						m.DeveloperFields = nil
+					}
+					return m
+				}),
+				cmp.AllowUnexported(proto.Value{}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
 func TestDecodeMessageDefinition(t *testing.T) {
 	fit, buf := createFitForTest()
 

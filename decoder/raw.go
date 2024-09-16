@@ -136,7 +136,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 			}
 
 			// 2. a. Decode Message Definition
-			if (d.BytesArray[0] & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
+			if (d.BytesArray[0] & (proto.MesgCompressedHeaderMask | proto.MesgDefinitionMask)) == proto.MesgDefinitionMask {
 				const fixedSize = uint16(6) //  Header + Reserved + Architecture + MesgNum (2 bytes) + n Fields
 				nr, err = io.ReadFull(r, d.BytesArray[1:fixedSize])
 				n += int64(nr)

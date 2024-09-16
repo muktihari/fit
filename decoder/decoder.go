@@ -534,7 +534,10 @@ func (d *Decoder) decodeMessage() error {
 		return err
 	}
 	header := b[0]
-	if (header & proto.MesgDefinitionMask) == proto.MesgDefinitionMask {
+
+	// NOTE: Compressed Timestamp Header Bit 5-6 is the local message type.
+	// Bit 6 overlap with MesgDefinitionMask; It's a message definition only if Bit 7 is zero.
+	if (header & (proto.MesgCompressedHeaderMask | proto.MesgDefinitionMask)) == proto.MesgDefinitionMask {
 		return d.decodeMessageDefinition(header)
 	}
 	return d.decodeMessageData(header)
