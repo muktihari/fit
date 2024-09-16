@@ -439,6 +439,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		return fmt.Errorf("message validation failed: %w", err)
 	}
 
+	var compressed bool
 	if e.options.headerOption == headerOptionCompressedTimestamp {
 		if e.w == io.Discard {
 			// NOTE: Only for calculating data size (Early Check Strategy)
@@ -451,7 +452,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 				}
 			}
 			prevLen := len(mesg.Fields)
-			e.compressTimestampIntoHeader(mesg)
+			compressed = e.compressTimestampIntoHeader(mesg)
 			if prevLen > len(mesg.Fields) {
 				defer func() { // Revert: put timestamp field back at original index
 					mesg.Fields = mesg.Fields[:prevLen]
@@ -460,7 +461,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 				}()
 			}
 		} else {
-			e.compressTimestampIntoHeader(mesg)
+			compressed = e.compressTimestampIntoHeader(mesg)
 		}
 	}
 
@@ -471,9 +472,12 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 
 	b, _ := mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
-	if e.options.headerOption == headerOptionNormal {
-		b[0] = (b[0] &^ proto.LocalMesgNumMask) | localMesgNum // Update the message definition header.
-		mesg.Header = (mesg.Header &^ proto.LocalMesgNumMask) | localMesgNum
+
+	b[0] |= localMesgNum // Update the message definition header.
+	if compressed {
+		// TODO: implement compressed timestamp with multiple local messages type.
+	} else {
+		mesg.Header |= localMesgNum
 	}
 
 	var n int
@@ -502,28 +506,27 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	return nil
 }
 
-func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
+func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) (ok bool) {
 	timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
 	if timestamp == basetype.Uint32Invalid {
-		return // not supported
+		return false // not supported
 	}
 
 	if timestamp < uint32(typedef.DateTimeMin) {
-		return
+		return false
 	}
 
 	// The 5-bit time offset rolls over every 32 seconds, it is necessary that the difference
 	// between timestamp and timestamp reference be measured less than 32 seconds apart.
 	if (timestamp - e.timestampReference) > proto.CompressedTimeMask {
 		e.timestampReference = timestamp
-		return // Rollover event occurs, keep it as it is.
+		return false // Rollover event occurs, keep it as it is.
 	}
-
-	e.timestampReference = timestamp
 
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
 	mesg.Header |= proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
+	return true
 }
 
 func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {

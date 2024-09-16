@@ -1178,9 +1178,12 @@ func TestCompressTimestampInHeader(t *testing.T) {
 	now := time.Now()
 	offset := byte(datetime.ToUint32(now) & proto.CompressedTimeMask)
 	tt := []struct {
-		name    string
-		mesgs   []proto.Message
-		headers []byte
+		name                string
+		mesgs               []proto.Message
+		headers             []byte
+		lenFields           []int
+		compresseds         []bool
+		timestampReferences []uint32
 	}{
 		{
 			name: "compress timestamp in header happy flow",
@@ -1207,7 +1210,16 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				proto.MesgNormalHeaderMask, // record: the message containing timestamp reference prior to the use of compressed header.
 				proto.MesgCompressedHeaderMask | (offset+1)&proto.CompressedTimeMask,
 				proto.MesgCompressedHeaderMask | (offset+2)&proto.CompressedTimeMask,
-				proto.MesgCompressedHeaderMask | (offset+32)&proto.CompressedTimeMask,
+				proto.MesgNormalHeaderMask,
+			},
+			lenFields:   []int{2, 1, 0, 0, 1},
+			compresseds: []bool{false, false, true, true, false},
+			timestampReferences: []uint32{
+				0,
+				datetime.ToUint32(now),
+				datetime.ToUint32(now),
+				datetime.ToUint32(now),
+				datetime.ToUint32(now.Add(32 * time.Second)),
 			},
 		},
 		{
@@ -1233,6 +1245,14 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				proto.MesgNormalHeaderMask, // record: roll over has occurred, the timestamp is used new timestamp reference.
 				proto.MesgCompressedHeaderMask | (offset+1)&proto.CompressedTimeMask,
 			},
+			lenFields:   []int{2, 1, 1, 0},
+			compresseds: []bool{false, false, false, true},
+			timestampReferences: []uint32{
+				0,
+				datetime.ToUint32(now),
+				datetime.ToUint32(now.Add(32 * time.Second)),
+				datetime.ToUint32(now.Add(32 * time.Second)), // same as prev timestamp
+			},
 		},
 		{
 			name: "timestamp less than DateTimeMin",
@@ -1249,9 +1269,15 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				proto.MesgNormalHeaderMask,
 				proto.MesgNormalHeaderMask,
 			},
+			lenFields:   []int{2, 1},
+			compresseds: []bool{false, false},
+			timestampReferences: []uint32{
+				0,
+				0, // less than DateTimeMin do not change timestampReference
+			},
 		},
 		{
-			name: "timestamp wrong type not uint32 or typedef.DateTime",
+			name: "timestamp type typedef.DateTime",
 			mesgs: []proto.Message{
 				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
@@ -1265,9 +1291,15 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				proto.MesgNormalHeaderMask,
 				proto.MesgNormalHeaderMask,
 			},
+			lenFields:   []int{2, 1},
+			compresseds: []bool{false, false},
+			timestampReferences: []uint32{
+				0,
+				datetime.ToUint32(now), // typedef.Datetime will be converted into uint32 in proto.Value
+			},
 		},
 		{
-			name: "timestamp wrong type not uint32 or typedef.DateTime",
+			name: "timestamp wrong type not uint32 or typedef.DateTime: time.Time",
 			mesgs: []proto.Message{
 				{Num: mesgnum.FileId, Fields: []proto.Field{
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerGarmin),
@@ -1281,19 +1313,35 @@ func TestCompressTimestampInHeader(t *testing.T) {
 				proto.MesgNormalHeaderMask,
 				proto.MesgNormalHeaderMask,
 			},
+			lenFields:   []int{2, 1},
+			compresseds: []bool{false, false},
+			timestampReferences: []uint32{
+				0,
+				0,
+			},
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(nil)
-			for i := range tc.mesgs {
-				enc.compressTimestampIntoHeader(&tc.mesgs[i])
+			for j := range tc.mesgs {
+				compressed := enc.compressTimestampIntoHeader(&tc.mesgs[j])
+				if compressed != tc.compresseds[j] {
+					t.Errorf("index: %d: expected compressed: %t, got: %t", j, tc.compresseds[j], compressed)
+				}
+				if enc.timestampReference != tc.timestampReferences[j] {
+					t.Errorf("index: %d: expected timestampReference: %d, got: %d",
+						j, tc.timestampReferences[j], enc.timestampReference)
+				}
 			}
 			// Now that all message have been processed let's check the header
-			for i := range tc.mesgs {
-				if diff := cmp.Diff(tc.mesgs[i].Header, tc.headers[i]); diff != "" {
-					t.Errorf("index: %d: %s", i, diff)
+			for j := range tc.mesgs {
+				if diff := cmp.Diff(tc.mesgs[j].Header, tc.headers[j]); diff != "" {
+					t.Errorf("index: %d: %s", j, diff)
+				}
+				if l := len(tc.mesgs[j].Fields); l != tc.lenFields[j] {
+					t.Errorf("index: %d: expected len fields: %d, got: %d", j, l, tc.lenFields[j])
 				}
 			}
 		})
