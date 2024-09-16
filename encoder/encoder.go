@@ -121,9 +121,15 @@ func WithBigEndian() Option {
 	return func(o *options) { o.endianness = proto.BigEndian }
 }
 
-// WithHeaderOption direct the Encoder to use this option instead of default HeaderOptionNormal and local message type zero.
+// WithHeaderOption directs the Encoder to use this option instead of default HeaderOptionNormal with local message type zero.
+//
 //   - If HeaderOptionNormal is selected, valid local message type value is 0-15; invalid values will be treated as 15.
+//
 //   - If HeaderOptionCompressedTimestamp is selected, valid local message type value is 0-3; invalid values will be treated as 3.
+//
+//     Saves 7 bytes per message when its timestamp is compressed: 3 bytes for field definition
+//     and 4 bytes for the uint32 timestamp value.
+//
 //   - Otherwise, no change will be made and the Encoder will use default values.
 //
 // NOTE: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message type.
