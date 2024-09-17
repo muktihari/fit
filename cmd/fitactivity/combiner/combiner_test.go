@@ -41,6 +41,7 @@ func TestCombine(t *testing.T) {
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(100)),
 					}},
 					{Num: mesgnum.SplitSummary, Fields: []proto.Field{
 						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
@@ -53,6 +54,7 @@ func TestCombine(t *testing.T) {
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 2),
 						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(200)),
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
@@ -78,6 +80,7 @@ func TestCombine(t *testing.T) {
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 10),
 						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(100)),
 					}},
 					{Num: mesgnum.SplitSummary, Fields: []proto.Field{
 						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
@@ -86,6 +89,7 @@ func TestCombine(t *testing.T) {
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 20),
 						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(200)),
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
@@ -112,18 +116,22 @@ func TestCombine(t *testing.T) {
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(100)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 2),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(200)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 10),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(300)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(300)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 20),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(400)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(400)),
 				}},
 				{Num: mesgnum.SplitSummary, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(datetime.ToUint32(now) + 20), // Additional

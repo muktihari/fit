@@ -91,8 +91,20 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 		fit.Messages = fit.Messages[:valid]
 	}
 
+	accumu := new(accumulator)
+	for _, mesg := range fits[0].Messages {
+		for _, field := range mesg.Fields {
+			if !field.Accumulate {
+				continue
+			}
+			if !field.Value.Valid(field.BaseType) {
+				continue
+			}
+			accumu.Collect(mesg.Num, field.Num, field.Value)
+		}
+	}
+
 	sessions := sessionsByIndex[0]
-	lastPrevDistance := getLastDistanceOrZero(result.Messages)
 	for i := 1; i < len(fits); i++ {
 		var (
 			nextFitSessions = sessionsByIndex[i]
@@ -100,24 +112,27 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 			nextSes         = nextFitSessions[0]
 		)
 
-		var lastDistance uint32
 		for _, mesg := range fits[i].Messages {
 			switch mesg.Num {
 			case mesgnum.FileId, mesgnum.FileCreator:
 				continue // skip
-			case mesgnum.Record:
-				// Accumulate distance
-				field := mesg.FieldByNum(fieldnum.RecordDistance)
-				if field != nil && field.Value.Uint32() != basetype.Uint32Invalid {
-					lastDistance = field.Value.Uint32() + lastPrevDistance
-					field.Value = proto.Uint32(lastDistance)
-				}
-				fallthrough
 			default:
+				// Accumulate the accumulable values.
+				for j := range mesg.Fields {
+					field := &mesg.Fields[j]
+					if !field.Accumulate {
+						continue
+					}
+					if !field.Value.Valid(field.BaseType) {
+						continue
+					}
+					field.Value = accumu.Accumulate(mesg.Num, field.Num, field.Value)
+				}
 				result.Messages = append(result.Messages, mesg)
 			}
 		}
-		lastPrevDistance = lastDistance
+
+		accumu.SequenceCompleted()
 
 		// If it's a multisport activity such as a triathlon, append the session.
 		if ses.Sport != nextSes.Sport {
