@@ -9,47 +9,18 @@ import (
 	"testing"
 )
 
-func TestTrimRightZero(t *testing.T) {
-	tt := []struct {
-		str      string
-		expected string
-	}{
-		{str: "", expected: ""},
-		{str: "\x00", expected: ""},
-		{str: "Open Water", expected: "Open Water"},
-		{str: "Open Water\x00", expected: "Open Water"},
-		{str: "Open Water\x00\x00", expected: "Open Water"},
-		{str: "Walk or jog lightly.\x00��", expected: "Walk or jog lightly."},
-		{str: "Walk or jog lightly.��", expected: "Walk or jog lightly.��"},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
-			res := trimRightZero([]byte(tc.str))
-			if string(res) != tc.expected {
-				t.Fatalf("expected: %s, got: %s", tc.expected, res)
-			}
-		})
-	}
-}
-
-func BenchmarkTrimRightZero(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = trimRightZero([]byte(""))
-		_ = trimRightZero([]byte("\x00"))
-		_ = trimRightZero([]byte("Open Water"))
-		_ = trimRightZero([]byte("Open Water\x00"))
-		_ = trimRightZero([]byte("Open Water\x00\x00"))
-		_ = trimRightZero([]byte("Walk or jog lightly.\x00��"))
-	}
-}
-
 func TestUTF8String(t *testing.T) {
 	tt := []struct {
 		in  []byte
 		out string
 	}{
+		{in: []byte(""), out: ""},
+		{in: []byte("\x00"), out: ""},
+		{in: []byte("Open Water"), out: "Open Water"},
+		{in: []byte("Open Water\x00"), out: "Open Water"},
+		{in: []byte("Open Water\x00\x00"), out: "Open Water"},
 		{in: []byte("Walk or jog lightly.��"), out: "Walk or jog lightly."},
+		{in: []byte("Walk or jog lightly.\x00��"), out: "Walk or jog lightly."},
 		{in: []byte("0000000000000�0000000"), out: "00000000000000000000"},
 		{in: []byte("0000000000000\xe80000000"), out: "00000000000000000000"},
 	}

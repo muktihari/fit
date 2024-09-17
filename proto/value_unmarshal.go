@@ -224,31 +224,22 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 			}
 			return SliceString(vals), nil
 		}
-		b = trimRightZero(b)
 		return String(utf8String(b)), nil
 	}
 
 	return Value{}, fmt.Errorf("type %s(%d) is not supported: %w", baseType, baseType, ErrTypeNotSupported)
 }
 
-// trimRightZero returns a subslice of b up to the null-terminated
-// string ('\x00') and discard the remaining bytes, as these are likely
-// padding bytes used to meet the desired length.
-func trimRightZero(b []byte) []byte {
-	for i := range b {
-		if b[i] == 0 {
-			return b[:i]
-		}
-	}
-	return b
-}
-
 // utf8String converts b into a valid UTF-8 string. If it encounters
-// utf8.RuneError character, it will discard that character.
+// utf8.RuneError character it will discard it. It stops when all bytes
+// have been successfully decoded or reach a null-terminated string '\x00'.
 func utf8String(b []byte) string {
 	buf := make([]byte, 0, 255)
 	for len(b) > 0 {
 		r, size := utf8.DecodeRune(b)
+		if r == 0 {
+			break
+		}
 		if r != utf8.RuneError {
 			buf = utf8.AppendRune(buf, r)
 		}
