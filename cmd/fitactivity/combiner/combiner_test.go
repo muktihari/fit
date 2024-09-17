@@ -155,6 +155,176 @@ func TestCombine(t *testing.T) {
 				}},
 			}},
 		},
+		{
+			name: "cycling + cycling + running",
+			fits: []*proto.FIT{
+				{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+					}},
+					{Num: mesgnum.SplitSummary, Fields: []proto.Field{
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummaryNumSplits).WithValue(uint16(1)),
+					}},
+					{Num: mesgnum.SplitSummary, Fields: []proto.Field{
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunRest),
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummaryNumSplits).WithValue(uint16(1)),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 2),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+					}},
+					{Num: mesgnum.Session, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 2),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(2000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(3000)),
+					}},
+					{Num: mesgnum.Activity, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityAutoMultiSport),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now) + 2),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp).WithValue(datetime.ToUint32(now.Add(7*time.Hour)) + 2),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
+					}},
+				}},
+				{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now) + 10),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 10),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+					}},
+					{Num: mesgnum.SplitSummary, Fields: []proto.Field{
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
+						factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummaryNumSplits).WithValue(uint16(1)),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 20),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+					}},
+					{Num: mesgnum.Session, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 20),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 10),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(2000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(3000)),
+					}},
+					{Num: mesgnum.Activity, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityAutoMultiSport),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now) + 12),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp).WithValue(datetime.ToUint32(now.Add(7*time.Hour)) + 12),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
+					}},
+				}},
+				{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now) + 100),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 100),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+					}},
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 200),
+						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+					}},
+					{Num: mesgnum.Session, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportRunning),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 100),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(2000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(3000)),
+					}},
+					{Num: mesgnum.Activity, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityAutoMultiSport),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime).WithValue(uint32(3000)),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now) + 120),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp).WithValue(datetime.ToUint32(now.Add(7*time.Hour)) + 120),
+						factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(1)),
+					}},
+				}},
+			},
+			expected: &proto.FIT{Messages: []proto.Message{
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(now)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(100)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 2),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 10),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(300)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 20),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(400)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 100),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(500)),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 200),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(600)),
+				}},
+				{Num: mesgnum.SplitSummary, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(datetime.ToUint32(now) + 200), // Additional
+					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
+					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummaryNumSplits).WithValue(uint16(2)),
+				}},
+				{Num: mesgnum.SplitSummary, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(datetime.ToUint32(now) + 200), // Additional
+					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunRest),
+					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummaryNumSplits).WithValue(uint16(1)),
+				}},
+				{Num: mesgnum.Session, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(400)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(4000)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(6000 + 7000)), // gap 7000
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(6000 + 7000)),   // gap 7000
+				}},
+				{Num: mesgnum.Session, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportRunning),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 100),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(2000)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(3000)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(3000)),
+				}},
+				{Num: mesgnum.Activity, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityAutoMultiSport),
+					factory.CreateField(mesgnum.Activity, fieldnum.ActivityTotalTimerTime).WithValue(uint32(199000)), // 19s
+					factory.CreateField(mesgnum.Activity, fieldnum.ActivityTimestamp).WithValue(datetime.ToUint32(now) + 200),
+					factory.CreateField(mesgnum.Activity, fieldnum.ActivityLocalTimestamp).WithValue(
+						datetime.ToUint32(now.Add(7*time.Hour)) + 200,
+					),
+					factory.CreateField(mesgnum.Activity, fieldnum.ActivityNumSessions).WithValue(uint16(2)),
+				}},
+			}},
+		},
 	}
 
 	for i, tc := range tt {
