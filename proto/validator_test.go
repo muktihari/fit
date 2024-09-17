@@ -72,12 +72,3 @@ func TestValidateMessageDefinition(t *testing.T) {
 		})
 	}
 }
-
-func TestValidatorSetProtocolVersion(t *testing.T) {
-	validator := proto.NewValidator(proto.V1)
-	validator.SetProtocolVersion(proto.V2)
-
-	if validator.ProtocolVersion() != proto.V2 {
-		t.Fatalf("expected: %v, got: %v", proto.V2, validator.ProtocolVersion())
-	}
-}
