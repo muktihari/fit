@@ -160,11 +160,11 @@ const (
 
 const combineUsage = `About:
   ` + combineDesc + `
+  
+  ` + moreInfo + `
 
 Usage:
   ` + cli + ` combine [subcommands] [flags] [files]
-
-  ` + moreInfo + `
 
 Available Subcommands (optional):
   conceal    ` + concealDesc + `
