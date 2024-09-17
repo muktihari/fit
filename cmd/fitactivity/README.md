@@ -67,15 +67,13 @@ Example:
 - File C: _running_, walking
 - Result: swimming, cycling, running, walking
 
-If the last session sport type is not match with the first session of the next file, error will be returned.
+If the last session sport type is not match with the first session of the next file, the session of the next file will be append as it is.
 
 Mismatch example:
 
 - File A: swimming, **cycling**
 - File B: **running**, walking
-- Result: error sport type mismatch
-
-That is the only guard that we implement, it is user responsibility to select the correct files.
+- Result: swimming, **cycling**, **running**, walking
 
 _NOTE: Combining FIT activity files is NOT the same as merging multiple files into a single chained FIT file._
 

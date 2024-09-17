@@ -25,10 +25,7 @@ type errorString string
 
 func (e errorString) Error() string { return string(e) }
 
-const (
-	errNoSessionFound = errorString("no session found")
-	errSportMismatch  = errorString("sport mismatch")
-)
+const errNoSessionFound = errorString("no session found")
 
 // Combine combines multiple FIT activities into one continuous activity.
 func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
@@ -102,10 +99,6 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 			ses             = sessions[len(sessions)-1]
 			nextSes         = nextFitSessions[0]
 		)
-		if ses.Sport != nextSes.Sport {
-			return nil, fmt.Errorf("fits[%d] %q != %q: %w",
-				i, ses.Sport, nextSes.Sport, errSportMismatch)
-		}
 
 		var lastDistance uint32
 		for _, mesg := range fits[i].Messages {
@@ -125,6 +118,12 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 			}
 		}
 		lastPrevDistance = lastDistance
+
+		// If it's a multisport activity such as a triathlon, append the session.
+		if ses.Sport != nextSes.Sport {
+			sessions = append(sessions, nextSes)
+			continue
+		}
 
 		// Add time gap
 		endTime := ses.StartTime.Add(time.Duration(ses.TotalElapsedTime/1000) * time.Second)
