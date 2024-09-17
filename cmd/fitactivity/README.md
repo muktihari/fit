@@ -261,8 +261,8 @@ Usage:
 
 Flags:
   (select at least one):
-    --start         uint32     conceal distance: first x meters
-    --end           uint32     conceal distance: last x meters
+    --first         uint32     conceal distance: first x meters
+    --last          uint32     conceal distance: last x meters
 
   (optional):
   -i, --interleave  uint8      normal header with valid local message type 0-15 [default: 15]

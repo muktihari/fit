@@ -471,8 +471,8 @@ Usage:
 
 Flags: 
   (select at least one):
-    --start         uint32     ` + concealFirstDesc + `
-    --end           uint32     ` + concealLastDesc + `
+    --first         uint32     ` + concealFirstDesc + `
+    --last          uint32     ` + concealLastDesc + `
 
   (optional):
   -i, --interleave  uint8      ` + interleaveDesc + `
