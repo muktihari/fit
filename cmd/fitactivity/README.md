@@ -39,10 +39,10 @@ The common messages in an Activity File:
 - Session: fields will be aggregated with the correspoding session of the next FIT file.
 - Lap: append as it is.
 - Event: append as it is
-- Record: field `distance` will be accumulated before append, the rest will be appended as it is
+- Record: accumulable fields such as `distance` and `accumulated_power` will be accumulated before appending, the rest will be appended as they are.
 - SplitSummary: fields will be aggregated with the split summary of the next FIT file that has the same `split_type`.
 
-The rest of the messages from the next FIT files will be appended as it is.
+All fields in messages that are eligible for accumulation will be accumulated before appending, the rest will be appended as they are.
 
 ### Aggregating Fields:
 

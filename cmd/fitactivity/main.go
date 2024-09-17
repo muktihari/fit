@@ -415,7 +415,7 @@ loop:
 
 			prevLen := len(fit.Messages)
 
-			msg := fmt.Sprintf("Removing [unknown: %t, nums: %s, devdata: %t]",
+			msg := fmt.Sprintf("Removing [unknown: %t, mesgnums: %s, devdata: %t]",
 				removeUnknown, removeMesgNums, removeDevData)
 			verboserun(msg, func() {
 				remover.Remove(fit, opts...)
@@ -917,7 +917,7 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 			nameSuffix, strings.ReplaceAll(removeMesgNums, ",", "_"))
 	}
 
-	fmt.Fprintf(os.Stdout, "- Removing %d file(s) [unknown: %t, nums: %s, devdata: %t]\n",
+	fmt.Fprintf(os.Stdout, "- Removing %d file(s) [unknown: %t, mesgnums: %s, devdata: %t]\n",
 		len(files), removeUnknown, removeMesgNums, removeDevData)
 
 	var dec = decoder.New(nil)
