@@ -874,7 +874,7 @@ func TestEncodeHeader(t *testing.T) {
 				t.Fatal(diff)
 			}
 
-			if enc.protocolValidator.ProtocolVersion() != tc.protocolVersion {
+			if enc.protocolValidator.ProtocolVersion != tc.protocolVersion {
 				t.Fatalf("expected protocol version: %v, got: %v",
 					tc.protocolVersion, enc.options.protocolVersion)
 			}
@@ -1016,7 +1016,7 @@ func TestEncodeMessage(t *testing.T) {
 			enc := New(tc.w, tc.opts...)
 			// Protocol Version now is set on encodeFileHeader as we allow dynamic protocol version
 			// based on FileHeader. This by pass it since we don't encode file header.
-			enc.protocolValidator.SetProtocolVersion(enc.options.protocolVersion)
+			enc.protocolValidator.ProtocolVersion = enc.options.protocolVersion
 			err := enc.encodeMessage(&tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)

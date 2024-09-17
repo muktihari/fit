@@ -13,16 +13,16 @@ import (
 const ErrProtocolViolation = errorString("protocol violation")
 
 // NewValidator creates protocol validator base on given version.
-func NewValidator(version Version) *Validator {
-	return &Validator{version: version}
+func NewValidator(protocolVersion Version) *Validator {
+	return &Validator{ProtocolVersion: protocolVersion}
 }
 
 // Validator is protocol validator
-type Validator struct{ version Version }
+type Validator struct{ ProtocolVersion Version }
 
 // ValidateMessageDefinition validates whether the message definition contains unsupported data for the targeted version.
 func (p *Validator) ValidateMessageDefinition(mesgDef *MessageDefinition) error {
-	if p.version == V1 {
+	if p.ProtocolVersion == V1 {
 		if len(mesgDef.DeveloperFieldDefinitions) > 0 {
 			return fmt.Errorf("protocol version 1.0 do not support developer fields: %w", ErrProtocolViolation)
 		}
@@ -35,9 +35,3 @@ func (p *Validator) ValidateMessageDefinition(mesgDef *MessageDefinition) error 
 	}
 	return nil
 }
-
-// ProtocolVersion returns the protocol version that this validator validates.
-func (p *Validator) ProtocolVersion() Version { return p.version }
-
-// SetProtocolVersion sets new protocol version to validate.
-func (p *Validator) SetProtocolVersion(version Version) { p.version = version }

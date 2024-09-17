@@ -321,7 +321,7 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
 		header.ProtocolVersion = proto.V1
 	}
-	e.protocolValidator.SetProtocolVersion(header.ProtocolVersion)
+	e.protocolValidator.ProtocolVersion = header.ProtocolVersion
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
