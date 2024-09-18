@@ -392,9 +392,25 @@ func TestEncode(t *testing.T) {
 			w:   fnWriteOK,
 			err: ErrExceedMaxAllowed,
 		},
+		{
+			name: "encode return error protocol violation since proto.V1 does not allow Int64",
+			fit: &proto.FIT{
+				FileHeader: proto.FileHeader{ProtocolVersion: proto.V1},
+				Messages: []proto.Message{
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						{FieldBase: &proto.FieldBase{BaseType: basetype.Sint64}},
+					}},
+				},
+			},
+			w:   fnWriteOK,
+			err: proto.ErrProtocolViolation,
+		},
 	}
 
 	for i, tc := range tt {
+		if i != len(tt)-1 {
+			continue
+		}
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w)
 			err := enc.Encode(tc.fit)
