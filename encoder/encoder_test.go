@@ -362,18 +362,7 @@ var (
 )
 
 func TestEncode(t *testing.T) {
-	tt := []struct {
-		name string
-		w    io.Writer
-		err  error
-	}{
-		{name: "encode with nil", w: nil, err: ErrNilWriter},
-		{name: "encode with writer", w: fnWriteOK},
-		{name: "encode with writerAt", w: mockWriterAt{fnWriteOK, fnWriteAtOK}},
-		{name: "encode with writeSeeker", w: mockWriteSeeker{fnWriteOK, fnSeekOK}},
-	}
-
-	fit := proto.FIT{
+	fitOK := proto.FIT{
 		Messages: []proto.Message{
 			{Num: mesgnum.FileId, Fields: []proto.Field{
 				factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
@@ -381,10 +370,34 @@ func TestEncode(t *testing.T) {
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	tt := []struct {
+		name string
+		w    io.Writer
+		fit  *proto.FIT
+		err  error
+	}{
+		{name: "encode with nil", w: nil, fit: &fitOK, err: ErrNilWriter},
+		{name: "encode with writer", w: fnWriteOK, fit: &fitOK},
+		{name: "encode with writerAt", w: mockWriterAt{fnWriteOK, fnWriteAtOK}, fit: &fitOK},
+		{name: "encode with writeSeeker", w: mockWriteSeeker{fnWriteOK, fnSeekOK}, fit: &fitOK},
+		{
+			name: "encode return error from validation",
+			fit: &proto.FIT{
+				Messages: []proto.Message{
+					{Num: mesgnum.Record, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)), // Exceed max allowed
+					}},
+				},
+			},
+			w:   fnWriteOK,
+			err: ErrExceedMaxAllowed,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w)
-			err := enc.Encode(&fit)
+			err := enc.Encode(tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
@@ -392,10 +405,10 @@ func TestEncode(t *testing.T) {
 	}
 
 	// Test same logic for EncodeWithContext
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w)
-			err := enc.EncodeWithContext(context.Background(), &fit)
+			err := enc.EncodeWithContext(context.Background(), tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
@@ -928,12 +941,6 @@ func TestEncodeMessage(t *testing.T) {
 			w: fnWriteOK,
 		},
 		{
-			name: "message validator's validate return error",
-			mesg: proto.Message{},
-			w:    nil,
-			err:  ErrNoFields,
-		},
-		{
 			name: "normal header: protocol validator's validate message definition return error",
 			opts: []Option{
 				WithProtocolVersion(proto.V1),
@@ -1167,12 +1174,6 @@ func makeEncodeMessagesTableTest() []encodeMessagesTestCase {
 			name:  "encode messages return empty messages error",
 			mesgs: []proto.Message{},
 			err:   ErrEmptyMessages,
-		},
-		{
-			name:          "encode messages return error",
-			mesgValidator: fnValidateErr,
-			mesgs:         []proto.Message{{}},
-			err:           ErrNoFields, // Validator error since the first mesg is invalid.
 		},
 		{
 			name:  "missing file_id mesg",

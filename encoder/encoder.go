@@ -249,6 +249,9 @@ func (e *Encoder) reset() {
 //
 // Encode chooses which strategy to use for encoding the data based on given writer.
 func (e *Encoder) Encode(fit *proto.FIT) (err error) {
+	if err = e.validateMessages(fit.Messages); err != nil {
+		return err
+	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		err = e.encodeWithDirectUpdateStrategy(fit)
@@ -303,6 +306,18 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 		return err
 	}
 
+	return nil
+}
+
+func (e *Encoder) validateMessages(messages []proto.Message) error {
+	defer e.options.messageValidator.Reset()
+	for i := range messages {
+		mesg := &messages[i] // Must use pointer reference since validator may update the message.
+		if err := e.options.messageValidator.Validate(mesg); err != nil {
+			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
+		}
+	}
 	return nil
 }
 
@@ -435,10 +450,6 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	mesg.Header = proto.MesgNormalHeaderMask
-
-	if err = e.options.messageValidator.Validate(mesg); err != nil {
-		return fmt.Errorf("message validation failed: %w", err)
-	}
 
 	var compressed bool
 	if e.options.headerOption == HeaderOptionCompressedTimestamp {
@@ -578,6 +589,9 @@ func (e *Encoder) encodeCRC() error {
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
+	if err = e.validateMessages(fit.Messages); err != nil {
+		return err
+	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		err = e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)

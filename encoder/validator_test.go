@@ -493,6 +493,11 @@ func TestMessageValidatorValidate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:  "error no fields",
+			mesgs: []proto.Message{{Fields: []proto.Field{}}},
+			errs:  []error{ErrNoFields},
+		},
 	}
 
 	for i, tc := range tt {

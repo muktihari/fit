@@ -145,6 +145,15 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	if !errors.Is(err, io.EOF) {
 		t.Fatalf("expected err: %v, got: %v", io.EOF, err)
 	}
+
+	// Message validation error
+	streamEnc, _ = New(mockWriterAt{}).StreamEncoder()
+	err = streamEnc.WriteMessage(&proto.Message{Fields: []proto.Field{
+		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256))}},
+	)
+	if !errors.Is(err, ErrExceedMaxAllowed) {
+		t.Fatalf("expected err: %v, got: %v", ErrExceedMaxAllowed, err)
+	}
 }
 
 func TestStreamEncoderWithoutWriteBuffer(t *testing.T) {
