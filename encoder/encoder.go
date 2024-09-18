@@ -314,7 +314,8 @@ func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 	for i := range messages {
 		mesg := &messages[i] // Must use pointer reference since validator may update the message.
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
-			return err
+			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
 		}
 		if err = e.options.messageValidator.Validate(mesg); err != nil {
 			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
