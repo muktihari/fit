@@ -416,6 +416,52 @@ func TestEncode(t *testing.T) {
 	}
 }
 
+func TestValidateMessages(t *testing.T) {
+	tt := []struct {
+		name            string
+		protocolVersion proto.Version
+		messages        []proto.Message
+		err             error
+	}{
+		{
+			name:            "happy flow",
+			protocolVersion: proto.V1,
+			messages: []proto.Message{{Num: mesgnum.FileId, Fields: []proto.Field{
+				factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment),
+			}}},
+		},
+		{
+			name:            "protocol validation failed",
+			protocolVersion: proto.V1,
+			messages: []proto.Message{{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+			}, DeveloperFields: []proto.DeveloperField{{}}}},
+			err: proto.ErrProtocolViolation,
+		},
+		{
+			name:            "message validation failed",
+			protocolVersion: proto.V1,
+			messages: []proto.Message{{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
+			}}},
+			err: ErrExceedMaxAllowed,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			enc := New(nil)
+			// Protocol Version now is set on encodeFileHeader as we allow dynamic protocol version
+			// based on FileHeader. This by pass it since we don't encode file header.
+			enc.protocolValidator.ProtocolVersion = tc.protocolVersion
+			err := enc.validateMessages(tc.messages)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
+			}
+		})
+	}
+}
+
 type encodeWithDirectUpdateTestCase struct {
 	name string
 	fit  *proto.FIT
@@ -941,43 +987,6 @@ func TestEncodeMessage(t *testing.T) {
 			w: fnWriteOK,
 		},
 		{
-			name: "normal header: protocol validator's validate message definition return error",
-			opts: []Option{
-				WithProtocolVersion(proto.V1),
-			},
-			mesg: proto.Message{Fields: []proto.Field{
-				{
-					FieldBase: &proto.FieldBase{
-						Name:     factory.NameUnknown,
-						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
-						BaseType: profile.Sint64.BaseType(),
-					},
-					Value: proto.Int64(1234),
-				},
-			}},
-			w:   nil,
-			err: proto.ErrProtocolViolation,
-		},
-		{
-			name: "compressed timestamp header: protocol validator's validate message definition return error",
-			opts: []Option{
-				WithProtocolVersion(proto.V1),
-				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
-			},
-			mesg: proto.Message{Fields: []proto.Field{
-				{
-					FieldBase: &proto.FieldBase{
-						Name:     factory.NameUnknown,
-						Type:     profile.Sint64, // int64 type is ilegal for protocol v1.0
-						BaseType: profile.Sint64.BaseType(),
-					},
-					Value: proto.Int64(1234),
-				},
-			}},
-			w:   nil,
-			err: proto.ErrProtocolViolation,
-		},
-		{
 			name: "write message definition return error",
 			opts: []Option{
 				WithMessageValidator(fnValidateOK),
@@ -1021,9 +1030,6 @@ func TestEncodeMessage(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.opts = append(tc.opts, WithWriteBufferSize(0))
 			enc := New(tc.w, tc.opts...)
-			// Protocol Version now is set on encodeFileHeader as we allow dynamic protocol version
-			// based on FileHeader. This by pass it since we don't encode file header.
-			enc.protocolValidator.ProtocolVersion = enc.options.protocolVersion
 			err := enc.encodeMessage(&tc.mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)

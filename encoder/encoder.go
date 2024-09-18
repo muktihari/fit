@@ -309,11 +309,14 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	return nil
 }
 
-func (e *Encoder) validateMessages(messages []proto.Message) error {
+func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 	defer e.options.messageValidator.Reset()
 	for i := range messages {
 		mesg := &messages[i] // Must use pointer reference since validator may update the message.
-		if err := e.options.messageValidator.Validate(mesg); err != nil {
+		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
+			return err
+		}
+		if err = e.options.messageValidator.Validate(mesg); err != nil {
 			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
@@ -478,10 +481,6 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	mesgDef := e.newMessageDefinition(mesg)
-	if err := e.protocolValidator.ValidateMessageDefinition(mesgDef); err != nil {
-		return err
-	}
-
 	b, _ := mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 
