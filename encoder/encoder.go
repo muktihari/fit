@@ -280,6 +280,22 @@ func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
 	e.protocolValidator.ProtocolVersion = fileHeader.ProtocolVersion
 }
 
+func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
+	defer e.options.messageValidator.Reset()
+	for i := range messages {
+		mesg := &messages[i] // Must use pointer reference since validator may update the message.
+		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
+			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
+		}
+		if err = e.options.messageValidator.Validate(mesg); err != nil {
+			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
+		}
+	}
+	return nil
+}
+
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing,
 // it updates the actual size of the messages that being written to the proto.
 func (e *Encoder) encodeWithDirectUpdateStrategy(fit *proto.FIT) error {
@@ -316,22 +332,6 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 		return err
 	}
 
-	return nil
-}
-
-func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
-	defer e.options.messageValidator.Reset()
-	for i := range messages {
-		mesg := &messages[i] // Must use pointer reference since validator may update the message.
-		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
-			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
-				i, mesg.Num, mesg.Num.String(), err)
-		}
-		if err = e.options.messageValidator.Validate(mesg); err != nil {
-			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
-				i, mesg.Num, mesg.Num.String(), err)
-		}
-	}
 	return nil
 }
 
