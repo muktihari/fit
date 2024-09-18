@@ -451,7 +451,7 @@ func TestValidateMessages(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(nil)
-			// Protocol Version now is set on encodeFileHeader as we allow dynamic protocol version
+			// Protocol Version is now selected by selectProtocolVersion method as we allow dynamic protocol version
 			// based on FileHeader. This by pass it since we don't encode file header.
 			enc.protocolValidator.ProtocolVersion = tc.protocolVersion
 			err := enc.validateMessages(tc.messages)
