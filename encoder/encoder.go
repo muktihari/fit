@@ -249,6 +249,10 @@ func (e *Encoder) reset() {
 //
 // Encode chooses which strategy to use for encoding the data based on given writer.
 func (e *Encoder) Encode(fit *proto.FIT) (err error) {
+	e.selectProtocolVersion(&fit.FileHeader)
+	if err = e.validateMessages(fit.Messages); err != nil {
+		return err
+	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		err = e.encodeWithDirectUpdateStrategy(fit)
@@ -265,6 +269,31 @@ func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 		return f.Flush()
 	}
 	return
+}
+
+func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
+	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
+		fileHeader.ProtocolVersion = e.options.protocolVersion
+	} else if fileHeader.ProtocolVersion == 0 { // Default when not specified in FileHeader.
+		fileHeader.ProtocolVersion = proto.V1
+	}
+	e.protocolValidator.ProtocolVersion = fileHeader.ProtocolVersion
+}
+
+func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
+	defer e.options.messageValidator.Reset()
+	for i := range messages {
+		mesg := &messages[i] // Must use pointer reference since validator may update the message.
+		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
+			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
+		}
+		if err = e.options.messageValidator.Validate(mesg); err != nil {
+			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
+				i, mesg.Num, mesg.Num.String(), err)
+		}
+	}
+	return nil
 }
 
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing,
@@ -315,13 +344,6 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	if header.ProfileVersion == 0 { // only change when zero to allow custom profile version
 		header.ProfileVersion = profile.Version
 	}
-
-	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
-		header.ProtocolVersion = e.options.protocolVersion
-	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
-		header.ProtocolVersion = proto.V1
-	}
-	e.protocolValidator.ProtocolVersion = header.ProtocolVersion
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
@@ -436,10 +458,6 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	mesg.Header = proto.MesgNormalHeaderMask
 
-	if err = e.options.messageValidator.Validate(mesg); err != nil {
-		return fmt.Errorf("message validation failed: %w", err)
-	}
-
 	var compressed bool
 	if e.options.headerOption == HeaderOptionCompressedTimestamp {
 		if e.w == io.Discard {
@@ -467,10 +485,6 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	mesgDef := e.newMessageDefinition(mesg)
-	if err := e.protocolValidator.ValidateMessageDefinition(mesgDef); err != nil {
-		return err
-	}
-
 	b, _ := mesgDef.MarshalAppend(e.buf[:0])
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 
@@ -578,6 +592,10 @@ func (e *Encoder) encodeCRC() error {
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
+	e.selectProtocolVersion(&fit.FileHeader)
+	if err = e.validateMessages(fit.Messages); err != nil {
+		return err
+	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		err = e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)

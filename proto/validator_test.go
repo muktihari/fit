@@ -6,9 +6,13 @@ package proto_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
+	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -68,6 +72,70 @@ func TestValidateMessageDefinition(t *testing.T) {
 			err := validator.ValidateMessageDefinition(&tc.mesgDef)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, git: %v", tc.err, err)
+			}
+		})
+	}
+}
+
+func TestValidateMessage(t *testing.T) {
+	tt := []struct {
+		name            string
+		mesg            proto.Message
+		protocolVersion proto.Version
+		err             error
+	}{
+		{
+			name:            "happy flow v1",
+			protocolVersion: proto.V1,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance),
+			}},
+		},
+		{
+			name:            "happy flow v2",
+			protocolVersion: proto.V2,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance),
+			}},
+		},
+		{
+			name:            "v1 is selected but mesg has developer data",
+			protocolVersion: proto.V1,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance),
+			}, DeveloperFields: []proto.DeveloperField{{}}},
+			err: proto.ErrProtocolViolation,
+		},
+		{
+			name:            "v1 is selected but mesg has type Int64",
+			protocolVersion: proto.V1,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{BaseType: basetype.Sint64}},
+			}},
+			err: proto.ErrProtocolViolation,
+		},
+		{
+			name:            "v2 is selected it's ok that mesg has developer data",
+			protocolVersion: proto.V2,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance),
+			}, DeveloperFields: []proto.DeveloperField{{}}},
+		},
+		{
+			name:            "v2 is selected it's ok that mesg has type Int64",
+			protocolVersion: proto.V2,
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{BaseType: basetype.Sint64}},
+			}},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			v := proto.NewValidator(tc.protocolVersion)
+			err := v.ValidateMessage(&tc.mesg)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
 		})
 	}

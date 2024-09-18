@@ -35,3 +35,19 @@ func (p *Validator) ValidateMessageDefinition(mesgDef *MessageDefinition) error 
 	}
 	return nil
 }
+
+// ValidateMessage validates whether the message contains unsupported data for the targeted version.
+func (p *Validator) ValidateMessage(mesg *Message) error {
+	if p.ProtocolVersion == V1 {
+		if len(mesg.DeveloperFields) > 0 {
+			return fmt.Errorf("protocol version 1.0 do not support developer fields: %w", ErrProtocolViolation)
+		}
+		for i := range mesg.Fields {
+			field := &mesg.Fields[i]
+			if field.BaseType&basetype.BaseTypeNumMask > basetype.Byte&basetype.BaseTypeNumMask { // byte was the last type added in 1.0
+				return fmt.Errorf("protocol version 1.0 do not support type '%s': %w", field.BaseType, ErrProtocolViolation)
+			}
+		}
+	}
+	return nil
+}
