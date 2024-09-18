@@ -927,6 +927,7 @@ func TestEncodeHeader(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			bytebuf := new(bytes.Buffer)
 			enc := New(bytebuf, append(tc.opts, WithWriteBufferSize(0))...)
+			enc.selectProtocolVersion(&tc.header)
 			_ = enc.encodeFileHeader(&tc.header)
 
 			if diff := cmp.Diff(bytebuf.Bytes(), tc.b); diff != "" {

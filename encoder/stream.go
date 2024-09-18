@@ -25,6 +25,7 @@ type StreamEncoder struct {
 //   - This method is called right after SequenceCompleted method has been called.
 func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 	if !e.fileHeaderWritten {
+		e.enc.selectProtocolVersion(&e.fileHeader)
 		if err := e.enc.encodeFileHeader(&e.fileHeader); err != nil {
 			return fmt.Errorf("could not encode file header: %w", err)
 		}

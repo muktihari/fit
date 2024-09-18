@@ -249,6 +249,7 @@ func (e *Encoder) reset() {
 //
 // Encode chooses which strategy to use for encoding the data based on given writer.
 func (e *Encoder) Encode(fit *proto.FIT) (err error) {
+	e.selectProtocolVersion(&fit.FileHeader)
 	if err = e.validateMessages(fit.Messages); err != nil {
 		return err
 	}
@@ -268,6 +269,15 @@ func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 		return f.Flush()
 	}
 	return
+}
+
+func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
+	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
+		fileHeader.ProtocolVersion = e.options.protocolVersion
+	} else if fileHeader.ProtocolVersion == 0 { // Default when not specified in FileHeader.
+		fileHeader.ProtocolVersion = proto.V1
+	}
+	e.protocolValidator.ProtocolVersion = fileHeader.ProtocolVersion
 }
 
 // encodeWithDirectUpdateStrategy encodes all data to file, after completing,
@@ -334,13 +344,6 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 	if header.ProfileVersion == 0 { // only change when zero to allow custom profile version
 		header.ProfileVersion = profile.Version
 	}
-
-	if e.options.protocolVersion != 0 { // Override regardless the value in FileHeader.
-		header.ProtocolVersion = e.options.protocolVersion
-	} else if header.ProtocolVersion == 0 { // Default when not specified in FileHeader.
-		header.ProtocolVersion = proto.V1
-	}
-	e.protocolValidator.ProtocolVersion = header.ProtocolVersion
 
 	header.DataType = proto.DataTypeFIT
 	header.CRC = 0 // recalculated
@@ -589,6 +592,7 @@ func (e *Encoder) encodeCRC() error {
 
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
+	e.selectProtocolVersion(&fit.FileHeader)
 	if err = e.validateMessages(fit.Messages); err != nil {
 		return err
 	}
