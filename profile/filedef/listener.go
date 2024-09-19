@@ -100,24 +100,44 @@ var _ decoder.MesgListener = (*Listener)(nil)
 // This will handle message conversion from proto.Message received from Decoder into
 // mesgdef's structure and group it by its correspoding defined file types.
 func NewListener(opts ...Option) *Listener {
-	l := &Listener{
-		options: defaultOptions(),
-		active:  true,
-	}
+	l := new(Listener)
+	l.Reset(opts...)
+	return l
+}
+
+// Reset resets the Listener for reuse. It resets options to default options so any
+// options needs to be inputed again. It is similar to NewListener() but it retains
+// the underlying storage for use by future decode to reduce memory allocs.
+func (l *Listener) Reset(opts ...Option) {
+	l.Close()
+	prevChannelBuffer := l.options.channelBuffer
+	l.options = defaultOptions()
 	for i := range opts {
 		opts[i](&l.options)
 	}
 
-	l.reset()
-
-	l.poolc = make(chan []proto.Field, l.options.channelBuffer)
-	for i := uint(0); i < l.options.channelBuffer; i++ {
-		l.poolc <- nil // fill pool with nil slice, alloc as needed.
+	if prevChannelBuffer != l.options.channelBuffer {
+		prevPoolc := l.poolc
+		l.poolc = make(chan []proto.Field, l.options.channelBuffer)
+		for i := uint(0); i < l.options.channelBuffer; i++ {
+			select {
+			case v := <-prevPoolc:
+				l.poolc <- v // fill with previously allocated slice.
+			default:
+				l.poolc <- nil // fill pool with nil slice, alloc as needed.
+			}
+		}
 	}
+	l.reset()
+	l.active = true
 
 	go l.loop()
+}
 
-	return l
+func (l *Listener) reset() {
+	l.file = nil
+	l.mesgc = make(chan proto.Message, l.options.channelBuffer)
+	l.done = make(chan struct{})
 }
 
 func (l *Listener) loop() {
@@ -184,10 +204,4 @@ func (l *Listener) Close() {
 func (l *Listener) File() File {
 	l.Close()
 	return l.file
-}
-
-func (l *Listener) reset() {
-	l.file = nil
-	l.mesgc = make(chan proto.Message, l.options.channelBuffer)
-	l.done = make(chan struct{})
 }
