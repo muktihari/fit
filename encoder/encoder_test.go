@@ -227,8 +227,7 @@ func (f fnValidate) Validate(mesg *proto.Message) error { return f(mesg) }
 func (f fnValidate) Reset()                             {}
 
 var (
-	fnValidateOK  = fnValidate(func(mesg *proto.Message) error { return nil })
-	fnValidateErr = fnValidate(func(mesg *proto.Message) error { return fmt.Errorf("validate error") })
+	fnValidateOK = fnValidate(func(mesg *proto.Message) error { return nil })
 )
 
 func TestOptions(t *testing.T) {
