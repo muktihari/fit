@@ -10,6 +10,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/muktihari/fit/encoder"
 	"github.com/muktihari/fit/factory"
@@ -49,6 +50,11 @@ func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
 	enc := encoder.New(fitWriter,
 		encoder.WithProtocolVersion(proto.V2),
 		encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15),
+		encoder.WithMessageValidator(
+			encoder.NewMessageValidator(
+				encoder.ValidatorWithPreserveInvalidValues(),
+			),
+		),
 	)
 
 	csvr := csv.NewReader(csvReader)
@@ -112,8 +118,22 @@ func (c *CSVToFITConv) convert() error {
 		case "Data":
 			mesgNum, ok := mesgNumLookup[mesgName]
 			if !ok {
-				c.unknownMesg++
-				continue
+				digits := strings.Map(func(r rune) rune {
+					if !unicode.IsDigit(r) {
+						return -1
+					}
+					return r
+				}, mesgName)
+				if digits == "" {
+					c.unknownMesg++
+					continue
+				}
+				// Unknown has number, try parsing it as MesgNum.
+				v, err := strconv.ParseUint(digits, 10, 16)
+				if err != nil {
+					return fmt.Errorf("could not parse unknown mesgNum %q: %w", mesgName, err)
+				}
+				mesgNum = typedef.MesgNum(v)
 			}
 
 			if mesgNum == mesgnum.FileId {
@@ -192,13 +212,33 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		if fieldName == "" {
 			continue
 		}
-		if strings.HasPrefix(fieldName, factory.NameUnknown) {
-			c.unknownField++
-			continue
+
+		var recoverableUnknownField bool
+		fieldNum, ok := fieldNumLookup[num][fieldName]
+		if !ok {
+			if strings.HasPrefix(fieldName, factory.NameUnknown) {
+				digits := strings.Map(func(r rune) rune {
+					if !unicode.IsDigit(r) {
+						return -1
+					}
+					return r
+				}, fieldName)
+				if digits == "" {
+					c.unknownField++
+					continue
+				}
+				v, err := strconv.ParseUint(digits, 10, 8)
+				if err != nil {
+					return mesg, fmt.Errorf("could not parse unknown fieldNum %q: %w", fieldName, err)
+				}
+				fieldNum = byte(v)
+				recoverableUnknownField = true
+				ok = true
+			}
 		}
 
-		if fieldNum, ok := fieldNumLookup[num][fieldName]; ok {
-			field, err := c.createField(num, fieldNum, strValue, units)
+		if ok {
+			field, err := c.createField(num, fieldNum, strValue, units, recoverableUnknownField)
 			if err != nil {
 				return mesg, fmt.Errorf("could not create field: num: %q (%d): %w", fieldName, fieldNum, err)
 			}
@@ -235,8 +275,12 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 	return mesg, nil
 }
 
-func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, units string) (field proto.Field, err error) {
+func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, units string, recoverableUnknownField bool) (field proto.Field, err error) {
 	field = factory.CreateField(mesgNum, num)
+	if recoverableUnknownField {
+		field.BaseType = basetype.FromString(units)
+		field.Type = profile.ProfileTypeFromBaseType(field.BaseType)
+	}
 
 	sliceValues := strings.Split(strValue, "|")
 	if len(sliceValues) != 1 || field.Array {
