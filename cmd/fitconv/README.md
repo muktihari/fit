@@ -7,7 +7,7 @@ This is designed to work seamlessly with CSVs produced by the Official FIT SDK's
 Note:
 
 - Currently, only conversions between FIT and CSV formats are supported. Other formats may be added in the future as needed or upon request.
-- When converting from CSV to FIT, any unknown messages and fields are omitted due to the inability to ascertain their correct value types without additional context.
+- When converting from CSV to FIT, any unknown messages and fields are omitted by default, unless the CSV file is created by fitconv using `--verbose` flags (see Usage for details).
 
 This program is available for download in [Release's Assets](https://github.com/muktihari/fit/releases).
 
