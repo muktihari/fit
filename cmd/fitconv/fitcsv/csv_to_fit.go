@@ -187,6 +187,8 @@ type dynamicFieldRef struct {
 	value string
 }
 
+var placeholderField = proto.Field{FieldBase: &proto.FieldBase{Num: 255, Name: "fitconv_field_placeholder"}}
+
 func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.Message, error) {
 	c.col = 0
 
@@ -214,7 +216,11 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		}
 
 		var recoverableUnknownField bool
-		fieldNum, ok := fieldNumLookup[num][fieldName]
+		var fieldNum byte
+		var ok bool
+		if int(num) < len(fieldNumLookup) {
+			fieldNum, ok = fieldNumLookup[num][fieldName]
+		}
 		if !ok {
 			if strings.HasPrefix(fieldName, factory.NameUnknown) {
 				digits := strings.Map(func(r rune) rune {
@@ -262,6 +268,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 			name:  fieldName,
 			value: strValue,
 		})
+		mesg.Fields = append(mesg.Fields, placeholderField)
 	}
 
 	for _, ref := range dynamicFieldRefs {
@@ -409,13 +416,26 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 						return err
 					}
 
-					mesgRef.Fields = append(mesgRef.Fields[:ref.index+1], mesgRef.Fields[ref.index:]...) // make space for fieldRef
-					mesgRef.Fields[ref.index] = fieldRef                                                 // put field at original index
+					mesgRef.Fields[ref.index] = fieldRef // replace field placeholder
 					return nil
 				}
 			}
 		}
 	}
+
+	// Remove remaining field placeholders if it can't be subtituted.
+	var valid int
+	for i := range mesgRef.Fields {
+		if mesgRef.Fields[i].Name == placeholderField.Name {
+			continue
+		}
+		if i != valid {
+			mesgRef.Fields[i], mesgRef.Fields[valid] = mesgRef.Fields[valid], mesgRef.Fields[i]
+		}
+		valid++
+	}
+	mesgRef.Fields = mesgRef.Fields[:valid]
+
 	c.unknwonDynamicField++
 	return nil
 }
