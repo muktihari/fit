@@ -55,7 +55,7 @@ type options struct {
 	ondiskWriteBuffer         int  // Buffer on read/write in disk when useDisk is specified.
 	useDisk                   bool // Write temporary data in disk instead of in memory.
 	printRawValue             bool // Print scaled value as is in the binary form (sint, uint, etc.) than in its representation.
-	printUnknownMesgNum       bool // Print 'unknown(68)' instead of 'unknown'.
+	verbose                   bool // Print 'unknown(68)' instead of 'unknown'.
 	printOnlyValidValue       bool // Print invalid value e.g. 65535 for uint16.
 	printGPSPositionInDegrees bool // Print latitude and longitude in degrees instead of semicircles.
 	trimTrailingCommas        bool
@@ -67,7 +67,7 @@ func defaultOptions() *options {
 		useDisk:                   false,
 		ondiskWriteBuffer:         4 << 10,
 		printRawValue:             false,
-		printUnknownMesgNum:       false,
+		verbose:                   false,
 		printOnlyValidValue:       false,
 		printGPSPositionInDegrees: false,
 		trimTrailingCommas:        false,
@@ -90,7 +90,7 @@ func WithPrintRawValue() Option {
 }
 
 func WithPrintUnknownMesgNum() Option {
-	return func(o *options) { o.printUnknownMesgNum = true }
+	return func(o *options) { o.verbose = true }
 }
 
 func WithUseDisk(writeBuffer int) Option {
@@ -305,7 +305,7 @@ func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 	mesgName := mesgDef.MesgNum.String()
 	if strings.HasPrefix(mesgName, "MesgNumInvalid") {
 		mesgName = factory.NameUnknown
-		if c.options.printUnknownMesgNum {
+		if c.options.verbose {
 			mesgName = formatUnknown(int(mesgDef.MesgNum))
 		}
 	}
@@ -317,7 +317,7 @@ func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 		field := factory.CreateField(mesgDef.MesgNum, fieldDef.Num)
 
 		name := field.Name
-		if c.options.printUnknownMesgNum && name == factory.NameUnknown {
+		if c.options.verbose && name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
 		}
 
@@ -338,7 +338,7 @@ func (c *FITToCSVConv) writeMesgDef(mesgDef proto.MessageDefinition) {
 		fieldDesc := c.getFieldDescription(devFieldDef.DeveloperDataIndex, devFieldDef.Num)
 		if fieldDesc != nil {
 			name = strings.Join(fieldDesc.FieldName, "|")
-		} else if c.options.printUnknownMesgNum {
+		} else if c.options.verbose {
 			name = formatUnknown(int(devFieldDef.Num))
 		}
 		c.buf.WriteString(name)
@@ -379,7 +379,7 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 	mesgName := mesg.Num.String()
 	if strings.HasPrefix(mesgName, "MesgNumInvalid") {
 		mesgName = factory.NameUnknown
-		if c.options.printUnknownMesgNum {
+		if c.options.verbose {
 			mesgName = formatUnknown(int(mesg.Num))
 		}
 	}
@@ -396,8 +396,9 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 		}
 
 		name, units := field.Name, field.Units
-		if c.options.printUnknownMesgNum && field.Name == factory.NameUnknown {
+		if c.options.verbose && field.Name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
+			units = field.BaseType.String()
 		}
 		if subField := field.SubFieldSubtitution(&mesg); subField != nil {
 			name, units = subField.Name, subField.Units
@@ -433,7 +434,7 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 		if fieldDesc != nil {
 			name = strings.Join(fieldDesc.FieldName, "|")
 			units = strings.Join(fieldDesc.Units, "|")
-		} else if c.options.printUnknownMesgNum {
+		} else if c.options.verbose {
 			name = formatUnknown(int(devField.Num))
 		}
 

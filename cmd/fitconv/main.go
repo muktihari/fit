@@ -22,42 +22,64 @@ var version = "dev"
 
 const blockSize = 8 << 10
 
+const about = `
+fitconv or FIT Converter is a CLI program to convert FIT into other format. 
+Currently, it can only convert FIT to CSV and CSV to FIT (back-and-forth). 
+This is designed to work seamlessly with CSVs produced by the Official 
+FIT SDK's FitCSVTool.jar. However, interoperability is not 100% guaranteed.
+
+If you find this program helpful, consider:
+- Giving a GitHub star: https://github.com/muktihari/fit
+- Or become a sponsor: https://github.com/sponsors/muktihari
+
+Every bit of support means a lot. Thank you!
+`
+
 func main() {
 	var opt string
 	if version != "dev" {
 		flag.StringVar(&opt, "opt", "", "")
 	}
 
-	var flagVersion bool
-	flag.BoolVar(&flagVersion, "v", false, "Show version")
+	var printVersion, printVersionHelp = false, "Show version"
+	flag.BoolVar(&printVersion, "v", false, printVersionHelp)
+	flag.BoolVar(&printVersion, "version", false, printVersionHelp)
 
-	var flagUseDisk bool
-	flag.BoolVar(&flagUseDisk, "disk", false, "Use disk instead of load everything in memory")
+	var printAbout bool
+	flag.BoolVar(&printAbout, "about", false, "Print about this program")
 
-	var flagPrintUnknownMesgNum bool
-	flag.BoolVar(&flagPrintUnknownMesgNum, "unknown", false, "Print unknown mesg num e.g. 'unknown(68)' instead of 'unknown'")
+	var useDisk bool
+	flag.BoolVar(&useDisk, "disk", false, "Use disk instead of load everything in memory")
 
-	var flagPrintOnlyValidValue bool
-	flag.BoolVar(&flagPrintOnlyValidValue, "valid", false, "Print only valid value")
+	var verbose bool
+	flag.BoolVar(&verbose, "verbose", false, "Print unknown with number e.g. 'unknown(68)' instead of 'unknown'")
 
-	var flagPrintRawValue bool
-	flag.BoolVar(&flagPrintRawValue, "raw", false, "Use raw value instead of scaled value")
+	var printOnlyValidValue bool
+	flag.BoolVar(&printOnlyValidValue, "valid", false, "Print only valid value")
 
-	var flagPrintDegrees bool
-	flag.BoolVar(&flagPrintDegrees, "deg", false, "Print GPS position (Lat & Long) in degrees instead of semicircles")
+	var printRawValue bool
+	flag.BoolVar(&printRawValue, "raw", false, "Use raw value instead of scaled value")
 
-	var flagTrimTrailingCommas bool
-	flag.BoolVar(&flagTrimTrailingCommas, "trim", false, "Trim trailing commas in every line")
+	var printDegrees bool
+	flag.BoolVar(&printDegrees, "deg", false, "Print GPS position (Lat & Long) in degrees instead of semicircles")
 
-	var flagNoExpandComponents bool
-	flag.BoolVar(&flagNoExpandComponents, "no-expand", false, "[Decode Option] Do not expand components")
+	var trimTrailingCommas bool
+	flag.BoolVar(&trimTrailingCommas, "trim", false, "Trim trailing commas in every line")
 
-	var flagNoChecksum bool
-	flag.BoolVar(&flagNoChecksum, "no-checksum", false, "[Decode Option] should not do crc checksum")
+	var noExpand bool
+	flag.BoolVar(&noExpand, "no-expand", false, "[Decode Option] Do not expand components")
+
+	var noChecksum bool
+	flag.BoolVar(&noChecksum, "no-checksum", false, "[Decode Option] should not do crc checksum")
 
 	flag.Parse()
 
-	if flagVersion {
+	if printAbout {
+		fmt.Print(about)
+		return
+	}
+
+	if printVersion {
 		fmt.Println(version)
 		return
 	}
@@ -85,30 +107,30 @@ func main() {
 	*/
 
 	var fitToCsvOptions []fitcsv.Option
-	if flagUseDisk {
+	if useDisk {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithUseDisk(blockSize))
 	}
-	if flagPrintRawValue {
+	if printRawValue {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintRawValue())
 	}
-	if flagPrintUnknownMesgNum {
+	if verbose {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintUnknownMesgNum())
 	}
-	if flagPrintDegrees {
+	if printDegrees {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintGPSPositionInDegrees())
 	}
-	if flagPrintOnlyValidValue {
+	if printOnlyValidValue {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithPrintOnlyValidValue())
 	}
-	if flagTrimTrailingCommas {
+	if trimTrailingCommas {
 		fitToCsvOptions = append(fitToCsvOptions, fitcsv.WithTrimTrailingCommas())
 	}
 
 	var decoderOptions []decoder.Option
-	if flagNoExpandComponents {
+	if noExpand {
 		decoderOptions = append(decoderOptions, decoder.WithNoComponentExpansion())
 	}
-	if flagNoChecksum {
+	if noChecksum {
 		decoderOptions = append(decoderOptions, decoder.WithIgnoreChecksum())
 	}
 
@@ -244,7 +266,7 @@ func csvToFit(path string) error {
 		info = fmt.Sprintf(" [Info: %s are skipped]", strings.Join(skipped, ", "))
 	}
 
-	fmt.Printf("🚀 %q -> %q.%s\n", filepath.Join(dir, path), filepath.Join(dir, namefit), info)
+	fmt.Printf("🚀 %q -> %q%s\n", filepath.Join(dir, path), filepath.Join(dir, namefit), info)
 
 	return nil
 }
