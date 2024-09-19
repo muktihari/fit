@@ -149,6 +149,9 @@ func (c *CSVToFITConv) convert() error {
 			if err != nil {
 				return fmt.Errorf("could not create mesg: num: %q (%d): %w", mesgNum, mesgNum, err)
 			}
+			if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
+				continue
+			}
 
 			if mesg.Num == mesgnum.FieldDescription {
 				c.fieldDescriptions = append(c.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
@@ -199,7 +202,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 	}
 
 	if len(record) < 6 {
-		return mesg, nil
+		return proto.Message{}, nil
 	}
 
 	var dynamicFieldRefs []dynamicFieldRef
@@ -235,7 +238,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 				}
 				v, err := strconv.ParseUint(digits, 10, 8)
 				if err != nil {
-					return mesg, fmt.Errorf("could not parse unknown fieldNum %q: %w", fieldName, err)
+					return proto.Message{}, fmt.Errorf("could not parse unknown fieldNum %q: %w", fieldName, err)
 				}
 				fieldNum = byte(v)
 				recoverableUnknownField = true
@@ -246,7 +249,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		if ok {
 			field, err := c.createField(num, fieldNum, strValue, units, recoverableUnknownField)
 			if err != nil {
-				return mesg, fmt.Errorf("could not create field: num: %q (%d): %w", fieldName, fieldNum, err)
+				return proto.Message{}, fmt.Errorf("could not create field: num: %q (%d): %w", fieldName, fieldNum, err)
 			}
 			mesg.Fields = append(mesg.Fields, field)
 			continue
@@ -254,11 +257,11 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 
 		devField, err := c.createDeveloperField(fieldName, strValue, units)
 		if err != nil {
-			return mesg, fmt.Errorf("could not create developer field: %w", err)
+			return proto.Message{}, fmt.Errorf("could not create developer field: %w", err)
 		}
 		if devField.Value.Type() != proto.TypeInvalid {
 			mesg.DeveloperFields = append(mesg.DeveloperFields, devField)
-			return mesg, nil
+			continue
 		}
 
 		// If the field cannot be found in fieldNumLookup and isn't a valid developer field,
@@ -273,9 +276,22 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 
 	for _, ref := range dynamicFieldRefs {
 		if err := c.revertSubFieldSubtitution(&mesg, ref); err != nil {
-			return mesg, err
+			return proto.Message{}, err
 		}
 	}
+
+	// Remove remaining field placeholders if it can't be subtituted.
+	var valid int
+	for i := range mesg.Fields {
+		if mesg.Fields[i].Name == placeholderField.Name {
+			continue
+		}
+		if i != valid {
+			mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
+		}
+		valid++
+	}
+	mesg.Fields = mesg.Fields[:valid]
 
 	removeExpandedComponents(&mesg)
 
@@ -422,19 +438,6 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 			}
 		}
 	}
-
-	// Remove remaining field placeholders if it can't be subtituted.
-	var valid int
-	for i := range mesgRef.Fields {
-		if mesgRef.Fields[i].Name == placeholderField.Name {
-			continue
-		}
-		if i != valid {
-			mesgRef.Fields[i], mesgRef.Fields[valid] = mesgRef.Fields[valid], mesgRef.Fields[i]
-		}
-		valid++
-	}
-	mesgRef.Fields = mesgRef.Fields[:valid]
 
 	c.unknwonDynamicField++
 	return nil
