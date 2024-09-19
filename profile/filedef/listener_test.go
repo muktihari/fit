@@ -267,3 +267,8 @@ func TestClose(t *testing.T) {
 	l.Close()
 	l.Close() // already closed, should not panic
 }
+
+func TestReset(t *testing.T) {
+	l := filedef.NewListener()
+	l.Reset(filedef.WithChannelBuffer(256))
+}
