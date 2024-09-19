@@ -246,20 +246,20 @@ func (d *Decoder) reset() {
 	d.messages = nil
 	d.crc = 0
 	d.fileId = nil
-	d.developerDataIndexes = d.developerDataIndexes[:0]
-	d.fieldDescriptions = d.fieldDescriptions[:0]
 }
 
-// releaseTemporaryObjects releases objects that being created on a single decode process
-// by stops referencing those objects so it can be released on next GC cycle.
+// releaseTemporaryObjects releases objects that being created during a single decode process
+// by stops referencing those objects so it can be garbage-collected on next GC cycle.
 func (d *Decoder) releaseTemporaryObjects() {
 	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
 	d.fieldsArray = [255]proto.Field{}
 	d.developerFieldsArray = [255]proto.DeveloperField{}
 	d.messages = nil
+	d.developerDataIndexes = d.developerDataIndexes[:0]
 	for i := range d.fieldDescriptions {
 		d.fieldDescriptions[i] = nil
 	}
+	d.fieldDescriptions = d.fieldDescriptions[:0]
 }
 
 // CheckIntegrity checks all FIT sequences of given reader are valid determined by these following checks:
