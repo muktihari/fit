@@ -277,6 +277,19 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		}
 	}
 
+	// Remove remaining field placeholders if it can't be subtituted.
+	var valid int
+	for i := range mesg.Fields {
+		if mesg.Fields[i].Name == placeholderField.Name {
+			continue
+		}
+		if i != valid {
+			mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
+		}
+		valid++
+	}
+	mesg.Fields = mesg.Fields[:valid]
+
 	removeExpandedComponents(&mesg)
 
 	return mesg, nil
@@ -422,19 +435,6 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 			}
 		}
 	}
-
-	// Remove remaining field placeholders if it can't be subtituted.
-	var valid int
-	for i := range mesgRef.Fields {
-		if mesgRef.Fields[i].Name == placeholderField.Name {
-			continue
-		}
-		if i != valid {
-			mesgRef.Fields[i], mesgRef.Fields[valid] = mesgRef.Fields[valid], mesgRef.Fields[i]
-		}
-		valid++
-	}
-	mesgRef.Fields = mesgRef.Fields[:valid]
 
 	c.unknwonDynamicField++
 	return nil
