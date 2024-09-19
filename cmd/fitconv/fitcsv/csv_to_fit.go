@@ -85,8 +85,9 @@ func (c *CSVToFITConv) Convert() error {
 }
 
 func (c *CSVToFITConv) convert() error {
-loop:
 	for {
+		c.line++
+
 		record, err := c.csv.Read()
 		if err == io.EOF {
 			break
@@ -99,7 +100,6 @@ loop:
 			continue
 		}
 
-		c.line++
 		var (
 			header   = record[0]
 			_        = record[1] // local message num
@@ -108,12 +108,12 @@ loop:
 
 		switch header {
 		case "Type", "Definition":
-			continue loop
+			continue
 		case "Data":
 			mesgNum, ok := mesgNumLookup[mesgName]
 			if !ok {
 				c.unknownMesg++
-				continue loop
+				continue
 			}
 
 			if mesgNum == mesgnum.FileId {
@@ -127,7 +127,7 @@ loop:
 
 			mesg, err := c.createMesg(mesgNum, record)
 			if err != nil {
-				return fmt.Errorf("could not create mesg: %w", err)
+				return fmt.Errorf("could not create mesg: num: %q (%d): %w", mesgNum, mesgNum, err)
 			}
 
 			if mesg.Num == mesgnum.FieldDescription {
@@ -138,7 +138,7 @@ loop:
 				mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 				mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
 				c.fit.Messages = append(c.fit.Messages, mesg)
-				continue loop
+				continue
 			}
 
 			if err = c.streamEnc.WriteMessage(&mesg); err != nil {
@@ -168,6 +168,8 @@ type dynamicFieldRef struct {
 }
 
 func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.Message, error) {
+	c.col = 0
+
 	mesg := proto.Message{
 		Num:             num,
 		Fields:          c.fieldsArray[:0],
@@ -181,6 +183,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 	var dynamicFieldRefs []dynamicFieldRef
 
 	for i := 3; i+2 < len(record); i += 3 {
+		c.col = i
 		var (
 			fieldName = record[i+0]
 			strValue  = record[i+1]
@@ -197,7 +200,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		if fieldNum, ok := fieldNumLookup[num][fieldName]; ok {
 			field, err := c.createField(num, fieldNum, strValue, units)
 			if err != nil {
-				return mesg, fmt.Errorf("could not create field: %w", err)
+				return mesg, fmt.Errorf("could not create field: num: %q (%d): %w", fieldName, fieldNum, err)
 			}
 			mesg.Fields = append(mesg.Fields, field)
 			continue
@@ -248,8 +251,8 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 				units,
 			)
 			if err != nil {
-				return field, fmt.Errorf("%q: [%d]: could not parse %q into %s: %v",
-					field.Name, i, sliceValues[i], field.BaseType.GoType(), err)
+				return field, fmt.Errorf("[%d]: could not parse %q into %s: %v",
+					i, sliceValues[i], field.BaseType.GoType(), err)
 			}
 			protoValues = append(protoValues, value)
 		}
@@ -266,8 +269,8 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 		units,
 	)
 	if err != nil {
-		err = fmt.Errorf("%q: could not parse %q into %s: %v",
-			field.Name, strValue, field.BaseType.GoType(), err)
+		err = fmt.Errorf("could not parse %q into %s: %v",
+			strValue, field.BaseType.GoType(), err)
 	}
 
 	return
@@ -421,11 +424,11 @@ func parseValue(strValue string, baseType basetype.BaseType, profileType profile
 	}
 
 	var scaledValue float64
-	var isScaled bool = strings.Contains(strValue, ".")
+	var isScaled bool = baseType != basetype.String && strings.Contains(strValue, ".")
 	if isScaled {
 		scaledValue, err = strconv.ParseFloat(strValue, 64)
 		if err != nil {
-			return value, err
+			return value, fmt.Errorf("try")
 		}
 		scaledValue = scaleoffset.Discard(scaledValue, scale, offset)
 	}

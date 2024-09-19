@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -53,7 +54,13 @@ func format(val proto.Value) string {
 		}
 		return strconv.FormatFloat(value, 'g', -1, 64)
 	case proto.TypeString:
-		return val.String()
+		s := strings.Map(func(r rune) rune {
+			if !unicode.IsPrint(r) || r == '"' {
+				return -1
+			}
+			return r
+		}, val.String())
+		return s
 	case proto.TypeSliceBool:
 		return concat(val.SliceBool(), func(v typedef.Bool) string {
 			return strconv.FormatUint(uint64(v), 10)
@@ -105,7 +112,16 @@ func format(val proto.Value) string {
 			return strconv.FormatFloat(v, 'g', -1, 64)
 		})
 	case proto.TypeSliceString:
-		return concat(val.SliceString(), func(v string) string {
+		vs := val.SliceString()
+		for i := range vs {
+			vs[i] = strings.Map(func(r rune) rune {
+				if !unicode.IsPrint(r) || r == '"' {
+					return -1
+				}
+				return r
+			}, vs[i])
+		}
+		return concat(vs, func(v string) string {
 			return v
 		})
 	default:
