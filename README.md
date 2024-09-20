@@ -7,7 +7,7 @@
 [![Profile Version](https://img.shields.io/badge/profile-v21.141-lightblue.svg?style=flat)](https://developer.garmin.com/fit/download)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
-This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) protocol](https://developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).
+This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) Protocol](https://developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).
 
 ## Motivation
 
@@ -340,7 +340,15 @@ NOTE: The `1st` on the list, "raw", means we decode the file into the original F
 
 We decode slightly faster and encode significantly faster. We allocate far fewer objects on the heap and have a smaller memory footprint for both decoding and encoding.
 
+## Supports
+
+If you have any questions or would like to discuss something, feel free to [open a discussion](https://github.com/muktihari/fit/discussions). If you encounter any issue, feel free to [open an issue](https://github.com/muktihari/fit/issues). We'll do our best to help with any issues as we are able to.
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](/CONTRIBUTING.md).
 Thank you, [contributors](https://github.com/muktihari/fit/graphs/contributors)!
+
+## Sponsorship
+
+If you find this project helpful, please consider giving it a GitHub star. You can also contribute to the development of this project by [becoming a sponsor](https://github.com/sponsors/muktihari). Every bit of support, even just buying me a coffee, truly means a lot. Thank you!
