@@ -129,15 +129,15 @@ func (l *Listener) Reset(opts ...Option) {
 		}
 	}
 	l.reset()
-	l.active = true
-
-	go l.loop()
 }
 
 func (l *Listener) reset() {
 	l.file = nil
 	l.mesgc = make(chan proto.Message, l.options.channelBuffer)
 	l.done = make(chan struct{})
+	l.active = true
+
+	go l.loop()
 }
 
 func (l *Listener) loop() {
@@ -166,26 +166,13 @@ func (l *Listener) processMesg(mesg proto.Message) {
 func (l *Listener) OnMesg(mesg proto.Message) {
 	if !l.active {
 		l.reset()
-		go l.loop()
-		l.active = true
 	}
-	l.mesgc <- l.prep(mesg)
-}
 
-func (l *Listener) prep(mesg proto.Message) proto.Message {
-	fields := <-l.poolc
-
-	if cap(fields) < len(mesg.Fields) {
-		fields = make([]proto.Field, len(mesg.Fields))
-	}
-	fields = fields[:len(mesg.Fields)]
-	copy(fields, mesg.Fields)
-	mesg.Fields = fields
-
+	mesg.Fields = append((<-l.poolc)[:0], mesg.Fields...)
 	// Must clone DeveloperFields since it is being referenced in mesgdef's structs.
 	mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
 
-	return mesg
+	l.mesgc <- mesg
 }
 
 // Close closes channel and wait until all messages is consumed.
