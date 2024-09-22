@@ -44,6 +44,7 @@ type Activity struct {
 	TimeInZones    []*mesgdef.TimeInZone
 	Splits         []*mesgdef.Split
 	SplitSummaries []*mesgdef.SplitSummary // entries must be unique within each split_type
+	Sports         []*mesgdef.Sport
 
 	// Messages not related to Activity
 	UnrelatedMessages []proto.Message
@@ -105,6 +106,8 @@ func (f *Activity) Add(mesg proto.Message) {
 		f.Splits = append(f.Splits, mesgdef.NewSplit(&mesg))
 	case mesgnum.SplitSummary:
 		f.SplitSummaries = append(f.SplitSummaries, mesgdef.NewSplitSummary(&mesg))
+	case mesgnum.Sport:
+		f.Sports = append(f.Sports, mesgdef.NewSport(&mesg))
 	default:
 		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
@@ -119,7 +122,8 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 		len(f.Laps) + len(f.Records) + len(f.DeviceInfos) + len(f.Events) +
 		len(f.Lengths) + len(f.SegmentLaps) + len(f.ZonesTargets) + len(f.Workouts) +
 		len(f.WorkoutSteps) + len(f.HRs) + len(f.HRVs) + len(f.GpsMetadatas) +
-		len(f.TimeInZones) + len(f.Splits) + len(f.SplitSummaries) + len(f.UnrelatedMessages)
+		len(f.TimeInZones) + len(f.Splits) + len(f.SplitSummaries) + len(f.Sports) +
+		len(f.UnrelatedMessages)
 
 	fit := proto.FIT{
 		Messages: make([]proto.Message, 0, size),
@@ -135,11 +139,44 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 	for i := range f.FieldDescriptions {
 		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
 	}
+
+	// Let's put non-timestamp messages at the beginning, we don't need to sort it anyway.
+	if f.UserProfile != nil {
+		sortStartPos += 1
+		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
+	}
+	sortStartPos += len(f.ZonesTargets)
+	for i := range f.ZonesTargets {
+		fit.Messages = append(fit.Messages, f.ZonesTargets[i].ToMesg(options))
+	}
+	sortStartPos += len(f.Workouts)
+	for i := range f.Workouts {
+		fit.Messages = append(fit.Messages, f.Workouts[i].ToMesg(options))
+	}
+	sortStartPos += len(f.WorkoutSteps)
+	for i := range f.WorkoutSteps {
+		fit.Messages = append(fit.Messages, f.WorkoutSteps[i].ToMesg(options))
+	}
+	sortStartPos += len(f.HRVs)
+	for i := range f.HRVs {
+		fit.Messages = append(fit.Messages, f.HRVs[i].ToMesg(options))
+	}
+	sortStartPos += len(f.Splits)
+	for i := range f.Splits {
+		fit.Messages = append(fit.Messages, f.Splits[i].ToMesg(options))
+	}
+	sortStartPos += len(f.SplitSummaries)
+	for i := range f.SplitSummaries {
+		fit.Messages = append(fit.Messages, f.SplitSummaries[i].ToMesg(options))
+	}
+	sortStartPos += len(f.Sports)
+	for i := range f.Sports {
+		fit.Messages = append(fit.Messages, f.Sports[i].ToMesg(options))
+	}
+
+	// Below are messages with timestamp, should be sorted.
 	for i := range f.DeviceInfos {
 		fit.Messages = append(fit.Messages, f.DeviceInfos[i].ToMesg(options))
-	}
-	if f.UserProfile != nil {
-		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
 	if f.Activity != nil {
 		fit.Messages = append(fit.Messages, f.Activity.ToMesg(options))
@@ -162,32 +199,14 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 	for i := range f.SegmentLaps {
 		fit.Messages = append(fit.Messages, f.SegmentLaps[i].ToMesg(options))
 	}
-	for i := range f.ZonesTargets {
-		fit.Messages = append(fit.Messages, f.ZonesTargets[i].ToMesg(options))
-	}
-	for i := range f.Workouts {
-		fit.Messages = append(fit.Messages, f.Workouts[i].ToMesg(options))
-	}
-	for i := range f.WorkoutSteps {
-		fit.Messages = append(fit.Messages, f.WorkoutSteps[i].ToMesg(options))
-	}
 	for i := range f.HRs {
 		fit.Messages = append(fit.Messages, f.HRs[i].ToMesg(options))
-	}
-	for i := range f.HRVs {
-		fit.Messages = append(fit.Messages, f.HRVs[i].ToMesg(options))
 	}
 	for i := range f.GpsMetadatas {
 		fit.Messages = append(fit.Messages, f.GpsMetadatas[i].ToMesg(options))
 	}
 	for i := range f.TimeInZones {
 		fit.Messages = append(fit.Messages, f.TimeInZones[i].ToMesg(options))
-	}
-	for i := range f.Splits {
-		fit.Messages = append(fit.Messages, f.Splits[i].ToMesg(options))
-	}
-	for i := range f.SplitSummaries {
-		fit.Messages = append(fit.Messages, f.SplitSummaries[i].ToMesg(options))
 	}
 
 	fit.Messages = append(fit.Messages, f.UnrelatedMessages...)
