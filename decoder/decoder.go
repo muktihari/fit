@@ -42,7 +42,6 @@ const (
 	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
 
 	errInvalidBaseType = errorString("invalid basetype")
-	errMissingFileId   = errorString("missing file_id")
 )
 
 // Decoder is FIT file decoder. See New() for details.
@@ -343,7 +342,8 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
-// FileId message should be the first message of any FIT file, otherwise return an error.
+// The FileId is expected to be present as the first message; however, we don't validate this,
+// as it's an edge case that occurs when a FIT file is poorly encoded.
 //
 // If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
@@ -353,15 +353,10 @@ func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return nil, d.err
 	}
-	for len(d.messages) == 0 {
+	for d.fileId == nil {
 		if d.err = d.decodeMessage(); d.err != nil {
 			return nil, d.err
 		}
-	}
-	if d.fileId == nil {
-		mesg := &d.messages[0]
-		return nil, fmt.Errorf("expect file_id as first mesg, got: %s(%d): %w",
-			mesg.Num, mesg.Num, errMissingFileId)
 	}
 	return d.fileId, nil
 }
