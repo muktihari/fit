@@ -24,9 +24,8 @@ type HsaStepData struct {
 	Steps              []uint32  // Array: [N]; Units: steps; Total step sum
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaStepData creates new HsaStepData struct based on given mesg.
@@ -34,14 +33,23 @@ type HsaStepData struct {
 func NewHsaStepData(mesg *proto.Message) *HsaStepData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -50,6 +58,7 @@ func NewHsaStepData(mesg *proto.Message) *HsaStepData {
 		ProcessingInterval: vals[0].Uint16(),
 		Steps:              vals[1].SliceUint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -85,6 +94,10 @@ func (m *HsaStepData) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -118,6 +131,12 @@ func (m *HsaStepData) SetProcessingInterval(v uint16) *HsaStepData {
 // Array: [N]; Units: steps; Total step sum
 func (m *HsaStepData) SetSteps(v []uint32) *HsaStepData {
 	m.Steps = v
+	return m
+}
+
+// SetDeveloperFields HsaStepData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaStepData) SetUnknownFields(unknownFields ...proto.Field) *HsaStepData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

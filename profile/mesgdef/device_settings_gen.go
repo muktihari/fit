@@ -47,9 +47,8 @@ type DeviceSettings struct {
 	TapInterface                        typedef.Switch
 	TapSensitivity                      typedef.TapSensitivity // Used to hold the tap threshold setting
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDeviceSettings creates new DeviceSettings struct based on given mesg.
@@ -57,14 +56,23 @@ type DeviceSettings struct {
 func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
 	vals := [175]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 174 {
+			if mesg.Fields[i].Num > 174 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -98,6 +106,7 @@ func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
 		TapInterface:                        typedef.Switch(vals[134].Uint8()),
 		TapSensitivity:                      typedef.TapSensitivity(vals[174].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -236,6 +245,10 @@ func (m *DeviceSettings) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 174)
 		field.Value = proto.Uint8(byte(m.TapSensitivity))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -473,6 +486,12 @@ func (m *DeviceSettings) SetTapInterface(v typedef.Switch) *DeviceSettings {
 // Used to hold the tap threshold setting
 func (m *DeviceSettings) SetTapSensitivity(v typedef.TapSensitivity) *DeviceSettings {
 	m.TapSensitivity = v
+	return m
+}
+
+// SetDeveloperFields DeviceSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *DeviceSettings) SetUnknownFields(unknownFields ...proto.Field) *DeviceSettings {
+	m.UnknownFields = unknownFields
 	return m
 }
 

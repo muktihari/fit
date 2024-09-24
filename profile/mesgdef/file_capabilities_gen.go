@@ -25,9 +25,8 @@ type FileCapabilities struct {
 	Type         typedef.File
 	Flags        typedef.FileFlags // Base: uint8z
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewFileCapabilities creates new FileCapabilities struct based on given mesg.
@@ -35,14 +34,23 @@ type FileCapabilities struct {
 func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -54,6 +62,7 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 		MaxCount:     vals[3].Uint16(),
 		MaxSize:      vals[4].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -104,6 +113,10 @@ func (m *FileCapabilities) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -150,6 +163,12 @@ func (m *FileCapabilities) SetMaxCount(v uint16) *FileCapabilities {
 // Units: bytes
 func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
 	m.MaxSize = v
+	return m
+}
+
+// SetDeveloperFields FileCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *FileCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FileCapabilities {
+	m.UnknownFields = unknownFields
 	return m
 }
 

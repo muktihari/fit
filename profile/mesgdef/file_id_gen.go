@@ -27,6 +27,8 @@ type FileId struct {
 	Product      uint16
 	Number       uint16 // Only set for files that are not created/erased.
 	Type         typedef.File
+
+	UnknownFields []proto.Field // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 }
 
 // NewFileId creates new FileId struct based on given mesg.
@@ -34,13 +36,22 @@ type FileId struct {
 func NewFileId(mesg *proto.Message) *FileId {
 	vals := [9]proto.Value{}
 
+	var unknownFields []proto.Field
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 8 {
+			if mesg.Fields[i].Num > 8 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 	}
 
 	return &FileId{
@@ -51,6 +62,8 @@ func NewFileId(mesg *proto.Message) *FileId {
 		TimeCreated:  datetime.ToTime(vals[4].Uint32()),
 		Number:       vals[5].Uint16(),
 		ProductName:  vals[8].String(),
+
+		UnknownFields: unknownFields,
 	}
 }
 
@@ -103,6 +116,10 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.ProductName)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -180,5 +197,11 @@ func (m *FileId) SetNumber(v uint16) *FileId {
 // Optional free form string to indicate the devices name or model
 func (m *FileId) SetProductName(v string) *FileId {
 	m.ProductName = v
+	return m
+}
+
+// SetDeveloperFields FileId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *FileId) SetUnknownFields(unknownFields ...proto.Field) *FileId {
+	m.UnknownFields = unknownFields
 	return m
 }

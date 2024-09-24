@@ -23,9 +23,8 @@ type SpeedZone struct {
 	MessageIndex typedef.MessageIndex
 	HighValue    uint16 // Scale: 1000; Units: m/s
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSpeedZone creates new SpeedZone struct based on given mesg.
@@ -33,14 +32,23 @@ type SpeedZone struct {
 func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -49,6 +57,7 @@ func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 		HighValue:    vals[0].Uint16(),
 		Name:         vals[1].String(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -82,6 +91,10 @@ func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -135,6 +148,12 @@ func (m *SpeedZone) SetHighValueScaled(v float64) *SpeedZone {
 // SetName sets Name value.
 func (m *SpeedZone) SetName(v string) *SpeedZone {
 	m.Name = v
+	return m
+}
+
+// SetDeveloperFields SpeedZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SpeedZone) SetUnknownFields(unknownFields ...proto.Field) *SpeedZone {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -27,9 +27,8 @@ type WeatherAlert struct {
 	Severity   typedef.WeatherSeverity   // Warning, Watch, Advisory, Statement
 	Type       typedef.WeatherSevereType // Tornado, Severe Thunderstorm, etc.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWeatherAlert creates new WeatherAlert struct based on given mesg.
@@ -37,14 +36,23 @@ type WeatherAlert struct {
 func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -56,6 +64,7 @@ func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 		Severity:   typedef.WeatherSeverity(vals[3].Uint8()),
 		Type:       typedef.WeatherSevereType(vals[4].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -104,6 +113,10 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -167,6 +180,12 @@ func (m *WeatherAlert) SetSeverity(v typedef.WeatherSeverity) *WeatherAlert {
 // Tornado, Severe Thunderstorm, etc.
 func (m *WeatherAlert) SetType(v typedef.WeatherSevereType) *WeatherAlert {
 	m.Type = v
+	return m
+}
+
+// SetDeveloperFields WeatherAlert's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *WeatherAlert) SetUnknownFields(unknownFields ...proto.Field) *WeatherAlert {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/proto"
 )
 
 func BenchmarkAggregate(b *testing.B) {
@@ -148,6 +149,22 @@ func TestAggregate(t *testing.T) {
 				S:     mesgdef.NewSession(nil).SetTimestamp(datetime.Epoch().Add(1)),
 				Total: 3,
 			},
+		},
+		{
+			name: "unknown fields",
+			dst: mesgdef.NewSession(nil).SetUnknownFields(
+				proto.Field{FieldBase: &proto.FieldBase{Num: 1}, Value: proto.Uint8(1)},
+				proto.Field{FieldBase: &proto.FieldBase{Num: 2}, Value: proto.Uint8(2)},
+			),
+			src: mesgdef.NewSession(nil).SetUnknownFields(
+				proto.Field{FieldBase: &proto.FieldBase{Num: 2}, Value: proto.Uint8(22)},
+				proto.Field{FieldBase: &proto.FieldBase{Num: 3}, Value: proto.Uint8(3)},
+			),
+			exp: mesgdef.NewSession(nil).SetUnknownFields(
+				proto.Field{FieldBase: &proto.FieldBase{Num: 1}, Value: proto.Uint8(1)},
+				proto.Field{FieldBase: &proto.FieldBase{Num: 2}, Value: proto.Uint8(2)},
+				proto.Field{FieldBase: &proto.FieldBase{Num: 3}, Value: proto.Uint8(3)},
+			),
 		},
 	}
 

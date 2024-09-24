@@ -23,9 +23,8 @@ type ExdScreenConfiguration struct {
 	Layout        typedef.ExdLayout
 	ScreenEnabled typedef.Bool
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewExdScreenConfiguration creates new ExdScreenConfiguration struct based on given mesg.
@@ -33,14 +32,23 @@ type ExdScreenConfiguration struct {
 func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 	vals := [4]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 3 {
+			if mesg.Fields[i].Num > 3 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -50,6 +58,7 @@ func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 		Layout:        typedef.ExdLayout(vals[2].Uint8()),
 		ScreenEnabled: vals[3].Bool(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -90,6 +99,10 @@ func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -122,6 +135,12 @@ func (m *ExdScreenConfiguration) SetLayout(v typedef.ExdLayout) *ExdScreenConfig
 // SetScreenEnabled sets ScreenEnabled value.
 func (m *ExdScreenConfiguration) SetScreenEnabled(v typedef.Bool) *ExdScreenConfiguration {
 	m.ScreenEnabled = v
+	return m
+}
+
+// SetDeveloperFields ExdScreenConfiguration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *ExdScreenConfiguration) SetUnknownFields(unknownFields ...proto.Field) *ExdScreenConfiguration {
+	m.UnknownFields = unknownFields
 	return m
 }
 

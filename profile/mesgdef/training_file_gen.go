@@ -27,9 +27,8 @@ type TrainingFile struct {
 	Product      uint16
 	Type         typedef.File
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTrainingFile creates new TrainingFile struct based on given mesg.
@@ -37,14 +36,23 @@ type TrainingFile struct {
 func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -56,6 +64,7 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 		SerialNumber: vals[3].Uint32z(),
 		TimeCreated:  datetime.ToTime(vals[4].Uint32()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -104,6 +113,10 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(uint32(m.TimeCreated.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -174,6 +187,12 @@ func (m *TrainingFile) SetSerialNumber(v uint32) *TrainingFile {
 // SetTimeCreated sets TimeCreated value.
 func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
 	m.TimeCreated = v
+	return m
+}
+
+// SetDeveloperFields TrainingFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *TrainingFile) SetUnknownFields(unknownFields ...proto.Field) *TrainingFile {
+	m.UnknownFields = unknownFields
 	return m
 }
 

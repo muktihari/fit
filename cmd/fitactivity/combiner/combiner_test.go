@@ -58,6 +58,8 @@ func TestCombine(t *testing.T) {
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 2),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
@@ -93,6 +95,8 @@ func TestCombine(t *testing.T) {
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 20),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 10),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
@@ -133,6 +137,11 @@ func TestCombine(t *testing.T) {
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(400)),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordAccumulatedPower).WithValue(uint32(400)),
 				}},
+				{Num: mesgnum.Sport, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSport).WithValue(typedef.SportCycling),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSubSport).WithValue(typedef.SubSportGeneric),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportName).WithValue("Cycling"),
+				}},
 				{Num: mesgnum.SplitSummary, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(datetime.ToUint32(now) + 20), // Additional
 					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
@@ -145,6 +154,8 @@ func TestCombine(t *testing.T) {
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 20),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(400)),
@@ -186,8 +197,15 @@ func TestCombine(t *testing.T) {
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 2),
 						factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(200)),
 					}},
+					{Num: mesgnum.Sport, Fields: []proto.Field{
+						factory.CreateField(mesgnum.Sport, fieldnum.SportSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Sport, fieldnum.SportSubSport).WithValue(typedef.SubSportGeneric),
+						factory.CreateField(mesgnum.Sport, fieldnum.SportName).WithValue("Cycling"),
+					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 2),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
@@ -221,6 +239,8 @@ func TestCombine(t *testing.T) {
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 20),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 10),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
@@ -250,6 +270,8 @@ func TestCombine(t *testing.T) {
 					}},
 					{Num: mesgnum.Session, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportRunning),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportTrail),
+						factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Running"),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 100),
 						factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),
@@ -294,6 +316,16 @@ func TestCombine(t *testing.T) {
 					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 200),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(600)),
 				}},
+				{Num: mesgnum.Sport, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSport).WithValue(typedef.SportCycling),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSubSport).WithValue(typedef.SubSportGeneric),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportName).WithValue("Cycling"),
+				}},
+				{Num: mesgnum.Sport, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSport).WithValue(typedef.SportRunning),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportSubSport).WithValue(typedef.SubSportTrail),
+					factory.CreateField(mesgnum.Sport, fieldnum.SportName).WithValue("Running"),
+				}},
 				{Num: mesgnum.SplitSummary, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(datetime.ToUint32(now) + 200), // Additional
 					factory.CreateField(mesgnum.SplitSummary, fieldnum.SplitSummarySplitType).WithValue(typedef.SplitTypeRunActive),
@@ -306,6 +338,8 @@ func TestCombine(t *testing.T) {
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportCycling),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportGeneric),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Cycling"),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(400)),
@@ -315,6 +349,8 @@ func TestCombine(t *testing.T) {
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportRunning),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSubSport).WithValue(typedef.SubSportTrail),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionSportProfileName).WithValue("Running"),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 200),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionStartTime).WithValue(datetime.ToUint32(now) + 100),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(200)),

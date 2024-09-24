@@ -26,9 +26,8 @@ type HsaBodyBatteryData struct {
 	Uncharged          []int16   // Array: [N]; Body battery uncharged value
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaBodyBatteryData creates new HsaBodyBatteryData struct based on given mesg.
@@ -36,14 +35,23 @@ type HsaBodyBatteryData struct {
 func NewHsaBodyBatteryData(mesg *proto.Message) *HsaBodyBatteryData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -54,6 +62,7 @@ func NewHsaBodyBatteryData(mesg *proto.Message) *HsaBodyBatteryData {
 		Charged:            vals[2].SliceInt16(),
 		Uncharged:          vals[3].SliceInt16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -97,6 +106,10 @@ func (m *HsaBodyBatteryData) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 3)
 		field.Value = proto.SliceInt16(m.Uncharged)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -148,6 +161,12 @@ func (m *HsaBodyBatteryData) SetCharged(v []int16) *HsaBodyBatteryData {
 // Array: [N]; Body battery uncharged value
 func (m *HsaBodyBatteryData) SetUncharged(v []int16) *HsaBodyBatteryData {
 	m.Uncharged = v
+	return m
+}
+
+// SetDeveloperFields HsaBodyBatteryData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaBodyBatteryData) SetUnknownFields(unknownFields ...proto.Field) *HsaBodyBatteryData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

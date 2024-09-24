@@ -22,9 +22,8 @@ type VideoDescription struct {
 	MessageIndex typedef.MessageIndex // Long descriptions will be split into multiple parts
 	MessageCount uint16               // Total number of description parts
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewVideoDescription creates new VideoDescription struct based on given mesg.
@@ -32,14 +31,23 @@ type VideoDescription struct {
 func NewVideoDescription(mesg *proto.Message) *VideoDescription {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -48,6 +56,7 @@ func NewVideoDescription(mesg *proto.Message) *VideoDescription {
 		MessageCount: vals[0].Uint16(),
 		Text:         vals[1].String(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -83,6 +92,10 @@ func (m *VideoDescription) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -111,6 +124,12 @@ func (m *VideoDescription) SetMessageCount(v uint16) *VideoDescription {
 // SetText sets Text value.
 func (m *VideoDescription) SetText(v string) *VideoDescription {
 	m.Text = v
+	return m
+}
+
+// SetDeveloperFields VideoDescription's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *VideoDescription) SetUnknownFields(unknownFields ...proto.Field) *VideoDescription {
+	m.UnknownFields = unknownFields
 	return m
 }
 

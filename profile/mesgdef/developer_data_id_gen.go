@@ -23,6 +23,8 @@ type DeveloperDataId struct {
 	ApplicationVersion uint32
 	ManufacturerId     typedef.Manufacturer
 	DeveloperDataIndex uint8
+
+	UnknownFields []proto.Field // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 }
 
 // NewDeveloperDataId creates new DeveloperDataId struct based on given mesg.
@@ -30,13 +32,22 @@ type DeveloperDataId struct {
 func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 	vals := [5]proto.Value{}
 
+	var unknownFields []proto.Field
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 4 {
+			if mesg.Fields[i].Num > 4 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 	}
 
 	return &DeveloperDataId{
@@ -45,6 +56,8 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 		ManufacturerId:     typedef.Manufacturer(vals[2].Uint16()),
 		DeveloperDataIndex: vals[3].Uint8(),
 		ApplicationVersion: vals[4].Uint32(),
+
+		UnknownFields: unknownFields,
 	}
 }
 
@@ -89,6 +102,10 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -127,5 +144,11 @@ func (m *DeveloperDataId) SetDeveloperDataIndex(v uint8) *DeveloperDataId {
 // SetApplicationVersion sets ApplicationVersion value.
 func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
 	m.ApplicationVersion = v
+	return m
+}
+
+// SetDeveloperFields DeveloperDataId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *DeveloperDataId) SetUnknownFields(unknownFields ...proto.Field) *DeveloperDataId {
+	m.UnknownFields = unknownFields
 	return m
 }

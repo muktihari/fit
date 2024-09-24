@@ -29,9 +29,8 @@ type MonitoringInfo struct {
 	CyclesToCalories     []uint16               // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
 	RestingMetabolicRate uint16                 // Units: kcal / day
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMonitoringInfo creates new MonitoringInfo struct based on given mesg.
@@ -39,14 +38,23 @@ type MonitoringInfo struct {
 func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -62,6 +70,7 @@ func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 		CyclesToCalories:     vals[4].SliceUint16(),
 		RestingMetabolicRate: vals[5].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -110,6 +119,10 @@ func (m *MonitoringInfo) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.RestingMetabolicRate)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -252,6 +265,12 @@ func (m *MonitoringInfo) SetCyclesToCaloriesScaled(vs []float64) *MonitoringInfo
 // Units: kcal / day
 func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {
 	m.RestingMetabolicRate = v
+	return m
+}
+
+// SetDeveloperFields MonitoringInfo's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *MonitoringInfo) SetUnknownFields(unknownFields ...proto.Field) *MonitoringInfo {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -22,9 +22,8 @@ type CadenceZone struct {
 	MessageIndex typedef.MessageIndex
 	HighValue    uint8 // Units: rpm
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCadenceZone creates new CadenceZone struct based on given mesg.
@@ -32,14 +31,23 @@ type CadenceZone struct {
 func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -48,6 +56,7 @@ func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 		HighValue:    vals[0].Uint8(),
 		Name:         vals[1].String(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -83,6 +92,10 @@ func (m *CadenceZone) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -109,6 +122,12 @@ func (m *CadenceZone) SetHighValue(v uint8) *CadenceZone {
 // SetName sets Name value.
 func (m *CadenceZone) SetName(v string) *CadenceZone {
 	m.Name = v
+	return m
+}
+
+// SetDeveloperFields CadenceZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *CadenceZone) SetUnknownFields(unknownFields ...proto.Field) *CadenceZone {
+	m.UnknownFields = unknownFields
 	return m
 }
 

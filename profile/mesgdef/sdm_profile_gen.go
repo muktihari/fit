@@ -28,9 +28,8 @@ type SdmProfile struct {
 	SdmAntIdTransType uint8        // Base: uint8z
 	OdometerRollover  uint8        // Rollover counter that can be used to extend the odometer
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSdmProfile creates new SdmProfile struct based on given mesg.
@@ -38,14 +37,23 @@ type SdmProfile struct {
 func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -59,6 +67,7 @@ func NewSdmProfile(mesg *proto.Message) *SdmProfile {
 		SdmAntIdTransType: vals[5].Uint8z(),
 		OdometerRollover:  vals[7].Uint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -117,6 +126,10 @@ func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(m.OdometerRollover)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -235,6 +248,12 @@ func (m *SdmProfile) SetSdmAntIdTransType(v uint8) *SdmProfile {
 // Rollover counter that can be used to extend the odometer
 func (m *SdmProfile) SetOdometerRollover(v uint8) *SdmProfile {
 	m.OdometerRollover = v
+	return m
+}
+
+// SetDeveloperFields SdmProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SdmProfile) SetUnknownFields(unknownFields ...proto.Field) *SdmProfile {
+	m.UnknownFields = unknownFields
 	return m
 }
 

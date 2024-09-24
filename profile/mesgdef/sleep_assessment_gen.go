@@ -34,9 +34,8 @@ type SleepAssessment struct {
 	AwakeningsCount          uint8  // The number of awakenings during sleep.
 	InterruptionsScore       uint8  // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSleepAssessment creates new SleepAssessment struct based on given mesg.
@@ -44,14 +43,23 @@ type SleepAssessment struct {
 func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 	vals := [16]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 15 {
+			if mesg.Fields[i].Num > 15 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -71,6 +79,7 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 		InterruptionsScore:       vals[14].Uint8(),
 		AverageStressDuringSleep: vals[15].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -159,6 +168,10 @@ func (m *SleepAssessment) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint16(m.AverageStressDuringSleep)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -304,6 +317,12 @@ func (m *SleepAssessment) SetAverageStressDuringSleepScaled(v float64) *SleepAss
 		return m
 	}
 	m.AverageStressDuringSleep = uint16(unscaled)
+	return m
+}
+
+// SetDeveloperFields SleepAssessment's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SleepAssessment) SetUnknownFields(unknownFields ...proto.Field) *SleepAssessment {
+	m.UnknownFields = unknownFields
 	return m
 }
 

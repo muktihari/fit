@@ -39,9 +39,8 @@ type TimeInZone struct {
 	ThresholdHeartRate       uint8
 	PwrCalcType              typedef.PwrZoneCalc
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTimeInZone creates new TimeInZone struct based on given mesg.
@@ -49,14 +48,23 @@ type TimeInZone struct {
 func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -79,6 +87,7 @@ func NewTimeInZone(mesg *proto.Message) *TimeInZone {
 		PwrCalcType:              typedef.PwrZoneCalc(vals[14].Uint8()),
 		FunctionalThresholdPower: vals[15].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -182,6 +191,10 @@ func (m *TimeInZone) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint16(m.FunctionalThresholdPower)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -513,6 +526,12 @@ func (m *TimeInZone) SetPwrCalcType(v typedef.PwrZoneCalc) *TimeInZone {
 // SetFunctionalThresholdPower sets FunctionalThresholdPower value.
 func (m *TimeInZone) SetFunctionalThresholdPower(v uint16) *TimeInZone {
 	m.FunctionalThresholdPower = v
+	return m
+}
+
+// SetDeveloperFields TimeInZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *TimeInZone) SetUnknownFields(unknownFields ...proto.Field) *TimeInZone {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -181,9 +181,8 @@ type Session struct {
 
 	state [23]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSession creates new Session struct based on given mesg.
@@ -192,10 +191,14 @@ func NewSession(mesg *proto.Message) *Session {
 	vals := [255]proto.Value{}
 
 	var state [23]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 181 && mesg.Fields[i].IsExpandedField {
@@ -204,6 +207,11 @@ func NewSession(mesg *proto.Message) *Session {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -367,6 +375,7 @@ func NewSession(mesg *proto.Message) *Session {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -1189,6 +1198,10 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 210)
 		field.Value = proto.Uint16(m.MaxCoreTemperature)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -4650,6 +4663,12 @@ func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
 		return m
 	}
 	m.MaxCoreTemperature = uint16(unscaled)
+	return m
+}
+
+// SetDeveloperFields Session's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Session) SetUnknownFields(unknownFields ...proto.Field) *Session {
+	m.UnknownFields = unknownFields
 	return m
 }
 

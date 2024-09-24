@@ -24,9 +24,8 @@ type ZonesTarget struct {
 	HrCalcType               typedef.HrZoneCalc
 	PwrCalcType              typedef.PwrZoneCalc
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewZonesTarget creates new ZonesTarget struct based on given mesg.
@@ -34,14 +33,23 @@ type ZonesTarget struct {
 func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 	vals := [8]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 7 {
+			if mesg.Fields[i].Num > 7 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -52,6 +60,7 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 		HrCalcType:               typedef.HrZoneCalc(vals[5].Uint8()),
 		PwrCalcType:              typedef.PwrZoneCalc(vals[7].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -97,6 +106,10 @@ func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -133,6 +146,12 @@ func (m *ZonesTarget) SetHrCalcType(v typedef.HrZoneCalc) *ZonesTarget {
 // SetPwrCalcType sets PwrCalcType value.
 func (m *ZonesTarget) SetPwrCalcType(v typedef.PwrZoneCalc) *ZonesTarget {
 	m.PwrCalcType = v
+	return m
+}
+
+// SetDeveloperFields ZonesTarget's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *ZonesTarget) SetUnknownFields(unknownFields ...proto.Field) *ZonesTarget {
+	m.UnknownFields = unknownFields
 	return m
 }
 

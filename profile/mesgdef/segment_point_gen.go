@@ -30,9 +30,8 @@ type SegmentPoint struct {
 
 	state [1]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.
@@ -41,10 +40,14 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 	vals := [255]proto.Value{}
 
 	var state [1]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 7 && mesg.Fields[i].IsExpandedField {
@@ -53,6 +56,11 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -67,6 +75,7 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -123,6 +132,10 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -326,6 +339,12 @@ func (m *SegmentPoint) SetEnhancedAltitudeScaled(v float64) *SegmentPoint {
 		return m
 	}
 	m.EnhancedAltitude = uint32(unscaled)
+	return m
+}
+
+// SetDeveloperFields SegmentPoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SegmentPoint) SetUnknownFields(unknownFields ...proto.Field) *SegmentPoint {
+	m.UnknownFields = unknownFields
 	return m
 }
 

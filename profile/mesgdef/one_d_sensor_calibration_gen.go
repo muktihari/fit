@@ -27,9 +27,8 @@ type OneDSensorCalibration struct {
 	OffsetCal          int32              // Internal Calibration factor
 	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewOneDSensorCalibration creates new OneDSensorCalibration struct based on given mesg.
@@ -37,14 +36,23 @@ type OneDSensorCalibration struct {
 func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -56,6 +64,7 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 		LevelShift:         vals[3].Uint32(),
 		OffsetCal:          vals[4].Int32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -104,6 +113,10 @@ func (m *OneDSensorCalibration) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Int32(m.OffsetCal)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -178,6 +191,12 @@ func (m *OneDSensorCalibration) SetLevelShift(v uint32) *OneDSensorCalibration {
 // Internal Calibration factor
 func (m *OneDSensorCalibration) SetOffsetCal(v int32) *OneDSensorCalibration {
 	m.OffsetCal = v
+	return m
+}
+
+// SetDeveloperFields OneDSensorCalibration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *OneDSensorCalibration) SetUnknownFields(unknownFields ...proto.Field) *OneDSensorCalibration {
+	m.UnknownFields = unknownFields
 	return m
 }
 

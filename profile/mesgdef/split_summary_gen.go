@@ -34,9 +34,8 @@ type SplitSummary struct {
 	AvgHeartRate    uint8 // Units: bpm
 	MaxHeartRate    uint8 // Units: bpm
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSplitSummary creates new SplitSummary struct based on given mesg.
@@ -44,14 +43,23 @@ type SplitSummary struct {
 func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -71,6 +79,7 @@ func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 		TotalCalories:   vals[13].Uint32(),
 		TotalMovingTime: vals[77].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -159,6 +168,10 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 77)
 		field.Value = proto.Uint32(m.TotalMovingTime)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -423,6 +436,12 @@ func (m *SplitSummary) SetTotalMovingTimeScaled(v float64) *SplitSummary {
 		return m
 	}
 	m.TotalMovingTime = uint32(unscaled)
+	return m
+}
+
+// SetDeveloperFields SplitSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SplitSummary) SetUnknownFields(unknownFields ...proto.Field) *SplitSummary {
+	m.UnknownFields = unknownFields
 	return m
 }
 

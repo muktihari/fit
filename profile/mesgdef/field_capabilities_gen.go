@@ -24,9 +24,8 @@ type FieldCapabilities struct {
 	File         typedef.File
 	FieldNum     uint8
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewFieldCapabilities creates new FieldCapabilities struct based on given mesg.
@@ -34,14 +33,23 @@ type FieldCapabilities struct {
 func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -52,6 +60,7 @@ func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 		FieldNum:     vals[2].Uint8(),
 		Count:        vals[3].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -97,6 +106,10 @@ func (m *FieldCapabilities) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -133,6 +146,12 @@ func (m *FieldCapabilities) SetFieldNum(v uint8) *FieldCapabilities {
 // SetCount sets Count value.
 func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
 	m.Count = v
+	return m
+}
+
+// SetDeveloperFields FieldCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *FieldCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FieldCapabilities {
+	m.UnknownFields = unknownFields
 	return m
 }
 

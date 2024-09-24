@@ -22,9 +22,8 @@ type WatchfaceSettings struct {
 	Mode         typedef.WatchfaceMode
 	Layout       byte
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWatchfaceSettings creates new WatchfaceSettings struct based on given mesg.
@@ -32,14 +31,23 @@ type WatchfaceSettings struct {
 func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -48,6 +56,7 @@ func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 		Mode:         typedef.WatchfaceMode(vals[0].Uint8()),
 		Layout:       vals[1].Uint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -81,6 +90,10 @@ func (m *WatchfaceSettings) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.Layout)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -125,6 +138,12 @@ func (m *WatchfaceSettings) SetMode(v typedef.WatchfaceMode) *WatchfaceSettings 
 // SetLayout sets Layout value.
 func (m *WatchfaceSettings) SetLayout(v byte) *WatchfaceSettings {
 	m.Layout = v
+	return m
+}
+
+// SetDeveloperFields WatchfaceSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *WatchfaceSettings) SetUnknownFields(unknownFields ...proto.Field) *WatchfaceSettings {
+	m.UnknownFields = unknownFields
 	return m
 }
 

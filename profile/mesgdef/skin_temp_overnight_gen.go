@@ -27,9 +27,8 @@ type SkinTempOvernight struct {
 	Average7DayDeviation float32 // The average 7 day overnight deviation from baseline temperature in degrees C
 	NightlyValue         float32 // Final overnight temperature value
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSkinTempOvernight creates new SkinTempOvernight struct based on given mesg.
@@ -37,14 +36,23 @@ type SkinTempOvernight struct {
 func NewSkinTempOvernight(mesg *proto.Message) *SkinTempOvernight {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -55,6 +63,7 @@ func NewSkinTempOvernight(mesg *proto.Message) *SkinTempOvernight {
 		Average7DayDeviation: vals[2].Float32(),
 		NightlyValue:         vals[4].Float32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -98,6 +107,10 @@ func (m *SkinTempOvernight) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.Float32(m.NightlyValue)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -148,6 +161,12 @@ func (m *SkinTempOvernight) SetAverage7DayDeviation(v float32) *SkinTempOvernigh
 // Final overnight temperature value
 func (m *SkinTempOvernight) SetNightlyValue(v float32) *SkinTempOvernight {
 	m.NightlyValue = v
+	return m
+}
+
+// SetDeveloperFields SkinTempOvernight's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SkinTempOvernight) SetUnknownFields(unknownFields ...proto.Field) *SkinTempOvernight {
+	m.UnknownFields = unknownFields
 	return m
 }
 

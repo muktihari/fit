@@ -49,9 +49,8 @@ type UserProfile struct {
 	HeightSetting              typedef.DisplayMeasure
 	DepthSetting               typedef.DisplayMeasure
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewUserProfile creates new UserProfile struct based on given mesg.
@@ -59,14 +58,23 @@ type UserProfile struct {
 func NewUserProfile(mesg *proto.Message) *UserProfile {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -112,6 +120,7 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 		DepthSetting:          typedef.DisplayMeasure(vals[47].Uint8()),
 		DiveCount:             vals[49].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -283,6 +292,10 @@ func (m *UserProfile) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 49)
 		field.Value = proto.Uint32(m.DiveCount)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -591,6 +604,12 @@ func (m *UserProfile) SetDepthSetting(v typedef.DisplayMeasure) *UserProfile {
 // SetDiveCount sets DiveCount value.
 func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
 	m.DiveCount = v
+	return m
+}
+
+// SetDeveloperFields UserProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *UserProfile) SetUnknownFields(unknownFields ...proto.Field) *UserProfile {
+	m.UnknownFields = unknownFields
 	return m
 }
 

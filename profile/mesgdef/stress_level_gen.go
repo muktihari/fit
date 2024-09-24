@@ -23,9 +23,8 @@ type StressLevel struct {
 	StressLevelTime  time.Time // Units: s; Time stress score was calculated
 	StressLevelValue int16
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewStressLevel creates new StressLevel struct based on given mesg.
@@ -33,14 +32,23 @@ type StressLevel struct {
 func NewStressLevel(mesg *proto.Message) *StressLevel {
 	vals := [2]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 1 {
+			if mesg.Fields[i].Num > 1 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -48,6 +56,7 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 		StressLevelValue: vals[0].Int16(),
 		StressLevelTime:  datetime.ToTime(vals[1].Uint32()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -78,6 +87,10 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -101,6 +114,12 @@ func (m *StressLevel) SetStressLevelValue(v int16) *StressLevel {
 // Units: s; Time stress score was calculated
 func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
 	m.StressLevelTime = v
+	return m
+}
+
+// SetDeveloperFields StressLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *StressLevel) SetUnknownFields(unknownFields ...proto.Field) *StressLevel {
+	m.UnknownFields = unknownFields
 	return m
 }
 

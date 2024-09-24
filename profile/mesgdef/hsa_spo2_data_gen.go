@@ -25,9 +25,8 @@ type HsaSpo2Data struct {
 	Confidence         []uint8   // Array: [N]; SpO2 Confidence
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaSpo2Data creates new HsaSpo2Data struct based on given mesg.
@@ -35,14 +34,23 @@ type HsaSpo2Data struct {
 func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -52,6 +60,7 @@ func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 		ReadingSpo2:        vals[1].SliceUint8(),
 		Confidence:         vals[2].SliceUint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -90,6 +99,10 @@ func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint8(m.Confidence)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -133,6 +146,12 @@ func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
 // Array: [N]; SpO2 Confidence
 func (m *HsaSpo2Data) SetConfidence(v []uint8) *HsaSpo2Data {
 	m.Confidence = v
+	return m
+}
+
+// SetDeveloperFields HsaSpo2Data's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaSpo2Data) SetUnknownFields(unknownFields ...proto.Field) *HsaSpo2Data {
+	m.UnknownFields = unknownFields
 	return m
 }
 

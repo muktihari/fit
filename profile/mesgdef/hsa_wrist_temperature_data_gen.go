@@ -25,9 +25,8 @@ type HsaWristTemperatureData struct {
 	Value              []uint16  // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaWristTemperatureData creates new HsaWristTemperatureData struct based on given mesg.
@@ -35,14 +34,23 @@ type HsaWristTemperatureData struct {
 func NewHsaWristTemperatureData(mesg *proto.Message) *HsaWristTemperatureData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -51,6 +59,7 @@ func NewHsaWristTemperatureData(mesg *proto.Message) *HsaWristTemperatureData {
 		ProcessingInterval: vals[0].Uint16(),
 		Value:              vals[1].SliceUint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -84,6 +93,10 @@ func (m *HsaWristTemperatureData) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint16(m.Value)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -159,6 +172,12 @@ func (m *HsaWristTemperatureData) SetValueScaled(vs []float64) *HsaWristTemperat
 		}
 		m.Value[i] = uint16(unscaled)
 	}
+	return m
+}
+
+// SetDeveloperFields HsaWristTemperatureData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaWristTemperatureData) SetUnknownFields(unknownFields ...proto.Field) *HsaWristTemperatureData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

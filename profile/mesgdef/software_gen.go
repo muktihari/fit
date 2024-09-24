@@ -23,9 +23,8 @@ type Software struct {
 	MessageIndex typedef.MessageIndex
 	Version      uint16 // Scale: 100
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSoftware creates new Software struct based on given mesg.
@@ -33,14 +32,23 @@ type Software struct {
 func NewSoftware(mesg *proto.Message) *Software {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -49,6 +57,7 @@ func NewSoftware(mesg *proto.Message) *Software {
 		Version:      vals[3].Uint16(),
 		PartNumber:   vals[5].String(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -82,6 +91,10 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.PartNumber)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -135,6 +148,12 @@ func (m *Software) SetVersionScaled(v float64) *Software {
 // SetPartNumber sets PartNumber value.
 func (m *Software) SetPartNumber(v string) *Software {
 	m.PartNumber = v
+	return m
+}
+
+// SetDeveloperFields Software's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Software) SetUnknownFields(unknownFields ...proto.Field) *Software {
+	m.UnknownFields = unknownFields
 	return m
 }
 

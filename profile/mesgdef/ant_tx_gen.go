@@ -30,9 +30,8 @@ type AntTx struct {
 
 	state [1]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewAntTx creates new AntTx struct based on given mesg.
@@ -41,10 +40,14 @@ func NewAntTx(mesg *proto.Message) *AntTx {
 	vals := [254]proto.Value{}
 
 	var state [1]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 5 && mesg.Fields[i].IsExpandedField {
@@ -53,6 +56,11 @@ func NewAntTx(mesg *proto.Message) *AntTx {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -66,6 +74,7 @@ func NewAntTx(mesg *proto.Message) *AntTx {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -120,6 +129,10 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -200,6 +213,12 @@ func (m *AntTx) SetChannelNumber(v uint8) *AntTx {
 // Array: [N]
 func (m *AntTx) SetData(v []byte) *AntTx {
 	m.Data = v
+	return m
+}
+
+// SetDeveloperFields AntTx's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *AntTx) SetUnknownFields(unknownFields ...proto.Field) *AntTx {
+	m.UnknownFields = unknownFields
 	return m
 }
 
