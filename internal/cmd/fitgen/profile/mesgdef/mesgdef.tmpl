@@ -31,11 +31,10 @@ type {{ .Name }} struct {
 	state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8 // Used for tracking expanded fields.
 	{{ end }}
 
+	UnknownFields []proto.Field            // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
-	// Developer Fields are dynamic, can't be mapped as struct's fields. 
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
-	{{ end -}}
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+	{{- end }}
 }
 
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
@@ -47,12 +46,16 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 	var state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
 	{{ end -}}
 
+	var unknownFields []proto.Field
 	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
 		var developerFields []proto.DeveloperField
 	{{ end -}}
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > {{ byteSub .MaxFieldNum 1 }} {
+			if mesg.Fields[i].Num > {{ byteSub .MaxFieldNum 1 }} || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			{{ if gt $.MaxFieldExpandNum 1 -}}
@@ -63,6 +66,11 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 			{{ end -}}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 			developerFields = mesg.DeveloperFields
 		{{ end -}}
@@ -76,6 +84,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 		{{ if gt .MaxFieldExpandNum 1 -}}
 		state: state,
 		{{ end }}
+		UnknownFields: unknownFields,
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 		DeveloperFields: developerFields,
 		{{ end }}
@@ -118,6 +127,10 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 		{{ if eq .CanExpand true -}} } {{ end -}}
 	}
 	{{ end }}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
@@ -270,6 +283,12 @@ func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
 {{ end -}}
 
 {{ end }}
+
+// SetDeveloperFields {{ $.Name }}'s UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *{{ $.Name }}) SetUnknownFields(unknownFields ...proto.Field) *{{ $.Name }} {
+	m.UnknownFields = unknownFields
+	return m
+}
 
 {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 // SetDeveloperFields {{ $.Name }}'s DeveloperFields.
