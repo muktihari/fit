@@ -203,4 +203,18 @@ func TestRecordToMesgTimestampCorrectness(t *testing.T) {
 		t.Fatalf("field should be nil, got: fieldNum: %d, value: %d",
 			field.Num, field.Value.Uint32())
 	}
+
+	r = NewRecord(&proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+		{FieldBase: &proto.FieldBase{Num: 252, Name: factory.NameUnknown}},
+	}})
+	mesg = r.ToMesg(nil)
+	field = mesg.FieldByNum(252)
+	if field == nil {
+		t.Fatal("field should not be nil")
+	}
+	if field.Num != 252 && field.Name != factory.NameUnknown {
+		t.Fatalf("expected num: %d, name: %s, got num: %d, name: %s",
+			252, factory.NameUnknown, field.Num, field.Name)
+	}
 }
