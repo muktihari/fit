@@ -16,6 +16,11 @@ import (
 // But for messages that have timestamp, we can reconstruct the messages by timestamp order.
 //
 // ref: https://developer.garmin.com/fit/file-types/activity/
+//
+// If split and split_summary messages are present, they are typically share the same timestamp,
+// which is the end time of the activity. By having the end time of the activity, they can be
+// placed at the end of the messages. Do the same for other summary type messages.
+// ref: https://forums.garmin.com/developer/fit-sdk/f/discussion/385625/timestamp-field-in-split_summary-messages
 type Activity struct {
 	FileId mesgdef.FileId // required fields: type, manufacturer, product, serial_number, time_created
 
@@ -140,41 +145,30 @@ func (f *Activity) ToFIT(options *mesgdef.Options) proto.FIT {
 		fit.Messages = append(fit.Messages, f.FieldDescriptions[i].ToMesg(options))
 	}
 
-	// Let's put non-timestamp messages at the beginning, we don't need to sort it anyway.
 	if f.UserProfile != nil {
-		sortStartPos += 1
 		fit.Messages = append(fit.Messages, f.UserProfile.ToMesg(options))
 	}
-	sortStartPos += len(f.ZonesTargets)
 	for i := range f.ZonesTargets {
 		fit.Messages = append(fit.Messages, f.ZonesTargets[i].ToMesg(options))
 	}
-	sortStartPos += len(f.Workouts)
 	for i := range f.Workouts {
 		fit.Messages = append(fit.Messages, f.Workouts[i].ToMesg(options))
 	}
-	sortStartPos += len(f.WorkoutSteps)
 	for i := range f.WorkoutSteps {
 		fit.Messages = append(fit.Messages, f.WorkoutSteps[i].ToMesg(options))
 	}
-	sortStartPos += len(f.HRVs)
 	for i := range f.HRVs {
 		fit.Messages = append(fit.Messages, f.HRVs[i].ToMesg(options))
 	}
-	sortStartPos += len(f.Splits)
 	for i := range f.Splits {
 		fit.Messages = append(fit.Messages, f.Splits[i].ToMesg(options))
 	}
-	sortStartPos += len(f.SplitSummaries)
 	for i := range f.SplitSummaries {
 		fit.Messages = append(fit.Messages, f.SplitSummaries[i].ToMesg(options))
 	}
-	sortStartPos += len(f.Sports)
 	for i := range f.Sports {
 		fit.Messages = append(fit.Messages, f.Sports[i].ToMesg(options))
 	}
-
-	// Below are messages with timestamp, should be sorted.
 	for i := range f.DeviceInfos {
 		fit.Messages = append(fit.Messages, f.DeviceInfos[i].ToMesg(options))
 	}
