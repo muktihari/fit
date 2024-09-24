@@ -48,6 +48,7 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 	})
 
 	var (
+		sports          []*mesgdef.Sport
 		splitSummaries  []*mesgdef.SplitSummary
 		sessionsByIndex = make([][]*mesgdef.Session, len(fits))
 		activities      = make([]*mesgdef.Activity, 0, len(fits))
@@ -78,6 +79,19 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 				continue
 			case mesgnum.Activity:
 				activities = append(activities, mesgdef.NewActivity(&mesg))
+				continue
+			case mesgnum.Sport:
+				m := mesgdef.NewSport(&mesg)
+				var ok bool
+				for _, v := range sports {
+					if v.Sport == m.Sport {
+						ok = true
+						break
+					}
+				}
+				if !ok {
+					sports = append(sports, m)
+				}
 				continue
 			}
 			if j != valid {
@@ -154,16 +168,43 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 
 	// Summarize
 
+	for _, ses := range sessions {
+		var ok bool
+		for _, v := range sports {
+			if v.Sport == ses.Sport {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			sports = append(sports, mesgdef.NewSport(nil).
+				SetSport(ses.Sport).
+				SetSubSport(ses.SubSport).
+				SetName(ses.SportProfileName))
+		}
+	}
+
+	for _, v := range sports {
+		result.Messages = append(result.Messages, v.ToMesg(nil))
+	}
+
 	firstTimestamp := getFirstTimestamp(result.Messages)
 	lastTimestamp := getLastTimestamp(result.Messages)
 
 	for _, v := range splitSummaries {
 		mesg := v.ToMesg(nil)
-		// Split Summary does not have timestamp, but we found a case where it may contains
-		// timestamp on FIT files produced by Garmin Devices, so let's create one.
-		mesg.Fields = append([]proto.Field{
-			factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(lastTimestamp),
-		}, mesg.Fields...)
+
+		// Split Summary does not have timestamp, but Garmin devices produce timestamp for this message
+		// and Garmin Connect will reject our files if we don't include it.
+		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/385625/timestamp-field-in-split_summary-messages
+
+		mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
+
+		field := factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(lastTimestamp)
+		mesg.Fields = append(mesg.Fields, proto.Field{})
+		copy(mesg.Fields[1:], mesg.Fields)
+		mesg.Fields[0] = field // Put timestamp as first field
+
 		result.Messages = append(result.Messages, mesg)
 	}
 
