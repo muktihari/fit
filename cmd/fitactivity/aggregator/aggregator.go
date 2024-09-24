@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/proto"
 )
 
 // Aggregate aggregates src and dst into dst using reflection where T
@@ -47,6 +48,22 @@ func Aggregate[T any](dst, src T) {
 			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, EnhancedMinAltitude, etc.
 		case strings.HasPrefix(f.Name, "Avg") || strings.HasPrefix(f.Name, "EnhancedAvg"):
 			avg(dv.Field(i), sv.Field(i)) // AvgHeartRate, AvgCadence, EnhancedAvgSpeed, etc..
+		case f.Type == reflect.TypeOf([]proto.Field{}):
+			dFields, sFields := dv.Field(i), sv.Field(i) // UnknownFields
+			for j := 0; j < sFields.Len(); j++ {
+				sNum := sFields.Index(j).FieldByName("Num").Uint()
+				var ok bool
+				for k := 0; k < dFields.Len(); k++ {
+					dNum := dFields.Index(k).FieldByName("Num").Uint()
+					if sNum == dNum {
+						ok = true
+						break
+					}
+				}
+				if !ok {
+					dFields.Set(reflect.AppendSlice(dFields, sFields.Slice(j, j+1)))
+				}
+			}
 		default:
 			fill(dv.Field(i), sv.Field(i)) // Timestamp, Sport, Event, etc.
 		}
@@ -301,6 +318,7 @@ func fill(dst, src reflect.Value) {
 	case reflect.Struct:
 		if dst.IsZero() && dst.Type() == reflect.TypeOf(time.Time{}) {
 			dst.Set(src)
+			return
 		}
 	}
 }
