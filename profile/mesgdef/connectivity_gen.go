@@ -32,9 +32,8 @@ type Connectivity struct {
 	IncidentDetectionEnabled    typedef.Bool
 	GrouptrackEnabled           typedef.Bool
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewConnectivity creates new Connectivity struct based on given mesg.
@@ -42,14 +41,23 @@ type Connectivity struct {
 func NewConnectivity(mesg *proto.Message) *Connectivity {
 	vals := [13]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 12 {
+			if mesg.Fields[i].Num > 12 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -68,6 +76,7 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 		IncidentDetectionEnabled:    vals[11].Bool(),
 		GrouptrackEnabled:           vals[12].Bool(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -151,6 +160,10 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 12)
 		field.Value = proto.Bool(m.GrouptrackEnabled)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -243,6 +256,12 @@ func (m *Connectivity) SetIncidentDetectionEnabled(v typedef.Bool) *Connectivity
 // SetGrouptrackEnabled sets GrouptrackEnabled value.
 func (m *Connectivity) SetGrouptrackEnabled(v typedef.Bool) *Connectivity {
 	m.GrouptrackEnabled = v
+	return m
+}
+
+// SetDeveloperFields Connectivity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Connectivity) SetUnknownFields(unknownFields ...proto.Field) *Connectivity {
+	m.UnknownFields = unknownFields
 	return m
 }
 

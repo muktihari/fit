@@ -21,9 +21,8 @@ import (
 type Hrv struct {
 	Time []uint16 // Array: [N]; Scale: 1000; Units: s; Time between beats
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHrv creates new Hrv struct based on given mesg.
@@ -31,20 +30,30 @@ type Hrv struct {
 func NewHrv(mesg *proto.Message) *Hrv {
 	vals := [1]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 0 {
+			if mesg.Fields[i].Num > 0 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
 	return &Hrv{
 		Time: vals[0].SliceUint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -68,6 +77,10 @@ func (m *Hrv) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.SliceUint16(m.Time)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -124,6 +137,12 @@ func (m *Hrv) SetTimeScaled(vs []float64) *Hrv {
 		}
 		m.Time[i] = uint16(unscaled)
 	}
+	return m
+}
+
+// SetDeveloperFields Hrv's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Hrv) SetUnknownFields(unknownFields ...proto.Field) *Hrv {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -46,9 +46,8 @@ type Length struct {
 
 	state [4]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewLength creates new Length struct based on given mesg.
@@ -57,10 +56,14 @@ func NewLength(mesg *proto.Message) *Length {
 	vals := [255]proto.Value{}
 
 	var state [4]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 24 && mesg.Fields[i].IsExpandedField {
@@ -69,6 +72,11 @@ func NewLength(mesg *proto.Message) *Length {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -98,6 +106,7 @@ func NewLength(mesg *proto.Message) *Length {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -232,6 +241,10 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(m.MaxRespirationRate)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -525,6 +538,12 @@ func (m *Length) SetAvgRespirationRate(v uint8) *Length {
 // SetMaxRespirationRate sets MaxRespirationRate value.
 func (m *Length) SetMaxRespirationRate(v uint8) *Length {
 	m.MaxRespirationRate = v
+	return m
+}
+
+// SetDeveloperFields Length's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Length) SetUnknownFields(unknownFields ...proto.Field) *Length {
+	m.UnknownFields = unknownFields
 	return m
 }
 

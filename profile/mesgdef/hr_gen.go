@@ -30,9 +30,8 @@ type Hr struct {
 
 	state [2]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHr creates new Hr struct based on given mesg.
@@ -41,10 +40,14 @@ func NewHr(mesg *proto.Message) *Hr {
 	vals := [254]proto.Value{}
 
 	var state [2]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 10 && mesg.Fields[i].IsExpandedField {
@@ -53,6 +56,11 @@ func NewHr(mesg *proto.Message) *Hr {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -66,6 +74,7 @@ func NewHr(mesg *proto.Message) *Hr {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -120,6 +129,10 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 10)
 		field.Value = proto.SliceUint8(m.EventTimestamp12)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -267,6 +280,12 @@ func (m *Hr) SetEventTimestampScaled(vs []float64) *Hr {
 // Array: [N]; Units: s
 func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	m.EventTimestamp12 = v
+	return m
+}
+
+// SetDeveloperFields Hr's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Hr) SetUnknownFields(unknownFields ...proto.Field) *Hr {
+	m.UnknownFields = unknownFields
 	return m
 }
 

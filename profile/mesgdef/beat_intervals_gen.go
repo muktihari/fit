@@ -24,9 +24,8 @@ type BeatIntervals struct {
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
 	TimestampMs uint16   // Units: ms; Milliseconds past date_time
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewBeatIntervals creates new BeatIntervals struct based on given mesg.
@@ -34,14 +33,23 @@ type BeatIntervals struct {
 func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -50,6 +58,7 @@ func NewBeatIntervals(mesg *proto.Message) *BeatIntervals {
 		TimestampMs: vals[0].Uint16(),
 		Time:        vals[1].SliceUint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -85,6 +94,10 @@ func (m *BeatIntervals) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -116,6 +129,12 @@ func (m *BeatIntervals) SetTimestampMs(v uint16) *BeatIntervals {
 // Array: [N]; Units: ms; Array of millisecond times between beats
 func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
 	m.Time = v
+	return m
+}
+
+// SetDeveloperFields BeatIntervals's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *BeatIntervals) SetUnknownFields(unknownFields ...proto.Field) *BeatIntervals {
+	m.UnknownFields = unknownFields
 	return m
 }
 

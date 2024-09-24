@@ -52,9 +52,8 @@ type BikeProfile struct {
 	RearGearNum              uint8 // Base: uint8z; Number of rear gears
 	ShimanoDi2Enabled        typedef.Bool
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewBikeProfile creates new BikeProfile struct based on given mesg.
@@ -62,14 +61,23 @@ type BikeProfile struct {
 func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -107,6 +115,7 @@ func NewBikeProfile(mesg *proto.Message) *BikeProfile {
 		RearGear:                 vals[41].SliceUint8(),
 		ShimanoDi2Enabled:        vals[44].Bool(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -285,6 +294,10 @@ func (m *BikeProfile) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 44)
 		field.Value = proto.Bool(m.ShimanoDi2Enabled)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -673,6 +686,12 @@ func (m *BikeProfile) SetRearGear(v []uint8) *BikeProfile {
 // SetShimanoDi2Enabled sets ShimanoDi2Enabled value.
 func (m *BikeProfile) SetShimanoDi2Enabled(v typedef.Bool) *BikeProfile {
 	m.ShimanoDi2Enabled = v
+	return m
+}
+
+// SetDeveloperFields BikeProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *BikeProfile) SetUnknownFields(unknownFields ...proto.Field) *BikeProfile {
+	m.UnknownFields = unknownFields
 	return m
 }
 

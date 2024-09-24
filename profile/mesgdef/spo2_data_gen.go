@@ -25,9 +25,8 @@ type Spo2Data struct {
 	ReadingConfidence uint8
 	Mode              typedef.Spo2MeasurementType // Mode when data was captured
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSpo2Data creates new Spo2Data struct based on given mesg.
@@ -35,14 +34,23 @@ type Spo2Data struct {
 func NewSpo2Data(mesg *proto.Message) *Spo2Data {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -52,6 +60,7 @@ func NewSpo2Data(mesg *proto.Message) *Spo2Data {
 		ReadingConfidence: vals[1].Uint8(),
 		Mode:              typedef.Spo2MeasurementType(vals[2].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -90,6 +99,10 @@ func (m *Spo2Data) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Mode))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -131,6 +144,12 @@ func (m *Spo2Data) SetReadingConfidence(v uint8) *Spo2Data {
 // Mode when data was captured
 func (m *Spo2Data) SetMode(v typedef.Spo2MeasurementType) *Spo2Data {
 	m.Mode = v
+	return m
+}
+
+// SetDeveloperFields Spo2Data's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Spo2Data) SetUnknownFields(unknownFields ...proto.Field) *Spo2Data {
+	m.UnknownFields = unknownFields
 	return m
 }
 

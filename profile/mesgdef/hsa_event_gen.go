@@ -23,9 +23,8 @@ type HsaEvent struct {
 	Timestamp time.Time // Units: s
 	EventId   uint8     // Event ID
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaEvent creates new HsaEvent struct based on given mesg.
@@ -33,14 +32,23 @@ type HsaEvent struct {
 func NewHsaEvent(mesg *proto.Message) *HsaEvent {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -48,6 +56,7 @@ func NewHsaEvent(mesg *proto.Message) *HsaEvent {
 		Timestamp: datetime.ToTime(vals[253].Uint32()),
 		EventId:   vals[0].Uint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -78,6 +87,10 @@ func (m *HsaEvent) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -103,6 +116,12 @@ func (m *HsaEvent) SetTimestamp(v time.Time) *HsaEvent {
 // Event ID
 func (m *HsaEvent) SetEventId(v uint8) *HsaEvent {
 	m.EventId = v
+	return m
+}
+
+// SetDeveloperFields HsaEvent's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaEvent) SetUnknownFields(unknownFields ...proto.Field) *HsaEvent {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -28,9 +28,8 @@ type SegmentId struct {
 	DeleteStatus          typedef.SegmentDeleteStatus  // Indicates if any segments should be deleted
 	SelectionType         typedef.SegmentSelectionType // Indicates how the segment was selected to be sent to the device
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentId creates new SegmentId struct based on given mesg.
@@ -38,14 +37,23 @@ type SegmentId struct {
 func NewSegmentId(mesg *proto.Message) *SegmentId {
 	vals := [9]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 8 {
+			if mesg.Fields[i].Num > 8 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -60,6 +68,7 @@ func NewSegmentId(mesg *proto.Message) *SegmentId {
 		DeleteStatus:          typedef.SegmentDeleteStatus(vals[7].Uint8()),
 		SelectionType:         typedef.SegmentSelectionType(vals[8].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -123,6 +132,10 @@ func (m *SegmentId) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.SelectionType))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -203,6 +216,12 @@ func (m *SegmentId) SetDeleteStatus(v typedef.SegmentDeleteStatus) *SegmentId {
 // Indicates how the segment was selected to be sent to the device
 func (m *SegmentId) SetSelectionType(v typedef.SegmentSelectionType) *SegmentId {
 	m.SelectionType = v
+	return m
+}
+
+// SetDeveloperFields SegmentId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *SegmentId) SetUnknownFields(unknownFields ...proto.Field) *SegmentId {
+	m.UnknownFields = unknownFields
 	return m
 }
 

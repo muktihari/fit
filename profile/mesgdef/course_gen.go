@@ -23,9 +23,8 @@ type Course struct {
 	Sport        typedef.Sport
 	SubSport     typedef.SubSport
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCourse creates new Course struct based on given mesg.
@@ -33,14 +32,23 @@ type Course struct {
 func NewCourse(mesg *proto.Message) *Course {
 	vals := [8]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 7 {
+			if mesg.Fields[i].Num > 7 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -50,6 +58,7 @@ func NewCourse(mesg *proto.Message) *Course {
 		Capabilities: typedef.CourseCapabilities(vals[6].Uint32z()),
 		SubSport:     typedef.SubSport(vals[7].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -90,6 +99,10 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -122,6 +135,12 @@ func (m *Course) SetCapabilities(v typedef.CourseCapabilities) *Course {
 // SetSubSport sets SubSport value.
 func (m *Course) SetSubSport(v typedef.SubSport) *Course {
 	m.SubSport = v
+	return m
+}
+
+// SetDeveloperFields Course's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Course) SetUnknownFields(unknownFields ...proto.Field) *Course {
+	m.UnknownFields = unknownFields
 	return m
 }
 

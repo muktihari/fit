@@ -24,9 +24,8 @@ type RespirationRate struct {
 	Timestamp       time.Time
 	RespirationRate int16 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewRespirationRate creates new RespirationRate struct based on given mesg.
@@ -34,14 +33,23 @@ type RespirationRate struct {
 func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -49,6 +57,7 @@ func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 		Timestamp:       datetime.ToTime(vals[253].Uint32()),
 		RespirationRate: vals[0].Int16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -77,6 +86,10 @@ func (m *RespirationRate) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 0)
 		field.Value = proto.Int16(m.RespirationRate)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -127,6 +140,12 @@ func (m *RespirationRate) SetRespirationRateScaled(v float64) *RespirationRate {
 		return m
 	}
 	m.RespirationRate = int16(unscaled)
+	return m
+}
+
+// SetDeveloperFields RespirationRate's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *RespirationRate) SetUnknownFields(unknownFields ...proto.Field) *RespirationRate {
+	m.UnknownFields = unknownFields
 	return m
 }
 

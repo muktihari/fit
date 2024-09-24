@@ -30,9 +30,8 @@ type MagnetometerData struct {
 	CalibratedMagZ   []float32 // Array: [N]; Units: G; Calibrated Magnetometer reading
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMagnetometerData creates new MagnetometerData struct based on given mesg.
@@ -40,14 +39,23 @@ type MagnetometerData struct {
 func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -62,6 +70,7 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 		CalibratedMagY:   vals[6].SliceFloat32(),
 		CalibratedMagZ:   vals[7].SliceFloat32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -125,6 +134,10 @@ func (m *MagnetometerData) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.SliceFloat32(m.CalibratedMagZ)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -208,6 +221,12 @@ func (m *MagnetometerData) SetCalibratedMagY(v []float32) *MagnetometerData {
 // Array: [N]; Units: G; Calibrated Magnetometer reading
 func (m *MagnetometerData) SetCalibratedMagZ(v []float32) *MagnetometerData {
 	m.CalibratedMagZ = v
+	return m
+}
+
+// SetDeveloperFields MagnetometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *MagnetometerData) SetUnknownFields(unknownFields ...proto.Field) *MagnetometerData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

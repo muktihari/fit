@@ -31,9 +31,8 @@ type CoursePoint struct {
 	Type         typedef.CoursePoint
 	Favorite     typedef.Bool
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCoursePoint creates new CoursePoint struct based on given mesg.
@@ -41,14 +40,23 @@ type CoursePoint struct {
 func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -62,6 +70,7 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 		Name:         vals[6].String(),
 		Favorite:     vals[8].Bool(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -120,6 +129,10 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 8)
 		field.Value = proto.Bool(m.Favorite)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -236,6 +249,12 @@ func (m *CoursePoint) SetName(v string) *CoursePoint {
 // SetFavorite sets Favorite value.
 func (m *CoursePoint) SetFavorite(v typedef.Bool) *CoursePoint {
 	m.Favorite = v
+	return m
+}
+
+// SetDeveloperFields CoursePoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *CoursePoint) SetUnknownFields(unknownFields ...proto.Field) *CoursePoint {
+	m.UnknownFields = unknownFields
 	return m
 }
 

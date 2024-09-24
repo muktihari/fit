@@ -25,9 +25,8 @@ type BarometerData struct {
 	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewBarometerData creates new BarometerData struct based on given mesg.
@@ -35,14 +34,23 @@ type BarometerData struct {
 func NewBarometerData(mesg *proto.Message) *BarometerData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -52,6 +60,7 @@ func NewBarometerData(mesg *proto.Message) *BarometerData {
 		SampleTimeOffset: vals[1].SliceUint16(),
 		BaroPres:         vals[2].SliceUint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -90,6 +99,10 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint32(m.BaroPres)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -133,6 +146,12 @@ func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
 // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
 	m.BaroPres = v
+	return m
+}
+
+// SetDeveloperFields BarometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *BarometerData) SetUnknownFields(unknownFields ...proto.Field) *BarometerData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -57,9 +57,8 @@ type DiveSettings struct {
 	LastStopMultiple          uint8                          // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 	NoFlyTimeMode             typedef.NoFlyTimeMode          // Indicates which guidelines to use for no-fly surface interval.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDiveSettings creates new DiveSettings struct based on given mesg.
@@ -67,14 +66,23 @@ type DiveSettings struct {
 func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -115,6 +123,7 @@ func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 		LastStopMultiple:          vals[36].Uint8(),
 		NoFlyTimeMode:             typedef.NoFlyTimeMode(vals[37].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -308,6 +317,10 @@ func (m *DiveSettings) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 37)
 		field.Value = proto.Uint8(byte(m.NoFlyTimeMode))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -787,6 +800,12 @@ func (m *DiveSettings) SetLastStopMultipleScaled(v float64) *DiveSettings {
 // Indicates which guidelines to use for no-fly surface interval.
 func (m *DiveSettings) SetNoFlyTimeMode(v typedef.NoFlyTimeMode) *DiveSettings {
 	m.NoFlyTimeMode = v
+	return m
+}
+
+// SetDeveloperFields DiveSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *DiveSettings) SetUnknownFields(unknownFields ...proto.Field) *DiveSettings {
+	m.UnknownFields = unknownFields
 	return m
 }
 

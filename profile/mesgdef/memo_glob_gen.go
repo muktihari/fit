@@ -25,9 +25,8 @@ type MemoGlob struct {
 	ParentIndex typedef.MessageIndex // Index of mesg that this glob is associated with.
 	FieldNum    uint8                // Field within the parent that this glob is associated with
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMemoGlob creates new MemoGlob struct based on given mesg.
@@ -35,14 +34,23 @@ type MemoGlob struct {
 func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 	vals := [251]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 250 {
+			if mesg.Fields[i].Num > 250 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -54,6 +62,7 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 		FieldNum:    vals[3].Uint8(),
 		Data:        vals[4].SliceUint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -102,6 +111,10 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 4)
 		field.Value = proto.SliceUint8(m.Data)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -158,6 +171,12 @@ func (m *MemoGlob) SetFieldNum(v uint8) *MemoGlob {
 // Base: uint8z; Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
 	m.Data = v
+	return m
+}
+
+// SetDeveloperFields MemoGlob's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *MemoGlob) SetUnknownFields(unknownFields ...proto.Field) *MemoGlob {
+	m.UnknownFields = unknownFields
 	return m
 }
 

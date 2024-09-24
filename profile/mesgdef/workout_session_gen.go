@@ -27,9 +27,8 @@ type WorkoutSession struct {
 	SubSport       typedef.SubSport
 	PoolLengthUnit typedef.DisplayMeasure
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWorkoutSession creates new WorkoutSession struct based on given mesg.
@@ -37,14 +36,23 @@ type WorkoutSession struct {
 func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -57,6 +65,7 @@ func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 		PoolLength:     vals[4].Uint16(),
 		PoolLengthUnit: typedef.DisplayMeasure(vals[5].Uint8()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -110,6 +119,10 @@ func (m *WorkoutSession) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -187,6 +200,12 @@ func (m *WorkoutSession) SetPoolLengthScaled(v float64) *WorkoutSession {
 // SetPoolLengthUnit sets PoolLengthUnit value.
 func (m *WorkoutSession) SetPoolLengthUnit(v typedef.DisplayMeasure) *WorkoutSession {
 	m.PoolLengthUnit = v
+	return m
+}
+
+// SetDeveloperFields WorkoutSession's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *WorkoutSession) SetUnknownFields(unknownFields ...proto.Field) *WorkoutSession {
+	m.UnknownFields = unknownFields
 	return m
 }
 

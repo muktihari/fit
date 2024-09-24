@@ -31,9 +31,8 @@ type Totals struct {
 	Sport        typedef.Sport
 	SportIndex   uint8
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTotals creates new Totals struct based on given mesg.
@@ -41,14 +40,23 @@ type Totals struct {
 func NewTotals(mesg *proto.Message) *Totals {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -64,6 +72,7 @@ func NewTotals(mesg *proto.Message) *Totals {
 		ActiveTime:   vals[6].Uint32(),
 		SportIndex:   vals[9].Uint8(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -132,6 +141,10 @@ func (m *Totals) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint8(m.SportIndex)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -215,6 +228,12 @@ func (m *Totals) SetActiveTime(v uint32) *Totals {
 // SetSportIndex sets SportIndex value.
 func (m *Totals) SetSportIndex(v uint8) *Totals {
 	m.SportIndex = v
+	return m
+}
+
+// SetDeveloperFields Totals's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Totals) SetUnknownFields(unknownFields ...proto.Field) *Totals {
+	m.UnknownFields = unknownFields
 	return m
 }
 

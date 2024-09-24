@@ -23,9 +23,8 @@ type Capabilities struct {
 	WorkoutsSupported     typedef.WorkoutCapabilities      // Base: uint32z
 	ConnectivitySupported typedef.ConnectivityCapabilities // Base: uint32z
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCapabilities creates new Capabilities struct based on given mesg.
@@ -33,14 +32,23 @@ type Capabilities struct {
 func NewCapabilities(mesg *proto.Message) *Capabilities {
 	vals := [24]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 23 {
+			if mesg.Fields[i].Num > 23 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -54,6 +62,7 @@ func NewCapabilities(mesg *proto.Message) *Capabilities {
 		WorkoutsSupported:     typedef.WorkoutCapabilities(vals[21].Uint32z()),
 		ConnectivitySupported: typedef.ConnectivityCapabilities(vals[23].Uint32z()),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -94,6 +103,10 @@ func (m *Capabilities) ToMesg(options *Options) proto.Message {
 		fields = append(fields, field)
 	}
 
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
+	}
+
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
 	pool.Put(arr)
@@ -132,6 +145,12 @@ func (m *Capabilities) SetWorkoutsSupported(v typedef.WorkoutCapabilities) *Capa
 // Base: uint32z
 func (m *Capabilities) SetConnectivitySupported(v typedef.ConnectivityCapabilities) *Capabilities {
 	m.ConnectivitySupported = v
+	return m
+}
+
+// SetDeveloperFields Capabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Capabilities) SetUnknownFields(unknownFields ...proto.Field) *Capabilities {
+	m.UnknownFields = unknownFields
 	return m
 }
 

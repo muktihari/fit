@@ -25,9 +25,8 @@ type TankUpdate struct {
 	Sensor    typedef.AntChannelId // Base: uint32z
 	Pressure  uint16               // Scale: 100; Units: bar
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTankUpdate creates new TankUpdate struct based on given mesg.
@@ -35,14 +34,23 @@ type TankUpdate struct {
 func NewTankUpdate(mesg *proto.Message) *TankUpdate {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -51,6 +59,7 @@ func NewTankUpdate(mesg *proto.Message) *TankUpdate {
 		Sensor:    typedef.AntChannelId(vals[0].Uint32z()),
 		Pressure:  vals[1].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -84,6 +93,10 @@ func (m *TankUpdate) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.Pressure)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -144,6 +157,12 @@ func (m *TankUpdate) SetPressureScaled(v float64) *TankUpdate {
 		return m
 	}
 	m.Pressure = uint16(unscaled)
+	return m
+}
+
+// SetDeveloperFields TankUpdate's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *TankUpdate) SetUnknownFields(unknownFields ...proto.Field) *TankUpdate {
+	m.UnknownFields = unknownFields
 	return m
 }
 

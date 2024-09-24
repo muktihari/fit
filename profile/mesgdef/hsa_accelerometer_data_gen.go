@@ -29,9 +29,8 @@ type HsaAccelerometerData struct {
 	TimestampMs      uint16    // Units: ms; Millisecond resolution of the timestamp
 	SamplingInterval uint16    // Units: ms; Sampling Interval in Milliseconds
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaAccelerometerData creates new HsaAccelerometerData struct based on given mesg.
@@ -39,14 +38,23 @@ type HsaAccelerometerData struct {
 func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -59,6 +67,7 @@ func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 		AccelZ:           vals[4].SliceInt16(),
 		Timestamp32K:     vals[5].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -112,6 +121,10 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(m.Timestamp32K)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -299,6 +312,12 @@ func (m *HsaAccelerometerData) SetAccelZScaled(vs []float64) *HsaAccelerometerDa
 // 32 kHz timestamp
 func (m *HsaAccelerometerData) SetTimestamp32K(v uint32) *HsaAccelerometerData {
 	m.Timestamp32K = v
+	return m
+}
+
+// SetDeveloperFields HsaAccelerometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *HsaAccelerometerData) SetUnknownFields(unknownFields ...proto.Field) *HsaAccelerometerData {
+	m.UnknownFields = unknownFields
 	return m
 }
 

@@ -29,9 +29,8 @@ type TimestampCorrelation struct {
 	TimestampMs               uint16    // Units: ms; Millisecond part of the UTC timestamp at the time the system timestamp was recorded.
 	SystemTimestampMs         uint16    // Units: ms; Millisecond part of the system timestamp
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTimestampCorrelation creates new TimestampCorrelation struct based on given mesg.
@@ -39,14 +38,23 @@ type TimestampCorrelation struct {
 func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 	vals := [254]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -59,6 +67,7 @@ func NewTimestampCorrelation(mesg *proto.Message) *TimestampCorrelation {
 		TimestampMs:               vals[4].Uint16(),
 		SystemTimestampMs:         vals[5].Uint16(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -112,6 +121,10 @@ func (m *TimestampCorrelation) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.SystemTimestampMs)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -239,6 +252,12 @@ func (m *TimestampCorrelation) SetTimestampMs(v uint16) *TimestampCorrelation {
 // Units: ms; Millisecond part of the system timestamp
 func (m *TimestampCorrelation) SetSystemTimestampMs(v uint16) *TimestampCorrelation {
 	m.SystemTimestampMs = v
+	return m
+}
+
+// SetDeveloperFields TimestampCorrelation's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *TimestampCorrelation) SetUnknownFields(unknownFields ...proto.Field) *TimestampCorrelation {
+	m.UnknownFields = unknownFields
 	return m
 }
 

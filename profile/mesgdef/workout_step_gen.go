@@ -39,9 +39,8 @@ type WorkoutStep struct {
 	Equipment                      typedef.WorkoutEquipment
 	SecondaryTargetType            typedef.WktStepTarget
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWorkoutStep creates new WorkoutStep struct based on given mesg.
@@ -49,14 +48,23 @@ type WorkoutStep struct {
 func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 	vals := [255]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 {
+			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -81,6 +89,7 @@ func NewWorkoutStep(mesg *proto.Message) *WorkoutStep {
 		SecondaryCustomTargetValueLow:  vals[21].Uint32(),
 		SecondaryCustomTargetValueHigh: vals[22].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -194,6 +203,10 @@ func (m *WorkoutStep) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 22)
 		field.Value = proto.Uint32(m.SecondaryCustomTargetValueHigh)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -548,6 +561,12 @@ func (m *WorkoutStep) SetSecondaryCustomTargetValueLow(v uint32) *WorkoutStep {
 // SetSecondaryCustomTargetValueHigh sets SecondaryCustomTargetValueHigh value.
 func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
 	m.SecondaryCustomTargetValueHigh = v
+	return m
+}
+
+// SetDeveloperFields WorkoutStep's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *WorkoutStep) SetUnknownFields(unknownFields ...proto.Field) *WorkoutStep {
+	m.UnknownFields = unknownFields
 	return m
 }
 

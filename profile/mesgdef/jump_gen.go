@@ -35,9 +35,8 @@ type Jump struct {
 
 	state [2]uint8 // Used for tracking expanded fields.
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewJump creates new Jump struct based on given mesg.
@@ -46,10 +45,14 @@ func NewJump(mesg *proto.Message) *Jump {
 	vals := [254]proto.Value{}
 
 	var state [2]uint8
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 253 {
+			if mesg.Fields[i].Num > 253 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			if mesg.Fields[i].Num < 9 && mesg.Fields[i].IsExpandedField {
@@ -58,6 +61,11 @@ func NewJump(mesg *proto.Message) *Jump {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -75,6 +83,7 @@ func NewJump(mesg *proto.Message) *Jump {
 
 		state: state,
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -146,6 +155,10 @@ func (m *Jump) ToMesg(options *Options) proto.Message {
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -311,6 +324,12 @@ func (m *Jump) SetEnhancedSpeedScaled(v float64) *Jump {
 		return m
 	}
 	m.EnhancedSpeed = uint32(unscaled)
+	return m
+}
+
+// SetDeveloperFields Jump's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *Jump) SetUnknownFields(unknownFields ...proto.Field) *Jump {
+	m.UnknownFields = unknownFields
 	return m
 }
 

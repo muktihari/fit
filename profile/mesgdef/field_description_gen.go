@@ -32,6 +32,8 @@ type FieldDescription struct {
 	Scale                 uint8
 	Offset                int8
 	NativeFieldNum        uint8
+
+	UnknownFields []proto.Field // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 }
 
 // NewFieldDescription creates new FieldDescription struct based on given mesg.
@@ -39,13 +41,22 @@ type FieldDescription struct {
 func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 	vals := [16]proto.Value{}
 
+	var unknownFields []proto.Field
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 15 {
+			if mesg.Fields[i].Num > 15 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 	}
 
 	return &FieldDescription{
@@ -63,6 +74,8 @@ func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 		FitBaseUnitId:         typedef.FitBaseUnit(vals[13].Uint16()),
 		NativeMesgNum:         typedef.MesgNum(vals[14].Uint16()),
 		NativeFieldNum:        vals[15].Uint8(),
+
+		UnknownFields: unknownFields,
 	}
 }
 
@@ -150,6 +163,10 @@ func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint8(m.NativeFieldNum)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -244,5 +261,11 @@ func (m *FieldDescription) SetNativeMesgNum(v typedef.MesgNum) *FieldDescription
 // SetNativeFieldNum sets NativeFieldNum value.
 func (m *FieldDescription) SetNativeFieldNum(v uint8) *FieldDescription {
 	m.NativeFieldNum = v
+	return m
+}
+
+// SetDeveloperFields FieldDescription's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *FieldDescription) SetUnknownFields(unknownFields ...proto.Field) *FieldDescription {
+	m.UnknownFields = unknownFields
 	return m
 }

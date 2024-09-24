@@ -28,9 +28,8 @@ type VideoClip struct {
 	StartTimestampMs uint16
 	EndTimestampMs   uint16
 
-	// Developer Fields are dynamic, can't be mapped as struct's fields.
-	// [Added since protocol version 2.0]
-	DeveloperFields []proto.DeveloperField
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewVideoClip creates new VideoClip struct based on given mesg.
@@ -38,14 +37,23 @@ type VideoClip struct {
 func NewVideoClip(mesg *proto.Message) *VideoClip {
 	vals := [8]proto.Value{}
 
+	var unknownFields []proto.Field
 	var developerFields []proto.DeveloperField
 	if mesg != nil {
+		arr := pool.Get().(*[poolsize]proto.Field)
+		unknownFields = arr[:0]
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 7 {
+			if mesg.Fields[i].Num > 7 || mesg.Fields[i].Name == factory.NameUnknown {
+				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
+		if len(unknownFields) == 0 {
+			unknownFields = nil
+		}
+		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -58,6 +66,7 @@ func NewVideoClip(mesg *proto.Message) *VideoClip {
 		ClipStart:        vals[6].Uint32(),
 		ClipEnd:          vals[7].Uint32(),
 
+		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
 	}
 }
@@ -111,6 +120,10 @@ func (m *VideoClip) ToMesg(options *Options) proto.Message {
 		field := fac.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint32(m.ClipEnd)
 		fields = append(fields, field)
+	}
+
+	for i := range m.UnknownFields {
+		fields = append(fields, m.UnknownFields[i])
 	}
 
 	mesg.Fields = make([]proto.Field, len(fields))
@@ -171,6 +184,12 @@ func (m *VideoClip) SetClipStart(v uint32) *VideoClip {
 // Units: ms; End of clip in video time
 func (m *VideoClip) SetClipEnd(v uint32) *VideoClip {
 	m.ClipEnd = v
+	return m
+}
+
+// SetDeveloperFields VideoClip's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+func (m *VideoClip) SetUnknownFields(unknownFields ...proto.Field) *VideoClip {
+	m.UnknownFields = unknownFields
 	return m
 }
 
