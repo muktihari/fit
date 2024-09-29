@@ -18,10 +18,10 @@ type Segment struct {
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
 
-	SegmentId               *mesgdef.SegmentId
-	SegmentLeaderboardEntry *mesgdef.SegmentLeaderboardEntry
-	SegmentLap              *mesgdef.SegmentLap
-	SegmentPoints           []*mesgdef.SegmentPoint
+	SegmentId                 *mesgdef.SegmentId
+	SegmentLap                *mesgdef.SegmentLap
+	SegmentLeaderboardEntries []*mesgdef.SegmentLeaderboardEntry
+	SegmentPoints             []*mesgdef.SegmentPoint
 
 	UnrelatedMessages []proto.Message
 }
@@ -49,7 +49,7 @@ func (f *Segment) Add(mesg proto.Message) {
 	case mesgnum.SegmentId:
 		f.SegmentId = mesgdef.NewSegmentId(&mesg)
 	case mesgnum.SegmentLeaderboardEntry:
-		f.SegmentLeaderboardEntry = mesgdef.NewSegmentLeaderboardEntry(&mesg)
+		f.SegmentLeaderboardEntries = append(f.SegmentLeaderboardEntries, mesgdef.NewSegmentLeaderboardEntry(&mesg))
 	case mesgnum.SegmentLap:
 		f.SegmentLap = mesgdef.NewSegmentLap(&mesg)
 	case mesgnum.SegmentPoint:
@@ -62,9 +62,9 @@ func (f *Segment) Add(mesg proto.Message) {
 
 // ToFIT converts Segment to proto.FIT. If options is nil, default options will be used.
 func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
-	var size = 4 // non slice fields
+	var size = 3 // non slice fields
 
-	size += len(f.SegmentPoints) + len(f.DeveloperDataIds) +
+	size += len(f.SegmentPoints) + len(f.SegmentLeaderboardEntries) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
 	fit := proto.FIT{
@@ -83,8 +83,8 @@ func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
 	if f.SegmentId != nil {
 		fit.Messages = append(fit.Messages, f.SegmentId.ToMesg(options))
 	}
-	if f.SegmentLeaderboardEntry != nil {
-		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry.ToMesg(options))
+	for i := range f.SegmentLeaderboardEntries {
+		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntries[i].ToMesg(options))
 	}
 	if f.SegmentLap != nil {
 		fit.Messages = append(fit.Messages, f.SegmentLap.ToMesg(options))
