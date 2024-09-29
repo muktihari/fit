@@ -64,7 +64,7 @@ func (f *Segment) Add(mesg proto.Message) {
 func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 3 // non slice fields
 
-	size += len(f.SegmentPoints) + len(f.DeveloperDataIds) +
+	size += len(f.SegmentPoints) + len(f.SegmentLeaderboardEntries) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
 
 	fit := proto.FIT{
