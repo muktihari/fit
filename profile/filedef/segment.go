@@ -19,7 +19,7 @@ type Segment struct {
 	FieldDescriptions []*mesgdef.FieldDescription
 
 	SegmentId               *mesgdef.SegmentId
-	SegmentLeaderboardEntry *mesgdef.SegmentLeaderboardEntry
+	SegmentLeaderboardEntry []*mesgdef.SegmentLeaderboardEntry
 	SegmentLap              *mesgdef.SegmentLap
 	SegmentPoints           []*mesgdef.SegmentPoint
 
@@ -49,7 +49,7 @@ func (f *Segment) Add(mesg proto.Message) {
 	case mesgnum.SegmentId:
 		f.SegmentId = mesgdef.NewSegmentId(&mesg)
 	case mesgnum.SegmentLeaderboardEntry:
-		f.SegmentLeaderboardEntry = mesgdef.NewSegmentLeaderboardEntry(&mesg)
+		f.SegmentLeaderboardEntry = append(f.SegmentLeaderboardEntry, mesgdef.NewSegmentLeaderboardEntry(&mesg))
 	case mesgnum.SegmentLap:
 		f.SegmentLap = mesgdef.NewSegmentLap(&mesg)
 	case mesgnum.SegmentPoint:
@@ -83,8 +83,8 @@ func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
 	if f.SegmentId != nil {
 		fit.Messages = append(fit.Messages, f.SegmentId.ToMesg(options))
 	}
-	if f.SegmentLeaderboardEntry != nil {
-		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry.ToMesg(options))
+	for i := range f.SegmentLeaderboardEntry {
+		fit.Messages = append(fit.Messages, f.SegmentLeaderboardEntry[i].ToMesg(options))
 	}
 	if f.SegmentLap != nil {
 		fit.Messages = append(fit.Messages, f.SegmentLap.ToMesg(options))
