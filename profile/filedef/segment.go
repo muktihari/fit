@@ -19,8 +19,8 @@ type Segment struct {
 	FieldDescriptions []*mesgdef.FieldDescription
 
 	SegmentId               *mesgdef.SegmentId
-	SegmentLeaderboardEntry []*mesgdef.SegmentLeaderboardEntry
 	SegmentLap              *mesgdef.SegmentLap
+	SegmentLeaderboardEntry []*mesgdef.SegmentLeaderboardEntry
 	SegmentPoints           []*mesgdef.SegmentPoint
 
 	UnrelatedMessages []proto.Message
