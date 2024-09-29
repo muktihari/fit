@@ -62,7 +62,7 @@ func (f *Segment) Add(mesg proto.Message) {
 
 // ToFIT converts Segment to proto.FIT. If options is nil, default options will be used.
 func (f *Segment) ToFIT(options *mesgdef.Options) proto.FIT {
-	var size = 4 // non slice fields
+	var size = 3 // non slice fields
 
 	size += len(f.SegmentPoints) + len(f.DeveloperDataIds) +
 		len(f.FieldDescriptions) + len(f.UnrelatedMessages)
