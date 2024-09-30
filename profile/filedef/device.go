@@ -5,6 +5,7 @@
 package filedef
 
 import (
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -58,7 +59,7 @@ func (f *Device) Add(mesg proto.Message) {
 	case mesgnum.FieldCapabilities:
 		f.FieldCapabilities = append(f.FieldCapabilities, mesgdef.NewFieldCapabilities(&mesg))
 	default:
-		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
+		mesg.Fields = sliceutil.Clone(mesg.Fields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

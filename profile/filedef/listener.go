@@ -6,6 +6,7 @@ package filedef
 
 import (
 	"github.com/muktihari/fit/decoder"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -170,7 +171,7 @@ func (l *Listener) OnMesg(mesg proto.Message) {
 
 	mesg.Fields = append((<-l.poolc)[:0], mesg.Fields...)
 	// Must clone DeveloperFields since it is being referenced in mesgdef's structs.
-	mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
+	mesg.DeveloperFields = sliceutil.Clone(mesg.DeveloperFields)
 
 	l.mesgc <- mesg
 }
