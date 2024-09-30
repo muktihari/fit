@@ -9,6 +9,7 @@ package {{ .Package }}
 
 import (
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	{{- if .Imports -}}
@@ -66,10 +67,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 			{{ end -}}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		if len(unknownFields) == 0 {
-			unknownFields = nil
-		}
-		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		unknownFields = sliceutil.Clone(unknownFields)
 		pool.Put(arr)
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 			developerFields = mesg.DeveloperFields
