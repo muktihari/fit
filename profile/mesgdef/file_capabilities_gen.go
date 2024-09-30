@@ -8,6 +8,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
@@ -46,10 +47,7 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		if len(unknownFields) == 0 {
-			unknownFields = nil
-		}
-		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		unknownFields = sliceutil.Clone(unknownFields)
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}

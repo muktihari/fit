@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/kit/scaleoffset"
@@ -616,8 +617,8 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 	if len(d.options.mesgDefListeners) > 0 {
 		// Clone since we don't have control of the object lifecycle outside Decoder.
 		mesgDef := *mesgDef
-		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions[:0:0], mesgDef.FieldDefinitions...)
-		mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions[:0:0], mesgDef.DeveloperFieldDefinitions...)
+		mesgDef.FieldDefinitions = sliceutil.Clone(mesgDef.FieldDefinitions)
+		mesgDef.DeveloperFieldDefinitions = sliceutil.Clone(mesgDef.DeveloperFieldDefinitions)
 		for i := range d.options.mesgDefListeners {
 			d.options.mesgDefListeners[i].OnMesgDef(mesgDef) // blocking or non-blocking depends on listeners' implementation.
 		}
@@ -683,8 +684,8 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 	}
 
 	if !d.options.broadcastOnly || d.options.broadcastMesgCopy {
-		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
-		mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
+		mesg.Fields = sliceutil.Clone(mesg.Fields)
+		mesg.DeveloperFields = sliceutil.Clone(mesg.DeveloperFields)
 	}
 
 	if !d.options.broadcastOnly {

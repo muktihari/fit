@@ -44,6 +44,15 @@ func BenchmarkRecordToMesg(b *testing.B) {
 }
 
 func TestRecordFieldExpansionCorrectness(t *testing.T) {
+	t.Run("NewRecord -> IsExpandedField()", func(t *testing.T) {
+		r := NewRecord(&proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+			{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedRespirationRate).FieldBase, IsExpandedField: true},
+		}})
+		if !r.IsExpandedField(fieldnum.RecordEnhancedRespirationRate) {
+			t.Fatalf("expected expanded: true, got: false")
+		}
+	})
+
 	r := NewRecord(nil)
 
 	type numExpand struct {
@@ -203,18 +212,31 @@ func TestRecordToMesgTimestampCorrectness(t *testing.T) {
 		t.Fatalf("field should be nil, got: fieldNum: %d, value: %d",
 			field.Num, field.Value.Uint32())
 	}
+}
 
-	r = NewRecord(&proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
-		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
-		{FieldBase: &proto.FieldBase{Num: 252, Name: factory.NameUnknown}},
-	}})
-	mesg = r.ToMesg(nil)
-	field = mesg.FieldByNum(252)
-	if field == nil {
-		t.Fatal("field should not be nil")
-	}
-	if field.Num != 252 && field.Name != factory.NameUnknown {
-		t.Fatalf("expected num: %d, name: %s, got num: %d, name: %s",
-			252, factory.NameUnknown, field.Num, field.Name)
-	}
+func TestRecordUnknownFields(t *testing.T) {
+	now := time.Now()
+
+	t.Run("with unknown fields", func(t *testing.T) {
+		r := NewRecord(&proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+			{FieldBase: &proto.FieldBase{Num: 252, Name: factory.NameUnknown}},
+		}})
+		mesg := r.ToMesg(nil)
+		field := mesg.FieldByNum(252)
+		if field == nil {
+			t.Fatal("field should not be nil")
+		}
+		if field.Num != 252 && field.Name != factory.NameUnknown {
+			t.Fatalf("expected num: %d, name: %s, got num: %d, name: %s",
+				252, factory.NameUnknown, field.Num, field.Name)
+		}
+	})
+
+	t.Run("without unknown fields", func(t *testing.T) {
+		r := NewRecord(nil)
+		if r.UnknownFields != nil {
+			t.Fatalf("UnknownFields should be nil, got: %+v", r.UnknownFields)
+		}
+	})
 }

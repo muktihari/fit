@@ -8,6 +8,7 @@ package mesgdef
 
 import (
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
@@ -53,10 +54,7 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 			}
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
-		if len(unknownFields) == 0 {
-			unknownFields = nil
-		}
-		unknownFields = append(unknownFields[:0:0], unknownFields...)
+		unknownFields = sliceutil.Clone(unknownFields)
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}

@@ -5,6 +5,7 @@
 package filedef
 
 import (
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
@@ -64,7 +65,7 @@ func (f *Sport) Add(mesg proto.Message) {
 	case mesgnum.CadenceZone:
 		f.CadenceZones = append(f.CadenceZones, mesgdef.NewCadenceZone(&mesg))
 	default:
-		mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
+		mesg.Fields = sliceutil.Clone(mesg.Fields)
 		f.UnrelatedMessages = append(f.UnrelatedMessages, mesg)
 	}
 }

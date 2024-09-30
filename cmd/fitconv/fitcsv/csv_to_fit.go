@@ -14,6 +14,7 @@ import (
 
 	"github.com/muktihari/fit/encoder"
 	"github.com/muktihari/fit/factory"
+	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/scaleoffset"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile"
@@ -158,8 +159,8 @@ func (c *CSVToFITConv) convert() error {
 			}
 
 			if c.streamEnc == nil {
-				mesg.Fields = append(mesg.Fields[:0:0], mesg.Fields...)
-				mesg.DeveloperFields = append(mesg.DeveloperFields[:0:0], mesg.DeveloperFields...)
+				mesg.Fields = sliceutil.Clone(mesg.Fields)
+				mesg.DeveloperFields = sliceutil.Clone(mesg.DeveloperFields)
 				c.fit.Messages = append(c.fit.Messages, mesg)
 				continue
 			}
