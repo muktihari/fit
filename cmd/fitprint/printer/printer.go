@@ -29,11 +29,14 @@ import (
 
 const fitprintGithubURL = "https://github.com/muktihari/fit/tree/master/cmd/fitprint"
 
-//go:linkname bitsFromValue github.com/muktihari/fit/decoder.bitsFromValue
-func bitsFromValue(value proto.Value) (bits uint32, ok bool)
+// MUST have the same layout with github.com/muktihari/fit/decoder.bitvalue
+type bitvalue struct{ store [32]uint64 }
 
-//go:linkname valueFromBits github.com/muktihari/fit/decoder.valueFromBits
-func valueFromBits(bits uint32, baseType basetype.BaseType) proto.Value
+//go:linkname ToValue github.com/muktihari/fit/decoder.(*bitvalue).ToValue
+func ToValue(v *bitvalue, baseType basetype.BaseType) proto.Value
+
+//go:linkname makeBitValue github.com/muktihari/fit/decoder.makeBitValue
+func makeBitValue(value proto.Value) (v bitvalue, ok bool)
 
 func Print(path string) error {
 	ext := filepath.Ext(path)
@@ -404,8 +407,8 @@ func formatFieldValue(
 	}
 
 	if isDynamicField { // Cast value as dynamic field's target type
-		bits, _ := bitsFromValue(value)
-		value = valueFromBits(bits, baseType)
+		bitVal, _ := makeBitValue(value)
+		value = ToValue(&bitVal, baseType)
 	}
 	ts := TypedefString(profileType, value)
 	if strings.Contains(ts, "Invalid") {
@@ -421,8 +424,8 @@ func formatFieldValue(
 func formatCast[S []E, E any](s S, bt basetype.BaseType, pt profile.ProfileType) string {
 	ss := make([]string, 0, len(s))
 	for i := range s {
-		bits, _ := bitsFromValue(proto.Any(s[i]))
-		val := valueFromBits(bits, bt)
+		bitVal, _ := makeBitValue(proto.Any(s[i]))
+		val := ToValue(&bitVal, bt)
 		ts := TypedefString(pt, val)
 		if strings.Contains(ts, "Invalid") {
 			ss = append(ss, fmt.Sprintf("unknown(%v)", val.Any()))
