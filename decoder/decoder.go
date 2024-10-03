@@ -741,8 +741,9 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		if baseType != field.BaseType { // Convert value
-			bitVal, _ := bitsFromValue(val)
-			val = valueFromBits(bitVal, field.BaseType)
+			if bitVal, ok := makeBitValue(val); ok {
+				val = bitVal.ToValue(field.BaseType)
+			}
 		}
 
 		if field.Num == proto.FieldNumTimestamp && val.Type() == proto.TypeUint32 {
@@ -754,8 +755,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field.Value = val
 
 		if d.options.shouldExpandComponent && field.Accumulate {
-			if val, ok := bitsFromValue(field.Value); ok {
-				d.accumulator.Collect(mesg.Num, field.Num, val) // Collect the field values to be used in component expansion.
+			if bitVal, ok := makeBitValue(val); ok {
+				d.accumulator.Collect(mesg.Num, field.Num, bitVal.AsUint32()) // Collect the field values to be used in component expansion.
 			}
 		}
 
@@ -782,15 +783,15 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 }
 
 func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
-	if !containingField.Value.Valid(containingField.BaseType) {
-		return
-	}
-
 	if len(components) == 0 {
 		return
 	}
 
-	bitVal, ok := bitsFromValue(containingField.Value)
+	if !containingField.Value.Valid(containingField.BaseType) {
+		return
+	}
+
+	bitVal, ok := makeBitValue(containingField.Value)
 	if !ok {
 		return
 	}
@@ -805,24 +806,39 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		componentField.IsExpandedField = true
 
 		if component.Accumulate {
-			bitVal = d.accumulator.Accumulate(mesg.Num, component.FieldNum, bitVal, component.Bits)
+			bitVal = makeBitValueFromUint32(d.accumulator.Accumulate(mesg.Num, component.FieldNum, bitVal.AsUint32(), component.Bits))
 		}
 
-		var val = bitVal
-		if len(components) > 1 {
-			if bitVal == 0 {
-				break // no more bits to shift
-			}
-			var mask uint32 = (1 << component.Bits) - 1 // e.g. (1 << 8) - 1     = 255
-			val = val & mask                            // e.g. 0x27010E08 & 255 = 0x08
-			bitVal = bitVal >> component.Bits           // e.g. 0x27010E08 >> 8  = 0x27010E
+		// A component can only have max 32 bits value
+		val, ok := bitVal.PullByMask(component.Bits)
+		if !ok {
+			break
 		}
 
 		componentScaled := scaleoffset.Apply(val, component.Scale, component.Offset)
 		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
-		componentField.Value = valueFromBits(val, componentField.BaseType)
+		componentBitVal := makeBitValueFromUint32(val)
+		value := componentBitVal.ToValue(componentField.BaseType)
 
-		mesg.Fields = append(mesg.Fields, componentField)
+		var shouldAppend bool
+		fieldRef := mesg.FieldByNum(component.FieldNum)
+		if fieldRef == nil {
+			fieldRef = &componentField
+			shouldAppend = true
+		}
+
+		if fieldRef.Array {
+			// Some of expanded field's values are in the form of slice:
+			// - Hr: event_timestamp FROM event_timestamp_12 (approx. up to 120 bits)
+			// - RawBbi: time, quality, gap FROM data (approx. up to 240 bits)
+			fieldRef.Value = valueAppend(fieldRef.Value, value)
+		} else {
+			fieldRef.Value = value
+		}
+
+		if shouldAppend {
+			mesg.Fields = append(mesg.Fields, componentField)
+		}
 
 		// The destination field (componentField) can itself contain components requiring expansion.
 		// e.g. compressed_speed_distance -> (speed, distance), speed -> enhanced_speed.
@@ -913,8 +929,9 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if baseType != fieldDesc.FitBaseTypeId { // Convert value
-			bitVal, _ := bitsFromValue(val)
-			val = valueFromBits(bitVal, fieldDesc.FitBaseTypeId)
+			if bitVal, ok := makeBitValue(val); ok {
+				val = bitVal.ToValue(fieldDesc.FitBaseTypeId)
+			}
 		}
 
 		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.

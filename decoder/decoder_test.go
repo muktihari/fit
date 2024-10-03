@@ -1888,88 +1888,91 @@ func TestExpandComponents(t *testing.T) {
 	tt := []struct {
 		name                 string
 		mesg                 proto.Message
-		containingField      proto.Field
-		components           []proto.Component
-		nFieldAfterExpansion int
+		fieldsAfterExpansion []proto.Field
 	}{
 		{
 			name: "expand components single happy flow",
 			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
-			nFieldAfterExpansion: 2, // 1 for speed, +1 expand field enhanced_speed
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase, Value: proto.Uint32(1000), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components multiple happy flow",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
 			}},
-			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
-			components: func() []proto.Component {
-				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
-				for _, subfield := range subfields {
-					if subfield.Name == "gear_change_data" {
-						return subfield.Components
-					}
-				}
-				return nil
-			}(),
-			nFieldAfterExpansion: 5, // 1 for Event, 4 for expansion fields (rear_gear_num, rear_gear, front_gear_num. front_gear)
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(0x08), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGear).FieldBase, Value: proto.Uint8(0x0E), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGearNum).FieldBase, Value: proto.Uint8(0x01), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGear).FieldBase, Value: proto.Uint8(0x27), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components run out bits for the last component",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00000E08)),
 			}},
-			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00010E08)),
-			components: func() []proto.Component {
-				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
-				for _, subfield := range subfields {
-					if subfield.Name == "gear_change_data" {
-						return subfield.Components
-					}
-				}
-				return nil
-			}(),
-			nFieldAfterExpansion: 4, // 1 for Event, 3 for expansion fields (rear_gear_num, rear_gear, front_gear_num)
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00000E08)),
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(uint8(0x08)), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGear).FieldBase, Value: proto.Uint8(uint8(0x0E)), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components containing field value mismatch",
 			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
 			}},
-			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
-			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
-			nFieldAfterExpansion: 1,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
+			},
 		},
 		{
 			name: "expand components accumulate",
 			mesg: proto.Message{Num: mesgnum.Hr, Fields: []proto.Field{
-				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue(uint8(10)),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue([]uint32{10}),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
-			components:           factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).Components,
-			nFieldAfterExpansion: 2,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue([]uint32{10, 10}),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
+			},
 		},
 		{
 			name: "expand components do not expand when containing field's value is invalid",
 			mesg: proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
-			components:           factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).Components,
-			nFieldAfterExpansion: 1,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+			},
 		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(nil)
-			dec.expandComponents(&tc.mesg, &tc.containingField, tc.components)
-			if len(tc.mesg.Fields) != tc.nFieldAfterExpansion {
-				t.Fatalf("expected n fields: %d, got: %d", tc.nFieldAfterExpansion, len(tc.mesg.Fields))
+			for _, field := range tc.mesg.Fields {
+				if subField := field.SubFieldSubtitution(&tc.mesg); subField != nil {
+					dec.expandComponents(&tc.mesg, &field, subField.Components)
+				} else {
+					dec.expandComponents(&tc.mesg, &field, field.Components)
+				}
+			}
+			if diff := cmp.Diff(tc.mesg.Fields, tc.fieldsAfterExpansion,
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+			); diff != "" {
+				t.Fatal(diff)
 			}
 		})
 	}
