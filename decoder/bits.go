@@ -78,20 +78,13 @@ type numeric interface {
 
 // storeFromSlice creates value store from given s (slice of supported numeric type).
 func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
-	var index uint8
-	value, pos := uint64(0), uint8(0)
-	for {
-		if len(s) == 0 {
-			store[index] = value
-			break
-		}
-		if pos == 8 {
-			store[index] = value
-			value, pos = 0, 0
-			index++
-		}
-		value |= uint64(s[0]) << (pos * 8)
+	var index, pos uint8
+	for len(s) > 0 && index < 32 {
+		store[index] |= uint64(s[0]) << (pos * 8)
 		pos += bitsize
+		if pos == 8 {
+			index, pos = index+1, 0
+		}
 		s = s[1:]
 	}
 	return store
