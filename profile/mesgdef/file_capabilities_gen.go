@@ -48,6 +48,7 @@ func NewFileCapabilities(mesg *proto.Message) *FileCapabilities {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -117,6 +118,7 @@ func (m *FileCapabilities) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -164,7 +166,7 @@ func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
 	return m
 }
 
-// SetDeveloperFields FileCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields FileCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FileCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FileCapabilities {
 	m.UnknownFields = unknownFields
 	return m

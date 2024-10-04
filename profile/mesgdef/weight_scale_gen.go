@@ -59,6 +59,7 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -176,6 +177,7 @@ func (m *WeightScale) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -519,7 +521,7 @@ func (m *WeightScale) SetBmiScaled(v float64) *WeightScale {
 	return m
 }
 
-// SetDeveloperFields WeightScale's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields WeightScale's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WeightScale) SetUnknownFields(unknownFields ...proto.Field) *WeightScale {
 	m.UnknownFields = unknownFields
 	return m

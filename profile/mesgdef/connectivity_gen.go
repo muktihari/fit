@@ -55,6 +55,7 @@ func NewConnectivity(mesg *proto.Message) *Connectivity {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -166,6 +167,7 @@ func (m *Connectivity) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -257,7 +259,7 @@ func (m *Connectivity) SetGrouptrackEnabled(v typedef.Bool) *Connectivity {
 	return m
 }
 
-// SetDeveloperFields Connectivity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Connectivity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Connectivity) SetUnknownFields(unknownFields ...proto.Field) *Connectivity {
 	m.UnknownFields = unknownFields
 	return m

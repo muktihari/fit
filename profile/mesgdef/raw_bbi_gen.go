@@ -57,6 +57,7 @@ func NewRawBbi(mesg *proto.Message) *RawBbi {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -137,6 +138,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -193,7 +195,7 @@ func (m *RawBbi) SetGap(v []uint8) *RawBbi {
 	return m
 }
 
-// SetDeveloperFields RawBbi's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields RawBbi's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *RawBbi) SetUnknownFields(unknownFields ...proto.Field) *RawBbi {
 	m.UnknownFields = unknownFields
 	return m

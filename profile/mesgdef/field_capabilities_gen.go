@@ -47,6 +47,7 @@ func NewFieldCapabilities(mesg *proto.Message) *FieldCapabilities {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -110,6 +111,7 @@ func (m *FieldCapabilities) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -147,7 +149,7 @@ func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
 	return m
 }
 
-// SetDeveloperFields FieldCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields FieldCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FieldCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FieldCapabilities {
 	m.UnknownFields = unknownFields
 	return m

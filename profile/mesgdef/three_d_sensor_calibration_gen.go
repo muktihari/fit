@@ -52,6 +52,7 @@ func NewThreeDSensorCalibration(mesg *proto.Message) *ThreeDSensorCalibration {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -165,6 +166,7 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -314,7 +316,7 @@ func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs [9]float64) *Thr
 	return m
 }
 
-// SetDeveloperFields ThreeDSensorCalibration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields ThreeDSensorCalibration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ThreeDSensorCalibration) SetUnknownFields(unknownFields ...proto.Field) *ThreeDSensorCalibration {
 	m.UnknownFields = unknownFields
 	return m

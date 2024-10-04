@@ -45,6 +45,7 @@ func NewSleepLevel(mesg *proto.Message) *SleepLevel {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -90,6 +91,7 @@ func (m *SleepLevel) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -114,7 +116,7 @@ func (m *SleepLevel) SetSleepLevel(v typedef.SleepLevel) *SleepLevel {
 	return m
 }
 
-// SetDeveloperFields SleepLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields SleepLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SleepLevel) SetUnknownFields(unknownFields ...proto.Field) *SleepLevel {
 	m.UnknownFields = unknownFields
 	return m

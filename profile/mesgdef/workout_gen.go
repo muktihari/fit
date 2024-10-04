@@ -51,6 +51,7 @@ func NewWorkout(mesg *proto.Message) *Workout {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -132,6 +133,7 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -218,7 +220,7 @@ func (m *Workout) SetPoolLengthUnit(v typedef.DisplayMeasure) *Workout {
 	return m
 }
 
-// SetDeveloperFields Workout's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Workout's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Workout) SetUnknownFields(unknownFields ...proto.Field) *Workout {
 	m.UnknownFields = unknownFields
 	return m

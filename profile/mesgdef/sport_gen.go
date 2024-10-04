@@ -45,6 +45,7 @@ func NewSport(mesg *proto.Message) *Sport {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -96,6 +97,7 @@ func (m *Sport) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -121,7 +123,7 @@ func (m *Sport) SetName(v string) *Sport {
 	return m
 }
 
-// SetDeveloperFields Sport's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Sport's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Sport) SetUnknownFields(unknownFields ...proto.Field) *Sport {
 	m.UnknownFields = unknownFields
 	return m

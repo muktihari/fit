@@ -55,6 +55,7 @@ func NewBloodPressure(mesg *proto.Message) *BloodPressure {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -154,6 +155,7 @@ func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -248,7 +250,7 @@ func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressu
 	return m
 }
 
-// SetDeveloperFields BloodPressure's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields BloodPressure's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *BloodPressure) SetUnknownFields(unknownFields ...proto.Field) *BloodPressure {
 	m.UnknownFields = unknownFields
 	return m

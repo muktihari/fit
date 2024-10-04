@@ -47,6 +47,7 @@ func NewHrvValue(mesg *proto.Message) *HrvValue {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -92,6 +93,7 @@ func (m *HrvValue) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -141,7 +143,7 @@ func (m *HrvValue) SetValueScaled(v float64) *HrvValue {
 	return m
 }
 
-// SetDeveloperFields HrvValue's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields HrvValue's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrvValue) SetUnknownFields(unknownFields ...proto.Field) *HrvValue {
 	m.UnknownFields = unknownFields
 	return m

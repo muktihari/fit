@@ -52,6 +52,7 @@ func NewSegmentFile(mesg *proto.Message) *SegmentFile {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -143,6 +144,7 @@ func (m *SegmentFile) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -220,7 +222,7 @@ func (m *SegmentFile) SetDefaultRaceLeader(v uint8) *SegmentFile {
 	return m
 }
 
-// SetDeveloperFields SegmentFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields SegmentFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SegmentFile) SetUnknownFields(unknownFields ...proto.Field) *SegmentFile {
 	m.UnknownFields = unknownFields
 	return m

@@ -46,6 +46,7 @@ func NewCourse(mesg *proto.Message) *Course {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -103,6 +104,7 @@ func (m *Course) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -136,7 +138,7 @@ func (m *Course) SetSubSport(v typedef.SubSport) *Course {
 	return m
 }
 
-// SetDeveloperFields Course's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Course's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Course) SetUnknownFields(unknownFields ...proto.Field) *Course {
 	m.UnknownFields = unknownFields
 	return m

@@ -49,6 +49,7 @@ func NewFileId(mesg *proto.Message) *FileId {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 	}
 
@@ -122,6 +123,7 @@ func (m *FileId) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	return mesg
@@ -198,7 +200,7 @@ func (m *FileId) SetProductName(v string) *FileId {
 	return m
 }
 
-// SetDeveloperFields FileId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields FileId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FileId) SetUnknownFields(unknownFields ...proto.Field) *FileId {
 	m.UnknownFields = unknownFields
 	return m

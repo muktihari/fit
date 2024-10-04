@@ -54,6 +54,7 @@ func NewCoursePoint(mesg *proto.Message) *CoursePoint {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -135,6 +136,7 @@ func (m *CoursePoint) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -250,7 +252,7 @@ func (m *CoursePoint) SetFavorite(v typedef.Bool) *CoursePoint {
 	return m
 }
 
-// SetDeveloperFields CoursePoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields CoursePoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *CoursePoint) SetUnknownFields(unknownFields ...proto.Field) *CoursePoint {
 	m.UnknownFields = unknownFields
 	return m

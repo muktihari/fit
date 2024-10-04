@@ -209,6 +209,7 @@ func NewSession(mesg *proto.Message) *Session {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -1204,6 +1205,7 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -4664,7 +4666,7 @@ func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
 	return m
 }
 
-// SetDeveloperFields Session's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Session's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Session) SetUnknownFields(unknownFields ...proto.Field) *Session {
 	m.UnknownFields = unknownFields
 	return m

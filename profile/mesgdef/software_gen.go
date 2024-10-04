@@ -46,6 +46,7 @@ func NewSoftware(mesg *proto.Message) *Software {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -97,6 +98,7 @@ func (m *Software) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -149,7 +151,7 @@ func (m *Software) SetPartNumber(v string) *Software {
 	return m
 }
 
-// SetDeveloperFields Software's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Software's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Software) SetUnknownFields(unknownFields ...proto.Field) *Software {
 	m.UnknownFields = unknownFields
 	return m

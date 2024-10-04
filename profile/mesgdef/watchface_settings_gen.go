@@ -45,6 +45,7 @@ func NewWatchfaceSettings(mesg *proto.Message) *WatchfaceSettings {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -96,6 +97,7 @@ func (m *WatchfaceSettings) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -139,7 +141,7 @@ func (m *WatchfaceSettings) SetLayout(v byte) *WatchfaceSettings {
 	return m
 }
 
-// SetDeveloperFields WatchfaceSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields WatchfaceSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WatchfaceSettings) SetUnknownFields(unknownFields ...proto.Field) *WatchfaceSettings {
 	m.UnknownFields = unknownFields
 	return m

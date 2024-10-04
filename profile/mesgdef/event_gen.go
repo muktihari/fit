@@ -71,6 +71,7 @@ func NewEvent(mesg *proto.Message) *Event {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -253,6 +254,7 @@ func (m *Event) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -552,7 +554,7 @@ func (m *Event) SetRadarThreatMaxApproachSpeedScaled(v float64) *Event {
 	return m
 }
 
-// SetDeveloperFields Event's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields Event's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Event) SetUnknownFields(unknownFields ...proto.Field) *Event {
 	m.UnknownFields = unknownFields
 	return m

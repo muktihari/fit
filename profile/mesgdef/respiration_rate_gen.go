@@ -47,6 +47,7 @@ func NewRespirationRate(mesg *proto.Message) *RespirationRate {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -92,6 +93,7 @@ func (m *RespirationRate) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -141,7 +143,7 @@ func (m *RespirationRate) SetRespirationRateScaled(v float64) *RespirationRate {
 	return m
 }
 
-// SetDeveloperFields RespirationRate's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields RespirationRate's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *RespirationRate) SetUnknownFields(unknownFields ...proto.Field) *RespirationRate {
 	m.UnknownFields = unknownFields
 	return m
