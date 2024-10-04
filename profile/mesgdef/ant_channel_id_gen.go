@@ -47,7 +47,7 @@ func NewAntChannelId(mesg *proto.Message) *AntChannelId {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
-		clear(arr[:len(unknownFields)])
+		*arr = [poolsize]proto.Field{}
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -111,7 +111,7 @@ func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
-	clear(fields)
+	*arr = [poolsize]proto.Field{}
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
