@@ -57,6 +57,7 @@ func NewDiveAlarm(mesg *proto.Message) *DiveAlarm {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -172,6 +173,7 @@ func (m *DiveAlarm) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -333,13 +335,13 @@ func (m *DiveAlarm) SetSpeedScaled(v float64) *DiveAlarm {
 	return m
 }
 
-// SetDeveloperFields DiveAlarm's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DiveAlarm) SetUnknownFields(unknownFields ...proto.Field) *DiveAlarm {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DiveAlarm's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DiveAlarm) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveAlarm {
 	m.DeveloperFields = developerFields
 	return m

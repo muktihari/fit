@@ -47,6 +47,7 @@ func NewHsaStepData(mesg *proto.Message) *HsaStepData {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -98,6 +99,7 @@ func (m *HsaStepData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -132,13 +134,13 @@ func (m *HsaStepData) SetSteps(v []uint32) *HsaStepData {
 	return m
 }
 
-// SetDeveloperFields HsaStepData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaStepData) SetUnknownFields(unknownFields ...proto.Field) *HsaStepData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaStepData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaStepData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaStepData {
 	m.DeveloperFields = developerFields
 	return m

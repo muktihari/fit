@@ -50,6 +50,7 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -119,6 +120,7 @@ func (m *TrainingFile) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -188,13 +190,13 @@ func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
 	return m
 }
 
-// SetDeveloperFields TrainingFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *TrainingFile) SetUnknownFields(unknownFields ...proto.Field) *TrainingFile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields TrainingFile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *TrainingFile) SetDeveloperFields(developerFields ...proto.DeveloperField) *TrainingFile {
 	m.DeveloperFields = developerFields
 	return m

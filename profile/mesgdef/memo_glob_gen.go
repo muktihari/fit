@@ -48,6 +48,7 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -117,6 +118,7 @@ func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -172,13 +174,13 @@ func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
 	return m
 }
 
-// SetDeveloperFields MemoGlob's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MemoGlob) SetUnknownFields(unknownFields ...proto.Field) *MemoGlob {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MemoGlob's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MemoGlob) SetDeveloperFields(developerFields ...proto.DeveloperField) *MemoGlob {
 	m.DeveloperFields = developerFields
 	return m

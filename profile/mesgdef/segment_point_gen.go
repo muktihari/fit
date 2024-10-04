@@ -58,6 +58,7 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -138,6 +139,7 @@ func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -340,13 +342,13 @@ func (m *SegmentPoint) SetEnhancedAltitudeScaled(v float64) *SegmentPoint {
 	return m
 }
 
-// SetDeveloperFields SegmentPoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SegmentPoint) SetUnknownFields(unknownFields ...proto.Field) *SegmentPoint {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SegmentPoint's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SegmentPoint) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentPoint {
 	m.DeveloperFields = developerFields
 	return m

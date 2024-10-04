@@ -45,6 +45,7 @@ func NewHrZone(mesg *proto.Message) *HrZone {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -96,6 +97,7 @@ func (m *HrZone) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -123,13 +125,13 @@ func (m *HrZone) SetName(v string) *HrZone {
 	return m
 }
 
-// SetDeveloperFields HrZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrZone) SetUnknownFields(unknownFields ...proto.Field) *HrZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HrZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HrZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrZone {
 	m.DeveloperFields = developerFields
 	return m

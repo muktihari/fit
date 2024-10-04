@@ -53,6 +53,7 @@ func NewActivity(mesg *proto.Message) *Activity {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -134,6 +135,7 @@ func (m *Activity) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -224,13 +226,13 @@ func (m *Activity) SetEventGroup(v uint8) *Activity {
 	return m
 }
 
-// SetDeveloperFields Activity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Activity) SetUnknownFields(unknownFields ...proto.Field) *Activity {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Activity's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Activity) SetDeveloperFields(developerFields ...proto.DeveloperField) *Activity {
 	m.DeveloperFields = developerFields
 	return m

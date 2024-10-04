@@ -45,6 +45,7 @@ func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -90,6 +91,7 @@ func (m *OhrSettings) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -114,13 +116,13 @@ func (m *OhrSettings) SetEnabled(v typedef.Switch) *OhrSettings {
 	return m
 }
 
-// SetDeveloperFields OhrSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *OhrSettings) SetUnknownFields(unknownFields ...proto.Field) *OhrSettings {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields OhrSettings's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *OhrSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *OhrSettings {
 	m.DeveloperFields = developerFields
 	return m

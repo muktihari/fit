@@ -50,6 +50,7 @@ func NewWeatherAlert(mesg *proto.Message) *WeatherAlert {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -119,6 +120,7 @@ func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -181,13 +183,13 @@ func (m *WeatherAlert) SetType(v typedef.WeatherSevereType) *WeatherAlert {
 	return m
 }
 
-// SetDeveloperFields WeatherAlert's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WeatherAlert) SetUnknownFields(unknownFields ...proto.Field) *WeatherAlert {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WeatherAlert's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WeatherAlert) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeatherAlert {
 	m.DeveloperFields = developerFields
 	return m

@@ -48,6 +48,7 @@ func NewBarometerData(mesg *proto.Message) *BarometerData {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -105,6 +106,7 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -147,13 +149,13 @@ func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
 	return m
 }
 
-// SetDeveloperFields BarometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *BarometerData) SetUnknownFields(unknownFields ...proto.Field) *BarometerData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields BarometerData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *BarometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *BarometerData {
 	m.DeveloperFields = developerFields
 	return m

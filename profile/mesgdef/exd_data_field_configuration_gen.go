@@ -55,6 +55,7 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -203,6 +204,7 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -248,13 +250,13 @@ func (m *ExdDataFieldConfiguration) SetTitle(v [32]string) *ExdDataFieldConfigur
 	return m
 }
 
-// SetDeveloperFields ExdDataFieldConfiguration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ExdDataFieldConfiguration) SetUnknownFields(unknownFields ...proto.Field) *ExdDataFieldConfiguration {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ExdDataFieldConfiguration's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ExdDataFieldConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataFieldConfiguration {
 	m.DeveloperFields = developerFields
 	return m

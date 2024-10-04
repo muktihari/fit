@@ -53,6 +53,7 @@ func NewGyroscopeData(mesg *proto.Message) *GyroscopeData {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -140,6 +141,7 @@ func (m *GyroscopeData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -222,13 +224,13 @@ func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {
 	return m
 }
 
-// SetDeveloperFields GyroscopeData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *GyroscopeData) SetUnknownFields(unknownFields ...proto.Field) *GyroscopeData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields GyroscopeData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *GyroscopeData) SetDeveloperFields(developerFields ...proto.DeveloperField) *GyroscopeData {
 	m.DeveloperFields = developerFields
 	return m

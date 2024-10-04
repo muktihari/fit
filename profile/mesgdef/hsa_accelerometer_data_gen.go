@@ -52,6 +52,7 @@ func NewHsaAccelerometerData(mesg *proto.Message) *HsaAccelerometerData {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -127,6 +128,7 @@ func (m *HsaAccelerometerData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -313,13 +315,13 @@ func (m *HsaAccelerometerData) SetTimestamp32K(v uint32) *HsaAccelerometerData {
 	return m
 }
 
-// SetDeveloperFields HsaAccelerometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaAccelerometerData) SetUnknownFields(unknownFields ...proto.Field) *HsaAccelerometerData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaAccelerometerData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaAccelerometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaAccelerometerData {
 	m.DeveloperFields = developerFields
 	return m

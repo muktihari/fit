@@ -47,6 +47,7 @@ func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -98,6 +99,7 @@ func (m *VideoFrame) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -132,13 +134,13 @@ func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
 	return m
 }
 
-// SetDeveloperFields VideoFrame's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *VideoFrame) SetUnknownFields(unknownFields ...proto.Field) *VideoFrame {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields VideoFrame's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *VideoFrame) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoFrame {
 	m.DeveloperFields = developerFields
 	return m

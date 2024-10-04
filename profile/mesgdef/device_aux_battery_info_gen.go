@@ -50,6 +50,7 @@ func NewDeviceAuxBatteryInfo(mesg *proto.Message) *DeviceAuxBatteryInfo {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -113,6 +114,7 @@ func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -180,13 +182,13 @@ func (m *DeviceAuxBatteryInfo) SetBatteryIdentifier(v uint8) *DeviceAuxBatteryIn
 	return m
 }
 
-// SetDeveloperFields DeviceAuxBatteryInfo's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DeviceAuxBatteryInfo) SetUnknownFields(unknownFields ...proto.Field) *DeviceAuxBatteryInfo {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DeviceAuxBatteryInfo's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DeviceAuxBatteryInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *DeviceAuxBatteryInfo {
 	m.DeveloperFields = developerFields
 	return m

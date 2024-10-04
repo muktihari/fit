@@ -57,6 +57,7 @@ func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -174,6 +175,7 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -437,13 +439,13 @@ func (m *SplitSummary) SetTotalMovingTimeScaled(v float64) *SplitSummary {
 	return m
 }
 
-// SetDeveloperFields SplitSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SplitSummary) SetUnknownFields(unknownFields ...proto.Field) *SplitSummary {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SplitSummary's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SplitSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *SplitSummary {
 	m.DeveloperFields = developerFields
 	return m

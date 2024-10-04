@@ -53,6 +53,7 @@ func NewObdiiData(mesg *proto.Message) *ObdiiData {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -140,6 +141,7 @@ func (m *ObdiiData) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -225,13 +227,13 @@ func (m *ObdiiData) SetStartTimestampMs(v uint16) *ObdiiData {
 	return m
 }
 
-// SetDeveloperFields ObdiiData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ObdiiData) SetUnknownFields(unknownFields ...proto.Field) *ObdiiData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ObdiiData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ObdiiData) SetDeveloperFields(developerFields ...proto.DeveloperField) *ObdiiData {
 	m.DeveloperFields = developerFields
 	return m

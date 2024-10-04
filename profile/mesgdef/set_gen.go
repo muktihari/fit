@@ -57,6 +57,7 @@ func NewSet(mesg *proto.Message) *Set {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -160,6 +161,7 @@ func (m *Set) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -303,13 +305,13 @@ func (m *Set) SetWktStepIndex(v typedef.MessageIndex) *Set {
 	return m
 }
 
-// SetDeveloperFields Set's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Set) SetUnknownFields(unknownFields ...proto.Field) *Set {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Set's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Set) SetDeveloperFields(developerFields ...proto.DeveloperField) *Set {
 	m.DeveloperFields = developerFields
 	return m

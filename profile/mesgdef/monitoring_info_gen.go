@@ -52,6 +52,7 @@ func NewMonitoringInfo(mesg *proto.Message) *MonitoringInfo {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -125,6 +126,7 @@ func (m *MonitoringInfo) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -266,13 +268,13 @@ func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {
 	return m
 }
 
-// SetDeveloperFields MonitoringInfo's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MonitoringInfo) SetUnknownFields(unknownFields ...proto.Field) *MonitoringInfo {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MonitoringInfo's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MonitoringInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *MonitoringInfo {
 	m.DeveloperFields = developerFields
 	return m

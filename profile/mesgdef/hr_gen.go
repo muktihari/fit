@@ -58,6 +58,7 @@ func NewHr(mesg *proto.Message) *Hr {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -135,6 +136,7 @@ func (m *Hr) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -281,13 +283,13 @@ func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	return m
 }
 
-// SetDeveloperFields Hr's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Hr) SetUnknownFields(unknownFields ...proto.Field) *Hr {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Hr's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Hr) SetDeveloperFields(developerFields ...proto.DeveloperField) *Hr {
 	m.DeveloperFields = developerFields
 	return m

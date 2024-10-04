@@ -68,6 +68,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)]) {{/* In case of unknown field or field.Value contains pointer to a slice */}}
 		pool.Put(arr)
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 			developerFields = mesg.DeveloperFields
@@ -132,6 +133,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields) {{/* In case of unknown field or field.Value contains pointer to a slice */}}
 	pool.Put(arr)
 
 	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
@@ -282,14 +284,14 @@ func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
 
 {{ end }}
 
-// SetDeveloperFields {{ $.Name }}'s UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *{{ $.Name }}) SetUnknownFields(unknownFields ...proto.Field) *{{ $.Name }} {
 	m.UnknownFields = unknownFields
 	return m
 }
 
 {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
-// SetDeveloperFields {{ $.Name }}'s DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperField) *{{ $.Name }} {
 	m.DeveloperFields = developerFields
 	return m

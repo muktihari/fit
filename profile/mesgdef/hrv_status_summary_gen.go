@@ -53,6 +53,7 @@ func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -134,6 +135,7 @@ func (m *HrvStatusSummary) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -354,13 +356,13 @@ func (m *HrvStatusSummary) SetStatus(v typedef.HrvStatus) *HrvStatusSummary {
 	return m
 }
 
-// SetDeveloperFields HrvStatusSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrvStatusSummary) SetUnknownFields(unknownFields ...proto.Field) *HrvStatusSummary {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HrvStatusSummary's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HrvStatusSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrvStatusSummary {
 	m.DeveloperFields = developerFields
 	return m

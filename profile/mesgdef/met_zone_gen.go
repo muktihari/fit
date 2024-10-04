@@ -47,6 +47,7 @@ func NewMetZone(mesg *proto.Message) *MetZone {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -104,6 +105,7 @@ func (m *MetZone) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -189,13 +191,13 @@ func (m *MetZone) SetFatCaloriesScaled(v float64) *MetZone {
 	return m
 }
 
-// SetDeveloperFields MetZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MetZone) SetUnknownFields(unknownFields ...proto.Field) *MetZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MetZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MetZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *MetZone {
 	m.DeveloperFields = developerFields
 	return m

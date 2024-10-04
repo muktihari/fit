@@ -46,6 +46,7 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -91,6 +92,7 @@ func (m *StressLevel) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -115,13 +117,13 @@ func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
 	return m
 }
 
-// SetDeveloperFields StressLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *StressLevel) SetUnknownFields(unknownFields ...proto.Field) *StressLevel {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields StressLevel's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *StressLevel) SetDeveloperFields(developerFields ...proto.DeveloperField) *StressLevel {
 	m.DeveloperFields = developerFields
 	return m

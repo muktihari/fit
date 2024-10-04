@@ -45,6 +45,7 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 	}
 
@@ -106,6 +107,7 @@ func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	return mesg
@@ -145,7 +147,7 @@ func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
 	return m
 }
 
-// SetDeveloperFields DeveloperDataId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DeveloperDataId) SetUnknownFields(unknownFields ...proto.Field) *DeveloperDataId {
 	m.UnknownFields = unknownFields
 	return m

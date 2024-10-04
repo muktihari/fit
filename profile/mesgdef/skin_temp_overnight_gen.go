@@ -50,6 +50,7 @@ func NewSkinTempOvernight(mesg *proto.Message) *SkinTempOvernight {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
+		clear(arr[:len(unknownFields)])
 		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
@@ -113,6 +114,7 @@ func (m *SkinTempOvernight) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
+	clear(fields)
 	pool.Put(arr)
 
 	mesg.DeveloperFields = m.DeveloperFields
@@ -162,13 +164,13 @@ func (m *SkinTempOvernight) SetNightlyValue(v float32) *SkinTempOvernight {
 	return m
 }
 
-// SetDeveloperFields SkinTempOvernight's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SkinTempOvernight) SetUnknownFields(unknownFields ...proto.Field) *SkinTempOvernight {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SkinTempOvernight's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SkinTempOvernight) SetDeveloperFields(developerFields ...proto.DeveloperField) *SkinTempOvernight {
 	m.DeveloperFields = developerFields
 	return m
