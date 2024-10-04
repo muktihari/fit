@@ -681,64 +681,64 @@ func String(v string) Value {
 	return Value{num: uint64(len(v)), typ: TypeString, ptr: unsafe.Pointer(unsafe.StringData(v))}
 }
 
-// SliceBool converts []bool as Value. This takes ownership of s, and the caller should not use s after this call.
-func SliceBool[S []E, E typedef.Bool](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceBool, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+// SliceBool converts []typedef.Bool as Value. This takes ownership of s, and the caller should not use s after this call.
+func SliceBool(s []typedef.Bool) Value {
+	return Value{num: uint64(len(s)), typ: TypeSliceBool, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt8 converts []int8 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt8[S []E, E ~int8](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt8, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceInt8, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint8 converts []uint8 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint8[S []E, E ~uint8](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint8, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceUint8, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt16 converts []int16 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt16[S []E, E ~int16](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt16, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceInt16, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint16 converts []uint16 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint16[S []E, E ~uint16](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint16, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceUint16, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt32 converts []int32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt32[S []E, E ~int32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt32, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceInt32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint32 converts []uint32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint32[S []E, E ~uint32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint32, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceUint32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt64 converts []int64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt64[S []E, E ~int64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt64, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceInt64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint64 converts []uint64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint64[S []E, E ~uint64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint64, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceUint64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceFloat32 converts []float32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceFloat32[S []E, E ~float32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceFloat32, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceFloat32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceFloat64 converts []float64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceFloat64[S []E, E ~float64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceFloat64, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceFloat64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceString converts []string as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceString[S []E, E ~string](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceString, ptr: unsafe.Pointer(unsafe.SliceData([]E(s)))}
+	return Value{num: uint64(len(s)), typ: TypeSliceString, ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // Any converts any value into Value. If the given v is not a primitive-type value or
