@@ -128,13 +128,13 @@ func (m *SlaveDevice) SetProduct(v uint16) *SlaveDevice {
 	return m
 }
 
-// SetUnknownFields SlaveDevice's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SlaveDevice) SetUnknownFields(unknownFields ...proto.Field) *SlaveDevice {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SlaveDevice's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SlaveDevice) SetDeveloperFields(developerFields ...proto.DeveloperField) *SlaveDevice {
 	m.DeveloperFields = developerFields
 	return m

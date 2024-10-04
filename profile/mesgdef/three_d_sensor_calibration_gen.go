@@ -316,13 +316,13 @@ func (m *ThreeDSensorCalibration) SetOrientationMatrixScaled(vs [9]float64) *Thr
 	return m
 }
 
-// SetUnknownFields ThreeDSensorCalibration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ThreeDSensorCalibration) SetUnknownFields(unknownFields ...proto.Field) *ThreeDSensorCalibration {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ThreeDSensorCalibration's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ThreeDSensorCalibration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ThreeDSensorCalibration {
 	m.DeveloperFields = developerFields
 	return m

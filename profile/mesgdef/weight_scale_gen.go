@@ -521,13 +521,13 @@ func (m *WeightScale) SetBmiScaled(v float64) *WeightScale {
 	return m
 }
 
-// SetUnknownFields WeightScale's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WeightScale) SetUnknownFields(unknownFields ...proto.Field) *WeightScale {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WeightScale's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WeightScale) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeightScale {
 	m.DeveloperFields = developerFields
 	return m

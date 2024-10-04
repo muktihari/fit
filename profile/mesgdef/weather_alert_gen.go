@@ -183,13 +183,13 @@ func (m *WeatherAlert) SetType(v typedef.WeatherSevereType) *WeatherAlert {
 	return m
 }
 
-// SetUnknownFields WeatherAlert's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WeatherAlert) SetUnknownFields(unknownFields ...proto.Field) *WeatherAlert {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WeatherAlert's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WeatherAlert) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeatherAlert {
 	m.DeveloperFields = developerFields
 	return m

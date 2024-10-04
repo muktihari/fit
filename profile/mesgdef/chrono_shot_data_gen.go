@@ -156,13 +156,13 @@ func (m *ChronoShotData) SetShotNum(v uint16) *ChronoShotData {
 	return m
 }
 
-// SetUnknownFields ChronoShotData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ChronoShotData) SetUnknownFields(unknownFields ...proto.Field) *ChronoShotData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ChronoShotData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ChronoShotData) SetDeveloperFields(developerFields ...proto.DeveloperField) *ChronoShotData {
 	m.DeveloperFields = developerFields
 	return m

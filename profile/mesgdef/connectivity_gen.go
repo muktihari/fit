@@ -259,13 +259,13 @@ func (m *Connectivity) SetGrouptrackEnabled(v typedef.Bool) *Connectivity {
 	return m
 }
 
-// SetUnknownFields Connectivity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Connectivity) SetUnknownFields(unknownFields ...proto.Field) *Connectivity {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Connectivity's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Connectivity) SetDeveloperFields(developerFields ...proto.DeveloperField) *Connectivity {
 	m.DeveloperFields = developerFields
 	return m

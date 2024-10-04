@@ -289,13 +289,13 @@ func (m *ChronoShotSession) SetGrainWeightScaled(v float64) *ChronoShotSession {
 	return m
 }
 
-// SetUnknownFields ChronoShotSession's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ChronoShotSession) SetUnknownFields(unknownFields ...proto.Field) *ChronoShotSession {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ChronoShotSession's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ChronoShotSession) SetDeveloperFields(developerFields ...proto.DeveloperField) *ChronoShotSession {
 	m.DeveloperFields = developerFields
 	return m

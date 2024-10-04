@@ -134,13 +134,13 @@ func (m *VideoFrame) SetFrameNumber(v uint32) *VideoFrame {
 	return m
 }
 
-// SetUnknownFields VideoFrame's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *VideoFrame) SetUnknownFields(unknownFields ...proto.Field) *VideoFrame {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields VideoFrame's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *VideoFrame) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoFrame {
 	m.DeveloperFields = developerFields
 	return m

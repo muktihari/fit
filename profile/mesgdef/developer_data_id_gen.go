@@ -147,7 +147,7 @@ func (m *DeveloperDataId) SetApplicationVersion(v uint32) *DeveloperDataId {
 	return m
 }
 
-// SetUnknownFields DeveloperDataId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DeveloperDataId) SetUnknownFields(unknownFields ...proto.Field) *DeveloperDataId {
 	m.UnknownFields = unknownFields
 	return m

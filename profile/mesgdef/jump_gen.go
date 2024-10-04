@@ -327,13 +327,13 @@ func (m *Jump) SetEnhancedSpeedScaled(v float64) *Jump {
 	return m
 }
 
-// SetUnknownFields Jump's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Jump) SetUnknownFields(unknownFields ...proto.Field) *Jump {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Jump's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Jump) SetDeveloperFields(developerFields ...proto.DeveloperField) *Jump {
 	m.DeveloperFields = developerFields
 	return m

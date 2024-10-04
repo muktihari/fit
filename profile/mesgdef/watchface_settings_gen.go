@@ -141,13 +141,13 @@ func (m *WatchfaceSettings) SetLayout(v byte) *WatchfaceSettings {
 	return m
 }
 
-// SetUnknownFields WatchfaceSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WatchfaceSettings) SetUnknownFields(unknownFields ...proto.Field) *WatchfaceSettings {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WatchfaceSettings's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WatchfaceSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *WatchfaceSettings {
 	m.DeveloperFields = developerFields
 	return m

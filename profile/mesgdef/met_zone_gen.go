@@ -191,13 +191,13 @@ func (m *MetZone) SetFatCaloriesScaled(v float64) *MetZone {
 	return m
 }
 
-// SetUnknownFields MetZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MetZone) SetUnknownFields(unknownFields ...proto.Field) *MetZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MetZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MetZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *MetZone {
 	m.DeveloperFields = developerFields
 	return m

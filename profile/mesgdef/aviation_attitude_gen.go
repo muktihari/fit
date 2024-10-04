@@ -519,13 +519,13 @@ func (m *AviationAttitude) SetValidity(v []typedef.AttitudeValidity) *AviationAt
 	return m
 }
 
-// SetUnknownFields AviationAttitude's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AviationAttitude) SetUnknownFields(unknownFields ...proto.Field) *AviationAttitude {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AviationAttitude's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AviationAttitude) SetDeveloperFields(developerFields ...proto.DeveloperField) *AviationAttitude {
 	m.DeveloperFields = developerFields
 	return m

@@ -147,13 +147,13 @@ func (m *Spo2Data) SetMode(v typedef.Spo2MeasurementType) *Spo2Data {
 	return m
 }
 
-// SetUnknownFields Spo2Data's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Spo2Data) SetUnknownFields(unknownFields ...proto.Field) *Spo2Data {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Spo2Data's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Spo2Data) SetDeveloperFields(developerFields ...proto.DeveloperField) *Spo2Data {
 	m.DeveloperFields = developerFields
 	return m

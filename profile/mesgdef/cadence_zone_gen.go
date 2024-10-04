@@ -125,13 +125,13 @@ func (m *CadenceZone) SetName(v string) *CadenceZone {
 	return m
 }
 
-// SetUnknownFields CadenceZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *CadenceZone) SetUnknownFields(unknownFields ...proto.Field) *CadenceZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields CadenceZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *CadenceZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *CadenceZone {
 	m.DeveloperFields = developerFields
 	return m

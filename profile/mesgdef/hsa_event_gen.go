@@ -119,13 +119,13 @@ func (m *HsaEvent) SetEventId(v uint8) *HsaEvent {
 	return m
 }
 
-// SetUnknownFields HsaEvent's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaEvent) SetUnknownFields(unknownFields ...proto.Field) *HsaEvent {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaEvent's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaEvent) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaEvent {
 	m.DeveloperFields = developerFields
 	return m

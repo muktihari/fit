@@ -305,13 +305,13 @@ func (m *Set) SetWktStepIndex(v typedef.MessageIndex) *Set {
 	return m
 }
 
-// SetUnknownFields Set's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Set) SetUnknownFields(unknownFields ...proto.Field) *Set {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Set's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Set) SetDeveloperFields(developerFields ...proto.DeveloperField) *Set {
 	m.DeveloperFields = developerFields
 	return m

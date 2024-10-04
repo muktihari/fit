@@ -170,13 +170,13 @@ func (m *MesgCapabilities) SetCount(v uint16) *MesgCapabilities {
 	return m
 }
 
-// SetUnknownFields MesgCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MesgCapabilities) SetUnknownFields(unknownFields ...proto.Field) *MesgCapabilities {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MesgCapabilities's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MesgCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *MesgCapabilities {
 	m.DeveloperFields = developerFields
 	return m

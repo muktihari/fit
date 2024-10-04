@@ -134,13 +134,13 @@ func (m *HsaConfigurationData) SetDataSize(v uint8) *HsaConfigurationData {
 	return m
 }
 
-// SetUnknownFields HsaConfigurationData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaConfigurationData) SetUnknownFields(unknownFields ...proto.Field) *HsaConfigurationData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaConfigurationData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaConfigurationData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaConfigurationData {
 	m.DeveloperFields = developerFields
 	return m

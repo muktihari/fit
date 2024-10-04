@@ -151,13 +151,13 @@ func (m *Software) SetPartNumber(v string) *Software {
 	return m
 }
 
-// SetUnknownFields Software's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Software) SetUnknownFields(unknownFields ...proto.Field) *Software {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Software's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Software) SetDeveloperFields(developerFields ...proto.DeveloperField) *Software {
 	m.DeveloperFields = developerFields
 	return m

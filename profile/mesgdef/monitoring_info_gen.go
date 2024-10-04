@@ -268,13 +268,13 @@ func (m *MonitoringInfo) SetRestingMetabolicRate(v uint16) *MonitoringInfo {
 	return m
 }
 
-// SetUnknownFields MonitoringInfo's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MonitoringInfo) SetUnknownFields(unknownFields ...proto.Field) *MonitoringInfo {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MonitoringInfo's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MonitoringInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *MonitoringInfo {
 	m.DeveloperFields = developerFields
 	return m

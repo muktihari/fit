@@ -224,13 +224,13 @@ func (m *GyroscopeData) SetCalibratedGyroZ(v []float32) *GyroscopeData {
 	return m
 }
 
-// SetUnknownFields GyroscopeData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *GyroscopeData) SetUnknownFields(unknownFields ...proto.Field) *GyroscopeData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields GyroscopeData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *GyroscopeData) SetDeveloperFields(developerFields ...proto.DeveloperField) *GyroscopeData {
 	m.DeveloperFields = developerFields
 	return m

@@ -166,13 +166,13 @@ func (m *FileCapabilities) SetMaxSize(v uint32) *FileCapabilities {
 	return m
 }
 
-// SetUnknownFields FileCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FileCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FileCapabilities {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields FileCapabilities's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *FileCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *FileCapabilities {
 	m.DeveloperFields = developerFields
 	return m

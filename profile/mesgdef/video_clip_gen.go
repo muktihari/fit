@@ -187,13 +187,13 @@ func (m *VideoClip) SetClipEnd(v uint32) *VideoClip {
 	return m
 }
 
-// SetUnknownFields VideoClip's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *VideoClip) SetUnknownFields(unknownFields ...proto.Field) *VideoClip {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields VideoClip's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *VideoClip) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoClip {
 	m.DeveloperFields = developerFields
 	return m

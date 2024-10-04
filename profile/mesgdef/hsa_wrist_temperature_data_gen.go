@@ -175,13 +175,13 @@ func (m *HsaWristTemperatureData) SetValueScaled(vs []float64) *HsaWristTemperat
 	return m
 }
 
-// SetUnknownFields HsaWristTemperatureData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaWristTemperatureData) SetUnknownFields(unknownFields ...proto.Field) *HsaWristTemperatureData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaWristTemperatureData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaWristTemperatureData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaWristTemperatureData {
 	m.DeveloperFields = developerFields
 	return m

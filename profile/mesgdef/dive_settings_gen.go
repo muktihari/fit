@@ -803,13 +803,13 @@ func (m *DiveSettings) SetNoFlyTimeMode(v typedef.NoFlyTimeMode) *DiveSettings {
 	return m
 }
 
-// SetUnknownFields DiveSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DiveSettings) SetUnknownFields(unknownFields ...proto.Field) *DiveSettings {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DiveSettings's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DiveSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveSettings {
 	m.DeveloperFields = developerFields
 	return m

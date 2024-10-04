@@ -200,7 +200,7 @@ func (m *FileId) SetProductName(v string) *FileId {
 	return m
 }
 
-// SetUnknownFields FileId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FileId) SetUnknownFields(unknownFields ...proto.Field) *FileId {
 	m.UnknownFields = unknownFields
 	return m

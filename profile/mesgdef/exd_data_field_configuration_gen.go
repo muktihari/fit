@@ -250,13 +250,13 @@ func (m *ExdDataFieldConfiguration) SetTitle(v [32]string) *ExdDataFieldConfigur
 	return m
 }
 
-// SetUnknownFields ExdDataFieldConfiguration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ExdDataFieldConfiguration) SetUnknownFields(unknownFields ...proto.Field) *ExdDataFieldConfiguration {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ExdDataFieldConfiguration's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ExdDataFieldConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataFieldConfiguration {
 	m.DeveloperFields = developerFields
 	return m

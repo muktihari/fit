@@ -2660,13 +2660,13 @@ func (m *Record) SetCoreTemperatureScaled(v float64) *Record {
 	return m
 }
 
-// SetUnknownFields Record's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Record) SetUnknownFields(unknownFields ...proto.Field) *Record {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Record's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Record) SetDeveloperFields(developerFields ...proto.DeveloperField) *Record {
 	m.DeveloperFields = developerFields
 	return m

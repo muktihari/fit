@@ -149,13 +149,13 @@ func (m *ZonesTarget) SetPwrCalcType(v typedef.PwrZoneCalc) *ZonesTarget {
 	return m
 }
 
-// SetUnknownFields ZonesTarget's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ZonesTarget) SetUnknownFields(unknownFields ...proto.Field) *ZonesTarget {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ZonesTarget's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ZonesTarget) SetDeveloperFields(developerFields ...proto.DeveloperField) *ZonesTarget {
 	m.DeveloperFields = developerFields
 	return m

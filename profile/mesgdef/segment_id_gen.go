@@ -219,13 +219,13 @@ func (m *SegmentId) SetSelectionType(v typedef.SegmentSelectionType) *SegmentId 
 	return m
 }
 
-// SetUnknownFields SegmentId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SegmentId) SetUnknownFields(unknownFields ...proto.Field) *SegmentId {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SegmentId's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SegmentId) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentId {
 	m.DeveloperFields = developerFields
 	return m

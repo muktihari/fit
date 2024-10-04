@@ -564,13 +564,13 @@ func (m *WorkoutStep) SetSecondaryCustomTargetValueHigh(v uint32) *WorkoutStep {
 	return m
 }
 
-// SetUnknownFields WorkoutStep's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WorkoutStep) SetUnknownFields(unknownFields ...proto.Field) *WorkoutStep {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WorkoutStep's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WorkoutStep) SetDeveloperFields(developerFields ...proto.DeveloperField) *WorkoutStep {
 	m.DeveloperFields = developerFields
 	return m

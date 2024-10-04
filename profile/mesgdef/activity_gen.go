@@ -226,13 +226,13 @@ func (m *Activity) SetEventGroup(v uint8) *Activity {
 	return m
 }
 
-// SetUnknownFields Activity's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Activity) SetUnknownFields(unknownFields ...proto.Field) *Activity {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Activity's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Activity) SetDeveloperFields(developerFields ...proto.DeveloperField) *Activity {
 	m.DeveloperFields = developerFields
 	return m

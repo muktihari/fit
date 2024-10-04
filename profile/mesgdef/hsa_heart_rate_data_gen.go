@@ -149,13 +149,13 @@ func (m *HsaHeartRateData) SetHeartRate(v []uint8) *HsaHeartRateData {
 	return m
 }
 
-// SetUnknownFields HsaHeartRateData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaHeartRateData) SetUnknownFields(unknownFields ...proto.Field) *HsaHeartRateData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaHeartRateData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaHeartRateData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaHeartRateData {
 	m.DeveloperFields = developerFields
 	return m

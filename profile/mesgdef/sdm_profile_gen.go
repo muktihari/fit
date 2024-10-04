@@ -251,13 +251,13 @@ func (m *SdmProfile) SetOdometerRollover(v uint8) *SdmProfile {
 	return m
 }
 
-// SetUnknownFields SdmProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SdmProfile) SetUnknownFields(unknownFields ...proto.Field) *SdmProfile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SdmProfile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SdmProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *SdmProfile {
 	m.DeveloperFields = developerFields
 	return m

@@ -153,13 +153,13 @@ func (m *DiveGas) SetMode(v typedef.DiveGasMode) *DiveGas {
 	return m
 }
 
-// SetUnknownFields DiveGas's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DiveGas) SetUnknownFields(unknownFields ...proto.Field) *DiveGas {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DiveGas's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DiveGas) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveGas {
 	m.DeveloperFields = developerFields
 	return m

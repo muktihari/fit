@@ -110,13 +110,13 @@ func (m *FileCreator) SetHardwareVersion(v uint8) *FileCreator {
 	return m
 }
 
-// SetUnknownFields FileCreator's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FileCreator) SetUnknownFields(unknownFields ...proto.Field) *FileCreator {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields FileCreator's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *FileCreator) SetDeveloperFields(developerFields ...proto.DeveloperField) *FileCreator {
 	m.DeveloperFields = developerFields
 	return m

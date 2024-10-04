@@ -315,13 +315,13 @@ func (m *HsaAccelerometerData) SetTimestamp32K(v uint32) *HsaAccelerometerData {
 	return m
 }
 
-// SetUnknownFields HsaAccelerometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaAccelerometerData) SetUnknownFields(unknownFields ...proto.Field) *HsaAccelerometerData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaAccelerometerData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaAccelerometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaAccelerometerData {
 	m.DeveloperFields = developerFields
 	return m

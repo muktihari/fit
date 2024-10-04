@@ -541,13 +541,13 @@ func (m *Length) SetMaxRespirationRate(v uint8) *Length {
 	return m
 }
 
-// SetUnknownFields Length's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Length) SetUnknownFields(unknownFields ...proto.Field) *Length {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Length's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Length) SetDeveloperFields(developerFields ...proto.DeveloperField) *Length {
 	m.DeveloperFields = developerFields
 	return m

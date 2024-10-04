@@ -203,13 +203,13 @@ func (m *AadAccelFeatures) SetTimeAboveThresholdScaled(v float64) *AadAccelFeatu
 	return m
 }
 
-// SetUnknownFields AadAccelFeatures's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AadAccelFeatures) SetUnknownFields(unknownFields ...proto.Field) *AadAccelFeatures {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AadAccelFeatures's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AadAccelFeatures) SetDeveloperFields(developerFields ...proto.DeveloperField) *AadAccelFeatures {
 	m.DeveloperFields = developerFields
 	return m

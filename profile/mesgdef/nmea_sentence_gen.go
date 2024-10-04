@@ -134,13 +134,13 @@ func (m *NmeaSentence) SetSentence(v string) *NmeaSentence {
 	return m
 }
 
-// SetUnknownFields NmeaSentence's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *NmeaSentence) SetUnknownFields(unknownFields ...proto.Field) *NmeaSentence {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields NmeaSentence's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *NmeaSentence) SetDeveloperFields(developerFields ...proto.DeveloperField) *NmeaSentence {
 	m.DeveloperFields = developerFields
 	return m

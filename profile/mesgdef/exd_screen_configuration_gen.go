@@ -138,13 +138,13 @@ func (m *ExdScreenConfiguration) SetScreenEnabled(v typedef.Bool) *ExdScreenConf
 	return m
 }
 
-// SetUnknownFields ExdScreenConfiguration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ExdScreenConfiguration) SetUnknownFields(unknownFields ...proto.Field) *ExdScreenConfiguration {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ExdScreenConfiguration's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ExdScreenConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdScreenConfiguration {
 	m.DeveloperFields = developerFields
 	return m

@@ -320,13 +320,13 @@ func (m *SleepAssessment) SetAverageStressDuringSleepScaled(v float64) *SleepAss
 	return m
 }
 
-// SetUnknownFields SleepAssessment's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SleepAssessment) SetUnknownFields(unknownFields ...proto.Field) *SleepAssessment {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SleepAssessment's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SleepAssessment) SetDeveloperFields(developerFields ...proto.DeveloperField) *SleepAssessment {
 	m.DeveloperFields = developerFields
 	return m

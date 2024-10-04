@@ -116,13 +116,13 @@ func (m *SleepLevel) SetSleepLevel(v typedef.SleepLevel) *SleepLevel {
 	return m
 }
 
-// SetUnknownFields SleepLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SleepLevel) SetUnknownFields(unknownFields ...proto.Field) *SleepLevel {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SleepLevel's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SleepLevel) SetDeveloperFields(developerFields ...proto.DeveloperField) *SleepLevel {
 	m.DeveloperFields = developerFields
 	return m

@@ -143,13 +143,13 @@ func (m *HrvValue) SetValueScaled(v float64) *HrvValue {
 	return m
 }
 
-// SetUnknownFields HrvValue's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrvValue) SetUnknownFields(unknownFields ...proto.Field) *HrvValue {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HrvValue's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HrvValue) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrvValue {
 	m.DeveloperFields = developerFields
 	return m

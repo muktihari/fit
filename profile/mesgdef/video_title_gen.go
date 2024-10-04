@@ -127,13 +127,13 @@ func (m *VideoTitle) SetText(v string) *VideoTitle {
 	return m
 }
 
-// SetUnknownFields VideoTitle's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *VideoTitle) SetUnknownFields(unknownFields ...proto.Field) *VideoTitle {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields VideoTitle's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *VideoTitle) SetDeveloperFields(developerFields ...proto.DeveloperField) *VideoTitle {
 	m.DeveloperFields = developerFields
 	return m

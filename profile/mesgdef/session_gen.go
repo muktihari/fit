@@ -4666,13 +4666,13 @@ func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
 	return m
 }
 
-// SetUnknownFields Session's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Session) SetUnknownFields(unknownFields ...proto.Field) *Session {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Session's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Session) SetDeveloperFields(developerFields ...proto.DeveloperField) *Session {
 	m.DeveloperFields = developerFields
 	return m

@@ -269,13 +269,13 @@ func (m *AccelerometerData) SetCompressedCalibratedAccelZ(v []int16) *Accelerome
 	return m
 }
 
-// SetUnknownFields AccelerometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AccelerometerData) SetUnknownFields(unknownFields ...proto.Field) *AccelerometerData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AccelerometerData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AccelerometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *AccelerometerData {
 	m.DeveloperFields = developerFields
 	return m

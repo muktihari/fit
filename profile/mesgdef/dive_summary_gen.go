@@ -754,13 +754,13 @@ func (m *DiveSummary) SetHangTimeScaled(v float64) *DiveSummary {
 	return m
 }
 
-// SetUnknownFields DiveSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DiveSummary) SetUnknownFields(unknownFields ...proto.Field) *DiveSummary {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DiveSummary's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DiveSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveSummary {
 	m.DeveloperFields = developerFields
 	return m

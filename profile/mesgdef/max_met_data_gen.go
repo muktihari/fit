@@ -229,13 +229,13 @@ func (m *MaxMetData) SetSpeedSource(v typedef.MaxMetSpeedSource) *MaxMetData {
 	return m
 }
 
-// SetUnknownFields MaxMetData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MaxMetData) SetUnknownFields(unknownFields ...proto.Field) *MaxMetData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MaxMetData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MaxMetData) SetDeveloperFields(developerFields ...proto.DeveloperField) *MaxMetData {
 	m.DeveloperFields = developerFields
 	return m

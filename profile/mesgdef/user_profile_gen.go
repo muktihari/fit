@@ -607,13 +607,13 @@ func (m *UserProfile) SetDiveCount(v uint32) *UserProfile {
 	return m
 }
 
-// SetUnknownFields UserProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *UserProfile) SetUnknownFields(unknownFields ...proto.Field) *UserProfile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields UserProfile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *UserProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *UserProfile {
 	m.DeveloperFields = developerFields
 	return m

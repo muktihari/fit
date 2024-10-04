@@ -190,13 +190,13 @@ func (m *TrainingFile) SetTimeCreated(v time.Time) *TrainingFile {
 	return m
 }
 
-// SetUnknownFields TrainingFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *TrainingFile) SetUnknownFields(unknownFields ...proto.Field) *TrainingFile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields TrainingFile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *TrainingFile) SetDeveloperFields(developerFields ...proto.DeveloperField) *TrainingFile {
 	m.DeveloperFields = developerFields
 	return m

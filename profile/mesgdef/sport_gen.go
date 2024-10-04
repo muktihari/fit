@@ -123,13 +123,13 @@ func (m *Sport) SetName(v string) *Sport {
 	return m
 }
 
-// SetUnknownFields Sport's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Sport) SetUnknownFields(unknownFields ...proto.Field) *Sport {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Sport's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Sport) SetDeveloperFields(developerFields ...proto.DeveloperField) *Sport {
 	m.DeveloperFields = developerFields
 	return m

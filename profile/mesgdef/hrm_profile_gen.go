@@ -153,13 +153,13 @@ func (m *HrmProfile) SetHrmAntIdTransType(v uint8) *HrmProfile {
 	return m
 }
 
-// SetUnknownFields HrmProfile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrmProfile) SetUnknownFields(unknownFields ...proto.Field) *HrmProfile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HrmProfile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HrmProfile) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrmProfile {
 	m.DeveloperFields = developerFields
 	return m

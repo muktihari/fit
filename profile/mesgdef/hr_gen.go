@@ -283,13 +283,13 @@ func (m *Hr) SetEventTimestamp12(v []byte) *Hr {
 	return m
 }
 
-// SetUnknownFields Hr's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Hr) SetUnknownFields(unknownFields ...proto.Field) *Hr {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Hr's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Hr) SetDeveloperFields(developerFields ...proto.DeveloperField) *Hr {
 	m.DeveloperFields = developerFields
 	return m

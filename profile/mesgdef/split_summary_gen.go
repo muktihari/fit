@@ -439,13 +439,13 @@ func (m *SplitSummary) SetTotalMovingTimeScaled(v float64) *SplitSummary {
 	return m
 }
 
-// SetUnknownFields SplitSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SplitSummary) SetUnknownFields(unknownFields ...proto.Field) *SplitSummary {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SplitSummary's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SplitSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *SplitSummary {
 	m.DeveloperFields = developerFields
 	return m

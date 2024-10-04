@@ -125,13 +125,13 @@ func (m *HrZone) SetName(v string) *HrZone {
 	return m
 }
 
-// SetUnknownFields HrZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HrZone) SetUnknownFields(unknownFields ...proto.Field) *HrZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HrZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HrZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *HrZone {
 	m.DeveloperFields = developerFields
 	return m

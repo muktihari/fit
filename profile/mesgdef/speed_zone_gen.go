@@ -151,13 +151,13 @@ func (m *SpeedZone) SetName(v string) *SpeedZone {
 	return m
 }
 
-// SetUnknownFields SpeedZone's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SpeedZone) SetUnknownFields(unknownFields ...proto.Field) *SpeedZone {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SpeedZone's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SpeedZone) SetDeveloperFields(developerFields ...proto.DeveloperField) *SpeedZone {
 	m.DeveloperFields = developerFields
 	return m

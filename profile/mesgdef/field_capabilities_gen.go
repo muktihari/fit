@@ -149,13 +149,13 @@ func (m *FieldCapabilities) SetCount(v uint16) *FieldCapabilities {
 	return m
 }
 
-// SetUnknownFields FieldCapabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FieldCapabilities) SetUnknownFields(unknownFields ...proto.Field) *FieldCapabilities {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields FieldCapabilities's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *FieldCapabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *FieldCapabilities {
 	m.DeveloperFields = developerFields
 	return m

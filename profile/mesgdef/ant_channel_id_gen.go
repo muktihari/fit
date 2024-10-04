@@ -155,13 +155,13 @@ func (m *AntChannelId) SetDeviceIndex(v typedef.DeviceIndex) *AntChannelId {
 	return m
 }
 
-// SetUnknownFields AntChannelId's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AntChannelId) SetUnknownFields(unknownFields ...proto.Field) *AntChannelId {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AntChannelId's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AntChannelId) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntChannelId {
 	m.DeveloperFields = developerFields
 	return m

@@ -216,13 +216,13 @@ func (m *AntTx) SetData(v []byte) *AntTx {
 	return m
 }
 
-// SetUnknownFields AntTx's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AntTx) SetUnknownFields(unknownFields ...proto.Field) *AntTx {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AntTx's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AntTx) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntTx {
 	m.DeveloperFields = developerFields
 	return m

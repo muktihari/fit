@@ -255,13 +255,13 @@ func (m *TimestampCorrelation) SetSystemTimestampMs(v uint16) *TimestampCorrelat
 	return m
 }
 
-// SetUnknownFields TimestampCorrelation's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *TimestampCorrelation) SetUnknownFields(unknownFields ...proto.Field) *TimestampCorrelation {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields TimestampCorrelation's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *TimestampCorrelation) SetDeveloperFields(developerFields ...proto.DeveloperField) *TimestampCorrelation {
 	m.DeveloperFields = developerFields
 	return m

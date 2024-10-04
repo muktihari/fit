@@ -175,13 +175,13 @@ func (m *HsaRespirationData) SetRespirationRateScaled(vs []float64) *HsaRespirat
 	return m
 }
 
-// SetUnknownFields HsaRespirationData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaRespirationData) SetUnknownFields(unknownFields ...proto.Field) *HsaRespirationData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaRespirationData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaRespirationData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaRespirationData {
 	m.DeveloperFields = developerFields
 	return m

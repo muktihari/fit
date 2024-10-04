@@ -203,13 +203,13 @@ func (m *WorkoutSession) SetPoolLengthUnit(v typedef.DisplayMeasure) *WorkoutSes
 	return m
 }
 
-// SetUnknownFields WorkoutSession's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WorkoutSession) SetUnknownFields(unknownFields ...proto.Field) *WorkoutSession {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WorkoutSession's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WorkoutSession) SetDeveloperFields(developerFields ...proto.DeveloperField) *WorkoutSession {
 	m.DeveloperFields = developerFields
 	return m

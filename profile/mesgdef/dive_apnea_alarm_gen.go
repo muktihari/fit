@@ -335,13 +335,13 @@ func (m *DiveApneaAlarm) SetSpeedScaled(v float64) *DiveApneaAlarm {
 	return m
 }
 
-// SetUnknownFields DiveApneaAlarm's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DiveApneaAlarm) SetUnknownFields(unknownFields ...proto.Field) *DiveApneaAlarm {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DiveApneaAlarm's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DiveApneaAlarm) SetDeveloperFields(developerFields ...proto.DeveloperField) *DiveApneaAlarm {
 	m.DeveloperFields = developerFields
 	return m

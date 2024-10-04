@@ -216,13 +216,13 @@ func (m *ClimbPro) SetCurrentDist(v float32) *ClimbPro {
 	return m
 }
 
-// SetUnknownFields ClimbPro's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ClimbPro) SetUnknownFields(unknownFields ...proto.Field) *ClimbPro {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ClimbPro's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ClimbPro) SetDeveloperFields(developerFields ...proto.DeveloperField) *ClimbPro {
 	m.DeveloperFields = developerFields
 	return m

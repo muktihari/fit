@@ -164,13 +164,13 @@ func (m *SkinTempOvernight) SetNightlyValue(v float32) *SkinTempOvernight {
 	return m
 }
 
-// SetUnknownFields SkinTempOvernight's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SkinTempOvernight) SetUnknownFields(unknownFields ...proto.Field) *SkinTempOvernight {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SkinTempOvernight's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SkinTempOvernight) SetDeveloperFields(developerFields ...proto.DeveloperField) *SkinTempOvernight {
 	m.DeveloperFields = developerFields
 	return m

@@ -261,13 +261,13 @@ func (m *Goal) SetSource(v typedef.GoalSource) *Goal {
 	return m
 }
 
-// SetUnknownFields Goal's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Goal) SetUnknownFields(unknownFields ...proto.Field) *Goal {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Goal's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Goal) SetDeveloperFields(developerFields ...proto.DeveloperField) *Goal {
 	m.DeveloperFields = developerFields
 	return m

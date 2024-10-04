@@ -264,7 +264,7 @@ func (m *FieldDescription) SetNativeFieldNum(v uint8) *FieldDescription {
 	return m
 }
 
-// SetUnknownFields FieldDescription's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *FieldDescription) SetUnknownFields(unknownFields ...proto.Field) *FieldDescription {
 	m.UnknownFields = unknownFields
 	return m

@@ -164,13 +164,13 @@ func (m *HsaBodyBatteryData) SetUncharged(v []int16) *HsaBodyBatteryData {
 	return m
 }
 
-// SetUnknownFields HsaBodyBatteryData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaBodyBatteryData) SetUnknownFields(unknownFields ...proto.Field) *HsaBodyBatteryData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaBodyBatteryData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaBodyBatteryData) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaBodyBatteryData {
 	m.DeveloperFields = developerFields
 	return m

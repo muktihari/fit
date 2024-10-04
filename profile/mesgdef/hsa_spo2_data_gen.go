@@ -149,13 +149,13 @@ func (m *HsaSpo2Data) SetConfidence(v []uint8) *HsaSpo2Data {
 	return m
 }
 
-// SetUnknownFields HsaSpo2Data's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *HsaSpo2Data) SetUnknownFields(unknownFields ...proto.Field) *HsaSpo2Data {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields HsaSpo2Data's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *HsaSpo2Data) SetDeveloperFields(developerFields ...proto.DeveloperField) *HsaSpo2Data {
 	m.DeveloperFields = developerFields
 	return m

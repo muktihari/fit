@@ -379,13 +379,13 @@ func (m *WeatherConditions) SetLowTemperature(v int8) *WeatherConditions {
 	return m
 }
 
-// SetUnknownFields WeatherConditions's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *WeatherConditions) SetUnknownFields(unknownFields ...proto.Field) *WeatherConditions {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields WeatherConditions's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *WeatherConditions) SetDeveloperFields(developerFields ...proto.DeveloperField) *WeatherConditions {
 	m.DeveloperFields = developerFields
 	return m

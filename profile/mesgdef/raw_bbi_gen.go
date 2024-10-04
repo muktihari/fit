@@ -195,13 +195,13 @@ func (m *RawBbi) SetGap(v []uint8) *RawBbi {
 	return m
 }
 
-// SetUnknownFields RawBbi's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *RawBbi) SetUnknownFields(unknownFields ...proto.Field) *RawBbi {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields RawBbi's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *RawBbi) SetDeveloperFields(developerFields ...proto.DeveloperField) *RawBbi {
 	m.DeveloperFields = developerFields
 	return m

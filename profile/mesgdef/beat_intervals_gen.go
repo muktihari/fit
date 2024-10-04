@@ -132,13 +132,13 @@ func (m *BeatIntervals) SetTime(v []uint16) *BeatIntervals {
 	return m
 }
 
-// SetUnknownFields BeatIntervals's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *BeatIntervals) SetUnknownFields(unknownFields ...proto.Field) *BeatIntervals {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields BeatIntervals's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *BeatIntervals) SetDeveloperFields(developerFields ...proto.DeveloperField) *BeatIntervals {
 	m.DeveloperFields = developerFields
 	return m

@@ -250,13 +250,13 @@ func (m *BloodPressure) SetUserProfileIndex(v typedef.MessageIndex) *BloodPressu
 	return m
 }
 
-// SetUnknownFields BloodPressure's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *BloodPressure) SetUnknownFields(unknownFields ...proto.Field) *BloodPressure {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields BloodPressure's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *BloodPressure) SetDeveloperFields(developerFields ...proto.DeveloperField) *BloodPressure {
 	m.DeveloperFields = developerFields
 	return m

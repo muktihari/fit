@@ -148,13 +148,13 @@ func (m *Capabilities) SetConnectivitySupported(v typedef.ConnectivityCapabiliti
 	return m
 }
 
-// SetUnknownFields Capabilities's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Capabilities) SetUnknownFields(unknownFields ...proto.Field) *Capabilities {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Capabilities's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Capabilities) SetDeveloperFields(developerFields ...proto.DeveloperField) *Capabilities {
 	m.DeveloperFields = developerFields
 	return m

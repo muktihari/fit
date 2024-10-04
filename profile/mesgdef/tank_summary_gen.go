@@ -240,13 +240,13 @@ func (m *TankSummary) SetVolumeUsedScaled(v float64) *TankSummary {
 	return m
 }
 
-// SetUnknownFields TankSummary's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *TankSummary) SetUnknownFields(unknownFields ...proto.Field) *TankSummary {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields TankSummary's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *TankSummary) SetDeveloperFields(developerFields ...proto.DeveloperField) *TankSummary {
 	m.DeveloperFields = developerFields
 	return m

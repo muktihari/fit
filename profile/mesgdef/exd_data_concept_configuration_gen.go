@@ -242,13 +242,13 @@ func (m *ExdDataConceptConfiguration) SetIsSigned(v typedef.Bool) *ExdDataConcep
 	return m
 }
 
-// SetUnknownFields ExdDataConceptConfiguration's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ExdDataConceptConfiguration) SetUnknownFields(unknownFields ...proto.Field) *ExdDataConceptConfiguration {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ExdDataConceptConfiguration's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ExdDataConceptConfiguration) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExdDataConceptConfiguration {
 	m.DeveloperFields = developerFields
 	return m

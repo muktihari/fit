@@ -252,13 +252,13 @@ func (m *CoursePoint) SetFavorite(v typedef.Bool) *CoursePoint {
 	return m
 }
 
-// SetUnknownFields CoursePoint's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *CoursePoint) SetUnknownFields(unknownFields ...proto.Field) *CoursePoint {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields CoursePoint's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *CoursePoint) SetDeveloperFields(developerFields ...proto.DeveloperField) *CoursePoint {
 	m.DeveloperFields = developerFields
 	return m

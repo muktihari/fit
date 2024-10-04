@@ -2769,13 +2769,13 @@ func (m *SegmentLap) SetEnhancedMinAltitudeScaled(v float64) *SegmentLap {
 	return m
 }
 
-// SetUnknownFields SegmentLap's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SegmentLap) SetUnknownFields(unknownFields ...proto.Field) *SegmentLap {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SegmentLap's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SegmentLap) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentLap {
 	m.DeveloperFields = developerFields
 	return m

@@ -138,13 +138,13 @@ func (m *ExerciseTitle) SetWktStepName(v []string) *ExerciseTitle {
 	return m
 }
 
-// SetUnknownFields ExerciseTitle's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *ExerciseTitle) SetUnknownFields(unknownFields ...proto.Field) *ExerciseTitle {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields ExerciseTitle's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *ExerciseTitle) SetDeveloperFields(developerFields ...proto.DeveloperField) *ExerciseTitle {
 	m.DeveloperFields = developerFields
 	return m

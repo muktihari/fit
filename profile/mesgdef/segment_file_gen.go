@@ -222,13 +222,13 @@ func (m *SegmentFile) SetDefaultRaceLeader(v uint8) *SegmentFile {
 	return m
 }
 
-// SetUnknownFields SegmentFile's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *SegmentFile) SetUnknownFields(unknownFields ...proto.Field) *SegmentFile {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields SegmentFile's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *SegmentFile) SetDeveloperFields(developerFields ...proto.DeveloperField) *SegmentFile {
 	m.DeveloperFields = developerFields
 	return m

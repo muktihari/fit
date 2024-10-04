@@ -231,13 +231,13 @@ func (m *Totals) SetSportIndex(v uint8) *Totals {
 	return m
 }
 
-// SetUnknownFields Totals's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Totals) SetUnknownFields(unknownFields ...proto.Field) *Totals {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Totals's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Totals) SetDeveloperFields(developerFields ...proto.DeveloperField) *Totals {
 	m.DeveloperFields = developerFields
 	return m

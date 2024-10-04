@@ -149,13 +149,13 @@ func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
 	return m
 }
 
-// SetUnknownFields BarometerData's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *BarometerData) SetUnknownFields(unknownFields ...proto.Field) *BarometerData {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields BarometerData's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *BarometerData) SetDeveloperFields(developerFields ...proto.DeveloperField) *BarometerData {
 	m.DeveloperFields = developerFields
 	return m

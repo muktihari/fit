@@ -117,13 +117,13 @@ func (m *StressLevel) SetStressLevelTime(v time.Time) *StressLevel {
 	return m
 }
 
-// SetUnknownFields StressLevel's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *StressLevel) SetUnknownFields(unknownFields ...proto.Field) *StressLevel {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields StressLevel's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *StressLevel) SetDeveloperFields(developerFields ...proto.DeveloperField) *StressLevel {
 	m.DeveloperFields = developerFields
 	return m

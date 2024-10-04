@@ -182,13 +182,13 @@ func (m *DeviceAuxBatteryInfo) SetBatteryIdentifier(v uint8) *DeviceAuxBatteryIn
 	return m
 }
 
-// SetUnknownFields DeviceAuxBatteryInfo's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *DeviceAuxBatteryInfo) SetUnknownFields(unknownFields ...proto.Field) *DeviceAuxBatteryInfo {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields DeviceAuxBatteryInfo's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *DeviceAuxBatteryInfo) SetDeveloperFields(developerFields ...proto.DeveloperField) *DeviceAuxBatteryInfo {
 	m.DeveloperFields = developerFields
 	return m

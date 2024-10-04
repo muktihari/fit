@@ -554,13 +554,13 @@ func (m *Event) SetRadarThreatMaxApproachSpeedScaled(v float64) *Event {
 	return m
 }
 
-// SetUnknownFields Event's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Event) SetUnknownFields(unknownFields ...proto.Field) *Event {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Event's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Event) SetDeveloperFields(developerFields ...proto.DeveloperField) *Event {
 	m.DeveloperFields = developerFields
 	return m

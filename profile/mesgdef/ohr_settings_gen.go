@@ -116,13 +116,13 @@ func (m *OhrSettings) SetEnabled(v typedef.Switch) *OhrSettings {
 	return m
 }
 
-// SetUnknownFields OhrSettings's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *OhrSettings) SetUnknownFields(unknownFields ...proto.Field) *OhrSettings {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields OhrSettings's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *OhrSettings) SetDeveloperFields(developerFields ...proto.DeveloperField) *OhrSettings {
 	m.DeveloperFields = developerFields
 	return m

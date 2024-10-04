@@ -174,13 +174,13 @@ func (m *MemoGlob) SetData(v []uint8) *MemoGlob {
 	return m
 }
 
-// SetUnknownFields MemoGlob's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *MemoGlob) SetUnknownFields(unknownFields ...proto.Field) *MemoGlob {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields MemoGlob's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *MemoGlob) SetDeveloperFields(developerFields ...proto.DeveloperField) *MemoGlob {
 	m.DeveloperFields = developerFields
 	return m

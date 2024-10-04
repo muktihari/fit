@@ -803,13 +803,13 @@ func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
 	return m
 }
 
-// SetUnknownFields Monitoring's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *Monitoring) SetUnknownFields(unknownFields ...proto.Field) *Monitoring {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields Monitoring's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *Monitoring) SetDeveloperFields(developerFields ...proto.DeveloperField) *Monitoring {
 	m.DeveloperFields = developerFields
 	return m

@@ -216,13 +216,13 @@ func (m *AntRx) SetData(v []byte) *AntRx {
 	return m
 }
 
-// SetUnknownFields AntRx's UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
+// SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *AntRx) SetUnknownFields(unknownFields ...proto.Field) *AntRx {
 	m.UnknownFields = unknownFields
 	return m
 }
 
-// SetDeveloperFields AntRx's DeveloperFields.
+// SetDeveloperFields sets DeveloperFields.
 func (m *AntRx) SetDeveloperFields(developerFields ...proto.DeveloperField) *AntRx {
 	m.DeveloperFields = developerFields
 	return m
