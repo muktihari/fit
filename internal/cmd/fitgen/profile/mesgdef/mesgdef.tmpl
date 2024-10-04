@@ -68,7 +68,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
 		}
 		unknownFields = sliceutil.Clone(unknownFields)
-		clear(arr[:len(unknownFields)]) {{/* In case of unknown field or field.Value contains pointer to a slice */}}
+		*arr = [poolsize]proto.Field{} {{/* In case of unknown field or field.Value contains pointer to a slice */}}
 		pool.Put(arr)
 		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
 			developerFields = mesg.DeveloperFields
@@ -133,7 +133,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 
 	mesg.Fields = make([]proto.Field, len(fields))
 	copy(mesg.Fields, fields)
-	clear(fields) {{/* In case of unknown field or field.Value contains pointer to a slice */}}
+	*arr = [poolsize]proto.Field{} {{/* In case of unknown field or field.Value contains pointer to a slice */}}
 	pool.Put(arr)
 
 	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
