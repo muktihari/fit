@@ -104,7 +104,7 @@ func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
 //   - bits's store run out value (reach zero)
 //   - given bitsize > 32
 func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
-	if v.store[31] == math.MaxUint64 || v.store[0] == 0 || bitsize > 32 {
+	if v.store[31] == math.MaxUint64 || v.store == [32]uint64{} || bitsize > 32 {
 		return 0, false
 	}
 
@@ -114,7 +114,7 @@ func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
 
 	for i := 1; i < len(v.store); i++ {
 		if v.store[i] == 0 {
-			break
+			continue
 		}
 		// e.g. 128 bits Layout Before: 0x0000_0000_0000_FFFF_0000_0000_2701_0E08
 		hi := v.store[i] & mask    // e.g. 0x0000_0000_0000_FFFF & 0xFF                  = 0x0000_0000_0000_00FF
