@@ -36,8 +36,8 @@ func (a *Accumulator) Collect(mesgNum typedef.MesgNum, destFieldNum byte, val ui
 	})
 }
 
-// Accumulate calculates the accumulated value and update accordingly. It returns the original value
-// when the corresponding value does not exist.
+// Accumulate calculates the accumulated value and update it accordingly. If targeted value
+// does not exist, it will be collected and the original value will be returned.
 func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val uint32, bits byte) uint32 {
 	for i := range a.values {
 		av := &a.values[i]
@@ -48,6 +48,12 @@ func (a *Accumulator) Accumulate(mesgNum typedef.MesgNum, destFieldNum byte, val
 			return av.value
 		}
 	}
+	a.values = append(a.values, value{
+		mesgNum:  mesgNum,
+		fieldNum: destFieldNum,
+		value:    val,
+		last:     val,
+	})
 	return val
 }
 

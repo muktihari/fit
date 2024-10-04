@@ -1862,6 +1862,54 @@ func TestDecodeFields(t *testing.T) {
 			opts: []Option{WithLogWriter(io.Discard)},
 			err:  nil,
 		},
+		{
+			name: "decode fields field def's size 2 < 4 size of uint32",
+			r: func() io.Reader {
+				mesg := proto.Message{
+					Num: 68,
+					Fields: []proto.Field{
+						{
+							FieldBase: &proto.FieldBase{
+								Num:  1,
+								Name: "Unknown",
+							},
+							Value: proto.SliceUint8([]byte{1, 0}),
+						},
+					},
+				}
+				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
+				mesgb = mesgb[1:] // splice mesg header
+				cur := 0
+				return fnReader(func(b []byte) (n int, err error) {
+					cur += copy(b, mesgb[cur:])
+					return len(b), nil
+				})
+			}(),
+			mesgdef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: 68,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      1,
+						Size:     2,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+			validateFn: func(mesg proto.Message) error {
+				if mesg.Fields[0].Value.Type() != proto.TypeUint32 {
+					return fmt.Errorf("expected proto value type: %s, got: %s",
+						proto.TypeUint32, mesg.Fields[0].Value.Type(),
+					)
+				}
+				if mesg.Fields[0].Value.Uint32() != 1 {
+					return fmt.Errorf("expected value: 1, got: %d", mesg.Fields[0].Value.Any())
+				}
+				return nil
+			},
+			opts: []Option{WithLogWriter(io.Discard)},
+			err:  nil,
+		},
 	}
 
 	for i, tc := range tt {
@@ -1887,135 +1935,135 @@ func TestDecodeFields(t *testing.T) {
 func TestExpandComponents(t *testing.T) {
 	tt := []struct {
 		name                 string
+		accumu               *Accumulator
 		mesg                 proto.Message
-		containingField      proto.Field
-		components           []proto.Component
-		nFieldAfterExpansion int
+		fieldsAfterExpansion []proto.Field
 	}{
 		{
 			name: "expand components single happy flow",
 			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
-			nFieldAfterExpansion: 2, // 1 for speed, +1 expand field enhanced_speed
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase, Value: proto.Uint32(1000), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components multiple happy flow",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
 			}},
-			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
-			components: func() []proto.Component {
-				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
-				for _, subfield := range subfields {
-					if subfield.Name == "gear_change_data" {
-						return subfield.Components
-					}
-				}
-				return nil
-			}(),
-			nFieldAfterExpansion: 5, // 1 for Event, 4 for expansion fields (rear_gear_num, rear_gear, front_gear_num. front_gear)
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x27010E08)),
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(0x08), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGear).FieldBase, Value: proto.Uint8(0x0E), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGearNum).FieldBase, Value: proto.Uint8(0x01), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGear).FieldBase, Value: proto.Uint8(0x27), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components run out bits for the last component",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00000E08)),
 			}},
-			containingField: factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00010E08)),
-			components: func() []proto.Component {
-				subfields := factory.CreateField(mesgnum.Event, fieldnum.EventData).SubFields
-				for _, subfield := range subfields {
-					if subfield.Name == "gear_change_data" {
-						return subfield.Components
-					}
-				}
-				return nil
-			}(),
-			nFieldAfterExpansion: 4, // 1 for Event, 3 for expansion fields (rear_gear_num, rear_gear, front_gear_num)
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(typedef.EventFrontGearChange)),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00000E08)),
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(uint8(0x08)), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGear).FieldBase, Value: proto.Uint8(uint8(0x0E)), IsExpandedField: true},
+			},
 		},
 		{
 			name: "expand components containing field value mismatch",
 			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
 			}},
-			containingField:      factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
-			components:           factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).Components,
-			nFieldAfterExpansion: 1,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue("invalid value"),
+			},
 		},
 		{
 			name: "expand components accumulate",
 			mesg: proto.Message{Num: mesgnum.Hr, Fields: []proto.Field{
-				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue(uint8(10)),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue([]uint32{10}),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
-			components:           factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).Components,
-			nFieldAfterExpansion: 2,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue([]uint32{10, 10}),
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue(uint8(10)),
+			},
 		},
 		{
 			name: "expand components do not expand when containing field's value is invalid",
 			mesg: proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
 			}},
-			containingField:      factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
-			components:           factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).Components,
-			nFieldAfterExpansion: 1,
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+			},
+		},
+		{
+			name: "expand components requiring expansion: compressed_speed_distance -> (speed, speed -> enhanced_speed, distance)",
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).WithValue([]byte{0, 4, 1}),
+			}},
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).WithValue([]byte{0, 4, 1}),
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).FieldBase, Value: proto.Uint16(10240), IsExpandedField: true},         // (1024 / 1000) * 1000
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase, Value: proto.Uint32(10240), IsExpandedField: true}, // (1024 / 100) * 1000
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).FieldBase, Value: proto.Uint32(100), IsExpandedField: true},        // (1600 / 16) * 1
+			},
+		},
+		{
+			// Real world use case from "testdata/from_official_sdk/activity_poolswim_with_hr.csv"
+			// prior Hr message event_timestamp value: 3.6201171875 -> 3707
+			// event_timestamp_12:  "158|114|57|159|6|167|29|142|25|244|228|130"
+			// event_timestamp:     "4.654296875|4.8974609375|5.6552734375|6.609375|7.5283203125|8.3984375|9.23828125|10.044921875"
+			// event_timestamp raw: "4766       |5015        |5791        |6768    |7709        |8600     |9460      |10286"
+			name: "expand components: Hr mesg's event_timestamp_12",
+			accumu: &Accumulator{values: []value{
+				// Prior Hr message
+				{mesgNum: mesgnum.Hr, fieldNum: fieldnum.HrEventTimestamp, value: 3707, last: 3707},
+			}},
+			mesg: proto.Message{Num: mesgnum.Hr, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue([]byte{158, 114, 57, 159, 6, 167, 29, 142, 25, 244, 228, 130}),
+			}},
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp12).WithValue([]byte{158, 114, 57, 159, 6, 167, 29, 142, 25, 244, 228, 130}),
+				{
+					FieldBase: factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).FieldBase,
+					Value: proto.SliceUint32([]uint32{
+						4766, 5015, 5791, 6768, 7709, 8600, 9460, 10286,
+					}),
+					IsExpandedField: true,
+				},
+			},
 		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(nil)
-			dec.expandComponents(&tc.mesg, &tc.containingField, tc.components)
-			if len(tc.mesg.Fields) != tc.nFieldAfterExpansion {
-				t.Fatalf("expected n fields: %d, got: %d", tc.nFieldAfterExpansion, len(tc.mesg.Fields))
+			if tc.accumu != nil {
+				dec.accumulator = tc.accumu
+			}
+			for _, field := range tc.mesg.Fields {
+				if subField := field.SubFieldSubtitution(&tc.mesg); subField != nil {
+					dec.expandComponents(&tc.mesg, &field, subField.Components)
+				} else {
+					dec.expandComponents(&tc.mesg, &field, field.Components)
+				}
+			}
+			if diff := cmp.Diff(tc.mesg.Fields, tc.fieldsAfterExpansion,
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+			); diff != "" {
+				t.Fatal(diff)
 			}
 		})
-	}
-}
-
-func TestExpandMutipleComponents(t *testing.T) {
-	// Expand componentField.Components that require expansion
-	compressedSepeedDistanceField := factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).
-		WithValue([]byte{0, 4, 1})
-
-	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{compressedSepeedDistanceField}}
-	dec := New(nil)
-	dec.expandComponents(&mesg, &compressedSepeedDistanceField, compressedSepeedDistanceField.Components)
-
-	if len(mesg.Fields) != 4 {
-		t.Errorf("expected n fields after expansion: %d, got: %d", 4, len(mesg.Fields))
-	}
-
-	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordCompressedSpeedDistance).Any(),
-		[]byte{0, 4, 1},
-	); diff != "" {
-		t.Errorf("compressed_speed_distance: %s", diff)
-	}
-
-	// Formula: value = (value / component_speed_scale) * destination_field_scale
-
-	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordSpeed).Any(),
-		uint16(10240), // (1024 / 100) * 1000
-	); diff != "" {
-		t.Errorf("speed: %s", diff)
-	}
-
-	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordDistance).Any(),
-		uint32(100), // (1600 / 16) * 1
-	); diff != "" {
-		t.Errorf("distance: %s", diff)
-	}
-
-	if diff := cmp.Diff(
-		mesg.FieldValueByNum(fieldnum.RecordEnhancedSpeed).Any(),
-		uint32(10240), // (1024 / 1000) * 1000
-	); diff != "" {
-		t.Errorf("enhanced_speed: %s", diff)
 	}
 }
 
@@ -2699,6 +2747,297 @@ func TestReset(t *testing.T) {
 					}
 					return true
 				}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestConvertValueToUint32(t *testing.T) {
+	tt := []struct {
+		value    proto.Value
+		expected uint32
+	}{
+		{
+			value:    proto.Int8(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Uint8(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Int16(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Uint16(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Int32(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Uint32(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Int64(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Uint64(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Float32(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Float64(32),
+			expected: 32,
+		},
+		{
+			value:    proto.Value{},
+			expected: basetype.Uint32Invalid,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v", i, tc.value.Any()), func(t *testing.T) {
+			val := convertValueToUint32(tc.value)
+			if diff := cmp.Diff(val, tc.expected); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestConvertUint32ToValue(t *testing.T) {
+	tt := []struct {
+		value    uint32
+		baseType basetype.BaseType
+		expected proto.Value
+	}{
+		{
+			value:    32,
+			baseType: basetype.Sint8,
+			expected: proto.Int8(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Uint8,
+			expected: proto.Uint8(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Sint16,
+			expected: proto.Int16(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Uint16,
+			expected: proto.Uint16(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Sint32,
+			expected: proto.Int32(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Uint32,
+			expected: proto.Uint32(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Sint64,
+			expected: proto.Int64(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Uint64,
+			expected: proto.Uint64(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Float32,
+			expected: proto.Float32(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.Float64,
+			expected: proto.Float64(32),
+		},
+		{
+			value:    32,
+			baseType: basetype.String,
+			expected: proto.Value{},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %d -> %s", i, tc.value, tc.baseType), func(t *testing.T) {
+			val := convertUint32ToValue(tc.value, tc.baseType)
+			if diff := cmp.Diff(val, tc.expected,
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestConvertBytesToValue(t *testing.T) {
+	tt := []struct {
+		value    proto.Value
+		baseType basetype.BaseType
+		expected proto.Value
+	}{
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Sint8,
+			expected: proto.Int8(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Uint8,
+			expected: proto.Uint8(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Sint16,
+			expected: proto.Int16(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Uint16,
+			expected: proto.Uint16(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Sint32,
+			expected: proto.Int32(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Uint32,
+			expected: proto.Uint32(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Sint64,
+			expected: proto.Int64(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Uint64,
+			expected: proto.Uint64(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Float32,
+			expected: proto.Float32(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.Float64,
+			expected: proto.Float64(1),
+		},
+		{
+			value:    proto.Uint8(1),
+			baseType: basetype.String,
+			expected: proto.Uint8(1),
+		},
+		{
+			value:    proto.SliceUint8([]uint8{1, 1}),
+			baseType: basetype.Uint32,
+			expected: proto.Uint32(257),
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v", i, tc.value.Any()), func(t *testing.T) {
+			val := convertBytesToValue(tc.value, tc.baseType)
+			if diff := cmp.Diff(val, tc.expected,
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestValueAppend(t *testing.T) {
+	tt := []struct {
+		slice    proto.Value
+		elem     proto.Value
+		expected proto.Value
+	}{
+		{
+			slice:    proto.SliceInt8([]int8{10}),
+			elem:     proto.Int8(11),
+			expected: proto.SliceInt8([]int8{10, 11}),
+		},
+		{
+			slice:    proto.SliceUint8([]uint8{10}),
+			elem:     proto.Uint8(11),
+			expected: proto.SliceUint8([]uint8{10, 11}),
+		},
+		{
+			slice:    proto.SliceInt16([]int16{10}),
+			elem:     proto.Int16(11),
+			expected: proto.SliceInt16([]int16{10, 11}),
+		},
+		{
+			slice:    proto.SliceUint16([]uint16{10}),
+			elem:     proto.Uint16(11),
+			expected: proto.SliceUint16([]uint16{10, 11}),
+		},
+		{
+			slice:    proto.SliceInt32([]int32{10}),
+			elem:     proto.Int32(11),
+			expected: proto.SliceInt32([]int32{10, 11}),
+		},
+		{
+			slice:    proto.SliceUint32([]uint32{10}),
+			elem:     proto.Uint32(11),
+			expected: proto.SliceUint32([]uint32{10, 11}),
+		},
+		{
+			slice:    proto.SliceInt64([]int64{10}),
+			elem:     proto.Int64(11),
+			expected: proto.SliceInt64([]int64{10, 11}),
+		},
+		{
+			slice:    proto.SliceUint64([]uint64{10}),
+			elem:     proto.Uint64(11),
+			expected: proto.SliceUint64([]uint64{10, 11}),
+		},
+		{
+			slice:    proto.SliceFloat32([]float32{10}),
+			elem:     proto.Float32(11),
+			expected: proto.SliceFloat32([]float32{10, 11}),
+		},
+		{
+			slice:    proto.SliceFloat64([]float64{10}),
+			elem:     proto.Float64(11),
+			expected: proto.SliceFloat64([]float64{10, 11}),
+		},
+		{
+			slice:    proto.SliceString([]string{"invalid"}),
+			elem:     proto.String("qwerty"),
+			expected: proto.SliceString([]string{"invalid"}),
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.slice.Type()), func(t *testing.T) {
+			val := valueAppend(tc.slice, tc.elem)
+			if diff := cmp.Diff(val, tc.expected,
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}

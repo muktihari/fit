@@ -13,8 +13,6 @@ import (
 	"strings"
 	"time"
 
-	_ "unsafe"
-
 	"github.com/muktihari/fit/decoder"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
@@ -28,12 +26,6 @@ import (
 )
 
 const fitprintGithubURL = "https://github.com/muktihari/fit/tree/master/cmd/fitprint"
-
-//go:linkname bitsFromValue github.com/muktihari/fit/decoder.bitsFromValue
-func bitsFromValue(value proto.Value) (bits uint32, ok bool)
-
-//go:linkname valueFromBits github.com/muktihari/fit/decoder.valueFromBits
-func valueFromBits(bits uint32, baseType basetype.BaseType) proto.Value
 
 func Print(path string) error {
 	ext := filepath.Ext(path)
@@ -404,8 +396,7 @@ func formatFieldValue(
 	}
 
 	if isDynamicField { // Cast value as dynamic field's target type
-		bits, _ := bitsFromValue(value)
-		value = valueFromBits(bits, baseType)
+		value = castValue(value, baseType)
 	}
 	ts := TypedefString(profileType, value)
 	if strings.Contains(ts, "Invalid") {
@@ -421,8 +412,7 @@ func formatFieldValue(
 func formatCast[S []E, E any](s S, bt basetype.BaseType, pt profile.ProfileType) string {
 	ss := make([]string, 0, len(s))
 	for i := range s {
-		bits, _ := bitsFromValue(proto.Any(s[i]))
-		val := valueFromBits(bits, bt)
+		val := castValue(proto.Any(s[i]), bt)
 		ts := TypedefString(pt, val)
 		if strings.Contains(ts, "Invalid") {
 			ss = append(ss, fmt.Sprintf("unknown(%v)", val.Any()))
@@ -438,4 +428,49 @@ func formatCast[S []E, E any](s S, bt basetype.BaseType, pt profile.ProfileType)
 
 func formatDeveloperFieldValue(value proto.Value, units string) string {
 	return fmt.Sprintf("%v %s", value.Any(), units)
+}
+
+// castValue cast any integer value into targeted baseType.
+// If it's not supported original value will be returned.
+func castValue(val proto.Value, baseType basetype.BaseType) proto.Value {
+	var value uint64
+	switch val.Type() {
+	case proto.TypeInt8:
+		value = uint64(val.Int8())
+	case proto.TypeUint8:
+		value = uint64(val.Uint8())
+	case proto.TypeInt16:
+		value = uint64(val.Int16())
+	case proto.TypeUint16:
+		value = uint64(val.Uint16())
+	case proto.TypeInt32:
+		value = uint64(val.Int32())
+	case proto.TypeUint32:
+		value = uint64(val.Uint32())
+	case proto.TypeInt64:
+		value = uint64(val.Int64())
+	case proto.TypeUint64:
+		value = uint64(val.Uint64())
+	}
+
+	switch baseType {
+	case basetype.Sint8:
+		return proto.Int8(int8(value))
+	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
+		return proto.Uint8(uint8(value))
+	case basetype.Sint16:
+		return proto.Int16(int16(value))
+	case basetype.Uint16, basetype.Uint16z:
+		return proto.Uint16(uint16(value))
+	case basetype.Sint32:
+		return proto.Int32(int32(value))
+	case basetype.Uint32, basetype.Uint32z:
+		return proto.Uint32(uint32(value))
+	case basetype.Sint64:
+		return proto.Int64(int64(value))
+	case basetype.Uint64, basetype.Uint64z:
+		return proto.Uint64(uint64(value))
+	}
+
+	return val
 }
