@@ -134,12 +134,12 @@ func TestMakeBits(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.value.Type()), func(t *testing.T) {
-			bitVal, ok := makeBits(tc.value)
+			vbits, ok := makeBits(tc.value)
 			if ok != tc.ok {
 				t.Fatalf("expected ok: %t, got: %t", tc.ok, ok)
 			}
-			if bitVal != tc.expected {
-				t.Fatalf("expected bitVal: %v, got: %v", tc.expected, bitVal)
+			if vbits != tc.expected {
+				t.Fatalf("expected bits:\n%v,\n got:\n%v", tc.expected, vbits)
 			}
 		})
 	}
@@ -147,10 +147,10 @@ func TestMakeBits(t *testing.T) {
 
 func TestBitsPull(t *testing.T) {
 	type pull struct {
-		bits   byte
-		value  uint32
-		ok     bool
-		bitVal bits
+		bits  byte
+		value uint32
+		ok    bool
+		vbits bits
 	}
 	tt := []struct {
 		name  string
@@ -160,40 +160,40 @@ func TestBitsPull(t *testing.T) {
 		{
 			name:  "single value one pull",
 			vbits: bits{store: [32]uint64{20}},
-			pulls: []pull{{bits: 8, value: 20, ok: true, bitVal: bits{store: [32]uint64{0}}}},
+			pulls: []pull{{bits: 8, value: 20, ok: true, vbits: bits{store: [32]uint64{0}}}},
 		},
 		{
 			name:  "single value multiple pull",
 			vbits: bits{store: [32]uint64{math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, bitVal: bits{store: [32]uint64{255}}},
-				{bits: 8, value: 255, ok: true, bitVal: bits{store: [32]uint64{0}}},
+				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{255}}},
+				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{0}}},
 			},
 		},
 		{
 			name:  "slice value one pull",
 			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, bitVal: bits{store: [32]uint64{math.MaxUint64, 255}}},
+				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
 			},
 		},
 		{
 			name:  "slice value multiple pull",
 			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, bitVal: bits{store: [32]uint64{math.MaxUint64, 255}}},
-				{bits: 8, value: 255, ok: true, bitVal: bits{store: [32]uint64{math.MaxUint64}}},
+				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
+				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64}}},
 			},
 		},
 		{
 			name:  "single value one pull bits > 32 (64)",
 			vbits: bits{store: [32]uint64{20}},
-			pulls: []pull{{bits: 64, value: 0, ok: false, bitVal: bits{store: [32]uint64{20}}}},
+			pulls: []pull{{bits: 64, value: 0, ok: false, vbits: bits{store: [32]uint64{20}}}},
 		},
 		{
 			name:  "single value one pull store is zero",
 			vbits: bits{store: [32]uint64{0}},
-			pulls: []pull{{bits: 8, value: 0, ok: false, bitVal: bits{store: [32]uint64{0}}}},
+			pulls: []pull{{bits: 8, value: 0, ok: false, vbits: bits{store: [32]uint64{0}}}},
 		},
 	}
 
@@ -207,8 +207,8 @@ func TestBitsPull(t *testing.T) {
 				if u32 != p.value {
 					t.Fatalf("expected value: %t, got: %t", p.ok, ok)
 				}
-				if tc.vbits != p.bitVal {
-					t.Fatalf("expected bitVal:\n%v,\n got:\n%v", tc.vbits, p.bitVal)
+				if tc.vbits != p.vbits {
+					t.Fatalf("expected bits:\n%v,\n got:\n%v", tc.vbits, p.vbits)
 				}
 			}
 		})
