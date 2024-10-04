@@ -97,30 +97,30 @@ func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
 	return store
 }
 
-// Pull retrieves a value of the specified bit size from the storage value and
-// the storage value will be updated accordingly. If one of these conditions is met,
+// Pull retrieves a value of the specified bit size from the value store and
+// the value store will be updated accordingly. If one of these conditions is met,
 // zero and false will be returned:
 //   - bits struct is invalid
 //   - bits's store run out value (reach zero)
-//   - given bits > 32
-func (v *bits) Pull(bits byte) (val uint32, ok bool) {
-	if v.store[31] == math.MaxUint64 || v.store[0] == 0 || bits > 32 {
+//   - given bitsize > 32
+func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
+	if v.store[31] == math.MaxUint64 || v.store[0] == 0 || bitsize > 32 {
 		return 0, false
 	}
 
-	mask := uint64(1)<<bits - 1     // e.g. (1 << 8) - 1     = 255
+	mask := uint64(1)<<bitsize - 1  // e.g. (1 << 8) - 1     = 255
 	val = uint32(v.store[0] & mask) // e.g. 0x27010E08 & 255 = 0x08
-	v.store[0] >>= bits             // e.g. 0x27010E08 >> 8  = 0x27010E
+	v.store[0] >>= bitsize          // e.g. 0x27010E08 >> 8  = 0x27010E
 
 	for i := 1; i < len(v.store); i++ {
 		if v.store[i] == 0 {
 			break
 		}
 		// e.g. 128 bits Layout Before: 0x0000_0000_0000_FFFF_0000_0000_2701_0E08
-		hi := v.store[i] & mask // e.g. 0x0000_0000_0000_FFFF & 0xFF                  = 0x0000_0000_0000_00FF
-		lo := hi << (64 - bits) // e,g. 0x0000_0000_0000_00FF << (64 - 8)             = 0xFF00_0000_0000_0000
-		v.store[i-1] |= lo      // e.g. 0x0000_0000_0027_010E | 0xFF00_0000_0000_0000 = 0xFF00_0000_0027_010E
-		v.store[i] >>= bits     // e.g. 0x0000_0000_0000_FFFF >> 8                    = 0x0000_0000_0000_00FF
+		hi := v.store[i] & mask    // e.g. 0x0000_0000_0000_FFFF & 0xFF                  = 0x0000_0000_0000_00FF
+		lo := hi << (64 - bitsize) // e,g. 0x0000_0000_0000_00FF << (64 - 8)             = 0xFF00_0000_0000_0000
+		v.store[i-1] |= lo         // e.g. 0x0000_0000_0027_010E | 0xFF00_0000_0000_0000 = 0xFF00_0000_0027_010E
+		v.store[i] >>= bitsize     // e.g. 0x0000_0000_0000_FFFF >> 8                    = 0x0000_0000_0000_00FF
 		// e.g. 128 bits Layout After:  0x0000_0000_0000_00FF_FF00_0000_0027_010E
 	}
 

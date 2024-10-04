@@ -13,7 +13,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-func TestMakeBitValue(t *testing.T) {
+func TestMakeBits(t *testing.T) {
 	tt := []struct {
 		value    proto.Value
 		expected bits
@@ -145,7 +145,7 @@ func TestMakeBitValue(t *testing.T) {
 	}
 }
 
-func TestBitValuePull(t *testing.T) {
+func TestBitsPull(t *testing.T) {
 	type pull struct {
 		bits   byte
 		value  uint32
