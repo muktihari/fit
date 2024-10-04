@@ -407,9 +407,6 @@ func TestEncode(t *testing.T) {
 	}
 
 	for i, tc := range tt {
-		if i != len(tt)-1 {
-			continue
-		}
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w)
 			err := enc.Encode(tc.fit)
