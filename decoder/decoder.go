@@ -741,9 +741,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		if baseType != field.BaseType { // Convert value
-			if bitVal, ok := makeBitValue(val); ok {
-				val = bitVal.ToValue(field.BaseType)
-			}
+			val = convertBytesToValue(val, field.BaseType)
 		}
 
 		if field.Num == proto.FieldNumTimestamp && val.Type() == proto.TypeUint32 {
@@ -755,8 +753,8 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field.Value = val
 
 		if d.options.shouldExpandComponent && field.Accumulate {
-			if bitVal, ok := makeBitValue(val); ok {
-				d.accumulator.Collect(mesg.Num, field.Num, bitVal.AsUint32()) // Collect the field values to be used in component expansion.
+			if v := convertValueToUint32(val); v != basetype.Uint32Invalid {
+				d.accumulator.Collect(mesg.Num, field.Num, v) // Collect the field values to be used in component expansion.
 			}
 		}
 
@@ -791,7 +789,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		return
 	}
 
-	bitVal, ok := makeBitValue(containingField.Value)
+	vbits, ok := makeBits(containingField.Value)
 	if !ok {
 		return
 	}
@@ -805,20 +803,19 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		componentField = d.factory.CreateField(mesg.Num, component.FieldNum)
 		componentField.IsExpandedField = true
 
-		if component.Accumulate {
-			bitVal = makeBitValueFromUint32(d.accumulator.Accumulate(mesg.Num, component.FieldNum, bitVal.AsUint32(), component.Bits))
-		}
-
 		// A component can only have max 32 bits value
-		val, ok := bitVal.PullByMask(component.Bits)
+		val, ok := vbits.Pull(component.Bits)
 		if !ok {
 			break
 		}
 
+		if component.Accumulate {
+			val = d.accumulator.Accumulate(mesg.Num, component.FieldNum, val, component.Bits)
+		}
+
 		componentScaled := scaleoffset.Apply(val, component.Scale, component.Offset)
 		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
-		componentBitVal := makeBitValueFromUint32(val)
-		value := componentBitVal.ToValue(componentField.BaseType)
+		value := convertUint32ToValue(val, componentField.BaseType)
 
 		var shouldAppend bool
 		fieldRef := mesg.FieldByNum(component.FieldNum)
@@ -929,9 +926,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if baseType != fieldDesc.FitBaseTypeId { // Convert value
-			if bitVal, ok := makeBitValue(val); ok {
-				val = bitVal.ToValue(fieldDesc.FitBaseTypeId)
-			}
+			val = convertBytesToValue(val, fieldDesc.FitBaseTypeId)
 		}
 
 		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
@@ -1073,4 +1068,126 @@ func strcount(b []byte) (size byte) {
 		}
 	}
 	return size
+}
+
+// convertValueToUint32 converts val into uint32. If val's type is not supported,
+// it returns basetype.Uint32Invalid.
+func convertValueToUint32(val proto.Value) uint32 {
+	switch val.Type() {
+	case proto.TypeInt8:
+		return uint32(val.Int8())
+	case proto.TypeUint8:
+		return uint32(val.Uint8())
+	case proto.TypeInt16:
+		return uint32(val.Int16())
+	case proto.TypeUint16:
+		return uint32(val.Uint16())
+	case proto.TypeInt32:
+		return uint32(val.Int32())
+	case proto.TypeUint32:
+		return uint32(val.Uint32())
+	case proto.TypeInt64:
+		return uint32(val.Int64())
+	case proto.TypeUint64:
+		return uint32(val.Uint64())
+	case proto.TypeFloat32:
+		return uint32(val.Float32())
+	case proto.TypeFloat64:
+		return uint32(val.Float64())
+	}
+	return basetype.Uint32Invalid
+}
+
+// convertUint32ToValue val into proto.Value of targeted baseType.
+// If targeted baseType is not supported, it returns proto.Value{}.
+func convertUint32ToValue(val uint32, baseType basetype.BaseType) proto.Value {
+	switch baseType {
+	case basetype.Sint8:
+		return proto.Int8(int8(val))
+	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
+		return proto.Uint8(uint8(val))
+	case basetype.Sint16:
+		return proto.Int16(int16(val))
+	case basetype.Uint16, basetype.Uint16z:
+		return proto.Uint16(uint16(val))
+	case basetype.Sint32:
+		return proto.Int32(int32(val))
+	case basetype.Uint32, basetype.Uint32z:
+		return proto.Uint32(uint32(val))
+	case basetype.Sint64:
+		return proto.Int64(int64(val))
+	case basetype.Uint64, basetype.Uint64z:
+		return proto.Uint64(uint64(val))
+	case basetype.Float32:
+		return proto.Float32(float32(val))
+	case basetype.Float64:
+		return proto.Float64(float64(val))
+	}
+	return proto.Value{}
+}
+
+// convertBytesToValue converts val in the form of byte or []byte into target baseType.
+// This is used for casting value of bad encoded FIT files.
+func convertBytesToValue(val proto.Value, baseType basetype.BaseType) proto.Value {
+	var value uint64
+	switch val.Type() {
+	case proto.TypeUint8:
+		value = uint64(val.Uint8())
+	case proto.TypeSliceUint8:
+		b := val.SliceUint8()
+		for i := range b {
+			value |= uint64(b[i]) << (i * 8)
+		}
+	}
+	switch baseType {
+	case basetype.Sint8:
+		return proto.Int8(int8(value))
+	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
+		return proto.Uint8(uint8(value))
+	case basetype.Sint16:
+		return proto.Int16(int16(value))
+	case basetype.Uint16, basetype.Uint16z:
+		return proto.Uint16(uint16(value))
+	case basetype.Sint32:
+		return proto.Int32(int32(value))
+	case basetype.Uint32, basetype.Uint32z:
+		return proto.Uint32(uint32(value))
+	case basetype.Sint64:
+		return proto.Int64(int64(value))
+	case basetype.Uint64, basetype.Uint64z:
+		return proto.Uint64(value)
+	case basetype.Float32:
+		return proto.Float32(float32(value))
+	case basetype.Float64:
+		return proto.Float64(float64(value))
+	}
+	return val
+}
+
+// valueAppend appends elem into slice. Elem must be has type element of
+// slice's element. Otherwise, undefined behavior.
+func valueAppend(slice proto.Value, elem proto.Value) proto.Value {
+	switch elem.Type() {
+	case proto.TypeInt8:
+		return proto.SliceInt8(append(slice.SliceInt8(), elem.Int8()))
+	case proto.TypeUint8:
+		return proto.SliceUint8(append(slice.SliceUint8(), elem.Uint8()))
+	case proto.TypeInt16:
+		return proto.SliceInt16(append(slice.SliceInt16(), elem.Int16()))
+	case proto.TypeUint16:
+		return proto.SliceUint16(append(slice.SliceUint16(), elem.Uint16()))
+	case proto.TypeInt32:
+		return proto.SliceInt32(append(slice.SliceInt32(), elem.Int32()))
+	case proto.TypeUint32:
+		return proto.SliceUint32(append(slice.SliceUint32(), elem.Uint32()))
+	case proto.TypeInt64:
+		return proto.SliceInt64(append(slice.SliceInt64(), elem.Int64()))
+	case proto.TypeUint64:
+		return proto.SliceUint64(append(slice.SliceUint64(), elem.Uint64()))
+	case proto.TypeFloat32:
+		return proto.SliceFloat32(append(slice.SliceFloat32(), elem.Float32()))
+	case proto.TypeFloat64:
+		return proto.SliceFloat64(append(slice.SliceFloat64(), elem.Float64()))
+	}
+	return slice
 }
