@@ -136,11 +136,11 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				field.InvalidValue += fmt.Sprintf("&& %s != \"\"", field.ComparableValue)
 			}
 
-			if len(parserField.Scales) <= 1 { // Multiple scales only for components
+			// Scale and offset do not apply for field that has more than one components
+			if len(parserField.Components) > 1 {
+				field.Scale, field.Offset = 1, 0
+			} else {
 				field.Scale = scaleOrDefault(parserField.Scales, 0)
-			}
-
-			if len(parserField.Offsets) <= 1 { // Multiple offsets only for components
 				field.Offset = offsetOrDefault(parserField.Offsets, 0)
 			}
 
