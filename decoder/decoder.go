@@ -877,9 +877,11 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		componentField = d.factory.CreateField(mesg.Num, component.FieldNum)
 		componentField.IsExpandedField = true
 
-		// A component can only have max 32 bits value
+		// A component can only have max 32 bits value.
+		// If a field has only one component, expand it even if its value is zero
+		// e.g. speed (0) -> enhanced_speed (0).
 		val, ok := vbits.Pull(component.Bits)
-		if !ok {
+		if !ok && len(components) > 1 {
 			break
 		}
 
