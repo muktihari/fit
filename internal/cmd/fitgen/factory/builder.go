@@ -138,9 +138,14 @@ func (b *Builder) makeFieldBases(message parser.Message) string {
 		if array := field.Array != ""; array {
 			strbuf.WriteString(fmt.Sprintf("Array: %t, %s", array, makeArrayComment(field.Array)))
 		}
-		strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(field.Scales, 0))) // first index or default
-		if offset := offsetOrDefault(field.Offsets, 0); offset != 0 {
-			strbuf.WriteString(fmt.Sprintf("Offset: %g,", offset)) // first index or default
+		// Scale and offset do not apply for field that has more than one components
+		if len(field.Components) > 1 {
+			strbuf.WriteString(fmt.Sprintf("Scale: %d,", 1))
+		} else {
+			strbuf.WriteString(fmt.Sprintf("Scale: %g,", scaleOrDefault(field.Scales, 0))) // first index or default
+			if offset := offsetOrDefault(field.Offsets, 0); offset != 0 {
+				strbuf.WriteString(fmt.Sprintf("Offset: %g,", offset)) // first index or default
+			}
 		}
 		if accumulate := accumulateOrDefault(field.Accumulate, 0); accumulate {
 			strbuf.WriteString(fmt.Sprintf("Accumulate: %t,", accumulate))
