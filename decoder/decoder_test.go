@@ -1682,13 +1682,14 @@ func TestDecodeMessageData(t *testing.T) {
 
 func TestDecodeFields(t *testing.T) {
 	tt := []struct {
-		name       string
-		r          io.Reader
-		opts       []Option
-		mesgdef    *proto.MessageDefinition
-		mesg       proto.Message
-		validateFn func(mesg proto.Message) error
-		err        error
+		name              string
+		r                 io.Reader
+		opts              []Option
+		mesgdef           *proto.MessageDefinition
+		mesg              proto.Message
+		validateFn        func(mesg proto.Message) error
+		accumulatedValues []value
+		err               error
 	}{
 		{
 			name: "decode fields happy flow",
@@ -1722,7 +1723,9 @@ func TestDecodeFields(t *testing.T) {
 		},
 		{
 			name: "decode fields accumulate distance",
-			r:    fnReaderOK,
+			r: func() io.Reader {
+				return bytes.NewBuffer(binary.LittleEndian.AppendUint32(nil, 15))
+			}(),
 			mesgdef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
 				MesgNum: mesgnum.Record,
@@ -1733,6 +1736,66 @@ func TestDecodeFields(t *testing.T) {
 						BaseType: basetype.Uint32,
 					},
 				},
+			},
+			accumulatedValues: []value{
+				{
+					mesgNum:  mesgnum.Record,
+					fieldNum: fieldnum.RecordDistance,
+					last:     15,
+					value:    15,
+				},
+			},
+			mesg: proto.Message{Num: mesgnum.Record},
+			validateFn: func(mesg proto.Message) error {
+				expected := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(15)),
+				}}
+				if diff := cmp.Diff(mesg, expected,
+					cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+				); diff != "" {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
+			},
+		},
+		{
+			name: "decode fields accumulate slice value: hr's event_timestamp",
+			r: func() io.Reader {
+				var b []byte
+				b = binary.LittleEndian.AppendUint32(b, 15)
+				b = binary.LittleEndian.AppendUint32(b, 20)
+				return bytes.NewBuffer(b)
+			}(),
+			mesgdef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask,
+				MesgNum: mesgnum.Hr,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      fieldnum.HrEventTimestamp,
+						Size:     basetype.Uint32.Size() * 2,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+			accumulatedValues: []value{
+				{
+					mesgNum:  mesgnum.Hr,
+					fieldNum: fieldnum.HrEventTimestamp,
+					last:     20,
+					value:    20,
+				},
+			},
+			mesg: proto.Message{Num: mesgnum.Hr},
+			validateFn: func(mesg proto.Message) error {
+				expected := proto.Message{Num: mesgnum.Hr, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Hr, fieldnum.HrEventTimestamp).WithValue([]uint32{15, 20}),
+				}}
+				if diff := cmp.Diff(mesg, expected,
+					cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
+				); diff != "" {
+					return fmt.Errorf("%s", diff)
+				}
+				return nil
 			},
 		},
 		{
@@ -1922,11 +1985,56 @@ func TestDecodeFields(t *testing.T) {
 			if err != nil {
 				return
 			}
+			if diff := cmp.Diff(dec.accumulator.values, tc.accumulatedValues,
+				cmp.AllowUnexported(value{}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
 			if tc.validateFn == nil {
 				return
 			}
 			if err := tc.validateFn(tc.mesg); err != nil {
 				t.Fatalf("expected nil, got: %v", err)
+			}
+		})
+	}
+}
+
+func TestCollectAccumulableValues(t *testing.T) {
+	tt := []struct {
+		val               proto.Value
+		accumulatedValues []value
+	}{
+		{val: proto.Int8(1), accumulatedValues: []value{{last: 1, value: 1}}},
+		{val: proto.Uint8(2), accumulatedValues: []value{{last: 2, value: 2}}},
+		{val: proto.Int16(3), accumulatedValues: []value{{last: 3, value: 3}}},
+		{val: proto.Uint16(4), accumulatedValues: []value{{last: 4, value: 4}}},
+		{val: proto.Int32(5), accumulatedValues: []value{{last: 5, value: 5}}},
+		{val: proto.Uint32(6), accumulatedValues: []value{{last: 6, value: 6}}},
+		{val: proto.Int64(7), accumulatedValues: []value{{last: 7, value: 7}}},
+		{val: proto.Uint64(8), accumulatedValues: []value{{last: 8, value: 8}}},
+		{val: proto.Float32(9), accumulatedValues: []value{{last: 9, value: 9}}},
+		{val: proto.Float64(10), accumulatedValues: []value{{last: 10, value: 10}}},
+		{val: proto.SliceInt8([]int8{1, 2}), accumulatedValues: []value{{last: 2, value: 2}}},
+		{val: proto.SliceUint8([]uint8{2, 3}), accumulatedValues: []value{{last: 3, value: 3}}},
+		{val: proto.SliceInt16([]int16{3, 4}), accumulatedValues: []value{{last: 4, value: 4}}},
+		{val: proto.SliceUint16([]uint16{4, 5}), accumulatedValues: []value{{last: 5, value: 5}}},
+		{val: proto.SliceInt32([]int32{5, 6}), accumulatedValues: []value{{last: 6, value: 6}}},
+		{val: proto.SliceUint32([]uint32{6, 7}), accumulatedValues: []value{{last: 7, value: 7}}},
+		{val: proto.SliceInt64([]int64{7, 8}), accumulatedValues: []value{{last: 8, value: 8}}},
+		{val: proto.SliceUint64([]uint64{8, 9}), accumulatedValues: []value{{last: 9, value: 9}}},
+		{val: proto.SliceFloat32([]float32{9, 10}), accumulatedValues: []value{{last: 10, value: 10}}},
+		{val: proto.SliceFloat64([]float64{10, 11}), accumulatedValues: []value{{last: 11, value: 11}}},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v", i, tc.val.Any()), func(t *testing.T) {
+			dec := New(nil)
+			dec.collectAccumulableValues(0, 0, tc.val)
+			if diff := cmp.Diff(dec.accumulator.values, tc.accumulatedValues,
+				cmp.AllowUnexported(value{}),
+			); diff != "" {
+				t.Fatal(diff)
 			}
 		})
 	}
@@ -2748,67 +2856,6 @@ func TestReset(t *testing.T) {
 					return true
 				}),
 			); diff != "" {
-				t.Fatal(diff)
-			}
-		})
-	}
-}
-
-func TestConvertValueToUint32(t *testing.T) {
-	tt := []struct {
-		value    proto.Value
-		expected uint32
-	}{
-		{
-			value:    proto.Int8(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Uint8(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Int16(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Uint16(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Int32(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Uint32(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Int64(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Uint64(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Float32(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Float64(32),
-			expected: 32,
-		},
-		{
-			value:    proto.Value{},
-			expected: basetype.Uint32Invalid,
-		},
-	}
-
-	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %v", i, tc.value.Any()), func(t *testing.T) {
-			val := convertValueToUint32(tc.value)
-			if diff := cmp.Diff(val, tc.expected); diff != "" {
 				t.Fatal(diff)
 			}
 		})
