@@ -1000,7 +1000,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 				0: {FieldNum: 73 /* enhanced_speed */, Scale: 1000, Bits: 16},
 			}},
 		7: {Name: "power", Num: 7, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "watts"},
-		8: {Name: "compressed_speed_distance", Num: 8, Type: profile.Byte, BaseType: basetype.Byte, Array: true /* [3] */, Scale: 100, Units: "m/s,m",
+		8: {Name: "compressed_speed_distance", Num: 8, Type: profile.Byte, BaseType: basetype.Byte, Array: true /* [3] */, Scale: 1, Units: "m/s,m",
 			Components: []proto.Component{
 				0: {FieldNum: 6 /* speed */, Scale: 100, Bits: 12},
 				1: {FieldNum: 5 /* distance */, Scale: 16, Accumulate: true, Bits: 12},
@@ -2122,7 +2122,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 			}},
 		6: {Name: "filtered_bpm", Num: 6, Type: profile.Uint8, BaseType: basetype.Uint8, Array: true /* [N] */, Scale: 1, Units: "bpm"},
 		9: {Name: "event_timestamp", Num: 9, Type: profile.Uint32, BaseType: basetype.Uint32, Array: true /* [N] */, Scale: 1024, Accumulate: true, Units: "s"},
-		10: {Name: "event_timestamp_12", Num: 10, Type: profile.Byte, BaseType: basetype.Byte, Array: true /* [N] */, Scale: 1024, Accumulate: true, Units: "s",
+		10: {Name: "event_timestamp_12", Num: 10, Type: profile.Byte, BaseType: basetype.Byte, Array: true /* [N] */, Scale: 1, Accumulate: true, Units: "s",
 			Components: []proto.Component{
 				0: {FieldNum: 9 /* event_timestamp */, Scale: 1024, Accumulate: true, Bits: 12},
 				1: {FieldNum: 9 /* event_timestamp */, Scale: 1024, Accumulate: true, Bits: 12},
