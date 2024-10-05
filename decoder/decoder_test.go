@@ -2127,6 +2127,16 @@ func TestExpandComponents(t *testing.T) {
 			},
 		},
 		{
+			name: "expand field that only has one component and its value is zero",
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(0)),
+			}},
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(0)),
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase, Value: proto.Uint32(0), IsExpandedField: true},
+			},
+		},
+		{
 			// Real world use case from "testdata/from_official_sdk/activity_poolswim_with_hr.csv"
 			// prior Hr message event_timestamp value: 3.6201171875 -> 3707
 			// event_timestamp_12:  "158|114|57|159|6|167|29|142|25|244|228|130"
