@@ -753,9 +753,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field.Value = val
 
 		if d.options.shouldExpandComponent && field.Accumulate {
-			if v := convertValueToUint32(val); v != basetype.Uint32Invalid {
-				d.accumulator.Collect(mesg.Num, field.Num, v) // Collect the field values to be used in component expansion.
-			}
+			d.collectAccumulableValues(mesg.Num, field.Num, field.Value)
 		}
 
 		mesg.Fields = append(mesg.Fields, field)
@@ -778,6 +776,82 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	}
 
 	return nil
+}
+
+// collectAccumulableValues collects the field values to be used in component expansion.
+func (d *Decoder) collectAccumulableValues(mesgNum typedef.MesgNum, fieldNum byte, val proto.Value) {
+	switch val.Type() {
+	case proto.TypeInt8:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Int8()))
+	case proto.TypeUint8:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Uint8()))
+	case proto.TypeInt16:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Int16()))
+	case proto.TypeUint16:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Uint16()))
+	case proto.TypeInt32:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Int32()))
+	case proto.TypeUint32:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Uint32()))
+	case proto.TypeInt64:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Int64()))
+	case proto.TypeUint64:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Uint64()))
+	case proto.TypeFloat32:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Float32()))
+	case proto.TypeFloat64:
+		d.accumulator.Collect(mesgNum, fieldNum, uint32(val.Float64()))
+	case proto.TypeSliceInt8:
+		vals := val.SliceInt8()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceUint8:
+		vals := val.SliceUint8()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceInt16:
+		vals := val.SliceInt16()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceUint16:
+		vals := val.SliceUint16()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceInt32:
+		vals := val.SliceInt32()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceUint32:
+		vals := val.SliceUint32()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceInt64:
+		vals := val.SliceInt64()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceUint64:
+		vals := val.SliceUint64()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceFloat32:
+		vals := val.SliceFloat32()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	case proto.TypeSliceFloat64:
+		vals := val.SliceFloat64()
+		for i := range vals {
+			d.accumulator.Collect(mesgNum, fieldNum, uint32(vals[i]))
+		}
+	}
 }
 
 func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
@@ -1068,34 +1142,6 @@ func strcount(b []byte) (size byte) {
 		}
 	}
 	return size
-}
-
-// convertValueToUint32 converts val into uint32. If val's type is not supported,
-// it returns basetype.Uint32Invalid.
-func convertValueToUint32(val proto.Value) uint32 {
-	switch val.Type() {
-	case proto.TypeInt8:
-		return uint32(val.Int8())
-	case proto.TypeUint8:
-		return uint32(val.Uint8())
-	case proto.TypeInt16:
-		return uint32(val.Int16())
-	case proto.TypeUint16:
-		return uint32(val.Uint16())
-	case proto.TypeInt32:
-		return uint32(val.Int32())
-	case proto.TypeUint32:
-		return uint32(val.Uint32())
-	case proto.TypeInt64:
-		return uint32(val.Int64())
-	case proto.TypeUint64:
-		return uint32(val.Uint64())
-	case proto.TypeFloat32:
-		return uint32(val.Float32())
-	case proto.TypeFloat64:
-		return uint32(val.Float64())
-	}
-	return basetype.Uint32Invalid
 }
 
 // convertUint32ToValue val into proto.Value of targeted baseType.
