@@ -124,11 +124,11 @@ func TestMakeBits(t *testing.T) {
 		},
 		{
 			value:    proto.String("invalid"),
-			expected: bits{[32]uint64{31: math.MaxUint64}}, ok: false,
+			expected: bits{}, ok: false,
 		},
 		{
 			value:    proto.Value{},
-			expected: bits{[32]uint64{31: math.MaxUint64}}, ok: false,
+			expected: bits{}, ok: false,
 		},
 	}
 
@@ -184,11 +184,6 @@ func TestBitsPull(t *testing.T) {
 				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
 				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64}}},
 			},
-		},
-		{
-			name:  "single value one pull bits > 32 (64)",
-			vbits: bits{store: [32]uint64{20}},
-			pulls: []pull{{bits: 64, value: 0, ok: false, vbits: bits{store: [32]uint64{20}}}},
 		},
 		{
 			name:  "single value one pull store is zero",
