@@ -2161,6 +2161,23 @@ func TestExpandComponents(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "edge case not following best practice: expanding compressed_speed_distance, but message already has speed",
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				// speed (0) will be expanded to enhanced_speed (0)
+				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(0),
+				// compressed_speed_distance will be expanded to speed (10240) and distance (100), replacing
+				// existing speed (0) -> speed (10240). speed (10240) then is expanded again, replacing
+				// enhanced_speed (0) -> enhanced_speed (10240)
+				factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).WithValue([]byte{0, 4, 1}),
+			}},
+			fieldsAfterExpansion: []proto.Field{
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).FieldBase, Value: proto.Uint16(10240), IsExpandedField: false}, // Value is updated: (1024 / 1000) * 1000
+				factory.CreateField(mesgnum.Record, fieldnum.RecordCompressedSpeedDistance).WithValue([]byte{0, 4, 1}),
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase, Value: proto.Uint32(10240), IsExpandedField: true}, // Value is updated: (1024 / 100) * 1000
+				{FieldBase: factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).FieldBase, Value: proto.Uint32(100), IsExpandedField: true},        // (1600 / 16) * 1
+			},
+		},
 	}
 
 	for i, tc := range tt {
@@ -2171,9 +2188,9 @@ func TestExpandComponents(t *testing.T) {
 			}
 			for _, field := range tc.mesg.Fields {
 				if subField := field.SubFieldSubtitution(&tc.mesg); subField != nil {
-					dec.expandComponents(&tc.mesg, &field, subField.Components)
+					dec.expandComponents(&tc.mesg, field.Value, field.BaseType, subField.Components)
 				} else {
-					dec.expandComponents(&tc.mesg, &field, field.Components)
+					dec.expandComponents(&tc.mesg, field.Value, field.BaseType, field.Components)
 				}
 			}
 			if diff := cmp.Diff(tc.mesg.Fields, tc.fieldsAfterExpansion,
@@ -2254,7 +2271,7 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 
 	dec := New(nil, WithFactory(fac))
 	fieldToExpand := mesg.FieldByNum(2)
-	dec.expandComponents(&mesg, fieldToExpand, fieldToExpand.Components)
+	dec.expandComponents(&mesg, fieldToExpand.Value, fieldToExpand.BaseType, fieldToExpand.Components)
 
 	if len(mesg.Fields) != 3 {
 		t.Errorf("expected n fields: %d, got %d", 3, len(mesg.Fields))

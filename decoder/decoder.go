@@ -768,11 +768,11 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		field := &mesg.Fields[i]
 		if subField := field.SubFieldSubtitution(mesg); subField != nil {
 			// Expand sub-field components as the main field components
-			d.expandComponents(mesg, field, subField.Components)
+			d.expandComponents(mesg, field.Value, field.BaseType, subField.Components)
 			continue
 		}
 		// No sub-field can interpret as main field, expand main field components
-		d.expandComponents(mesg, field, field.Components)
+		d.expandComponents(mesg, field.Value, field.BaseType, field.Components)
 	}
 
 	return nil
@@ -854,22 +854,20 @@ func (d *Decoder) collectAccumulableValues(mesgNum typedef.MesgNum, fieldNum byt
 	}
 }
 
-func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.Field, components []proto.Component) {
+func (d *Decoder) expandComponents(mesg *proto.Message, containingValue proto.Value, baseType basetype.BaseType, components []proto.Component) {
 	if len(components) == 0 {
 		return
 	}
 
-	if !containingField.Value.Valid(containingField.BaseType) {
+	if !containingValue.Valid(baseType) {
 		return
 	}
 
-	vbits, ok := makeBits(containingField.Value)
+	vbits, ok := makeBits(containingValue)
 	if !ok {
 		return
 	}
 
-	// PERF: Reuse a single variable 'componentField' instead of declaring it inside the loop to prevent
-	// the Compiler's escape analysis from moving it to the heap.
 	var componentField proto.Field
 	for i := range components {
 		component := &components[i]
@@ -893,17 +891,30 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 		val = uint32(scaleoffset.Discard(componentScaled, componentField.Scale, componentField.Offset))
 		value := convertUint32ToValue(val, componentField.BaseType)
 
+		// All components fields are appended, so it makes more sense to search from the last order.
+		// Our goal is to create new or update existing expanded field. However, there is an edge case
+		// where the decoded field with the same field number as the expanded field candidate already exist
+		// before the expansion begin. For such cases, that field will be updated instead of creating new
+		// expanded field. If its value is an array, value will be appended, otherwise, value will be replaced.
+		var fieldRef *proto.Field
+		for j := len(mesg.Fields) - 1; j >= 0; j-- {
+			field := &mesg.Fields[j]
+			if field.Num == component.FieldNum {
+				fieldRef = field
+				break
+			}
+		}
+
 		var shouldAppend bool
-		fieldRef := mesg.FieldByNum(component.FieldNum)
 		if fieldRef == nil {
 			fieldRef = &componentField
 			shouldAppend = true
 		}
 
+		// Some of expanded field's values are in the form of slice, e.g.:
+		// - Hr: event_timestamp FROM event_timestamp_12 (approx. up to 120 bits)
+		// - RawBbi: time, quality, gap FROM data (approx. up to 240 bits)
 		if fieldRef.Array {
-			// Some of expanded field's values are in the form of slice:
-			// - Hr: event_timestamp FROM event_timestamp_12 (approx. up to 120 bits)
-			// - RawBbi: time, quality, gap FROM data (approx. up to 240 bits)
 			fieldRef.Value = valueAppend(fieldRef.Value, value)
 		} else {
 			fieldRef.Value = value
@@ -915,10 +926,12 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingField *proto.F
 
 		// The destination field (componentField) can itself contain components requiring expansion.
 		// e.g. compressed_speed_distance -> (speed, distance), speed -> enhanced_speed.
+		//
+		// NOTE: We pass the 32 bits component's value to ensure we only expand this value.
 		if subField := componentField.SubFieldSubtitution(mesg); subField != nil {
-			d.expandComponents(mesg, &componentField, subField.Components)
+			d.expandComponents(mesg, value, componentField.BaseType, subField.Components)
 		} else {
-			d.expandComponents(mesg, &componentField, componentField.Components)
+			d.expandComponents(mesg, value, componentField.BaseType, componentField.Components)
 		}
 	}
 }
