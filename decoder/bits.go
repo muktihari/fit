@@ -5,23 +5,18 @@
 package decoder
 
 import (
-	"math"
-
 	"github.com/muktihari/fit/proto"
 )
 
 // bits is 2048 bits value implementation, large enough to hold proto.Value in its integer form.
 // This bits value enable us to do bitwise operation and it's used for component expansion as
-// Field's Value requiring expansion can hold up to 255 byte (2040 bits) data, this is obviously
+// Field's Value requiring expansion can hold up to 255 bytes (2040 bits) data, this is obviously
 // way more bits than Go's primitive value can handle.
 //
 // In Profile.xlsx v21.141, the biggest value for component expansion is "raw_bbi" message for
 // having 240 bits on "data" and the second is "hr" message for having 120 bits on "event_timestamp_12".
 type bits struct {
-	// NOTE: We use array to avoid memory allocation, it's simple to maintain and it has more
-	// deterministic performance. Max value to hold is 2040 bits, so the value of the last
-	// index will always less than math.MaxUint64. We use the last index to determine the
-	// validity of this stuct, if last index is math.MaxUint64, this struct is invalid.
+	// We use array to avoid memory allocation. It's simple to maintain and more deterministic.
 	store [32]uint64
 }
 
@@ -29,47 +24,49 @@ type bits struct {
 func makeBits(value proto.Value) (v bits, ok bool) {
 	switch value.Type() {
 	case proto.TypeInt8:
-		return bits{store: [32]uint64{0: uint64(value.Int8())}}, true
+		v.store[0] = uint64(value.Int8())
 	case proto.TypeUint8:
-		return bits{store: [32]uint64{0: uint64(value.Uint8())}}, true
+		v.store[0] = uint64(value.Uint8())
 	case proto.TypeInt16:
-		return bits{store: [32]uint64{0: uint64(value.Int16())}}, true
+		v.store[0] = uint64(value.Int16())
 	case proto.TypeUint16:
-		return bits{store: [32]uint64{0: uint64(value.Uint16())}}, true
+		v.store[0] = uint64(value.Uint16())
 	case proto.TypeInt32:
-		return bits{store: [32]uint64{0: uint64(value.Int32())}}, true
+		v.store[0] = uint64(value.Int32())
 	case proto.TypeUint32:
-		return bits{store: [32]uint64{0: uint64(value.Uint32())}}, true
+		v.store[0] = uint64(value.Uint32())
 	case proto.TypeInt64:
-		return bits{store: [32]uint64{0: uint64(value.Int64())}}, true
+		v.store[0] = uint64(value.Int64())
 	case proto.TypeUint64:
-		return bits{store: [32]uint64{0: value.Uint64()}}, true
+		v.store[0] = value.Uint64()
 	case proto.TypeFloat32:
-		return bits{store: [32]uint64{0: uint64(value.Float32())}}, true
+		v.store[0] = uint64(value.Float32())
 	case proto.TypeFloat64:
-		return bits{store: [32]uint64{0: uint64(value.Float64())}}, true
+		v.store[0] = uint64(value.Float64())
 	case proto.TypeSliceInt8:
-		return bits{store: storeFromSlice(value.SliceInt8(), 1)}, true
+		v.store = storeFromSlice(value.SliceInt8(), 1)
 	case proto.TypeSliceUint8:
-		return bits{store: storeFromSlice(value.SliceUint8(), 1)}, true
+		v.store = storeFromSlice(value.SliceUint8(), 1)
 	case proto.TypeSliceInt16:
-		return bits{store: storeFromSlice(value.SliceInt16(), 2)}, true
+		v.store = storeFromSlice(value.SliceInt16(), 2)
 	case proto.TypeSliceUint16:
-		return bits{store: storeFromSlice(value.SliceUint16(), 2)}, true
+		v.store = storeFromSlice(value.SliceUint16(), 2)
 	case proto.TypeSliceInt32:
-		return bits{store: storeFromSlice(value.SliceInt32(), 4)}, true
+		v.store = storeFromSlice(value.SliceInt32(), 4)
 	case proto.TypeSliceUint32:
-		return bits{store: storeFromSlice(value.SliceUint32(), 4)}, true
+		v.store = storeFromSlice(value.SliceUint32(), 4)
 	case proto.TypeSliceInt64:
-		return bits{store: storeFromSlice(value.SliceInt64(), 8)}, true
+		v.store = storeFromSlice(value.SliceInt64(), 8)
 	case proto.TypeSliceUint64:
-		return bits{store: storeFromSlice(value.SliceUint64(), 8)}, true
+		v.store = storeFromSlice(value.SliceUint64(), 8)
 	case proto.TypeSliceFloat32:
-		return bits{store: storeFromSlice(value.SliceFloat32(), 4)}, true
+		v.store = storeFromSlice(value.SliceFloat32(), 4)
 	case proto.TypeSliceFloat64:
-		return bits{store: storeFromSlice(value.SliceFloat64(), 8)}, true
+		v.store = storeFromSlice(value.SliceFloat64(), 8)
+	default:
+		return v, false
 	}
-	return bits{store: [32]uint64{31: math.MaxUint64}}, false
+	return v, true
 }
 
 type numeric interface {
@@ -90,14 +87,13 @@ func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
 	return store
 }
 
+var storezero [32]uint64
+
 // Pull retrieves a value of the specified bit size from the value store and
-// the value store will be updated accordingly. If one of these conditions is met,
-// zero and false will be returned:
-//   - bits struct is invalid
-//   - bits's store run out value (reach zero)
-//   - given bitsize > 32
+// the value store will be updated accordingly. If bits's store run out value
+// (reach zero) zero and false will be returned.
 func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
-	if v.store[31] == math.MaxUint64 || v.store == [32]uint64{} || bitsize > 32 {
+	if v.store == storezero {
 		return 0, false
 	}
 
