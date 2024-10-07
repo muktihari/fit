@@ -149,7 +149,6 @@ func TestBitsPull(t *testing.T) {
 	type pull struct {
 		bits  byte
 		value uint32
-		ok    bool
 		vbits bits
 	}
 	tt := []struct {
@@ -160,47 +159,44 @@ func TestBitsPull(t *testing.T) {
 		{
 			name:  "single value one pull",
 			vbits: bits{store: [32]uint64{20}},
-			pulls: []pull{{bits: 8, value: 20, ok: true, vbits: bits{store: [32]uint64{0}}}},
+			pulls: []pull{{bits: 8, value: 20, vbits: bits{store: [32]uint64{0}}}},
 		},
 		{
 			name:  "single value multiple pull",
 			vbits: bits{store: [32]uint64{math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{255}}},
-				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{0}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{255}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{0}}},
 			},
 		},
 		{
 			name:  "slice value one pull",
 			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
 			},
 		},
 		{
 			name:  "slice value multiple pull",
 			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
 			pulls: []pull{
-				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
-				{bits: 8, value: 255, ok: true, vbits: bits{store: [32]uint64{math.MaxUint64}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64}}},
 			},
 		},
 		{
 			name:  "single value one pull store is zero",
 			vbits: bits{store: [32]uint64{0}},
-			pulls: []pull{{bits: 8, value: 0, ok: false, vbits: bits{store: [32]uint64{0}}}},
+			pulls: []pull{{bits: 8, value: 0, vbits: bits{store: [32]uint64{0}}}},
 		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			for _, p := range tc.pulls {
-				u32, ok := tc.vbits.Pull(p.bits)
-				if ok != p.ok {
-					t.Fatalf("expected ok: %t, got: %t", p.ok, ok)
-				}
+				u32 := tc.vbits.Pull(p.bits)
 				if u32 != p.value {
-					t.Fatalf("expected value: %t, got: %t", p.ok, ok)
+					t.Fatalf("expected value: %v, got: %v", p.value, u32)
 				}
 				if tc.vbits != p.vbits {
 					t.Fatalf("expected bits:\n%v,\n got:\n%v", tc.vbits, p.vbits)
