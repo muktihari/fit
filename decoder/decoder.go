@@ -254,6 +254,7 @@ func (d *Decoder) releaseTemporaryObjects() {
 	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
 	d.fieldsArray = [255]proto.Field{}
 	d.developerFieldsArray = [255]proto.DeveloperField{}
+	d.fileId = nil
 	d.messages = nil
 	d.developerDataIndexes = d.developerDataIndexes[:0]
 	for i := range d.fieldDescriptions {
@@ -699,7 +700,7 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 	return nil
 }
 
-func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Message) error {
+func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Message) (err error) {
 	for i := range mesgDef.FieldDefinitions {
 		fieldDef := &mesgDef.FieldDefinitions[i]
 
@@ -717,9 +718,9 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		}
 
 		var (
-			baseType   = field.BaseType
-			profilType = field.Type
-			array      = field.Array
+			baseType    = field.BaseType
+			profileType = field.Type
+			array       = field.Array
 		)
 
 		// Gracefully handle poorly encoded FIT file.
@@ -728,31 +729,29 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			continue
 		} else if fieldDef.Size < baseType.Size() {
 			baseType = basetype.Byte
-			profilType = profile.Byte
+			profileType = profile.Byte
 			array = fieldDef.Size > baseType.Size() && fieldDef.Size&baseType.Size() == 0
 			d.logField(mesg, fieldDef, "Size is less than expected. Fallback: decode as byte(s) and convert the value")
 		} else if fieldDef.Size > baseType.Size() && !field.Array && baseType != basetype.String {
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
-		val, err := d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, profilType, array, overrideStringArray)
+		field.Value, err = d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, profileType, array, overrideStringArray)
 		if err != nil {
 			return err
 		}
 
 		if baseType != field.BaseType { // Convert value
-			val = convertBytesToValue(val, field.BaseType)
+			field.Value = convertBytesToValue(field.Value, field.BaseType)
 		}
 
-		if field.Num == proto.FieldNumTimestamp && val.Type() == proto.TypeUint32 {
-			timestamp := val.Uint32()
+		if field.Num == proto.FieldNumTimestamp && field.Value.Type() == proto.TypeUint32 {
+			timestamp := field.Value.Uint32()
 			d.timestamp = timestamp
 			d.lastTimeOffset = byte(timestamp & proto.CompressedTimeMask)
 		}
 
-		field.Value = val
-
-		if d.options.shouldExpandComponent && field.Accumulate {
+		if field.Accumulate && d.options.shouldExpandComponent {
 			d.collectAccumulableValues(mesg.Num, field.Num, field.Value)
 		}
 
@@ -951,8 +950,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		if !ok {
 			// NOTE: Currently, we allow missing DeveloperDataId message,
 			// we only use FieldDescription messages to decode developer data.
-			d.log("mesg.Num: %d, developerFields[%d].Num: %d: missing developer data id with developer data index '%d'",
-				mesg.Num, i, devFieldDef.Num, devFieldDef.DeveloperDataIndex)
+			if d.options.logWriter != nil {
+				fmt.Fprintf(d.options.logWriter,
+					"mesg.Num: %d, developerFields[%d].Num: %d: missing developer data id with developer data index '%d'",
+					mesg.Num, i, devFieldDef.Num, devFieldDef.DeveloperDataIndex)
+			}
 		}
 
 		// Find the FieldDescription that refers to this DeveloperField.
@@ -971,9 +973,11 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if fieldDesc == nil {
-			d.log("mesg.Num: %d, developerFields[%d].Num: %d: Can't interpret developer field, "+
-				"no field description mesg found. Just read acquired bytes (%d) and move forward. [byte pos: %d]\n",
-				mesg.Num, i, devFieldDef.Num, devFieldDef.Size, d.n)
+			if d.options.logWriter != nil {
+				fmt.Fprintf(d.options.logWriter, "mesg.Num: %d, developerFields[%d].Num: %d: Can't interpret developer field, "+
+					"no field description mesg found. Just read acquired bytes (%d) and move forward. [byte pos: %d]\n",
+					mesg.Num, i, devFieldDef.Num, devFieldDef.Size, d.n)
+			}
 			if _, err := d.readN(int(devFieldDef.Size)); err != nil {
 				return fmt.Errorf("no field description found, unable to read acquired bytes: %w", err)
 			}
@@ -986,11 +990,6 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		var isArray bool
-		typeSize := fieldDesc.FitBaseTypeId.Size()
-		if devFieldDef.Size > typeSize && devFieldDef.Size%typeSize == 0 {
-			isArray = true
-		}
-
 		baseType := fieldDesc.FitBaseTypeId
 		profileType := profile.ProfileTypeFromBaseType(baseType)
 
@@ -1001,9 +1000,12 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		} else if devFieldDef.Size < fieldDesc.FitBaseTypeId.Size() {
 			baseType = basetype.Byte
 			profileType = profile.Byte
-			isArray = devFieldDef.Size > baseType.Size() && devFieldDef.Size&baseType.Size() == 0
 			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId,
 				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
+		}
+
+		if devFieldDef.Size > baseType.Size() && devFieldDef.Size%baseType.Size() == 0 {
+			isArray = true
 		}
 
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
@@ -1068,24 +1070,22 @@ func (d *Decoder) readValue(size byte, arch byte, baseType basetype.BaseType, pr
 	return proto.UnmarshalValue(b, arch, baseType, profileType, isArray)
 }
 
-// log logs only if logWriter is not nil.
-func (d *Decoder) log(format string, args ...any) {
-	if d.options.logWriter == nil {
-		return
-	}
-	fmt.Fprintf(d.options.logWriter, format, args...)
-}
-
 const logFieldTemplate = "mesg.Num: %q, %s.Num: %d, size: %d, type: %q (size: %d). %s. [bytes pos: %d]\n"
 
 // logField logs field related issues only if logWriter is not nil.
 func (d *Decoder) logField(m *proto.Message, fd *proto.FieldDefinition, msg string) {
-	d.log(logFieldTemplate, m.Num, "field", fd.Num, fd.Size, fd.BaseType, fd.BaseType.Size(), msg, d.n)
+	if d.options.logWriter == nil {
+		return
+	}
+	fmt.Fprintf(d.options.logWriter, logFieldTemplate, m.Num, "field", fd.Num, fd.Size, fd.BaseType, fd.BaseType.Size(), msg, d.n)
 }
 
 // logDeveloperField logs developerField related issues only if logWriter is not nil.
 func (d *Decoder) logDeveloperField(m *proto.Message, dfd *proto.DeveloperFieldDefinition, bt basetype.BaseType, msg string) {
-	d.log(logFieldTemplate, m.Num, "developerField", dfd.Num, dfd.Size, bt, bt.Size(), msg, d.n)
+	if d.options.logWriter == nil {
+		return
+	}
+	fmt.Fprintf(d.options.logWriter, logFieldTemplate, m.Num, "developerField", dfd.Num, dfd.Size, bt, bt.Size(), msg, d.n)
 }
 
 // DecodeWithContext is similar to Decode but with respect to context propagation.
