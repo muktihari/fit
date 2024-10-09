@@ -182,6 +182,15 @@ func (l *Listener) Close() {
 		return
 	}
 	close(l.mesgc)
+
+	// PERF: In case the Listener might be reused later, this ensure fields' pool does not reference any pointer
+	// such as proto.FieldBase created for unknown fields or field.Value that reference any pointer to a slice.
+	for i := uint(0); i < l.options.channelBuffer; i++ {
+		fields := <-l.poolc
+		clear(fields[:cap(fields):cap(fields)])
+		l.poolc <- fields
+	}
+
 	<-l.done
 	l.active = false
 }
