@@ -2532,7 +2532,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			dec := New(tc.r)
+			dec := New(tc.r, WithLogWriter(io.Discard))
 			dec.developerDataIndexes = append(dec.developerDataIndexes, tc.developerDataIndexes...)
 			dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
 			err := dec.decodeDeveloperFields(tc.mesgDef, tc.mesg)
@@ -2887,6 +2887,40 @@ func TestReset(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLogs(t *testing.T) {
+	mesg := proto.Message{Num: mesgnum.Record}
+	fieldDef := proto.FieldDefinition{Num: fieldnum.RecordTimestamp, Size: 4, BaseType: basetype.Uint32}
+	devFieldDef := proto.DeveloperFieldDefinition{Num: fieldnum.RecordTimestamp, Size: 4, DeveloperDataIndex: 0}
+
+	t.Run("logField: nil log writter", func(t *testing.T) {
+		dec := New(nil)
+		dec.logField(&mesg, &fieldDef, "msg")
+	})
+
+	t.Run("logField: with log writter", func(t *testing.T) {
+		buf := bytes.NewBuffer(nil)
+		dec := New(nil, WithLogWriter(buf))
+		dec.logField(&mesg, &fieldDef, "msg")
+		if buf.Len() == 0 {
+			t.Fatalf("expected non zero, got zero buf.Len()")
+		}
+	})
+
+	t.Run("logDeveloperField: nil log writter", func(t *testing.T) {
+		dec := New(nil)
+		dec.logDeveloperField(&mesg, &devFieldDef, basetype.Uint32, "msg")
+	})
+
+	t.Run("logDeveloperField: with log writter", func(t *testing.T) {
+		buf := bytes.NewBuffer(nil)
+		dec := New(nil, WithLogWriter(buf))
+		dec.logDeveloperField(&mesg, &devFieldDef, basetype.Uint32, "msg")
+		if buf.Len() == 0 {
+			t.Fatalf("expected non zero, got zero buf.Len()")
+		}
+	})
 }
 
 func TestConvertUint32ToValue(t *testing.T) {
