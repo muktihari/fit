@@ -383,6 +383,9 @@ func TestEncode(t *testing.T) {
 			name: "encode return error from validation",
 			fit: &proto.FIT{
 				Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment),
+					}},
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)), // Exceed max allowed
 					}},
@@ -396,6 +399,9 @@ func TestEncode(t *testing.T) {
 			fit: &proto.FIT{
 				FileHeader: proto.FileHeader{ProtocolVersion: proto.V1},
 				Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment),
+					}},
 					{Num: mesgnum.Record, Fields: []proto.Field{
 						{FieldBase: &proto.FieldBase{BaseType: basetype.Sint64}},
 					}},
@@ -443,19 +449,41 @@ func TestValidateMessages(t *testing.T) {
 			}}},
 		},
 		{
-			name:            "protocol validation failed",
+			name:            "empty messages",
+			protocolVersion: proto.V1,
+			messages:        []proto.Message{},
+			err:             ErrEmptyMessages,
+		},
+		{
+			name:            "missing file_id",
 			protocolVersion: proto.V1,
 			messages: []proto.Message{{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			}, DeveloperFields: []proto.DeveloperField{{}}}},
+			}}},
+			err: ErrMissingFileId,
+		},
+		{
+			name:            "protocol validation failed",
+			protocolVersion: proto.V1,
+			messages: []proto.Message{
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
+				}, DeveloperFields: []proto.DeveloperField{{}}}},
 			err: proto.ErrProtocolViolation,
 		},
 		{
 			name:            "message validation failed",
 			protocolVersion: proto.V1,
-			messages: []proto.Message{{Num: mesgnum.Record, Fields: []proto.Field{
-				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
-			}}},
+			messages: []proto.Message{
+				{Num: mesgnum.FileId, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment),
+				}},
+				{Num: mesgnum.Record, Fields: []proto.Field{
+					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
+				}}},
 			err: ErrExceedMaxAllowed,
 		},
 	}
@@ -474,78 +502,84 @@ func TestValidateMessages(t *testing.T) {
 	}
 }
 
-type encodeWithDirectUpdateTestCase struct {
-	name string
-	fit  *proto.FIT
-	w    io.Writer
-	err  error
-}
-
-func makeEncodeWithDirectUpdateStrategyTableTest() []encodeWithDirectUpdateTestCase {
-	return []encodeWithDirectUpdateTestCase{
-		{
-			name: "happy flow coverage",
-			fit: &proto.FIT{Messages: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				}},
-			}},
-			w: mockWriterAt{fnWriteOK, fnWriteAtOK},
-		},
-		{
-			name: "encode header error",
-			fit:  &proto.FIT{},
-			w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
-			err:  io.EOF,
-		},
-		{
-			name: "encode messages error",
-			fit:  &proto.FIT{},
-			w:    mockWriterAt{fnWriteOK, fnWriteAtErr},
-			err:  ErrEmptyMessages,
-		},
-		{
-			name: "encode crc error",
-			fit: &proto.FIT{Messages: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				}},
-			}},
-			w: func() io.Writer {
-				fnWrites := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
-				index := 0
-
-				return mockWriterAt{
-					fnWriter(func(b []byte) (n int, err error) {
-						fn := fnWrites[index]
-						index++
-						return fn.Write(b)
-					}),
-					fnWriteAtOK,
-				}
-			}(),
-			err: io.EOF,
-		},
-		{
-			name: "update error",
-			fit: &proto.FIT{FileHeader: proto.FileHeader{Size: 14, DataSize: 100, DataType: proto.DataTypeFIT}, Messages: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
-				}},
-			}},
-			w:   mockWriterAt{fnWriteOK, fnWriteAtErr},
-			err: io.EOF,
-		},
-	}
-}
-
 func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
-	tt := makeEncodeWithDirectUpdateStrategyTableTest()
+	type testCase struct {
+		name string
+		fit  *proto.FIT
+		w    io.Writer
+		err  error
+	}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+	tt := func() []testCase {
+		return []testCase{
+			{
+				name: "happy flow coverage",
+				fit: &proto.FIT{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+					}},
+				}},
+				w: mockWriterAt{fnWriteOK, fnWriteAtOK},
+			},
+			{
+				name: "encode header error",
+				fit:  &proto.FIT{},
+				w:    mockWriterAt{fnWriteErr, fnWriteAtErr},
+				err:  io.EOF,
+			},
+			{
+				name: "encodeMessages return error",
+				fit:  &proto.FIT{Messages: []proto.Message{{}}},
+				w: func() io.Writer {
+					fnInstances := []io.Writer{fnWriteOK, fnWriteErr}
+					cur := 0
+					return fnWriter(func(b []byte) (n int, err error) {
+						f := fnInstances[cur]
+						cur++
+						return f.Write(b)
+					})
+				}(),
+				err: io.EOF,
+			},
+			{
+				name: "encode crc error",
+				fit: &proto.FIT{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+					}},
+				}},
+				w: func() io.Writer {
+					fnWrites := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
+					index := 0
+
+					return mockWriterAt{
+						fnWriter(func(b []byte) (n int, err error) {
+							fn := fnWrites[index]
+							index++
+							return fn.Write(b)
+						}),
+						fnWriteAtOK,
+					}
+				}(),
+				err: io.EOF,
+			},
+			{
+				name: "update error",
+				fit: &proto.FIT{FileHeader: proto.FileHeader{Size: 14, DataSize: 100, DataType: proto.DataTypeFIT}, Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity),
+					}},
+				}},
+				w:   mockWriterAt{fnWriteOK, fnWriteAtErr},
+				err: io.EOF,
+			},
+		}
+	}
+
+	for i, tc := range tt() {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w, WithWriteBufferSize(0))
-			err := enc.Encode(tc.fit)
+			err := enc.encodeWithDirectUpdateStrategy(tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
@@ -553,12 +587,10 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 	}
 
 	// Test same logic for EncodeWithContext
-	tt2 := makeEncodeWithDirectUpdateStrategyTableTest()
-
-	for _, tc := range tt2 {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt() {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w, WithWriteBufferSize(0))
-			err := enc.EncodeWithContext(context.Background(), tc.fit)
+			err := enc.encodeWithDirectUpdateStrategyWithContext(context.Background(), tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
@@ -566,92 +598,85 @@ func TestEncodeWithDirectUpdateStrategy(t *testing.T) {
 	}
 }
 
-type encodeWithEarlyCheckStrategyTestCase struct {
-	name string
-	fit  *proto.FIT
-	w    io.Writer
-	err  error
-}
-
-func makeEncodeWithEarlyCheckStrategy() []encodeWithEarlyCheckStrategyTestCase {
-	return []encodeWithEarlyCheckStrategyTestCase{
-		{
-			name: "happy flow coverage",
-			fit:  &proto.FIT{Messages: []proto.Message{{}}},
-			w:    fnWriteOK,
-		},
-		{
-			name: "calculate data size error",
-			fit:  &proto.FIT{Messages: []proto.Message{}},
-			w: func() io.Writer {
-				fnInstances := []io.Writer{fnWriteErr}
-				index := 0
-
-				return fnWriter(func(b []byte) (n int, err error) {
-					f := fnInstances[index]
-					index++
-					return f.Write(b)
-				})
-			}(),
-			err: ErrEmptyMessages,
-		},
-		{
-			name: "encode header error",
-			fit: &proto.FIT{Messages: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-				}},
-			}},
-			w:   fnWriteErr,
-			err: io.EOF,
-		},
-		{
-			name: "encode messages error",
-			fit: &proto.FIT{Messages: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-				}},
-			}},
-			w: func() io.Writer {
-				fnInstances := []io.Writer{fnWriteOK, fnWriteErr}
-				index := 0
-
-				return fnWriter(func(b []byte) (n int, err error) {
-					f := fnInstances[index]
-					index++
-					return f.Write(b)
-				})
-			}(),
-			err: io.EOF, // since fnWriteErr produce io.EOF
-		},
-		{
-			name: "encode crc error",
-			fit:  &proto.FIT{Messages: []proto.Message{{}}},
-			w: func() io.Writer {
-				fnInstances := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
-				index := 0
-
-				return fnWriter(func(b []byte) (n int, err error) {
-					f := fnInstances[index%len(fnInstances)]
-					index++
-					return f.Write(b)
-				})
-			}(),
-			err: io.EOF, // since fnWriteErr produce io.EOF
-		},
-	}
-}
-
 func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
-	tt := makeEncodeWithEarlyCheckStrategy()
+	type testCase struct {
+		name string
+		fit  *proto.FIT
+		w    io.Writer
+		err  error
+	}
 
-	for i, tc := range tt {
+	tt := func() []testCase {
+		return []testCase{
+			{
+				name: "happy flow coverage",
+				fit:  &proto.FIT{Messages: []proto.Message{{}}},
+				w:    fnWriteOK,
+			},
+			{
+				name: "calculate data size error",
+				fit: &proto.FIT{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(nil), // Invalid Value
+					}},
+				}},
+				w:   fnWriteOK,
+				err: proto.ErrTypeNotSupported,
+			},
+			{
+				name: "encode header error",
+				fit: &proto.FIT{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
+					}},
+				}},
+				w:   fnWriteErr,
+				err: io.EOF,
+			},
+			{
+				name: "encode messages error",
+				fit: &proto.FIT{Messages: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
+					}},
+				}},
+				w: func() io.Writer {
+					fnInstances := []io.Writer{fnWriteOK, fnWriteErr}
+					index := 0
+
+					return fnWriter(func(b []byte) (n int, err error) {
+						f := fnInstances[index]
+						index++
+						return f.Write(b)
+					})
+				}(),
+				err: io.EOF, // since fnWriteErr produce io.EOF
+			},
+			{
+				name: "encode crc error",
+				fit:  &proto.FIT{Messages: []proto.Message{{}}},
+				w: func() io.Writer {
+					fnInstances := []io.Writer{fnWriteOK, fnWriteOK, fnWriteOK, fnWriteErr}
+					index := 0
+
+					return fnWriter(func(b []byte) (n int, err error) {
+						f := fnInstances[index%len(fnInstances)]
+						index++
+						return f.Write(b)
+					})
+				}(),
+				err: io.EOF, // since fnWriteErr produce io.EOF
+			},
+		}
+	}
+
+	for i, tc := range tt() {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w,
 				WithMessageValidator(fnValidateOK),
 				WithWriteBufferSize(0),
 			)
-			err := enc.Encode(tc.fit)
+			err := enc.encodeWithEarlyCheckStrategy(tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -659,15 +684,13 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 	}
 
 	// Test same logic for EncodeWithContext
-	tt2 := makeEncodeWithEarlyCheckStrategy()
-
-	for _, tc := range tt2 {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range tt() {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(tc.w,
 				WithMessageValidator(fnValidateOK),
 				WithWriteBufferSize(0),
 			)
-			err := enc.EncodeWithContext(context.Background(), tc.fit)
+			err := enc.encodeWithEarlyCheckStrategyWithContext(context.Background(), tc.fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected: %v, got: %v", tc.err, err)
 			}
@@ -1170,42 +1193,30 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 	}
 }
 
-type encodeMessagesTestCase struct {
-	name          string
-	mesgValidator MessageValidator
-	mesgs         []proto.Message
-	err           error
-}
-
-func makeEncodeMessagesTableTest() []encodeMessagesTestCase {
-	return []encodeMessagesTestCase{
-		{
-			name:          "encode messages happy flow",
-			mesgValidator: fnValidateOK,
-			mesgs: []proto.Message{
-				{Num: mesgnum.FileId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
-					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(typedef.GarminProductEdge1030)),
-				}},
-			},
-		},
-		{
-			name:  "encode messages return empty messages error",
-			mesgs: []proto.Message{},
-			err:   ErrEmptyMessages,
-		},
-		{
-			name:  "missing file_id mesg",
-			mesgs: []proto.Message{{Num: mesgnum.Record}},
-			err:   ErrMissingFileId,
-		},
-	}
-}
-
 func TestEncodeMessages(t *testing.T) {
-	tt := makeEncodeMessagesTableTest()
+	type testCase struct {
+		name          string
+		mesgValidator MessageValidator
+		mesgs         []proto.Message
+		err           error
+	}
 
-	for _, tc := range tt {
+	tt := func() []testCase {
+		return []testCase{
+			{
+				name:          "encode messages happy flow",
+				mesgValidator: fnValidateOK,
+				mesgs: []proto.Message{
+					{Num: mesgnum.FileId, Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(uint16(typedef.ManufacturerGarmin)),
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdProduct).WithValue(uint16(typedef.GarminProductEdge1030)),
+					}},
+				},
+			},
+		}
+	}
+
+	for _, tc := range tt() {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(io.Discard)
 			err := enc.encodeMessages(tc.mesgs)
@@ -1216,9 +1227,7 @@ func TestEncodeMessages(t *testing.T) {
 	}
 
 	// Test same logic for encodeMessagesWithContext
-	tt2 := makeEncodeMessagesTableTest()
-
-	for _, tc := range tt2 {
+	for _, tc := range tt() {
 		t.Run(tc.name, func(t *testing.T) {
 			enc := New(io.Discard)
 			err := enc.encodeMessagesWithContext(context.Background(), tc.mesgs)

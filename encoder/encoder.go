@@ -281,18 +281,33 @@ func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
 }
 
 func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
-	defer e.options.messageValidator.Reset()
+	if len(messages) == 0 {
+		return ErrEmptyMessages
+	}
+
+	if messages[0].Num != mesgnum.FileId {
+		return fmt.Errorf("first message is expected to be file_id, got: %s: %w",
+			messages[0].Num, ErrMissingFileId)
+	}
+
 	for i := range messages {
-		mesg := &messages[i] // Must use pointer reference since validator may update the message.
+		mesg := &messages[i]
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
 			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
+	}
+
+	for i := range messages {
+		mesg := &messages[i] // Must use pointer reference since message validator may update the message.
 		if err = e.options.messageValidator.Validate(mesg); err != nil {
+			e.options.messageValidator.Reset()
 			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
+	e.options.messageValidator.Reset()
+
 	return nil
 }
 
@@ -435,14 +450,6 @@ func (e *Encoder) calculateDataSize(fit *proto.FIT) error {
 }
 
 func (e *Encoder) encodeMessages(messages []proto.Message) error {
-	if len(messages) == 0 {
-		return ErrEmptyMessages
-	}
-
-	if messages[0].Num != mesgnum.FileId {
-		return ErrMissingFileId
-	}
-
 	for i := range messages {
 		mesg := &messages[i]
 		if err := e.encodeMessage(mesg); err != nil {
@@ -668,14 +675,6 @@ func (e *Encoder) encodeWithEarlyCheckStrategyWithContext(ctx context.Context, f
 }
 
 func (e *Encoder) encodeMessagesWithContext(ctx context.Context, messages []proto.Message) error {
-	if len(messages) == 0 {
-		return ErrEmptyMessages
-	}
-
-	if messages[0].Num != mesgnum.FileId {
-		return ErrMissingFileId
-	}
-
 	for i := range messages {
 		select {
 		case <-ctx.Done():
