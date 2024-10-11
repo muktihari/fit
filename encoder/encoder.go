@@ -290,18 +290,23 @@ func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 			messages[0].Num, ErrMissingFileId)
 	}
 
-	defer e.options.messageValidator.Reset()
 	for i := range messages {
-		mesg := &messages[i] // Must use pointer reference since validator may update the message.
+		mesg := &messages[i]
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
 			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
+	}
+
+	for i := range messages {
+		mesg := &messages[i] // Must use pointer reference since message validator may update the message.
 		if err = e.options.messageValidator.Validate(mesg); err != nil {
+			e.options.messageValidator.Reset()
 			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
+	e.options.messageValidator.Reset()
 
 	return nil
 }
