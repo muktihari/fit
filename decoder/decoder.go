@@ -95,9 +95,10 @@ type options struct {
 	mesgDefListeners      []MesgDefListener // Each listener will received every decoded message definition.
 	readBufferSize        int
 	shouldChecksum        bool
-	broadcastOnly         bool
 	shouldExpandComponent bool
+	broadcastOnly         bool
 	broadcastMesgCopy     bool
+	preallocateMessages   bool
 }
 
 func defaultOptions() options {
@@ -106,9 +107,10 @@ func defaultOptions() options {
 		logWriter:             nil,
 		readBufferSize:        defaultReadBufferSize,
 		shouldChecksum:        true,
-		broadcastOnly:         false,
 		shouldExpandComponent: true,
+		broadcastOnly:         false,
 		broadcastMesgCopy:     false,
+		preallocateMessages:   false,
 	}
 }
 
@@ -163,6 +165,14 @@ func WithIgnoreChecksum() Option {
 // WithNoComponentExpansion directs the Decoder to not expand the components.
 func WithNoComponentExpansion() Option {
 	return func(o *options) { o.shouldExpandComponent = false }
+}
+
+// WithPreallocateMessages directs the Decoder to fast read the reader to count messages, then allocate messages with
+// the size of the resulting counter to avoid re-allocation when appending each decoded message. After that, the reader's
+// offset will be rollback to the previous offset for the actual decoding. Only work if the given reader is an [io.ReadSeeker]
+// and WithBroadcastOnly() is unset. How fast it is may depends on I/O, but typically, it beats the cost of re-allocation.
+func WithPreallocateMessages() Option {
+	return func(o *options) { o.preallocateMessages = true }
 }
 
 // WithLogWriter specifies where the log messages will be written to. By default, the Decoder do not write any log if
@@ -518,11 +528,122 @@ func (d *Decoder) decodeFileHeader() error {
 }
 
 func (d *Decoder) decodeMessages() (err error) {
+	if d.err = d.preallocateMessages(); d.err != nil {
+		return fmt.Errorf("preallocateMessages failed: %w", d.err)
+	}
 	for d.cur < d.fileHeader.DataSize {
 		if err = d.decodeMessage(); err != nil {
 			return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
 		}
 	}
+	return nil
+}
+
+// preallocateMessages fast read the reader to count messages of the current FIT sequence then allocate d.messages
+// with the size of the resulting counter. Only work if WithPreallocateMessages() is set, WithBroadcastOnly() is unset,
+// and the given io.Reader is an io.ReadSeeker. Otherwise, this function does nothing.
+func (d *Decoder) preallocateMessages() (err error) {
+	if !d.options.preallocateMessages || d.options.broadcastOnly {
+		return nil
+	}
+
+	readSeeker, ok := d.readBuffer.Reader().(io.ReadSeeker)
+	if !ok {
+		return nil // Not supported
+	}
+
+	var (
+		b         []byte
+		offset    int
+		mcount    int
+		msizeRefs [proto.LocalMesgNumMask + 1]int
+		dataSize  = int(d.fileHeader.DataSize)
+	)
+
+	for offset < dataSize {
+		b, err = d.readBuffer.ReadN(1)
+		if err != nil {
+			break
+		}
+		offset += len(b)
+
+		header := b[0]
+		if (header & (proto.MesgCompressedHeaderMask | proto.MesgDefinitionMask)) == proto.MesgDefinitionMask {
+			b, err = d.readBuffer.ReadN(5)
+			if err != nil {
+				break
+			}
+			offset += len(b)
+
+			b, err = d.readBuffer.ReadN(int(b[4]) * 3)
+			if err != nil {
+				break
+			}
+			offset += len(b)
+
+			var msize int
+			for ; len(b) >= 3; b = b[3:] {
+				msize += int(b[1])
+			}
+
+			if (header & proto.DevDataMask) == proto.DevDataMask {
+				b, err = d.readBuffer.ReadN(1)
+				if err != nil {
+					break
+				}
+				offset += len(b)
+
+				b, err = d.readBuffer.ReadN(int(b[0]) * 3)
+				if err != nil {
+					break
+				}
+				offset += len(b)
+
+				for ; len(b) >= 3; b = b[3:] {
+					msize += int(b[1])
+				}
+			}
+
+			msizeRefs[header&proto.LocalMesgNumMask] = msize
+			continue
+		}
+
+		localMesgNum := header
+		if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
+			localMesgNum = (header & proto.CompressedLocalMesgNumMask) >> proto.CompressedBitShift
+		}
+		msize := msizeRefs[localMesgNum&proto.LocalMesgNumMask]
+		if msize == 0 {
+			err = ErrMesgDefMissing
+			break
+		}
+
+		n := min(msize, reservedbuf)
+		for n > 0 {
+			_, err = d.readBuffer.ReadN(n)
+			if err != nil {
+				break
+			}
+			offset, msize = offset+n, msize-n
+			n = min(msize, reservedbuf)
+		}
+
+		mcount += 1
+	}
+
+	if err != nil {
+		return fmt.Errorf("[byte pos: %d]: %w", d.n+int64(offset), err)
+	}
+
+	offset += d.readBuffer.Remaining()
+	if _, err = readSeeker.Seek(-int64(offset), io.SeekCurrent); err != nil {
+		return fmt.Errorf("[byte pos: %d]: seek: could not rollback offset: %w",
+			d.n+int64(offset), err)
+	}
+
+	d.readBuffer.Reset(readSeeker, d.options.readBufferSize)
+	d.messages = append(make([]proto.Message, 0, mcount), d.messages...)
+
 	return nil
 }
 

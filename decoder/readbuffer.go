@@ -68,7 +68,7 @@ func (b *readBuffer) Reset(r io.Reader, size int) {
 //
 // NOTE: n should be >= 0 and n <= reservedbuf, however, we don't enforce it for efficiency.
 func (b *readBuffer) ReadN(n int) ([]byte, error) {
-	remaining := b.last - b.cur
+	remaining := b.Remaining()
 	if n > remaining { // fill buf
 		cur := reservedbuf
 		if remaining != 0 {
@@ -88,3 +88,10 @@ func (b *readBuffer) ReadN(n int) ([]byte, error) {
 	b.cur += n
 	return buf, nil
 }
+
+// Remaining returns the number of bytes that can be read from the current buffer
+// without triggering read to underlying reader.
+func (b *readBuffer) Remaining() int { return b.last - b.cur }
+
+// Reader returns underlying reader.
+func (b *readBuffer) Reader() io.Reader { return b.r }
