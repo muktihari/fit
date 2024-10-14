@@ -1,6 +1,6 @@
 # Security Policy
 
-We include only the essential dependencies to minimize the chance of a supply-chain attack. To ensure that we don’t expose ourselves to that vulnerability, all commits will be scanned by [OpenSSF Scorecard](https://github.com/ossf/scorecard) during PR reviews, upon merging to the master branch, and on a weekly basis (every Tuesday).
+We include only the essential dependencies to minimize the chance of a supply-chain attack. To minimize the risk of exposing ourselves to that vulnerability, all commits will be scanned by [OpenSSF Scorecard](https://github.com/ossf/scorecard) during PR reviews, upon merging to the master branch, and on a monthly basis.
 
 ## Supported Versions
 
