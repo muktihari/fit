@@ -87,15 +87,9 @@ func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
 	return store
 }
 
-var storezero [32]uint64
-
 // Pull retrieves a value of the specified bit size from the value store and
 // the value store will be updated accordingly.
 func (v *bits) Pull(bitsize byte) (val uint32) {
-	if v.store == storezero {
-		return 0
-	}
-
 	mask := uint64(1)<<bitsize - 1  // e.g. (1 << 8) - 1     = 255
 	val = uint32(v.store[0] & mask) // e.g. 0x27010E08 & 255 = 0x08
 	v.store[0] >>= bitsize          // e.g. 0x27010E08 >> 8  = 0x27010E
