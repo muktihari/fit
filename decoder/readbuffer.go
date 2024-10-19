@@ -20,37 +20,53 @@ const (
 	defaultReadBufferSize = 4096
 )
 
-// readBuffer is a custom buffered reader. See newReadBuffer() for details.
+// readBuffer is a custom buffered reader that will automatically handle buffering, allowing us to
+// read bytes directly from the buffer without extra copying, unlike *bufio.Reader which requires us
+// to copy the bytes on every Read() method call. When using *bufio.reader we might receive fewer bytes
+// than requested, readBuffer returns exactly n requested bytes, otherwise, it returns an error.
 type readBuffer struct {
 	r io.Reader // reader provided by the client
 
-	// buf is a bytes buffer to read from io.Reader.
-	// This has unique memory layout:
-	// [reserved section] + [resizable section]
-	// [0, 1,..., 765,    + 766, 767,..., size]
+	// buf is buffer bytes for client reading.
 	//
-	// reserved section is used to memmove remaining bytes when remaining < n.
+	// Memory layout:
+	// [reserved section] + [resizable section]:
+	// [0, 1, 2,..., 765] + [766, 767, 768,...]
+	//
+	// reserved section is used to memmove remaining bytes when remaining < n on reading.
 	// resizable section is the space for reading from io.Reader.
 	//
-	// This way, fragmented remaining bytes is handled and it will always try to
-	// read exactly x size bytes from io.Reader.
+	// This way, fragmented remaining bytes is handled and we can always try
+	// reading exactly n size bytes from io.Reader.
+	//
+	// This should be allocated upon creation with minimum len 2*reservedbuf.
 	buf []byte
 
 	cur, last int // cur and last of buf positions
 }
 
-// newReadBuffer creates a new reader that will automatically handle buffering,
-// allowing us to read bytes directly from the buffer without extra copying.
-// This is unlike *bufio.Reader, which requires us to copy the bytes on every Read() method call.
-func newReadBuffer(rd io.Reader, size int) *readBuffer {
-	r := new(readBuffer)
-	r.Reset(rd, size)
-	return r
+// Reset resets readBuffer with the new reader and size.
+func (b *readBuffer) Reset(r io.Reader, size int) {
+	b.r, b.cur, b.last = r, 0, 0
+
+	if size < minReadBufferSize {
+		size = minReadBufferSize
+	} else if size > maxReadBufferSize {
+		size = maxReadBufferSize
+	}
+
+	oldsize := cap(b.buf) - reservedbuf
+	if size > oldsize {
+		b.buf = make([]byte, reservedbuf+size)
+	}
+	b.buf = b.buf[:reservedbuf+size]
 }
 
 // ReadN reads bytes from the buffer and return exactly n bytes.
 // If the remaining bytes in the buffer is less than n bytes requested, it will automatically fill the buffer.
-// And if in the process it got less than n, an error will be returned.
+// And if it got less than n, an error will be returned.
+//
+// NOTE: n should be >= 0 and n <= reservedbuf, however, we don't enforce it for efficiency.
 func (b *readBuffer) ReadN(n int) ([]byte, error) {
 	remaining := b.last - b.cur
 	if n > remaining { // fill buf
@@ -72,25 +88,3 @@ func (b *readBuffer) ReadN(n int) ([]byte, error) {
 	b.cur += n
 	return buf, nil
 }
-
-// Reset resets buf reader.
-func (b *readBuffer) Reset(rd io.Reader, size int) {
-	if size < minReadBufferSize {
-		size = minReadBufferSize
-	} else if size > maxReadBufferSize {
-		size = maxReadBufferSize
-	}
-
-	oldsize := cap(b.buf) - reservedbuf
-	if size > oldsize {
-		b.buf = make([]byte, reservedbuf+size)
-	}
-	b.buf = b.buf[:reservedbuf+size]
-
-	b.r = rd
-	b.cur = reservedbuf
-	b.last = reservedbuf
-}
-
-// Size return the len of resizeable section of buf.
-func (b *readBuffer) Size() int { return len(b.buf) - reservedbuf }

@@ -9,36 +9,67 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestNewReadBuffer(t *testing.T) {
+func TestReadBufferReset(t *testing.T) {
 	tt := []struct {
-		name   string
-		size   int
-		lenBuf int
+		name         string
+		r            io.Reader
+		size         int
+		expectedSize int
 	}{
-		{name: "default", size: defaultReadBufferSize, lenBuf: reservedbuf + defaultReadBufferSize},
-		{name: "less than minReadBufferSize", size: 8, lenBuf: reservedbuf + minReadBufferSize},
-		{name: "8192", size: 8192, lenBuf: reservedbuf + 8192},
-		{name: "more than maxReadBufferSize", size: math.MaxInt, lenBuf: reservedbuf + maxReadBufferSize},
+		{
+			name:         "default",
+			r:            fnReaderOK,
+			size:         4096,
+			expectedSize: 4096,
+		},
+		{
+			name:         "less than minimal size",
+			r:            fnReaderOK,
+			size:         reservedbuf - 1,
+			expectedSize: reservedbuf,
+		},
+		{
+			name:         "more than maximum size",
+			r:            fnReaderOK,
+			size:         maxReadBufferSize + 1,
+			expectedSize: maxReadBufferSize,
+		},
+		{
+			name:         "nil buffer",
+			r:            nil,
+			size:         4096,
+			expectedSize: 4096,
+		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			b := newReadBuffer(nil, tc.size)
-			if b.cur != reservedbuf {
-				t.Fatalf("expected cur: %d, got: %d", reservedbuf, b.cur)
+			b := &readBuffer{
+				r:    fnReader(func(b []byte) (n int, err error) { return n, err }),
+				cur:  123,
+				last: 456,
 			}
-			if b.last != reservedbuf {
-				t.Fatalf("expected last: %d, got: %d", reservedbuf, b.last)
+			b.Reset(tc.r, tc.size)
+
+			if diff := cmp.Diff(b.r, tc.r, cmp.Transformer("r", func(r io.Reader) uintptr {
+				return reflect.ValueOf(r).Pointer()
+			})); diff != "" {
+				t.Fatal(diff)
 			}
-			if len(b.buf) != tc.lenBuf {
-				t.Fatalf("expected len(buf): %d, got: %d", tc.lenBuf, len(b.buf))
+
+			if b.cur != 0 && b.last != 0 {
+				t.Fatalf("cur and last should be zero after reset, got: %d and %d", b.cur, b.last)
+			}
+
+			size := len(b.buf) - reservedbuf
+			if size != tc.expectedSize {
+				t.Fatalf("expected size: %d, got: %d", tc.expectedSize, size)
 			}
 		})
 	}
@@ -177,36 +208,11 @@ func TestReadBufferReadN(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			b := newReadBuffer(tc.r, tc.size)
+			b := new(readBuffer)
+			b.Reset(tc.r, 4096)
 			if err := tc.testFn(b); err != nil {
 				t.Fatalf("expected nil, got: %v", err)
 			}
 		})
-	}
-}
-
-func TestReadBufferResetAndSize(t *testing.T) {
-	r := io.Reader(fnReaderOK)
-	b := newReadBuffer(nil, 4096)
-
-	b.Reset(r, 4096*2)
-	if b.Size() != 4096*2 {
-		t.Fatalf("expected: %d, got: %d", 4096*2, b.Size())
-	}
-	if diff := cmp.Diff(r, b.r, cmp.Transformer("r", func(r io.Reader) uintptr {
-		return reflect.ValueOf(r).Pointer()
-	})); diff != "" {
-		t.Fatal(diff)
-	}
-
-	// Revert back
-	b.Reset(nil, 4096)
-	if diff := cmp.Diff(nil, b.r, cmp.Transformer("r", func(r io.Reader) uintptr {
-		return reflect.ValueOf(r).Pointer()
-	})); diff != "" {
-		t.Fatal(diff)
-	}
-	if b.Size() != 4096 {
-		t.Fatalf("expected: %d, got: %d", 4096, b.Size())
 	}
 }
