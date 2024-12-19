@@ -854,7 +854,7 @@ func remove(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 	var removeUnknown bool
 	fs.BoolVar(&removeUnknown, flagNameRemoveUnknown, false, removeUnknownDesc)
 
-	const flagNameRemoveMesgNums = "nums"
+	const flagNameRemoveMesgNums = "mesgnums"
 	var removeMesgNums string
 	fs.StringVar(&removeMesgNums, flagNameRemoveMesgNums, "", removeMesgNumsDesc)
 
