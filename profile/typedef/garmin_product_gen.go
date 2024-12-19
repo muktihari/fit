@@ -309,6 +309,7 @@ const (
 	GarminProductMarqCommanderAsia          GarminProduct = 3449
 	GarminProductMarqExpeditionAsia         GarminProduct = 3450
 	GarminProductMarqAthleteAsia            GarminProduct = 3451
+	GarminProductIndexSmartScale2           GarminProduct = 3461
 	GarminProductInstinctSolar              GarminProduct = 3466
 	GarminProductFr45Asia                   GarminProduct = 3469
 	GarminProductVivoactive3Daimler         GarminProduct = 3473
@@ -431,10 +432,18 @@ const (
 	GarminProductVivoactive5                GarminProduct = 4426
 	GarminProductFr165                      GarminProduct = 4432
 	GarminProductFr165Music                 GarminProduct = 4433
+	GarminProductEdge1050                   GarminProduct = 4440
 	GarminProductDescentT2                  GarminProduct = 4442
 	GarminProductHrmFit                     GarminProduct = 4446
 	GarminProductMarqGen2Commander          GarminProduct = 4472
+	GarminProductLilyAthlete                GarminProduct = 4477 // aka the Lily 2 Active
+	GarminProductFenix8Solar                GarminProduct = 4532
+	GarminProductFenix8SolarLarge           GarminProduct = 4533
+	GarminProductFenix8Small                GarminProduct = 4534
+	GarminProductFenix8                     GarminProduct = 4536
 	GarminProductD2Mach1Pro                 GarminProduct = 4556
+	GarminProductEnduro3                    GarminProduct = 4575
+	GarminProductFenixE                     GarminProduct = 4666
 	GarminProductSdm4                       GarminProduct = 10007 // SDM4 footpod
 	GarminProductEdgeRemote                 GarminProduct = 10014
 	GarminProductTacxTrainingAppWin         GarminProduct = 20533
@@ -1046,6 +1055,8 @@ func (g GarminProduct) String() string {
 		return "marq_expedition_asia"
 	case GarminProductMarqAthleteAsia:
 		return "marq_athlete_asia"
+	case GarminProductIndexSmartScale2:
+		return "index_smart_scale_2"
 	case GarminProductInstinctSolar:
 		return "instinct_solar"
 	case GarminProductFr45Asia:
@@ -1290,14 +1301,30 @@ func (g GarminProduct) String() string {
 		return "fr165"
 	case GarminProductFr165Music:
 		return "fr165_music"
+	case GarminProductEdge1050:
+		return "edge_1050"
 	case GarminProductDescentT2:
 		return "descent_t2"
 	case GarminProductHrmFit:
 		return "hrm_fit"
 	case GarminProductMarqGen2Commander:
 		return "marq_gen2_commander"
+	case GarminProductLilyAthlete:
+		return "lily_athlete"
+	case GarminProductFenix8Solar:
+		return "fenix8_solar"
+	case GarminProductFenix8SolarLarge:
+		return "fenix8_solar_large"
+	case GarminProductFenix8Small:
+		return "fenix8_small"
+	case GarminProductFenix8:
+		return "fenix8"
 	case GarminProductD2Mach1Pro:
 		return "d2_mach1_pro"
+	case GarminProductEnduro3:
+		return "enduro3"
+	case GarminProductFenixE:
+		return "fenix_e"
 	case GarminProductSdm4:
 		return "sdm4"
 	case GarminProductEdgeRemote:
@@ -1922,6 +1949,8 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductMarqExpeditionAsia
 	case "marq_athlete_asia":
 		return GarminProductMarqAthleteAsia
+	case "index_smart_scale_2":
+		return GarminProductIndexSmartScale2
 	case "instinct_solar":
 		return GarminProductInstinctSolar
 	case "fr45_asia":
@@ -2166,14 +2195,30 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductFr165
 	case "fr165_music":
 		return GarminProductFr165Music
+	case "edge_1050":
+		return GarminProductEdge1050
 	case "descent_t2":
 		return GarminProductDescentT2
 	case "hrm_fit":
 		return GarminProductHrmFit
 	case "marq_gen2_commander":
 		return GarminProductMarqGen2Commander
+	case "lily_athlete":
+		return GarminProductLilyAthlete
+	case "fenix8_solar":
+		return GarminProductFenix8Solar
+	case "fenix8_solar_large":
+		return GarminProductFenix8SolarLarge
+	case "fenix8_small":
+		return GarminProductFenix8Small
+	case "fenix8":
+		return GarminProductFenix8
 	case "d2_mach1_pro":
 		return GarminProductD2Mach1Pro
+	case "enduro3":
+		return GarminProductEnduro3
+	case "fenix_e":
+		return GarminProductFenixE
 	case "sdm4":
 		return GarminProductSdm4
 	case "edge_remote":
@@ -2502,6 +2547,7 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductMarqCommanderAsia,
 		GarminProductMarqExpeditionAsia,
 		GarminProductMarqAthleteAsia,
+		GarminProductIndexSmartScale2,
 		GarminProductInstinctSolar,
 		GarminProductFr45Asia,
 		GarminProductVivoactive3Daimler,
@@ -2624,10 +2670,18 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductVivoactive5,
 		GarminProductFr165,
 		GarminProductFr165Music,
+		GarminProductEdge1050,
 		GarminProductDescentT2,
 		GarminProductHrmFit,
 		GarminProductMarqGen2Commander,
+		GarminProductLilyAthlete,
+		GarminProductFenix8Solar,
+		GarminProductFenix8SolarLarge,
+		GarminProductFenix8Small,
+		GarminProductFenix8,
 		GarminProductD2Mach1Pro,
+		GarminProductEnduro3,
+		GarminProductFenixE,
 		GarminProductSdm4,
 		GarminProductEdgeRemote,
 		GarminProductTacxTrainingAppWin,

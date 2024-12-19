@@ -6,7 +6,7 @@
 
 package profile
 
-// Version is the current profile version, v21.141, in uint16 representation.
+// Version is the current profile version, v21.158, in uint16 representation.
 //
-//	-> "21" + "141" = "21141" -> 21141.
-const Version uint16 = 21141
+//	-> "21" + "158" = "21158" -> 21158.
+const Version uint16 = 21158

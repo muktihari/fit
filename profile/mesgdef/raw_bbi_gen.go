@@ -24,9 +24,9 @@ type RawBbi struct {
 	Timestamp   time.Time
 	Data        []uint16 // Array: [N]; 1 bit for gap indicator, 1 bit for quality indicator, and 14 bits for Beat-to-Beat interval values in whole-integer millisecond resolution
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
-	Quality     []uint8  // Array: [N]
-	Gap         []uint8  // Array: [N]
-	TimestampMs uint16   // Units: ms; ms since last overnight_raw_bbi message
+	Quality     []uint8  // Array: [N]; 1 = high confidence. 0 = low confidence. N/A when gap = 1
+	Gap         []uint8  // Array: [N]; 1 = gap (time represents ms gap length). 0 = BBI data
+	TimestampMs uint16   // Units: ms; Millisecond resolution of the timestamp
 
 	state [1]uint8 // Used for tracking expanded fields.
 
@@ -157,7 +157,7 @@ func (m *RawBbi) SetTimestamp(v time.Time) *RawBbi {
 
 // SetTimestampMs sets TimestampMs value.
 //
-// Units: ms; ms since last overnight_raw_bbi message
+// Units: ms; Millisecond resolution of the timestamp
 func (m *RawBbi) SetTimestampMs(v uint16) *RawBbi {
 	m.TimestampMs = v
 	return m
@@ -181,7 +181,7 @@ func (m *RawBbi) SetTime(v []uint16) *RawBbi {
 
 // SetQuality sets Quality value.
 //
-// Array: [N]
+// Array: [N]; 1 = high confidence. 0 = low confidence. N/A when gap = 1
 func (m *RawBbi) SetQuality(v []uint8) *RawBbi {
 	m.Quality = v
 	return m
@@ -189,7 +189,7 @@ func (m *RawBbi) SetQuality(v []uint8) *RawBbi {
 
 // SetGap sets Gap value.
 //
-// Array: [N]
+// Array: [N]; 1 = gap (time represents ms gap length). 0 = BBI data
 func (m *RawBbi) SetGap(v []uint8) *RawBbi {
 	m.Gap = v
 	return m

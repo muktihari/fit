@@ -22,7 +22,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaStressData struct {
 	Timestamp          time.Time
-	StressLevel        []int8 // Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+	StressLevel        []int8 // Array: [N]; Units: s; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
 	ProcessingInterval uint16 // Units: s; Processing interval length in seconds
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
@@ -126,7 +126,7 @@ func (m *HsaStressData) SetProcessingInterval(v uint16) *HsaStressData {
 
 // SetStressLevel sets StressLevel value.
 //
-// Array: [N]; Units: s; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+// Array: [N]; Units: s; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
 func (m *HsaStressData) SetStressLevel(v []int8) *HsaStressData {
 	m.StressLevel = v
 	return m

@@ -22,7 +22,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaConfigurationData struct {
 	Timestamp time.Time // Units: s; Encoded configuration data
-	Data      []byte    // Array: [N]
+	Data      []byte    // Array: [N]; Encoded configuration data. Health SDK use only
 	DataSize  uint8     // Size in bytes of data field
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
@@ -120,7 +120,7 @@ func (m *HsaConfigurationData) SetTimestamp(v time.Time) *HsaConfigurationData {
 
 // SetData sets Data value.
 //
-// Array: [N]
+// Array: [N]; Encoded configuration data. Health SDK use only
 func (m *HsaConfigurationData) SetData(v []byte) *HsaConfigurationData {
 	m.Data = v
 	return m

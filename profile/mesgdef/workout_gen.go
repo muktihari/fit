@@ -21,6 +21,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type Workout struct {
 	WktName        string
+	WktDescription string                      // Description of the workout
 	Capabilities   typedef.WorkoutCapabilities // Base: uint32z
 	MessageIndex   typedef.MessageIndex
 	NumValidSteps  uint16 // number of valid steps
@@ -65,6 +66,7 @@ func NewWorkout(mesg *proto.Message) *Workout {
 		SubSport:       typedef.SubSport(vals[11].Uint8()),
 		PoolLength:     vals[14].Uint16(),
 		PoolLengthUnit: typedef.DisplayMeasure(vals[15].Uint8()),
+		WktDescription: vals[17].String(),
 
 		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
@@ -124,6 +126,11 @@ func (m *Workout) ToMesg(options *Options) proto.Message {
 	if m.PoolLengthUnit != typedef.DisplayMeasureInvalid {
 		field := fac.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
+		fields = append(fields, field)
+	}
+	if m.WktDescription != basetype.StringInvalid {
+		field := fac.CreateField(mesg.Num, 17)
+		field.Value = proto.String(m.WktDescription)
 		fields = append(fields, field)
 	}
 
@@ -217,6 +224,14 @@ func (m *Workout) SetPoolLengthScaled(v float64) *Workout {
 // SetPoolLengthUnit sets PoolLengthUnit value.
 func (m *Workout) SetPoolLengthUnit(v typedef.DisplayMeasure) *Workout {
 	m.PoolLengthUnit = v
+	return m
+}
+
+// SetWktDescription sets WktDescription value.
+//
+// Description of the workout
+func (m *Workout) SetWktDescription(v string) *Workout {
+	m.WktDescription = v
 	return m
 }
 

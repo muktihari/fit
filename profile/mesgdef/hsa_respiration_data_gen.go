@@ -23,7 +23,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaRespirationData struct {
 	Timestamp          time.Time // Units: s
-	RespirationRate    []int16   // Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+	RespirationRate    []int16   // Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
@@ -114,7 +114,7 @@ func (m *HsaRespirationData) TimestampUint32() uint32 { return datetime.ToUint32
 // RespirationRateScaled return RespirationRate in its scaled value.
 // If RespirationRate value is invalid, nil will be returned.
 //
-// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
 func (m *HsaRespirationData) RespirationRateScaled() []float64 {
 	if m.RespirationRate == nil {
 		return nil
@@ -148,7 +148,7 @@ func (m *HsaRespirationData) SetProcessingInterval(v uint16) *HsaRespirationData
 
 // SetRespirationRate sets RespirationRate value.
 //
-// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
 func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
 	m.RespirationRate = v
 	return m
@@ -157,7 +157,7 @@ func (m *HsaRespirationData) SetRespirationRate(v []int16) *HsaRespirationData {
 // SetRespirationRateScaled is similar to SetRespirationRate except it accepts a scaled value.
 // This method automatically converts the given value to its []int16 form, discarding any applied scale and offset.
 //
-// Array: [N]; Scale: 100; Units: breaths/min; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+// Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
 func (m *HsaRespirationData) SetRespirationRateScaled(vs []float64) *HsaRespirationData {
 	if vs == nil {
 		m.RespirationRate = nil

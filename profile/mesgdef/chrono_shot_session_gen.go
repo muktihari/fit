@@ -22,13 +22,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ChronoShotSession struct {
-	Timestamp      time.Time
-	MinSpeed       uint32 // Scale: 1000; Units: m/s
-	MaxSpeed       uint32 // Scale: 1000; Units: m/s
-	AvgSpeed       uint32 // Scale: 1000; Units: m/s
-	GrainWeight    uint32 // Scale: 10; Units: gr
-	ShotCount      uint16
-	ProjectileType typedef.ProjectileType
+	Timestamp         time.Time
+	MinSpeed          uint32 // Scale: 1000; Units: m/s
+	MaxSpeed          uint32 // Scale: 1000; Units: m/s
+	AvgSpeed          uint32 // Scale: 1000; Units: m/s
+	GrainWeight       uint32 // Scale: 10; Units: gr
+	StandardDeviation uint32 // Scale: 1000; Units: m/s
+	ShotCount         uint16
+	ProjectileType    typedef.ProjectileType
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
@@ -58,13 +59,14 @@ func NewChronoShotSession(mesg *proto.Message) *ChronoShotSession {
 	}
 
 	return &ChronoShotSession{
-		Timestamp:      datetime.ToTime(vals[253].Uint32()),
-		MinSpeed:       vals[0].Uint32(),
-		MaxSpeed:       vals[1].Uint32(),
-		AvgSpeed:       vals[2].Uint32(),
-		ShotCount:      vals[3].Uint16(),
-		ProjectileType: typedef.ProjectileType(vals[4].Uint8()),
-		GrainWeight:    vals[5].Uint32(),
+		Timestamp:         datetime.ToTime(vals[253].Uint32()),
+		MinSpeed:          vals[0].Uint32(),
+		MaxSpeed:          vals[1].Uint32(),
+		AvgSpeed:          vals[2].Uint32(),
+		ShotCount:         vals[3].Uint16(),
+		ProjectileType:    typedef.ProjectileType(vals[4].Uint8()),
+		GrainWeight:       vals[5].Uint32(),
+		StandardDeviation: vals[6].Uint32(),
 
 		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
@@ -119,6 +121,11 @@ func (m *ChronoShotSession) ToMesg(options *Options) proto.Message {
 	if m.GrainWeight != basetype.Uint32Invalid {
 		field := fac.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(m.GrainWeight)
+		fields = append(fields, field)
+	}
+	if m.StandardDeviation != basetype.Uint32Invalid {
+		field := fac.CreateField(mesg.Num, 6)
+		field.Value = proto.Uint32(m.StandardDeviation)
 		fields = append(fields, field)
 	}
 
@@ -181,6 +188,17 @@ func (m *ChronoShotSession) GrainWeightScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.GrainWeight)/10 - 0
+}
+
+// StandardDeviationScaled return StandardDeviation in its scaled value.
+// If StandardDeviation value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) StandardDeviationScaled() float64 {
+	if m.StandardDeviation == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.StandardDeviation)/1000 - 0
 }
 
 // SetTimestamp sets Timestamp value.
@@ -286,6 +304,28 @@ func (m *ChronoShotSession) SetGrainWeightScaled(v float64) *ChronoShotSession {
 		return m
 	}
 	m.GrainWeight = uint32(unscaled)
+	return m
+}
+
+// SetStandardDeviation sets StandardDeviation value.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) SetStandardDeviation(v uint32) *ChronoShotSession {
+	m.StandardDeviation = v
+	return m
+}
+
+// SetStandardDeviationScaled is similar to SetStandardDeviation except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *ChronoShotSession) SetStandardDeviationScaled(v float64) *ChronoShotSession {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.StandardDeviation = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.StandardDeviation = uint32(unscaled)
 	return m
 }
 

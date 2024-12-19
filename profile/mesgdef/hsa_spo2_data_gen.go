@@ -22,8 +22,8 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaSpo2Data struct {
 	Timestamp          time.Time // Units: s
-	ReadingSpo2        []uint8   // Array: [N]; Units: percent; SpO2 Reading
-	Confidence         []uint8   // Array: [N]; SpO2 Confidence
+	ReadingSpo2        []uint8   // Array: [N]; Units: percent; SpO2 Reading: [70,100] Blank: 240
+	Confidence         []uint8   // Array: [N]; SpO2 Confidence: [0,254]
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
@@ -135,7 +135,7 @@ func (m *HsaSpo2Data) SetProcessingInterval(v uint16) *HsaSpo2Data {
 
 // SetReadingSpo2 sets ReadingSpo2 value.
 //
-// Array: [N]; Units: percent; SpO2 Reading
+// Array: [N]; Units: percent; SpO2 Reading: [70,100] Blank: 240
 func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
 	m.ReadingSpo2 = v
 	return m
@@ -143,7 +143,7 @@ func (m *HsaSpo2Data) SetReadingSpo2(v []uint8) *HsaSpo2Data {
 
 // SetConfidence sets Confidence value.
 //
-// Array: [N]; SpO2 Confidence
+// Array: [N]; SpO2 Confidence: [0,254]
 func (m *HsaSpo2Data) SetConfidence(v []uint8) *HsaSpo2Data {
 	m.Confidence = v
 	return m

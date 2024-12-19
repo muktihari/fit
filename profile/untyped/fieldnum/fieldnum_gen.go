@@ -140,6 +140,7 @@ const (
 	ChronoShotSessionMinSpeed                         = 0   // [ ChronoShotSession ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: m/s];
 	ChronoShotSessionProjectileType                   = 4   // [ ChronoShotSession ] [Type: ProjectileType, Base: enum];
 	ChronoShotSessionShotCount                        = 3   // [ ChronoShotSession ] [Type: Uint16, Base: uint16];
+	ChronoShotSessionStandardDeviation                = 6   // [ ChronoShotSession ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: m/s];
 	ChronoShotSessionTimestamp                        = 253 // [ ChronoShotSession ] [Type: DateTime, Base: uint32];
 	ClimbProClimbCategory                             = 4   // [ ClimbPro ] [Type: Uint8, Base: uint8];
 	ClimbProClimbNumber                               = 3   // [ ClimbPro ] [Type: Uint16, Base: uint16];
@@ -457,14 +458,14 @@ const (
 	HsaAccelerometerDataTimestamp32K                  = 5   // [ HsaAccelerometerData ] [Type: Uint32, Base: uint32]; 32 kHz timestamp
 	HsaAccelerometerDataTimestampMs                   = 0   // [ HsaAccelerometerData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond resolution of the timestamp
 	HsaBodyBatteryDataCharged                         = 2   // [ HsaBodyBatteryData ] [Type: Sint16, Base: sint16, Array: [N]]; Body battery charged value
-	HsaBodyBatteryDataLevel                           = 1   // [ HsaBodyBatteryData ] [Type: Sint8, Base: sint8, Array: [N], Units: percent]; Body battery level
+	HsaBodyBatteryDataLevel                           = 1   // [ HsaBodyBatteryData ] [Type: Sint8, Base: sint8, Array: [N], Units: percent]; Body battery level: [0,100] Blank: -16
 	HsaBodyBatteryDataProcessingInterval              = 0   // [ HsaBodyBatteryData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
 	HsaBodyBatteryDataTimestamp                       = 253 // [ HsaBodyBatteryData ] [Type: DateTime, Base: uint32, Units: s];
 	HsaBodyBatteryDataUncharged                       = 3   // [ HsaBodyBatteryData ] [Type: Sint16, Base: sint16, Array: [N]]; Body battery uncharged value
-	HsaConfigurationDataData                          = 0   // [ HsaConfigurationData ] [Type: Byte, Base: byte, Array: [N]];
+	HsaConfigurationDataData                          = 0   // [ HsaConfigurationData ] [Type: Byte, Base: byte, Array: [N]]; Encoded configuration data. Health SDK use only
 	HsaConfigurationDataDataSize                      = 1   // [ HsaConfigurationData ] [Type: Uint8, Base: uint8]; Size in bytes of data field
 	HsaConfigurationDataTimestamp                     = 253 // [ HsaConfigurationData ] [Type: DateTime, Base: uint32, Units: s]; Encoded configuration data
-	HsaEventEventId                                   = 0   // [ HsaEvent ] [Type: Uint8, Base: uint8]; Event ID
+	HsaEventEventId                                   = 0   // [ HsaEvent ] [Type: Uint8, Base: uint8]; Event ID. Health SDK use only
 	HsaEventTimestamp                                 = 253 // [ HsaEvent ] [Type: DateTime, Base: uint32, Units: s];
 	HsaGyroscopeDataGyroX                             = 2   // [ HsaGyroscopeData ] [Type: Sint16, Base: sint16, Array: [N], Scale: 28.57143, Offset: 0, Units: deg/s]; X-Axis Measurement
 	HsaGyroscopeDataGyroY                             = 3   // [ HsaGyroscopeData ] [Type: Sint16, Base: sint16, Array: [N], Scale: 28.57143, Offset: 0, Units: deg/s]; Y-Axis Measurement
@@ -473,22 +474,22 @@ const (
 	HsaGyroscopeDataTimestamp                         = 253 // [ HsaGyroscopeData ] [Type: DateTime, Base: uint32, Units: s];
 	HsaGyroscopeDataTimestamp32K                      = 5   // [ HsaGyroscopeData ] [Type: Uint32, Base: uint32, Units: 1/32768 s]; 32 kHz timestamp
 	HsaGyroscopeDataTimestampMs                       = 0   // [ HsaGyroscopeData ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond resolution of the timestamp
-	HsaHeartRateDataHeartRate                         = 2   // [ HsaHeartRateData ] [Type: Uint8, Base: uint8, Array: [N], Units: bpm]; Beats / min
+	HsaHeartRateDataHeartRate                         = 2   // [ HsaHeartRateData ] [Type: Uint8, Base: uint8, Array: [N], Units: bpm]; Beats / min. Blank: 0
 	HsaHeartRateDataProcessingInterval                = 0   // [ HsaHeartRateData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
 	HsaHeartRateDataStatus                            = 1   // [ HsaHeartRateData ] [Type: Uint8, Base: uint8]; Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
 	HsaHeartRateDataTimestamp                         = 253 // [ HsaHeartRateData ] [Type: DateTime, Base: uint32, Units: s];
 	HsaRespirationDataProcessingInterval              = 0   // [ HsaRespirationData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
-	HsaRespirationDataRespirationRate                 = 1   // [ HsaRespirationData ] [Type: Sint16, Base: sint16, Array: [N], Scale: 100, Offset: 0, Units: breaths/min]; Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+	HsaRespirationDataRespirationRate                 = 1   // [ HsaRespirationData ] [Type: Sint16, Base: sint16, Array: [N], Scale: 100, Offset: 0, Units: breaths/min]; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
 	HsaRespirationDataTimestamp                       = 253 // [ HsaRespirationData ] [Type: DateTime, Base: uint32, Units: s];
-	HsaSpo2DataConfidence                             = 2   // [ HsaSpo2Data ] [Type: Uint8, Base: uint8, Array: [N]]; SpO2 Confidence
+	HsaSpo2DataConfidence                             = 2   // [ HsaSpo2Data ] [Type: Uint8, Base: uint8, Array: [N]]; SpO2 Confidence: [0,254]
 	HsaSpo2DataProcessingInterval                     = 0   // [ HsaSpo2Data ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
-	HsaSpo2DataReadingSpo2                            = 1   // [ HsaSpo2Data ] [Type: Uint8, Base: uint8, Array: [N], Units: percent]; SpO2 Reading
+	HsaSpo2DataReadingSpo2                            = 1   // [ HsaSpo2Data ] [Type: Uint8, Base: uint8, Array: [N], Units: percent]; SpO2 Reading: [70,100] Blank: 240
 	HsaSpo2DataTimestamp                              = 253 // [ HsaSpo2Data ] [Type: DateTime, Base: uint32, Units: s];
-	HsaStepDataProcessingInterval                     = 0   // [ HsaStepData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
+	HsaStepDataProcessingInterval                     = 0   // [ HsaStepData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds. File start: 0xFFFFFFEF File stop: 0xFFFFFFEE
 	HsaStepDataSteps                                  = 1   // [ HsaStepData ] [Type: Uint32, Base: uint32, Array: [N], Units: steps]; Total step sum
 	HsaStepDataTimestamp                              = 253 // [ HsaStepData ] [Type: DateTime, Base: uint32, Units: s];
 	HsaStressDataProcessingInterval                   = 0   // [ HsaStressData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
-	HsaStressDataStressLevel                          = 1   // [ HsaStressData ] [Type: Sint8, Base: sint8, Array: [N], Units: s]; Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+	HsaStressDataStressLevel                          = 1   // [ HsaStressData ] [Type: Sint8, Base: sint8, Array: [N], Units: s]; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
 	HsaStressDataTimestamp                            = 253 // [ HsaStressData ] [Type: DateTime, Base: uint32];
 	HsaWristTemperatureDataProcessingInterval         = 0   // [ HsaWristTemperatureData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
 	HsaWristTemperatureDataTimestamp                  = 253 // [ HsaWristTemperatureData ] [Type: DateTime, Base: uint32, Units: s];
@@ -742,11 +743,11 @@ const (
 	PowerZoneMessageIndex                             = 254 // [ PowerZone ] [Type: MessageIndex, Base: uint16];
 	PowerZoneName                                     = 2   // [ PowerZone ] [Type: String, Base: string];
 	RawBbiData                                        = 1   // [ RawBbi ] [Type: Uint16, Base: uint16, Array: [N]]; 1 bit for gap indicator, 1 bit for quality indicator, and 14 bits for Beat-to-Beat interval values in whole-integer millisecond resolution
-	RawBbiGap                                         = 4   // [ RawBbi ] [Type: Uint8, Base: uint8, Array: [N]];
-	RawBbiQuality                                     = 3   // [ RawBbi ] [Type: Uint8, Base: uint8, Array: [N]];
+	RawBbiGap                                         = 4   // [ RawBbi ] [Type: Uint8, Base: uint8, Array: [N]]; 1 = gap (time represents ms gap length). 0 = BBI data
+	RawBbiQuality                                     = 3   // [ RawBbi ] [Type: Uint8, Base: uint8, Array: [N]]; 1 = high confidence. 0 = low confidence. N/A when gap = 1
 	RawBbiTime                                        = 2   // [ RawBbi ] [Type: Uint16, Base: uint16, Array: [N], Units: ms]; Array of millisecond times between beats
 	RawBbiTimestamp                                   = 253 // [ RawBbi ] [Type: DateTime, Base: uint32];
-	RawBbiTimestampMs                                 = 0   // [ RawBbi ] [Type: Uint16, Base: uint16, Units: ms]; ms since last overnight_raw_bbi message
+	RawBbiTimestampMs                                 = 0   // [ RawBbi ] [Type: Uint16, Base: uint16, Units: ms]; Millisecond resolution of the timestamp
 	RecordAbsolutePressure                            = 91  // [ Record ] [Type: Uint32, Base: uint32, Units: Pa]; Includes atmospheric pressure
 	RecordAccumulatedPower                            = 29  // [ Record ] [Type: Uint32, Base: uint32, Units: watts];
 	RecordActivityType                                = 42  // [ Record ] [Type: ActivityType, Base: enum];
@@ -1388,6 +1389,7 @@ const (
 	WorkoutStepWeightDisplayUnit                      = 13  // [ WorkoutStep ] [Type: FitBaseUnit, Base: uint16];
 	WorkoutStepWktStepName                            = 0   // [ WorkoutStep ] [Type: String, Base: string];
 	WorkoutSubSport                                   = 11  // [ Workout ] [Type: SubSport, Base: enum];
+	WorkoutWktDescription                             = 17  // [ Workout ] [Type: String, Base: string]; Description of the workout
 	WorkoutWktName                                    = 8   // [ Workout ] [Type: String, Base: string];
 	ZonesTargetFunctionalThresholdPower               = 3   // [ ZonesTarget ] [Type: Uint16, Base: uint16];
 	ZonesTargetHrCalcType                             = 5   // [ ZonesTarget ] [Type: HrZoneCalc, Base: enum];
