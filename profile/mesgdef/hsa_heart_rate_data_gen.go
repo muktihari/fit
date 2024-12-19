@@ -22,7 +22,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaHeartRateData struct {
 	Timestamp          time.Time // Units: s
-	HeartRate          []uint8   // Array: [N]; Units: bpm; Beats / min
+	HeartRate          []uint8   // Array: [N]; Units: bpm; Beats / min. Blank: 0
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 	Status             uint8     // Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
 
@@ -143,7 +143,7 @@ func (m *HsaHeartRateData) SetStatus(v uint8) *HsaHeartRateData {
 
 // SetHeartRate sets HeartRate value.
 //
-// Array: [N]; Units: bpm; Beats / min
+// Array: [N]; Units: bpm; Beats / min. Blank: 0
 func (m *HsaHeartRateData) SetHeartRate(v []uint8) *HsaHeartRateData {
 	m.HeartRate = v
 	return m

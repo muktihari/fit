@@ -161,6 +161,8 @@ const (
 	ManufacturerEzon                   Manufacturer = 148
 	ManufacturerLaisi                  Manufacturer = 149
 	ManufacturerMyzone                 Manufacturer = 150
+	ManufacturerAbawo                  Manufacturer = 151
+	ManufacturerBafang                 Manufacturer = 152
 	ManufacturerDevelopment            Manufacturer = 255
 	ManufacturerHealthandlife          Manufacturer = 257
 	ManufacturerLezyne                 Manufacturer = 258
@@ -235,6 +237,9 @@ const (
 	ManufacturerMagicshine             Manufacturer = 327
 	ManufacturerIctrainer              Manufacturer = 328
 	ManufacturerAbsoluteCycling        Manufacturer = 329
+	ManufacturerEoSwimbetter           Manufacturer = 330
+	ManufacturerMywhoosh               Manufacturer = 331
+	ManufacturerRavemen                Manufacturer = 332
 	ManufacturerActigraphcorp          Manufacturer = 5759
 	ManufacturerInvalid                Manufacturer = 0xFFFF
 )
@@ -539,6 +544,10 @@ func (m Manufacturer) String() string {
 		return "laisi"
 	case ManufacturerMyzone:
 		return "myzone"
+	case ManufacturerAbawo:
+		return "abawo"
+	case ManufacturerBafang:
+		return "bafang"
 	case ManufacturerDevelopment:
 		return "development"
 	case ManufacturerHealthandlife:
@@ -687,6 +696,12 @@ func (m Manufacturer) String() string {
 		return "ictrainer"
 	case ManufacturerAbsoluteCycling:
 		return "absolute_cycling"
+	case ManufacturerEoSwimbetter:
+		return "eo_swimbetter"
+	case ManufacturerMywhoosh:
+		return "mywhoosh"
+	case ManufacturerRavemen:
+		return "ravemen"
 	case ManufacturerActigraphcorp:
 		return "actigraphcorp"
 	default:
@@ -993,6 +1008,10 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerLaisi
 	case "myzone":
 		return ManufacturerMyzone
+	case "abawo":
+		return ManufacturerAbawo
+	case "bafang":
+		return ManufacturerBafang
 	case "development":
 		return ManufacturerDevelopment
 	case "healthandlife":
@@ -1141,6 +1160,12 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerIctrainer
 	case "absolute_cycling":
 		return ManufacturerAbsoluteCycling
+	case "eo_swimbetter":
+		return ManufacturerEoSwimbetter
+	case "mywhoosh":
+		return ManufacturerMywhoosh
+	case "ravemen":
+		return ManufacturerRavemen
 	case "actigraphcorp":
 		return ManufacturerActigraphcorp
 	default:
@@ -1299,6 +1324,8 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerEzon,
 		ManufacturerLaisi,
 		ManufacturerMyzone,
+		ManufacturerAbawo,
+		ManufacturerBafang,
 		ManufacturerDevelopment,
 		ManufacturerHealthandlife,
 		ManufacturerLezyne,
@@ -1373,6 +1400,9 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerMagicshine,
 		ManufacturerIctrainer,
 		ManufacturerAbsoluteCycling,
+		ManufacturerEoSwimbetter,
+		ManufacturerMywhoosh,
+		ManufacturerRavemen,
 		ManufacturerActigraphcorp,
 	}
 }

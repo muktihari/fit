@@ -20,6 +20,7 @@ const (
 	AutolapTriggerPositionWaypoint AutolapTrigger = 4
 	AutolapTriggerPositionMarked   AutolapTrigger = 5
 	AutolapTriggerOff              AutolapTrigger = 6
+	AutolapTriggerAutoSelect       AutolapTrigger = 13
 	AutolapTriggerInvalid          AutolapTrigger = 0xFF
 )
 
@@ -41,6 +42,8 @@ func (a AutolapTrigger) String() string {
 		return "position_marked"
 	case AutolapTriggerOff:
 		return "off"
+	case AutolapTriggerAutoSelect:
+		return "auto_select"
 	default:
 		return "AutolapTriggerInvalid(" + strconv.Itoa(int(a)) + ")"
 	}
@@ -63,6 +66,8 @@ func AutolapTriggerFromString(s string) AutolapTrigger {
 		return AutolapTriggerPositionMarked
 	case "off":
 		return AutolapTriggerOff
+	case "auto_select":
+		return AutolapTriggerAutoSelect
 	default:
 		return AutolapTriggerInvalid
 	}
@@ -78,5 +83,6 @@ func ListAutolapTrigger() []AutolapTrigger {
 		AutolapTriggerPositionWaypoint,
 		AutolapTriggerPositionMarked,
 		AutolapTriggerOff,
+		AutolapTriggerAutoSelect,
 	}
 }

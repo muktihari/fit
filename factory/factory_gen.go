@@ -1765,6 +1765,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		11:  {Name: "sub_sport", Num: 11, Type: profile.SubSport, BaseType: basetype.Enum, Scale: 1},
 		14:  {Name: "pool_length", Num: 14, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 100, Units: "m"},
 		15:  {Name: "pool_length_unit", Num: 15, Type: profile.DisplayMeasure, BaseType: basetype.Enum, Scale: 1},
+		17:  {Name: "wkt_description", Num: 17, Type: profile.String, BaseType: basetype.String, Scale: 1},
 	},
 	mesgnum.WorkoutSession: {
 		254: {Name: "message_index", Num: 254, Type: profile.MessageIndex, BaseType: basetype.Uint16, Scale: 1},
@@ -2430,6 +2431,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		3:   {Name: "shot_count", Num: 3, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1},
 		4:   {Name: "projectile_type", Num: 4, Type: profile.ProjectileType, BaseType: basetype.Enum, Scale: 1},
 		5:   {Name: "grain_weight", Num: 5, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 10, Units: "gr"},
+		6:   {Name: "standard_deviation", Num: 6, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "m/s"},
 	},
 	mesgnum.ChronoShotData: {
 		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},

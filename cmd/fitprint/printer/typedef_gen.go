@@ -17,7 +17,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21141] }
+func _() { _ = [1]struct{}{}[profile.Version-21158] }
 
 func TypedefString(pt profile.ProfileType, v proto.Value) string {
 	switch pt {

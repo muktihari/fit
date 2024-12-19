@@ -22,7 +22,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaBodyBatteryData struct {
 	Timestamp          time.Time // Units: s
-	Level              []int8    // Array: [N]; Units: percent; Body battery level
+	Level              []int8    // Array: [N]; Units: percent; Body battery level: [0,100] Blank: -16
 	Charged            []int16   // Array: [N]; Body battery charged value
 	Uncharged          []int16   // Array: [N]; Body battery uncharged value
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
@@ -142,7 +142,7 @@ func (m *HsaBodyBatteryData) SetProcessingInterval(v uint16) *HsaBodyBatteryData
 
 // SetLevel sets Level value.
 //
-// Array: [N]; Units: percent; Body battery level
+// Array: [N]; Units: percent; Body battery level: [0,100] Blank: -16
 func (m *HsaBodyBatteryData) SetLevel(v []int8) *HsaBodyBatteryData {
 	m.Level = v
 	return m

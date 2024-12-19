@@ -22,7 +22,7 @@ import (
 // Do not rely on field indices, such as when using reflection.
 type HsaEvent struct {
 	Timestamp time.Time // Units: s
-	EventId   uint8     // Event ID
+	EventId   uint8     // Event ID. Health SDK use only
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
@@ -113,7 +113,7 @@ func (m *HsaEvent) SetTimestamp(v time.Time) *HsaEvent {
 
 // SetEventId sets EventId value.
 //
-// Event ID
+// Event ID. Health SDK use only
 func (m *HsaEvent) SetEventId(v uint8) *HsaEvent {
 	m.EventId = v
 	return m

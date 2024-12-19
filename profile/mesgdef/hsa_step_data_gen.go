@@ -23,7 +23,7 @@ import (
 type HsaStepData struct {
 	Timestamp          time.Time // Units: s
 	Steps              []uint32  // Array: [N]; Units: steps; Total step sum
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds. File start: 0xFFFFFFEF File stop: 0xFFFFFFEE
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
@@ -120,7 +120,7 @@ func (m *HsaStepData) SetTimestamp(v time.Time) *HsaStepData {
 
 // SetProcessingInterval sets ProcessingInterval value.
 //
-// Units: s; Processing interval length in seconds
+// Units: s; Processing interval length in seconds. File start: 0xFFFFFFEF File stop: 0xFFFFFFEE
 func (m *HsaStepData) SetProcessingInterval(v uint16) *HsaStepData {
 	m.ProcessingInterval = v
 	return m
