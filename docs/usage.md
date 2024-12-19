@@ -4,6 +4,8 @@ Table of Contents:
 
 1. [Decoding](#Decoding)
    - [Decode Protocol Messages](#Decode-Protocol-Messages)
+   - [Decode with Message Listener](#Decode-with-Message-Listener)
+     - [Creating your own Message Listener](#Creating-your-own-Message-Listener)
    - [Decode into Common File Types](#Decode-into-Common-File-Types)
      - [Using your own custom File Types](#Using-your-own-custom-File-Types)
    - [Decode Chained FIT Files](#Decode-Chained-FIT-Files)
@@ -65,6 +67,121 @@ func main() {
     // FileHeader DataSize: 94080
     // Messages count: 3611
     // File Type: 4
+}
+```
+
+### Decode with Message Listener
+
+The decoder has the ability to broadcast messages to all registered message listeners, enable us to consume the message as soon as it is decoded. We can register one or more listeners, whether it's a [filedef.Listener](https://github.com/muktihari/fit/blob/master/profile/filedef/listener.go) or your own custom listener (as long as it satisfies the [decoder.MesgListener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface) using **WithMesgListener** option.
+
+Please note that by default, the message passed to **OnMesg** function is short-lived object, you need to copy the **mesg.Fields** and **mesg.DeveloperFields** if you want to retain them, or direct the decoder to copy them for us using **WithBroadcastMesgCopy**.
+
+#### Creating your own Message Listener
+
+Here is the simple example of creating message listener. A RecordCounter to count how many Record in a FIT file:
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
+)
+
+type RecordCounter struct{ Count int }
+
+var _ decoder.MesgListener = (*RecordCounter)(nil)
+
+func (c *RecordCounter) OnMesg(mesg proto.Message) {
+    if mesg.Num == mesgnum.Record {
+        c.Count++
+    }
+}
+
+func main() {
+    f, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    rc := new(RecordCounter)
+
+    dec := decoder.New(f,
+        // Add activity listener to the decoder:
+        decoder.WithMesgListener(rc),
+        // Direct the decoder to only broadcast
+        // the messages without retaining them:
+        decoder.WithBroadcastOnly(),
+    )
+
+    _, err = dec.Decode()
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("We have %d records\n", rc.Count)
+}
+
+```
+
+Another example is when we just want to retrieve the Record Messages from a FIT file:
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "slices"
+
+    "github.com/muktihari/fit/decoder"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
+)
+
+type RecordRetriever struct{ Records []proto.Message }
+
+var _ decoder.MesgListener = (*RecordRetriever)(nil)
+
+func (c *RecordRetriever) OnMesg(mesg proto.Message) {
+    if mesg.Num == mesgnum.Record {
+        // Unless WithBroadcastMesgCopy is used, we must copy
+        // the slices since mesg is a short-lived object.
+        mesg.Fields = slices.Clone(mesg.Fields)
+        mesg.DeveloperFields = slices.Clone(mesg.DeveloperFields)
+
+        c.Records = append(c.Records, mesg)
+    }
+}
+
+func main() {
+    f, err := os.Open("Activity.fit")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    rr := new(RecordRetriever)
+
+    dec := decoder.New(f,
+        // Add activity listener to the decoder:
+        decoder.WithMesgListener(rr),
+        // Direct the decoder to only broadcast
+        // the messages without retaining them:
+        decoder.WithBroadcastOnly(),
+    )
+
+    _, err = dec.Decode()
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("Records: %d\n", len(rr.Records))
 }
 ```
 
@@ -151,14 +268,17 @@ func main() {
     }
     defer f.Close()
 
-    // The listener will receive every decoded message from the decoder as soon as it is decoded
-    // and transform it into an filedef.File.
+    // The listener will receive every message from the decoder
+    // as soon as it is decoded and transform it into an filedef.File.
     lis := filedef.NewListener()
     defer lis.Close() // release channel used by listener
 
     dec := decoder.New(f,
-        decoder.WithMesgListener(lis), // Add activity listener to the decoder
-        decoder.WithBroadcastOnly(),   // Direct the decoder to only broadcast the messages without retaining them.
+        // Add activity listener to the decoder:
+        decoder.WithMesgListener(lis),
+        // Direct the decoder to only broadcast
+        // the messages without retaining them:
+        decoder.WithBroadcastOnly(),
     )
 
     _, err = dec.Decode()
@@ -204,9 +324,7 @@ func main() {
 
 #### Using your own custom File Types
 
-The ability to broadcast every message as soon as it is decoded is one of biggest advantage of using this SDK, we can define custom listener to process the message as we like and in a streaming fashion, as long as it satisfies the [decoder.Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface.
-
-Not only does [filedef.Listener](https://github.com/muktihari/fit/blob/master/profile/filedef/listener.go#L16C1-L23C2) implements [decoder.Listener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface, but it also allows you to create your own custom File as long as it satisfies [filedef.File](https://github.com/muktihari/fit/blob/master/profile/filedef/filedef.go#L17C1-L22C2) interface. For example, if you only want to retrieve some messages, you can build your own custom Activity File like this instead of using our default predefined [Activity File](https://github.com/muktihari/fit/blob/master/profile/filedef/activity.go#L19C1-L46C2):
+Not only does [filedef.Listener](https://github.com/muktihari/fit/blob/master/profile/filedef/listener.go#L16C1-L23C2) implements [decoder.MesgListener](https://github.com/muktihari/fit/blob/master/decoder/listener.go) interface, but it also allows you to create your own custom File as long as it satisfies [filedef.File](https://github.com/muktihari/fit/blob/master/profile/filedef/filedef.go#L17C1-L22C2) interface. For example, if you only want to retrieve some messages, you can build your own custom Activity File like this instead of using our default predefined [Activity File](https://github.com/muktihari/fit/blob/master/profile/filedef/activity.go#L19C1-L46C2):
 
 ```go
 package main
@@ -345,6 +463,8 @@ You can also use [PeekFileHeader()](#-Peek-FileHeader), [PeekFileId()](#Peek-Fil
 ### Peek FileHeader
 
 We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
+
+NOTE: The FileHeader retrieved from this method is only valid before Decode method is completed, you will need to copy it if you want to use it later by dereferencing the pointer before calling Decode method.
 
 ```go
 package main
