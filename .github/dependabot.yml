@@ -10,8 +10,16 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    groups:
+      gomod-bulk:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      github-actions-bulk:
+        patterns:
+          - "*"
