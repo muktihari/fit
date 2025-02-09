@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 	"unsafe"
@@ -301,6 +302,49 @@ func TestString(t *testing.T) {
 			t.Fatalf("expected: %v, got: %v", basetype.StringInvalid, v.String())
 		}
 	})
+}
+
+func TestValueFormat(t *testing.T) {
+	tt := []struct {
+		value    Value
+		format   string
+		expected string
+	}{
+		{value: Value{}, format: "%v", expected: "<invalid proto.Value>"},
+		{value: String("FIT"), format: "%d", expected: "%!d(string=FIT)"},
+		{value: String("FIT"), format: "%s", expected: "FIT"},
+		{value: String("FIT"), format: "%5s", expected: "  FIT"},
+		{value: String("FIT"), format: "%-5s", expected: "FIT  "},
+		{value: String("FIT"), format: "%v", expected: "FIT"},
+		{value: String("FIT"), format: "%5v", expected: "FIT"},
+		{value: Uint64(11), format: "%d", expected: "11"},
+		{value: Uint64(11), format: "%f", expected: "%!f(uint64=11)"},
+		{value: Uint64(1), format: "%v", expected: "1"},
+		{value: Uint64(1), format: "%+v", expected: "1"},
+		{value: Uint64(1), format: "%#v", expected: "0x1"},
+		{value: Int64(1), format: "%v", expected: "1"},
+		{value: Int64(1), format: "%+v", expected: "1"},
+		{value: Int64(1), format: "%#v", expected: "1"},
+		{value: Float32(10.500001), format: "%.2f", expected: "10.50"},
+		{value: SliceUint64([]uint64{1, 2}), format: "%v", expected: "[1 2]"},
+		{value: SliceUint64([]uint64{1, 2}), format: "%+v", expected: "[1 2]"},
+		{value: SliceUint64([]uint64{1, 2}), format: "%#v", expected: "[]uint64{0x1, 0x2}"},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), format: "%v", expected: "[true false]"},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), format: "%+v", expected: "[true false]"},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue, typedef.BoolFalse}), format: "%#v", expected: "[]typedef.Bool{0x1, 0x0}"},
+		{value: SliceBool(nil), format: "%v", expected: "[]"},
+		{value: SliceBool(nil), format: "%#v", expected: "[]typedef.Bool(nil)"},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s(%v)", i, tc.format, tc.value.Any()), func(t *testing.T) {
+			var buf strings.Builder
+			fmt.Fprintf(&buf, tc.format, tc.value)
+			if str := buf.String(); str != tc.expected {
+				t.Fatalf("expected: %q, got: %q", tc.expected, str)
+			}
+		})
+	}
 }
 
 func TestSliceBool(t *testing.T) {
