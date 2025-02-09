@@ -6,6 +6,7 @@ package proto_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -190,6 +191,51 @@ func TestMessageRemoveFieldByNum(t *testing.T) {
 			}
 			if len(tc.mesg.Fields) != tc.size {
 				t.Fatalf("expected len after removal: %d, got: %d", tc.size, len(tc.mesg.Fields))
+			}
+		})
+	}
+}
+
+func TestFieldFormat(t *testing.T) {
+	field := factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(7))
+
+	tt := []struct {
+		format   string
+		expected string
+	}{
+		{
+			format: "%f",
+			expected: fmt.Sprintf("%%!f(proto.Field={(%p)(%v) %v %t})",
+				field.FieldBase, field.FieldBase, field.Value, field.IsExpandedField),
+		},
+		{
+			format: "%s",
+			expected: fmt.Sprintf("%%!s(proto.Field={(%p)(%v) %v %t})",
+				field.FieldBase, field.FieldBase, field.Value, field.IsExpandedField),
+		},
+		{
+			format: "%v",
+			expected: fmt.Sprintf("{(%p)(%v) %v %t}",
+				field.FieldBase, field.FieldBase, field.Value, field.IsExpandedField),
+		},
+		{
+			format: "%+v",
+			expected: fmt.Sprintf("{FieldBase:(%p)(%+v) Value:%+v IsExpandedField:%t}",
+				field.FieldBase, field.FieldBase, field.Value, field.IsExpandedField),
+		},
+		{
+			format: "%#v",
+			expected: fmt.Sprintf("{FieldBase:(%p)(%#v), Value:%#v, IsExpandedField:%t}",
+				field.FieldBase, field.FieldBase, field.Value, field.IsExpandedField),
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.format), func(t *testing.T) {
+			var buf strings.Builder
+			fmt.Fprintf(&buf, tc.format, field)
+			if str := buf.String(); str != tc.expected {
+				t.Fatalf("expected:\n%q,\ngot:\n%q", tc.expected, str)
 			}
 		})
 	}
