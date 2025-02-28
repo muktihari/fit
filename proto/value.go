@@ -83,38 +83,66 @@ func (t Type) String() string {
 
 // Value is a zero alloc implementation value that hold any FIT protocol value
 // (value of primitive-types or slice of primitive-types).
-//
-// To compare two Values of not known type, compare the results of the Any method.
-// Using == on two Values is disallowed.
 type Value struct {
-	_   [0]func()      // disallow ==
-	num uint64         // num holds either a numeric value or a slice's len.
-	ptr unsafe.Pointer // ptr holds a pointer to slice's data only if it's a slice value.
-	typ Type           // typ holds a Type.
+	num uint64         // num holds either a numeric value or a slice's len + type identifier (5 msb).
+	ptr unsafe.Pointer // ptr holds either a pointer to type identifier or a pointer to slice's data.
 }
 
-// Return the underlying type the Value holds.
-func (v Value) Type() Type { return v.typ }
+// Type identifier only for numeric values.
+// For slices, we use 5 most significant bits (msb) of Value's num for type identifier.
+//
+// The use of pointer arithmetic in "(Value) Type" method depends on:
+//   - The pointer addresses MUST be incremented by 1 byte.
+//   - The order MUST identical with constants Types order.
+var (
+	memptr     [12]byte // we only need the addresses
+	startAddr  = uintptr(unsafe.Pointer(&memptr[TypeInvalid]))
+	ptrBool    = unsafe.Pointer(&memptr[TypeBool])
+	ptrInt8    = unsafe.Pointer(&memptr[TypeInt8])
+	ptrUint8   = unsafe.Pointer(&memptr[TypeUint8])
+	ptrInt16   = unsafe.Pointer(&memptr[TypeInt16])
+	ptrUint16  = unsafe.Pointer(&memptr[TypeUint16])
+	ptrInt32   = unsafe.Pointer(&memptr[TypeInt32])
+	ptrUint32  = unsafe.Pointer(&memptr[TypeUint32])
+	ptrInt64   = unsafe.Pointer(&memptr[TypeInt64])
+	ptrUint64  = unsafe.Pointer(&memptr[TypeUint64])
+	ptrFloat32 = unsafe.Pointer(&memptr[TypeFloat32])
+	ptrFloat64 = unsafe.Pointer(&memptr[TypeFloat64])
+)
 
-// Int8 returns Value as int8, if it's not a valid int8 value, it returns basetype.Sint8Invalid (0x7F).
-func (v Value) Int8() int8 {
-	if v.typ != TypeInt8 {
-		return basetype.Sint8Invalid
+const (
+	vbits  = 5                       // reserved bits for slice's type identifier (max value: 31, large enough to hold a Type)
+	vshift = 64 - vbits              // type identifier bits shifter only for slices.
+	vmask  = math.MaxUint64 >> vbits // mask for retrieving slice's len from Value's num, no slice's len exceed this value.
+)
+
+// Return the underlying type the Value holds.
+func (v Value) Type() Type {
+	if p := uintptr(v.ptr); p >= startAddr && p <= uintptr(ptrFloat64) {
+		return Type(p - startAddr)
 	}
-	return int8(v.num)
+	return Type(v.num >> vshift)
 }
 
 // Bool returns Value as typedef.Bool, if it's not a valid typedef.Bool value, it returns typedef.BoolInvalid.
 func (v Value) Bool() typedef.Bool {
-	if v.typ != TypeBool {
+	if v.ptr != ptrBool {
 		return typedef.BoolInvalid
 	}
 	return typedef.Bool(v.num)
 }
 
+// Int8 returns Value as int8, if it's not a valid int8 value, it returns basetype.Sint8Invalid (0x7F).
+func (v Value) Int8() int8 {
+	if v.ptr != ptrInt8 {
+		return basetype.Sint8Invalid
+	}
+	return int8(v.num)
+}
+
 // Uint8 returns Value as uint8, if it's not a valid uint8 value, it returns basetype.Uint8Invalid (0xFF).
 func (v Value) Uint8() uint8 {
-	if v.typ != TypeUint8 {
+	if v.ptr != ptrUint8 {
 		return basetype.Uint8Invalid
 	}
 	return uint8(v.num)
@@ -122,7 +150,7 @@ func (v Value) Uint8() uint8 {
 
 // Uint8z returns Value as uint8, if it's not a valid uint8 value, it returns basetype.Uint8zInvalid (0).
 func (v Value) Uint8z() uint8 {
-	if v.typ != TypeUint8 {
+	if v.ptr != ptrUint8 {
 		return basetype.Uint8zInvalid
 	}
 	return uint8(v.num)
@@ -130,7 +158,7 @@ func (v Value) Uint8z() uint8 {
 
 // Int16 returns Value as int16, if it's not a valid int16 value, it returns basetype.Sint16Invalid (0x7FFF).
 func (v Value) Int16() int16 {
-	if v.typ != TypeInt16 {
+	if v.ptr != ptrInt16 {
 		return basetype.Sint16Invalid
 	}
 	return int16(v.num)
@@ -138,7 +166,7 @@ func (v Value) Int16() int16 {
 
 // Uint16 returns Value as uint16, if it's not a valid uint16 value, it returns basetype.Uint16Invalid (0xFFFF).
 func (v Value) Uint16() uint16 {
-	if v.typ != TypeUint16 {
+	if v.ptr != ptrUint16 {
 		return basetype.Uint16Invalid
 	}
 	return uint16(v.num)
@@ -146,7 +174,7 @@ func (v Value) Uint16() uint16 {
 
 // Uint16z returns Value as uint16, if it's not a valid uint16 value, it returns basetype.Uint16zInvalid (0).
 func (v Value) Uint16z() uint16 {
-	if v.typ != TypeUint16 {
+	if v.ptr != ptrUint16 {
 		return basetype.Uint16zInvalid
 	}
 	return uint16(v.num)
@@ -154,7 +182,7 @@ func (v Value) Uint16z() uint16 {
 
 // Int32 returns Value as int32, if it's not a valid int32 value, it returns basetype.Sint32Invalid (0x7FFFFFFF).
 func (v Value) Int32() int32 {
-	if v.typ != TypeInt32 {
+	if v.ptr != ptrInt32 {
 		return basetype.Sint32Invalid
 	}
 	return int32(v.num)
@@ -162,7 +190,7 @@ func (v Value) Int32() int32 {
 
 // Uint32 returns Value as uint32, if it's not a valid uint32 value, it returns basetype.Uint32Invalid (0xFFFFFFFF).
 func (v Value) Uint32() uint32 {
-	if v.typ != TypeUint32 {
+	if v.ptr != ptrUint32 {
 		return basetype.Uint32Invalid
 	}
 	return uint32(v.num)
@@ -170,7 +198,7 @@ func (v Value) Uint32() uint32 {
 
 // Uint32z returns Value as uint32, if it's not a valid uint32 value, it returns basetype.Uint32zInvalid (0).
 func (v Value) Uint32z() uint32 {
-	if v.typ != TypeUint32 {
+	if v.ptr != ptrUint32 {
 		return basetype.Uint32zInvalid
 	}
 	return uint32(v.num)
@@ -178,7 +206,7 @@ func (v Value) Uint32z() uint32 {
 
 // Int64 returns Value as int64, if it's not a valid int64 value, it returns basetype.Sint64Invalid (0x7FFFFFFFFFFFFFFF).
 func (v Value) Int64() int64 {
-	if v.typ != TypeInt64 {
+	if v.ptr != ptrInt64 {
 		return basetype.Sint64Invalid
 	}
 	return int64(v.num)
@@ -186,7 +214,7 @@ func (v Value) Int64() int64 {
 
 // Uint64 returns Value as uint64, if it's not a valid uint64 value, it returns basetype.Uint64Invalid (0xFFFFFFFFFFFFFFFF).
 func (v Value) Uint64() uint64 {
-	if v.typ != TypeUint64 {
+	if v.ptr != ptrUint64 {
 		return basetype.Uint64Invalid
 	}
 	return v.num
@@ -194,7 +222,7 @@ func (v Value) Uint64() uint64 {
 
 // Uint64z returns Value as uint64, if it's not a valid uint64 value, it returns basetype.Uint64Invalid (0).
 func (v Value) Uint64z() uint64 {
-	if v.typ != TypeUint64 {
+	if v.ptr != ptrUint64 {
 		return basetype.Uint64zInvalid
 	}
 	return uint64(v.num)
@@ -202,7 +230,7 @@ func (v Value) Uint64z() uint64 {
 
 // Float32 returns Value as float32, if it's not a valid float32 value, it returns basetype.Float32Invalid (0xFFFFFFFF) in float32 value.
 func (v Value) Float32() float32 {
-	if v.typ != TypeFloat32 {
+	if v.ptr != ptrFloat32 {
 		return math.Float32frombits(basetype.Float32Invalid)
 	}
 	return math.Float32frombits(uint32(v.num))
@@ -210,7 +238,7 @@ func (v Value) Float32() float32 {
 
 // Float64 returns Value as float64, if it's not a valid float64 value, it returns basetype.Float64Invalid (0xFFFFFFFFFFFFFFFF) in float64 value.
 func (v Value) Float64() float64 {
-	if v.typ != TypeFloat64 {
+	if v.ptr != ptrFloat64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return math.Float64frombits(v.num)
@@ -219,10 +247,10 @@ func (v Value) Float64() float64 {
 // String returns Value as string, if it's not a valid string value, it returns basetype.StringInvalid.
 // This should not be treated as a Go's String method, use Any() if you want to print the underlying value.
 func (v Value) String() string {
-	if v.typ != TypeString {
+	if Type(v.num>>vshift) != TypeString {
 		return basetype.StringInvalid
 	}
-	return unsafe.String((*byte)(v.ptr), v.num)
+	return unsafe.String((*byte)(v.ptr), v.num&vmask)
 }
 
 var _ fmt.Formatter = (*Value)(nil)
@@ -231,7 +259,7 @@ var _ fmt.Formatter = (*Value)(nil)
 // is used to return string value, rather than the Value formatted as a string.
 func (v Value) Format(p fmt.State, verb rune) {
 	switch {
-	case v.typ == TypeInvalid:
+	case v == Value{}:
 		fmt.Fprintf(p, "<invalid proto.Value>")
 	case verb != 'v':
 		fmt.Fprintf(p, fmt.FormatString(p, verb), v.Any())
@@ -246,126 +274,126 @@ func (v Value) Format(p fmt.State, verb rune) {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceBool() []typedef.Bool {
-	if v.typ != TypeSliceBool {
+	if Type(v.num>>vshift) != TypeSliceBool {
 		return nil
 	}
-	return unsafe.Slice((*typedef.Bool)(v.ptr), v.num)
+	return unsafe.Slice((*typedef.Bool)(v.ptr), v.num&vmask)
 }
 
 // SliceInt8 returns Value as []int8, if it's not a valid []int8 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt8() []int8 {
-	if v.typ != TypeSliceInt8 {
+	if Type(v.num>>vshift) != TypeSliceInt8 {
 		return nil
 	}
-	return unsafe.Slice((*int8)(v.ptr), v.num)
+	return unsafe.Slice((*int8)(v.ptr), v.num&vmask)
 }
 
 // SliceUint8 returns Value as []uint8, if it's not a valid []uint8 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint8() []uint8 {
-	if v.typ != TypeSliceUint8 {
+	if Type(v.num>>vshift) != TypeSliceUint8 {
 		return nil
 	}
-	return unsafe.Slice((*uint8)(v.ptr), v.num)
+	return unsafe.Slice((*uint8)(v.ptr), v.num&vmask)
 }
 
 // SliceInt16 returns Value as []int16, if it's not a valid []int16 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt16() []int16 {
-	if v.typ != TypeSliceInt16 {
+	if Type(v.num>>vshift) != TypeSliceInt16 {
 		return nil
 	}
-	return unsafe.Slice((*int16)(v.ptr), v.num)
+	return unsafe.Slice((*int16)(v.ptr), v.num&vmask)
 }
 
 // SliceUint16 returns Value as []uint16, if it's not a valid []uint16 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint16() []uint16 {
-	if v.typ != TypeSliceUint16 {
+	if Type(v.num>>vshift) != TypeSliceUint16 {
 		return nil
 	}
-	return unsafe.Slice((*uint16)(v.ptr), v.num)
+	return unsafe.Slice((*uint16)(v.ptr), v.num&vmask)
 }
 
 // SliceInt32 returns Value as []int32, if it's not a valid []int32 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt32() []int32 {
-	if v.typ != TypeSliceInt32 {
+	if Type(v.num>>vshift) != TypeSliceInt32 {
 		return nil
 	}
-	return unsafe.Slice((*int32)(v.ptr), v.num)
+	return unsafe.Slice((*int32)(v.ptr), v.num&vmask)
 }
 
 // SliceUint32 returns Value as []uint32, if it's not a valid []uint32 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint32() []uint32 {
-	if v.typ != TypeSliceUint32 {
+	if Type(v.num>>vshift) != TypeSliceUint32 {
 		return nil
 	}
-	return unsafe.Slice((*uint32)(v.ptr), v.num)
+	return unsafe.Slice((*uint32)(v.ptr), v.num&vmask)
 }
 
 // SliceInt64 returns Value as []int64, if it's not a valid []int64 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt64() []int64 {
-	if v.typ != TypeSliceInt64 {
+	if Type(v.num>>vshift) != TypeSliceInt64 {
 		return nil
 	}
-	return unsafe.Slice((*int64)(v.ptr), v.num)
+	return unsafe.Slice((*int64)(v.ptr), v.num&vmask)
 }
 
 // SliceUint64 returns Value as []uint64, if it's not a valid []uint64 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint64() []uint64 {
-	if v.typ != TypeSliceUint64 {
+	if Type(v.num>>vshift) != TypeSliceUint64 {
 		return nil
 	}
-	return unsafe.Slice((*uint64)(v.ptr), v.num)
+	return unsafe.Slice((*uint64)(v.ptr), v.num&vmask)
 }
 
 // SliceFloat32 returns Value as []float32, if it's not a valid []float32 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceFloat32() []float32 {
-	if v.typ != TypeSliceFloat32 {
+	if Type(v.num>>vshift) != TypeSliceFloat32 {
 		return nil
 	}
-	return unsafe.Slice((*float32)(v.ptr), v.num)
+	return unsafe.Slice((*float32)(v.ptr), v.num&vmask)
 }
 
 // SliceFloat64 returns Value as []float64, if it's not a valid []float64 value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceFloat64() []float64 {
-	if v.typ != TypeSliceFloat64 {
+	if Type(v.num>>vshift) != TypeSliceFloat64 {
 		return nil
 	}
-	return unsafe.Slice((*float64)(v.ptr), v.num)
+	return unsafe.Slice((*float64)(v.ptr), v.num&vmask)
 }
 
 // SliceString returns Value as []string, if it's not a valid []string value, it returns nil.
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceString() []string {
-	if v.typ != TypeSliceString {
+	if Type(v.num>>vshift) != TypeSliceString {
 		return nil
 	}
-	return unsafe.Slice((*string)(v.ptr), v.num)
+	return unsafe.Slice((*string)(v.ptr), v.num&vmask)
 }
 
 // Any returns Value's underlying value. If the underlying value is a slice, the caller takes ownership of that slice value,
 // so Value should no longer be used after this call, except the returned value is copied and the copied value is used instead.
 func (v Value) Any() any {
-	switch v.typ {
+	switch v.Type() {
 	case TypeBool:
 		return v.Bool()
 	case TypeInt8:
@@ -420,7 +448,7 @@ func (v Value) Any() any {
 
 // Align checks whether Value's type is align with given basetype.
 func (v Value) Align(t basetype.BaseType) bool {
-	switch v.typ {
+	switch v.Type() {
 	case TypeBool, TypeSliceBool:
 		return t == basetype.Enum
 	case TypeInt8, TypeSliceInt8:
@@ -457,7 +485,7 @@ func (v Value) Align(t basetype.BaseType) bool {
 func (v Value) Valid(t basetype.BaseType) bool {
 	var invalidCount int
 
-	switch v.typ {
+	switch v.Type() {
 	case TypeBool:
 		return v.num < 2 // Only 0 (false) and 1 (true) is valid
 	case TypeInt8:
@@ -641,122 +669,122 @@ func Bool(v typedef.Bool) Value {
 	if v > 1 {
 		num = uint64(typedef.BoolInvalid)
 	}
-	return Value{num: num, typ: TypeBool}
+	return Value{num: num, ptr: ptrBool}
 }
 
 // Int8 converts int8 as Value.
 func Int8(v int8) Value {
-	return Value{num: uint64(v), typ: TypeInt8}
+	return Value{num: uint64(v), ptr: ptrInt8}
 }
 
 // Uint8 converts uint8 as Value.
 func Uint8(v uint8) Value {
-	return Value{num: uint64(v), typ: TypeUint8}
+	return Value{num: uint64(v), ptr: ptrUint8}
 }
 
 // Int16 converts int16 as Value.
 func Int16(v int16) Value {
-	return Value{num: uint64(v), typ: TypeInt16}
+	return Value{num: uint64(v), ptr: ptrInt16}
 }
 
 // Uint16 converts uint16 as Value.
 func Uint16(v uint16) Value {
-	return Value{num: uint64(v), typ: TypeUint16}
+	return Value{num: uint64(v), ptr: ptrUint16}
 }
 
 // Int32 converts int32 as Value.
 func Int32(v int32) Value {
-	return Value{num: uint64(v), typ: TypeInt32}
+	return Value{num: uint64(v), ptr: ptrInt32}
 }
 
 // Uint32 converts uint32 as Value.
 func Uint32(v uint32) Value {
-	return Value{num: uint64(v), typ: TypeUint32}
+	return Value{num: uint64(v), ptr: ptrUint32}
 }
 
 // Int64 converts int64 as Value.
 func Int64(v int64) Value {
-	return Value{num: uint64(v), typ: TypeInt64}
+	return Value{num: uint64(v), ptr: ptrInt64}
 }
 
 // Uint64 converts uint64 as Value.
 func Uint64(v uint64) Value {
-	return Value{num: v, typ: TypeUint64}
+	return Value{num: v, ptr: ptrUint64}
 }
 
 // Float32 converts float32 as Value.
 func Float32(v float32) Value {
-	return Value{num: uint64(math.Float32bits(v)), typ: TypeFloat32}
+	return Value{num: uint64(math.Float32bits(v)), ptr: ptrFloat32}
 }
 
 // Float64 converts float64 as Value.
 func Float64(v float64) Value {
-	return Value{num: math.Float64bits(v), typ: TypeFloat64}
+	return Value{num: math.Float64bits(v), ptr: ptrFloat64}
 }
 
 // String converts string as Value.
 func String(v string) Value {
-	return Value{num: uint64(len(v)), typ: TypeString, ptr: unsafe.Pointer(unsafe.StringData(v))}
+	return Value{num: uint64(TypeString)<<vshift | uint64(len(v)), ptr: unsafe.Pointer(unsafe.StringData(v))}
 }
 
 // SliceBool converts []typedef.Bool as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceBool(s []typedef.Bool) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceBool, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceBool)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt8 converts []int8 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt8[S []E, E ~int8](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt8, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceInt8)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint8 converts []uint8 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint8[S []E, E ~uint8](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint8, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceUint8)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt16 converts []int16 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt16[S []E, E ~int16](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt16, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceInt16)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint16 converts []uint16 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint16[S []E, E ~uint16](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint16, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceUint16)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt32 converts []int32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt32[S []E, E ~int32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceInt32)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint32 converts []uint32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint32[S []E, E ~uint32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceUint32)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceInt64 converts []int64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceInt64[S []E, E ~int64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceInt64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceInt64)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceUint64 converts []uint64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceUint64[S []E, E ~uint64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceUint64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceUint64)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceFloat32 converts []float32 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceFloat32[S []E, E ~float32](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceFloat32, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceFloat32)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceFloat64 converts []float64 as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceFloat64[S []E, E ~float64](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceFloat64, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceFloat64)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // SliceString converts []string as Value. This takes ownership of s, and the caller should not use s after this call.
 func SliceString[S []E, E ~string](s S) Value {
-	return Value{num: uint64(len(s)), typ: TypeSliceString, ptr: unsafe.Pointer(unsafe.SliceData(s))}
+	return Value{num: uint64(TypeSliceString)<<vshift | uint64(len(s)), ptr: unsafe.Pointer(unsafe.SliceData(s))}
 }
 
 // Any converts any value into Value. If the given v is not a primitive-type value or
@@ -928,7 +956,7 @@ var sizes = [...]int{
 
 // Sizeof returns the size of val in bytes. For every string in Value, if the last index of the string is not '\x00', size += 1.
 func Sizeof(val Value) int {
-	switch val.typ {
+	switch typ := val.Type(); typ {
 	case TypeString:
 		s := val.String()
 		n := len(s)
@@ -937,27 +965,27 @@ func Sizeof(val Value) int {
 		}
 		return n * sizes[TypeString]
 	case TypeSliceBool:
-		return int(val.num) * sizes[TypeBool]
+		return int(val.num&vmask) * sizes[TypeBool]
 	case TypeSliceInt8:
-		return int(val.num) * sizes[TypeInt8]
+		return int(val.num&vmask) * sizes[TypeInt8]
 	case TypeSliceUint8:
-		return int(val.num) * sizes[TypeUint8]
+		return int(val.num&vmask) * sizes[TypeUint8]
 	case TypeSliceInt16:
-		return int(val.num) * sizes[TypeInt16]
+		return int(val.num&vmask) * sizes[TypeInt16]
 	case TypeSliceUint16:
-		return int(val.num) * sizes[TypeUint16]
+		return int(val.num&vmask) * sizes[TypeUint16]
 	case TypeSliceInt32:
-		return int(val.num) * sizes[TypeInt32]
+		return int(val.num&vmask) * sizes[TypeInt32]
 	case TypeSliceUint32:
-		return int(val.num) * sizes[TypeUint32]
+		return int(val.num&vmask) * sizes[TypeUint32]
 	case TypeSliceInt64:
-		return int(val.num) * sizes[TypeInt64]
+		return int(val.num&vmask) * sizes[TypeInt64]
 	case TypeSliceUint64:
-		return int(val.num) * sizes[TypeUint64]
+		return int(val.num&vmask) * sizes[TypeUint64]
 	case TypeSliceFloat32:
-		return int(val.num) * sizes[TypeFloat32]
+		return int(val.num&vmask) * sizes[TypeFloat32]
 	case TypeSliceFloat64:
-		return int(val.num) * sizes[TypeFloat64]
+		return int(val.num&vmask) * sizes[TypeFloat64]
 	case TypeSliceString:
 		vs := val.SliceString()
 		var size int
@@ -973,6 +1001,6 @@ func Sizeof(val Value) int {
 		}
 		return size * sizes[TypeString]
 	default:
-		return sizes[val.typ]
+		return sizes[typ]
 	}
 }
