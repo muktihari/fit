@@ -32,6 +32,47 @@ func TestTypeString(t *testing.T) {
 	}
 }
 
+func TestValueType(t *testing.T) {
+	tt := []struct {
+		value    Value
+		expected Type
+	}{
+		{value: Value{}, expected: TypeInvalid},
+		{value: Bool(typedef.BoolTrue), expected: TypeBool},
+		{value: Int8(1), expected: TypeInt8},
+		{value: Uint8(1), expected: TypeUint8},
+		{value: Int16(1), expected: TypeInt16},
+		{value: Uint16(1), expected: TypeUint16},
+		{value: Int32(1), expected: TypeInt32},
+		{value: Uint32(1), expected: TypeUint32},
+		{value: Int64(1), expected: TypeInt64},
+		{value: Uint64(1), expected: TypeUint64},
+		{value: Float32(1), expected: TypeFloat32},
+		{value: Float64(1), expected: TypeFloat64},
+		{value: String("FIT"), expected: TypeString},
+		{value: SliceBool([]typedef.Bool{typedef.BoolTrue}), expected: TypeSliceBool},
+		{value: SliceInt8([]int8{1}), expected: TypeSliceInt8},
+		{value: SliceUint8([]uint8{1}), expected: TypeSliceUint8},
+		{value: SliceInt16([]int16{1}), expected: TypeSliceInt16},
+		{value: SliceUint16([]uint16{1}), expected: TypeSliceUint16},
+		{value: SliceInt32([]int32{1}), expected: TypeSliceInt32},
+		{value: SliceUint32([]uint32{1}), expected: TypeSliceUint32},
+		{value: SliceInt64([]int64{1}), expected: TypeSliceInt64},
+		{value: SliceUint64([]uint64{1}), expected: TypeSliceUint64},
+		{value: SliceFloat32([]float32{1}), expected: TypeSliceFloat32},
+		{value: SliceFloat64([]float64{1}), expected: TypeSliceFloat64},
+		{value: SliceString([]string{"FIT"}), expected: TypeSliceString},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.expected), func(t *testing.T) {
+			if typ := tc.value.Type(); typ != tc.expected {
+				t.Fatalf("expected: %s, got: %s", tc.expected, typ)
+			}
+		})
+	}
+}
+
 func TestBool(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		input := typedef.BoolTrue
@@ -938,8 +979,8 @@ func TestValueAlign(t *testing.T) {
 		{value: SliceInt8([]int8{1, 2, 3}), baseType: basetype.Sint8, expected: true},
 	}
 
-	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%v (%T): %s", tc.value, tc.value, tc.baseType), func(t *testing.T) {
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %v (%T): %s", i, tc.value, tc.value, tc.baseType), func(t *testing.T) {
 			if align := tc.value.Align(tc.baseType); align != tc.expected {
 				t.Fatalf("expected: %t, got %t", tc.expected, align)
 			}
@@ -1019,7 +1060,6 @@ func TestLen(t *testing.T) {
 		sizeInBytes int
 	}{
 		{value: Value{}, sizeInBytes: 0},
-		{value: Value{typ: TypeInvalid}, sizeInBytes: 0},
 		{value: Bool(typedef.BoolTrue), sizeInBytes: 1},
 		{value: Int8(10), sizeInBytes: 1},
 		{value: Uint8(10), sizeInBytes: 1},
