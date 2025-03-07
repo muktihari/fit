@@ -31,10 +31,20 @@ type ExdScreenConfiguration struct {
 // NewExdScreenConfiguration creates new ExdScreenConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdScreenConfiguration with all fields being set to its corresponding invalid value.
 func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
-	vals := [4]proto.Value{}
+	m := new(ExdScreenConfiguration)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all ExdScreenConfiguration's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *ExdScreenConfiguration) Reset(mesg *proto.Message) {
+	var (
+		vals            [4]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewExdScreenConfiguration(mesg *proto.Message) *ExdScreenConfiguration {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &ExdScreenConfiguration{
+	*m = ExdScreenConfiguration{
 		ScreenIndex:   vals[0].Uint8(),
 		FieldCount:    vals[1].Uint8(),
 		Layout:        typedef.ExdLayout(vals[2].Uint8()),

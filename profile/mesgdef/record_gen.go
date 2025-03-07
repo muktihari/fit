@@ -117,11 +117,21 @@ type Record struct {
 // NewRecord creates new Record struct based on given mesg.
 // If mesg is nil, it will return Record with all fields being set to its corresponding invalid value.
 func NewRecord(mesg *proto.Message) *Record {
-	vals := [254]proto.Value{}
+	m := new(Record)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [14]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Record's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Record) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		state           [14]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -142,7 +152,7 @@ func NewRecord(mesg *proto.Message) *Record {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Record{
+	*m = Record{
 		Timestamp:    datetime.ToTime(vals[253].Uint32()),
 		PositionLat:  vals[0].Int32(),
 		PositionLong: vals[1].Int32(),

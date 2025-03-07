@@ -42,10 +42,20 @@ type SleepAssessment struct {
 // NewSleepAssessment creates new SleepAssessment struct based on given mesg.
 // If mesg is nil, it will return SleepAssessment with all fields being set to its corresponding invalid value.
 func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
-	vals := [16]proto.Value{}
+	m := new(SleepAssessment)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SleepAssessment's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SleepAssessment) Reset(mesg *proto.Message) {
+	var (
+		vals            [16]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -62,7 +72,7 @@ func NewSleepAssessment(mesg *proto.Message) *SleepAssessment {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SleepAssessment{
+	*m = SleepAssessment{
 		CombinedAwakeScore:       vals[0].Uint8(),
 		AwakeTimeScore:           vals[1].Uint8(),
 		AwakeningsCountScore:     vals[2].Uint8(),

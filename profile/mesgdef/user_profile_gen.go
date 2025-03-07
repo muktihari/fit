@@ -57,10 +57,20 @@ type UserProfile struct {
 // NewUserProfile creates new UserProfile struct based on given mesg.
 // If mesg is nil, it will return UserProfile with all fields being set to its corresponding invalid value.
 func NewUserProfile(mesg *proto.Message) *UserProfile {
-	vals := [255]proto.Value{}
+	m := new(UserProfile)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all UserProfile's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *UserProfile) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -77,7 +87,7 @@ func NewUserProfile(mesg *proto.Message) *UserProfile {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &UserProfile{
+	*m = UserProfile{
 		MessageIndex:               typedef.MessageIndex(vals[254].Uint16()),
 		FriendlyName:               vals[0].String(),
 		Gender:                     typedef.Gender(vals[1].Uint8()),

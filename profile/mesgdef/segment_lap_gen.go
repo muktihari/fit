@@ -128,11 +128,21 @@ type SegmentLap struct {
 // NewSegmentLap creates new SegmentLap struct based on given mesg.
 // If mesg is nil, it will return SegmentLap with all fields being set to its corresponding invalid value.
 func NewSegmentLap(mesg *proto.Message) *SegmentLap {
-	vals := [255]proto.Value{}
+	m := new(SegmentLap)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [12]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SegmentLap's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SegmentLap) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		state           [12]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -153,7 +163,7 @@ func NewSegmentLap(mesg *proto.Message) *SegmentLap {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SegmentLap{
+	*m = SegmentLap{
 		MessageIndex:                typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:                   datetime.ToTime(vals[253].Uint32()),
 		Event:                       typedef.Event(vals[0].Uint8()),

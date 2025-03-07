@@ -35,10 +35,20 @@ type OneDSensorCalibration struct {
 // NewOneDSensorCalibration creates new OneDSensorCalibration struct based on given mesg.
 // If mesg is nil, it will return OneDSensorCalibration with all fields being set to its corresponding invalid value.
 func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
-	vals := [254]proto.Value{}
+	m := new(OneDSensorCalibration)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all OneDSensorCalibration's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *OneDSensorCalibration) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -55,7 +65,7 @@ func NewOneDSensorCalibration(mesg *proto.Message) *OneDSensorCalibration {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &OneDSensorCalibration{
+	*m = OneDSensorCalibration{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
 		SensorType:         typedef.SensorType(vals[0].Uint8()),
 		CalibrationFactor:  vals[1].Uint32(),

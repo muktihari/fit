@@ -38,10 +38,20 @@ type ClimbPro struct {
 // NewClimbPro creates new ClimbPro struct based on given mesg.
 // If mesg is nil, it will return ClimbPro with all fields being set to its corresponding invalid value.
 func NewClimbPro(mesg *proto.Message) *ClimbPro {
-	vals := [254]proto.Value{}
+	m := new(ClimbPro)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all ClimbPro's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *ClimbPro) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -58,7 +68,7 @@ func NewClimbPro(mesg *proto.Message) *ClimbPro {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &ClimbPro{
+	*m = ClimbPro{
 		Timestamp:     datetime.ToTime(vals[253].Uint32()),
 		PositionLat:   vals[0].Int32(),
 		PositionLong:  vals[1].Int32(),

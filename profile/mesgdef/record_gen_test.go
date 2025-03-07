@@ -7,9 +7,11 @@ package mesgdef
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
@@ -239,4 +241,37 @@ func TestRecordUnknownFields(t *testing.T) {
 			t.Fatalf("UnknownFields should be nil, got: %+v", r.UnknownFields)
 		}
 	})
+}
+
+func TestRecordReset(t *testing.T) {
+	now := time.Now()
+	distance := uint32(1000)
+	mesg := &proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(distance)),
+	}}
+
+	r1 := NewRecord(mesg)
+	r2 := new(Record)
+	r2.Reset(mesg)
+
+	if diff := cmp.Diff(r1, r2,
+		cmp.Transformer("float32", func(v float32) uint32 { return math.Float32bits(v) }),
+		cmp.Exporter(func(_ reflect.Type) bool { return true }),
+	); diff != "" {
+		t.Fatal(diff)
+	}
+
+	if r1.Distance != distance && r1.Distance != r2.Distance {
+		t.Fatalf("expected: %d, got %d != %d",
+			distance, r1.Distance, r2.Distance)
+	}
+
+	r1.Reset(nil)
+	r2.Reset(nil)
+
+	if r1.Distance != basetype.Uint32Invalid && r1.Distance != r2.Distance {
+		t.Fatalf("expected:%d, got: %d != %d",
+			basetype.Uint32Invalid, r1.Distance, r2.Distance)
+	}
 }

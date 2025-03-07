@@ -54,11 +54,21 @@ type Length struct {
 // NewLength creates new Length struct based on given mesg.
 // If mesg is nil, it will return Length with all fields being set to its corresponding invalid value.
 func NewLength(mesg *proto.Message) *Length {
-	vals := [255]proto.Value{}
+	m := new(Length)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [4]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Length's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Length) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		state           [4]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -79,7 +89,7 @@ func NewLength(mesg *proto.Message) *Length {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Length{
+	*m = Length{
 		MessageIndex:               typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:                  datetime.ToTime(vals[253].Uint32()),
 		Event:                      typedef.Event(vals[0].Uint8()),

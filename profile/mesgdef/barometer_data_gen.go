@@ -33,10 +33,20 @@ type BarometerData struct {
 // NewBarometerData creates new BarometerData struct based on given mesg.
 // If mesg is nil, it will return BarometerData with all fields being set to its corresponding invalid value.
 func NewBarometerData(mesg *proto.Message) *BarometerData {
-	vals := [254]proto.Value{}
+	m := new(BarometerData)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all BarometerData's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *BarometerData) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -53,7 +63,7 @@ func NewBarometerData(mesg *proto.Message) *BarometerData {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &BarometerData{
+	*m = BarometerData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
 		TimestampMs:      vals[0].Uint16(),
 		SampleTimeOffset: vals[1].SliceUint16(),

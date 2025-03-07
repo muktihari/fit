@@ -31,9 +31,19 @@ type DeveloperDataId struct {
 // NewDeveloperDataId creates new DeveloperDataId struct based on given mesg.
 // If mesg is nil, it will return DeveloperDataId with all fields being set to its corresponding invalid value.
 func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
-	vals := [5]proto.Value{}
+	m := new(DeveloperDataId)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
+// Reset resets all DeveloperDataId's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *DeveloperDataId) Reset(mesg *proto.Message) {
+	var (
+		vals          [5]proto.Value
+		unknownFields []proto.Field
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -49,7 +59,7 @@ func NewDeveloperDataId(mesg *proto.Message) *DeveloperDataId {
 		pool.Put(arr)
 	}
 
-	return &DeveloperDataId{
+	*m = DeveloperDataId{
 		DeveloperId:        vals[0].SliceUint8(),
 		ApplicationId:      vals[1].SliceUint8(),
 		ManufacturerId:     typedef.Manufacturer(vals[2].Uint16()),

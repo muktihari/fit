@@ -43,10 +43,20 @@ type AviationAttitude struct {
 // NewAviationAttitude creates new AviationAttitude struct based on given mesg.
 // If mesg is nil, it will return AviationAttitude with all fields being set to its corresponding invalid value.
 func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
-	vals := [254]proto.Value{}
+	m := new(AviationAttitude)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all AviationAttitude's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *AviationAttitude) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -63,7 +73,7 @@ func NewAviationAttitude(mesg *proto.Message) *AviationAttitude {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &AviationAttitude{
+	*m = AviationAttitude{
 		Timestamp:    datetime.ToTime(vals[253].Uint32()),
 		TimestampMs:  vals[0].Uint16(),
 		SystemTime:   vals[1].SliceUint32(),

@@ -38,10 +38,20 @@ type MagnetometerData struct {
 // NewMagnetometerData creates new MagnetometerData struct based on given mesg.
 // If mesg is nil, it will return MagnetometerData with all fields being set to its corresponding invalid value.
 func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
-	vals := [254]proto.Value{}
+	m := new(MagnetometerData)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all MagnetometerData's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *MagnetometerData) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -58,7 +68,7 @@ func NewMagnetometerData(mesg *proto.Message) *MagnetometerData {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &MagnetometerData{
+	*m = MagnetometerData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
 		TimestampMs:      vals[0].Uint16(),
 		SampleTimeOffset: vals[1].SliceUint16(),

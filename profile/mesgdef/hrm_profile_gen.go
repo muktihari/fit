@@ -32,10 +32,20 @@ type HrmProfile struct {
 // NewHrmProfile creates new HrmProfile struct based on given mesg.
 // If mesg is nil, it will return HrmProfile with all fields being set to its corresponding invalid value.
 func NewHrmProfile(mesg *proto.Message) *HrmProfile {
-	vals := [255]proto.Value{}
+	m := new(HrmProfile)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HrmProfile's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HrmProfile) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewHrmProfile(mesg *proto.Message) *HrmProfile {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HrmProfile{
+	*m = HrmProfile{
 		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
 		Enabled:           vals[0].Bool(),
 		HrmAntId:          vals[1].Uint16z(),

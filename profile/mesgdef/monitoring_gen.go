@@ -61,11 +61,21 @@ type Monitoring struct {
 // NewMonitoring creates new Monitoring struct based on given mesg.
 // If mesg is nil, it will return Monitoring with all fields being set to its corresponding invalid value.
 func NewMonitoring(mesg *proto.Message) *Monitoring {
-	vals := [254]proto.Value{}
+	m := new(Monitoring)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [4]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Monitoring's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Monitoring) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		state           [4]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -86,7 +96,7 @@ func NewMonitoring(mesg *proto.Message) *Monitoring {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Monitoring{
+	*m = Monitoring{
 		Timestamp:       datetime.ToTime(vals[253].Uint32()),
 		DeviceIndex:     typedef.DeviceIndex(vals[0].Uint8()),
 		Calories:        vals[1].Uint16(),

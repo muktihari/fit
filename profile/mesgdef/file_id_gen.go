@@ -35,9 +35,19 @@ type FileId struct {
 // NewFileId creates new FileId struct based on given mesg.
 // If mesg is nil, it will return FileId with all fields being set to its corresponding invalid value.
 func NewFileId(mesg *proto.Message) *FileId {
-	vals := [9]proto.Value{}
+	m := new(FileId)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
+// Reset resets all FileId's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *FileId) Reset(mesg *proto.Message) {
+	var (
+		vals          [9]proto.Value
+		unknownFields []proto.Field
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -53,7 +63,7 @@ func NewFileId(mesg *proto.Message) *FileId {
 		pool.Put(arr)
 	}
 
-	return &FileId{
+	*m = FileId{
 		Type:         typedef.File(vals[0].Uint8()),
 		Manufacturer: typedef.Manufacturer(vals[1].Uint16()),
 		Product:      vals[2].Uint16(),

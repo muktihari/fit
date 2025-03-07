@@ -35,10 +35,20 @@ type TrainingFile struct {
 // NewTrainingFile creates new TrainingFile struct based on given mesg.
 // If mesg is nil, it will return TrainingFile with all fields being set to its corresponding invalid value.
 func NewTrainingFile(mesg *proto.Message) *TrainingFile {
-	vals := [254]proto.Value{}
+	m := new(TrainingFile)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all TrainingFile's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *TrainingFile) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -55,7 +65,7 @@ func NewTrainingFile(mesg *proto.Message) *TrainingFile {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &TrainingFile{
+	*m = TrainingFile{
 		Timestamp:    datetime.ToTime(vals[253].Uint32()),
 		Type:         typedef.File(vals[0].Uint8()),
 		Manufacturer: typedef.Manufacturer(vals[1].Uint16()),

@@ -33,10 +33,20 @@ type MemoGlob struct {
 // NewMemoGlob creates new MemoGlob struct based on given mesg.
 // If mesg is nil, it will return MemoGlob with all fields being set to its corresponding invalid value.
 func NewMemoGlob(mesg *proto.Message) *MemoGlob {
-	vals := [251]proto.Value{}
+	m := new(MemoGlob)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all MemoGlob's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *MemoGlob) Reset(mesg *proto.Message) {
+	var (
+		vals            [251]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -53,7 +63,7 @@ func NewMemoGlob(mesg *proto.Message) *MemoGlob {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &MemoGlob{
+	*m = MemoGlob{
 		PartIndex:   vals[250].Uint32(),
 		Memo:        vals[0].SliceUint8(),
 		MesgNum:     typedef.MesgNum(vals[1].Uint16()),

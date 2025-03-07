@@ -42,10 +42,20 @@ type DiveApneaAlarm struct {
 // NewDiveApneaAlarm creates new DiveApneaAlarm struct based on given mesg.
 // If mesg is nil, it will return DiveApneaAlarm with all fields being set to its corresponding invalid value.
 func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
-	vals := [255]proto.Value{}
+	m := new(DiveApneaAlarm)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all DiveApneaAlarm's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *DiveApneaAlarm) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -62,7 +72,7 @@ func NewDiveApneaAlarm(mesg *proto.Message) *DiveApneaAlarm {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &DiveApneaAlarm{
+	*m = DiveApneaAlarm{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		Depth:        vals[0].Uint32(),
 		Time:         vals[1].Int32(),

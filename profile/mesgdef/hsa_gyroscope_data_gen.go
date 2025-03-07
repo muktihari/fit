@@ -37,10 +37,20 @@ type HsaGyroscopeData struct {
 // NewHsaGyroscopeData creates new HsaGyroscopeData struct based on given mesg.
 // If mesg is nil, it will return HsaGyroscopeData with all fields being set to its corresponding invalid value.
 func NewHsaGyroscopeData(mesg *proto.Message) *HsaGyroscopeData {
-	vals := [254]proto.Value{}
+	m := new(HsaGyroscopeData)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HsaGyroscopeData's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HsaGyroscopeData) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -57,7 +67,7 @@ func NewHsaGyroscopeData(mesg *proto.Message) *HsaGyroscopeData {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HsaGyroscopeData{
+	*m = HsaGyroscopeData{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
 		TimestampMs:      vals[0].Uint16(),
 		SamplingInterval: vals[1].Uint16(),

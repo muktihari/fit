@@ -35,10 +35,20 @@ type WorkoutSession struct {
 // NewWorkoutSession creates new WorkoutSession struct based on given mesg.
 // If mesg is nil, it will return WorkoutSession with all fields being set to its corresponding invalid value.
 func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
-	vals := [255]proto.Value{}
+	m := new(WorkoutSession)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all WorkoutSession's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *WorkoutSession) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -55,7 +65,7 @@ func NewWorkoutSession(mesg *proto.Message) *WorkoutSession {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &WorkoutSession{
+	*m = WorkoutSession{
 		MessageIndex:   typedef.MessageIndex(vals[254].Uint16()),
 		Sport:          typedef.Sport(vals[0].Uint8()),
 		SubSport:       typedef.SubSport(vals[1].Uint8()),

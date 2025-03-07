@@ -42,10 +42,20 @@ type SplitSummary struct {
 // NewSplitSummary creates new SplitSummary struct based on given mesg.
 // If mesg is nil, it will return SplitSummary with all fields being set to its corresponding invalid value.
 func NewSplitSummary(mesg *proto.Message) *SplitSummary {
-	vals := [255]proto.Value{}
+	m := new(SplitSummary)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SplitSummary's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SplitSummary) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -62,7 +72,7 @@ func NewSplitSummary(mesg *proto.Message) *SplitSummary {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SplitSummary{
+	*m = SplitSummary{
 		MessageIndex:    typedef.MessageIndex(vals[254].Uint16()),
 		SplitType:       typedef.SplitType(vals[0].Uint8()),
 		NumSplits:       vals[3].Uint16(),

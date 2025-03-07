@@ -31,10 +31,20 @@ type ExerciseTitle struct {
 // NewExerciseTitle creates new ExerciseTitle struct based on given mesg.
 // If mesg is nil, it will return ExerciseTitle with all fields being set to its corresponding invalid value.
 func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
-	vals := [255]proto.Value{}
+	m := new(ExerciseTitle)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all ExerciseTitle's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *ExerciseTitle) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewExerciseTitle(mesg *proto.Message) *ExerciseTitle {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &ExerciseTitle{
+	*m = ExerciseTitle{
 		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
 		ExerciseCategory: typedef.ExerciseCategory(vals[0].Uint16()),
 		ExerciseName:     vals[1].Uint16(),

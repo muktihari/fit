@@ -30,10 +30,20 @@ type OhrSettings struct {
 // NewOhrSettings creates new OhrSettings struct based on given mesg.
 // If mesg is nil, it will return OhrSettings with all fields being set to its corresponding invalid value.
 func NewOhrSettings(mesg *proto.Message) *OhrSettings {
-	vals := [254]proto.Value{}
+	m := new(OhrSettings)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all OhrSettings's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *OhrSettings) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -50,7 +60,7 @@ func NewOhrSettings(mesg *proto.Message) *OhrSettings {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &OhrSettings{
+	*m = OhrSettings{
 		Timestamp: datetime.ToTime(vals[253].Uint32()),
 		Enabled:   typedef.Switch(vals[0].Uint8()),
 

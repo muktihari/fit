@@ -32,10 +32,20 @@ type HsaStressData struct {
 // NewHsaStressData creates new HsaStressData struct based on given mesg.
 // If mesg is nil, it will return HsaStressData with all fields being set to its corresponding invalid value.
 func NewHsaStressData(mesg *proto.Message) *HsaStressData {
-	vals := [254]proto.Value{}
+	m := new(HsaStressData)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HsaStressData's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HsaStressData) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewHsaStressData(mesg *proto.Message) *HsaStressData {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HsaStressData{
+	*m = HsaStressData{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
 		ProcessingInterval: vals[0].Uint16(),
 		StressLevel:        vals[1].SliceInt8(),

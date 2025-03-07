@@ -55,10 +55,20 @@ type DeviceSettings struct {
 // NewDeviceSettings creates new DeviceSettings struct based on given mesg.
 // If mesg is nil, it will return DeviceSettings with all fields being set to its corresponding invalid value.
 func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
-	vals := [175]proto.Value{}
+	m := new(DeviceSettings)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all DeviceSettings's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *DeviceSettings) Reset(mesg *proto.Message) {
+	var (
+		vals            [175]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -75,7 +85,7 @@ func NewDeviceSettings(mesg *proto.Message) *DeviceSettings {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &DeviceSettings{
+	*m = DeviceSettings{
 		ActiveTimeZone: vals[0].Uint8(),
 		UtcOffset:      vals[1].Uint32(),
 		TimeOffset:     vals[2].SliceUint32(),

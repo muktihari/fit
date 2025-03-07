@@ -50,10 +50,20 @@ type Split struct {
 // NewSplit creates new Split struct based on given mesg.
 // If mesg is nil, it will return Split with all fields being set to its corresponding invalid value.
 func NewSplit(mesg *proto.Message) *Split {
-	vals := [255]proto.Value{}
+	m := new(Split)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Split's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Split) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -70,7 +80,7 @@ func NewSplit(mesg *proto.Message) *Split {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Split{
+	*m = Split{
 		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
 		SplitType:         typedef.SplitType(vals[0].Uint8()),
 		TotalElapsedTime:  vals[1].Uint32(),

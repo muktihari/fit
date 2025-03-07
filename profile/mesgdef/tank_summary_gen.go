@@ -35,10 +35,20 @@ type TankSummary struct {
 // NewTankSummary creates new TankSummary struct based on given mesg.
 // If mesg is nil, it will return TankSummary with all fields being set to its corresponding invalid value.
 func NewTankSummary(mesg *proto.Message) *TankSummary {
-	vals := [254]proto.Value{}
+	m := new(TankSummary)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all TankSummary's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *TankSummary) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -55,7 +65,7 @@ func NewTankSummary(mesg *proto.Message) *TankSummary {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &TankSummary{
+	*m = TankSummary{
 		Timestamp:     datetime.ToTime(vals[253].Uint32()),
 		Sensor:        typedef.AntChannelId(vals[0].Uint32z()),
 		StartPressure: vals[1].Uint16(),

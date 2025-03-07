@@ -42,10 +42,20 @@ type Set struct {
 // NewSet creates new Set struct based on given mesg.
 // If mesg is nil, it will return Set with all fields being set to its corresponding invalid value.
 func NewSet(mesg *proto.Message) *Set {
-	vals := [255]proto.Value{}
+	m := new(Set)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Set's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Set) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -62,7 +72,7 @@ func NewSet(mesg *proto.Message) *Set {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Set{
+	*m = Set{
 		Timestamp:   datetime.ToTime(vals[254].Uint32()),
 		Duration:    vals[0].Uint32(),
 		Repetitions: vals[3].Uint16(),

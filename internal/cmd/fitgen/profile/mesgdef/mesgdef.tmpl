@@ -41,16 +41,25 @@ type {{ .Name }} struct {
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
-	vals := [{{ .MaxFieldNum }}]proto.Value{}
+	m := new({{ .Name }})
+	m.Reset(mesg)
+	return m
+}
 
-	{{ if gt .MaxFieldExpandNum 1 -}}
-	var state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
-	{{ end -}}
+// Reset resets all {{ .Name }}'s fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *{{ $.Name }}) Reset(mesg *proto.Message) {
+	var (
+		vals [{{ .MaxFieldNum }}]proto.Value
+		{{ if gt .MaxFieldExpandNum 1 -}}
+		state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
+		{{ end -}}
+		unknownFields []proto.Field
+		{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
+			developerFields []proto.DeveloperField
+		{{ end -}}
+	)
 
-	var unknownFields []proto.Field
-	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
-		var developerFields []proto.DeveloperField
-	{{ end -}}
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -76,7 +85,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 	}
 
 
-	return &{{ .Name }}{
+	*m = {{ .Name }}{
 		{{ range .Fields -}}
 			{{ .Name }}: {{ .TypedValue }},
 		{{ end }}
@@ -88,7 +97,7 @@ func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
 		DeveloperFields: developerFields,
 		{{ end }}
 	}
-}
+} 
 
 // ToMesg converts {{ .Name }} into proto.Message. If options is nil, default options will be used.
 func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
