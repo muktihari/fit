@@ -65,10 +65,20 @@ type DiveSettings struct {
 // NewDiveSettings creates new DiveSettings struct based on given mesg.
 // If mesg is nil, it will return DiveSettings with all fields being set to its corresponding invalid value.
 func NewDiveSettings(mesg *proto.Message) *DiveSettings {
-	vals := [255]proto.Value{}
+	m := new(DiveSettings)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all DiveSettings's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *DiveSettings) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -85,7 +95,7 @@ func NewDiveSettings(mesg *proto.Message) *DiveSettings {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &DiveSettings{
+	*m = DiveSettings{
 		Timestamp:                 datetime.ToTime(vals[253].Uint32()),
 		MessageIndex:              typedef.MessageIndex(vals[254].Uint16()),
 		Name:                      vals[0].String(),

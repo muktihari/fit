@@ -38,10 +38,20 @@ type Activity struct {
 // NewActivity creates new Activity struct based on given mesg.
 // If mesg is nil, it will return Activity with all fields being set to its corresponding invalid value.
 func NewActivity(mesg *proto.Message) *Activity {
-	vals := [254]proto.Value{}
+	m := new(Activity)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Activity's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Activity) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -58,7 +68,7 @@ func NewActivity(mesg *proto.Message) *Activity {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Activity{
+	*m = Activity{
 		Timestamp:      datetime.ToTime(vals[253].Uint32()),
 		TotalTimerTime: vals[0].Uint32(),
 		NumSessions:    vals[1].Uint16(),

@@ -32,10 +32,20 @@ type VideoFrame struct {
 // NewVideoFrame creates new VideoFrame struct based on given mesg.
 // If mesg is nil, it will return VideoFrame with all fields being set to its corresponding invalid value.
 func NewVideoFrame(mesg *proto.Message) *VideoFrame {
-	vals := [254]proto.Value{}
+	m := new(VideoFrame)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all VideoFrame's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *VideoFrame) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewVideoFrame(mesg *proto.Message) *VideoFrame {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &VideoFrame{
+	*m = VideoFrame{
 		Timestamp:   datetime.ToTime(vals[253].Uint32()),
 		TimestampMs: vals[0].Uint16(),
 		FrameNumber: vals[1].Uint32(),

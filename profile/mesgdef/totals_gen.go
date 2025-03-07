@@ -39,10 +39,20 @@ type Totals struct {
 // NewTotals creates new Totals struct based on given mesg.
 // If mesg is nil, it will return Totals with all fields being set to its corresponding invalid value.
 func NewTotals(mesg *proto.Message) *Totals {
-	vals := [255]proto.Value{}
+	m := new(Totals)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Totals's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Totals) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -59,7 +69,7 @@ func NewTotals(mesg *proto.Message) *Totals {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Totals{
+	*m = Totals{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:    datetime.ToTime(vals[253].Uint32()),
 		TimerTime:    vals[0].Uint32(),

@@ -29,10 +29,20 @@ type FileCreator struct {
 // NewFileCreator creates new FileCreator struct based on given mesg.
 // If mesg is nil, it will return FileCreator with all fields being set to its corresponding invalid value.
 func NewFileCreator(mesg *proto.Message) *FileCreator {
-	vals := [2]proto.Value{}
+	m := new(FileCreator)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all FileCreator's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *FileCreator) Reset(mesg *proto.Message) {
+	var (
+		vals            [2]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -49,7 +59,7 @@ func NewFileCreator(mesg *proto.Message) *FileCreator {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &FileCreator{
+	*m = FileCreator{
 		SoftwareVersion: vals[0].Uint16(),
 		HardwareVersion: vals[1].Uint8(),
 

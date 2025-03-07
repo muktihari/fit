@@ -29,10 +29,20 @@ type SlaveDevice struct {
 // NewSlaveDevice creates new SlaveDevice struct based on given mesg.
 // If mesg is nil, it will return SlaveDevice with all fields being set to its corresponding invalid value.
 func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
-	vals := [2]proto.Value{}
+	m := new(SlaveDevice)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SlaveDevice's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SlaveDevice) Reset(mesg *proto.Message) {
+	var (
+		vals            [2]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -49,7 +59,7 @@ func NewSlaveDevice(mesg *proto.Message) *SlaveDevice {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SlaveDevice{
+	*m = SlaveDevice{
 		Manufacturer: typedef.Manufacturer(vals[0].Uint16()),
 		Product:      vals[1].Uint16(),
 

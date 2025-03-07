@@ -30,10 +30,20 @@ type PowerZone struct {
 // NewPowerZone creates new PowerZone struct based on given mesg.
 // If mesg is nil, it will return PowerZone with all fields being set to its corresponding invalid value.
 func NewPowerZone(mesg *proto.Message) *PowerZone {
-	vals := [255]proto.Value{}
+	m := new(PowerZone)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all PowerZone's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *PowerZone) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -50,7 +60,7 @@ func NewPowerZone(mesg *proto.Message) *PowerZone {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &PowerZone{
+	*m = PowerZone{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[1].Uint16(),
 		Name:         vals[2].String(),

@@ -44,10 +44,20 @@ type WeightScale struct {
 // NewWeightScale creates new WeightScale struct based on given mesg.
 // If mesg is nil, it will return WeightScale with all fields being set to its corresponding invalid value.
 func NewWeightScale(mesg *proto.Message) *WeightScale {
-	vals := [254]proto.Value{}
+	m := new(WeightScale)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all WeightScale's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *WeightScale) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -64,7 +74,7 @@ func NewWeightScale(mesg *proto.Message) *WeightScale {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &WeightScale{
+	*m = WeightScale{
 		Timestamp:         datetime.ToTime(vals[253].Uint32()),
 		Weight:            typedef.Weight(vals[0].Uint16()),
 		PercentFat:        vals[1].Uint16(),

@@ -31,10 +31,20 @@ type StressLevel struct {
 // NewStressLevel creates new StressLevel struct based on given mesg.
 // If mesg is nil, it will return StressLevel with all fields being set to its corresponding invalid value.
 func NewStressLevel(mesg *proto.Message) *StressLevel {
-	vals := [2]proto.Value{}
+	m := new(StressLevel)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all StressLevel's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *StressLevel) Reset(mesg *proto.Message) {
+	var (
+		vals            [2]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewStressLevel(mesg *proto.Message) *StressLevel {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &StressLevel{
+	*m = StressLevel{
 		StressLevelValue: vals[0].Int16(),
 		StressLevelTime:  datetime.ToTime(vals[1].Uint32()),
 

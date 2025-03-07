@@ -40,9 +40,19 @@ type FieldDescription struct {
 // NewFieldDescription creates new FieldDescription struct based on given mesg.
 // If mesg is nil, it will return FieldDescription with all fields being set to its corresponding invalid value.
 func NewFieldDescription(mesg *proto.Message) *FieldDescription {
-	vals := [16]proto.Value{}
+	m := new(FieldDescription)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
+// Reset resets all FieldDescription's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *FieldDescription) Reset(mesg *proto.Message) {
+	var (
+		vals          [16]proto.Value
+		unknownFields []proto.Field
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -58,7 +68,7 @@ func NewFieldDescription(mesg *proto.Message) *FieldDescription {
 		pool.Put(arr)
 	}
 
-	return &FieldDescription{
+	*m = FieldDescription{
 		DeveloperDataIndex:    vals[0].Uint8(),
 		FieldDefinitionNumber: vals[1].Uint8(),
 		FitBaseTypeId:         basetype.BaseType((vals[2]).Uint8()),

@@ -32,10 +32,20 @@ type HsaConfigurationData struct {
 // NewHsaConfigurationData creates new HsaConfigurationData struct based on given mesg.
 // If mesg is nil, it will return HsaConfigurationData with all fields being set to its corresponding invalid value.
 func NewHsaConfigurationData(mesg *proto.Message) *HsaConfigurationData {
-	vals := [254]proto.Value{}
+	m := new(HsaConfigurationData)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HsaConfigurationData's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HsaConfigurationData) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewHsaConfigurationData(mesg *proto.Message) *HsaConfigurationData {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HsaConfigurationData{
+	*m = HsaConfigurationData{
 		Timestamp: datetime.ToTime(vals[253].Uint32()),
 		Data:      vals[0].SliceUint8(),
 		DataSize:  vals[1].Uint8(),

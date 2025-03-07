@@ -31,10 +31,20 @@ type SpeedZone struct {
 // NewSpeedZone creates new SpeedZone struct based on given mesg.
 // If mesg is nil, it will return SpeedZone with all fields being set to its corresponding invalid value.
 func NewSpeedZone(mesg *proto.Message) *SpeedZone {
-	vals := [255]proto.Value{}
+	m := new(SpeedZone)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SpeedZone's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SpeedZone) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewSpeedZone(mesg *proto.Message) *SpeedZone {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SpeedZone{
+	*m = SpeedZone{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[0].Uint16(),
 		Name:         vals[1].String(),

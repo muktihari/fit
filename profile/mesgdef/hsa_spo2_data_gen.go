@@ -33,10 +33,20 @@ type HsaSpo2Data struct {
 // NewHsaSpo2Data creates new HsaSpo2Data struct based on given mesg.
 // If mesg is nil, it will return HsaSpo2Data with all fields being set to its corresponding invalid value.
 func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
-	vals := [254]proto.Value{}
+	m := new(HsaSpo2Data)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HsaSpo2Data's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HsaSpo2Data) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -53,7 +63,7 @@ func NewHsaSpo2Data(mesg *proto.Message) *HsaSpo2Data {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HsaSpo2Data{
+	*m = HsaSpo2Data{
 		Timestamp:          datetime.ToTime(vals[253].Uint32()),
 		ProcessingInterval: vals[0].Uint16(),
 		ReadingSpo2:        vals[1].SliceUint8(),

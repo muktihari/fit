@@ -30,10 +30,20 @@ type CadenceZone struct {
 // NewCadenceZone creates new CadenceZone struct based on given mesg.
 // If mesg is nil, it will return CadenceZone with all fields being set to its corresponding invalid value.
 func NewCadenceZone(mesg *proto.Message) *CadenceZone {
-	vals := [255]proto.Value{}
+	m := new(CadenceZone)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all CadenceZone's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *CadenceZone) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -50,7 +60,7 @@ func NewCadenceZone(mesg *proto.Message) *CadenceZone {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &CadenceZone{
+	*m = CadenceZone{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		HighValue:    vals[0].Uint8(),
 		Name:         vals[1].String(),

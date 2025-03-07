@@ -31,10 +31,20 @@ type Course struct {
 // NewCourse creates new Course struct based on given mesg.
 // If mesg is nil, it will return Course with all fields being set to its corresponding invalid value.
 func NewCourse(mesg *proto.Message) *Course {
-	vals := [8]proto.Value{}
+	m := new(Course)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Course's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Course) Reset(mesg *proto.Message) {
+	var (
+		vals            [8]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewCourse(mesg *proto.Message) *Course {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Course{
+	*m = Course{
 		Sport:        typedef.Sport(vals[4].Uint8()),
 		Name:         vals[5].String(),
 		Capabilities: typedef.CourseCapabilities(vals[6].Uint32z()),

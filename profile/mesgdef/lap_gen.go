@@ -156,11 +156,21 @@ type Lap struct {
 // NewLap creates new Lap struct based on given mesg.
 // If mesg is nil, it will return Lap with all fields being set to its corresponding invalid value.
 func NewLap(mesg *proto.Message) *Lap {
-	vals := [255]proto.Value{}
+	m := new(Lap)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [18]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Lap's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Lap) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		state           [18]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -181,7 +191,7 @@ func NewLap(mesg *proto.Message) *Lap {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Lap{
+	*m = Lap{
 		MessageIndex:                  typedef.MessageIndex(vals[254].Uint16()),
 		Timestamp:                     datetime.ToTime(vals[253].Uint32()),
 		Event:                         typedef.Event(vals[0].Uint8()),

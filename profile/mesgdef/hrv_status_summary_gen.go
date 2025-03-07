@@ -38,10 +38,20 @@ type HrvStatusSummary struct {
 // NewHrvStatusSummary creates new HrvStatusSummary struct based on given mesg.
 // If mesg is nil, it will return HrvStatusSummary with all fields being set to its corresponding invalid value.
 func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
-	vals := [254]proto.Value{}
+	m := new(HrvStatusSummary)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HrvStatusSummary's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HrvStatusSummary) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -58,7 +68,7 @@ func NewHrvStatusSummary(mesg *proto.Message) *HrvStatusSummary {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HrvStatusSummary{
+	*m = HrvStatusSummary{
 		Timestamp:             datetime.ToTime(vals[253].Uint32()),
 		WeeklyAverage:         vals[0].Uint16(),
 		LastNightAverage:      vals[1].Uint16(),

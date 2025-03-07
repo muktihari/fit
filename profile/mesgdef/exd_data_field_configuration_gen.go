@@ -35,11 +35,21 @@ type ExdDataFieldConfiguration struct {
 // NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg.
 // If mesg is nil, it will return ExdDataFieldConfiguration with all fields being set to its corresponding invalid value.
 func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguration {
-	vals := [6]proto.Value{}
+	m := new(ExdDataFieldConfiguration)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [1]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all ExdDataFieldConfiguration's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *ExdDataFieldConfiguration) Reset(mesg *proto.Message) {
+	var (
+		vals            [6]proto.Value
+		state           [1]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -60,7 +70,7 @@ func NewExdDataFieldConfiguration(mesg *proto.Message) *ExdDataFieldConfiguratio
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &ExdDataFieldConfiguration{
+	*m = ExdDataFieldConfiguration{
 		ScreenIndex:  vals[0].Uint8(),
 		ConceptField: vals[1].Uint8(),
 		FieldId:      vals[2].Uint8(),

@@ -32,10 +32,20 @@ type ZonesTarget struct {
 // NewZonesTarget creates new ZonesTarget struct based on given mesg.
 // If mesg is nil, it will return ZonesTarget with all fields being set to its corresponding invalid value.
 func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
-	vals := [8]proto.Value{}
+	m := new(ZonesTarget)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all ZonesTarget's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *ZonesTarget) Reset(mesg *proto.Message) {
+	var (
+		vals            [8]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewZonesTarget(mesg *proto.Message) *ZonesTarget {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &ZonesTarget{
+	*m = ZonesTarget{
 		MaxHeartRate:             vals[1].Uint8(),
 		ThresholdHeartRate:       vals[2].Uint8(),
 		FunctionalThresholdPower: vals[3].Uint16(),

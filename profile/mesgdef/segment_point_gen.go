@@ -38,11 +38,21 @@ type SegmentPoint struct {
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.
 // If mesg is nil, it will return SegmentPoint with all fields being set to its corresponding invalid value.
 func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
-	vals := [255]proto.Value{}
+	m := new(SegmentPoint)
+	m.Reset(mesg)
+	return m
+}
 
-	var state [1]uint8
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SegmentPoint's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SegmentPoint) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		state           [1]uint8
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -63,7 +73,7 @@ func NewSegmentPoint(mesg *proto.Message) *SegmentPoint {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SegmentPoint{
+	*m = SegmentPoint{
 		MessageIndex:     typedef.MessageIndex(vals[254].Uint16()),
 		PositionLat:      vals[1].Int32(),
 		PositionLong:     vals[2].Int32(),

@@ -31,10 +31,20 @@ type HsaEvent struct {
 // NewHsaEvent creates new HsaEvent struct based on given mesg.
 // If mesg is nil, it will return HsaEvent with all fields being set to its corresponding invalid value.
 func NewHsaEvent(mesg *proto.Message) *HsaEvent {
-	vals := [254]proto.Value{}
+	m := new(HsaEvent)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all HsaEvent's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *HsaEvent) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -51,7 +61,7 @@ func NewHsaEvent(mesg *proto.Message) *HsaEvent {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &HsaEvent{
+	*m = HsaEvent{
 		Timestamp: datetime.ToTime(vals[253].Uint32()),
 		EventId:   vals[0].Uint8(),
 

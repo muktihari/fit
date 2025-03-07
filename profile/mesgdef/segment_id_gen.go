@@ -36,10 +36,20 @@ type SegmentId struct {
 // NewSegmentId creates new SegmentId struct based on given mesg.
 // If mesg is nil, it will return SegmentId with all fields being set to its corresponding invalid value.
 func NewSegmentId(mesg *proto.Message) *SegmentId {
-	vals := [9]proto.Value{}
+	m := new(SegmentId)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all SegmentId's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *SegmentId) Reset(mesg *proto.Message) {
+	var (
+		vals            [9]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -56,7 +66,7 @@ func NewSegmentId(mesg *proto.Message) *SegmentId {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &SegmentId{
+	*m = SegmentId{
 		Name:                  vals[0].String(),
 		Uuid:                  vals[1].String(),
 		Sport:                 typedef.Sport(vals[2].Uint8()),

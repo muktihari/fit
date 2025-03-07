@@ -36,10 +36,20 @@ type VideoClip struct {
 // NewVideoClip creates new VideoClip struct based on given mesg.
 // If mesg is nil, it will return VideoClip with all fields being set to its corresponding invalid value.
 func NewVideoClip(mesg *proto.Message) *VideoClip {
-	vals := [8]proto.Value{}
+	m := new(VideoClip)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all VideoClip's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *VideoClip) Reset(mesg *proto.Message) {
+	var (
+		vals            [8]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -56,7 +66,7 @@ func NewVideoClip(mesg *proto.Message) *VideoClip {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &VideoClip{
+	*m = VideoClip{
 		ClipNumber:       vals[0].Uint16(),
 		StartTimestamp:   datetime.ToTime(vals[1].Uint32()),
 		StartTimestampMs: vals[2].Uint16(),

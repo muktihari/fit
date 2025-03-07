@@ -40,10 +40,20 @@ type GpsMetadata struct {
 // NewGpsMetadata creates new GpsMetadata struct based on given mesg.
 // If mesg is nil, it will return GpsMetadata with all fields being set to its corresponding invalid value.
 func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
-	vals := [254]proto.Value{}
+	m := new(GpsMetadata)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all GpsMetadata's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *GpsMetadata) Reset(mesg *proto.Message) {
+	var (
+		vals            [254]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -60,7 +70,7 @@ func NewGpsMetadata(mesg *proto.Message) *GpsMetadata {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &GpsMetadata{
+	*m = GpsMetadata{
 		Timestamp:        datetime.ToTime(vals[253].Uint32()),
 		TimestampMs:      vals[0].Uint16(),
 		PositionLat:      vals[1].Int32(),

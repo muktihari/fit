@@ -32,10 +32,20 @@ type MesgCapabilities struct {
 // NewMesgCapabilities creates new MesgCapabilities struct based on given mesg.
 // If mesg is nil, it will return MesgCapabilities with all fields being set to its corresponding invalid value.
 func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
-	vals := [255]proto.Value{}
+	m := new(MesgCapabilities)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all MesgCapabilities's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *MesgCapabilities) Reset(mesg *proto.Message) {
+	var (
+		vals            [255]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -52,7 +62,7 @@ func NewMesgCapabilities(mesg *proto.Message) *MesgCapabilities {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &MesgCapabilities{
+	*m = MesgCapabilities{
 		MessageIndex: typedef.MessageIndex(vals[254].Uint16()),
 		File:         typedef.File(vals[0].Uint8()),
 		MesgNum:      typedef.MesgNum(vals[1].Uint16()),

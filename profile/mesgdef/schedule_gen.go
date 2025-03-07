@@ -36,10 +36,20 @@ type Schedule struct {
 // NewSchedule creates new Schedule struct based on given mesg.
 // If mesg is nil, it will return Schedule with all fields being set to its corresponding invalid value.
 func NewSchedule(mesg *proto.Message) *Schedule {
-	vals := [7]proto.Value{}
+	m := new(Schedule)
+	m.Reset(mesg)
+	return m
+}
 
-	var unknownFields []proto.Field
-	var developerFields []proto.DeveloperField
+// Reset resets all Schedule's fields based on given mesg.
+// If mesg is nil, all fields will be set to its corresponding invalid value.
+func (m *Schedule) Reset(mesg *proto.Message) {
+	var (
+		vals            [7]proto.Value
+		unknownFields   []proto.Field
+		developerFields []proto.DeveloperField
+	)
+
 	if mesg != nil {
 		arr := pool.Get().(*[poolsize]proto.Field)
 		unknownFields = arr[:0]
@@ -56,7 +66,7 @@ func NewSchedule(mesg *proto.Message) *Schedule {
 		developerFields = mesg.DeveloperFields
 	}
 
-	return &Schedule{
+	*m = Schedule{
 		Manufacturer:  typedef.Manufacturer(vals[0].Uint16()),
 		Product:       vals[1].Uint16(),
 		SerialNumber:  vals[2].Uint32z(),
