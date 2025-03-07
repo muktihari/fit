@@ -710,7 +710,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		if field.Name == factory.NameUnknown {
 			// Assign fieldDef's type for unknown field so later we can encode it as per its original value.
 			field.BaseType = fieldDef.BaseType
-			field.Type = profile.ProfileTypeFromBaseType(field.BaseType)
+			field.Type = profile.ProfileType(field.BaseType & basetype.BaseTypeNumMask)
 			// Check if the size corresponds to an array.
 			field.Array = fieldDef.Size > field.BaseType.Size() && fieldDef.Size%field.BaseType.Size() == 0
 			// Fallback to FIT Protocol's string rule: decoder will determine it by counting the utf8 null-terminated string.
@@ -720,7 +720,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 		var (
 			baseType    = field.BaseType
 			profileType = field.Type
-			array       = field.Array
+			isArray     = field.Array
 		)
 
 		// Gracefully handle poorly encoded FIT file.
@@ -728,21 +728,21 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			d.logField(mesg, fieldDef, "Size is zero. Skip")
 			continue
 		} else if fieldDef.Size < baseType.Size() {
-			baseType = basetype.Byte
-			profileType = profile.Byte
-			array = fieldDef.Size > baseType.Size() && fieldDef.Size&baseType.Size() == 0
+			baseType = basetype.Uint8
+			profileType = profile.Uint8
+			isArray = true
 			d.logField(mesg, fieldDef, "Size is less than expected. Fallback: decode as byte(s) and convert the value")
 		} else if fieldDef.Size > baseType.Size() && !field.Array && baseType != basetype.String {
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
-		field.Value, err = d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, profileType, array, overrideStringArray)
+		field.Value, err = d.readValue(fieldDef.Size, mesgDef.Architecture, baseType, profileType, isArray, overrideStringArray)
 		if err != nil {
 			return err
 		}
 
 		if baseType != field.BaseType { // Convert value
-			field.Value = convertBytesToValue(field.Value, field.BaseType)
+			field.Value = convertBytesToValue(field.Value.SliceUint8(), mesgDef.Architecture, field.BaseType)
 		}
 
 		if field.Num == proto.FieldNumTimestamp && field.Value.Type() == proto.TypeUint32 {
@@ -989,23 +989,22 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 				fieldDesc.FitBaseTypeId, errInvalidBaseType)
 		}
 
-		var isArray bool
-		baseType := fieldDesc.FitBaseTypeId
-		profileType := profile.ProfileTypeFromBaseType(baseType)
+		var (
+			baseType    = fieldDesc.FitBaseTypeId
+			profileType = profile.ProfileType(baseType & basetype.BaseTypeNumMask)
+			isArray     = devFieldDef.Size > baseType.Size() && devFieldDef.Size%baseType.Size() == 0
+		)
 
 		// Gracefully handle poorly encoded FIT file.
 		if devFieldDef.Size == 0 {
 			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId, "Size is zero. Skip")
 			continue
 		} else if devFieldDef.Size < fieldDesc.FitBaseTypeId.Size() {
-			baseType = basetype.Byte
-			profileType = profile.Byte
+			baseType = basetype.Uint8
+			profileType = profile.Uint8
+			isArray = true
 			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId,
 				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
-		}
-
-		if devFieldDef.Size > baseType.Size() && devFieldDef.Size%baseType.Size() == 0 {
-			isArray = true
 		}
 
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
@@ -1017,7 +1016,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		if baseType != fieldDesc.FitBaseTypeId { // Convert value
-			val = convertBytesToValue(val, fieldDesc.FitBaseTypeId)
+			val = convertBytesToValue(val.SliceUint8(), mesgDef.Architecture, fieldDesc.FitBaseTypeId)
 		}
 
 		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
@@ -1165,7 +1164,7 @@ func convertUint32ToValue(val uint32, baseType basetype.BaseType) proto.Value {
 	switch baseType {
 	case basetype.Sint8:
 		return proto.Int8(int8(val))
-	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
+	case basetype.Enum, basetype.Byte, basetype.Uint8, basetype.Uint8z:
 		return proto.Uint8(uint8(val))
 	case basetype.Sint16:
 		return proto.Int16(int16(val))
@@ -1188,23 +1187,24 @@ func convertUint32ToValue(val uint32, baseType basetype.BaseType) proto.Value {
 }
 
 // convertBytesToValue converts val in the form of byte or []byte into target baseType.
-// This is used for casting value of bad encoded FIT files.
-func convertBytesToValue(val proto.Value, baseType basetype.BaseType) proto.Value {
+// This is used for casting value of bad encoded FIT files where value takes fewer bytes
+// than specified in profile. Example:
+//   - 1 byte but for uint16, should have been 2 bytes
+//   - 3 bytes but for uint32, should have been 4 bytes
+func convertBytesToValue(b []uint8, arch byte, baseType basetype.BaseType) proto.Value {
 	var value uint64
-	switch val.Type() {
-	case proto.TypeUint8:
-		value = uint64(val.Uint8())
-	case proto.TypeSliceUint8:
-		b := val.SliceUint8()
+	if arch == proto.LittleEndian {
 		for i := range b {
 			value |= uint64(b[i]) << (i * 8)
 		}
+	} else {
+		n := len(b) - 1
+		for i := range b {
+			value |= uint64(b[i]) << ((n - i) * 8)
+		}
 	}
-	switch baseType {
-	case basetype.Sint8:
-		return proto.Int8(int8(value))
-	case basetype.Enum, basetype.Uint8, basetype.Uint8z:
-		return proto.Uint8(uint8(value))
+
+	switch baseType { // only eligible for numeric type size > 1
 	case basetype.Sint16:
 		return proto.Int16(int16(value))
 	case basetype.Uint16, basetype.Uint16z:
@@ -1221,8 +1221,9 @@ func convertBytesToValue(val proto.Value, baseType basetype.BaseType) proto.Valu
 		return proto.Float32(float32(value))
 	case basetype.Float64:
 		return proto.Float64(float64(value))
+	default:
+		return proto.SliceUint8(b)
 	}
-	return val
 }
 
 // valueAppend appends elem into slice. Elem must be has type element of

@@ -3000,75 +3000,83 @@ func TestConvertUint32ToValue(t *testing.T) {
 
 func TestConvertBytesToValue(t *testing.T) {
 	tt := []struct {
-		value    proto.Value
+		value    []uint8
+		arch     byte
 		baseType basetype.BaseType
 		expected proto.Value
 	}{
 		{
-			value:    proto.Uint8(1),
-			baseType: basetype.Sint8,
-			expected: proto.Int8(1),
-		},
-		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Uint8,
-			expected: proto.Uint8(1),
+			expected: proto.SliceUint8([]uint8{1}),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Sint16,
 			expected: proto.Int16(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Uint16,
 			expected: proto.Uint16(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Sint32,
 			expected: proto.Int32(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Uint32,
 			expected: proto.Uint32(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Sint64,
 			expected: proto.Int64(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Uint64,
 			expected: proto.Uint64(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Float32,
 			expected: proto.Float32(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.Float64,
 			expected: proto.Float64(1),
 		},
 		{
-			value:    proto.Uint8(1),
+			value:    []uint8{1},
 			baseType: basetype.String,
-			expected: proto.Uint8(1),
+			expected: proto.SliceUint8([]uint8{1}),
 		},
 		{
-			value:    proto.SliceUint8([]uint8{1, 1}),
+			value:    []uint8{1, 1},
 			baseType: basetype.Uint32,
 			expected: proto.Uint32(257),
+		},
+		{
+			value:    []uint8{1, 2, 3},
+			arch:     proto.LittleEndian,
+			baseType: basetype.Uint32,
+			expected: proto.Uint32(3<<16 | 2<<8 | 1),
+		},
+		{
+			value:    []uint8{1, 2, 3},
+			arch:     proto.BigEndian,
+			baseType: basetype.Uint32,
+			expected: proto.Uint32(3 | 2<<8 | 1<<16),
 		},
 	}
 
 	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %v", i, tc.value.Any()), func(t *testing.T) {
-			val := convertBytesToValue(tc.value, tc.baseType)
+		t.Run(fmt.Sprintf("[%d] %v %v", i, tc.value, tc.expected.Any()), func(t *testing.T) {
+			val := convertBytesToValue(tc.value, tc.arch, tc.baseType)
 			if diff := cmp.Diff(val, tc.expected,
 				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
