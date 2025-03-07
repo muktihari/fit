@@ -483,8 +483,6 @@ func (v Value) Align(t basetype.BaseType) bool {
 // Valid checks whether the Value is valid based on given basetype. This does not verify whether the Type of
 // the Value aligns with the provided BaseType. For slices, even though only one element is valid, the Value will be counted a valid value.
 func (v Value) Valid(t basetype.BaseType) bool {
-	var invalidCount int
-
 	switch v.Type() {
 	case TypeBool:
 		return v.num < 2 // Only 0 (false) and 1 (true) is valid
@@ -534,131 +532,131 @@ func (v Value) Valid(t basetype.BaseType) bool {
 	case TypeSliceBool:
 		vals := v.SliceBool()
 		for i := range vals {
-			if vals[i] == typedef.BoolInvalid {
-				invalidCount++
+			if vals[i] != typedef.BoolInvalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceInt8:
 		vals := v.SliceInt8()
 		for i := range vals {
-			if vals[i] == basetype.Sint8Invalid {
-				invalidCount++
+			if vals[i] != basetype.Sint8Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceUint8:
 		vals := v.SliceUint8()
 		if t == basetype.Uint8z {
 			for i := range vals {
-				if vals[i] == basetype.Uint8zInvalid {
-					invalidCount++
+				if vals[i] != basetype.Uint8zInvalid {
+					return true
 				}
 			}
 		} else {
 			for i := range vals {
-				if vals[i] == basetype.Uint8Invalid {
-					invalidCount++
+				if vals[i] != basetype.Uint8Invalid {
+					return true
 				}
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceInt16:
 		vals := v.SliceInt16()
 		for i := range vals {
-			if vals[i] == basetype.Sint16Invalid {
-				invalidCount++
+			if vals[i] != basetype.Sint16Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceUint16:
 		vals := v.SliceUint16()
 		if t == basetype.Uint16z {
 			for i := range vals {
-				if vals[i] == basetype.Uint16zInvalid {
-					invalidCount++
+				if vals[i] != basetype.Uint16zInvalid {
+					return true
 				}
 			}
 		} else {
 			for i := range vals {
-				if vals[i] == basetype.Uint16Invalid {
-					invalidCount++
+				if vals[i] != basetype.Uint16Invalid {
+					return true
 				}
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceInt32:
 		vals := v.SliceInt32()
 		for i := range vals {
-			if vals[i] == basetype.Sint32Invalid {
-				invalidCount++
+			if vals[i] != basetype.Sint32Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceUint32:
 		vals := v.SliceUint32()
 		if t == basetype.Uint32z {
 			for i := range vals {
-				if vals[i] == basetype.Uint32zInvalid {
-					invalidCount++
+				if vals[i] != basetype.Uint32zInvalid {
+					return true
 				}
 			}
 		} else {
 			for i := range vals {
-				if vals[i] == basetype.Uint32Invalid {
-					invalidCount++
+				if vals[i] != basetype.Uint32Invalid {
+					return true
 				}
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceInt64:
 		vals := v.SliceInt64()
 		for i := range vals {
-			if vals[i] == basetype.Sint64Invalid {
-				invalidCount++
+			if vals[i] != basetype.Sint64Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceUint64:
 		vals := v.SliceUint64()
 		if t == basetype.Uint64z {
 			for i := range vals {
-				if vals[i] == basetype.Uint64zInvalid {
-					invalidCount++
+				if vals[i] != basetype.Uint64zInvalid {
+					return true
 				}
 			}
 		} else {
 			for i := range vals {
-				if vals[i] == basetype.Uint64Invalid {
-					invalidCount++
+				if vals[i] != basetype.Uint64Invalid {
+					return true
 				}
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceFloat32:
 		vals := v.SliceFloat32()
 		for i := range vals {
-			if math.Float32bits(vals[i]) == basetype.Float32Invalid {
-				invalidCount++
+			if math.Float32bits(vals[i]) != basetype.Float32Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceFloat64:
 		vals := v.SliceFloat64()
 		for i := range vals {
-			if math.Float64bits(vals[i]) == basetype.Float64Invalid {
-				invalidCount++
+			if math.Float64bits(vals[i]) != basetype.Float64Invalid {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	case TypeSliceString:
 		vals := v.SliceString()
 		for i := range vals {
-			if vals[i] == basetype.StringInvalid || vals[i] == "\x00" {
-				invalidCount++
+			if vals[i] != basetype.StringInvalid && vals[i] != "\x00" {
+				return true
 			}
 		}
-		return invalidCount != len(vals)
+		return false
 	}
 	return false
 }
