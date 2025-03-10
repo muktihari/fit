@@ -108,6 +108,7 @@ var (
 	ptrUint64  = unsafe.Pointer(&memptr[TypeUint64])
 	ptrFloat32 = unsafe.Pointer(&memptr[TypeFloat32])
 	ptrFloat64 = unsafe.Pointer(&memptr[TypeFloat64])
+	endAddr    = uintptr(ptrFloat64)
 )
 
 const (
@@ -118,7 +119,7 @@ const (
 
 // Return the underlying type the Value holds.
 func (v Value) Type() Type {
-	if p := uintptr(v.ptr); p >= startAddr && p <= uintptr(ptrFloat64) {
+	if p := uintptr(v.ptr); p >= startAddr && p <= endAddr {
 		return Type(p - startAddr)
 	}
 	return Type(v.num >> vshift)
@@ -247,7 +248,7 @@ func (v Value) Float64() float64 {
 // String returns Value as string, if it's not a valid string value, it returns basetype.StringInvalid.
 // This should not be treated as a Go's String method, use Any() if you want to print the underlying value.
 func (v Value) String() string {
-	if Type(v.num>>vshift) != TypeString {
+	if v.Type() != TypeString {
 		return basetype.StringInvalid
 	}
 	return unsafe.String((*byte)(v.ptr), v.num&vmask)
@@ -274,7 +275,7 @@ func (v Value) Format(p fmt.State, verb rune) {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceBool() []typedef.Bool {
-	if Type(v.num>>vshift) != TypeSliceBool {
+	if v.Type() != TypeSliceBool {
 		return nil
 	}
 	return unsafe.Slice((*typedef.Bool)(v.ptr), v.num&vmask)
@@ -284,7 +285,7 @@ func (v Value) SliceBool() []typedef.Bool {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt8() []int8 {
-	if Type(v.num>>vshift) != TypeSliceInt8 {
+	if v.Type() != TypeSliceInt8 {
 		return nil
 	}
 	return unsafe.Slice((*int8)(v.ptr), v.num&vmask)
@@ -294,7 +295,7 @@ func (v Value) SliceInt8() []int8 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint8() []uint8 {
-	if Type(v.num>>vshift) != TypeSliceUint8 {
+	if v.Type() != TypeSliceUint8 {
 		return nil
 	}
 	return unsafe.Slice((*uint8)(v.ptr), v.num&vmask)
@@ -304,7 +305,7 @@ func (v Value) SliceUint8() []uint8 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt16() []int16 {
-	if Type(v.num>>vshift) != TypeSliceInt16 {
+	if v.Type() != TypeSliceInt16 {
 		return nil
 	}
 	return unsafe.Slice((*int16)(v.ptr), v.num&vmask)
@@ -314,7 +315,7 @@ func (v Value) SliceInt16() []int16 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint16() []uint16 {
-	if Type(v.num>>vshift) != TypeSliceUint16 {
+	if v.Type() != TypeSliceUint16 {
 		return nil
 	}
 	return unsafe.Slice((*uint16)(v.ptr), v.num&vmask)
@@ -324,7 +325,7 @@ func (v Value) SliceUint16() []uint16 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt32() []int32 {
-	if Type(v.num>>vshift) != TypeSliceInt32 {
+	if v.Type() != TypeSliceInt32 {
 		return nil
 	}
 	return unsafe.Slice((*int32)(v.ptr), v.num&vmask)
@@ -334,7 +335,7 @@ func (v Value) SliceInt32() []int32 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint32() []uint32 {
-	if Type(v.num>>vshift) != TypeSliceUint32 {
+	if v.Type() != TypeSliceUint32 {
 		return nil
 	}
 	return unsafe.Slice((*uint32)(v.ptr), v.num&vmask)
@@ -344,7 +345,7 @@ func (v Value) SliceUint32() []uint32 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceInt64() []int64 {
-	if Type(v.num>>vshift) != TypeSliceInt64 {
+	if v.Type() != TypeSliceInt64 {
 		return nil
 	}
 	return unsafe.Slice((*int64)(v.ptr), v.num&vmask)
@@ -354,7 +355,7 @@ func (v Value) SliceInt64() []int64 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceUint64() []uint64 {
-	if Type(v.num>>vshift) != TypeSliceUint64 {
+	if v.Type() != TypeSliceUint64 {
 		return nil
 	}
 	return unsafe.Slice((*uint64)(v.ptr), v.num&vmask)
@@ -364,7 +365,7 @@ func (v Value) SliceUint64() []uint64 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceFloat32() []float32 {
-	if Type(v.num>>vshift) != TypeSliceFloat32 {
+	if v.Type() != TypeSliceFloat32 {
 		return nil
 	}
 	return unsafe.Slice((*float32)(v.ptr), v.num&vmask)
@@ -374,7 +375,7 @@ func (v Value) SliceFloat32() []float32 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceFloat64() []float64 {
-	if Type(v.num>>vshift) != TypeSliceFloat64 {
+	if v.Type() != TypeSliceFloat64 {
 		return nil
 	}
 	return unsafe.Slice((*float64)(v.ptr), v.num&vmask)
@@ -384,7 +385,7 @@ func (v Value) SliceFloat64() []float64 {
 // The caller takes ownership of the returned value, so Value should no longer be used after this call,
 // except the returned value is copied and the copied value is used instead.
 func (v Value) SliceString() []string {
-	if Type(v.num>>vshift) != TypeSliceString {
+	if v.Type() != TypeSliceString {
 		return nil
 	}
 	return unsafe.Slice((*string)(v.ptr), v.num&vmask)
