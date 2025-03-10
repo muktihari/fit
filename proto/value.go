@@ -84,6 +84,7 @@ func (t Type) String() string {
 // Value is a zero alloc implementation value that hold any FIT protocol value
 // (value of primitive-types or slice of primitive-types).
 type Value struct {
+	_   [0]func()      // disallow ==
 	num uint64         // num holds either a numeric value or a slice's len + type identifier (5 msb).
 	ptr unsafe.Pointer // ptr holds either a pointer to type identifier or a pointer to slice's data.
 }
@@ -260,7 +261,7 @@ var _ fmt.Formatter = (*Value)(nil)
 // is used to return string value, rather than the Value formatted as a string.
 func (v Value) Format(p fmt.State, verb rune) {
 	switch {
-	case v == Value{}:
+	case v.num == 0 && v.ptr == nil:
 		fmt.Fprintf(p, "<invalid proto.Value>")
 	case verb != 'v':
 		fmt.Fprintf(p, fmt.FormatString(p, verb), v.Any())
