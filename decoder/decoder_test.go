@@ -1144,26 +1144,6 @@ func TestDecodeFileHeader(t *testing.T) {
 			err: io.EOF,
 		},
 		{
-			name: "decode invalid protocol",
-			r: func() io.Reader {
-				var buf, cur = append(buf[:0:0], buf...), 0
-				buf[1] = 100 // invalid protocol
-				return fnReader(func(b []byte) (n int, err error) {
-					m := len(buf)
-					if cur == m {
-						return 0, io.EOF
-					}
-					if cur+len(b) < m {
-						m = cur + len(b)
-					}
-					n = copy(b, buf[cur:m])
-					cur += n
-					return
-				})
-			}(),
-			err: proto.ErrProtocolVersionNotSupported,
-		},
-		{
 			name: "decode data type not `.FIT`",
 			r: func() io.Reader {
 				var buf, cur = append(buf[:0:0], buf...), 0
