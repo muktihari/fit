@@ -15,7 +15,6 @@ import (
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
@@ -26,7 +25,6 @@ func (e errorString) Error() string { return string(e) }
 const (
 	ErrNilWriter     = errorString("nil writer")
 	ErrEmptyMessages = errorString("empty messages")
-	ErrMissingFileId = errorString("missing file_id mesg")
 
 	ErrWriterAtOrWriteSeekerIsExpected = errorString("io.WriterAt or io.WriteSeeker is expected")
 )
@@ -285,11 +283,6 @@ func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 		return ErrEmptyMessages
 	}
 
-	if messages[0].Num != mesgnum.FileId {
-		return fmt.Errorf("first message is expected to be file_id, got: %s: %w",
-			messages[0].Num, ErrMissingFileId)
-	}
-
 	for i := range messages {
 		mesg := &messages[i]
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
@@ -346,7 +339,6 @@ func (e *Encoder) encodeWithEarlyCheckStrategy(fit *proto.FIT) error {
 	if err := e.encodeCRC(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -457,7 +449,6 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
-
 	return nil
 }
 

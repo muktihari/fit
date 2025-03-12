@@ -455,14 +455,6 @@ func TestValidateMessages(t *testing.T) {
 			err:             ErrEmptyMessages,
 		},
 		{
-			name:            "missing file_id",
-			protocolVersion: proto.V1,
-			messages: []proto.Message{{Num: mesgnum.Record, Fields: []proto.Field{
-				factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-			}}},
-			err: ErrMissingFileId,
-		},
-		{
 			name:            "protocol validation failed",
 			protocolVersion: proto.V1,
 			messages: []proto.Message{
