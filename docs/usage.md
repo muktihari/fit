@@ -847,7 +847,7 @@ func main() {
     defer f.Close()
 
     dec := decoder.NewRaw()
-    hash16 := crc16.New(nil)
+    hash16 := crc16.New()
 
     _, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
         switch flag {

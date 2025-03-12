@@ -866,7 +866,7 @@ func TestEncodeHeader(t *testing.T) {
 
 				binary.LittleEndian.PutUint16(b[2:4], profile.Version)
 
-				crc := crc16.New(nil)
+				crc := crc16.New()
 				crc.Write(b[:12])
 				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
 

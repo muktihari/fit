@@ -489,7 +489,7 @@ func TestCheckIntegrity(t *testing.T) {
 					DataType:        proto.DataTypeFIT,
 				}
 				b, _ := h.MarshalAppend(nil)
-				crc := crc16.New(nil)
+				crc := crc16.New()
 				crc.Write(b[:12])
 				binary.LittleEndian.PutUint16(b[12:14], crc.Sum16())
 				return bytes.NewReader(b)
@@ -654,7 +654,7 @@ func createFitForTest() (proto.FIT, []byte) {
 	bytesbuffer.Write(b)
 
 	// Marshal and calculate data size and crc checksum
-	crc16checker := crc16.New(nil)
+	crc16checker := crc16.New()
 	for i := range fit.Messages {
 		mesg := fit.Messages[i]
 		mesgDef, _ := proto.NewMessageDefinition(&mesg)

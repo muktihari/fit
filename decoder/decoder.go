@@ -199,7 +199,7 @@ func New(r io.Reader, opts ...Option) *Decoder {
 	d := &Decoder{
 		readBuffer:  new(readBuffer),
 		accumulator: NewAccumulator(),
-		crc16:       crc16.New(nil),
+		crc16:       crc16.New(),
 	}
 	d.Reset(r, opts...)
 	return d
