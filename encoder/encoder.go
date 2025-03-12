@@ -93,25 +93,14 @@ type Option func(o *options)
 // it will use proto.V1. This option overrides the FileHeader's ProtocolVersion and forces all FIT
 // files to use this ProtocolVersion during encoding.
 //
-// NOTE: If the given protocolVersion is not supported, the Protocol Version will not be changed.
-// Please validate using proto.Validate when putting user-defined Protocol Version to check
-// whether it is supported or not. Or just use predefined Protocol Version constants such as
-// proto.V1, proto.V2, etc, which the validity is ensured.
+// Available options: proto.V1 and proto.V2
 func WithProtocolVersion(protocolVersion proto.Version) Option {
-	return func(o *options) {
-		if proto.Validate(protocolVersion) == nil {
-			o.protocolVersion = protocolVersion
-		}
-	}
+	return func(o *options) { o.protocolVersion = protocolVersion }
 }
 
 // WithMessageValidator directs the Encoder to use this message validator instead of the default one.
 func WithMessageValidator(validator MessageValidator) Option {
-	return func(o *options) {
-		if validator != nil {
-			o.messageValidator = validator
-		}
-	}
+	return func(o *options) { o.messageValidator = validator }
 }
 
 // WithBigEndian directs the Encoder to encode values in Big-Endian bytes order (default: Little-Endian).
@@ -678,7 +667,6 @@ func (e *Encoder) encodeMessagesWithContext(ctx context.Context, messages []prot
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
-
 	return nil
 }
 

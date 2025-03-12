@@ -117,11 +117,7 @@ type Option func(o *options)
 
 // WithFactory sets custom factory.
 func WithFactory(factory Factory) Option {
-	return func(o *options) {
-		if factory != nil {
-			o.factory = factory
-		}
-	}
+	return func(o *options) { o.factory = factory }
 }
 
 // WithMesgListener adds listeners to the listener pool, where each listener will receive
@@ -488,10 +484,6 @@ func (d *Decoder) decodeFileHeader() error {
 		ProfileVersion:  binary.LittleEndian.Uint16(b[1:3]),
 		DataSize:        binary.LittleEndian.Uint32(b[3:7]),
 		DataType:        proto.DataTypeFIT,
-	}
-
-	if err := proto.Validate(d.fileHeader.ProtocolVersion); err != nil {
-		return err
 	}
 
 	if d.fileHeader.DataSize == 0 {
