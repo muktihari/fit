@@ -177,7 +177,7 @@ func WithWriteBufferSize(size int) Option {
 // Encoder to do so using WithWriteBufferSize(0).
 func New(w io.Writer, opts ...Option) *Encoder {
 	e := &Encoder{
-		crc16:             crc16.New(nil),
+		crc16:             crc16.New(),
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
 		buf:               make([]byte, 0, 1536),

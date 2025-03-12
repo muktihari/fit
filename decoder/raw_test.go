@@ -32,7 +32,7 @@ var fnDecodeRawErr = func(flag RawFlag, b []byte) error {
 
 func TestRawDecoderDecode(t *testing.T) {
 	_, buf := createFitForTest()
-	hash16 := crc16.New(nil)
+	hash16 := crc16.New()
 
 	tt := []struct {
 		name string
