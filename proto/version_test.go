@@ -26,7 +26,7 @@ func TestCreateVersion(t *testing.T) {
 		{
 			major:   2,
 			minor:   1,
-			version: proto.Version((1 << 4) | 1),
+			version: proto.Version((2 << 4) | 1),
 		},
 	}
 
