@@ -790,10 +790,6 @@ func ListMesgNum() []MesgNum {
 //
 // This is intended for those who prefer using this SDK as it is without the need to generate custom SDK using cmd/fitgen.
 func MesgNumRegister(v MesgNum, s string) error {
-	if v >= MesgNumInvalid {
-		return fmt.Errorf("could not register outside max range: %d", MesgNumInvalid)
-	}
-
 	switch v {
 	case MesgNumFileId:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumFileId", v)
@@ -1039,6 +1035,8 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumMfgRangeMin", v)
 	case MesgNumMfgRangeMax:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumMfgRangeMax", v)
+	case MesgNumInvalid:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumInvalid", v)
 	}
 
 	mesgnumToString[v] = s

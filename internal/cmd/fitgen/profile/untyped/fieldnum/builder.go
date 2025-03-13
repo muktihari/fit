@@ -52,8 +52,18 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 }
 
 func (b *Builder) Build() ([]generator.Data, error) {
+	messages := slices.Clone(b.messages)
+	slices.SortStableFunc(messages, func(x, y parser.Message) int {
+		if x.Name < y.Name {
+			return -1
+		} else if x.Name > y.Name {
+			return 1
+		}
+		return 0
+	})
+
 	constants := make([]shared.Constant, 0)
-	for _, mesg := range b.messages {
+	for _, mesg := range messages {
 		for _, field := range mesg.Fields {
 			baseType := b.lookup.BaseType(field.Type).String()
 			if field.Type == "bool" {
@@ -69,14 +79,6 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			})
 		}
 	}
-	slices.SortStableFunc(constants, func(x, y shared.Constant) int {
-		if x.Name < y.Name {
-			return -1
-		} else if x.Name > y.Name {
-			return 1
-		}
-		return 0
-	})
 
 	constants = append(constants, shared.Constant{
 		Name:   "Invalid",
