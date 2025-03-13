@@ -7,10 +7,10 @@
 package mesgdef
 
 import (
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
 	"math"
