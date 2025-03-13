@@ -121,20 +121,18 @@ func List{{ .Type }}() []{{ .Type }} {
 // 
 // This is intended for those who prefer using this SDK as it is without the need to generate custom SDK using cmd/fitgen.
 func {{ .Type }}Register(v {{ .Type }}, s string) error {
-	if v >= {{ .Type}}Invalid {
-		return fmt.Errorf("could not register outside max range: %d", {{ .Type}}Invalid)
-	}
-
     switch v {
     {{ range .Constants -}}
     case {{ .Name }}:
-		return fmt.Errorf("duplicate: %d is already exist for {{ .Name }}", v)
+        return fmt.Errorf("duplicate: %d is already exist for {{ .Name }}", v)
     {{ end -}}
+    case {{ .Type}}Invalid:
+        return fmt.Errorf("duplicate: %d is already exist for {{ .Type }}Invalid", v)
     }
 
-	{{ .Type | ToLower }}ToString[v] = s
-	stringTo{{ .Type }}[s] = v
+    {{ .Type | ToLower }}ToString[v] = s
+    stringTo{{ .Type }}[s] = v
 
-	return nil
+    return nil
 }
 {{ end }}
