@@ -19,13 +19,12 @@ import (
 )
 
 const (
-	ErrMissingDeveloperDataId  = errorString("missing developer data id")
-	ErrMissingFieldDescription = errorString("missing field description")
-
-	errNoFields          = errorString("no fields")
-	errInvalidUTF8String = errorString("invalid UTF-8 string")
-	errValueTypeMismatch = errorString("value type mismatch")
-	errExceedMaxAllowed  = errorString("exceed max allowed")
+	errNoFields                = errorString("no fields")
+	errValueTypeMismatch       = errorString("value type mismatch")
+	errInvalidUTF8String       = errorString("invalid UTF-8 string")
+	errExceedMaxAllowed        = errorString("exceed max allowed")
+	errMissingDeveloperDataId  = errorString("missing developer data id")
+	errMissingFieldDescription = errorString("missing field description")
 )
 
 // MessageValidator is an interface for implementing message validation before encoding the message.
@@ -168,7 +167,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 		}
 		if !ok {
 			return fmt.Errorf("developer field index: %d, num: %d: %w",
-				i, developerField.Num, ErrMissingDeveloperDataId)
+				i, developerField.Num, errMissingDeveloperDataId)
 		}
 
 		var fieldDesc *mesgdef.FieldDescription
@@ -182,7 +181,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 
 		if fieldDesc == nil {
 			return fmt.Errorf("developer field index: %d, num: %d: %w",
-				i, developerField.Num, ErrMissingFieldDescription)
+				i, developerField.Num, errMissingFieldDescription)
 		}
 
 		// Restore any scaled float64 value back into its corresponding integer representation.

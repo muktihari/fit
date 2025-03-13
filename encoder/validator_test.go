@@ -179,7 +179,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs: []error{nil, ErrMissingDeveloperDataId},
+			errs: []error{nil, errMissingDeveloperDataId},
 		},
 		{
 			name: "valid message with field description not found in previous message sequence",
@@ -197,7 +197,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs: []error{nil, ErrMissingFieldDescription},
+			errs: []error{nil, errMissingFieldDescription},
 		},
 		{
 			name: "invalid utf-8 string",

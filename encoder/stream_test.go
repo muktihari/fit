@@ -207,7 +207,7 @@ func TestStreamEncoderReset(t *testing.T) {
 			name: "io.WriteSeeker reset with io.Writer",
 			w1:   mockWriteSeeker{fnWriteOK, fnSeekOK},
 			w2:   fnWriteOK,
-			err:  ErrInvalidWriter,
+			err:  errInvalidWriter,
 		},
 	}
 

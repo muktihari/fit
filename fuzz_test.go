@@ -7,7 +7,6 @@ package fit_test
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -22,6 +21,7 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/typedef"
+	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
@@ -108,13 +108,13 @@ func FuzzDecodeEncodeRoundTrip(f *testing.F) {
 			if fit.Messages[0].Num != mesgnum.FileId {
 				t.Skipf("missing file_id mesg")
 			}
+			if missingDeveloperDataId(fit) {
+				// Currently, the decoder is does not strictly verify whether
+				// the DeveloperDataId message exist prior to decoding developer data,
+				// as long as FieldDefinition messages are present to define the data.
+				t.Skipf("missing developer data id message")
+			}
 			if err := enc.Encode(fit); err != nil {
-				if errors.Is(err, encoder.ErrMissingDeveloperDataId) {
-					// Currently, the decoder is does not strictly verify whether
-					// the DeveloperDataId message exist prior to decoding developer data,
-					// as long as FieldDefinition messages are present to define the data.
-					t.Skipf("missing developer data id message")
-				}
 				t.Fatal(err)
 			}
 		}
@@ -142,6 +142,23 @@ func FuzzDecodeEncodeRoundTrip(f *testing.F) {
 			t.Fatal(diff)
 		}
 	})
+}
+
+func missingDeveloperDataId(fit *proto.FIT) bool {
+	m := map[uint8]struct{}{}
+	for _, mesg := range fit.Messages {
+		if mesg.Num == mesgnum.DeveloperDataId {
+			v := mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8()
+			m[v] = struct{}{}
+			continue
+		}
+		for _, devField := range mesg.DeveloperFields {
+			if _, ok := m[devField.DeveloperDataIndex]; !ok {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // comparable checks whether the given bytes can be compared to encoded bytes
