@@ -16,9 +16,9 @@ const (
 	Vmax         = V2               // Vmax is an alias for the current latest version.
 )
 
-// CreateVersion creates version from major and minor value, it can only create version up to < Vmax.
+// CreateVersion creates version from major and minor value. Each value is 4 bits value (max: 15).
 func CreateVersion(major, minor byte) Version {
-	return Version((major << vMajorShift) | minor)
+	return Version(major<<vMajorShift | minor&vMinorMask)
 }
 
 // Major returns major value.
