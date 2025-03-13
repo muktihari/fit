@@ -154,11 +154,11 @@ func (f *Factory) RegisterMesg(mesg proto.Message) error {
 		f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
 	}
 	if mesg.Num > typedef.MesgNumMfgRangeMax {
-		return fmt.Errorf("could not register outside max range: %d: %w",
-			typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
+		return fmt.Errorf("mesg.Num %d is outside max range %d: %w",
+			mesg.Num, typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
 	}
 	if mesg.Num < 410 && mesgs[mesg.Num] != nil {
-		return fmt.Errorf("could not register on reserved predefined message, mesg.Num %d (%s) is already exist: %w",
+		return fmt.Errorf("mesg.Num %d is reserved for %q: %w",
 			mesg.Num, mesg.Num, ErrRegisterForbidden)
 	}
 	f.registeredMesgs[mesg.Num] = mesg
