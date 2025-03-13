@@ -16,8 +16,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/profile"
+	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/typedef"
 )
 

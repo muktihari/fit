@@ -21,12 +21,12 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/muktihari/fit/factory"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/hash"
 	"github.com/muktihari/fit/kit/hash/crc16"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
+	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
