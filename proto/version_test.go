@@ -28,8 +28,12 @@ func TestCreateVersion(t *testing.T) {
 			minor:   1,
 			version: proto.Version((2 << 4) | 1),
 		},
+		{
+			major:   0b0011_1110, // 62
+			minor:   0b0001_1000, // 24
+			version: 0b1110_1000, // 232
+		},
 	}
-
 	for _, tc := range tt {
 		t.Run(fmt.Sprintf("%d, %d", tc.major, tc.minor), func(t *testing.T) {
 			v := proto.CreateVersion(tc.major, tc.minor)
