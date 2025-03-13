@@ -13,11 +13,20 @@ import (
 
 // StreamEncoder is one layer above Encoder to enable encoding in streaming fashion.
 // This will only valid when the Writer given to the Encoder should either implement io.WriterAt or io.WriteSeeker.
-// This can only be created using (*Encoder).StreamEncoder() method.
 type StreamEncoder struct {
 	enc               *Encoder
 	fileHeader        proto.FileHeader
 	fileHeaderWritten bool
+}
+
+// NewStream returns a FIT stream encoder that enables message-by-message encoding.
+// The given w must also implement either io.WriterAt or io.WriteSeeker, otherwise, it returns error.
+func NewStream(w io.Writer, opts ...Option) (*StreamEncoder, error) {
+	switch w.(type) {
+	case io.WriterAt, io.WriteSeeker:
+		return &StreamEncoder{enc: New(w, opts...)}, nil
+	}
+	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", ErrInvalidWriter)
 }
 
 // WriteMessage writes message to the writer, it will auto write FileHeader when

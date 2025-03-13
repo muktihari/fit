@@ -7,7 +7,9 @@ package encoder
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
+	"reflect"
 	"testing"
 	"time"
 
@@ -18,6 +20,83 @@ import (
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestNewStream(t *testing.T) {
+	mv := NewMessageValidator()
+	tt := []struct {
+		name            string
+		w               io.Writer
+		opts            []Option
+		expectedOptions options
+		err             error
+	}{
+		{
+			name: "w io.WriterAt",
+			w:    &mockWriterAt{Writer: fnWriteOK, WriterAt: fnWriteAtOK},
+		},
+		{
+			name: "w io.WriteSeeker",
+			w:    &mockWriteSeeker{Writer: fnWriteOK, Seeker: fnSeekOK},
+		},
+		{
+			name: "test options should be passed",
+			w:    &mockWriteSeeker{Writer: fnWriteOK, Seeker: fnSeekOK},
+			opts: []Option{
+				WithBigEndian(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
+				WithMessageValidator(mv),
+			},
+			expectedOptions: func() options {
+				o := defaultOptions()
+				o.endianness = proto.BigEndian
+				o.headerOption = HeaderOptionCompressedTimestamp
+				o.messageValidator = mv
+				return o
+			}(),
+		},
+		{
+			name: "w io.Writer",
+			w:    fnWriteOK,
+			err:  ErrInvalidWriter,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			streamEnc, err := NewStream(tc.w, tc.opts...)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+
+			switch tc.w.(type) {
+			case io.WriterAt:
+				if _, ok := streamEnc.enc.w.(io.WriterAt); !ok {
+					t.Fatal("expected: io.WriterAt")
+				}
+			case io.WriteSeeker:
+				if _, ok := streamEnc.enc.w.(io.WriteSeeker); !ok {
+					t.Fatal("expected: io.WriteSeeker")
+				}
+			}
+
+			if tc.opts == nil {
+				return
+			}
+
+			if diff := cmp.Diff(streamEnc.enc.options, tc.expectedOptions,
+				cmp.AllowUnexported(options{}),
+				cmp.Transformer("MessaveValidator", func(mv MessageValidator) uintptr {
+					return reflect.ValueOf(mv).Pointer()
+				}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
 
 func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 	w := &writerAtStub{}
