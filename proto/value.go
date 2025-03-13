@@ -126,6 +126,74 @@ func (v Value) Type() Type {
 	return Type(v.num >> vshift)
 }
 
+var sizes = [...]int{
+	TypeInvalid: 0,
+	TypeBool:    1,
+	TypeInt8:    1,
+	TypeUint8:   1,
+	TypeInt16:   2,
+	TypeUint16:  2,
+	TypeInt32:   4,
+	TypeUint32:  4,
+	TypeInt64:   8,
+	TypeUint64:  8,
+	TypeFloat32: 4,
+	TypeFloat64: 8,
+	TypeString:  1,
+}
+
+// Size returns the size of Value in binary from. For every string in Value,
+// if the last index of the string is not '\x00', size += 1.
+func (v Value) Size() int {
+	switch typ := v.Type(); typ {
+	case TypeString:
+		s := v.String()
+		n := len(s)
+		if n == 0 || s[n-1] != '\x00' {
+			n += 1
+		}
+		return n * sizes[TypeString]
+	case TypeSliceBool:
+		return int(v.num&vmask) * sizes[TypeBool]
+	case TypeSliceInt8:
+		return int(v.num&vmask) * sizes[TypeInt8]
+	case TypeSliceUint8:
+		return int(v.num&vmask) * sizes[TypeUint8]
+	case TypeSliceInt16:
+		return int(v.num&vmask) * sizes[TypeInt16]
+	case TypeSliceUint16:
+		return int(v.num&vmask) * sizes[TypeUint16]
+	case TypeSliceInt32:
+		return int(v.num&vmask) * sizes[TypeInt32]
+	case TypeSliceUint32:
+		return int(v.num&vmask) * sizes[TypeUint32]
+	case TypeSliceInt64:
+		return int(v.num&vmask) * sizes[TypeInt64]
+	case TypeSliceUint64:
+		return int(v.num&vmask) * sizes[TypeUint64]
+	case TypeSliceFloat32:
+		return int(v.num&vmask) * sizes[TypeFloat32]
+	case TypeSliceFloat64:
+		return int(v.num&vmask) * sizes[TypeFloat64]
+	case TypeSliceString:
+		vs := v.SliceString()
+		var size int
+		for i := range vs {
+			n := len(vs[i])
+			if n == 0 || vs[i][n-1] != '\x00' {
+				n += 1 // utf-8 null terminated string
+			}
+			size += n
+		}
+		if size == 0 {
+			return 1 * sizes[TypeString] // utf-8 null terminated string
+		}
+		return size * sizes[TypeString]
+	default:
+		return sizes[typ]
+	}
+}
+
 // Bool returns Value as typedef.Bool, if it's not a valid typedef.Bool value, it returns typedef.BoolInvalid.
 func (v Value) Bool() typedef.Bool {
 	if v.ptr != ptrBool {
@@ -936,71 +1004,4 @@ func Any(v any) Value {
 	}
 
 	return Value{}
-}
-
-var sizes = [...]int{
-	TypeInvalid: 0,
-	TypeBool:    1,
-	TypeInt8:    int(basetype.Sint8.Size()),
-	TypeUint8:   int(basetype.Uint8.Size()),
-	TypeInt16:   int(basetype.Sint16.Size()),
-	TypeUint16:  int(basetype.Uint16.Size()),
-	TypeInt32:   int(basetype.Sint32.Size()),
-	TypeUint32:  int(basetype.Uint32.Size()),
-	TypeInt64:   int(basetype.Sint64.Size()),
-	TypeUint64:  int(basetype.Uint64.Size()),
-	TypeFloat32: int(basetype.Float32.Size()),
-	TypeFloat64: int(basetype.Float64.Size()),
-	TypeString:  int(basetype.String.Size()),
-}
-
-// Sizeof returns the size of val in bytes. For every string in Value, if the last index of the string is not '\x00', size += 1.
-func Sizeof(val Value) int {
-	switch typ := val.Type(); typ {
-	case TypeString:
-		s := val.String()
-		n := len(s)
-		if n == 0 || s[n-1] != '\x00' {
-			n += 1
-		}
-		return n * sizes[TypeString]
-	case TypeSliceBool:
-		return int(val.num&vmask) * sizes[TypeBool]
-	case TypeSliceInt8:
-		return int(val.num&vmask) * sizes[TypeInt8]
-	case TypeSliceUint8:
-		return int(val.num&vmask) * sizes[TypeUint8]
-	case TypeSliceInt16:
-		return int(val.num&vmask) * sizes[TypeInt16]
-	case TypeSliceUint16:
-		return int(val.num&vmask) * sizes[TypeUint16]
-	case TypeSliceInt32:
-		return int(val.num&vmask) * sizes[TypeInt32]
-	case TypeSliceUint32:
-		return int(val.num&vmask) * sizes[TypeUint32]
-	case TypeSliceInt64:
-		return int(val.num&vmask) * sizes[TypeInt64]
-	case TypeSliceUint64:
-		return int(val.num&vmask) * sizes[TypeUint64]
-	case TypeSliceFloat32:
-		return int(val.num&vmask) * sizes[TypeFloat32]
-	case TypeSliceFloat64:
-		return int(val.num&vmask) * sizes[TypeFloat64]
-	case TypeSliceString:
-		vs := val.SliceString()
-		var size int
-		for i := range vs {
-			n := len(vs[i])
-			if n == 0 || vs[i][n-1] != '\x00' {
-				n += 1 // utf-8 null terminated string
-			}
-			size += n
-		}
-		if size == 0 {
-			return 1 * sizes[TypeString] // utf-8 null terminated string
-		}
-		return size * sizes[TypeString]
-	default:
-		return sizes[typ]
-	}
 }

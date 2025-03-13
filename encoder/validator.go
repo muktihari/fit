@@ -259,8 +259,7 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	}
 
 	// Both proto.FieldDefinition's Size and proto.DeveloperFieldDefinition's Size is a type of byte.
-	size := proto.Sizeof(value)
-	if size > 255 {
+	if size := value.Size(); size > 255 {
 		return fmt.Errorf("max value size in bytes is 255, got: %d (value: %v): %w",
 			size, value.Any(), ErrExceedMaxAllowed)
 	}

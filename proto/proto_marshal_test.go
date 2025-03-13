@@ -308,9 +308,9 @@ func BenchmarkMessageMarshalAppend(b *testing.B) {
 		factory.CreateField(mesgnum.Record, fieldnum.RecordPower).WithValue(uint16(300)),
 	}}
 
-	var size = 1
+	var size int = 1
 	for i := range mesg.Fields {
-		size += proto.Sizeof(mesg.Fields[i].Value)
+		size += mesg.Fields[i].Value.Size()
 	}
 	buf := make([]byte, size)
 	b.StartTimer()
