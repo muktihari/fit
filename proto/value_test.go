@@ -1222,8 +1222,7 @@ func TestSizeof(t *testing.T) {
 	for i, tc := range tt {
 		val := tc.value.Any()
 		t.Run(fmt.Sprintf("[%d] %T(%v)", i, val, val), func(t *testing.T) {
-			size := Sizeof(tc.value)
-			if size != tc.sizeInBytes {
+			if size := tc.value.Size(); size != tc.sizeInBytes {
 				t.Fatalf("expected: %d, got: %d", tc.sizeInBytes, size)
 			}
 		})

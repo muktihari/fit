@@ -540,11 +540,12 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
 
 	for i := range mesg.Fields {
-		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions, proto.FieldDefinition{
-			Num:      mesg.Fields[i].Num,
-			Size:     byte(proto.Sizeof(mesg.Fields[i].Value)),
-			BaseType: mesg.Fields[i].BaseType,
-		})
+		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions,
+			proto.FieldDefinition{
+				Num:      mesg.Fields[i].Num,
+				Size:     byte(mesg.Fields[i].Value.Size()),
+				BaseType: mesg.Fields[i].BaseType,
+			})
 	}
 
 	if len(mesg.DeveloperFields) == 0 {
@@ -553,11 +554,12 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 
 	e.mesgDef.Header |= proto.DevDataMask
 	for i := range mesg.DeveloperFields {
-		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions, proto.DeveloperFieldDefinition{
-			Num:                mesg.DeveloperFields[i].Num,
-			Size:               byte(proto.Sizeof(mesg.DeveloperFields[i].Value)),
-			DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
-		})
+		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions,
+			proto.DeveloperFieldDefinition{
+				Num:                mesg.DeveloperFields[i].Num,
+				Size:               byte(mesg.DeveloperFields[i].Value.Size()),
+				DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
+			})
 	}
 
 	return &e.mesgDef
