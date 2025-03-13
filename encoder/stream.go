@@ -72,5 +72,5 @@ func (e *StreamEncoder) Reset(w io.Writer, opts ...Option) error {
 		e.fileHeaderWritten = false
 		return nil
 	}
-	return fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", ErrInvalidWriter)
+	return fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", errInvalidWriter)
 }

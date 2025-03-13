@@ -23,8 +23,7 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	ErrInvalidWriter = errorString("invalid writer")
-
+	errInvalidWriter = errorString("invalid writer")
 	errEmptyMessages = errorString("empty messages")
 )
 
@@ -245,7 +244,7 @@ func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategy(fit)
 	default:
-		err = fmt.Errorf("writer is nil: %w", ErrInvalidWriter)
+		err = fmt.Errorf("writer is nil: %w", errInvalidWriter)
 	}
 	e.reset()
 	if err != nil {
@@ -590,7 +589,7 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err er
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
 	default:
-		err = fmt.Errorf("writer is nil: %w", ErrInvalidWriter)
+		err = fmt.Errorf("writer is nil: %w", errInvalidWriter)
 	}
 	e.reset()
 	if err != nil {
@@ -679,5 +678,5 @@ func (e *Encoder) StreamEncoder() (*StreamEncoder, error) {
 	case io.WriterAt, io.WriteSeeker:
 		return &StreamEncoder{enc: e}, nil
 	}
-	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", ErrInvalidWriter)
+	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", errInvalidWriter)
 }

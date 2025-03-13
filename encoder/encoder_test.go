@@ -375,7 +375,7 @@ func TestEncode(t *testing.T) {
 		fit  *proto.FIT
 		err  error
 	}{
-		{name: "encode with nil", w: nil, fit: &fitOK, err: ErrInvalidWriter},
+		{name: "encode with nil", w: nil, fit: &fitOK, err: errInvalidWriter},
 		{name: "encode with writer", w: fnWriteOK, fit: &fitOK},
 		{name: "encode with writerAt", w: mockWriterAt{fnWriteOK, fnWriteAtOK}, fit: &fitOK},
 		{name: "encode with writeSeeker", w: mockWriteSeeker{fnWriteOK, fnSeekOK}, fit: &fitOK},
@@ -1704,7 +1704,7 @@ func TestStreamEncoder(t *testing.T) {
 		{
 			name: "writer is pure io.Writer",
 			w:    fnWriteOK,
-			err:  ErrInvalidWriter,
+			err:  errInvalidWriter,
 		},
 	}
 
