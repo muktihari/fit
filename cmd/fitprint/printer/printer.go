@@ -35,7 +35,7 @@ func Print(path string) error {
 
 	f, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("could not open file %s: %w", path, err)
+		return fmt.Errorf("open file %s: %w", path, err)
 	}
 	defer f.Close()
 
@@ -104,7 +104,7 @@ File Header:
 
 		fit, err := dec.Decode()
 		if err != nil {
-			return fmt.Errorf("could not decode: %w", err)
+			return fmt.Errorf("decode: %w", err)
 		}
 
 		p.Wait()

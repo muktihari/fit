@@ -91,7 +91,7 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				})
 				v, err := strconv.ParseInt(n, 10, 8)
 				if err != nil {
-					return nil, fmt.Errorf("could not parse array size: %w", err)
+					return nil, fmt.Errorf("parse array size: %w", err)
 				}
 				fixedArraySize = uint8(v)
 			}

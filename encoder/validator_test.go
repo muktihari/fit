@@ -161,7 +161,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint32(1000)), // should be uint16
 				}},
 			},
-			errs: []error{ErrValueTypeMismatch},
+			errs: []error{errValueTypeMismatch},
 		},
 		{
 			name: "valid message with developer data index not found in previous message sequence",
@@ -206,7 +206,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue("\xbd"),
 				}},
 			},
-			errs: []error{ErrInvalidUTF8String},
+			errs: []error{errInvalidUTF8String},
 		},
 		{
 			name: "invalid utf-8 []string",
@@ -218,7 +218,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.SegmentFile, fieldnum.SegmentFileLeaderActivityIdString).WithValue([]string{"valid utf-8", "\xbd"}), // valid and invalid string in array
 				}},
 			},
-			errs: []error{nil, ErrInvalidUTF8String},
+			errs: []error{nil, errInvalidUTF8String},
 		},
 		{
 			name: "n fields exceed allowed",
@@ -243,7 +243,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					}(),
 				},
 			},
-			errs: []error{ErrExceedMaxAllowed},
+			errs: []error{errExceedMaxAllowed},
 		},
 		{
 			name: "n developer fields exceed allowed",
@@ -277,7 +277,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					}(),
 				},
 			},
-			errs: []error{nil, nil, ErrExceedMaxAllowed},
+			errs: []error{nil, nil, errExceedMaxAllowed},
 		},
 		{
 			name: "field value size exceed max allowed",
@@ -286,7 +286,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					factory.CreateField(mesgnum.FileId, fieldnum.FileIdProductName).WithValue(strings.Repeat("a", 256)),
 				}},
 			},
-			errs: []error{ErrExceedMaxAllowed},
+			errs: []error{errExceedMaxAllowed},
 		},
 		{
 			name: "developer field value size exceed max allowed",
@@ -316,7 +316,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				}},
 			},
-			errs: []error{ErrExceedMaxAllowed},
+			errs: []error{errExceedMaxAllowed},
 		},
 		{
 			name: "valid message with developer fields invalid value",
@@ -436,7 +436,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
-			errs: []error{nil, nil, ErrValueTypeMismatch},
+			errs: []error{nil, nil, errValueTypeMismatch},
 		},
 		{
 			// in Profile.xlsx (v21.133) there is no field with scale 1 and offset other than 0, but just in case in future update.
@@ -496,7 +496,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name:  "error no fields",
 			mesgs: []proto.Message{{Fields: []proto.Field{}}},
-			errs:  []error{ErrNoFields},
+			errs:  []error{errNoFields},
 		},
 	}
 

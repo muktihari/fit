@@ -23,10 +23,9 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	ErrNilWriter     = errorString("nil writer")
-	ErrEmptyMessages = errorString("empty messages")
+	ErrInvalidWriter = errorString("invalid writer")
 
-	ErrWriterAtOrWriteSeekerIsExpected = errorString("io.WriterAt or io.WriteSeeker is expected")
+	errEmptyMessages = errorString("empty messages")
 )
 
 // HeaderOption is header option for encoding message's Header.
@@ -246,7 +245,7 @@ func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategy(fit)
 	default:
-		err = ErrNilWriter
+		err = fmt.Errorf("writer is nil: %w", ErrInvalidWriter)
 	}
 	e.reset()
 	if err != nil {
@@ -269,13 +268,13 @@ func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
 
 func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 	if len(messages) == 0 {
-		return ErrEmptyMessages
+		return errEmptyMessages
 	}
 
 	for i := range messages {
 		mesg := &messages[i]
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
-			return fmt.Errorf("protocol validation failed: message index: %d, num: %d (%s): %w",
+			return fmt.Errorf("protocol validation: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
@@ -284,7 +283,7 @@ func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 		mesg := &messages[i] // Must use pointer reference since message validator may update the message.
 		if err = e.options.messageValidator.Validate(mesg); err != nil {
 			e.options.messageValidator.Reset()
-			return fmt.Errorf("message validation failed: message index: %d, num: %d (%s): %w",
+			return fmt.Errorf("message validation: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
@@ -434,7 +433,7 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 	for i := range messages {
 		mesg := &messages[i]
 		if err := e.encodeMessage(mesg); err != nil {
-			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
+			return fmt.Errorf("encode message: at byte pos: %d, message index: %d, num: %d (%s): %w",
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
@@ -487,7 +486,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		n, err = e.w.Write(b)
 		e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 		if err != nil {
-			return fmt.Errorf("write message definition failed: %w", err)
+			return fmt.Errorf("write message definition: %w", err)
 		}
 		_, _ = e.crc16.Write(b)
 	}
@@ -495,13 +494,13 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	// At this point, e.buf may grow. Re-assign e.buf in case slice has grown.
 	e.buf, err = mesg.MarshalAppend(e.buf[:0], mesgDef.Architecture)
 	if err != nil {
-		return fmt.Errorf("marshal mesg failed: %w", err)
+		return fmt.Errorf("marshal message: %w", err)
 	}
 
 	n, err = e.w.Write(e.buf)
 	e.n, e.dataSize = e.n+int64(n), e.dataSize+uint32(n)
 	if err != nil {
-		return fmt.Errorf("write message failed: %w", err)
+		return fmt.Errorf("write message: %w", err)
 	}
 	_, _ = e.crc16.Write(e.buf)
 
@@ -571,7 +570,7 @@ func (e *Encoder) encodeCRC() error {
 	n, err := e.w.Write(b)
 	e.n += int64(n)
 	if err != nil {
-		return fmt.Errorf("could not write crc: %w", err)
+		return fmt.Errorf("write crc: %w", err)
 	}
 
 	e.crc16.Reset()
@@ -591,7 +590,7 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err er
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
 	default:
-		err = ErrNilWriter
+		err = fmt.Errorf("writer is nil: %w", ErrInvalidWriter)
 	}
 	e.reset()
 	if err != nil {
@@ -665,7 +664,7 @@ func (e *Encoder) encodeMessagesWithContext(ctx context.Context, messages []prot
 		}
 		mesg := &messages[i]
 		if err := e.encodeMessage(mesg); err != nil {
-			return fmt.Errorf("encode failed: at byte pos: %d, message index: %d, num: %d (%s): %w",
+			return fmt.Errorf("encode message: at byte pos: %d, message index: %d, num: %d (%s): %w",
 				e.n, i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
@@ -679,8 +678,6 @@ func (e *Encoder) StreamEncoder() (*StreamEncoder, error) {
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
 		return &StreamEncoder{enc: e}, nil
-	default:
-		return nil, fmt.Errorf("could not convert encoder into stream encoder: %w",
-			ErrWriterAtOrWriteSeekerIsExpected)
 	}
+	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", ErrInvalidWriter)
 }

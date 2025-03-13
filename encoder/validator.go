@@ -19,12 +19,13 @@ import (
 )
 
 const (
-	ErrInvalidUTF8String       = errorString("invalid UTF-8 string")
-	ErrValueTypeMismatch       = errorString("value type mismatch")
-	ErrNoFields                = errorString("no fields")
 	ErrMissingDeveloperDataId  = errorString("missing developer data id")
 	ErrMissingFieldDescription = errorString("missing field description")
-	ErrExceedMaxAllowed        = errorString("exceed max allowed")
+
+	errNoFields          = errorString("no fields")
+	errInvalidUTF8String = errorString("invalid UTF-8 string")
+	errValueTypeMismatch = errorString("value type mismatch")
+	errExceedMaxAllowed  = errorString("exceed max allowed")
 )
 
 // MessageValidator is an interface for implementing message validation before encoding the message.
@@ -66,19 +67,13 @@ type Factory interface {
 
 // ValidatorWithPreserveInvalidValues directs the message validator to preserve invalid value instead of omit it.
 func ValidatorWithPreserveInvalidValues() ValidatorOption {
-	return func(o *validatorOptions) {
-		o.omitInvalidValues = false
-	}
+	return func(o *validatorOptions) { o.omitInvalidValues = false }
 }
 
 // ValidatorWithFactory directs the message validator to use this factory instead of standard factory.
 // The factory is only used for validating developer fields that have valid native data.
 func ValidatorWithFactory(factory Factory) ValidatorOption {
-	return func(o *validatorOptions) {
-		if o.factory != nil {
-			o.factory = factory
-		}
-	}
+	return func(o *validatorOptions) { o.factory = factory }
 }
 
 type messageValidator struct {
@@ -138,14 +133,14 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			mesg.Fields[i], mesg.Fields[valid] = mesg.Fields[valid], mesg.Fields[i]
 		}
 		if valid == 255 {
-			return fmt.Errorf("max n fields is 255: %w", ErrExceedMaxAllowed)
+			return fmt.Errorf("max n fields is 255: %w", errExceedMaxAllowed)
 		}
 		valid++
 	}
 
 	mesg.Fields = mesg.Fields[:valid]
 	if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
-		return ErrNoFields
+		return errNoFields
 	}
 
 	switch mesg.Num {
@@ -225,7 +220,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 			mesg.DeveloperFields[i], mesg.DeveloperFields[valid] = mesg.DeveloperFields[valid], mesg.DeveloperFields[i]
 		}
 		if valid == 255 {
-			return fmt.Errorf("max n developer fields is 255: %w", ErrExceedMaxAllowed)
+			return fmt.Errorf("max n developer fields is 255: %w", errExceedMaxAllowed)
 		}
 		valid++
 	}
@@ -239,7 +234,7 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	if !value.Align(baseType) {
 		val := value.Any()
 		return fmt.Errorf("value %v with type '%T' is not align with the expected type '%s': %w",
-			val, val, baseType, ErrValueTypeMismatch)
+			val, val, baseType, errValueTypeMismatch)
 	}
 
 	// UTF-8 String Validation
@@ -247,13 +242,13 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	case proto.TypeString:
 		val := value.String()
 		if !utf8.ValidString(val) {
-			return fmt.Errorf("%q is not a valid utf-8 string: %w", val, ErrInvalidUTF8String)
+			return fmt.Errorf("%q is not a valid utf-8 string: %w", val, errInvalidUTF8String)
 		}
 	case proto.TypeSliceString:
 		val := value.SliceString()
 		for i := range val {
 			if !utf8.ValidString(val[i]) {
-				return fmt.Errorf("[%d] %q is not a valid utf-8 string: %w", i, val[i], ErrInvalidUTF8String)
+				return fmt.Errorf("[%d] %q is not a valid utf-8 string: %w", i, val[i], errInvalidUTF8String)
 			}
 		}
 	}
@@ -261,7 +256,7 @@ func valueIntegrity(value proto.Value, baseType basetype.BaseType) error {
 	// Both proto.FieldDefinition's Size and proto.DeveloperFieldDefinition's Size is a type of byte.
 	if size := value.Size(); size > 255 {
 		return fmt.Errorf("max value size in bytes is 255, got: %d (value: %v): %w",
-			size, value.Any(), ErrExceedMaxAllowed)
+			size, value.Any(), errExceedMaxAllowed)
 	}
 
 	return nil

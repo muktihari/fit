@@ -160,7 +160,7 @@ func main() {
 func fitToCsv(path string, decoderOptions []decoder.Option, opts ...fitcsv.Option) error {
 	ff, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("could not open file: %s: %w", path, err)
+		return fmt.Errorf("open file: %s: %w", path, err)
 	}
 	defer ff.Close()
 
@@ -178,7 +178,7 @@ func fitToCsv(path string, decoderOptions []decoder.Option, opts ...fitcsv.Optio
 
 	cf, err := os.OpenFile(pathcsv, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
-		return fmt.Errorf("could not open file: %s: %w", pathcsv, err)
+		return fmt.Errorf("open file: %s: %w", pathcsv, err)
 	}
 	defer cf.Close()
 
@@ -221,7 +221,7 @@ func fitToCsv(path string, decoderOptions []decoder.Option, opts ...fitcsv.Optio
 func csvToFit(path string) error {
 	cf, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("could not open file: %s: %w", path, err)
+		return fmt.Errorf("open file: %s: %w", path, err)
 	}
 	defer cf.Close()
 

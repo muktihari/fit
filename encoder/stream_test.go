@@ -161,8 +161,8 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	err = streamEnc.WriteMessage(&proto.Message{Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256))}},
 	)
-	if !errors.Is(err, ErrExceedMaxAllowed) {
-		t.Fatalf("expected err: %v, got: %v", ErrExceedMaxAllowed, err)
+	if !errors.Is(err, errExceedMaxAllowed) {
+		t.Fatalf("expected err: %v, got: %v", errExceedMaxAllowed, err)
 	}
 }
 
@@ -207,7 +207,7 @@ func TestStreamEncoderReset(t *testing.T) {
 			name: "io.WriteSeeker reset with io.Writer",
 			w1:   mockWriteSeeker{fnWriteOK, fnSeekOK},
 			w2:   fnWriteOK,
-			err:  ErrWriterAtOrWriteSeekerIsExpected,
+			err:  ErrInvalidWriter,
 		},
 	}
 

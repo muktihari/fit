@@ -27,18 +27,18 @@ func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 	if !e.fileHeaderWritten {
 		e.enc.selectProtocolVersion(&e.fileHeader)
 		if err := e.enc.encodeFileHeader(&e.fileHeader); err != nil {
-			return fmt.Errorf("could not encode file header: %w", err)
+			return fmt.Errorf("encode file header: %w", err)
 		}
 		e.fileHeaderWritten = true
 	}
 	if err := e.enc.protocolValidator.ValidateMessage(mesg); err != nil {
-		return fmt.Errorf("protocol validate message failed: %d (%s): %w", mesg.Num, mesg.Num, err)
+		return fmt.Errorf("protocol validation: mesgNum: %d (%s): %w", mesg.Num, mesg.Num, err)
 	}
 	if err := e.enc.options.messageValidator.Validate(mesg); err != nil {
-		return fmt.Errorf("message validation failed: mesgNum: %d (%s): %w", mesg.Num, mesg.Num, err)
+		return fmt.Errorf("message validation: mesgNum: %d (%s): %w", mesg.Num, mesg.Num, err)
 	}
 	if err := e.enc.encodeMessage(mesg); err != nil {
-		return fmt.Errorf("could not encode mesg: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
+		return fmt.Errorf("encode message: mesgNum: %d (%q): %w", mesg.Num, mesg.Num, err)
 	}
 	return nil
 }
@@ -47,10 +47,10 @@ func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 // This will also reset variables so that the StreamEncoder can be used for the next sequence of FIT file.
 func (e *StreamEncoder) SequenceCompleted() error {
 	if err := e.enc.encodeCRC(); err != nil {
-		return fmt.Errorf("could not encode crc: %w", err)
+		return fmt.Errorf("encode crc: %w", err)
 	}
 	if err := e.enc.updateFileHeader(&e.fileHeader); err != nil {
-		return fmt.Errorf("could not update header: %w", err)
+		return fmt.Errorf("update header: %w", err)
 	}
 	e.fileHeaderWritten = false
 	e.enc.reset()
@@ -72,5 +72,5 @@ func (e *StreamEncoder) Reset(w io.Writer, opts ...Option) error {
 		e.fileHeaderWritten = false
 		return nil
 	}
-	return fmt.Errorf("could not reset: %w", ErrWriterAtOrWriteSeekerIsExpected)
+	return fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", ErrInvalidWriter)
 }
