@@ -43,7 +43,7 @@ func NewBuilder(path string, lookup *lookup.Lookup, types []parser.Type, message
 	cd := filepath.Dir(filename)
 	f := &Builder{
 		template:           template.Must(template.New("main").ParseFiles(filepath.Join(cd, "factory.tmpl"))),
-		path:               filepath.Join(path, "factory"),
+		path:               filepath.Join(path, "profile", "factory"),
 		mesgnumPackageName: "typedef",
 		profilePackageName: "profile",
 		types:              types,
