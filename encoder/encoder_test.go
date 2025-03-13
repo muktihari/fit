@@ -375,7 +375,7 @@ func TestEncode(t *testing.T) {
 		fit  *proto.FIT
 		err  error
 	}{
-		{name: "encode with nil", w: nil, fit: &fitOK, err: ErrNilWriter},
+		{name: "encode with nil", w: nil, fit: &fitOK, err: ErrInvalidWriter},
 		{name: "encode with writer", w: fnWriteOK, fit: &fitOK},
 		{name: "encode with writerAt", w: mockWriterAt{fnWriteOK, fnWriteAtOK}, fit: &fitOK},
 		{name: "encode with writeSeeker", w: mockWriteSeeker{fnWriteOK, fnSeekOK}, fit: &fitOK},
@@ -392,7 +392,7 @@ func TestEncode(t *testing.T) {
 				},
 			},
 			w:   fnWriteOK,
-			err: ErrExceedMaxAllowed,
+			err: errExceedMaxAllowed,
 		},
 		{
 			name: "encode return error protocol violation since proto.V1 does not allow Int64",
@@ -452,7 +452,7 @@ func TestValidateMessages(t *testing.T) {
 			name:            "empty messages",
 			protocolVersion: proto.V1,
 			messages:        []proto.Message{},
-			err:             ErrEmptyMessages,
+			err:             errEmptyMessages,
 		},
 		{
 			name:            "protocol validation failed",
@@ -476,7 +476,7 @@ func TestValidateMessages(t *testing.T) {
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
 				}}},
-			err: ErrExceedMaxAllowed,
+			err: errExceedMaxAllowed,
 		},
 	}
 
@@ -1704,7 +1704,7 @@ func TestStreamEncoder(t *testing.T) {
 		{
 			name: "writer is pure io.Writer",
 			w:    fnWriteOK,
-			err:  ErrWriterAtOrWriteSeekerIsExpected,
+			err:  ErrInvalidWriter,
 		},
 	}
 

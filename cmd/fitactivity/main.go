@@ -610,7 +610,7 @@ func conceal(ctx context.Context, fs *flag.FlagSet, args []string) (err error) {
 			}
 		})
 		if err != nil {
-			return fmt.Errorf("could not conceal %q: %v", path, err)
+			return fmt.Errorf("conceal %q: %v", path, err)
 		}
 	}
 	return nil

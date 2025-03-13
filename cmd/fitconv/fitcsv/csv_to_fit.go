@@ -132,7 +132,7 @@ func (c *CSVToFITConv) convert() error {
 				// Unknown has number, try parsing it as MesgNum.
 				v, err := strconv.ParseUint(digits, 10, 16)
 				if err != nil {
-					return fmt.Errorf("could not parse unknown mesgNum %q: %w", mesgName, err)
+					return fmt.Errorf("parse unknown mesgNum %q: %w", mesgName, err)
 				}
 				mesgNum = typedef.MesgNum(v)
 			}
@@ -140,7 +140,7 @@ func (c *CSVToFITConv) convert() error {
 			if mesgNum == mesgnum.FileId {
 				if c.seq != 0 {
 					if err := c.finalize(); err != nil {
-						return fmt.Errorf("could not finalize: %w", err)
+						return fmt.Errorf("finalize: %w", err)
 					}
 				}
 				c.seq++
@@ -148,7 +148,7 @@ func (c *CSVToFITConv) convert() error {
 
 			mesg, err := c.createMesg(mesgNum, record)
 			if err != nil {
-				return fmt.Errorf("could not create mesg: num: %q (%d): %w", mesgNum, mesgNum, err)
+				return fmt.Errorf("create mesg: num: %q (%d): %w", mesgNum, mesgNum, err)
 			}
 			if len(mesg.Fields) == 0 && len(mesg.DeveloperFields) == 0 {
 				continue
@@ -239,7 +239,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 				}
 				v, err := strconv.ParseUint(digits, 10, 8)
 				if err != nil {
-					return proto.Message{}, fmt.Errorf("could not parse unknown fieldNum %q: %w", fieldName, err)
+					return proto.Message{}, fmt.Errorf("parse unknown fieldNum %q: %w", fieldName, err)
 				}
 				fieldNum = byte(v)
 				recoverableUnknownField = true
@@ -250,7 +250,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 		if ok {
 			field, err := c.createField(num, fieldNum, strValue, units, recoverableUnknownField)
 			if err != nil {
-				return proto.Message{}, fmt.Errorf("could not create field: num: %q (%d): %w", fieldName, fieldNum, err)
+				return proto.Message{}, fmt.Errorf("create field: num: %q (%d): %w", fieldName, fieldNum, err)
 			}
 			mesg.Fields = append(mesg.Fields, field)
 			continue
@@ -258,7 +258,7 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 
 		devField, err := c.createDeveloperField(fieldName, strValue, units)
 		if err != nil {
-			return proto.Message{}, fmt.Errorf("could not create developer field: %w", err)
+			return proto.Message{}, fmt.Errorf("create developer field: %w", err)
 		}
 		if devField.Value.Type() != proto.TypeInvalid {
 			mesg.DeveloperFields = append(mesg.DeveloperFields, devField)
@@ -337,7 +337,7 @@ func (c *CSVToFITConv) createField(mesgNum typedef.MesgNum, num byte, strValue, 
 		units,
 	)
 	if err != nil {
-		err = fmt.Errorf("could not parse %q into %s: %v",
+		err = fmt.Errorf("parse %q into %s: %v",
 			strValue, field.BaseType.GoType(), err)
 	}
 
