@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/muktihari/fit/internal/cmd/fitgen/factory"
 	"github.com/muktihari/fit/internal/cmd/fitgen/generator"
 	"github.com/muktihari/fit/internal/cmd/fitgen/lookup"
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
@@ -19,6 +18,7 @@ import (
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/strutil"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/xlsxlite"
 	"github.com/muktihari/fit/internal/cmd/fitgen/profile"
+	"github.com/muktihari/fit/internal/cmd/fitgen/profile/factory"
 	"github.com/muktihari/fit/internal/cmd/fitgen/profile/mesgdef"
 	"github.com/muktihari/fit/internal/cmd/fitgen/profile/typedef"
 	"github.com/muktihari/fit/internal/cmd/fitgen/profile/untyped/fieldnum"
@@ -32,9 +32,8 @@ The FIT SDK for Go Generator, also known as "fitgen", is a program designed to c
 several *.go files using Garmin SDK specifications (Profile.xlsx). These generated files
 enable this FIT SDK to carry out the decoding and encoding process of FIT files.
 
-The files are organized into distinct packages: 
- - profile: mesgdef, typedef, untyped
- - factory
+The files are organized into distinct packages under profile folder:
+ - factory, mesgdef, typedef, untyped/fieldnum, untyped/mesgnum
 
 To define your manufacturer specifications, duplicate the Profile.xlsx file and 
 incorporate your specifications within it. Afterward, utilize the provided command-line 

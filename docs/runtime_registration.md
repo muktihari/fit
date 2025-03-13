@@ -46,8 +46,8 @@ import (
 
     "github.com/muktihari/fit/decoder"
     "github.com/muktihari/fit/encoder"
-    "github.com/muktihari/fit/factory"
     "github.com/muktihari/fit/profile"
+    "github.com/muktihari/fit/profile/factory"
     "github.com/muktihari/fit/profile/filedef"
     "github.com/muktihari/fit/proto"
 )
