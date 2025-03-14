@@ -31,9 +31,9 @@ jobs:
         if: matrix.os == 'macOS'
         run: |
           CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          zip -9q $cli-$os-amd64.zip $cli
+          zip -9q $cli-$os-amd64.zip $cli LICENSE
           CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          zip -9q $cli-$os-arm64.zip $cli
+          zip -9q $cli-$os-arm64.zip $cli LICENSE
           rm $cli
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-arm64.zip)"
@@ -45,7 +45,7 @@ jobs:
         if: matrix.os == 'windows'
         run: |
           CGO_ENABLED=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli.exe cmd/$cli/main.go
-          zip -9q $cli-$os-amd64.zip $cli.exe
+          zip -9q $cli-$os-amd64.zip $cli.exe LICENSE
           rm $cli.exe
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.zip)"
         env:
@@ -56,7 +56,7 @@ jobs:
         if: matrix.os == 'linux'
         run: |
           CGO_ENABLED=0 GOOS=$os GOARCH=amd64 go build -ldflags="-s -w -X 'main.version=$(git describe --tags)'" -trimpath -o $cli cmd/$cli/main.go
-          tar -I 'gzip -9' -cf $cli-$os-amd64.tar.gz $cli
+          tar -I 'gzip -9' -cf $cli-$os-amd64.tar.gz $cli LICENSE
           rm $cli
           printf "sha256: %s\n" "$(shasum -a 256 $cli-$os-amd64.tar.gz)"
         env:
