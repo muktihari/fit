@@ -1271,7 +1271,7 @@ func main() {
     }
     defer f.Close()
 
-    streamEnc, err := encoder.New(f).StreamEncoder()
+    enc, err := encoder.NewStream(f)
     if err != nil {
         panic(err)
     }
@@ -1287,14 +1287,14 @@ func main() {
     // Write per message, we can use this to write message as it arrives.
     // For example, message retrieved from decoder's Listener can be
     // write right away without waiting all messages to be received.
-    if err := streamEnc.WriteMessage(&mesg); err != nil {
+    if err := enc.WriteMessage(&mesg); err != nil {
         panic(err)
     }
 
     /* Write more messages */
 
     // After all messages have been written, invoke this to finalize.
-    if err := streamEnc.SequenceCompleted(); err != nil {
+    if err := enc.SequenceCompleted(); err != nil {
         panic(err)
     }
 }

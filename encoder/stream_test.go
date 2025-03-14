@@ -7,7 +7,9 @@ package encoder
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
+	"reflect"
 	"testing"
 	"time"
 
@@ -19,10 +21,86 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+func TestNewStream(t *testing.T) {
+	mv := NewMessageValidator()
+	tt := []struct {
+		name            string
+		w               io.Writer
+		opts            []Option
+		expectedOptions options
+		err             error
+	}{
+		{
+			name: "w io.WriterAt",
+			w:    &mockWriterAt{Writer: fnWriteOK, WriterAt: fnWriteAtOK},
+		},
+		{
+			name: "w io.WriteSeeker",
+			w:    &mockWriteSeeker{Writer: fnWriteOK, Seeker: fnSeekOK},
+		},
+		{
+			name: "test options should be passed",
+			w:    &mockWriteSeeker{Writer: fnWriteOK, Seeker: fnSeekOK},
+			opts: []Option{
+				WithBigEndian(),
+				WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
+				WithMessageValidator(mv),
+			},
+			expectedOptions: func() options {
+				o := defaultOptions()
+				o.endianness = proto.BigEndian
+				o.headerOption = HeaderOptionCompressedTimestamp
+				o.messageValidator = mv
+				return o
+			}(),
+		},
+		{
+			name: "w io.Writer",
+			w:    fnWriteOK,
+			err:  errInvalidWriter,
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			streamEnc, err := NewStream(tc.w, tc.opts...)
+			if !errors.Is(err, tc.err) {
+				t.Fatalf("expected: %v, got: %v", tc.err, err)
+			}
+			if err != nil {
+				return
+			}
+
+			switch tc.w.(type) {
+			case io.WriterAt:
+				if _, ok := streamEnc.enc.w.(io.WriterAt); !ok {
+					t.Fatal("expected: io.WriterAt")
+				}
+			case io.WriteSeeker:
+				if _, ok := streamEnc.enc.w.(io.WriteSeeker); !ok {
+					t.Fatal("expected: io.WriteSeeker")
+				}
+			}
+
+			if tc.opts == nil {
+				return
+			}
+
+			if diff := cmp.Diff(streamEnc.enc.options, tc.expectedOptions,
+				cmp.AllowUnexported(options{}),
+				cmp.Transformer("MessaveValidator", func(mv MessageValidator) uintptr {
+					return reflect.ValueOf(mv).Pointer()
+				}),
+			); diff != "" {
+				t.Fatal(diff)
+			}
+		})
+	}
+}
+
 func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 	w := &writerAtStub{}
-	enc := New(w)
-	streamEnc, err := enc.StreamEncoder()
+	streamEnc, err := NewStream(w)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,8 +147,7 @@ func TestStreamEncoderOneSequenceHappyFlow(t *testing.T) {
 
 func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	// Decode Header Return Error
-	enc := New(mockWriterAt{Writer: fnWriteErr}, WithWriteBufferSize(0))
-	streamEnc, _ := enc.StreamEncoder()
+	streamEnc, _ := NewStream(mockWriterAt{Writer: fnWriteErr}, WithWriteBufferSize(0))
 
 	mesg := proto.Message{Num: mesgnum.FileId, Fields: []proto.Field{
 		factory.CreateField(mesgnum.FileId, fieldnum.FileIdTimeCreated).WithValue(datetime.ToUint32(time.Now())),
@@ -97,10 +174,9 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 		return len(b), nil
 	})
 
-	enc = New(mockWriterAt{Writer: w, WriterAt: fnWriteAtErr},
+	streamEnc, _ = NewStream(mockWriterAt{Writer: w, WriterAt: fnWriteAtErr},
 		WithWriteBufferSize(0),
 	)
-	streamEnc, _ = enc.StreamEncoder()
 	err = streamEnc.WriteMessage(&mesg)
 	if err != nil {
 		t.Fatalf("expected err: %v, got: %v", nil, err)
@@ -117,8 +193,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	wa := fnWriterAt(func(p []byte, offset int64) (n int, err error) {
 		return 0, io.ErrUnexpectedEOF
 	})
-	enc = New(mockWriterAt{Writer: fnWriteOK, WriterAt: wa})
-	streamEnc, _ = enc.StreamEncoder()
+	streamEnc, _ = NewStream(mockWriterAt{Writer: fnWriteOK, WriterAt: wa})
 	err = streamEnc.WriteMessage(&mesg)
 	if err != nil {
 		t.Fatalf("expected err: %v, got: %v", nil, err)
@@ -136,10 +211,9 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 		cur++
 		return ws[cur-1].Write(b)
 	})
-	enc = New(mockWriterAt{Writer: w, WriterAt: wa},
+	streamEnc, _ = NewStream(mockWriterAt{Writer: w, WriterAt: wa},
 		WithWriteBufferSize(0),
 	)
-	streamEnc, _ = enc.StreamEncoder()
 
 	err = streamEnc.WriteMessage(&mesg)
 	if !errors.Is(err, io.EOF) {
@@ -147,7 +221,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	}
 
 	// Protocol validation error
-	streamEnc, _ = New(mockWriterAt{}).StreamEncoder()
+	streamEnc, _ = NewStream(mockWriterAt{})
 	streamEnc.enc.protocolValidator.ProtocolVersion = proto.V1
 	err = streamEnc.WriteMessage(&proto.Message{Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
@@ -157,7 +231,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 	}
 
 	// Message validation error
-	streamEnc, _ = New(mockWriterAt{}).StreamEncoder()
+	streamEnc, _ = NewStream(mockWriterAt{})
 	err = streamEnc.WriteMessage(&proto.Message{Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256))}},
 	)
@@ -168,8 +242,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 
 func TestStreamEncoderWithoutWriteBuffer(t *testing.T) {
 	w := &writerAtStub{}
-	enc := New(w, WithWriteBufferSize(0))
-	streamEnc, err := enc.StreamEncoder()
+	streamEnc, err := NewStream(w, WithWriteBufferSize(0))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,7 +286,7 @@ func TestStreamEncoderReset(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			streamEnc, _ := New(tc.w1).StreamEncoder()
+			streamEnc, _ := NewStream(tc.w1)
 			err := streamEnc.Reset(tc.w2)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)

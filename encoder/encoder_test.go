@@ -1687,41 +1687,6 @@ func TestEncodeMessagesWithContext(t *testing.T) {
 	}
 }
 
-func TestStreamEncoder(t *testing.T) {
-	tt := []struct {
-		name string
-		w    io.Writer
-		err  error
-	}{
-		{
-			name: "writer is io.WriterAt",
-			w:    mockWriterAt{},
-		},
-		{
-			name: "writer is io.WriteSeeker",
-			w:    mockWriteSeeker{},
-		},
-		{
-			name: "writer is pure io.Writer",
-			w:    fnWriteOK,
-			err:  errInvalidWriter,
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := New(tc.w, WithWriteBufferSize(0)).StreamEncoder()
-			if !errors.Is(err, tc.err) {
-				t.Errorf("expected err: %v, got: %v", tc.err, err)
-			}
-			if err != nil {
-				return
-			}
-
-		})
-	}
-}
-
 func TestReset(t *testing.T) {
 	tt := []struct {
 		name     string

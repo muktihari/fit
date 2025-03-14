@@ -669,14 +669,3 @@ func (e *Encoder) encodeMessagesWithContext(ctx context.Context, messages []prot
 	}
 	return nil
 }
-
-// StreamEncoder turns this Encoder into StreamEncoder to encode per message basis or in streaming fashion.
-// It returns an error if the Encoder's Writer does not implement io.WriterAt or io.WriteSeeker.
-// After invoking this method, it is recommended not to use the Encoder to avoid undefined behavior.
-func (e *Encoder) StreamEncoder() (*StreamEncoder, error) {
-	switch e.w.(type) {
-	case io.WriterAt, io.WriteSeeker:
-		return &StreamEncoder{enc: e}, nil
-	}
-	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", errInvalidWriter)
-}
