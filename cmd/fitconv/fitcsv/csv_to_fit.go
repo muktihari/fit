@@ -48,7 +48,10 @@ type CSVToFITConv struct {
 
 // NewCSVToFITConv creates a new CSV to FIT converter.
 func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
-	enc := encoder.New(fitWriter,
+	csvr := csv.NewReader(csvReader)
+	csvr.FieldsPerRecord = -1 // dynamic number of fields
+
+	opts := []encoder.Option{
 		encoder.WithProtocolVersion(proto.V2),
 		encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15),
 		encoder.WithMessageValidator(
@@ -56,16 +59,15 @@ func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
 				encoder.ValidatorWithPreserveInvalidValues(),
 			),
 		),
-	)
-
-	csvr := csv.NewReader(csvReader)
-	csvr.FieldsPerRecord = -1 // dynamic number of fields
-	streamEnc, _ := enc.StreamEncoder()
-	return &CSVToFITConv{
-		enc:       enc,
-		streamEnc: streamEnc,
-		csv:       csvr,
 	}
+
+	switch fitWriter.(type) {
+	case io.WriterAt, io.WriteSeeker:
+		streamEnc, _ := encoder.NewStream(fitWriter, opts...)
+		return &CSVToFITConv{streamEnc: streamEnc, csv: csvr}
+	}
+	return &CSVToFITConv{enc: encoder.New(fitWriter, opts...), csv: csvr}
+
 }
 
 type CSVToFITConvInfo struct {
