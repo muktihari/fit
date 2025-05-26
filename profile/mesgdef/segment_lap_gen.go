@@ -7,7 +7,6 @@
 package mesgdef
 
 import (
-	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/kit/semicircles"
 	"github.com/muktihari/fit/profile/basetype"
@@ -144,10 +143,15 @@ func (m *SegmentLap) Reset(mesg *proto.Message) {
 	)
 
 	if mesg != nil {
-		arr := pool.Get().(*[poolsize]proto.Field)
-		unknownFields = arr[:0]
+		var n int
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Num > 254 || mesg.Fields[i].Name == factory.NameUnknown {
+			if mesg.Fields[i].Name == factory.NameUnknown {
+				n++
+			}
+		}
+		unknownFields = make([]proto.Field, 0, n)
+		for i := range mesg.Fields {
+			if mesg.Fields[i].Name == factory.NameUnknown {
 				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
@@ -155,11 +159,10 @@ func (m *SegmentLap) Reset(mesg *proto.Message) {
 				pos := mesg.Fields[i].Num / 8
 				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
 			}
-			vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+			if mesg.Fields[i].Num < 255 {
+				vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+			}
 		}
-		unknownFields = sliceutil.Clone(unknownFields)
-		*arr = [poolsize]proto.Field{}
-		pool.Put(arr)
 		developerFields = mesg.DeveloperFields
 	}
 
@@ -277,9 +280,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 
 	fac := options.Factory
 
-	arr := pool.Get().(*[poolsize]proto.Field)
-	fields := arr[:0]
-
+	fields := make([]proto.Field, 0, 95)
 	mesg := proto.Message{Num: typedef.MesgNumSegmentLap}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -767,14 +768,10 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		}
 	}
 
-	for i := range m.UnknownFields {
-		fields = append(fields, m.UnknownFields[i])
-	}
-
-	mesg.Fields = make([]proto.Field, len(fields))
-	copy(mesg.Fields, fields)
-	*arr = [poolsize]proto.Field{}
-	pool.Put(arr)
+	n := len(fields)
+	mesg.Fields = make([]proto.Field, n+len(m.UnknownFields))
+	copy(mesg.Fields[:n], fields)
+	copy(mesg.Fields[n:], m.UnknownFields)
 
 	mesg.DeveloperFields = m.DeveloperFields
 

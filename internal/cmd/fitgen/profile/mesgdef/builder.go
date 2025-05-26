@@ -191,17 +191,6 @@ func (b *Builder) Build() ([]generator.Data, error) {
 		)
 	}
 
-	dataBuilders = append(dataBuilders, generator.Data{
-		Template:     b.template,
-		TemplateExec: "util",
-		Path:         b.path,
-		Filename:     fmt.Sprintf("%s_util_gen.go", b.packageName),
-		Data: UtilData{
-			Package:      b.packageName,
-			MaxLenFields: byte(maxLenFields),
-		},
-	})
-
 	return dataBuilders, nil
 }
 
