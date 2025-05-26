@@ -158,7 +158,6 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 		endTime := ses.StartTime.Add(time.Duration(ses.TotalElapsedTime/1000) * time.Second)
 		gap := uint32(nextSes.StartTime.Sub(endTime).Seconds() * 1000)
 		ses.TotalElapsedTime += gap
-		ses.TotalTimerTime += gap
 		aggregator.Aggregate(ses, nextSes)
 
 		if len(nextFitSessions) > 1 { // append the rest of the sessions

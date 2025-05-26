@@ -161,7 +161,7 @@ func TestCombine(t *testing.T) {
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(400)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(4000)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(6000 + 7000)), // gap 7000
-					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(6000 + 7000)),   // gap 7000
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(6000)),          // exclude pauses and gap
 				}},
 				{Num: mesgnum.Activity, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Activity, fieldnum.ActivityType).WithValue(typedef.ActivityAutoMultiSport),
@@ -345,7 +345,7 @@ func TestCombine(t *testing.T) {
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalDistance).WithValue(uint32(400)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalMovingTime).WithValue(uint32(4000)),
 					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalElapsedTime).WithValue(uint32(6000 + 7000)), // gap 7000
-					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(6000 + 7000)),   // gap 7000
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTotalTimerTime).WithValue(uint32(6000)),          // exclude pauses and gap
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Session, fieldnum.SessionSport).WithValue(typedef.SportRunning),
