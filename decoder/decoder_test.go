@@ -1467,6 +1467,37 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			header: proto.MesgDefinitionMask,
 			err:    errInvalidBaseType,
 		},
+		{
+			name: "field/developer field definition's size is zero",
+			r: func() io.Reader {
+				mesgDef := proto.MessageDefinition{
+					Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+					MesgNum: mesgnum.Record,
+					FieldDefinitions: []proto.FieldDefinition{
+						{Num: fieldnum.RecordSpeed, Size: 2, BaseType: basetype.Uint16},
+						{Num: 48, Size: 0, BaseType: basetype.Enum},
+					},
+					DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+						{Num: 0, Size: 0, DeveloperDataIndex: 0},
+						{Num: 0, Size: 4, DeveloperDataIndex: 0},
+					},
+				}
+				buf, _ := mesgDef.MarshalAppend(nil)
+				return bytes.NewReader(buf[1:])
+			}(),
+			header: proto.MesgDefinitionMask | proto.DevDataMask,
+			mesgDef: &proto.MessageDefinition{
+				Header:  proto.MesgDefinitionMask | proto.DevDataMask,
+				MesgNum: mesgnum.Record,
+				FieldDefinitions: []proto.FieldDefinition{
+					{Num: fieldnum.RecordSpeed, Size: 2, BaseType: basetype.Uint16},
+				},
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{Num: 0, Size: 4, DeveloperDataIndex: 0},
+				},
+			},
+			err: nil,
+		},
 	}
 
 	for i, tc := range tt {
@@ -1815,49 +1846,6 @@ func TestDecodeFields(t *testing.T) {
 			},
 		},
 		{
-			name: "decode fields field def's size is zero, skip",
-			r: func() io.Reader {
-				mesg := proto.Message{
-					Num: 68,
-					Fields: []proto.Field{
-						{
-							FieldBase: &proto.FieldBase{
-								Num:  1,
-								Name: "Unknown",
-							},
-							Value: proto.Uint32(1),
-						},
-					},
-				}
-				mesgb, _ := mesg.MarshalAppend(nil, proto.LittleEndian)
-				mesgb = mesgb[1:] // splice mesg header
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					cur += copy(b, mesgb[cur:])
-					return len(b), nil
-				})
-			}(),
-			mesgdef: &proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: 68,
-				FieldDefinitions: []proto.FieldDefinition{
-					{
-						Num:      1,
-						Size:     0,
-						BaseType: basetype.Uint32,
-					},
-				},
-			},
-			validateFn: func(mesg proto.Message) error {
-				if len(mesg.Fields) != 0 {
-					return fmt.Errorf("expected len(fields) == 0, got: %d", len(mesg.Fields))
-				}
-				return nil
-			},
-			opts: []Option{WithLogWriter(io.Discard)},
-			err:  nil,
-		},
-		{
 			name: "decode fields field def's size 1 < 4 size of uint32",
 			r: func() io.Reader {
 				mesg := proto.Message{
@@ -1953,6 +1941,21 @@ func TestDecodeFields(t *testing.T) {
 			opts: []Option{WithLogWriter(io.Discard)},
 			err:  nil,
 		},
+		{
+			name: "unmarshal invalid basetype",
+			r:    fnReaderOK,
+			mesgdef: &proto.MessageDefinition{
+				MesgNum: typedef.MesgNumInvalid,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      255,
+						Size:     0,
+						BaseType: basetype.BaseType(255),
+					},
+				},
+			},
+			err: proto.ErrTypeNotSupported,
+		},
 	}
 
 	for i, tc := range tt {
@@ -1975,46 +1978,6 @@ func TestDecodeFields(t *testing.T) {
 			}
 			if err := tc.validateFn(tc.mesg); err != nil {
 				t.Fatalf("expected nil, got: %v", err)
-			}
-		})
-	}
-}
-
-func TestCollectAccumulableValues(t *testing.T) {
-	tt := []struct {
-		val               proto.Value
-		accumulatedValues []value
-	}{
-		{val: proto.Int8(1), accumulatedValues: []value{{last: 1, value: 1}}},
-		{val: proto.Uint8(2), accumulatedValues: []value{{last: 2, value: 2}}},
-		{val: proto.Int16(3), accumulatedValues: []value{{last: 3, value: 3}}},
-		{val: proto.Uint16(4), accumulatedValues: []value{{last: 4, value: 4}}},
-		{val: proto.Int32(5), accumulatedValues: []value{{last: 5, value: 5}}},
-		{val: proto.Uint32(6), accumulatedValues: []value{{last: 6, value: 6}}},
-		{val: proto.Int64(7), accumulatedValues: []value{{last: 7, value: 7}}},
-		{val: proto.Uint64(8), accumulatedValues: []value{{last: 8, value: 8}}},
-		{val: proto.Float32(9), accumulatedValues: []value{{last: 9, value: 9}}},
-		{val: proto.Float64(10), accumulatedValues: []value{{last: 10, value: 10}}},
-		{val: proto.SliceInt8([]int8{1, 2}), accumulatedValues: []value{{last: 2, value: 2}}},
-		{val: proto.SliceUint8([]uint8{2, 3}), accumulatedValues: []value{{last: 3, value: 3}}},
-		{val: proto.SliceInt16([]int16{3, 4}), accumulatedValues: []value{{last: 4, value: 4}}},
-		{val: proto.SliceUint16([]uint16{4, 5}), accumulatedValues: []value{{last: 5, value: 5}}},
-		{val: proto.SliceInt32([]int32{5, 6}), accumulatedValues: []value{{last: 6, value: 6}}},
-		{val: proto.SliceUint32([]uint32{6, 7}), accumulatedValues: []value{{last: 7, value: 7}}},
-		{val: proto.SliceInt64([]int64{7, 8}), accumulatedValues: []value{{last: 8, value: 8}}},
-		{val: proto.SliceUint64([]uint64{8, 9}), accumulatedValues: []value{{last: 9, value: 9}}},
-		{val: proto.SliceFloat32([]float32{9, 10}), accumulatedValues: []value{{last: 10, value: 10}}},
-		{val: proto.SliceFloat64([]float64{10, 11}), accumulatedValues: []value{{last: 11, value: 11}}},
-	}
-
-	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %v", i, tc.val.Any()), func(t *testing.T) {
-			dec := New(nil)
-			dec.collectAccumulableValues(0, 0, tc.val)
-			if diff := cmp.Diff(dec.accumulator.values, tc.accumulatedValues,
-				cmp.AllowUnexported(value{}),
-			); diff != "" {
-				t.Fatal(diff)
 			}
 		})
 	}
@@ -2272,7 +2235,6 @@ func TestDecodeDeveloperFields(t *testing.T) {
 		developerDataIndexes []uint8
 		fieldDescription     *mesgdef.FieldDescription
 		mesgDef              *proto.MessageDefinition
-		mesg                 *proto.Message
 		validateFn           func(mesg proto.Message) error
 		err                  error
 	}{
@@ -2304,7 +2266,6 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
 		},
 		{
 			name: "decode developer fields missing fieldDescription with developer data index 1",
@@ -2330,7 +2291,6 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
 		},
 		{
 			name: "decode developer fields missing field description number",
@@ -2356,7 +2316,6 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
 		},
 		{
 			name: "decode developer fields missing field description number but unable to read acquired bytes",
@@ -2382,8 +2341,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
-			err:  io.EOF,
+			err: io.EOF,
 		},
 		{
 			name: "decode developer fields got io.EOF",
@@ -2409,40 +2367,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
-			err:  io.EOF,
-		},
-		{
-			name: "decode developer field, devField def's size is zero, skip",
-			r:    fnReaderOK,
-			fieldDescription: mesgdef.NewFieldDescription(
-				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint8)),
-				}},
-			),
-			mesgDef: &proto.MessageDefinition{
-				Header:  proto.MesgDefinitionMask,
-				MesgNum: mesgnum.Record,
-				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
-					{
-						Num:                0,
-						DeveloperDataIndex: 0,
-						Size:               0,
-					},
-				},
-			},
-			mesg: &proto.Message{},
-			validateFn: func(mesg proto.Message) error {
-				if len(mesg.DeveloperFields) != 0 {
-					return fmt.Errorf("expected len(developerFields) == 0, got: %d", len(mesg.DeveloperFields))
-				}
-				return nil
-			},
+			err: io.EOF,
 		},
 		{
 			name: "decode developer field, devField def's size 1 < 4 size of uint32 ",
@@ -2468,7 +2393,6 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
 			validateFn: func(mesg proto.Message) error {
 				if mesg.DeveloperFields[0].Value.Type() != proto.TypeUint32 {
 					return fmt.Errorf("expected proto value type: %s, got: %s",
@@ -2505,8 +2429,7 @@ func TestDecodeDeveloperFields(t *testing.T) {
 					},
 				},
 			},
-			mesg: &proto.Message{},
-			err:  errInvalidBaseType,
+			err: errInvalidBaseType,
 		},
 	}
 
@@ -2515,153 +2438,16 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			dec := New(tc.r, WithLogWriter(io.Discard))
 			dec.developerDataIndexes = append(dec.developerDataIndexes, tc.developerDataIndexes...)
 			dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
-			err := dec.decodeDeveloperFields(tc.mesgDef, tc.mesg)
+			mesg := proto.Message{}
+			err := dec.decodeDeveloperFields(tc.mesgDef, &mesg)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, got: %v", tc.err, err)
 			}
 			if tc.validateFn == nil {
 				return
 			}
-			if err := tc.validateFn(*tc.mesg); err != nil {
+			if err := tc.validateFn(mesg); err != nil {
 				t.Fatalf("expected nil: got: %v", err)
-			}
-		})
-	}
-}
-
-func TestReadValue(t *testing.T) {
-	tt := []struct {
-		name                string
-		r                   io.Reader
-		size                byte
-		arch                byte
-		baseType            basetype.BaseType
-		profileType         profile.ProfileType
-		isArray             bool
-		overrideStringArray bool
-		result              proto.Value
-		err                 error
-	}{
-		{
-			name:        "readValue happy flow",
-			r:           fnReaderOK, // will produce 0
-			size:        1,
-			arch:        0,
-			baseType:    basetype.Sint8,
-			profileType: profile.Sint8,
-			result:      proto.Int8(0),
-		},
-		{
-			name: "readValue happy flow: string",
-			r: func() io.Reader {
-				buf := []byte("fit sdk\x00")
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(b) {
-						return 0, io.EOF
-					}
-					n = copy(b, buf[cur:])
-					cur += n
-					return cur, nil
-				})
-			}(),
-			size:        byte(len("fit sdk\x00")),
-			arch:        0,
-			baseType:    basetype.String,
-			profileType: profile.String,
-			result:      proto.String("fit sdk"),
-		},
-		{
-			name: "readValue happy flow: []string",
-			r: func() io.Reader {
-				buf := []byte("fit\x00sdk\x00")
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(b) {
-						return 0, io.EOF
-					}
-					n = copy(b, buf[cur:])
-					cur += n
-					return cur, nil
-				})
-			}(),
-			size:        byte(len("fit\x00sdk\x00")),
-			arch:        0,
-			baseType:    basetype.String,
-			profileType: profile.String,
-			isArray:     true,
-			result:      proto.SliceString([]string{"fit", "sdk"}),
-		},
-		{
-			name: "readValue happy flow: must []string",
-			r: func() io.Reader {
-				buf := []byte("fit\x00sdk\x00")
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(b) {
-						return 0, io.EOF
-					}
-					n = copy(b, buf[cur:])
-					cur += n
-					return cur, nil
-				})
-			}(),
-			size:                byte(len("fit\x00sdk\x00")),
-			arch:                0,
-			baseType:            basetype.String,
-			profileType:         profile.String,
-			isArray:             false,
-			overrideStringArray: true,
-			result:              proto.SliceString([]string{"fit", "sdk"}),
-		},
-		{
-			name: "readValue happy flow: must []string contains null-terminated string padding",
-			r: func() io.Reader {
-				buf := []byte("fit\x00\x00\x00sdk\x00\x00\x00")
-				cur := 0
-				return fnReader(func(b []byte) (n int, err error) {
-					if cur == len(b) {
-						return 0, io.EOF
-					}
-					n = copy(b, buf[cur:])
-					cur += n
-					return cur, nil
-				})
-			}(),
-			size:                byte(len("fit\x00\x00\x00sdk\x00\x00\x00")),
-			arch:                0,
-			baseType:            basetype.String,
-			isArray:             false,
-			overrideStringArray: true,
-			result:              proto.SliceString([]string{"fit", "sdk"}),
-		},
-		{
-			name:        "readValue happy flow",
-			r:           fnReaderOK, // will produce 0
-			size:        1,
-			arch:        0,
-			baseType:    basetype.BaseType(100),                                  // invalid basetype.
-			profileType: profile.ProfileTypeFromBaseType(basetype.BaseType(100)), // invalid basetype.
-			err:         proto.ErrTypeNotSupported,
-		},
-	}
-
-	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			dec := New(tc.r)
-			res, err := dec.readValue(tc.size, tc.arch, tc.baseType, tc.profileType, tc.isArray, tc.overrideStringArray)
-			if !errors.Is(err, tc.err) {
-				t.Fatalf("expected err: %v, got: %v", tc.err, err)
-			}
-			if err != nil {
-				return
-			}
-			if diff := cmp.Diff(res, tc.result,
-				cmp.Transformer("Value", func(v proto.Value) any {
-					return v.Any()
-				}),
-			); diff != "" {
-				t.Fatal(diff)
 			}
 		})
 	}
@@ -3136,6 +2922,39 @@ func TestValueAppend(t *testing.T) {
 				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
+			}
+		})
+	}
+}
+
+func TestCastBaseTypeToProfileType(t *testing.T) {
+	tt := []struct {
+		bt basetype.BaseType
+		pt profile.ProfileType
+	}{
+		{bt: basetype.Enum, pt: profile.Enum},
+		{bt: basetype.Sint8, pt: profile.Sint8},
+		{bt: basetype.Uint8, pt: profile.Uint8},
+		{bt: basetype.Sint16, pt: profile.Sint16},
+		{bt: basetype.Uint16, pt: profile.Uint16},
+		{bt: basetype.Sint32, pt: profile.Sint32},
+		{bt: basetype.Uint32, pt: profile.Uint32},
+		{bt: basetype.String, pt: profile.String},
+		{bt: basetype.Float32, pt: profile.Float32},
+		{bt: basetype.Float64, pt: profile.Float64},
+		{bt: basetype.Uint8z, pt: profile.Uint8z},
+		{bt: basetype.Uint16z, pt: profile.Uint16z},
+		{bt: basetype.Uint32z, pt: profile.Uint32z},
+		{bt: basetype.Byte, pt: profile.Byte},
+		{bt: basetype.Sint64, pt: profile.Sint64},
+		{bt: basetype.Uint64, pt: profile.Uint64},
+		{bt: basetype.Uint64z, pt: profile.Uint64z},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s -> %s", i, tc.bt, tc.pt), func(t *testing.T) {
+			if pt := profile.ProfileType(tc.bt & basetype.BaseTypeNumMask); pt != tc.pt {
+				t.Fatalf("expected: %d(%s), got: %d(%s)", tc.pt, tc.pt, pt, pt)
 			}
 		})
 	}
