@@ -50,41 +50,41 @@ File Header:
   - DataType: ".FIT"
   - CRC: 53438
 
-file_id (num: 0, arch: 1, fields[-]: 4, developerFields[+]: 0) [0]:
-  - manufacturer (num: 1, type: uint16 | manufacturer): 15 <dynastream>
-  - type (num: 0, type: enum | file): 4 <activity>
-  - garmin_product (num: 2, type: uint16 | garmin_product): 9001 <unknown(9001)> <<DynamicField: "product" (type: uint16)>>
-  - serial_number (num: 3, type: uint32z): 1701
-developer_data_id (num: 207, arch: 1, fields[-]: 2, developerFields[+]: 0) [1]:
-  - application_id (num: 1, type: byte array): [1 1 2 3 5 8 13 21 34 55 89 144 233 121 98 219]
-  - developer_data_index (num: 3, type: uint8): 0
-field_description (num: 206, arch: 1, fields[-]: 5, developerFields[+]: 0) [2]:
-  - developer_data_index (num: 0, type: uint8): 0
-  - field_definition_number (num: 1, type: uint8): 0
-  - fit_base_type_id (num: 2, type: uint8 | fit_base_type): 1 <sint8>
-  - field_name (num: 3, type: string array): ["doughnuts_earned"]
-  - units (num: 8, type: string array): ["doughnuts"]
-record (num: 20, arch: 1, fields[-]: 5, developerFields[+]: 1) [3]:
-  - heart_rate (num: 3, type: uint8): 140 bpm
-  - cadence (num: 4, type: uint8): 88 rpm
-  - distance (num: 5, type: uint32): 510 m ((51000 / 100) - 0)
-  - speed (num: 6, type: uint16): 47.488 m/s ((47488 / 1000) - 0)
-  - enhanced_speed (num: 73, type: uint32): 47.488 m/s ((47488 / 1000) - 0) <<ExpandedField>>
-  + doughnuts_earned (num: 0, type: sint8): 1 doughnuts
-record (num: 20, arch: 1, fields[-]: 5, developerFields[+]: 1) [4]:
-  - heart_rate (num: 3, type: uint8): 143 bpm
-  - cadence (num: 4, type: uint8): 90 rpm
-  - distance (num: 5, type: uint32): 2080 m ((208000 / 100) - 0)
-  - speed (num: 6, type: uint16): 36.416 m/s ((36416 / 1000) - 0)
-  - enhanced_speed (num: 73, type: uint32): 36.416 m/s ((36416 / 1000) - 0) <<ExpandedField>>
-  + doughnuts_earned (num: 0, type: sint8): 2 doughnuts
-record (num: 20, arch: 1, fields[-]: 5, developerFields[+]: 1) [5]:
-  - heart_rate (num: 3, type: uint8): 144 bpm
-  - cadence (num: 4, type: uint8): 92 rpm
-  - distance (num: 5, type: uint32): 3710 m ((371000 / 100) - 0)
-  - speed (num: 6, type: uint16): 35.344 m/s ((35344 / 1000) - 0)
-  - enhanced_speed (num: 73, type: uint32): 35.344 m/s ((35344 / 1000) - 0) <<ExpandedField>>
-  + doughnuts_earned (num: 0, type: sint8): 3 doughnuts
+file_id (num: 0, arch: 1, size: 9, fields[-]: 4, expandedFields[x]: 0, developerFields[+]: 0) [0]:
+ - manufacturer (num: 1, type: uint16 | manufacturer, size: 2): 15 <dynastream>
+ - type (num: 0, type: enum | file, size: 1): 4 <activity>
+ - garmin_product (num: 2, type: uint16 | garmin_product, size: 2): 9001 <unknown(9001)> <<DynamicField: "product" (type: uint16)>>
+ - serial_number (num: 3, type: uint32z, size: 4): 1701
+developer_data_id (num: 207, arch: 1, size: 17, fields[-]: 2, expandedFields[x]: 0, developerFields[+]: 0) [1]:
+ - application_id (num: 1, type: byte array, size: 16): [1 1 2 3 5 8 13 21 34 55 89 144 233 121 98 219]
+ - developer_data_index (num: 3, type: uint8, size: 1): 0
+field_description (num: 206, arch: 1, size: 30, fields[-]: 5, expandedFields[x]: 0, developerFields[+]: 0) [2]:
+ - developer_data_index (num: 0, type: uint8, size: 1): 0
+ - field_definition_number (num: 1, type: uint8, size: 1): 0
+ - fit_base_type_id (num: 2, type: uint8 | fit_base_type, size: 1): 1 <sint8>
+ - field_name (num: 3, type: string array, size: 17): ["doughnuts_earned"]
+ - units (num: 8, type: string array, size: 10): ["doughnuts"]
+record (num: 20, arch: 1, size: 9, fields[-]: 4, expandedFields[x]: 1, developerFields[+]: 1) [3]:
+ - heart_rate (num: 3, type: uint8, size: 1): 140 bpm
+ - cadence (num: 4, type: uint8, size: 1): 88 rpm
+ - distance (num: 5, type: uint32, size: 4): 510 m ((51000 / 100) - 0)
+ - speed (num: 6, type: uint16, size: 2): 47.488 m/s ((47488 / 1000) - 0)
+ x enhanced_speed (num: 73, type: uint32, size: ?): 47.488 m/s ((47488 / 1000) - 0)
+ + doughnuts_earned (num: 0, type: sint8, size: 1): 1 doughnuts
+record (num: 20, arch: 1, size: 9, fields[-]: 4, expandedFields[x]: 1, developerFields[+]: 1) [4]:
+ - heart_rate (num: 3, type: uint8, size: 1): 143 bpm
+ - cadence (num: 4, type: uint8, size: 1): 90 rpm
+ - distance (num: 5, type: uint32, size: 4): 2080 m ((208000 / 100) - 0)
+ - speed (num: 6, type: uint16, size: 2): 36.416 m/s ((36416 / 1000) - 0)
+ x enhanced_speed (num: 73, type: uint32, size: ?): 36.416 m/s ((36416 / 1000) - 0)
+ + doughnuts_earned (num: 0, type: sint8, size: 1): 2 doughnuts
+record (num: 20, arch: 1, size: 9, fields[-]: 4, expandedFields[x]: 1, developerFields[+]: 1) [5]:
+ - heart_rate (num: 3, type: uint8, size: 1): 144 bpm
+ - cadence (num: 4, type: uint8, size: 1): 92 rpm
+ - distance (num: 5, type: uint32, size: 4): 3710 m ((371000 / 100) - 0)
+ - speed (num: 6, type: uint16, size: 2): 35.344 m/s ((35344 / 1000) - 0)
+ x enhanced_speed (num: 73, type: uint32, size: ?): 35.344 m/s ((35344 / 1000) - 0)
+ + doughnuts_earned (num: 0, type: sint8, size: 1): 3 doughnuts
 
 File CRC: 40659
 ```

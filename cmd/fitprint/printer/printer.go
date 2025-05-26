@@ -10,6 +10,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -133,8 +135,11 @@ type printer struct {
 
 type message struct {
 	proto.Message
-	Reserved     byte
-	Architecture byte
+	Size                      byte
+	Reserved                  byte
+	Architecture              byte
+	FieldDefinitions          []proto.FieldDefinition
+	DeveloperFieldDefinitions []proto.DeveloperFieldDefinition
 }
 
 func New(w io.Writer) *printer {
@@ -220,7 +225,21 @@ func (p *printer) prep(mesg proto.Message) message {
 
 	mesgDef := p.localMessageDefinitions[proto.LocalMesgNum(mesg.Header)]
 
-	return message{Message: mesg, Reserved: mesgDef.Reserved, Architecture: mesgDef.Architecture}
+	var size byte
+	for _, v := range mesgDef.FieldDefinitions {
+		size += v.Size
+	}
+	for _, v := range mesgDef.DeveloperFieldDefinitions {
+		size += v.Size
+	}
+
+	return message{Message: mesg,
+		Size:                      size,
+		Reserved:                  mesgDef.Reserved,
+		Architecture:              mesgDef.Architecture,
+		FieldDefinitions:          slices.Clone(mesgDef.FieldDefinitions),
+		DeveloperFieldDefinitions: slices.Clone(mesgDef.DeveloperFieldDefinitions),
+	}
 }
 
 func (p *printer) print(m message) {
@@ -229,11 +248,21 @@ func (p *printer) print(m message) {
 		numstr = factory.NameUnknown
 	}
 
-	fmt.Fprintf(p.w, "%s (num: %d, arch: %d, fields[-]: %d, developerFields[+]: %d) [%d]:\n",
-		numstr, m.Num, m.Architecture, len(m.Fields), len(m.DeveloperFields), p.count)
+	var nFields, nExpandedField int
+	for i := range m.Fields {
+		if !m.Fields[i].IsExpandedField {
+			nFields++
+		} else {
+			nExpandedField++
+		}
 
-	for j := range m.Fields {
-		field := &m.Fields[j]
+	}
+
+	fmt.Fprintf(p.w, "%s (num: %d, arch: %d, size: %d, fields[-]: %d, expandedFields[x]: %d, developerFields[+]: %d) [%d]:\n",
+		numstr, m.Num, m.Architecture, m.Size, nFields, nExpandedField, len(m.DeveloperFields), p.count)
+
+	for i := range m.Fields {
+		field := &m.Fields[i]
 
 		var (
 			isDynamicField = false
@@ -243,6 +272,7 @@ func (p *printer) print(m message) {
 			scale          = field.Scale
 			offset         = field.Offset
 			units          = field.Units
+			flag           = '-'
 		)
 
 		if subField := field.SubFieldSubtitution(&m.Message); subField != nil {
@@ -282,8 +312,14 @@ func (p *printer) print(m message) {
 				valstr, field.Name, typestr)
 		}
 
+		var size string
+		if i < len(m.FieldDefinitions) {
+			size = strconv.Itoa(int(m.FieldDefinitions[i].Size))
+		}
+
 		if field.IsExpandedField {
-			valstr = fmt.Sprintf("%s <<ExpandedField>>", valstr)
+			flag = 'x'
+			size = "?"
 		}
 
 		typestr := baseType.String()
@@ -294,21 +330,22 @@ func (p *printer) print(m message) {
 			typestr += " array"
 		}
 
-		fmt.Fprintf(p.w, "  - %s (num: %d, type: %s): %v\n",
-			name, field.Num, typestr, valstr,
+		fmt.Fprintf(p.w, " %c %s (num: %d, type: %s, size: %s): %v\n",
+			flag, name, field.Num, typestr, size, valstr,
 		)
 	}
 
-	for i := range m.DeveloperFields {
-		devField := &m.DeveloperFields[i]
+	for k := range m.DeveloperFields {
+		devField := &m.DeveloperFields[k]
 		fieldDesc := p.getFieldDescription(devField.DeveloperDataIndex, devField.Num)
 		if fieldDesc == nil {
 			continue
 		}
-		fmt.Fprintf(p.w, "  + %s (num: %d, type: %s): %v\n",
+		fmt.Fprintf(p.w, " + %s (num: %d, type: %s, size: %d): %v\n",
 			strings.Join(fieldDesc.FieldName, "|"),
 			devField.Num,
 			fieldDesc.FitBaseTypeId,
+			m.DeveloperFieldDefinitions[k].Size,
 			formatDeveloperFieldValue(devField.Value, strings.Join(fieldDesc.Units, "|")),
 		)
 	}
