@@ -158,7 +158,18 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 		endTime := ses.StartTime.Add(time.Duration(ses.TotalElapsedTime/1000) * time.Second)
 		gap := uint32(nextSes.StartTime.Sub(endTime).Seconds() * 1000)
 		ses.TotalElapsedTime += gap
+
+		// Garmin uses Firstbeat's algorithm to calculate Total Training Effect (TTE), which is measured on a scale 0 to 5.
+		// The values between sessions can't simply be added together since this can exceed the scale.
+		// Moreover, not all manufacturers use this algorithm or apply the same scale.
+		// Until we know how to calculate this correctly, we pick the highest value from the combined sessions.
+		totalTrainingEffect := max(ses.TotalTrainingEffect, nextSes.TotalTrainingEffect)
+		totalAnaerobicTrainingEffect := max(ses.TotalAnaerobicTrainingEffect, nextSes.TotalAnaerobicTrainingEffect)
+
 		aggregator.Aggregate(ses, nextSes)
+
+		ses.TotalTrainingEffect = totalTrainingEffect
+		ses.TotalAnaerobicTrainingEffect = totalAnaerobicTrainingEffect
 
 		if len(nextFitSessions) > 1 { // append the rest of the sessions
 			sessions = append(sessions, nextFitSessions[1:]...)

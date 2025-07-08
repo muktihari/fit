@@ -56,6 +56,12 @@ We will aggregate fields depends on the prefix and suffix of the field name:
 
 Otherwise, they will be assigned with value from the corresponding field only if they are invalid.
 
+#### Total Training Effect (TTE)
+
+Even though Session's `total_training_effect` and `total_anaerobic_training_effect` both have prefix `total`, this is an exception.
+
+Garmin uses Firstbeat's algorithm to calculate Total Training Effect (TTE), which is measured on a scale 0 to 5. The values between sessions can't simply be added together since this can exceed this scale. Moreover, not all manufacturers use this algorithm or apply the same scale. Until we know how to calculate this correctly, **we pick the highest value from the combined sessions**. This might be a useful reference if we want to implement it later: [training effect white paper](https://assets.firstbeat.com/firstbeat/uploads/2015/10/white_paper_training_effect.pdf).
+
 ### The process
 
 We will combine last session group (include record, event, and lap) of the first file with the first session group of the next file (and so on).
