@@ -1269,6 +1269,10 @@ const (
 	TrainingFileProduct                               = 2   // [ TrainingFile ] [Type: Uint16, Base: uint16];
 	TrainingFileSerialNumber                          = 3   // [ TrainingFile ] [Type: Uint32z, Base: uint32z];
 	TrainingFileTimeCreated                           = 4   // [ TrainingFile ] [Type: DateTime, Base: uint32];
+	TrainingSettingsTargetDistance                    = 31  // [ TrainingSettings ] [Type: Uint32, Base: uint32, Scale: 100, Offset: 0, Units: m];
+	TrainingSettingsTargetSpeed                       = 32  // [ TrainingSettings ] [Type: Uint16, Base: uint16, Scale: 1000, Offset: 0, Units: m/s];
+	TrainingSettingsTargetTime                        = 33  // [ TrainingSettings ] [Type: Uint32, Base: uint32, Units: s];
+	TrainingSettingsPreciseTargetSpeed                = 153 // [ TrainingSettings ] [Type: Uint32, Base: uint32, Scale: 1e+06, Offset: 0, Units: m/s]; A more precise target speed field
 	UserProfileMessageIndex                           = 254 // [ UserProfile ] [Type: MessageIndex, Base: uint16];
 	UserProfileFriendlyName                           = 0   // [ UserProfile ] [Type: String, Base: string]; Used for Morning Report greeting
 	UserProfileGender                                 = 1   // [ UserProfile ] [Type: Gender, Base: enum];
