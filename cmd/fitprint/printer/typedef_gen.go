@@ -17,7 +17,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21158] }
+func _() { _ = [1]struct{}{}[profile.Version-21171] }
 
 func TypedefString(pt profile.ProfileType, v proto.Value) string {
 	switch pt {
@@ -367,12 +367,48 @@ func TypedefString(pt profile.ProfileType, v proto.Value) string {
 		return typedef.SquatExerciseName(v.Uint16()).String()
 	case profile.TotalBodyExerciseName:
 		return typedef.TotalBodyExerciseName(v.Uint16()).String()
+	case profile.MoveExerciseName:
+		return typedef.MoveExerciseName(v.Uint16()).String()
+	case profile.PoseExerciseName:
+		return typedef.PoseExerciseName(v.Uint16()).String()
 	case profile.TricepsExtensionExerciseName:
 		return typedef.TricepsExtensionExerciseName(v.Uint16()).String()
 	case profile.WarmUpExerciseName:
 		return typedef.WarmUpExerciseName(v.Uint16()).String()
 	case profile.RunExerciseName:
 		return typedef.RunExerciseName(v.Uint16()).String()
+	case profile.BikeExerciseName:
+		return typedef.BikeExerciseName(v.Uint16()).String()
+	case profile.BandedExercisesExerciseName:
+		return typedef.BandedExercisesExerciseName(v.Uint16()).String()
+	case profile.BattleRopeExerciseName:
+		return typedef.BattleRopeExerciseName(v.Uint16()).String()
+	case profile.EllipticalExerciseName:
+		return typedef.EllipticalExerciseName(v.Uint16()).String()
+	case profile.FloorClimbExerciseName:
+		return typedef.FloorClimbExerciseName(v.Uint16()).String()
+	case profile.IndoorBikeExerciseName:
+		return typedef.IndoorBikeExerciseName(v.Uint16()).String()
+	case profile.IndoorRowExerciseName:
+		return typedef.IndoorRowExerciseName(v.Uint16()).String()
+	case profile.LadderExerciseName:
+		return typedef.LadderExerciseName(v.Uint16()).String()
+	case profile.SandbagExerciseName:
+		return typedef.SandbagExerciseName(v.Uint16()).String()
+	case profile.SledExerciseName:
+		return typedef.SledExerciseName(v.Uint16()).String()
+	case profile.SledgeHammerExerciseName:
+		return typedef.SledgeHammerExerciseName(v.Uint16()).String()
+	case profile.StairStepperExerciseName:
+		return typedef.StairStepperExerciseName(v.Uint16()).String()
+	case profile.SuspensionExerciseName:
+		return typedef.SuspensionExerciseName(v.Uint16()).String()
+	case profile.TireExerciseName:
+		return typedef.TireExerciseName(v.Uint16()).String()
+	case profile.BikeOutdoorExerciseName:
+		return typedef.BikeOutdoorExerciseName(v.Uint16()).String()
+	case profile.RunIndoorExerciseName:
+		return typedef.RunIndoorExerciseName(v.Uint16()).String()
 	case profile.WaterType:
 		return typedef.WaterType(v.Uint8()).String()
 	case profile.TissueModelType:
