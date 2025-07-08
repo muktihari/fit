@@ -5,11 +5,16 @@
 package lookup
 
 import (
+	"fmt"
+	"math"
+	"strconv"
+
 	"github.com/muktihari/fit/internal/cmd/fitgen/parser"
 	"github.com/muktihari/fit/profile/basetype"
 )
 
 type Lookup struct {
+	mesgNumByName    map[string]uint16
 	fieldsByMesgName map[string][]parser.Field // fields is small, slice should be sufficient.
 	profiles         map[string]profile
 }
@@ -22,6 +27,7 @@ type profile struct {
 
 func New(types []parser.Type, messages []parser.Message) *Lookup {
 	l := &Lookup{
+		mesgNumByName:    make(map[string]uint16),
 		fieldsByMesgName: make(map[string][]parser.Field),
 		profiles:         make(map[string]profile),
 	}
@@ -30,8 +36,24 @@ func New(types []parser.Type, messages []parser.Message) *Lookup {
 }
 
 func (l *Lookup) populateLookupData(types []parser.Type, messages []parser.Message) {
+	l.populateMesgNumLookup(types)
 	l.populateProfileLookup(types)
 	l.populateMessageLookup(messages)
+}
+
+func (l *Lookup) populateMesgNumLookup(types []parser.Type) {
+	for _, typ := range types {
+		if typ.Name == "mesg_num" {
+			for _, v := range typ.Values {
+				x, err := strconv.ParseUint(v.Value, 0, 16)
+				if err != nil {
+					panic(fmt.Sprintf("could not parse mesg_num %q with value %q: %v", v.Name, v.Value, err))
+				}
+				l.mesgNumByName[v.Name] = uint16(x)
+			}
+			break
+		}
+	}
 }
 
 func (l *Lookup) populateProfileLookup(types []parser.Type) {
@@ -77,6 +99,14 @@ func (l *Lookup) populateMessageLookup(messages []parser.Message) {
 	for _, mesg := range messages {
 		l.fieldsByMesgName[mesg.Name] = mesg.Fields
 	}
+}
+
+func (l *Lookup) MesgNumByName(name string) uint16 {
+	num, ok := l.mesgNumByName[name]
+	if !ok {
+		return math.MaxUint16
+	}
+	return num
 }
 
 func (l *Lookup) BaseType(profileType string) basetype.BaseType {
