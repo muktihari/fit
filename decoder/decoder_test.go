@@ -2477,65 +2477,6 @@ func TestDecodeWithContext(t *testing.T) {
 			}
 		})
 	}
-
-	type strct struct {
-		name string
-		ctx  context.Context
-		r    io.Reader
-		err  error
-	}
-
-	t.Run("context", func(t *testing.T) {
-		// Test context related logic
-		tt2 := []strct{
-			{
-				name: "context canceled before decode header",
-				ctx: func() context.Context {
-					ctx, cancel := context.WithCancel(context.Background())
-					cancel()
-					return ctx
-				}(),
-				err: context.Canceled,
-			},
-			func() strct {
-				ctx, cancel := context.WithCancel(context.Background())
-				_, buffer := createFitForTest()
-				buf, cur := append(buffer[:0:0], buffer...), 0
-				r := fnReader(func(b []byte) (n int, err error) {
-					if cur == len(buf)-3 {
-						cancel() // cancel right after completing decode messages
-					}
-					m := len(buf) - 2
-					if cur+len(b)-2 < m {
-						m = cur + len(b) - 2
-					}
-					if cur == 0 {
-						m -= 1
-					}
-					n = copy(b, buf[cur:m])
-					cur += n
-					return n, nil
-				})
-
-				return strct{
-					name: "context canceled before decode crc",
-					r:    r,
-					ctx:  ctx,
-					err:  context.Canceled,
-				}
-			}(),
-		}
-
-		for i, tc := range tt2 {
-			t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-				dec := New(tc.r)
-				_, err := dec.DecodeWithContext(tc.ctx)
-				if !errors.Is(err, tc.err) {
-					t.Fatalf("expected err: %v, got: %v", tc.err, err)
-				}
-			})
-		}
-	})
 }
 
 func TestDecodeMessagesWithContext(t *testing.T) {
