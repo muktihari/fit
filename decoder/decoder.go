@@ -69,9 +69,8 @@ type Decoder struct {
 	// FileId Message is a special message that must present in a FIT file.
 	fileId *mesgdef.FileId
 
-	// Message Definition Lookup
-	localMessageDefinitions      [proto.LocalMesgNumMask + 1]*proto.MessageDefinition // message definition for upcoming message data
-	localMessageDefinitionsArray [proto.LocalMesgNumMask + 1]proto.MessageDefinition  // PERF: backing array for message definition
+	// Message definitions for upcoming message data
+	localMessageDefinitions [proto.LocalMesgNumMask + 1]proto.MessageDefinition
 
 	// Developer Data Lookup
 	developerDataIndexes []uint8
@@ -238,7 +237,9 @@ func (d *Decoder) reset() {
 // releaseTemporaryObjects releases objects that being created during a single decode process
 // by stops referencing those objects so it can be garbage-collected on next GC cycle.
 func (d *Decoder) releaseTemporaryObjects() {
-	d.localMessageDefinitions = [proto.LocalMesgNumMask + 1]*proto.MessageDefinition{}
+	for i := range d.localMessageDefinitions {
+		d.localMessageDefinitions[i].Header = 0
+	}
 	d.fieldsArray = [255]proto.Field{}
 	d.developerFieldsArray = [255]proto.DeveloperField{}
 	d.fileId = nil
@@ -518,21 +519,13 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		return err
 	}
 
-	localMesgNum := header & proto.LocalMesgNumMask
-	mesgDef := d.localMessageDefinitions[localMesgNum]
-	if mesgDef == nil {
-		// PERF: Use backing array to avoid object creation. On init, allocate slices
-		// with max cap for more deterministic performance by avoiding re-allocation.
-		mesgDef = &d.localMessageDefinitionsArray[localMesgNum]
-		if mesgDef.FieldDefinitions == nil && mesgDef.DeveloperFieldDefinitions == nil {
-			mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, 255)
-			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, 255)
-		}
-	}
-
+	mesgDef := &d.localMessageDefinitions[header&proto.LocalMesgNumMask]
 	mesgDef.Header = header
 	mesgDef.Reserved = b[0]
 	mesgDef.Architecture = b[1]
+	mesgDef.FieldDefinitions = mesgDef.FieldDefinitions[:0]
+	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
+
 	if mesgDef.Architecture == proto.LittleEndian {
 		mesgDef.MesgNum = typedef.MesgNum(binary.LittleEndian.Uint16(b[2:4]))
 	} else {
@@ -545,7 +538,10 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		return err
 	}
 
-	mesgDef.FieldDefinitions = mesgDef.FieldDefinitions[:0]
+	if mesgDef.FieldDefinitions == nil {
+		mesgDef.FieldDefinitions = make([]proto.FieldDefinition, 0, 255)
+	}
+
 	for ; len(b) >= 3; b = b[3:] {
 		fieldDef := proto.FieldDefinition{
 			Num:      b[0],
@@ -563,7 +559,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		mesgDef.FieldDefinitions = append(mesgDef.FieldDefinitions, fieldDef)
 	}
 
-	mesgDef.DeveloperFieldDefinitions = mesgDef.DeveloperFieldDefinitions[:0]
 	if (header & proto.DevDataMask) == proto.DevDataMask {
 		b, err = d.readN(1)
 		if err != nil {
@@ -574,6 +569,10 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 		b, err = d.readN(n * 3) // 3 byte per field
 		if err != nil {
 			return err
+		}
+
+		if mesgDef.DeveloperFieldDefinitions == nil {
+			mesgDef.DeveloperFieldDefinitions = make([]proto.DeveloperFieldDefinition, 0, 255)
 		}
 
 		for ; len(b) >= 3; b = b[3:] {
@@ -589,8 +588,6 @@ func (d *Decoder) decodeMessageDefinition(header byte) error {
 			mesgDef.DeveloperFieldDefinitions = append(mesgDef.DeveloperFieldDefinitions, devFieldDef)
 		}
 	}
-
-	d.localMessageDefinitions[localMesgNum] = mesgDef
 
 	if len(d.options.mesgDefListeners) > 0 {
 		// Clone since we don't have control of the object lifecycle outside Decoder.
@@ -610,8 +607,9 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 	if (header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
 		localMesgNum = (header & proto.CompressedLocalMesgNumMask) >> proto.CompressedBitShift
 	}
-	mesgDef := d.localMessageDefinitions[localMesgNum&proto.LocalMesgNumMask] // bounds check eliminated due to the mask
-	if mesgDef == nil {
+
+	mesgDef := &d.localMessageDefinitions[localMesgNum&proto.LocalMesgNumMask] // bounds check eliminated due to the mask
+	if mesgDef.Header == 0 {
 		return ErrMesgDefMissing
 	}
 
