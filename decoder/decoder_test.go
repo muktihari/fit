@@ -897,7 +897,7 @@ func TestNext(t *testing.T) {
 	}
 
 	for i := range dec.localMessageDefinitions {
-		if dec.localMessageDefinitions[i] != nil {
+		if dec.localMessageDefinitions[i].Header != 0 {
 			t.Errorf("message definition index %d should be nil", i)
 		}
 	}
@@ -1301,8 +1301,8 @@ func TestDecodeMessage(t *testing.T) {
 
 			var mesgDef *proto.MessageDefinition
 			for _, v := range dec.localMessageDefinitions {
-				if v != nil {
-					mesgDef = v
+				if v.Header != 0 {
+					mesgDef = &v
 					break
 				}
 			}
@@ -1510,7 +1510,7 @@ func TestDecodeMessageDefinition(t *testing.T) {
 			if err != nil {
 				return
 			}
-			mesgDef := dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
+			mesgDef := &dec.localMessageDefinitions[proto.MesgDefinitionMask&proto.LocalMesgNumMask]
 			if len(mesgDef.DeveloperFieldDefinitions) == 0 {
 				mesgDef.DeveloperFieldDefinitions = nil
 			}
@@ -1675,9 +1675,9 @@ func TestDecodeMessageData(t *testing.T) {
 			dec := New(tc.r, opts...)
 			if tc.mesgdef != nil {
 				if (tc.mesgdef.Header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask {
-					dec.localMessageDefinitions[(tc.mesgdef.Header&proto.CompressedLocalMesgNumMask)>>proto.CompressedBitShift] = tc.mesgdef
+					dec.localMessageDefinitions[(tc.mesgdef.Header&proto.CompressedLocalMesgNumMask)>>proto.CompressedBitShift] = *tc.mesgdef
 				} else {
-					dec.localMessageDefinitions[tc.mesgdef.Header&proto.LocalMesgNumMask] = tc.mesgdef
+					dec.localMessageDefinitions[tc.mesgdef.Header&proto.LocalMesgNumMask] = *tc.mesgdef
 				}
 			}
 			if tc.fieldDescription != nil {
@@ -2938,7 +2938,7 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 	})
 
 	dec := New(r, WithIgnoreChecksum(), WithNoComponentExpansion(), WithBroadcastOnly())
-	dec.localMessageDefinitions[0] = mesgDef
+	dec.localMessageDefinitions[0] = *mesgDef
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
