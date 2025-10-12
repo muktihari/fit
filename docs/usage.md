@@ -1033,7 +1033,7 @@ func main() {
     now := time.Now()
     activity := filedef.NewActivity()
 
-    activity.FileId = *mesgdef.NewFileId(nil).
+    activity.FileId.
         SetType(typedef.FileActivity).
         SetTimeCreated(now).
         SetManufacturer(typedef.ManufacturerSuunto).

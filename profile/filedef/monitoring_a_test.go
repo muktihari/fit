@@ -8,14 +8,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestNewMonitoringA(t *testing.T) {
+	a := filedef.NewMonitoringA()
+	fileId := *mesgdef.NewFileId(nil)
+	fileId.Type = typedef.FileMonitoringA
+	if diff := cmp.Diff(a.FileId, fileId); diff != "" {
+		t.Fatal(diff)
+	}
+}
 
 func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
@@ -55,48 +66,24 @@ func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 	}
 }
 
-func newMonitoringBMessageForTest(now time.Time) []proto.Message {
-	mesgsB := newMonitoringAMessageForTest(now)
-	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
-	return mesgsB
-}
-
-func TestMonitoringABCorrectness(t *testing.T) {
+func TestMonitoringACorrectness(t *testing.T) {
 	mesgsA := newMonitoringAMessageForTest(time.Now())
 
-	monitoringA := filedef.NewMonitoringAB(mesgsA...)
+	monitoringA := filedef.NewMonitoringA(mesgsA...)
 	if monitoringA.FileId.Type != typedef.FileMonitoringA {
 		t.Fatalf("expected: %v, got: %v", typedef.FileActivity, monitoringA.FileId.Type)
 	}
 
-	fit := monitoringA.ToFIT(nil) // use standard factory
+	fit := monitoringA.ToFIT(nil)
 
-	compare(t, mesgsA, fit.Messages)
-
-	mesgsB := newMonitoringBMessageForTest(time.Now())
-	ftype := mesgsB[0].FieldByNum(fieldnum.FileIdType)
-	ftype.Value = proto.Uint8(uint8(typedef.FileMonitoringB))
-
-	monitoringB := filedef.NewMonitoringAB(mesgsB...)
-	if monitoringB.FileId.Type != typedef.FileMonitoringB {
-		t.Fatalf("expected: %v, got: %v", typedef.FileMonitoringB, monitoringA.FileId.Type)
-	}
-
-	fit = monitoringB.ToFIT(nil) // use standard factory
-
-	compare(t, mesgsB, fit.Messages)
-}
-
-func compare(t *testing.T, expected, result []proto.Message) {
 	histogramExpected := map[typedef.MesgNum]int{}
-	for i := range expected {
-		histogramExpected[expected[i].Num]++
+	for i := range mesgsA {
+		histogramExpected[mesgsA[i].Num]++
 	}
 
 	histogramResult := map[typedef.MesgNum]int{}
-	for i := range result {
-		histogramResult[result[i].Num]++
+	for i := range fit.Messages {
+		histogramResult[fit.Messages[i].Num]++
 	}
 
 	if len(histogramExpected) != len(histogramResult) {
