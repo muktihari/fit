@@ -17,6 +17,14 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
+func TestNewSegment(t *testing.T) {
+	a := filedef.NewSegment()
+	expected := typedef.FileSegment
+	if a.FileId.Type != expected {
+		t.Fatalf("expected %v, got: %v", expected, a.FileId.Type)
+	}
+}
+
 func newSegmentMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
 		{Num: mesgnum.FileId, Fields: []proto.Field{

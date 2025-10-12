@@ -85,12 +85,12 @@ func TestListenerForSingleFitFile(t *testing.T) {
 		{
 			name:   "default listener for monitoring A",
 			mesgs:  newMonitoringAMessageForTest(now),
-			result: filedef.NewMonitoringAB(newMonitoringAMessageForTest(now)...),
+			result: filedef.NewMonitoringA(newMonitoringAMessageForTest(now)...),
 		},
 		{
 			name:   "default listener for monitoring B",
 			mesgs:  newMonitoringBMessageForTest(now),
-			result: filedef.NewMonitoringAB(newMonitoringBMessageForTest(now)...),
+			result: filedef.NewMonitoringB(newMonitoringBMessageForTest(now)...),
 		},
 		{
 			name:   "default listener for monitoring daily",

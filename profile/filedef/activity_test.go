@@ -16,11 +16,21 @@ import (
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestNewActivity(t *testing.T) {
+	f := filedef.NewActivity()
+	fileId := *mesgdef.NewFileId(nil)
+	fileId.Type = typedef.FileActivity
+	if diff := cmp.Diff(f.FileId, fileId); diff != "" {
+		t.Fatal(diff)
+	}
+}
 
 func sortFields(mesgs []proto.Message) {
 	for i := range mesgs {

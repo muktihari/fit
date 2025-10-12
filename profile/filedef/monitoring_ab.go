@@ -7,12 +7,14 @@ package filedef
 import (
 	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/profile/mesgdef"
+	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
 
 // MonitoringAB (Monitoring A and Monitoring B) files are used to store data that is logged over varying time intervals.
-// The two monitoring file formats are identical apart from supporting different conventions for file_id.number and the start of accumulating data values.
+// The two monitoring file formats are identical apart from supporting different conventions for file_id.number and
+// the start of accumulating data values.
 //
 // The FIT file_id.type = 15 for a monitoring_a file and
 // the FIT file_id.type = 32 for a monitoring_b file
@@ -32,9 +34,32 @@ type MonitoringAB struct {
 
 var _ File = (*MonitoringAB)(nil)
 
-// NewMonitoringAB creates new MonitoringAB File.
+// NewMonitoringA creates new Monitoring A.
+func NewMonitoringA(mesgs ...proto.Message) *MonitoringAB {
+	f := &MonitoringAB{FileId: newFileId}
+	f.FileId.Type = typedef.FileMonitoringA
+	for i := range mesgs {
+		f.Add(mesgs[i])
+	}
+	return f
+}
+
+// NewMonitoringB creates new Monitoring B.
+func NewMonitoringB(mesgs ...proto.Message) *MonitoringAB {
+	f := &MonitoringAB{FileId: newFileId}
+	f.FileId.Type = typedef.FileMonitoringB
+	for i := range mesgs {
+		f.Add(mesgs[i])
+	}
+	return f
+}
+
+// NewMonitoringAB creates new Monitoring A or B File depends on which type is specified on FileId.Type
+// either typedef.FileMonitoringA or typedef.FileMonitoringB after the object creation.
+//
+// Deprecated: Use NewMonitoringA or NewMonitoringB instead. This will be removed in v0.26.0 or later.
 func NewMonitoringAB(mesgs ...proto.Message) *MonitoringAB {
-	f := &MonitoringAB{}
+	f := &MonitoringAB{FileId: newFileId}
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
@@ -45,7 +70,7 @@ func NewMonitoringAB(mesgs ...proto.Message) *MonitoringAB {
 func (f *MonitoringAB) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
-		f.FileId = *mesgdef.NewFileId(&mesg)
+		f.FileId.Reset(&mesg)
 	case mesgnum.DeveloperDataId:
 		f.DeveloperDataIds = append(f.DeveloperDataIds, mesgdef.NewDeveloperDataId(&mesg))
 	case mesgnum.FieldDescription:

@@ -8,14 +8,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestNewWeight(t *testing.T) {
+	f := filedef.NewWeight()
+	fileId := *mesgdef.NewFileId(nil)
+	fileId.Type = typedef.FileWeight
+	if diff := cmp.Diff(f.FileId, fileId); diff != "" {
+		t.Fatal(diff)
+	}
+}
 
 func newWeightMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{

@@ -8,14 +8,34 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/filedef"
+	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
 	"github.com/muktihari/fit/proto"
 )
+
+func TestNewMonitoringA(t *testing.T) {
+	a := filedef.NewMonitoringA()
+	fileId := *mesgdef.NewFileId(nil)
+	fileId.Type = typedef.FileMonitoringA
+	if diff := cmp.Diff(a.FileId, fileId); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestNewMonitoringB(t *testing.T) {
+	f := filedef.NewMonitoringB()
+	fileId := *mesgdef.NewFileId(nil)
+	fileId.Type = typedef.FileMonitoringB
+	if diff := cmp.Diff(f.FileId, fileId); diff != "" {
+		t.Fatal(diff)
+	}
+}
 
 func newMonitoringAMessageForTest(now time.Time) []proto.Message {
 	return []proto.Message{
