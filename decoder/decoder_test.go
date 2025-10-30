@@ -849,20 +849,17 @@ func TestNext(t *testing.T) {
 	buf = append(buf, b...)
 
 	r := func() io.Reader {
-		bbbuf := buf
-		buf, cur := make([]byte, len(bbbuf)), 0
-		copy(buf, bbbuf)
+		cur, m := 0, len(buf)
 		return fnReader(func(b []byte) (n int, err error) {
-			m := len(buf)
 			if cur == m {
 				return 0, io.EOF
 			}
 			if cur+len(b) < m {
 				m = cur + len(b)
 			}
-			n = copy(b, buf[cur:m])
-			cur += n
-			return
+			n = copy(b, buf[cur:])
+			buf, cur = buf[n:], cur+n
+			return n, nil
 		})
 	}()
 
@@ -922,13 +919,38 @@ func TestNext(t *testing.T) {
 		t.Fatalf("lastTimeOffset should be zero")
 	}
 
-	if _, err := dec.PeekFileId(); err != io.EOF {
+	if _, err := dec.PeekFileId(); !errors.Is(err, io.EOF) {
 		t.Fatalf("expected EOF got %v", err)
 	}
 
 	if dec.Next() {
 		t.Fatalf("should be false, got true")
 	}
+
+	t.Run("next sequence has corrupted data on file header", func(t *testing.T) {
+		r := func() io.Reader {
+			_, buf := createFitForTest()
+			buf = append(buf, 12) // Next FIT sequence but corrupted on FileHeader only contains Size.
+			cur, m := 0, len(buf)
+			return fnReader(func(b []byte) (n int, err error) {
+				if cur == m {
+					return 0, io.EOF
+				}
+				n = copy(b, buf[cur:])
+				buf, cur = buf[n:], cur+n
+				return n, nil
+			})
+		}()
+		dec := New(r)
+		var errs = []error{nil, io.EOF}
+		for dec.Next() {
+			_, err := dec.Decode()
+			if !errors.Is(err, errs[0]) {
+				t.Fatalf("expected EOF, got: %v", errs[0])
+			}
+			errs = errs[1:]
+		}
+	})
 }
 
 type decodeTestCase struct {
