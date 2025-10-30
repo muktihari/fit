@@ -7,6 +7,7 @@ package decoder
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"slices"
@@ -273,9 +274,7 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 		// Check File Header Integrity
 		pos := d.n
 		if err = d.decodeFileHeaderOnce(); err != nil {
-			if pos != 0 && pos == d.n && err == io.EOF {
-				// When EOF error occurs exactly after a sequence has been completed,
-				// make the error as nil, it means we have reached the desirable EOF.
+			if desirableEOF(err, pos, d.n) {
 				err = nil
 			}
 			break
@@ -304,6 +303,14 @@ func (d *Decoder) CheckIntegrity() (seq int, err error) {
 	return seq, err
 }
 
+// Desirable EOF is when EOF error occurs exactly right after a sequence has been completed.
+func desirableEOF(err error, oldPos, newPos int64) bool {
+	if errors.Is(err, io.EOF) && oldPos != 0 && oldPos == newPos {
+		return true
+	}
+	return false
+}
+
 // discardMessages efficiently discards bytes used by messages.
 func (d *Decoder) discardMessages() (err error) {
 	for d.cur < d.fileHeader.DataSize {
@@ -320,7 +327,7 @@ func (d *Decoder) discardMessages() (err error) {
 // If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
 	return &d.fileHeader, nil
 }
@@ -332,11 +339,11 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 // If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
 	for d.fileId == nil {
 		if d.err = d.decodeMessage(); d.err != nil {
-			return nil, d.err
+			return nil, fmt.Errorf("decode message [byte pos: %d]: %w", d.n, d.err)
 		}
 	}
 	return d.fileId, nil
@@ -344,13 +351,12 @@ func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 
 // Next checks whether next bytes are still a valid FIT File sequence. Return false when invalid or reach EOF.
 func (d *Decoder) Next() bool {
-	if d.err != nil {
-		return false
-	}
-	if d.n == 0 {
+	if d.n == 0 && d.err == nil {
 		return true
 	}
-	return d.decodeFileHeaderOnce() == nil
+	pos := d.n
+	d.err = d.decodeFileHeaderOnce()
+	return !desirableEOF(d.err, pos, d.n)
 }
 
 // Decode method decodes `r` into FIT data. One invocation will produce one valid FIT data or
@@ -365,14 +371,14 @@ func (d *Decoder) Next() bool {
 //	}
 func (d *Decoder) Decode() (*proto.FIT, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
 	defer d.releaseTemporaryObjects()
 	if d.err = d.decodeMessages(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode message [byte pos: %d]: %w", d.n, d.err)
 	}
 	if d.err = d.decodeCRC(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode crc [byte pos: %d]: %w", d.n, d.err)
 	}
 	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
@@ -410,13 +416,13 @@ func (d *Decoder) Discard() error {
 	defer func() { d.options.shouldChecksum = optionsShouldChecksum }()
 
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return d.err
+		return fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
 	if d.err = d.discardMessages(); d.err != nil {
-		return d.err
+		return fmt.Errorf("discard message [byte pos: %d]: %w", d.n, d.err)
 	}
 	if _, d.err = d.readN(2); d.err != nil { // Discard File CRC
-		return d.err
+		return fmt.Errorf("discard crc [byte pos: %d]: %w", d.n, d.err)
 	}
 	d.reset()
 	return d.err
@@ -424,10 +430,13 @@ func (d *Decoder) Discard() error {
 
 // decodeFileHeaderOnce invokes decodeFileHeader exactly once.
 func (d *Decoder) decodeFileHeaderOnce() error {
-	if d.fileHeader == (proto.FileHeader{}) && d.err == nil {
-		d.err = d.decodeFileHeader()
+	if d.err != nil {
+		return d.err
 	}
-	return d.err
+	if d.fileHeader.Size != 0 {
+		return nil
+	}
+	return d.decodeFileHeader()
 }
 
 // decodeFileHeader is only invoked through decodeFileHeaderOnce.
@@ -491,7 +500,7 @@ func (d *Decoder) decodeFileHeader() error {
 func (d *Decoder) decodeMessages() (err error) {
 	for d.cur < d.fileHeader.DataSize {
 		if err = d.decodeMessage(); err != nil {
-			return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
+			return err
 		}
 	}
 	return nil
@@ -978,14 +987,14 @@ func (d *Decoder) DecodeWithContext(ctx context.Context) (*proto.FIT, error) {
 		ctx = context.Background()
 	}
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
 	defer d.releaseTemporaryObjects()
 	if d.err = d.decodeMessagesWithContext(ctx); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode message [byte pos: %d]: %w", d.n, d.err)
 	}
 	if d.err = d.decodeCRC(); d.err != nil {
-		return nil, d.err
+		return nil, fmt.Errorf("decode crc [byte pos: %d]: %w", d.n, d.err)
 	}
 	fit := &proto.FIT{
 		FileHeader: d.fileHeader,
@@ -1003,7 +1012,7 @@ func (d *Decoder) decodeMessagesWithContext(ctx context.Context) (err error) {
 			return ctx.Err()
 		default:
 			if err = d.decodeMessage(); err != nil {
-				return fmt.Errorf("decodeMessage [byte pos: %d]: %w", d.n, err)
+				return err
 			}
 		}
 	}
