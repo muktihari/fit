@@ -15,7 +15,7 @@ import (
             {{ printf "%q" $v }}
         {{ end -}}
     {{ end -}}
-	{{ if .AllowRegister }}"fmt"{{ end }}
+    {{ if .AllowRegister }}"fmt"{{ end }}
 )
 
 type {{ .Type }} {{ .Base }} {{ .Comment }}
@@ -39,73 +39,73 @@ var stringTo{{ .Type }} = map[string]{{ .Type }}{}
 {{ $r := printf "%.1s" $.Type | ToLower }}
 {{ $vals := print $.Type "ToString" | ToLower }}
 func ({{ $r }} {{ $.Type }}) String() string {
-	switch {{ $r }} {
-	{{ range .Constants -}}
-		{{ if not (eq (printf "%.2s" .Name) "//") -}}
-		case {{ .Name }}:
-			return {{ printf "%q" .String }}
-		{{ end -}}
-	{{ end -}}
-	default:
-	{{ if .AllowRegister -}}
-		if val, ok := {{ .Type | ToLower }}ToString[{{ $r }}]; ok {
-			return val
-		}
-	{{ end -}}
-	return "{{ .Type }}Invalid(" + {{- if eq (sprintf "%.4s" .Base) "byte" -}}
-			strconv.Itoa(int({{ $r }}))
-		{{- else if eq (sprintf "%.3s" .Base) "int" -}}
-			strconv.FormatInt(int64({{ $r }}), 10)
-		{{- else if eq (sprintf "%.4s" .Base) "uint" -}}
-			strconv.FormatUint(uint64({{ $r }}), 10)
-		{{- else if eq (sprintf "%.7s" .Base) "float32" -}}
-			strconv.FormatFloat(float64({{ $r }}), 'f', -1, 32)
-		{{- else if eq (sprintf "%.7s" .Base) "float64" -}}
-			strconv.FormatFloat(float64({{ $r }}), 'f', -1, 64)
-		{{- else if eq .Base "string" -}}
-			string({{ $r }})
-	{{ end -}} + ")"
-	}
+    switch {{ $r }} {
+    {{ range .Constants -}}
+        {{ if not (eq (printf "%.2s" .Name) "//") -}}
+        case {{ .Name }}:
+            return {{ printf "%q" .String }}
+        {{ end -}}
+    {{ end -}}
+    default:
+    {{ if .AllowRegister -}}
+        if val, ok := {{ .Type | ToLower }}ToString[{{ $r }}]; ok {
+            return val
+        }
+    {{ end -}}
+    return "{{ .Type }}Invalid(" + {{- if eq (sprintf "%.4s" .Base) "byte" -}}
+            strconv.Itoa(int({{ $r }}))
+        {{- else if eq (sprintf "%.3s" .Base) "int" -}}
+            strconv.FormatInt(int64({{ $r }}), 10)
+        {{- else if eq (sprintf "%.4s" .Base) "uint" -}}
+            strconv.FormatUint(uint64({{ $r }}), 10)
+        {{- else if eq (sprintf "%.7s" .Base) "float32" -}}
+            strconv.FormatFloat(float64({{ $r }}), 'f', -1, 32)
+        {{- else if eq (sprintf "%.7s" .Base) "float64" -}}
+            strconv.FormatFloat(float64({{ $r }}), 'f', -1, 64)
+        {{- else if eq .Base "string" -}}
+            string({{ $r }})
+    {{ end -}} + ")"
+    }
 }
 
 // FromString parse string into {{ .Type }} constant it's represent, return {{ .Type }}Invalid if not found.
 func {{ .Type }}FromString(s string) {{ .Type }} {
-	switch s {
-	{{ range .Constants -}}
-	{{ if and (not (eq (printf "%.2s" .Name) "//")) (not (eq .String "invalid")) -}}
-		case {{ printf "%q" .String }}:
-			return {{ .Name }}
-		{{ end -}}
-	{{ end -}}
-	default:
-		{{ if .AllowRegister -}}
-		if val, ok := stringTo{{ .Type }}[s]; ok {
-			return val
-		}
-		{{ end -}}
-		return {{ .Invalid.Name }}
-	}
+    switch s {
+    {{ range .Constants -}}
+        {{ if and (not (eq (printf "%.2s" .Name) "//")) (not (eq .String "invalid")) -}}
+        case {{ printf "%q" .String }}:
+            return {{ .Name }}
+        {{ end -}}
+    {{ end -}}
+    default:
+        {{ if .AllowRegister -}}
+        if val, ok := stringTo{{ .Type }}[s]; ok {
+            return val
+        }
+        {{ end -}}
+        return {{ .Invalid.Name }}
+    }
 }
 
 // List returns all constants.
 func List{{ .Type }}() []{{ .Type }} {
-	{{ if .AllowRegister -}}
-		list := []{{ .Type }} {
-			{{ range .Constants -}}
-				{{ .Name }},
-			{{ end -}}
-		}
-		for k := range {{ .Type | ToLower }}ToString {
-			list = append(list, k)
-		}
-		return list
-	{{ else -}}
-		return []{{ .Type }} {
-			{{ range .Constants -}}
-				{{ .Name }},
-			{{ end -}}
-		}
-	{{ end -}}
+    {{ if .AllowRegister -}}
+        list := []{{ .Type }} {
+            {{ range .Constants -}}
+                {{ .Name }},
+            {{ end -}}
+        }
+        for k := range {{ .Type | ToLower }}ToString {
+            list = append(list, k)
+        }
+        return list
+    {{ else -}}
+        return []{{ .Type }} {
+            {{ range .Constants -}}
+                {{ .Name }},
+            {{ end -}}
+        }
+    {{ end -}}
 }
 
 {{ if .AllowRegister }}

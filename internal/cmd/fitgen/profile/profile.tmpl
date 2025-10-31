@@ -21,14 +21,14 @@ func ProfileTypeFromBaseType(baseType basetype.BaseType) ProfileType {
 }
 
 func (p ProfileType) BaseType() basetype.BaseType {
-	switch p {
-	{{ range .MappingProfileTypeToBaseTypes -}}
-	case {{ .ProfileType }}:
-		return {{ .BaseType }}
-	{{ end -}}
-	}
-	
-	return 255
+    switch p {
+    {{ range .MappingProfileTypeToBaseTypes -}}
+    case {{ .ProfileType }}:
+        return {{ .BaseType }}
+    {{ end -}}
+    }
+    
+    return 255
 }
 {{ end }}
 

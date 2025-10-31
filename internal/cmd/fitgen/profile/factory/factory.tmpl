@@ -15,15 +15,15 @@
 package {{ .Package }}
 
 import (
-	"fmt"
-	"sync"
+    "fmt"
+    "sync"
 
-	"github.com/muktihari/fit/profile"
-	"github.com/muktihari/fit/profile/basetype"
-	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/profile/untyped/fieldnum"
-	"github.com/muktihari/fit/profile/untyped/mesgnum"
-	"github.com/muktihari/fit/proto"
+    "github.com/muktihari/fit/profile"
+    "github.com/muktihari/fit/profile/basetype"
+    "github.com/muktihari/fit/profile/typedef"
+    "github.com/muktihari/fit/profile/untyped/fieldnum"
+    "github.com/muktihari/fit/profile/untyped/mesgnum"
+    "github.com/muktihari/fit/proto"
 )
 
 type errorString string
@@ -31,17 +31,17 @@ type errorString string
 func (e errorString) Error() string { return string(e) }
 
 const (
-	// ErrRegisterForbidden occurs when trying to create manufacturer specific message outside available range.
-	ErrRegisterForbidden = errorString("register is forbidden")
+    // ErrRegisterForbidden occurs when trying to create manufacturer specific message outside available range.
+    ErrRegisterForbidden = errorString("register is forbidden")
 
-	// NameUnknown is the name of an unknown message or an unknown field.
-	NameUnknown string = "unknown"
+    // NameUnknown is the name of an unknown message or an unknown field.
+    NameUnknown string = "unknown"
 )
 
 
 // Factory handles creation and registration for FIT's message and field.
 type Factory struct {
-	registeredMesgs map[typedef.MesgNum]proto.Message
+    registeredMesgs map[typedef.MesgNum]proto.Message
 }
 
 // New creates new Factory with predefined messages.
@@ -53,111 +53,111 @@ type Factory struct {
 func New() *Factory { return &Factory{} }
 
 var ( // cache for CreateMesg method
-	once	   sync.Once
-	protoMesgs []proto.Message // data is populated on CreateMesg first invocation.
+    once       sync.Once
+    protoMesgs []proto.Message // data is populated on CreateMesg first invocation.
 )
 
 {{ template "create_mesg_doc" -}}
 func (f *Factory) CreateMesg(num typedef.MesgNum) proto.Message {
-	once.Do(func() { // populate data for the first invocation.
-		protoMesgs = make([]proto.Message, {{ .LenMesgs }})
-		var i int
-		var fieldBases *[256]*proto.FieldBase
-		for i, fieldBases = range mesgs {
-			if fieldBases == nil {
-				continue
-			}
-			var n byte
-			for j := range fieldBases {
-				if fieldBases[j] != nil {
-					n++
-				}
-			}
-			fields := make([]proto.Field, 0, n)
+    once.Do(func() { // populate data for the first invocation.
+        protoMesgs = make([]proto.Message, {{ .LenMesgs }})
+        var i int
+        var fieldBases *[256]*proto.FieldBase
+        for i, fieldBases = range mesgs {
+            if fieldBases == nil {
+                continue
+            }
+            var n byte
+            for j := range fieldBases {
+                if fieldBases[j] != nil {
+                    n++
+                }
+            }
+            fields := make([]proto.Field, 0, n)
             
-			var timestampNum byte = proto.FieldNumTimestamp
-			mesgNum := typedef.MesgNum(i)
-			switch mesgNum {
-			case mesgnum.CoursePoint:
-				timestampNum = fieldnum.CoursePointTimestamp
-			case mesgnum.Set:
-				timestampNum = fieldnum.SetTimestamp
-			}
+            var timestampNum byte = proto.FieldNumTimestamp
+            mesgNum := typedef.MesgNum(i)
+            switch mesgNum {
+            case mesgnum.CoursePoint:
+                timestampNum = fieldnum.CoursePointTimestamp
+            case mesgnum.Set:
+                timestampNum = fieldnum.SetTimestamp
+            }
 
-			// Place timestamp field at the first index since the field is frequently used.
-			// This kind of ordering matches the fields' ordering in Profile.xlsx which put timestamp at the beginning.
-			fieldBase := fieldBases[timestampNum]
-			if fieldBase != nil {
-				fields = append(fields, proto.Field{FieldBase: fieldBase})
-			}
-			for _, fieldBase = range fieldBases {
-				if fieldBase != nil && fieldBase.Num != timestampNum {
-					fields = append(fields, proto.Field{FieldBase: fieldBase})
-				}
-			}
-			protoMesgs[i] = proto.Message{
-				Num:    mesgNum,
-				Fields: fields,
-			}
-		}
-	})
+            // Place timestamp field at the first index since the field is frequently used.
+            // This kind of ordering matches the fields' ordering in Profile.xlsx which put timestamp at the beginning.
+            fieldBase := fieldBases[timestampNum]
+            if fieldBase != nil {
+                fields = append(fields, proto.Field{FieldBase: fieldBase})
+            }
+            for _, fieldBase = range fieldBases {
+                if fieldBase != nil && fieldBase.Num != timestampNum {
+                    fields = append(fields, proto.Field{FieldBase: fieldBase})
+                }
+            }
+            protoMesgs[i] = proto.Message{
+                Num:    mesgNum,
+                Fields: fields,
+            }
+        }
+    })
 
-	var mesg proto.Message
-	if num < {{ .LenMesgs }} {
-		mesg = protoMesgs[num]
-	}
-	if mesg.Num != num {
-		mesg = f.registeredMesgs[num]
-	}
-	mesg.Num = num // In case of unknown field
+    var mesg proto.Message
+    if num < {{ .LenMesgs }} {
+        mesg = protoMesgs[num]
+    }
+    if mesg.Num != num {
+        mesg = f.registeredMesgs[num]
+    }
+    mesg.Num = num // In case of unknown field
 
-	if len(mesg.Fields) != 0 {
-		fields := make([]proto.Field, len(mesg.Fields))
-		copy(fields, mesg.Fields)
-		mesg.Fields = fields
-	}
+    if len(mesg.Fields) != 0 {
+        fields := make([]proto.Field, len(mesg.Fields))
+        copy(fields, mesg.Fields)
+        mesg.Fields = fields
+    }
 
-	return mesg
+    return mesg
 }
 
 {{ template "create_field_doc" -}}
 func (f *Factory) CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
-	if mesgNum < {{ .LenMesgs }} && mesgs[mesgNum] != nil {
-		fieldBase := mesgs[mesgNum][num]
-		if fieldBase != nil {
-			return proto.Field{FieldBase: fieldBase}
-		}
-		return createUnknownField(num)
-	}
-	if mesg, ok := f.registeredMesgs[mesgNum]; ok {
-		for i := range mesg.Fields {
-			if mesg.Fields[i].Num == num {
-				return mesg.Fields[i]
-			}
-		}
-	}
-	return createUnknownField(num)
+    if mesgNum < {{ .LenMesgs }} && mesgs[mesgNum] != nil {
+        fieldBase := mesgs[mesgNum][num]
+        if fieldBase != nil {
+            return proto.Field{FieldBase: fieldBase}
+        }
+        return createUnknownField(num)
+    }
+    if mesg, ok := f.registeredMesgs[mesgNum]; ok {
+        for i := range mesg.Fields {
+            if mesg.Fields[i].Num == num {
+                return mesg.Fields[i]
+            }
+        }
+    }
+    return createUnknownField(num)
 }
 
 func createUnknownField(num byte) proto.Field {
-	return proto.Field{FieldBase: &proto.FieldBase{Name: NameUnknown, Num: num, Scale: 1, Offset: 0}}
+    return proto.Field{FieldBase: &proto.FieldBase{Name: NameUnknown, Num: num, Scale: 1, Offset: 0}}
 }
 
 {{ template "register_mesg_doc" -}}
 func (f *Factory) RegisterMesg(mesg proto.Message) error {
-	if f.registeredMesgs == nil {
-		f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
-	}
-	if mesg.Num > typedef.MesgNumMfgRangeMax {
-		return fmt.Errorf("mesg.Num %d is outside max range %d: %w", 
-			mesg.Num, typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
-	}
-	if mesg.Num < {{ .LenMesgs }} && mesgs[mesg.Num] != nil {
-		return fmt.Errorf("mesg.Num %d is reserved for %q: %w",
-			mesg.Num, mesg.Num, ErrRegisterForbidden)
-	}
-	f.registeredMesgs[mesg.Num] = mesg
-	return nil
+    if f.registeredMesgs == nil {
+        f.registeredMesgs = make(map[typedef.MesgNum]proto.Message) // only alloc when needed
+    }
+    if mesg.Num > typedef.MesgNumMfgRangeMax {
+        return fmt.Errorf("mesg.Num %d is outside max range %d: %w", 
+            mesg.Num, typedef.MesgNumMfgRangeMax, ErrRegisterForbidden)
+    }
+    if mesg.Num < {{ .LenMesgs }} && mesgs[mesg.Num] != nil {
+        return fmt.Errorf("mesg.Num %d is reserved for %q: %w",
+            mesg.Num, mesg.Num, ErrRegisterForbidden)
+    }
+    f.registeredMesgs[mesg.Num] = mesg
+    return nil
 }
 
 // Use array to ensure O(1) lookup
@@ -171,29 +171,29 @@ var mesgs = {{ .Messages }}
 
 package {{ .Package }}
 
- import (
-	"github.com/muktihari/fit/proto"
-	"github.com/muktihari/fit/profile/typedef"
+import (
+    "github.com/muktihari/fit/proto"
+    "github.com/muktihari/fit/profile/typedef"
 )
 
- var std = New()
+var std = New()
 
 // StandardFactory returns standard factory.
 func StandardFactory() *Factory { return std }
 
 {{ template "create_mesg_doc" -}}
 func CreateMesg(num typedef.MesgNum) proto.Message {
-	return std.CreateMesg(num)
+    return std.CreateMesg(num)
 }
 
 {{ template "create_field_doc" -}}
 func CreateField(mesgNum typedef.MesgNum, num byte) proto.Field {
-	return std.CreateField(mesgNum, num)
+    return std.CreateField(mesgNum, num)
 }
 
 {{ template "register_mesg_doc" -}}
 func RegisterMesg(mesg proto.Message) error {
-	return std.RegisterMesg(mesg)
+    return std.RegisterMesg(mesg)
 }
 
 {{ end }} // end of "exported"
