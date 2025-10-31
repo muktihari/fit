@@ -8,14 +8,14 @@
 package {{ .Package }}
 
 import (
-	"github.com/muktihari/fit/profile/factory"
-	"github.com/muktihari/fit/profile/typedef"
-	"github.com/muktihari/fit/proto"
-	{{- if .Imports -}}
-		{{ range $_, $v := .Imports }}
-			{{ printf "%q" $v -}}
-		{{ end }}
-	{{ end }}
+    "github.com/muktihari/fit/profile/factory"
+    "github.com/muktihari/fit/profile/typedef"
+    "github.com/muktihari/fit/proto"
+    {{- if .Imports -}}
+        {{ range $_, $v := .Imports }}
+            {{ printf "%q" $v -}}
+        {{ end }}
+    {{ end }}
 )
 
 // {{ .Name }} is a {{ .Name }} message.
@@ -23,43 +23,43 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type {{ .Name }} struct {
-	{{ range .OptimizedFields -}}
-	{{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
-	{{ end }}
+    {{ range .OptimizedFields -}}
+    {{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
+    {{ end }}
 
-	{{ if gt .MaxFieldExpandNum 1 -}}
-	state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8 // Used for tracking expanded fields.
-	{{ end }}
+    {{ if gt .MaxFieldExpandNum 1 -}}
+    state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8 // Used for tracking expanded fields.
+    {{ end }}
 
-	UnknownFields []proto.Field            // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
-	{{- end }}
+    UnknownFields []proto.Field            // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+    {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
+    DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+    {{- end }}
 }
 
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 
 // If mesg is nil, it will return {{ .Name }} with all fields being set to its corresponding invalid value.
 func New{{ .Name }}(mesg *proto.Message) *{{ .Name }} {
-	m := new({{ .Name }})
-	m.Reset(mesg)
-	return m
+    m := new({{ .Name }})
+    m.Reset(mesg)
+    return m
 }
 
 // Reset resets all {{ .Name }}'s fields based on given mesg.
 // If mesg is nil, all fields will be set to its corresponding invalid value.
 func (m *{{ $.Name }}) Reset(mesg *proto.Message) {
-	var (
-		vals [{{ .MaxFieldNum }}]proto.Value
-		{{ if gt .MaxFieldExpandNum 1 -}}
-		state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
-		{{ end -}}
-		unknownFields []proto.Field
-		{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
-			developerFields []proto.DeveloperField
-		{{ end -}}
-	)
+    var (
+        vals [{{ .MaxFieldNum }}]proto.Value
+        {{ if gt .MaxFieldExpandNum 1 -}}
+        state [{{ byteDiv .MaxFieldExpandNum 8 | byteAdd 1 }}]uint8
+        {{ end -}}
+        unknownFields []proto.Field
+        {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  -}}
+            developerFields []proto.DeveloperField
+        {{ end -}}
+    )
 
-	if mesg != nil {
+    if mesg != nil {
         var n int
         for i := range mesg.Fields {
             if mesg.Fields[i].Name == factory.NameUnknown {
@@ -67,86 +67,86 @@ func (m *{{ $.Name }}) Reset(mesg *proto.Message) {
             }
         }
         unknownFields = make([]proto.Field, 0, n)
-		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
-				unknownFields = append(unknownFields, mesg.Fields[i])
-				continue
-			}
-			{{ if gt $.MaxFieldExpandNum 1 -}}
-			if mesg.Fields[i].Num < {{ .MaxFieldExpandNum }} && mesg.Fields[i].IsExpandedField {
-				pos := mesg.Fields[i].Num/8
-				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
-			}
-			{{ end -}}
-            if mesg.Fields[i].Num < {{ .MaxFieldNum }} {
-			    vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+        for i := range mesg.Fields {
+            if mesg.Fields[i].Name == factory.NameUnknown {
+                unknownFields = append(unknownFields, mesg.Fields[i])
+                continue
             }
-		}
-		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-			developerFields = mesg.DeveloperFields
-		{{ end -}}
-	}
+            {{ if gt $.MaxFieldExpandNum 1 -}}
+            if mesg.Fields[i].Num < {{ .MaxFieldExpandNum }} && mesg.Fields[i].IsExpandedField {
+                pos := mesg.Fields[i].Num/8
+                state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
+            }
+            {{ end -}}
+            if mesg.Fields[i].Num < {{ .MaxFieldNum }} {
+                vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
+            }
+        }
+        {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+            developerFields = mesg.DeveloperFields
+        {{ end -}}
+    }
 
 
-	*m = {{ .Name }}{
-		{{ range .Fields -}}
-			{{ .Name }}: {{ .TypedValue }},
-		{{ end }}
-		{{ if gt .MaxFieldExpandNum 1 -}}
-		state: state,
-		{{ end }}
-		UnknownFields: unknownFields,
-		{{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-		DeveloperFields: developerFields,
-		{{ end }}
-	}
+    *m = {{ .Name }}{
+        {{ range .Fields -}}
+            {{ .Name }}: {{ .TypedValue }},
+        {{ end }}
+        {{ if gt .MaxFieldExpandNum 1 -}}
+        state: state,
+        {{ end }}
+        UnknownFields: unknownFields,
+        {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+        DeveloperFields: developerFields,
+        {{ end }}
+    }
 } 
 
 // ToMesg converts {{ .Name }} into proto.Message. If options is nil, default options will be used.
 func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
-	if options == nil {
-		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
-	}
+    if options == nil {
+        options = defaultOptions
+    } else if options.Factory == nil {
+        options.Factory = factory.StandardFactory()
+    }
 
-	fac := options.Factory
+    fac := options.Factory
 
-	fields := make([]proto.Field, 0, {{ len .Fields }})
-	mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
+    fields := make([]proto.Field, 0, {{ len .Fields }})
+    mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
 
-	{{ range .Fields -}}
-	if {{ .IsValidValue -}} {
-		{{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
-		field := fac.CreateField(mesg.Num, {{ .Num }})
-		{{ if gt .FixedArraySize 0 -}}
-		{{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
-			the struct since we promote the array from the same memory block as the struct. We must copy the array
-			to local variable, so it will be promoted instead (we only need the local variable to escape to the heap),
-			only then the struct can be garbage-collected on next GC's cycle. */ -}}
-		copied := m.{{ .Name }}
-		field.Value = {{ stringReplace .ProtoValue (printf "m.%s" .Name) "copied[:]" -1 }}
-		{{ else -}}
-		field.Value = {{ .ProtoValue }}
-		{{ end -}}
-		{{ if eq .CanExpand true -}}
-			field.IsExpandedField = expanded
-		{{ end -}}
-		fields = append(fields, field)
-		{{ if eq .CanExpand true -}} } {{ end -}}
-	}
-	{{ end }}
+    {{ range .Fields -}}
+    if {{ .IsValidValue -}} {
+        {{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
+        field := fac.CreateField(mesg.Num, {{ .Num }})
+        {{ if gt .FixedArraySize 0 -}}
+        {{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
+            the struct since we promote the array from the same memory block as the struct. We must copy the array
+            to local variable, so it will be promoted instead (we only need the local variable to escape to the heap),
+            only then the struct can be garbage-collected on next GC's cycle. */ -}}
+        copied := m.{{ .Name }}
+        field.Value = {{ stringReplace .ProtoValue (printf "m.%s" .Name) "copied[:]" -1 }}
+        {{ else -}}
+        field.Value = {{ .ProtoValue }}
+        {{ end -}}
+        {{ if eq .CanExpand true -}}
+            field.IsExpandedField = expanded
+        {{ end -}}
+        fields = append(fields, field)
+        {{ if eq .CanExpand true -}} } {{ end -}}
+    }
+    {{ end }}
 
     n := len(fields)
-	mesg.Fields = make([]proto.Field, n+len(m.UnknownFields))
-	copy(mesg.Fields[:n], fields)
+    mesg.Fields = make([]proto.Field, n+len(m.UnknownFields))
+    copy(mesg.Fields[:n], fields)
     copy(mesg.Fields[n:], m.UnknownFields)
 
-	{{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
-	mesg.DeveloperFields = m.DeveloperFields
-	{{ end }}
+    {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription"))  }}
+    mesg.DeveloperFields = m.DeveloperFields
+    {{ end }}
 
-	return mesg
+    return mesg
 }
 
 {{ range .DynamicFields -}}
@@ -154,22 +154,22 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
 // 
 {{ range .SwitchCases -}} 
 // Based on {{ .Name }}:
-	{{ range .CondValues -}}
+    {{ range .CondValues -}}
 //   - name: "{{ .ReturnValue.Name }}" {{- if .ReturnValue.Units -}}, units: "{{ .ReturnValue.Units }}" {{ end }}, value: {{ .ReturnValue.Value }}
-	{{ end -}}
+    {{ end -}}
 {{ end -}}
 // Otherwise:
 //   - name: "{{ .Default.Name }}" {{- if .Default.Units -}}, units: "{{ .Default.Units }}" {{ end }}, value: {{ .Default.Value }}
 func (m *{{ $.Name }}) Get{{ .Name }}() (name string, value any) {
 {{ range .SwitchCases -}}
-	switch {{ .Name -}} {
-	{{- range .CondValues }}
-	case {{ stringsJoin .Conds "," }}:
-		return "{{ .ReturnValue.Name }}", {{ .ReturnValue.Value -}}
-	{{ end}}
-	}
+    switch {{ .Name -}} {
+    {{- range .CondValues }}
+    case {{ stringsJoin .Conds "," }}:
+        return "{{ .ReturnValue.Name }}", {{ .ReturnValue.Value -}}
+    {{ end}}
+    }
 {{ end -}}
-	return "{{ .Default.Name }}", {{ .Default.Value }}
+    return "{{ .Default.Name }}", {{ .Default.Value }}
 }
 {{ end }}
 
@@ -187,32 +187,32 @@ func (m *{{ $.Name }}) {{ .Name }}Uint32() uint32 { return datetime.ToUint32(m.{
 // 
 // {{ .Comment }}
 func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if gt .FixedArraySize 0 }} [{{ .FixedArraySize }}]float64 {{ else if .Array }} []float64 {{ else }} float64 {{ end -}} {
-	if {{ .ComparableValue }} == {{ .InvalidValue }} {
-		return {{ if gt .FixedArraySize 0 }} {{ .InvalidArrayValueScaled }} {{ else if .Array }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
-	}
-	{{- if gt .FixedArraySize 0 }}
-		var vals [{{ .FixedArraySize }}]float64
-		for i := range m.{{ .Name }} {
-			if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
-				vals[i] = math.Float64frombits(basetype.Float64Invalid)
-				continue
-			}
-			vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} -{{ .Offset }}
-		}
-		return vals
-	{{- else if .Array }}
-		var vals = make([]float64, len(m.{{ .Name }}))
-		for i := range m.{{ .Name }} {
-			if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
-				vals[i] = math.Float64frombits(basetype.Float64Invalid)
-				continue
-			}
-			vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} - {{ .Offset }}
-		}
-		return vals
-	{{- else }}
-		return float64(m.{{ .Name }}) / {{ .Scale }} - {{ .Offset }}
-	{{ end -}}
+    if {{ .ComparableValue }} == {{ .InvalidValue }} {
+        return {{ if gt .FixedArraySize 0 }} {{ .InvalidArrayValueScaled }} {{ else if .Array }} nil {{ else }} math.Float64frombits(basetype.Float64Invalid) {{ end -}}
+    }
+    {{- if gt .FixedArraySize 0 }}
+        var vals [{{ .FixedArraySize }}]float64
+        for i := range m.{{ .Name }} {
+            if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
+                vals[i] = math.Float64frombits(basetype.Float64Invalid)
+                continue
+            }
+            vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} -{{ .Offset }}
+        }
+        return vals
+    {{- else if .Array }}
+        var vals = make([]float64, len(m.{{ .Name }}))
+        for i := range m.{{ .Name }} {
+            if m.{{ .Name }}[i] == {{ .BaseTypeInvalid }} {
+                vals[i] = math.Float64frombits(basetype.Float64Invalid)
+                continue
+            }
+            vals[i] = float64(m.{{ .Name }}[i]) / {{ .Scale }} - {{ .Offset }}
+        }
+        return vals
+    {{- else }}
+        return float64(m.{{ .Name }}) / {{ .Scale }} - {{ .Offset }}
+    {{ end -}}
 }
 {{ end }}
 {{ end }}
@@ -223,7 +223,7 @@ func (m *{{ $.Name }}) {{ .Name }}Scaled() {{ if gt .FixedArraySize 0 }} [{{ .Fi
 // {{ .Name }}Degrees returns {{ .Name }} in degrees instead of semicircles.
 // If {{ .Name }} value is invalid, float64 invalid value will be returned.
 func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 { 
-	return semicircles.ToDegrees(m.{{ .Name }})
+    return semicircles.ToDegrees(m.{{ .Name }})
 }
 {{ end }}
 {{ end }}
@@ -233,8 +233,8 @@ func (m *{{ $.Name }}) {{ .Name }}Degrees() float64 {
 //
 // {{ .Comment }}
 func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
-	m.{{ .Name }} = v
-	return m
+    m.{{ .Name }} = v
+    return m
 }
 
 {{ if not (and (eq .Scale 1.0) (eq .Offset 0.0)) -}}
@@ -243,39 +243,39 @@ func (m *{{ $.Name }}) Set{{ .Name }}(v {{ .Type }}) *{{ $.Name }} {
 // 
 // {{ .Comment }}
 func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if gt .FixedArraySize 0 }} vs [{{ .FixedArraySize }}]float64 {{ else if .Array }} vs []float64 {{ else }} v float64 {{ end }}) *{{ $.Name }} {
-	{{ if gt .FixedArraySize 0 -}}
-	m.{{ .Name }} = {{ .InvalidValue }}
-	for i := range vs {
-		unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
-		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
-			continue
-		}
-		m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
-	}
-	{{ else if .Array -}}
-	if vs == {{ .InvalidValue }} {
-		m.{{ .Name }} = {{ .InvalidValue }}
-		return m
-	}
-	m.{{ .Name }} = make({{ .Type }}, len(vs))
-	for i := range vs {
-		unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
-		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
-			m.{{ .Name }}[i] = {{ extractExactlyType .Type }}({{ .BaseTypeInvalid }})
-			continue
-		}
-		m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
-	}
-	{{ else -}}
-	unscaled := (v + {{ .Offset }}) * {{ .Scale }}
-	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
-		m.{{ .Name }} = {{ .Type }}({{ .BaseTypeInvalid }})
-		return m
-	}
-	m.{{ .Name }} = {{ .Type }}(unscaled)
-	{{ end -}}
+    {{ if gt .FixedArraySize 0 -}}
+    m.{{ .Name }} = {{ .InvalidValue }}
+    for i := range vs {
+        unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
+        if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+            continue
+        }
+        m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
+    }
+    {{ else if .Array -}}
+    if vs == {{ .InvalidValue }} {
+        m.{{ .Name }} = {{ .InvalidValue }}
+        return m
+    }
+    m.{{ .Name }} = make({{ .Type }}, len(vs))
+    for i := range vs {
+        unscaled := (vs[i] + {{ .Offset }}) * {{ .Scale }}
+        if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+            m.{{ .Name }}[i] = {{ extractExactlyType .Type }}({{ .BaseTypeInvalid }})
+            continue
+        }
+        m.{{ .Name }}[i] = {{ extractExactlyType .Type }}(unscaled)
+    }
+    {{ else -}}
+    unscaled := (v + {{ .Offset }}) * {{ .Scale }}
+    if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64({{ .BaseTypeInvalid }}) {
+        m.{{ .Name }} = {{ .Type }}({{ .BaseTypeInvalid }})
+        return m
+    }
+    m.{{ .Name }} = {{ .Type }}(unscaled)
+    {{ end -}}
 
-	return m
+    return m
 }
 {{ end -}}
 
@@ -283,8 +283,8 @@ func (m *{{ $.Name }}) Set{{ .Name }}Scaled({{ if gt .FixedArraySize 0 }} vs [{{
 // Set{{ .Name }}Degrees is similar to Set{{ .Name }} except it accepts a value in degrees.
 // This method will automatically convert given degrees value to semicircles ({{ .Type }}) form.
 func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
-	m.{{ .Name }} = semicircles.ToSemicircles(degrees)
-	return m
+    m.{{ .Name }} = semicircles.ToSemicircles(degrees)
+    return m
 }
 {{ end -}}
 
@@ -292,15 +292,15 @@ func (m *{{ $.Name }}) Set{{ .Name }}Degrees(degrees float64) *{{ $.Name }} {
 
 // SetUnknownFields sets UnknownFields (fields that are exist but they are not defined in Profile.xlsx)
 func (m *{{ $.Name }}) SetUnknownFields(unknownFields ...proto.Field) *{{ $.Name }} {
-	m.UnknownFields = unknownFields
-	return m
+    m.UnknownFields = unknownFields
+    return m
 }
 
 {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
 // SetDeveloperFields sets DeveloperFields.
 func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperField) *{{ $.Name }} {
-	m.DeveloperFields = developerFields
-	return m
+    m.DeveloperFields = developerFields
+    return m
 }
 {{ end }}
 
@@ -308,30 +308,30 @@ func (m *{{ $.Name }}) SetDeveloperFields(developerFields ...proto.DeveloperFiel
 // MarkAsExpandedField marks whether given fieldNum is an expanded field (field that being
 // generated through a component expansion). Eligible for field number: {{- template "eligible_for_expanded_fields" . }}.
 func (m *{{ $.Name }}) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
-	switch fieldNum {
-	case {{ template "eligible_for_expanded_fields" . }}:
-	default:
-		return false
-	}
-	pos := fieldNum/8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	m.state[pos] &^= bit
-	if flag {
-		m.state[pos] |= bit
-	}
-	return true
+    switch fieldNum {
+    case {{ template "eligible_for_expanded_fields" . }}:
+    default:
+        return false
+    }
+    pos := fieldNum/8
+    bit := uint8(1) << (fieldNum - (8 * pos))
+    m.state[pos] &^= bit
+    if flag {
+        m.state[pos] |= bit
+    }
+    return true
 }
 
 // IsExpandedField checks whether given fieldNum is a field generated through
 // a component expansion. Eligible for field number: {{- template "eligible_for_expanded_fields" . }}.
 func (m *{{ $.Name }}) IsExpandedField(fieldNum byte) bool {
-	{{/* Simple check is enough since we validate on marking */ -}}
-	if fieldNum >= {{ .MaxFieldExpandNum }} {
-		return false
-	}
-	pos := fieldNum/8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	return m.state[pos] & bit == bit
+    {{/* Simple check is enough since we validate on marking */ -}}
+    if fieldNum >= {{ .MaxFieldExpandNum }} {
+        return false
+    }
+    pos := fieldNum/8
+    bit := uint8(1) << (fieldNum - (8 * pos))
+    return m.state[pos] & bit == bit
 }
 {{ end }}
 
@@ -340,9 +340,9 @@ func (m *{{ $.Name }}) IsExpandedField(fieldNum byte) bool {
 {{ define "eligible_for_expanded_fields" }}
 {{- $first := true -}}
 {{ range $i, $v := .Fields -}}
-	{{- if .CanExpand -}}
-		{{- if $first -}} {{ $first = false }} {{ .Num }}
-		{{- else -}}, {{ .Num }} {{- end }}
-	{{- end -}}
+    {{- if .CanExpand -}}
+        {{- if $first -}} {{ $first = false }} {{ .Num }}
+        {{- else -}}, {{ .Num }} {{- end }}
+    {{- end -}}
 {{- end -}}
 {{ end }}

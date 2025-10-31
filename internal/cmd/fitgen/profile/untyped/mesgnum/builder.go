@@ -57,7 +57,6 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				Type:    typeName,
 				Op:      "=",
 				Value:   v.Value,
-				String:  v.Name,
 				Comment: v.Comment,
 			})
 		}
@@ -67,7 +66,6 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			Type:    typeName,
 			Op:      "=",
 			Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
-			String:  "invalid",
 			Comment: "INVALID",
 		})
 

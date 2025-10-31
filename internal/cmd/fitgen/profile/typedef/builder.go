@@ -118,12 +118,10 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				Constants:     constants,
 				AllowRegister: hasMfgRangeMin && hasMfgRangeMax,
 				Invalid: shared.Constant{
-					Name:    strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
-					Type:    typeName,
-					Op:      "=",
-					Value:   fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
-					String:  fmt.Sprintf("%sInvalid(%d)", typeName, basetype.FromString(t.BaseType).Invalid()),
-					Comment: "INVALID",
+					Name:  strutil.ToLetterPrefix(strutil.ToTitle(t.Name) + "Invalid"),
+					Type:  typeName,
+					Op:    "=",
+					Value: fmt.Sprintf("%#X", basetype.FromString(t.BaseType).Invalid()),
 				},
 			},
 		})

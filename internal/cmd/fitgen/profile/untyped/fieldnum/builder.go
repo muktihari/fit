@@ -81,10 +81,9 @@ func (b *Builder) Build() ([]generator.Data, error) {
 	}
 
 	constants = append(constants, shared.Constant{
-		Name:   "Invalid",
-		Op:     "=",
-		Value:  "255", // max byte
-		String: "invalid",
+		Name:  "Invalid",
+		Op:    "=",
+		Value: "255", // max byte
 	})
 
 	dataBuilder := generator.Data{
