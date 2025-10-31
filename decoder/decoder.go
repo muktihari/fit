@@ -42,6 +42,9 @@ const (
 	// ErrMesgDefMissing will be returned if message definition for the incoming message data is missing.
 	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
 
+	// ErrNoFileId will only be returned by PeekFileId method when no FileId is found in the current FIT sequence.
+	ErrNoFileId = errorString("no file_id")
+
 	errInvalidBaseType = errorString("invalid basetype")
 )
 
@@ -202,6 +205,10 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.reset()
 	d.n = 0 // Must reset bytes counter since it's a full reset.
 
+	// We must cleanup everything on full reset in case users call `PeekFileId` but they
+	// do not continue to call `Decode` or `Discard` after that, we might have dirty state.
+	d.releaseTemporaryObjects()
+
 	// Reuse listeners' slices
 	for i := range d.options.mesgListeners {
 		d.options.mesgListeners[i] = nil // avoid memory leaks
@@ -333,18 +340,25 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
-// The FileId is expected to be present as the first message; however, we don't validate this,
-// as it's an edge case that occurs when a FIT file is poorly encoded.
-//
+// Peeking FileId involves decoding messages, so any existing message listeners will also be broadcast.
 // If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
+//
+// NOTE: The FileId is typically present as the first message, whether in a single FIT file or in each FIT sequence of
+// a chained FIT file. However, in a chained FIT file, there is a case where the FileId may only present in
+// the first sequence (an Activity File) followed by the next sequences which consist only HR messages.
+// Calling this method on those next sequences will return [ErrNoFileId], indicating that the current sequence does not
+// have a FileId. Users can still continue by calling Decode or Discard.
 func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
-	for d.fileId == nil {
+	for d.fileId == nil && d.cur < d.fileHeader.DataSize {
 		if d.err = d.decodeMessage(); d.err != nil {
 			return nil, fmt.Errorf("decode message [byte pos: %d]: %w", d.n, d.err)
 		}
+	}
+	if d.fileId == nil {
+		return nil, fmt.Errorf("peek file_id has reached the end of the sequence [byte pos: %d]: %w", d.n, ErrNoFileId)
 	}
 	return d.fileId, nil
 }
@@ -414,6 +428,7 @@ func (d *Decoder) Discard() error {
 	optionsShouldChecksum := d.options.shouldChecksum
 	d.options.shouldChecksum = false
 	defer func() { d.options.shouldChecksum = optionsShouldChecksum }()
+	d.releaseTemporaryObjects() // Since Discard is mostly called after `PeekFileId`
 
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
 		return fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)

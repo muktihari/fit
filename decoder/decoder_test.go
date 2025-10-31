@@ -449,6 +449,48 @@ func TestPeekFileId(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("peek file_id on FIT sequences which don't have file_id", func(t *testing.T) {
+		f, err := os.Open(filepath.Join(fromOfficialSDK, "HrmPluginTestActivity.fit"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer f.Close()
+
+		dec := New(f)
+
+		fileId, err := dec.PeekFileId()
+		if err != nil {
+			t.Fatalf("peek: %v", err)
+		}
+
+		if fileId.Type != typedef.FileActivity {
+			t.Fatalf("expected %v, got: %v", typedef.FileActivity, fileId.Type)
+		}
+
+		_, err = dec.Decode()
+		if err != nil {
+			t.Fatalf("decode: %v", err)
+		}
+
+		// Next sequences only contains HR messages
+		for dec.Next() {
+			fileId, err := dec.PeekFileId()
+			if !errors.Is(err, ErrNoFileId) {
+				t.Fatalf("expected err: %v, got: %v", ErrNoFileId, err)
+			}
+			if fileId != nil {
+				t.Fatalf("expected fileId is nill, got: %v", fileId)
+			}
+			fit, err := dec.Decode()
+			if err != nil {
+				t.Fatalf("expected err is nil, got: %v", err)
+			}
+			if fit.Messages == nil {
+				t.Fatalf("messages should not be nil")
+			}
+		}
+	})
 }
 
 func TestCheckIntegrity(t *testing.T) {
@@ -2616,6 +2658,47 @@ func TestReset(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("reset after PeekFileId", func(t *testing.T) {
+		r := func() io.Reader {
+			_, buf := createFitForTest()
+			cur, m := 0, len(buf)
+			return fnReader(func(b []byte) (n int, err error) {
+				if cur == m {
+					return 0, io.EOF
+				}
+				n = copy(b, buf[cur:])
+				cur += n
+				return n, nil
+			})
+		}()
+		dec := New(r)
+		_, err := dec.PeekFileId()
+		if err != nil {
+			t.Fatalf("expected err: nil, got: %v", err)
+		}
+		dec.Reset(r)
+		for i, v := range dec.localMessageDefinitions {
+			if v.Header != 0 {
+				t.Errorf("expected localMessageDefinitions[%d] is 0, got: %d", i, v.Header)
+			}
+		}
+		if diff := cmp.Diff(dec.fieldsArray, [255]proto.Field{},
+			cmp.AllowUnexported(proto.Value{}),
+		); diff != "" {
+			t.Fatal(diff)
+		}
+		if diff := cmp.Diff(dec.developerFieldsArray, [255]proto.DeveloperField{},
+			cmp.AllowUnexported(proto.Value{}),
+		); diff != "" {
+			t.Fatal(diff)
+		}
+		for _, v := range dec.fieldDescriptions[:cap(dec.fieldDescriptions)] {
+			if v != nil {
+				t.Fatalf("field description should be nil, got: %v", v)
+			}
+		}
+	})
 }
 
 func TestLogs(t *testing.T) {
