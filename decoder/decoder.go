@@ -42,8 +42,8 @@ const (
 	// ErrMesgDefMissing will be returned if message definition for the incoming message data is missing.
 	ErrMesgDefMissing = errorString("message definition missing") // NOTE: Kept exported since it's used by RawDecoder
 
-	// ErrNoFileId will only be returned by PeekFileId method when no FileId is found in the current FIT sequence.
-	ErrNoFileId = errorString("no file_id")
+	// ErrPeekNoFileId will only be returned by PeekFileId method when no FileId is found in the current FIT sequence.
+	ErrPeekNoFileId = errorString("peek no file_id")
 
 	errInvalidBaseType = errorString("invalid basetype")
 )
@@ -346,7 +346,7 @@ func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
 // NOTE: The FileId is typically present as the first message, whether in a single FIT file or in each FIT sequence of
 // a chained FIT file. However, in a chained FIT file, there is a case where the FileId may only present in
 // the first sequence (an Activity File) followed by the next sequences which consist only HR messages.
-// Calling this method on those next sequences will return [ErrNoFileId], indicating that the current sequence does not
+// Calling this method on those next sequences will return [ErrPeekNoFileId], indicating that the current sequence does not
 // have a FileId. Users can still continue by calling Decode or Discard.
 func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
@@ -358,7 +358,7 @@ func (d *Decoder) PeekFileId() (*mesgdef.FileId, error) {
 		}
 	}
 	if d.fileId == nil {
-		return nil, fmt.Errorf("peek file_id has reached the end of the sequence [byte pos: %d]: %w", d.n, ErrNoFileId)
+		return nil, fmt.Errorf("peek file_id has reached the end of the sequence [byte pos: %d]: %w", d.n, ErrPeekNoFileId)
 	}
 	return d.fileId, nil
 }

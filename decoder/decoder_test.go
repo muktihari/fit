@@ -476,8 +476,8 @@ func TestPeekFileId(t *testing.T) {
 		// Next sequences only contains HR messages
 		for dec.Next() {
 			fileId, err := dec.PeekFileId()
-			if !errors.Is(err, ErrNoFileId) {
-				t.Fatalf("expected err: %v, got: %v", ErrNoFileId, err)
+			if !errors.Is(err, ErrPeekNoFileId) {
+				t.Fatalf("expected err: %v, got: %v", ErrPeekNoFileId, err)
 			}
 			if fileId != nil {
 				t.Fatalf("expected fileId is nill, got: %v", fileId)
