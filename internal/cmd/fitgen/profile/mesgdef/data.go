@@ -11,6 +11,8 @@ type Data struct {
 	Fields            []Field
 	OptimizedFields   []Field
 	DynamicFields     []DynamicField
+	KnownNums         [4]uint64
+	StateSize         byte
 	MaxFieldNum       byte
 	MaxFieldExpandNum byte
 }

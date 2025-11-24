@@ -44,7 +44,7 @@ type Length struct {
 	AvgRespirationRate         uint8
 	MaxRespirationRate         uint8
 
-	state [4]uint8 // Used for tracking expanded fields.
+	state [3]uint8 // Used for tracking expanded fields.
 
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
@@ -63,31 +63,28 @@ func NewLength(mesg *proto.Message) *Length {
 func (m *Length) Reset(mesg *proto.Message) {
 	var (
 		vals            [255]proto.Value
-		state           [4]uint8
+		state           [3]uint8
 		unknownFields   []proto.Field
 		developerFields []proto.DeveloperField
 	)
-
 	if mesg != nil {
-		var n int
+		knownNums := [4]uint64{66854655, 0, 0, 6917529027641081856}
+		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
-				n++
-			}
+			num = mesg.Fields[i].Num
+			n += (knownNums[num>>6]>>(num&63))&1 ^ 1
 		}
 		unknownFields = make([]proto.Field, 0, n)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
+			num = mesg.Fields[i].Num
+			if (knownNums[num>>6]>>(num&63))&1 == 0 {
 				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
-			if mesg.Fields[i].Num < 24 && mesg.Fields[i].IsExpandedField {
-				pos := mesg.Fields[i].Num / 8
-				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
+			if mesg.Fields[i].IsExpandedField && num < 24 {
+				state[num>>3] |= 1 << (num & 7)
 			}
-			if mesg.Fields[i].Num < 255 {
-				vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
-			}
+			vals[num] = mesg.Fields[i].Value
 		}
 		developerFields = mesg.DeveloperFields
 	}
@@ -568,11 +565,10 @@ func (m *Length) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
 	default:
 		return false
 	}
-	pos := fieldNum / 8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	m.state[pos] &^= bit
 	if flag {
-		m.state[pos] |= bit
+		m.state[fieldNum>>3] |= 1 << (fieldNum & 7)
+	} else {
+		m.state[fieldNum>>3] &^= 1 << (fieldNum & 7)
 	}
 	return true
 }
@@ -580,10 +576,10 @@ func (m *Length) MarkAsExpandedField(fieldNum byte, flag bool) (ok bool) {
 // IsExpandedField checks whether given fieldNum is a field generated through
 // a component expansion. Eligible for field number: 22, 23.
 func (m *Length) IsExpandedField(fieldNum byte) bool {
-	if fieldNum >= 24 {
+	switch fieldNum {
+	case 22, 23:
+	default:
 		return false
 	}
-	pos := fieldNum / 8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	return m.state[pos]&bit == bit
+	return (m.state[fieldNum>>3]>>(fieldNum&7))&1 == 1
 }
