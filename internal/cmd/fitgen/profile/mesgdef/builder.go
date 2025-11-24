@@ -44,9 +44,6 @@ func NewBuilder(path string, lookup *lookup.Lookup, message []parser.Message, ty
 			Funcs(template.FuncMap{
 				"stringsJoin":   strings.Join,
 				"stringReplace": strings.Replace,
-				"byteDiv":       func(a, b byte) byte { return a / b },
-				"byteAdd":       func(a, b byte) byte { return a + b },
-				"byteSub":       func(a, b byte) byte { return a - b },
 				"extractExactlyType": func(s string) string {
 					if !strings.HasPrefix(s, "[") {
 						return s
@@ -74,12 +71,14 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			maxLenFields = len(mesg.Fields)
 		}
 		var (
+			knownNums     [4]uint64
 			maxFieldNum   byte
 			dynamicFields []DynamicField
 			fields        = make([]Field, 0, len(mesg.Fields))
 			imports       = make(map[string]struct{})
 		)
 		for _, parserField := range mesg.Fields {
+			knownNums[parserField.Num>>6] |= 1 << (parserField.Num & 63)
 			if parserField.Num > maxFieldNum {
 				maxFieldNum = parserField.Num
 			}
@@ -172,6 +171,8 @@ func (b *Builder) Build() ([]generator.Data, error) {
 			Fields:            fields,
 			OptimizedFields:   optimizedFields,
 			DynamicFields:     dynamicFields,
+			KnownNums:         knownNums,
+			StateSize:         (maxFieldExpandNum + 8) / 8,
 			MaxFieldNum:       maxFieldNum + 1,
 			MaxFieldExpandNum: maxFieldExpandNum + 1,
 		}
