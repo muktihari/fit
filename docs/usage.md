@@ -353,7 +353,7 @@ type Activity struct {
 func (f *Activity) Add(mesg proto.Message) {
     switch mesg.Num {
     case mesgnum.FileId:
-        f.FileId = *mesgdef.NewFileId(&mesg)
+        f.FileId.Reset(&mesg)
     case mesgnum.Activity:
         f.Activity = mesgdef.NewActivity(&mesg)
     case mesgnum.Session:
@@ -1033,7 +1033,7 @@ func main() {
     now := time.Now()
     activity := filedef.NewActivity()
 
-    activity.FileId = *mesgdef.NewFileId(nil).
+    activity.FileId.
         SetType(typedef.FileActivity).
         SetTimeCreated(now).
         SetManufacturer(typedef.ManufacturerSuunto).
@@ -1319,8 +1319,6 @@ import (
     "github.com/muktihari/fit/encoder"
     "github.com/muktihari/fit/profile/filedef"
 )
-
-
 
 var (
     pool    = sync.Pool{New: func() any { return encoder.New(nil) }}
