@@ -12,35 +12,38 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// MonitoringDaily files follow the same format as monitoring files, however data is logged at 24 hour time intervals.
-type MonitoringDaily struct {
-	FileId mesgdef.FileId // required fields: type, manufacturer, product, serial_number, time_created, number
+// MonitoringB file is used to store data that is logged over varying time intervals.
+//
+// There are two monitoring files, MonitoringA and MonitoringB, which are identical apart from
+// supporting different conventions for file_id.number and the start of accumulating data values.
+type MonitoringB struct {
+	FileId mesgdef.FileId
 
 	// Developer Data Lookup
 	DeveloperDataIds  []*mesgdef.DeveloperDataId
 	FieldDescriptions []*mesgdef.FieldDescription
 
 	MonitoringInfo *mesgdef.MonitoringInfo
-	Monitorings    []*mesgdef.Monitoring // required fields: timestamp
+	Monitorings    []*mesgdef.Monitoring
 	DeviceInfos    []*mesgdef.DeviceInfo
 
 	UnrelatedMessages []proto.Message
 }
 
-var _ File = (*MonitoringDaily)(nil)
+var _ File = (*MonitoringB)(nil)
 
-// NewMonitoringDaily creates new MonitoringDaily File.
-func NewMonitoringDaily(mesgs ...proto.Message) *MonitoringDaily {
-	f := &MonitoringDaily{FileId: newFileId}
-	f.FileId.Type = typedef.FileMonitoringDaily
+// NewMonitoringB creates new Monitoring B.
+func NewMonitoringB(mesgs ...proto.Message) *MonitoringB {
+	f := &MonitoringB{FileId: newFileId}
+	f.FileId.Type = typedef.FileMonitoringB
 	for i := range mesgs {
 		f.Add(mesgs[i])
 	}
 	return f
 }
 
-// Add adds mesg to the MonitoringDaily.
-func (f *MonitoringDaily) Add(mesg proto.Message) {
+// Add adds mesg to the MonitoringA.
+func (f *MonitoringB) Add(mesg proto.Message) {
 	switch mesg.Num {
 	case mesgnum.FileId:
 		f.FileId.Reset(&mesg)
@@ -60,8 +63,8 @@ func (f *MonitoringDaily) Add(mesg proto.Message) {
 	}
 }
 
-// ToFIT converts MonitoringDaily to proto.FIT. If options is nil, default options will be used.
-func (f *MonitoringDaily) ToFIT(options *mesgdef.Options) proto.FIT {
+// ToFIT converts MonitoringA to proto.FIT. If options is nil, default options will be used.
+func (f *MonitoringB) ToFIT(options *mesgdef.Options) proto.FIT {
 	var size = 2 // non slice fields
 
 	size += len(f.Monitorings) + len(f.DeviceInfos) +
