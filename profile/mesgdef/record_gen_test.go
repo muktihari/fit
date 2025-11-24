@@ -45,6 +45,73 @@ func BenchmarkRecordToMesg(b *testing.B) {
 	}
 }
 
+func TestNewRecord(t *testing.T) {
+	tt := []struct {
+		name       string
+		mesg       proto.Message
+		validateFn func(rec *Record) error
+	}{
+		{
+			name: "field number 255 should be put in UnknownFields regardless the field name",
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				{FieldBase: &proto.FieldBase{Num: 255}},
+			}},
+			validateFn: func(rec *Record) error {
+				if len(rec.UnknownFields) != 1 {
+					return fmt.Errorf("expected UnknownFields len is 1, got: %d", len(rec.UnknownFields))
+				}
+				if rec.UnknownFields[0].Num != 255 {
+					return fmt.Errorf("expected num is 255, got: %d", rec.UnknownFields[0].Num)
+				}
+				return nil
+			},
+		},
+		{
+			name: "state of an expanded field must be preserved",
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				{
+					FieldBase:       factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).FieldBase,
+					Value:           proto.Uint32(1000),
+					IsExpandedField: true,
+				},
+			}},
+			validateFn: func(rec *Record) error {
+				pos := fieldnum.RecordDistance / 8
+				bit := uint8(1) << (fieldnum.RecordDistance - (8 * pos))
+				if rec.state[pos]&bit != bit {
+					return fmt.Errorf("bit is zero, state: %d, target bit: %d", rec.state[pos], bit)
+				}
+				return nil
+			},
+		},
+		{
+			name: "non-eligible expanded field should be ignored", // We only enforce num < 109, however user can't retrieve it anyway.
+			mesg: proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
+				{
+					FieldBase:       factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).FieldBase,
+					Value:           proto.Uint32(1000),
+					IsExpandedField: true,
+				},
+			}},
+			validateFn: func(rec *Record) error {
+				if rec.state != [14]uint8{} {
+					return fmt.Errorf("state should be all zeros")
+				}
+				return nil
+			},
+		},
+	}
+
+	for i, tc := range tt {
+		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
+			rec := NewRecord(&tc.mesg)
+			if err := tc.validateFn(rec); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
 func TestRecordFieldExpansionCorrectness(t *testing.T) {
 	t.Run("NewRecord -> IsExpandedField()", func(t *testing.T) {
 		r := NewRecord(&proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
