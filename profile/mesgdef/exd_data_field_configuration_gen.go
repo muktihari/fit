@@ -48,27 +48,24 @@ func (m *ExdDataFieldConfiguration) Reset(mesg *proto.Message) {
 		unknownFields   []proto.Field
 		developerFields []proto.DeveloperField
 	)
-
 	if mesg != nil {
-		var n int
+		knownNums := [4]uint64{63, 0, 0, 0}
+		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
-				n++
-			}
+			num = mesg.Fields[i].Num
+			n += (knownNums[num>>6]>>(num&63))&1 ^ 1
 		}
 		unknownFields = make([]proto.Field, 0, n)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
+			num = mesg.Fields[i].Num
+			if (knownNums[num>>6]>>(num&63))&1 == 0 {
 				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
-			if mesg.Fields[i].Num < 4 && mesg.Fields[i].IsExpandedField {
-				pos := mesg.Fields[i].Num / 8
-				state[pos] |= 1 << (mesg.Fields[i].Num - (8 * pos))
+			if mesg.Fields[i].IsExpandedField && num < 4 {
+				state[num>>3] |= 1 << (num & 7)
 			}
-			if mesg.Fields[i].Num < 6 {
-				vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
-			}
+			vals[num] = mesg.Fields[i].Value
 		}
 		developerFields = mesg.DeveloperFields
 	}
@@ -277,11 +274,10 @@ func (m *ExdDataFieldConfiguration) MarkAsExpandedField(fieldNum byte, flag bool
 	default:
 		return false
 	}
-	pos := fieldNum / 8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	m.state[pos] &^= bit
 	if flag {
-		m.state[pos] |= bit
+		m.state[fieldNum>>3] |= 1 << (fieldNum & 7)
+	} else {
+		m.state[fieldNum>>3] &^= 1 << (fieldNum & 7)
 	}
 	return true
 }
@@ -289,10 +285,10 @@ func (m *ExdDataFieldConfiguration) MarkAsExpandedField(fieldNum byte, flag bool
 // IsExpandedField checks whether given fieldNum is a field generated through
 // a component expansion. Eligible for field number: 2, 3.
 func (m *ExdDataFieldConfiguration) IsExpandedField(fieldNum byte) bool {
-	if fieldNum >= 4 {
+	switch fieldNum {
+	case 2, 3:
+	default:
 		return false
 	}
-	pos := fieldNum / 8
-	bit := uint8(1) << (fieldNum - (8 * pos))
-	return m.state[pos]&bit == bit
+	return (m.state[fieldNum>>3]>>(fieldNum&7))&1 == 1
 }

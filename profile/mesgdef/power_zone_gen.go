@@ -42,23 +42,21 @@ func (m *PowerZone) Reset(mesg *proto.Message) {
 		unknownFields   []proto.Field
 		developerFields []proto.DeveloperField
 	)
-
 	if mesg != nil {
-		var n int
+		knownNums := [4]uint64{6, 0, 0, 4611686018427387904}
+		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
-				n++
-			}
+			num = mesg.Fields[i].Num
+			n += (knownNums[num>>6]>>(num&63))&1 ^ 1
 		}
 		unknownFields = make([]proto.Field, 0, n)
 		for i := range mesg.Fields {
-			if mesg.Fields[i].Name == factory.NameUnknown {
+			num = mesg.Fields[i].Num
+			if (knownNums[num>>6]>>(num&63))&1 == 0 {
 				unknownFields = append(unknownFields, mesg.Fields[i])
 				continue
 			}
-			if mesg.Fields[i].Num < 255 {
-				vals[mesg.Fields[i].Num] = mesg.Fields[i].Value
-			}
+			vals[num] = mesg.Fields[i].Value
 		}
 		developerFields = mesg.DeveloperFields
 	}
