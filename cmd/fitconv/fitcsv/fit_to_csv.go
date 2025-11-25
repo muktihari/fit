@@ -400,7 +400,7 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 			name = formatUnknown(int(field.Num))
 			units = field.BaseType.String()
 		}
-		if subField := field.SubFieldSubtitution(&mesg); subField != nil {
+		if subField := field.SubFieldSubstitution(&mesg); subField != nil {
 			name, units = subField.Name, subField.Units
 		}
 
