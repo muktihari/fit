@@ -2194,7 +2194,7 @@ func TestExpandComponents(t *testing.T) {
 				dec.accumulator = tc.accumu
 			}
 			for _, field := range tc.mesg.Fields {
-				if subField := field.SubFieldSubtitution(&tc.mesg); subField != nil {
+				if subField := field.SubFieldSubstitution(&tc.mesg); subField != nil {
 					dec.expandComponents(&tc.mesg, field.Value, field.BaseType, subField.Components)
 				} else {
 					dec.expandComponents(&tc.mesg, field.Value, field.BaseType, field.Components)

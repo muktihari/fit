@@ -275,7 +275,7 @@ func (p *printer) print(m message) {
 			flag           = '-'
 		)
 
-		if subField := field.SubFieldSubtitution(&m.Message); subField != nil {
+		if subField := field.SubFieldSubstitution(&m.Message); subField != nil {
 			isDynamicField = true
 			name = subField.Name
 			baseType = subField.Type.BaseType()

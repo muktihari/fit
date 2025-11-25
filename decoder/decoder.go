@@ -768,7 +768,7 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 	// Now that all fields has been decoded, we need to expand all components and accumulate the accumulable values.
 	for i := range mesg.Fields {
 		field := &mesg.Fields[i]
-		if subField := field.SubFieldSubtitution(mesg); subField != nil {
+		if subField := field.SubFieldSubstitution(mesg); subField != nil {
 			// Expand sub-field components as the main field components
 			d.expandComponents(mesg, field.Value, field.BaseType, subField.Components)
 			continue
@@ -854,7 +854,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingValue proto.Va
 		// e.g. compressed_speed_distance -> (speed, distance), speed -> enhanced_speed.
 		//
 		// NOTE: We pass the 32 bits component's value to ensure we only expand this value.
-		if subField := componentField.SubFieldSubtitution(mesg); subField != nil {
+		if subField := componentField.SubFieldSubstitution(mesg); subField != nil {
 			d.expandComponents(mesg, value, componentField.BaseType, subField.Components)
 		} else {
 			d.expandComponents(mesg, value, componentField.BaseType, componentField.Components)
