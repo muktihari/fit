@@ -54,11 +54,6 @@ func TestLRU(t *testing.T) {
 	if len(l.bucket) != 0 {
 		t.Fatalf("expected lruBucket is %d, got: %d", 0, len(l.bucket))
 	}
-	for i := range l.items {
-		if l.items[i] != nil {
-			t.Fatalf("[%d] expected nil, got: %v", i, l.items[i])
-		}
-	}
 
 	l.ResetWithNewSize(10) // Only reslice
 	if len(l.items) != 10 {

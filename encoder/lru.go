@@ -27,9 +27,6 @@ func newLRU(size byte) *lru {
 
 // Reset reset variables so lru can be reused again without reallocation.
 func (l *lru) Reset() {
-	for i := range l.items {
-		l.items[i] = nil // avoid memory leaks
-	}
 	l.bucket = l.bucket[:0]
 }
 
@@ -37,11 +34,13 @@ func (l *lru) Reset() {
 // with the new capacity. If the new size is less than previous size it will reslice without re-allocs. Otherwise, only reset.
 func (l *lru) ResetWithNewSize(size byte) {
 	if size > byte(cap(l.items)) {
+		oldItems := l.items[:cap(l.items)]
 		l.items = make([][]byte, size)
+		copy(l.items, oldItems) // preserve old storage
 		l.bucket = make([]byte, 0, size)
 		return
 	}
-	l.Reset() // Must reset first to avoid memory leaks.
+	l.bucket = l.bucket[:0]
 	l.items = l.items[:size]
 }
 
@@ -50,18 +49,13 @@ func (l *lru) Put(item []byte) (itemIndex byte, isNewItem bool) {
 	if bucketIndex := l.bucketIndex(item); bucketIndex != -1 {
 		return l.markAsRecentlyUsed(bucketIndex), false
 	}
-	if len(l.bucket) != len(l.items) {
-		return l.store(item), true
+	if len(l.bucket) == len(l.items) {
+		return l.replaceLeastRecentlyUsed(item), true
 	}
-	return l.replaceLeastRecentlyUsed(item), true
-}
-
-func (l *lru) store(item []byte) (itemIndex byte) {
 	itemIndex = byte(len(l.bucket))
-	l.items[itemIndex] = make([]byte, len(item))
-	copy(l.items[itemIndex], item)
 	l.bucket = append(l.bucket, itemIndex)
-	return
+	l.storeAt(item, itemIndex)
+	return itemIndex, true
 }
 
 func (l *lru) markAsRecentlyUsed(bucketIndex int) (itemIndex byte) {
@@ -75,7 +69,11 @@ func (l *lru) replaceLeastRecentlyUsed(item []byte) (itemIndex byte) {
 	itemIndex = l.bucket[0]                        // take item's index out of bucket
 	copy(l.bucket[:len(l.bucket)-1], l.bucket[1:]) // left shift bucket
 	l.bucket[len(l.bucket)-1] = itemIndex          // place at most recent index
+	l.storeAt(item, itemIndex)
+	return
+}
 
+func (l *lru) storeAt(item []byte, itemIndex byte) {
 	// PERF: Only alloc when not enough capacity
 	if cap(l.items[itemIndex]) < len(item) {
 		l.items[itemIndex] = make([]byte, len(item))
@@ -83,8 +81,6 @@ func (l *lru) replaceLeastRecentlyUsed(item []byte) (itemIndex byte) {
 		l.items[itemIndex] = l.items[itemIndex][:len(item)]
 	}
 	copy(l.items[itemIndex], item)
-
-	return
 }
 
 func (l *lru) bucketIndex(item []byte) int {
