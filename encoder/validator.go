@@ -76,9 +76,9 @@ func ValidatorWithFactory(factory Factory) ValidatorOption {
 }
 
 type messageValidator struct {
-	options              validatorOptions
-	developerDataIndexes []uint8
-	fieldDescriptions    []*mesgdef.FieldDescription
+	options                validatorOptions
+	developerDataIndexSeen [4]uint64 // 256-bits bitmap for checking if DeveloperDataIndex has been seen.
+	fieldDescriptions      []*mesgdef.FieldDescription
 }
 
 // NewMessageValidator creates new message validator. The validator is mainly used to validate message before encoding.
@@ -93,8 +93,7 @@ func NewMessageValidator(opts ...ValidatorOption) MessageValidator {
 }
 
 func (v *messageValidator) Reset() {
-	v.developerDataIndexes = v.developerDataIndexes[:0]
-
+	v.developerDataIndexSeen = [4]uint64{}
 	for i := range v.fieldDescriptions {
 		v.fieldDescriptions[i] = nil // avoid memory leaks
 	}
@@ -144,8 +143,8 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
-		v.developerDataIndexes = append(v.developerDataIndexes,
-			mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8())
+		x := mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8()
+		v.developerDataIndexSeen[x>>6] |= 1 << (x & 63)
 	case mesgnum.FieldDescription:
 		v.fieldDescriptions = append(v.fieldDescriptions, mesgdef.NewFieldDescription(mesg))
 	}
@@ -158,14 +157,7 @@ func (v *messageValidator) Validate(mesg *proto.Message) error {
 	for i := range mesg.DeveloperFields {
 		developerField := &mesg.DeveloperFields[i]
 
-		var ok bool
-		for _, developerDataIndex := range v.developerDataIndexes {
-			if developerDataIndex == developerField.DeveloperDataIndex {
-				ok = true
-				break
-			}
-		}
-		if !ok {
+		if x := developerField.DeveloperDataIndex; (v.developerDataIndexSeen[x>>6]>>(x&63))&1 == 0 {
 			return fmt.Errorf("developer field index: %d, num: %d: %w",
 				i, developerField.Num, errMissingDeveloperDataId)
 		}

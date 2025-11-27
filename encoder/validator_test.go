@@ -68,13 +68,13 @@ func TestMessageValidatorOption(t *testing.T) {
 func TestValidatorReset(t *testing.T) {
 	mv := NewMessageValidator().(*messageValidator)
 
-	mv.developerDataIndexes = append(mv.developerDataIndexes, 0)
+	mv.developerDataIndexSeen[0>>6] |= 1 << (0 & 63)
 	mv.fieldDescriptions = append(mv.fieldDescriptions, mesgdef.NewFieldDescription(nil))
 
 	mv.Reset()
 
-	if len(mv.developerDataIndexes) != 0 {
-		t.Errorf("len(developerDataIndexes): expected 0: got: %d", len(mv.developerDataIndexes))
+	if mv.developerDataIndexSeen != [4]uint64{} {
+		t.Errorf("len(developerDataIndexes): expected 0: got: %d", len(mv.developerDataIndexSeen))
 	}
 
 	mv.fieldDescriptions = mv.fieldDescriptions[:cap(mv.fieldDescriptions)]
@@ -292,7 +292,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 			name: "developer field value size exceed max allowed",
 			mesgValidator: func() MessageValidator {
 				mesgValidator := NewMessageValidator().(*messageValidator)
-				mesgValidator.developerDataIndexes = []uint8{0}
+				mesgValidator.developerDataIndexSeen[0>>6] |= 1 << (0 & 63)
 
 				fieldDescription := proto.Message{
 					Num: mesgnum.FieldDescription,

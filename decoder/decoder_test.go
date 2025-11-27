@@ -2500,7 +2500,9 @@ func TestDecodeDeveloperFields(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			dec := New(tc.r, WithLogWriter(io.Discard))
-			dec.developerDataIndexes = append(dec.developerDataIndexes, tc.developerDataIndexes...)
+			for _, v := range tc.developerDataIndexes {
+				dec.developerDataIndexSeen[v>>6] |= 1 << (v & 63)
+			}
 			dec.fieldDescriptions = append(dec.fieldDescriptions, tc.fieldDescription)
 			mesg := proto.Message{}
 			err := dec.decodeDeveloperFields(tc.mesgDef, &mesg)
