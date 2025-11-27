@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"slices"
 
 	"github.com/muktihari/fit/internal/sliceutil"
 	"github.com/muktihari/fit/kit/hash"
@@ -77,8 +76,8 @@ type Decoder struct {
 	localMessageDefinitions [proto.LocalMesgNumMask + 1]proto.MessageDefinition
 
 	// Developer Data Lookup
-	developerDataIndexes []uint8
-	fieldDescriptions    []*mesgdef.FieldDescription
+	developerDataIndexSeen [4]uint64 // 256-bits bitmap for checking if DeveloperDataIndex has been seen.
+	fieldDescriptions      []*mesgdef.FieldDescription
 }
 
 // Factory defines a contract that any Factory containing these method can be used by the Decoder.
@@ -252,7 +251,7 @@ func (d *Decoder) releaseTemporaryObjects() {
 	d.developerFieldsArray = [255]proto.DeveloperField{}
 	d.fileId = nil
 	d.messages = nil
-	d.developerDataIndexes = d.developerDataIndexes[:0]
+	d.developerDataIndexSeen = [4]uint64{}
 	for i := range d.fieldDescriptions {
 		d.fieldDescriptions[i] = nil
 	}
@@ -669,8 +668,8 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 	switch mesg.Num {
 	case mesgnum.DeveloperDataId:
 		// These messages must occur before any related field description messages are written to the proto.
-		d.developerDataIndexes = append(d.developerDataIndexes,
-			mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8())
+		x := mesg.FieldValueByNum(fieldnum.DeveloperDataIdDeveloperDataIndex).Uint8()
+		d.developerDataIndexSeen[x>>6] |= 1 << (x & 63)
 	case mesgnum.FieldDescription:
 		// These messages must occur in the file before any related developer data is written to the proto.
 		d.fieldDescriptions = append(d.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
@@ -873,7 +872,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 
 		// NOTE: Currently, we allow missing DeveloperDataId message,
 		// we only use FieldDescription messages to decode developer data.
-		if !slices.Contains(d.developerDataIndexes, devFieldDef.DeveloperDataIndex) {
+		if x := devFieldDef.DeveloperDataIndex; (d.developerDataIndexSeen[x>>6]>>(x&63))&1 == 0 {
 			d.logf("mesg.Num: %d, developerFields[%d].Num: %d: missing developer data id with developer data index '%d'",
 				mesg.Num, i, devFieldDef.Num, devFieldDef.DeveloperDataIndex)
 		}

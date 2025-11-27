@@ -17,10 +17,7 @@ type flusher interface{ Flush() error }
 // This maintains the capability to write at specific bytes when the underlying writer implements either
 // io.WriterAt or io.Seeker. When size <= 0, the original writer will be returned.
 func newWriteBuffer(w io.Writer, size int) io.Writer {
-	if size < 0 {
-		size = 0
-	}
-	if size == 0 || w == nil {
+	if size <= 0 || w == nil {
 		return w
 	}
 	bw := bufio.NewWriterSize(w, size)
