@@ -1,62 +1,42 @@
-name: Run fitgen Triggered by Comment
+name: Run fitgen Triggered by Pull Request
 
 on:
-  issue_comment:
-    types:
-      - created
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "internal/cmd/fitgen/*"
 
 permissions: {}
 
 jobs:
   run-fitgen:
-    if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
 
     permissions:
       contents: write # allow push commit
 
     steps:
-      - name: Check PR comment
-        id: check-comment
-        env:
-          COMMENT: ${{ github.event.comment.body }} # Sanitize input using env to prevent script injection attack
-        run: |
-          if [[ "$COMMENT" =~ ^run\ fitgen\ ([0-9]+\.[0-9]+)$ ]]; then
-            echo "trigger=true" >> $GITHUB_OUTPUT
-            echo "profile_version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
-          else 
-            echo "trigger=false" >> $GITHUB_OUTPUT
-            echo "Aborted: not a valid 'run fitgen <profile.version>' command"
-            exit 0
-          fi
-
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        if: steps.check-comment.outputs.trigger == 'true'
         with:
-          token: "${{ secrets.FIT }}"
-
-      - name: Checkout PR
-        if: steps.check-comment.outputs.trigger == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.FIT }}
-        run: |
-          gh pr checkout ${{ github.event.issue.number }}
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up Go
-        if: steps.check-comment.outputs.trigger == 'true'
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
           go-version: "stable"
 
       - name: Run fitgen
-        if: steps.check-comment.outputs.trigger == 'true'
+        id: run-fitgen
         run: |
-          export wd=$(pwd)
+          wd=$(pwd)
           echo $wd
           cd internal/cmd/fitgen
-          go run main.go -f Profile.xlsx -p ../../../ -b all --profile-version ${{ steps.check-comment.outputs.profile_version }} --verbose -y
+          profile_version=$(cat profile_version.txt)
+          echo "profile_version=$profile_version" | tee -a "$GITHUB_OUTPUT"
+          go run main.go -f Profile.xlsx -p ../../../ -b all --profile-version $profile_version --verbose -y
           cd $wd
-          sed -E -i 's/profile\-v[0-9]+\.[0-9]+-lightblue.svg/\profile-v${{ steps.check-comment.outputs.profile_version }}-lightblue.svg/' README.md
+          sed -E -i "s/profile-v[0-9]+\.[0-9]+-lightblue.svg/profile-v$profile_version-lightblue.svg/" README.md
 
           cd cmd/fitconv
           go generate
@@ -67,13 +47,15 @@ jobs:
           cd $wd
 
       - name: Commit and Push
-        if: steps.check-comment.outputs.trigger == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.FIT }}
         run: |
-          git config --global user.email "muktihaz@gmail.com"
-          git config --global user.name "Hikmatulloh Hari Mukti"
+          changes=$(git status --porcelain)
+          if [[ -n "$changes" ]]; then
+            git config --global user.email "muktihaz@gmail.com"
+            git config --global user.name "Hikmatulloh Hari Mukti"
 
-          git add .
-          git commit -m "gh actions: generate files for v${{ steps.check-comment.outputs.profile_version }}"
-          git push
+            git add .
+            git commit -m "gh actions: generate files for v${{ steps.run-fitgen.outputs.profile_version }}"
+            git push
+          fi
