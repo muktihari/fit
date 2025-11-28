@@ -86,52 +86,48 @@ func (m *SdmProfile) Reset(mesg *proto.Message) {
 func (m *SdmProfile) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 8)
 	mesg := proto.Message{Num: typedef.MesgNumSdmProfile}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Enabled < 2 {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if m.SdmAntId != basetype.Uint16zInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.SdmAntId)
 		fields = append(fields, field)
 	}
 	if m.SdmCalFactor != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.SdmCalFactor)
 		fields = append(fields, field)
 	}
 	if m.Odometer != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.Odometer)
 		fields = append(fields, field)
 	}
 	if m.SpeedSource < 2 {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Bool(m.SpeedSource)
 		fields = append(fields, field)
 	}
 	if m.SdmAntIdTransType != basetype.Uint8zInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(m.SdmAntIdTransType)
 		fields = append(fields, field)
 	}
 	if m.OdometerRollover != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(m.OdometerRollover)
 		fields = append(fields, field)
 	}

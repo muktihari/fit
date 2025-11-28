@@ -82,37 +82,33 @@ func (m *DeviceAuxBatteryInfo) Reset(mesg *proto.Message) {
 func (m *DeviceAuxBatteryInfo) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumDeviceAuxBatteryInfo}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.DeviceIndex != typedef.DeviceIndexInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 	if m.BatteryVoltage != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.BatteryVoltage)
 		fields = append(fields, field)
 	}
 	if m.BatteryStatus != typedef.BatteryStatusInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(uint8(m.BatteryStatus))
 		fields = append(fields, field)
 	}
 	if m.BatteryIdentifier != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.BatteryIdentifier)
 		fields = append(fields, field)
 	}

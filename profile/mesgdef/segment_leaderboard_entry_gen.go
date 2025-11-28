@@ -84,47 +84,43 @@ func (m *SegmentLeaderboardEntry) Reset(mesg *proto.Message) {
 func (m *SegmentLeaderboardEntry) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 7)
 	mesg := proto.Message{Num: typedef.MesgNumSegmentLeaderboardEntry}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.Type != typedef.SegmentLeaderboardTypeInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}
 	if m.GroupPrimaryKey != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.GroupPrimaryKey)
 		fields = append(fields, field)
 	}
 	if m.ActivityId != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.ActivityId)
 		fields = append(fields, field)
 	}
 	if m.SegmentTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(m.SegmentTime)
 		fields = append(fields, field)
 	}
 	if m.ActivityIdString != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.ActivityIdString)
 		fields = append(fields, field)
 	}

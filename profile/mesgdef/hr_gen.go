@@ -92,48 +92,44 @@ func (m *Hr) Reset(mesg *proto.Message) {
 func (m *Hr) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumHr}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
 		if expanded := m.IsExpandedField(0); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 0)
+			field := factory.CreateField(mesg.Num, 0)
 			field.Value = proto.Uint16(m.FractionalTimestamp)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.Time256 != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.Time256)
 		fields = append(fields, field)
 	}
 	if m.FilteredBpm != nil {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.SliceUint8(m.FilteredBpm)
 		fields = append(fields, field)
 	}
 	if m.EventTimestamp != nil {
 		if expanded := m.IsExpandedField(9); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 9)
+			field := factory.CreateField(mesg.Num, 9)
 			field.Value = proto.SliceUint32(m.EventTimestamp)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.EventTimestamp12 != nil {
-		field := fac.CreateField(mesg.Num, 10)
+		field := factory.CreateField(mesg.Num, 10)
 		field.Value = proto.SliceUint8(m.EventTimestamp12)
 		fields = append(fields, field)
 	}

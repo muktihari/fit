@@ -76,27 +76,23 @@ func (m *SpeedZone) Reset(mesg *proto.Message) {
 func (m *SpeedZone) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 3)
 	mesg := proto.Message{Num: typedef.MesgNumSpeedZone}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.HighValue != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.HighValue)
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}

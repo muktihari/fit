@@ -81,32 +81,28 @@ func (m *Capabilities) Reset(mesg *proto.Message) {
 func (m *Capabilities) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 4)
 	mesg := proto.Message{Num: typedef.MesgNumCapabilities}
 
 	if m.Languages != nil {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.SliceUint8(m.Languages)
 		fields = append(fields, field)
 	}
 	if m.Sports != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint8(m.Sports)
 		fields = append(fields, field)
 	}
 	if m.WorkoutsSupported != typedef.WorkoutCapabilitiesInvalid {
-		field := fac.CreateField(mesg.Num, 21)
+		field := factory.CreateField(mesg.Num, 21)
 		field.Value = proto.Uint32(uint32(m.WorkoutsSupported))
 		fields = append(fields, field)
 	}
 	if m.ConnectivitySupported != typedef.ConnectivityCapabilitiesInvalid {
-		field := fac.CreateField(mesg.Num, 23)
+		field := factory.CreateField(mesg.Num, 23)
 		field.Value = proto.Uint32(uint32(m.ConnectivitySupported))
 		fields = append(fields, field)
 	}

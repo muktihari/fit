@@ -79,32 +79,28 @@ func (m *HsaSpo2Data) Reset(mesg *proto.Message) {
 func (m *HsaSpo2Data) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 4)
 	mesg := proto.Message{Num: typedef.MesgNumHsaSpo2Data}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.ProcessingInterval != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ProcessingInterval)
 		fields = append(fields, field)
 	}
 	if m.ReadingSpo2 != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint8(m.ReadingSpo2)
 		fields = append(fields, field)
 	}
 	if m.Confidence != nil {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint8(m.Confidence)
 		fields = append(fields, field)
 	}

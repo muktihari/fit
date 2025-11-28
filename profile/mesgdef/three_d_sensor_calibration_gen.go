@@ -108,37 +108,33 @@ func (m *ThreeDSensorCalibration) Reset(mesg *proto.Message) {
 func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 7)
 	mesg := proto.Message{Num: typedef.MesgNumThreeDSensorCalibration}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.SensorType != typedef.SensorTypeInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.SensorType))
 		fields = append(fields, field)
 	}
 	if m.CalibrationFactor != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint32(m.CalibrationFactor)
 		fields = append(fields, field)
 	}
 	if m.CalibrationDivisor != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.CalibrationDivisor)
 		fields = append(fields, field)
 	}
 	if m.LevelShift != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.LevelShift)
 		fields = append(fields, field)
 	}
@@ -147,7 +143,7 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 		basetype.Sint32Invalid,
 		basetype.Sint32Invalid,
 	} {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		copied := m.OffsetCal
 		field.Value = proto.SliceInt32(copied[:])
 		fields = append(fields, field)
@@ -163,7 +159,7 @@ func (m *ThreeDSensorCalibration) ToMesg(options *Options) proto.Message {
 		basetype.Sint32Invalid,
 		basetype.Sint32Invalid,
 	} {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		copied := m.OrientationMatrix
 		field.Value = proto.SliceInt32(copied[:])
 		fields = append(fields, field)

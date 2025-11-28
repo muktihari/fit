@@ -81,37 +81,33 @@ func (m *CameraEvent) Reset(mesg *proto.Message) {
 func (m *CameraEvent) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumCameraEvent}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.CameraEventType != typedef.CameraEventTypeInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.CameraEventType))
 		fields = append(fields, field)
 	}
 	if m.CameraFileUuid != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.String(m.CameraFileUuid)
 		fields = append(fields, field)
 	}
 	if m.CameraOrientation != typedef.CameraOrientationTypeInvalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.CameraOrientation))
 		fields = append(fields, field)
 	}

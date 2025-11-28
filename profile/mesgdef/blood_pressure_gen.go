@@ -93,67 +93,63 @@ func (m *BloodPressure) Reset(mesg *proto.Message) {
 func (m *BloodPressure) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 11)
 	mesg := proto.Message{Num: typedef.MesgNumBloodPressure}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.SystolicPressure != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.SystolicPressure)
 		fields = append(fields, field)
 	}
 	if m.DiastolicPressure != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.DiastolicPressure)
 		fields = append(fields, field)
 	}
 	if m.MeanArterialPressure != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.MeanArterialPressure)
 		fields = append(fields, field)
 	}
 	if m.Map3SampleMean != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint16(m.Map3SampleMean)
 		fields = append(fields, field)
 	}
 	if m.MapMorningValues != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint16(m.MapMorningValues)
 		fields = append(fields, field)
 	}
 	if m.MapEveningValues != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.MapEveningValues)
 		fields = append(fields, field)
 	}
 	if m.HeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.HeartRate)
 		fields = append(fields, field)
 	}
 	if m.HeartRateType != typedef.HrTypeInvalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.HeartRateType))
 		fields = append(fields, field)
 	}
 	if m.Status != typedef.BpStatusInvalid {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.Status))
 		fields = append(fields, field)
 	}
 	if m.UserProfileIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 9)
+		field := factory.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint16(uint16(m.UserProfileIndex))
 		fields = append(fields, field)
 	}

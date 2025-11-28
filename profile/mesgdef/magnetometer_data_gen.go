@@ -89,57 +89,53 @@ func (m *MagnetometerData) Reset(mesg *proto.Message) {
 func (m *MagnetometerData) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 9)
 	mesg := proto.Message{Num: typedef.MesgNumMagnetometerData}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.SampleTimeOffset != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint16(m.SampleTimeOffset)
 		fields = append(fields, field)
 	}
 	if m.MagX != nil {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint16(m.MagX)
 		fields = append(fields, field)
 	}
 	if m.MagY != nil {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.SliceUint16(m.MagY)
 		fields = append(fields, field)
 	}
 	if m.MagZ != nil {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.SliceUint16(m.MagZ)
 		fields = append(fields, field)
 	}
 	if m.CalibratedMagX != nil {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.SliceFloat32(m.CalibratedMagX)
 		fields = append(fields, field)
 	}
 	if m.CalibratedMagY != nil {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.SliceFloat32(m.CalibratedMagY)
 		fields = append(fields, field)
 	}
 	if m.CalibratedMagZ != nil {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.SliceFloat32(m.CalibratedMagZ)
 		fields = append(fields, field)
 	}

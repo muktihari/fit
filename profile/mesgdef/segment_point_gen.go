@@ -93,48 +93,44 @@ func (m *SegmentPoint) Reset(mesg *proto.Message) {
 func (m *SegmentPoint) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 7)
 	mesg := proto.Message{Num: typedef.MesgNumSegmentPoint}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
 	if m.Altitude != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint16(m.Altitude)
 		fields = append(fields, field)
 	}
 	if m.LeaderTime != nil {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.SliceUint32(m.LeaderTime)
 		fields = append(fields, field)
 	}
 	if m.EnhancedAltitude != basetype.Uint32Invalid {
 		if expanded := m.IsExpandedField(6); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 6)
+			field := factory.CreateField(mesg.Num, 6)
 			field.Value = proto.Uint32(m.EnhancedAltitude)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)

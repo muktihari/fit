@@ -126,28 +126,24 @@ func (m *ExdDataFieldConfiguration) Reset(mesg *proto.Message) {
 func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumExdDataFieldConfiguration}
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.ConceptField != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
 	if m.FieldId != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 2)
+			field := factory.CreateField(mesg.Num, 2)
 			field.Value = proto.Uint8(m.FieldId)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
@@ -155,14 +151,14 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 	}
 	if m.ConceptCount != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 3)
+			field := factory.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint8(m.ConceptCount)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.DisplayType != typedef.ExdDisplayTypeInvalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.DisplayType))
 		fields = append(fields, field)
 	}
@@ -200,7 +196,7 @@ func (m *ExdDataFieldConfiguration) ToMesg(options *Options) proto.Message {
 		basetype.StringInvalid,
 		basetype.StringInvalid,
 	} {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		copied := m.Title
 		field.Value = proto.SliceString(copied[:])
 		fields = append(fields, field)

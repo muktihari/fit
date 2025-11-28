@@ -101,63 +101,59 @@ func (m *Jump) Reset(mesg *proto.Message) {
 func (m *Jump) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 10)
 	mesg := proto.Message{Num: typedef.MesgNumJump}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if math.Float32bits(m.Distance) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Float32(m.Distance)
 		fields = append(fields, field)
 	}
 	if math.Float32bits(m.Height) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Float32(m.Height)
 		fields = append(fields, field)
 	}
 	if m.Rotations != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(m.Rotations)
 		fields = append(fields, field)
 	}
 	if math.Float32bits(m.HangTime) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Float32(m.HangTime)
 		fields = append(fields, field)
 	}
 	if math.Float32bits(m.Score) != basetype.Float32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Float32(m.Score)
 		fields = append(fields, field)
 	}
 	if m.PositionLat != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Int32(m.PositionLat)
 		fields = append(fields, field)
 	}
 	if m.PositionLong != basetype.Sint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Int32(m.PositionLong)
 		fields = append(fields, field)
 	}
 	if m.Speed != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint16(m.Speed)
 		fields = append(fields, field)
 	}
 	if m.EnhancedSpeed != basetype.Uint32Invalid {
 		if expanded := m.IsExpandedField(8); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 8)
+			field := factory.CreateField(mesg.Num, 8)
 			field.Value = proto.Uint32(m.EnhancedSpeed)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)

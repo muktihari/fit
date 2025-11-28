@@ -88,57 +88,53 @@ func (m *Workout) Reset(mesg *proto.Message) {
 func (m *Workout) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 9)
 	mesg := proto.Message{Num: typedef.MesgNumWorkout}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Sport != typedef.SportInvalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if m.Capabilities != typedef.WorkoutCapabilitiesInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(uint32(m.Capabilities))
 		fields = append(fields, field)
 	}
 	if m.NumValidSteps != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint16(m.NumValidSteps)
 		fields = append(fields, field)
 	}
 	if m.WktName != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.String(m.WktName)
 		fields = append(fields, field)
 	}
 	if m.SubSport != typedef.SubSportInvalid {
-		field := fac.CreateField(mesg.Num, 11)
+		field := factory.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if m.PoolLength != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
+		field := factory.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint16(m.PoolLength)
 		fields = append(fields, field)
 	}
 	if m.PoolLengthUnit != typedef.DisplayMeasureInvalid {
-		field := fac.CreateField(mesg.Num, 15)
+		field := factory.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint8(byte(m.PoolLengthUnit))
 		fields = append(fields, field)
 	}
 	if m.WktDescription != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 17)
+		field := factory.CreateField(mesg.Num, 17)
 		field.Value = proto.String(m.WktDescription)
 		fields = append(fields, field)
 	}

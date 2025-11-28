@@ -76,27 +76,23 @@ func (m *Software) Reset(mesg *proto.Message) {
 func (m *Software) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 3)
 	mesg := proto.Message{Num: typedef.MesgNumSoftware}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.Version != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint16(m.Version)
 		fields = append(fields, field)
 	}
 	if m.PartNumber != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.PartNumber)
 		fields = append(fields, field)
 	}

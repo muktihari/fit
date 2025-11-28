@@ -81,42 +81,38 @@ func (m *MemoGlob) Reset(mesg *proto.Message) {
 func (m *MemoGlob) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumMemoGlob}
 
 	if m.PartIndex != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 250)
+		field := factory.CreateField(mesg.Num, 250)
 		field.Value = proto.Uint32(m.PartIndex)
 		fields = append(fields, field)
 	}
 	if m.Memo != nil {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.SliceUint8(m.Memo)
 		fields = append(fields, field)
 	}
 	if m.MesgNum != typedef.MesgNumInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(uint16(m.MesgNum))
 		fields = append(fields, field)
 	}
 	if m.ParentIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.ParentIndex))
 		fields = append(fields, field)
 	}
 	if m.FieldNum != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.FieldNum)
 		fields = append(fields, field)
 	}
 	if m.Data != nil {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.SliceUint8(m.Data)
 		fields = append(fields, field)
 	}

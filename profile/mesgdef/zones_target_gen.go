@@ -79,37 +79,33 @@ func (m *ZonesTarget) Reset(mesg *proto.Message) {
 func (m *ZonesTarget) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumZonesTarget}
 
 	if m.MaxHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.MaxHeartRate)
 		fields = append(fields, field)
 	}
 	if m.ThresholdHeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(m.ThresholdHeartRate)
 		fields = append(fields, field)
 	}
 	if m.FunctionalThresholdPower != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint16(m.FunctionalThresholdPower)
 		fields = append(fields, field)
 	}
 	if m.HrCalcType != typedef.HrZoneCalcInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(byte(m.HrCalcType))
 		fields = append(fields, field)
 	}
 	if m.PwrCalcType != typedef.PwrZoneCalcInvalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.PwrCalcType))
 		fields = append(fields, field)
 	}

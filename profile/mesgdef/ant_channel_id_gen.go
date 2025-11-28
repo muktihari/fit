@@ -79,37 +79,33 @@ func (m *AntChannelId) Reset(mesg *proto.Message) {
 func (m *AntChannelId) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumAntChannelId}
 
 	if m.ChannelNumber != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ChannelNumber)
 		fields = append(fields, field)
 	}
 	if m.DeviceType != basetype.Uint8zInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.DeviceType)
 		fields = append(fields, field)
 	}
 	if m.DeviceNumber != basetype.Uint16zInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.DeviceNumber)
 		fields = append(fields, field)
 	}
 	if m.TransmissionType != basetype.Uint8zInvalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.TransmissionType)
 		fields = append(fields, field)
 	}
 	if m.DeviceIndex != typedef.DeviceIndexInvalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}

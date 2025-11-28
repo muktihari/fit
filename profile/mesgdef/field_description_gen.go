@@ -93,82 +93,78 @@ func (m *FieldDescription) Reset(mesg *proto.Message) {
 func (m *FieldDescription) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 14)
 	mesg := proto.Message{Num: typedef.MesgNumFieldDescription}
 
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.DeveloperDataIndex)
 		fields = append(fields, field)
 	}
 	if m.FieldDefinitionNumber != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.FieldDefinitionNumber)
 		fields = append(fields, field)
 	}
 	if m.FitBaseTypeId != 255 {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(uint8(m.FitBaseTypeId))
 		fields = append(fields, field)
 	}
 	if m.FieldName != nil {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.SliceString(m.FieldName)
 		fields = append(fields, field)
 	}
 	if m.Array != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(m.Array)
 		fields = append(fields, field)
 	}
 	if m.Components != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.String(m.Components)
 		fields = append(fields, field)
 	}
 	if m.Scale != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.Scale)
 		fields = append(fields, field)
 	}
 	if m.Offset != basetype.Sint8Invalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Int8(m.Offset)
 		fields = append(fields, field)
 	}
 	if m.Units != nil {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.SliceString(m.Units)
 		fields = append(fields, field)
 	}
 	if m.Bits != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 9)
+		field := factory.CreateField(mesg.Num, 9)
 		field.Value = proto.String(m.Bits)
 		fields = append(fields, field)
 	}
 	if m.Accumulate != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 10)
+		field := factory.CreateField(mesg.Num, 10)
 		field.Value = proto.String(m.Accumulate)
 		fields = append(fields, field)
 	}
 	if m.FitBaseUnitId != typedef.FitBaseUnitInvalid {
-		field := fac.CreateField(mesg.Num, 13)
+		field := factory.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint16(uint16(m.FitBaseUnitId))
 		fields = append(fields, field)
 	}
 	if m.NativeMesgNum != typedef.MesgNumInvalid {
-		field := fac.CreateField(mesg.Num, 14)
+		field := factory.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint16(uint16(m.NativeMesgNum))
 		fields = append(fields, field)
 	}
 	if m.NativeFieldNum != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 15)
+		field := factory.CreateField(mesg.Num, 15)
 		field.Value = proto.Uint8(m.NativeFieldNum)
 		fields = append(fields, field)
 	}

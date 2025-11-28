@@ -75,27 +75,23 @@ func (m *Video) Reset(mesg *proto.Message) {
 func (m *Video) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 3)
 	mesg := proto.Message{Num: typedef.MesgNumVideo}
 
 	if m.Url != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.Url)
 		fields = append(fields, field)
 	}
 	if m.HostingProvider != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.String(m.HostingProvider)
 		fields = append(fields, field)
 	}
 	if m.Duration != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.Duration)
 		fields = append(fields, field)
 	}

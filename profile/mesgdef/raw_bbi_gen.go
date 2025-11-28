@@ -91,33 +91,29 @@ func (m *RawBbi) Reset(mesg *proto.Message) {
 func (m *RawBbi) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumRawBbi}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.TimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.TimestampMs)
 		fields = append(fields, field)
 	}
 	if m.Data != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint16(m.Data)
 		fields = append(fields, field)
 	}
 	if m.Time != nil {
 		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 2)
+			field := factory.CreateField(mesg.Num, 2)
 			field.Value = proto.SliceUint16(m.Time)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
@@ -125,7 +121,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 	}
 	if m.Quality != nil {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 3)
+			field := factory.CreateField(mesg.Num, 3)
 			field.Value = proto.SliceUint8(m.Quality)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
@@ -133,7 +129,7 @@ func (m *RawBbi) ToMesg(options *Options) proto.Message {
 	}
 	if m.Gap != nil {
 		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 4)
+			field := factory.CreateField(mesg.Num, 4)
 			field.Value = proto.SliceUint8(m.Gap)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)

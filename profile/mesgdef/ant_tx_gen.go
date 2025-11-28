@@ -92,38 +92,34 @@ func (m *AntTx) Reset(mesg *proto.Message) {
 func (m *AntTx) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumAntTx}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.FractionalTimestamp != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.FractionalTimestamp)
 		fields = append(fields, field)
 	}
 	if m.MesgId != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.MesgId)
 		fields = append(fields, field)
 	}
 	if m.MesgData != nil {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceUint8(m.MesgData)
 		fields = append(fields, field)
 	}
 	if m.ChannelNumber != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 3)
+			field := factory.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint8(m.ChannelNumber)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
@@ -131,7 +127,7 @@ func (m *AntTx) ToMesg(options *Options) proto.Message {
 	}
 	if m.Data != nil {
 		if expanded := m.IsExpandedField(4); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 4)
+			field := factory.CreateField(mesg.Num, 4)
 			field.Value = proto.SliceUint8(m.Data)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
