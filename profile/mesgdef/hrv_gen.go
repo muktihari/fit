@@ -72,17 +72,13 @@ func (m *Hrv) Reset(mesg *proto.Message) {
 func (m *Hrv) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 1)
 	mesg := proto.Message{Num: typedef.MesgNumHrv}
 
 	if m.Time != nil {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.SliceUint16(m.Time)
 		fields = append(fields, field)
 	}

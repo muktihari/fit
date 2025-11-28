@@ -77,32 +77,28 @@ func (m *ExdScreenConfiguration) Reset(mesg *proto.Message) {
 func (m *ExdScreenConfiguration) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 4)
 	mesg := proto.Message{Num: typedef.MesgNumExdScreenConfiguration}
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.FieldCount != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.FieldCount)
 		fields = append(fields, field)
 	}
 	if m.Layout != typedef.ExdLayoutInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Layout))
 		fields = append(fields, field)
 	}
 	if m.ScreenEnabled < 2 {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.ScreenEnabled)
 		fields = append(fields, field)
 	}

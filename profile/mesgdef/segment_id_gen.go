@@ -87,57 +87,53 @@ func (m *SegmentId) Reset(mesg *proto.Message) {
 func (m *SegmentId) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 9)
 	mesg := proto.Message{Num: typedef.MesgNumSegmentId}
 
 	if m.Name != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}
 	if m.Uuid != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.String(m.Uuid)
 		fields = append(fields, field)
 	}
 	if m.Sport != typedef.SportInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if m.Enabled < 2 {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Bool(m.Enabled)
 		fields = append(fields, field)
 	}
 	if m.UserProfilePrimaryKey != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(m.UserProfilePrimaryKey)
 		fields = append(fields, field)
 	}
 	if m.DeviceId != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint32(m.DeviceId)
 		fields = append(fields, field)
 	}
 	if m.DefaultRaceLeader != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.DefaultRaceLeader)
 		fields = append(fields, field)
 	}
 	if m.DeleteStatus != typedef.SegmentDeleteStatusInvalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.DeleteStatus))
 		fields = append(fields, field)
 	}
 	if m.SelectionType != typedef.SegmentSelectionTypeInvalid {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.SelectionType))
 		fields = append(fields, field)
 	}

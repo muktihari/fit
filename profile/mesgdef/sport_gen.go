@@ -75,27 +75,23 @@ func (m *Sport) Reset(mesg *proto.Message) {
 func (m *Sport) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 3)
 	mesg := proto.Message{Num: typedef.MesgNumSport}
 
 	if m.Sport != typedef.SportInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(byte(m.Sport))
 		fields = append(fields, field)
 	}
 	if m.SubSport != typedef.SubSportInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(byte(m.SubSport))
 		fields = append(fields, field)
 	}
 	if m.Name != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.String(m.Name)
 		fields = append(fields, field)
 	}

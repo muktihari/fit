@@ -85,47 +85,43 @@ func (m *VideoClip) Reset(mesg *proto.Message) {
 func (m *VideoClip) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 7)
 	mesg := proto.Message{Num: typedef.MesgNumVideoClip}
 
 	if m.ClipNumber != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(m.ClipNumber)
 		fields = append(fields, field)
 	}
 	if !m.StartTimestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint32(uint32(m.StartTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.StartTimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(m.StartTimestampMs)
 		fields = append(fields, field)
 	}
 	if !m.EndTimestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(uint32(m.EndTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.EndTimestampMs != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint16(m.EndTimestampMs)
 		fields = append(fields, field)
 	}
 	if m.ClipStart != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint32(m.ClipStart)
 		fields = append(fields, field)
 	}
 	if m.ClipEnd != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint32(m.ClipEnd)
 		fields = append(fields, field)
 	}

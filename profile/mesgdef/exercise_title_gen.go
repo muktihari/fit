@@ -77,32 +77,28 @@ func (m *ExerciseTitle) Reset(mesg *proto.Message) {
 func (m *ExerciseTitle) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 4)
 	mesg := proto.Message{Num: typedef.MesgNumExerciseTitle}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
-		field := fac.CreateField(mesg.Num, 254)
+		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
 		fields = append(fields, field)
 	}
 	if m.ExerciseCategory != typedef.ExerciseCategoryInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint16(uint16(m.ExerciseCategory))
 		fields = append(fields, field)
 	}
 	if m.ExerciseName != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.ExerciseName)
 		fields = append(fields, field)
 	}
 	if m.WktStepName != nil {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.SliceString(m.WktStepName)
 		fields = append(fields, field)
 	}

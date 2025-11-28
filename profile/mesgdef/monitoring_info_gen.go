@@ -89,42 +89,38 @@ func (m *MonitoringInfo) Reset(mesg *proto.Message) {
 func (m *MonitoringInfo) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumMonitoringInfo}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if !m.LocalTimestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint32(uint32(m.LocalTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.ActivityType != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint8(m.ActivityType)
 		fields = append(fields, field)
 	}
 	if m.CyclesToDistance != nil {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.SliceUint16(m.CyclesToDistance)
 		fields = append(fields, field)
 	}
 	if m.CyclesToCalories != nil {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.SliceUint16(m.CyclesToCalories)
 		fields = append(fields, field)
 	}
 	if m.RestingMetabolicRate != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint16(m.RestingMetabolicRate)
 		fields = append(fields, field)
 	}

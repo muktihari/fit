@@ -99,28 +99,24 @@ func (m *ExdDataConceptConfiguration) Reset(mesg *proto.Message) {
 func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 11)
 	mesg := proto.Message{Num: typedef.MesgNumExdDataConceptConfiguration}
 
 	if m.ScreenIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(m.ScreenIndex)
 		fields = append(fields, field)
 	}
 	if m.ConceptField != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint8(m.ConceptField)
 		fields = append(fields, field)
 	}
 	if m.FieldId != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(2); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 2)
+			field := factory.CreateField(mesg.Num, 2)
 			field.Value = proto.Uint8(m.FieldId)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
@@ -128,44 +124,44 @@ func (m *ExdDataConceptConfiguration) ToMesg(options *Options) proto.Message {
 	}
 	if m.ConceptIndex != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(3); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 3)
+			field := factory.CreateField(mesg.Num, 3)
 			field.Value = proto.Uint8(m.ConceptIndex)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.DataPage != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(m.DataPage)
 		fields = append(fields, field)
 	}
 	if m.ConceptKey != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 5)
+		field := factory.CreateField(mesg.Num, 5)
 		field.Value = proto.Uint8(m.ConceptKey)
 		fields = append(fields, field)
 	}
 	if m.Scaling != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(m.Scaling)
 		fields = append(fields, field)
 	}
 	if m.DataUnits != typedef.ExdDataUnitsInvalid {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint8(byte(m.DataUnits))
 		fields = append(fields, field)
 	}
 	if m.Qualifier != typedef.ExdQualifiersInvalid {
-		field := fac.CreateField(mesg.Num, 9)
+		field := factory.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint8(byte(m.Qualifier))
 		fields = append(fields, field)
 	}
 	if m.Descriptor != typedef.ExdDescriptorsInvalid {
-		field := fac.CreateField(mesg.Num, 10)
+		field := factory.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint8(byte(m.Descriptor))
 		fields = append(fields, field)
 	}
 	if m.IsSigned < 2 {
-		field := fac.CreateField(mesg.Num, 11)
+		field := factory.CreateField(mesg.Num, 11)
 		field.Value = proto.Bool(m.IsSigned)
 		fields = append(fields, field)
 	}

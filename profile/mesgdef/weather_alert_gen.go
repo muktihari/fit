@@ -83,42 +83,38 @@ func (m *WeatherAlert) Reset(mesg *proto.Message) {
 func (m *WeatherAlert) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 6)
 	mesg := proto.Message{Num: typedef.MesgNumWeatherAlert}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.ReportId != basetype.StringInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.String(m.ReportId)
 		fields = append(fields, field)
 	}
 	if !m.IssueTime.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint32(uint32(m.IssueTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if !m.ExpireTime.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(uint32(m.ExpireTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.Severity != typedef.WeatherSeverityInvalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(byte(m.Severity))
 		fields = append(fields, field)
 	}
 	if m.Type != typedef.WeatherSevereTypeInvalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint8(byte(m.Type))
 		fields = append(fields, field)
 	}

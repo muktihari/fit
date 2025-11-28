@@ -151,95 +151,91 @@ func (m *Monitoring) Reset(mesg *proto.Message) {
 func (m *Monitoring) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 29)
 	mesg := proto.Message{Num: typedef.MesgNumMonitoring}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.DeviceIndex != typedef.DeviceIndexInvalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint8(uint8(m.DeviceIndex))
 		fields = append(fields, field)
 	}
 	if m.Calories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.Calories)
 		fields = append(fields, field)
 	}
 	if m.Distance != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint32(m.Distance)
 		fields = append(fields, field)
 	}
 	if m.Cycles != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint32(m.Cycles)
 		fields = append(fields, field)
 	}
 	if m.ActiveTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
 	if m.ActivityType != typedef.ActivityTypeInvalid {
 		if expanded := m.IsExpandedField(5); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 5)
+			field := factory.CreateField(mesg.Num, 5)
 			field.Value = proto.Uint8(byte(m.ActivityType))
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.ActivitySubtype != typedef.ActivitySubtypeInvalid {
-		field := fac.CreateField(mesg.Num, 6)
+		field := factory.CreateField(mesg.Num, 6)
 		field.Value = proto.Uint8(byte(m.ActivitySubtype))
 		fields = append(fields, field)
 	}
 	if m.ActivityLevel != typedef.ActivityLevelInvalid {
-		field := fac.CreateField(mesg.Num, 7)
+		field := factory.CreateField(mesg.Num, 7)
 		field.Value = proto.Uint8(byte(m.ActivityLevel))
 		fields = append(fields, field)
 	}
 	if m.Distance16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 8)
+		field := factory.CreateField(mesg.Num, 8)
 		field.Value = proto.Uint16(m.Distance16)
 		fields = append(fields, field)
 	}
 	if m.Cycles16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 9)
+		field := factory.CreateField(mesg.Num, 9)
 		field.Value = proto.Uint16(m.Cycles16)
 		fields = append(fields, field)
 	}
 	if m.ActiveTime16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 10)
+		field := factory.CreateField(mesg.Num, 10)
 		field.Value = proto.Uint16(m.ActiveTime16)
 		fields = append(fields, field)
 	}
 	if !m.LocalTimestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 11)
+		field := factory.CreateField(mesg.Num, 11)
 		field.Value = proto.Uint32(uint32(m.LocalTimestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.Temperature != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 12)
+		field := factory.CreateField(mesg.Num, 12)
 		field.Value = proto.Int16(m.Temperature)
 		fields = append(fields, field)
 	}
 	if m.TemperatureMin != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 14)
+		field := factory.CreateField(mesg.Num, 14)
 		field.Value = proto.Int16(m.TemperatureMin)
 		fields = append(fields, field)
 	}
 	if m.TemperatureMax != basetype.Sint16Invalid {
-		field := fac.CreateField(mesg.Num, 15)
+		field := factory.CreateField(mesg.Num, 15)
 		field.Value = proto.Int16(m.TemperatureMax)
 		fields = append(fields, field)
 	}
@@ -253,71 +249,71 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		basetype.Uint16Invalid,
 		basetype.Uint16Invalid,
 	} {
-		field := fac.CreateField(mesg.Num, 16)
+		field := factory.CreateField(mesg.Num, 16)
 		copied := m.ActivityTime
 		field.Value = proto.SliceUint16(copied[:])
 		fields = append(fields, field)
 	}
 	if m.ActiveCalories != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 19)
+		field := factory.CreateField(mesg.Num, 19)
 		field.Value = proto.Uint16(m.ActiveCalories)
 		fields = append(fields, field)
 	}
 	if m.CurrentActivityTypeIntensity != basetype.ByteInvalid {
-		field := fac.CreateField(mesg.Num, 24)
+		field := factory.CreateField(mesg.Num, 24)
 		field.Value = proto.Uint8(m.CurrentActivityTypeIntensity)
 		fields = append(fields, field)
 	}
 	if m.TimestampMin8 != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 25)
+		field := factory.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(m.TimestampMin8)
 		fields = append(fields, field)
 	}
 	if m.Timestamp16 != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 26)
+		field := factory.CreateField(mesg.Num, 26)
 		field.Value = proto.Uint16(m.Timestamp16)
 		fields = append(fields, field)
 	}
 	if m.HeartRate != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 27)
+		field := factory.CreateField(mesg.Num, 27)
 		field.Value = proto.Uint8(m.HeartRate)
 		fields = append(fields, field)
 	}
 	if m.Intensity != basetype.Uint8Invalid {
 		if expanded := m.IsExpandedField(28); !expanded || (expanded && options.IncludeExpandedFields) {
-			field := fac.CreateField(mesg.Num, 28)
+			field := factory.CreateField(mesg.Num, 28)
 			field.Value = proto.Uint8(m.Intensity)
 			field.IsExpandedField = expanded
 			fields = append(fields, field)
 		}
 	}
 	if m.DurationMin != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 29)
+		field := factory.CreateField(mesg.Num, 29)
 		field.Value = proto.Uint16(m.DurationMin)
 		fields = append(fields, field)
 	}
 	if m.Duration != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 30)
+		field := factory.CreateField(mesg.Num, 30)
 		field.Value = proto.Uint32(m.Duration)
 		fields = append(fields, field)
 	}
 	if m.Ascent != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 31)
+		field := factory.CreateField(mesg.Num, 31)
 		field.Value = proto.Uint32(m.Ascent)
 		fields = append(fields, field)
 	}
 	if m.Descent != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 32)
+		field := factory.CreateField(mesg.Num, 32)
 		field.Value = proto.Uint32(m.Descent)
 		fields = append(fields, field)
 	}
 	if m.ModerateActivityMinutes != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 33)
+		field := factory.CreateField(mesg.Num, 33)
 		field.Value = proto.Uint16(m.ModerateActivityMinutes)
 		fields = append(fields, field)
 	}
 	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 34)
+		field := factory.CreateField(mesg.Num, 34)
 		field.Value = proto.Uint16(m.VigorousActivityMinutes)
 		fields = append(fields, field)
 	}

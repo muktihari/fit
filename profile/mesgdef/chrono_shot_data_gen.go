@@ -78,27 +78,23 @@ func (m *ChronoShotData) Reset(mesg *proto.Message) {
 func (m *ChronoShotData) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 3)
 	mesg := proto.Message{Num: typedef.MesgNumChronoShotData}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
-		field := fac.CreateField(mesg.Num, 253)
+		field := factory.CreateField(mesg.Num, 253)
 		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.ShotSpeed != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.Uint32(m.ShotSpeed)
 		fields = append(fields, field)
 	}
 	if m.ShotNum != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.Uint16(m.ShotNum)
 		fields = append(fields, field)
 	}

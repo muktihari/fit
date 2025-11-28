@@ -78,32 +78,28 @@ func (m *TrainingSettings) Reset(mesg *proto.Message) {
 func (m *TrainingSettings) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 4)
 	mesg := proto.Message{Num: typedef.MesgNumTrainingSettings}
 
 	if m.TargetDistance != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 31)
+		field := factory.CreateField(mesg.Num, 31)
 		field.Value = proto.Uint32(m.TargetDistance)
 		fields = append(fields, field)
 	}
 	if m.TargetSpeed != basetype.Uint16Invalid {
-		field := fac.CreateField(mesg.Num, 32)
+		field := factory.CreateField(mesg.Num, 32)
 		field.Value = proto.Uint16(m.TargetSpeed)
 		fields = append(fields, field)
 	}
 	if m.TargetTime != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 33)
+		field := factory.CreateField(mesg.Num, 33)
 		field.Value = proto.Uint32(m.TargetTime)
 		fields = append(fields, field)
 	}
 	if m.PreciseTargetSpeed != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 153)
+		field := factory.CreateField(mesg.Num, 153)
 		field.Value = proto.Uint32(m.PreciseTargetSpeed)
 		fields = append(fields, field)
 	}

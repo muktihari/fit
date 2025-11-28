@@ -5,7 +5,6 @@
 package mesgdef
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -19,11 +18,8 @@ import (
 func TestDefaultOptions(t *testing.T) {
 	options := DefaultOptions()
 	if diff := cmp.Diff(options, &Options{
-		Factory:               factory.StandardFactory(),
 		IncludeExpandedFields: false,
-	}, cmp.Transformer("Factory", func(fac Factory) uintptr {
-		return uintptr(reflect.ValueOf(fac).UnsafePointer())
-	}),
+	},
 	); diff != "" {
 		t.Fatal(diff)
 	}

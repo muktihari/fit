@@ -75,37 +75,33 @@ func (m *DeveloperDataId) Reset(mesg *proto.Message) {
 func (m *DeveloperDataId) ToMesg(options *Options) proto.Message {
 	if options == nil {
 		options = defaultOptions
-	} else if options.Factory == nil {
-		options.Factory = factory.StandardFactory()
 	}
-
-	fac := options.Factory
 
 	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumDeveloperDataId}
 
 	if m.DeveloperId != nil {
-		field := fac.CreateField(mesg.Num, 0)
+		field := factory.CreateField(mesg.Num, 0)
 		field.Value = proto.SliceUint8(m.DeveloperId)
 		fields = append(fields, field)
 	}
 	if m.ApplicationId != nil {
-		field := fac.CreateField(mesg.Num, 1)
+		field := factory.CreateField(mesg.Num, 1)
 		field.Value = proto.SliceUint8(m.ApplicationId)
 		fields = append(fields, field)
 	}
 	if m.ManufacturerId != typedef.ManufacturerInvalid {
-		field := fac.CreateField(mesg.Num, 2)
+		field := factory.CreateField(mesg.Num, 2)
 		field.Value = proto.Uint16(uint16(m.ManufacturerId))
 		fields = append(fields, field)
 	}
 	if m.DeveloperDataIndex != basetype.Uint8Invalid {
-		field := fac.CreateField(mesg.Num, 3)
+		field := factory.CreateField(mesg.Num, 3)
 		field.Value = proto.Uint8(m.DeveloperDataIndex)
 		fields = append(fields, field)
 	}
 	if m.ApplicationVersion != basetype.Uint32Invalid {
-		field := fac.CreateField(mesg.Num, 4)
+		field := factory.CreateField(mesg.Num, 4)
 		field.Value = proto.Uint32(m.ApplicationVersion)
 		fields = append(fields, field)
 	}
