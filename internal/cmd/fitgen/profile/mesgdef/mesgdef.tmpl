@@ -102,11 +102,7 @@ func (m *{{ $.Name }}) Reset(mesg *proto.Message) {
 func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
     if options == nil {
         options = defaultOptions
-    } else if options.Factory == nil {
-        options.Factory = factory.StandardFactory()
     }
-
-    fac := options.Factory
 
     fields := make([]proto.Field, 0, {{ len .Fields }})
     mesg := proto.Message{ Num: typedef.MesgNum{{ .Name }} }
@@ -114,7 +110,7 @@ func (m *{{ .Name }}) ToMesg(options *Options) proto.Message {
     {{ range .Fields -}}
     if {{ .IsValidValue -}} {
         {{- if eq .CanExpand true -}} if expanded := m.IsExpandedField({{ .Num }}); !expanded || (expanded && options.IncludeExpandedFields) { {{ end }}
-        field := fac.CreateField(mesg.Num, {{ .Num }})
+        field := factory.CreateField(mesg.Num, {{ .Num }})
         {{ if gt .FixedArraySize 0 -}}
         {{- /* DO NOT reslice directly from the struct (e.g. m.Velocity[:]), otherwise, we will keep referencing
             the struct since we promote the array from the same memory block as the struct. We must copy the array
