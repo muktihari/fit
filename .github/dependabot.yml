@@ -9,7 +9,7 @@ updates:
   - package-ecosystem: gomod
     directory: /
     schedule:
-      interval: monthly
+      interval: quarterly
     groups:
       gomod-bulk:
         patterns:
@@ -18,7 +18,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: quarterly
     groups:
       github-actions-bulk:
         patterns:
