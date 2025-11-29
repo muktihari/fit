@@ -54,6 +54,10 @@ type Encoder struct {
 
 	dataSize uint32 // Data size of messages in bytes for a single FIT file.
 
+	// Indicates whether the data size has been calculated during the first phase of the Early Check Strategy.
+	// For the Direct Update Strategy, this flag is always false.
+	dataSizeCalculated bool
+
 	// This timestamp reference serves as current active timestamp when 'headerOptionCompressedTimestamp' is specified.
 	// The first timestamp value is retrieved from the first message containing a valid timestamp field,
 	// and will change every rollover event occurrence.
@@ -218,6 +222,7 @@ func (e *Encoder) reset() {
 	e.crc16.Reset()
 	e.localMesgNumLRU.Reset()
 	e.dataSize = 0
+	e.dataSizeCalculated = false
 	e.timestampReference = 0
 }
 
@@ -272,6 +277,7 @@ func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
 
 	for i := range messages {
 		mesg := &messages[i]
+		mesg.Header = proto.MesgNormalHeaderMask
 		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
 			return fmt.Errorf("protocol validation: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
@@ -408,22 +414,29 @@ func (e *Encoder) updateFileHeader(header *proto.FileHeader) (err error) {
 	}
 }
 
+type discard struct{}
+
+func (discard) Reset()                      {}
+func (discard) Size() int                   { return 0 }
+func (discard) BlockSize() int              { return 0 }
+func (discard) Sum([]byte) []byte           { return nil }
+func (discard) Write(p []byte) (int, error) { return len(p), nil }
+func (discard) Sum16() uint16               { return 0 }
+
 // calculateDataSize calculates total data size of the messages by counting bytes written to io.Discard.
 func (e *Encoder) calculateDataSize(fit *proto.FIT) error {
-	n := e.n
-	w := e.w
+	n, w, crc16 := e.n, e.w, e.crc16
+	defer func() { e.n, e.w, e.crc16 = n, w, crc16 }()
 
-	e.w = io.Discard
-
+	e.w, e.crc16 = discard{}, discard{}
 	if err := e.encodeMessages(fit.Messages); err != nil {
 		return fmt.Errorf("calculate data size: %w", err)
 	}
 
 	fit.FileHeader.DataSize = e.dataSize // update FileHeader's DataSize of the actual messages size
-	e.reset()
-
-	e.n = n
-	e.w = w
+	e.dataSize, e.timestampReference = 0, 0
+	e.localMesgNumLRU.Reset()
+	e.dataSizeCalculated = true
 
 	return nil
 }
@@ -441,32 +454,8 @@ func (e *Encoder) encodeMessages(messages []proto.Message) error {
 
 // encodeMessage marshals and encodes message definition and its message into w.
 func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
-	mesg.Header = proto.MesgNormalHeaderMask
-
-	var compressed bool
-	if e.options.headerOption == HeaderOptionCompressedTimestamp {
-		if e.w == io.Discard {
-			// NOTE: Only for calculating data size (Early Check Strategy)
-			var timestampField proto.Field
-			var i int
-			for i = range mesg.Fields {
-				if mesg.Fields[i].Num == proto.FieldNumTimestamp {
-					timestampField = mesg.Fields[i]
-					break
-				}
-			}
-			prevLen := len(mesg.Fields)
-			compressed = e.compressTimestampIntoHeader(mesg)
-			if compressed {
-				defer func() { // Revert: put timestamp field back at original index
-					mesg.Fields = mesg.Fields[:prevLen]
-					copy(mesg.Fields[i+1:], mesg.Fields[i:])
-					mesg.Fields[i] = timestampField
-				}()
-			}
-		} else {
-			compressed = e.compressTimestampIntoHeader(mesg)
-		}
+	if e.options.headerOption == HeaderOptionCompressedTimestamp && !e.dataSizeCalculated {
+		e.compressTimestampIntoHeader(mesg)
 	}
 
 	mesgDef := e.newMessageDefinition(mesg)
@@ -474,6 +463,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 
 	b[0] |= localMesgNum // Update the message definition header.
+	compressed := (mesg.Header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask
 	if compressed {
 		mesg.Header |= (localMesgNum << proto.CompressedBitShift)
 	} else {
@@ -506,27 +496,25 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	return nil
 }
 
-func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) (ok bool) {
+func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	timestamp := mesg.FieldValueByNum(proto.FieldNumTimestamp).Uint32()
 	if timestamp == basetype.Uint32Invalid {
-		return false // not supported
+		return // not supported
 	}
-
 	if timestamp < uint32(typedef.DateTimeMin) {
-		return false
+		return
 	}
 
 	// The 5-bit time offset rolls over every 32 seconds, it is necessary that the difference
 	// between timestamp and timestamp reference be measured less than 32 seconds apart.
 	if (timestamp - e.timestampReference) > proto.CompressedTimeMask {
 		e.timestampReference = timestamp
-		return false // Rollover event occurs, keep it as it is.
+		return // Rollover event occurs, keep it as it is.
 	}
 
 	timeOffset := byte(timestamp & proto.CompressedTimeMask)
 	mesg.Header = proto.MesgCompressedHeaderMask | timeOffset
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
-	return true
 }
 
 func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
@@ -565,15 +553,12 @@ func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefini
 
 func (e *Encoder) encodeCRC() error {
 	b := binary.LittleEndian.AppendUint16(e.buf[:0], e.crc16.Sum16())
-
 	n, err := e.w.Write(b)
 	e.n += int64(n)
 	if err != nil {
 		return fmt.Errorf("write crc: %w", err)
 	}
-
 	e.crc16.Reset()
-
 	return nil
 }
 
@@ -619,20 +604,18 @@ func (e *Encoder) encodeWithDirectUpdateStrategyWithContext(ctx context.Context,
 }
 
 func (e *Encoder) calculateDataSizeWithContext(ctx context.Context, fit *proto.FIT) error {
-	n := e.n
-	w := e.w
+	n, w, crc16 := e.n, e.w, e.crc16
+	defer func() { e.n, e.w, e.crc16 = n, w, crc16 }()
 
-	e.w = io.Discard
-
+	e.w, e.crc16 = discard{}, discard{}
 	if err := e.encodeMessagesWithContext(ctx, fit.Messages); err != nil {
 		return fmt.Errorf("calculate data size: %w", err)
 	}
 
 	fit.FileHeader.DataSize = e.dataSize // update FileHeader's DataSize of the actual messages size
-	e.reset()
-
-	e.n = n
-	e.w = w
+	e.dataSize, e.timestampReference = 0, 0
+	e.localMesgNumLRU.Reset()
+	e.dataSizeCalculated = true
 
 	return nil
 }

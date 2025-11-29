@@ -688,6 +688,27 @@ func TestEncodeWithEarlyCheckStrategy(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("discard", func(t *testing.T) {
+		d := discard{}
+		d.Reset()
+		if d.Size() != 0 {
+			t.Fatal("size != zero")
+		}
+		if d.BlockSize() != 0 {
+			t.Fatal("block size != zero")
+		}
+		if d.Sum([]byte(nil)) != nil {
+			t.Fatal("sum not nil")
+		}
+		n, err := d.Write(make([]byte, 8))
+		if n != 8 && err != nil {
+			t.Fatal("n should be 10 and err should be nil")
+		}
+		if d.Sum16() != 0 {
+			t.Fatal("sum16 != 0")
+		}
+	})
 }
 
 func TestUpdateHeader(t *testing.T) {
@@ -1071,43 +1092,6 @@ func TestEncodeMessage(t *testing.T) {
 			}
 		})
 	}
-
-	// Tests that does not fit in test table:
-	t.Run("encode message with early check must place timestamp field back to its original index", func(t *testing.T) {
-		pivotTime := time.Now()
-		mesg := proto.Message{
-			Fields: []proto.Field{
-				factory.CreateField(mesgnum.Record, fieldnum.RecordHeartRate).WithValue(uint8(80)),
-				factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(pivotTime)),
-				factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16((166.0 + 500.0) * 5.0)),
-			},
-		}
-		expected := proto.Message{
-			Fields: append(mesg.Fields[:0:0], mesg.Fields...),
-		}
-
-		enc := New(io.Discard,
-			WithHeaderOption(HeaderOptionCompressedTimestamp, 0),
-			WithMessageValidator(fnValidateOK),
-			WithWriteBufferSize(0), // Direct write
-		)
-		enc.timestampReference = datetime.ToUint32(pivotTime)
-
-		err := enc.encodeMessage(&mesg)
-		if err != nil {
-			t.Fatalf("expected err: nil, got: %v", err)
-		}
-
-		if diff := cmp.Diff(mesg, expected,
-			cmp.Transformer("Message", func(m proto.Message) proto.Message {
-				m.Header = 0 // Clear
-				return m
-			}),
-			cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
-		); diff != "" {
-			t.Fatal(diff)
-		}
-	})
 }
 
 func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
@@ -1382,7 +1366,8 @@ func TestCompressTimestampInHeader(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(nil)
 			for j := range tc.mesgs {
-				compressed := enc.compressTimestampIntoHeader(&tc.mesgs[j])
+				enc.compressTimestampIntoHeader(&tc.mesgs[j])
+				compressed := (tc.mesgs[j].Header & proto.MesgCompressedHeaderMask) == proto.MesgCompressedHeaderMask
 				if compressed != tc.compresseds[j] {
 					t.Errorf("index: %d: expected compressed: %t, got: %t", j, tc.compresseds[j], compressed)
 				}
