@@ -805,7 +805,7 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingValue proto.Va
 		// e.g. speed (0) -> enhanced_speed (0).
 		val := vbits.Pull(component.Bits)
 		if val == 0 && len(components) > 1 {
-			break
+			continue
 		}
 
 		if component.Accumulate {

@@ -2144,6 +2144,19 @@ func TestExpandComponents(t *testing.T) {
 			},
 		},
 		{
+			name: "expand all non-zero component values if intermediate values are zero",
+			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(typedef.EventFrontGearChange),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00010002)),
+			}},
+			fieldsAfterExpansion: []proto.Field{
+				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(typedef.EventFrontGearChange),
+				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00010002)),
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(2), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGearNum).FieldBase, Value: proto.Uint8(1), IsExpandedField: true},
+			},
+		},
+		{
 			// Real world use case from "testdata/from_official_sdk/activity_poolswim_with_hr.csv"
 			// prior Hr message event_timestamp value: 3.6201171875 -> 3707
 			// event_timestamp_12:  "158|114|57|159|6|167|29|142|25|244|228|130"
