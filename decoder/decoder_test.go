@@ -2090,6 +2090,8 @@ func TestExpandComponents(t *testing.T) {
 				factory.CreateField(mesgnum.Event, fieldnum.EventData).WithValue(uint32(0x00000E08)),
 				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGearNum).FieldBase, Value: proto.Uint8(uint8(0x08)), IsExpandedField: true},
 				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventRearGear).FieldBase, Value: proto.Uint8(uint8(0x0E)), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGearNum).FieldBase, Value: proto.Uint8(uint8(0)), IsExpandedField: true},
+				{FieldBase: factory.CreateField(mesgnum.Event, fieldnum.EventFrontGear).FieldBase, Value: proto.Uint8(uint8(0)), IsExpandedField: true},
 			},
 		},
 		{
