@@ -722,29 +722,23 @@ func (d *Decoder) decodeFields(mesgDef *proto.MessageDefinition, mesg *proto.Mes
 			}
 		}
 
-		var (
-			baseType    = field.BaseType
-			profileType = field.Type
-			isArray     = field.Array
-		)
-
 		// Gracefully handle poorly encoded FIT file.
-		if fieldDef.Size < baseType.Size() {
-			baseType = basetype.Uint8
-			profileType = profile.Uint8
-			isArray = true
-			d.logField(mesg, fieldDef, "Size is less than expected. Fallback: decode as byte(s) and convert the value")
-		} else if fieldDef.Size > baseType.Size() && !field.Array && baseType != basetype.String {
+		if n := field.BaseType.Size(); fieldDef.Size < n {
+			d.logField(mesg, fieldDef, "Size is less than expected. Add zero-padding so the value can be safely decoded")
+			var buf [8]byte
+			if mesgDef.Architecture == proto.LittleEndian {
+				copy(buf[:n], b)
+			} else {
+				copy(buf[n-fieldDef.Size:n], b)
+			}
+			b = buf[:n]
+		} else if fieldDef.Size > field.BaseType.Size() && !field.Array && field.BaseType != basetype.String {
 			d.logField(mesg, fieldDef, "field.Array is false. Fallback: retrieve first array's value only")
 		}
 
-		field.Value, err = proto.UnmarshalValue(b, mesgDef.Architecture, baseType, profileType, isArray)
+		field.Value, err = proto.UnmarshalValue(b, mesgDef.Architecture, field.BaseType, field.Type, field.Array)
 		if err != nil {
 			return err
-		}
-
-		if baseType != field.BaseType { // Convert value
-			field.Value = convertBytesToValue(field.Value.SliceUint8(), mesgDef.Architecture, field.BaseType)
 		}
 
 		if field.Num == proto.FieldNumTimestamp && field.Value.Type() == proto.TypeUint32 {
@@ -902,20 +896,22 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 				fieldDesc.FitBaseTypeId, errInvalidBaseType)
 		}
 
-		var (
-			baseType    = fieldDesc.FitBaseTypeId
-			profileType = profile.ProfileType(baseType & basetype.BaseTypeNumMask)
-			isArray     = devFieldDef.Size > baseType.Size() && devFieldDef.Size%baseType.Size() == 0
-		)
-
 		// Gracefully handle poorly encoded FIT file.
-		if devFieldDef.Size < fieldDesc.FitBaseTypeId.Size() {
-			baseType = basetype.Uint8
-			profileType = profile.Uint8
-			isArray = true
+		if n := fieldDesc.FitBaseTypeId.Size(); devFieldDef.Size < n {
 			d.logDeveloperField(mesg, devFieldDef, fieldDesc.FitBaseTypeId,
-				"Size is less than expected. Fallback: decode as byte(s) and convert the value")
+				"Size is less than expected. Add zero-padding so the value can be safely decoded")
+
+			var buf [8]byte
+			if mesgDef.Architecture == proto.LittleEndian {
+				copy(buf[:n], b)
+			} else {
+				copy(buf[n-devFieldDef.Size:n], b)
+			}
+			b = buf[:n]
 		}
+
+		profileType := profile.ProfileType(fieldDesc.FitBaseTypeId & basetype.BaseTypeNumMask)
+		isArray := devFieldDef.Size > fieldDesc.FitBaseTypeId.Size() && devFieldDef.Size%fieldDesc.FitBaseTypeId.Size() == 0
 
 		// NOTE: It seems there is no standard on utilizing Array field to handle []string in developer fields.
 		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/355554/how-to-determine-developer-field-s-value-type-is-a-string-or-string
@@ -924,11 +920,7 @@ func (d *Decoder) decodeDeveloperFields(mesgDef *proto.MessageDefinition, mesg *
 		}
 
 		// SAFETY: Base type validity is checked. The only error is when base type is invalid.
-		val, _ := proto.UnmarshalValue(b, mesgDef.Architecture, baseType, profileType, isArray)
-
-		if baseType != fieldDesc.FitBaseTypeId { // Convert value
-			val = convertBytesToValue(val.SliceUint8(), mesgDef.Architecture, fieldDesc.FitBaseTypeId)
-		}
+		val, _ := proto.UnmarshalValue(b, mesgDef.Architecture, fieldDesc.FitBaseTypeId, profileType, isArray)
 
 		// NOTE: Decoder will not attempt to validate native data when both NativeMesgNum and NativeFieldNum are valid.
 		// Users need to handle this themselves due to the limited context available.
@@ -1072,46 +1064,6 @@ func convertUint32ToValue(val uint32, baseType basetype.BaseType) proto.Value {
 		return proto.Float64(float64(val))
 	}
 	return proto.Value{}
-}
-
-// convertBytesToValue converts val in the form of byte or []byte into target baseType.
-// This is used for casting value of bad encoded FIT files where value takes fewer bytes
-// than specified in profile. Example:
-//   - 1 byte but for uint16, should have been 2 bytes
-//   - 3 bytes but for uint32, should have been 4 bytes
-func convertBytesToValue(b []uint8, arch byte, baseType basetype.BaseType) proto.Value {
-	var value uint64
-	if arch == proto.LittleEndian {
-		for i := range b {
-			value |= uint64(b[i]) << (i * 8)
-		}
-	} else {
-		n := len(b) - 1
-		for i := range b {
-			value |= uint64(b[i]) << ((n - i) * 8)
-		}
-	}
-
-	switch baseType { // only eligible for numeric type size > 1
-	case basetype.Sint16:
-		return proto.Int16(int16(value))
-	case basetype.Uint16, basetype.Uint16z:
-		return proto.Uint16(uint16(value))
-	case basetype.Sint32:
-		return proto.Int32(int32(value))
-	case basetype.Uint32, basetype.Uint32z:
-		return proto.Uint32(uint32(value))
-	case basetype.Sint64:
-		return proto.Int64(int64(value))
-	case basetype.Uint64, basetype.Uint64z:
-		return proto.Uint64(value)
-	case basetype.Float32:
-		return proto.Float32(float32(value))
-	case basetype.Float64:
-		return proto.Float64(float64(value))
-	default:
-		return proto.SliceUint8(b)
-	}
 }
 
 // valueAppend appends elem into slice. Elem must be has type element of
