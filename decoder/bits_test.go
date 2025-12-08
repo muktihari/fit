@@ -21,47 +21,47 @@ func TestMakeBits(t *testing.T) {
 	}{
 		{
 			value:    proto.Int8(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 8}, ok: true,
 		},
 		{
 			value:    proto.Uint8(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 8}, ok: true,
 		},
 		{
 			value:    proto.Int16(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 16}, ok: true,
 		},
 		{
 			value:    proto.Uint16(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 16}, ok: true,
 		},
 		{
 			value:    proto.Int32(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.Uint32(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.Int64(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 64}, ok: true,
 		},
 		{
 			value:    proto.Uint64(10),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 64}, ok: true,
 		},
 		{
 			value:    proto.Float32(10.5),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.Float64(12.9),
-			expected: bits{[32]uint64{12}}, ok: true,
+			expected: bits{[32]uint64{12}, 64}, ok: true,
 		},
 		{
 			value:    proto.SliceInt8([]int8{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 8}, ok: true,
 		},
 		{
 			value: proto.SliceUint8(func() []uint8 {
@@ -70,11 +70,11 @@ func TestMakeBits(t *testing.T) {
 				b = binary.LittleEndian.AppendUint64(b, 15)
 				return b
 			}()),
-			expected: bits{[32]uint64{10, 15}}, ok: true,
+			expected: bits{[32]uint64{10, 15}, 128}, ok: true,
 		},
 		{
 			value:    proto.SliceInt16([]int16{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 16}, ok: true,
 		},
 		{
 			value: proto.SliceUint16([]uint16{10, 25, 55, 11, 12, 13, 14, 15}),
@@ -96,31 +96,35 @@ func TestMakeBits(t *testing.T) {
 					b = binary.LittleEndian.AppendUint16(b, 15)
 					return binary.LittleEndian.Uint64(b)
 				}(),
-			}},
+			}, (16 * 8)},
 		},
 		{
 			value:    proto.SliceInt32([]int32{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.SliceUint32([]uint32{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.SliceInt64([]int64{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 64}, ok: true,
 		},
 		{
 			value:    proto.SliceUint64([]uint64{10}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 64}, ok: true,
 		},
 		{
 			value:    proto.SliceFloat32([]float32{10.5}),
-			expected: bits{[32]uint64{10}}, ok: true,
+			expected: bits{[32]uint64{10}, 32}, ok: true,
 		},
 		{
 			value:    proto.SliceFloat64([]float64{12.9}),
-			expected: bits{[32]uint64{12}}, ok: true,
+			expected: bits{[32]uint64{12}, 64}, ok: true,
+		},
+		{
+			value:    proto.SliceUint8(make([]uint8, 255)),
+			expected: bits{[32]uint64{}, 2040}, ok: true,
 		},
 		{
 			value:    proto.String("invalid"),
@@ -150,6 +154,7 @@ func TestBitsPull(t *testing.T) {
 		bits  byte
 		value uint32
 		vbits bits
+		ok    bool
 	}
 	tt := []struct {
 		name  string
@@ -158,48 +163,62 @@ func TestBitsPull(t *testing.T) {
 	}{
 		{
 			name:  "single value one pull",
-			vbits: bits{store: [32]uint64{20}},
-			pulls: []pull{{bits: 8, value: 20, vbits: bits{store: [32]uint64{0}}}},
+			vbits: bits{store: [32]uint64{20}, size: 8},
+			pulls: []pull{
+				{bits: 8, value: 20, vbits: bits{store: [32]uint64{0}}, ok: true},
+			},
 		},
 		{
 			name:  "single value multiple pull",
-			vbits: bits{store: [32]uint64{math.MaxUint16}},
+			vbits: bits{store: [32]uint64{math.MaxUint16}, size: 16},
 			pulls: []pull{
-				{bits: 8, value: 255, vbits: bits{store: [32]uint64{255}}},
-				{bits: 8, value: 255, vbits: bits{store: [32]uint64{0}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{255}, size: (16 - 8)}, ok: true},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{0}}, ok: true},
 			},
 		},
 		{
 			name:  "slice value one pull",
-			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
+			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}, size: (64 + 16)},
 			pulls: []pull{
-				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}, size: (64 + 16 - 8)}, ok: true},
 			},
 		},
 		{
 			name:  "slice value multiple pull",
-			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}},
+			vbits: bits{store: [32]uint64{math.MaxUint64, math.MaxUint16}, size: (64 + 16)},
 			pulls: []pull{
-				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}}},
-				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64}}},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64, 255}, size: (64 + 16 - 8)}, ok: true},
+				{bits: 8, value: 255, vbits: bits{store: [32]uint64{math.MaxUint64}, size: (64 + 16 - 8 - 8)}, ok: true},
 			},
 		},
 		{
-			name:  "single value one pull store is zero",
-			vbits: bits{store: [32]uint64{0}},
-			pulls: []pull{{bits: 8, value: 0, vbits: bits{store: [32]uint64{0}}}},
+			name:  "single value one pull when store's value is zero but have 8 bit size",
+			vbits: bits{store: [32]uint64{}, size: 8},
+			pulls: []pull{
+				{bits: 8, value: 0, vbits: bits{store: [32]uint64{0}}, ok: true},
+			},
+		},
+		{
+			name:  "single value one pull when store's value is zero with zero size",
+			vbits: bits{store: [32]uint64{}, size: 0},
+			pulls: []pull{
+				{bits: 8, value: 0, vbits: bits{store: [32]uint64{0}, size: 0}, ok: false},
+			},
 		},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			for _, p := range tc.pulls {
-				u32 := tc.vbits.Pull(p.bits)
+			for j, p := range tc.pulls {
+				u32, ok := tc.vbits.Pull(p.bits)
+				if ok != p.ok {
+					t.Fatalf("[%d] expected ok: %v, got: %v", j, p.ok, ok)
+				}
 				if u32 != p.value {
-					t.Fatalf("expected value: %v, got: %v", p.value, u32)
+					t.Fatalf("[%d] expected value: %v, got: %v", j, p.value, u32)
 				}
 				if tc.vbits != p.vbits {
-					t.Fatalf("expected bits:\n%v,\n got:\n%v", tc.vbits, p.vbits)
+					t.Fatalf("[%d] expected bits:\n%v,\n got:\n%v", j, tc.vbits, p.vbits)
 				}
 			}
 		})
