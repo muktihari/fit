@@ -51,35 +51,25 @@ func makeBits(value proto.Value) (v bits, ok bool) {
 	case proto.TypeFloat64:
 		v.store[0], v.size = uint64(value.Float64()), 64
 	case proto.TypeSliceInt8:
-		vs := value.SliceInt8()
-		v.store, v.size = storeFromSlice(vs, 1), uint64(len(vs))*8
+		bitsFromSlice(&v, value.SliceInt8(), 8)
 	case proto.TypeSliceUint8:
-		vs := value.SliceUint8()
-		v.store, v.size = storeFromSlice(vs, 1), uint64(len(vs))*8
+		bitsFromSlice(&v, value.SliceUint8(), 8)
 	case proto.TypeSliceInt16:
-		vs := value.SliceInt16()
-		v.store, v.size = storeFromSlice(vs, 2), uint64(len(vs))*16
+		bitsFromSlice(&v, value.SliceInt16(), 16)
 	case proto.TypeSliceUint16:
-		vs := value.SliceUint16()
-		v.store, v.size = storeFromSlice(vs, 2), uint64(len(vs))*16
+		bitsFromSlice(&v, value.SliceUint16(), 16)
 	case proto.TypeSliceInt32:
-		vs := value.SliceInt32()
-		v.store, v.size = storeFromSlice(vs, 4), uint64(len(vs))*32
+		bitsFromSlice(&v, value.SliceInt32(), 32)
 	case proto.TypeSliceUint32:
-		vs := value.SliceUint32()
-		v.store, v.size = storeFromSlice(vs, 4), uint64(len(vs))*32
+		bitsFromSlice(&v, value.SliceUint32(), 32)
 	case proto.TypeSliceInt64:
-		vs := value.SliceInt64()
-		v.store, v.size = storeFromSlice(vs, 8), uint64(len(vs))*64
+		bitsFromSlice(&v, value.SliceInt64(), 64)
 	case proto.TypeSliceUint64:
-		vs := value.SliceUint64()
-		v.store, v.size = storeFromSlice(vs, 8), uint64(len(vs))*64
+		bitsFromSlice(&v, value.SliceUint64(), 64)
 	case proto.TypeSliceFloat32:
-		vs := value.SliceFloat32()
-		v.store, v.size = storeFromSlice(vs, 4), uint64(len(vs))*32
+		bitsFromSlice(&v, value.SliceFloat32(), 32)
 	case proto.TypeSliceFloat64:
-		vs := value.SliceFloat64()
-		v.store, v.size = storeFromSlice(vs, 8), uint64(len(vs))*64
+		bitsFromSlice(&v, value.SliceFloat64(), 64)
 	default:
 		return v, false
 	}
@@ -90,18 +80,13 @@ type numeric interface {
 	int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64
 }
 
-// storeFromSlice creates value store from given s (slice of supported numeric type).
-func storeFromSlice[S []E, E numeric](s S, bitsize uint8) (store [32]uint64) {
-	var index, pos uint8
-	for len(s) > 0 && index < 32 {
-		store[index] |= uint64(s[0]) << (pos * 8)
-		pos += bitsize
-		if pos == 8 {
-			index, pos = index+1, 0
-		}
-		s = s[1:]
+// bitsFromSlice creates bits value from given s (slice of supported numeric type).
+func bitsFromSlice[S []E, E numeric](v *bits, s S, bitsize int) {
+	for i := range s { // SAFETY: Decoder guarantees s <= 2040 bits.
+		x := i * bitsize
+		v.store[x>>6] |= uint64(s[i]) << (x & 63)
 	}
-	return store
+	v.size = uint64(len(s) * bitsize)
 }
 
 // Pull retrieves a value of the specified bit size from the value store and

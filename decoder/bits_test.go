@@ -134,6 +134,78 @@ func TestMakeBits(t *testing.T) {
 			value:    proto.Value{},
 			expected: bits{}, ok: false,
 		},
+		{
+			value:    proto.SliceUint8(make([]byte, 256)),
+			expected: bits{store: [32]uint64{0}, size: 2048},
+			ok:       true,
+		},
+		{
+			value: func() proto.Value {
+				x := make([]byte, 256)
+				for i := range x {
+					x[i] = 255
+				}
+				return proto.SliceUint8(x)
+			}(),
+			expected: bits{
+				store: func() (x [32]uint64) {
+					for i := range x {
+						x[i] = math.MaxUint64
+					}
+					return
+				}(),
+				size: 2048,
+			},
+			ok: true,
+		},
+		{
+			value: func() proto.Value {
+				x := make([]byte, 255)
+				for i := range x {
+					x[i] = 255
+				}
+				return proto.SliceUint8(x)
+			}(),
+			expected: bits{
+				store: func() (x [32]uint64) {
+					for i := range x {
+						x[i] = math.MaxUint64
+					}
+					x[31] >>= 8
+					return
+				}(),
+				size: 2040,
+			},
+			ok: true,
+		},
+		{
+			value:    proto.SliceUint64(make([]uint64, 32)),
+			expected: bits{store: [32]uint64{0}, size: 2048},
+			ok:       true,
+		},
+		{
+			value:    proto.SliceUint16(append(make([]uint16, 4), 123)),
+			expected: bits{store: [32]uint64{0, 123, 0, 0}, size: 80},
+			ok:       true,
+		},
+		{
+			value: proto.SliceUint16([]uint16{1, 2, 3, 4, 5, 6, 7, 8}),
+			expected: bits{store: [32]uint64{
+				1 | (2 << 16) | (3 << 32) | (4 << 48),
+				5 | (6 << 16) | (7 << 32) | (8 << 48),
+			}, size: 128},
+			ok: true,
+		},
+		{
+			value: proto.SliceUint32([]uint32{1, 2, 3, 4, 5, 6, 7, 8}),
+			expected: bits{store: [32]uint64{
+				1 | (2 << 32),
+				3 | (4 << 32),
+				5 | (6 << 32),
+				7 | (8 << 32),
+			}, size: 256},
+			ok: true,
+		},
 	}
 
 	for i, tc := range tt {
