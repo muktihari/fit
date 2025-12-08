@@ -1958,6 +1958,68 @@ func TestDecodeFields(t *testing.T) {
 			err:  nil,
 		},
 		{
+			name: "decode fields field def's size 2 < 4 size of uint32 (Big-Endian)",
+			r: fnReader(func(b []byte) (n int, err error) {
+				return copy(b, []byte{1, 1}), nil // 257: []byte{0,0,1,1} in Big-Endian
+			}),
+			mesgdef: &proto.MessageDefinition{
+				Header:       proto.MesgDefinitionMask,
+				MesgNum:      68,
+				Architecture: proto.BigEndian,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      1,
+						Size:     2,
+						BaseType: basetype.Uint32,
+					},
+				},
+			},
+			validateFn: func(mesg proto.Message) error {
+				if mesg.Fields[0].Value.Type() != proto.TypeUint32 {
+					return fmt.Errorf("expected proto value type: %s, got: %s",
+						proto.TypeUint32, mesg.Fields[0].Value.Type(),
+					)
+				}
+				if mesg.Fields[0].Value.Uint32() != 257 {
+					return fmt.Errorf("expected value: 1, got: %d", mesg.Fields[0].Value.Any())
+				}
+				return nil
+			},
+			opts: []Option{WithLogWriter(io.Discard)},
+			err:  nil,
+		},
+		{
+			name: "decode fields field def's size 5 < 8 size of uint64 (Big-Endian)",
+			r: fnReader(func(b []byte) (n int, err error) {
+				return copy(b, []byte{8, 9, 10, 11, 12}), nil // 34511391500: []uint8{8, 9, 10, 11, 12}
+			}),
+			mesgdef: &proto.MessageDefinition{
+				Header:       proto.MesgDefinitionMask,
+				MesgNum:      68,
+				Architecture: proto.BigEndian,
+				FieldDefinitions: []proto.FieldDefinition{
+					{
+						Num:      1,
+						Size:     5,
+						BaseType: basetype.Uint64,
+					},
+				},
+			},
+			validateFn: func(mesg proto.Message) error {
+				if mesg.Fields[0].Value.Type() != proto.TypeUint64 {
+					return fmt.Errorf("expected proto value type: %s, got: %s",
+						proto.TypeUint32, mesg.Fields[0].Value.Type(),
+					)
+				}
+				if mesg.Fields[0].Value.Uint64() != 34511391500 {
+					return fmt.Errorf("expected value: 1, got: %d", mesg.Fields[0].Value.Any())
+				}
+				return nil
+			},
+			opts: []Option{WithLogWriter(io.Discard)},
+			err:  nil,
+		},
+		{
 			name: "decode fields field def's size 2 < 4 size of uint32",
 			r: func() io.Reader {
 				mesg := proto.Message{
@@ -2472,6 +2534,45 @@ func TestDecodeDeveloperFields(t *testing.T) {
 			},
 		},
 		{
+			name: "decode developer field, devField def's size 3 < 4 size of uint32 ",
+			r: fnReader(func(b []byte) (n int, err error) {
+				return copy(b, []byte{10, 11, 12}), nil // 658188: []uint8{0, 10, 11, 12}, nil
+			}),
+			fieldDescription: mesgdef.NewFieldDescription(
+				&proto.Message{Num: mesgnum.FieldDescription, Fields: []proto.Field{
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Heart Rate"),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordHeartRate)),
+					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint32)),
+				}},
+			),
+			mesgDef: &proto.MessageDefinition{
+				Header:       proto.MesgDefinitionMask,
+				MesgNum:      mesgnum.Record,
+				Architecture: proto.BigEndian,
+				DeveloperFieldDefinitions: []proto.DeveloperFieldDefinition{
+					{
+						Num:                0,
+						DeveloperDataIndex: 0,
+						Size:               3,
+					},
+				},
+			},
+			validateFn: func(mesg proto.Message) error {
+				if mesg.DeveloperFields[0].Value.Type() != proto.TypeUint32 {
+					return fmt.Errorf("expected proto value type: %s, got: %s",
+						proto.TypeUint32, mesg.DeveloperFields[0].Value.Type(),
+					)
+				}
+				if mesg.DeveloperFields[0].Value.Uint32() != 658188 {
+					return fmt.Errorf("expected value: 658188, got: %d", mesg.DeveloperFields[0].Value.Any())
+				}
+				return nil
+			},
+		},
+		{
 			name: "decode developer fields field description has invalid basetype",
 			r:    fnReaderOK,
 			fieldDescription: mesgdef.NewFieldDescription(
@@ -2805,94 +2906,6 @@ func TestConvertUint32ToValue(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %d -> %s", i, tc.value, tc.baseType), func(t *testing.T) {
 			val := convertUint32ToValue(tc.value, tc.baseType)
-			if diff := cmp.Diff(val, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
-			); diff != "" {
-				t.Fatal(diff)
-			}
-		})
-	}
-}
-
-func TestConvertBytesToValue(t *testing.T) {
-	tt := []struct {
-		value    []uint8
-		arch     byte
-		baseType basetype.BaseType
-		expected proto.Value
-	}{
-		{
-			value:    []uint8{1},
-			baseType: basetype.Uint8,
-			expected: proto.SliceUint8([]uint8{1}),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Sint16,
-			expected: proto.Int16(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Uint16,
-			expected: proto.Uint16(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Sint32,
-			expected: proto.Int32(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Uint32,
-			expected: proto.Uint32(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Sint64,
-			expected: proto.Int64(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Uint64,
-			expected: proto.Uint64(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Float32,
-			expected: proto.Float32(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.Float64,
-			expected: proto.Float64(1),
-		},
-		{
-			value:    []uint8{1},
-			baseType: basetype.String,
-			expected: proto.SliceUint8([]uint8{1}),
-		},
-		{
-			value:    []uint8{1, 1},
-			baseType: basetype.Uint32,
-			expected: proto.Uint32(257),
-		},
-		{
-			value:    []uint8{1, 2, 3},
-			arch:     proto.LittleEndian,
-			baseType: basetype.Uint32,
-			expected: proto.Uint32(3<<16 | 2<<8 | 1),
-		},
-		{
-			value:    []uint8{1, 2, 3},
-			arch:     proto.BigEndian,
-			baseType: basetype.Uint32,
-			expected: proto.Uint32(3 | 2<<8 | 1<<16),
-		},
-	}
-
-	for i, tc := range tt {
-		t.Run(fmt.Sprintf("[%d] %v %v", i, tc.value, tc.expected.Any()), func(t *testing.T) {
-			val := convertBytesToValue(tc.value, tc.arch, tc.baseType)
 			if diff := cmp.Diff(val, tc.expected,
 				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
