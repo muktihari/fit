@@ -787,12 +787,8 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingValue proto.Va
 		return
 	}
 
-	var componentField proto.Field
 	for i := range components {
 		component := &components[i]
-
-		componentField = d.options.factory.CreateField(mesg.Num, component.FieldNum)
-		componentField.IsExpandedField = true
 
 		// A component can only have max 32 bits value.
 		val, ok := vbits.Pull(component.Bits)
@@ -803,6 +799,9 @@ func (d *Decoder) expandComponents(mesg *proto.Message, containingValue proto.Va
 		if component.Accumulate {
 			val = d.accumulator.Accumulate(mesg.Num, component.FieldNum, val, component.Bits)
 		}
+
+		componentField := d.options.factory.CreateField(mesg.Num, component.FieldNum)
+		componentField.IsExpandedField = true
 
 		scaledValue := float64(val)/component.Scale - component.Offset
 		val = uint32((scaledValue + componentField.Offset) * componentField.Scale)
