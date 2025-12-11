@@ -129,18 +129,12 @@ func WithHeaderOption(headerOption HeaderOption, localMessageType byte) Option {
 	return func(o *options) {
 		switch headerOption {
 		case HeaderOptionNormal:
-			if localMessageType > 15 {
-				localMessageType = 15
-			}
+			o.headerOption = headerOption
+			o.localMessageType = min(localMessageType, 15)
 		case HeaderOptionCompressedTimestamp:
-			if localMessageType > 3 {
-				localMessageType = 3
-			}
-		default:
-			return
+			o.headerOption = headerOption
+			o.localMessageType = min(localMessageType, 3)
 		}
-		o.headerOption = headerOption
-		o.localMessageType = localMessageType
 	}
 }
 
