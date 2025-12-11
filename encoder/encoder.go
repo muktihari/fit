@@ -110,7 +110,7 @@ func WithBigEndian() Option {
 	return func(o *options) { o.endianness = proto.BigEndian }
 }
 
-// WithHeaderOption directs the Encoder to use this option instead of default HeaderOptionNormal with local message type zero.
+// WithHeaderOption directs the Encoder to use this option instead of default HeaderOptionNormal with local message type zero (0).
 //
 //   - If HeaderOptionNormal is selected, valid local message type value is 0-15; invalid values will be treated as 15.
 //
@@ -121,9 +121,12 @@ func WithBigEndian() Option {
 //
 //   - Otherwise, no change will be made and the Encoder will use default values.
 //
-// NOTE: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message type.
-// For instance, embedded devices may only support decoding data from local message type 0. Additionally,
-// multiple local message types should be avoided in file types like settings, where messages of the same type
+// To minimize file size, use the highest supported local message type value, which produces the most compact output.
+//
+// To minimize the required RAM for decoding on embedded devices, it's recommended to use a minimal number of local message type.
+// Some embedded devices may only support decoding data from local message type zero (0).
+//
+// Additionally, multiple local message types should be avoided in file types like settings, where messages of the same type
 // can be grouped together.
 func WithHeaderOption(headerOption HeaderOption, localMessageType byte) Option {
 	return func(o *options) {

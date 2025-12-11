@@ -40,11 +40,10 @@ import (
     "os"
 
     "github.com/muktihari/fit/decoder"
-    "github.com/muktihari/fit/profile/untyped/fieldnum"
 )
 
 func main() {
-    f, err := os.Open("Activity.fit")
+    f, err := os.Open("triathlon_summary_last.fit")
     if err != nil {
         panic(err)
     }
@@ -59,14 +58,24 @@ func main() {
 
     fmt.Printf("FileHeader DataSize: %d\n", fit.FileHeader.DataSize)
     fmt.Printf("Messages count: %d\n", len(fit.Messages))
-    // FileId is always the first message; 4 = activity
-    fmt.Printf("File Type: %v\n",
-        fit.Messages[0].FieldValueByNum(fieldnum.FileIdType).Any())
+    
+    fmt.Printf("\nMessage: %v\n", fit.Messages[0].Num)
+    for _, v := range fit.Messages[0].Fields {
+        fmt.Printf("  %s: %v (%v)\n", v.Name, v.Value, v.BaseType)
+    }
 
     // Output:
-    // FileHeader DataSize: 94080
-    // Messages count: 3611
-    // File Type: 4
+    // FileHeader DataSize: 273638
+    // Messages count: 12136
+    // 
+    // Message: file_id
+    //   serial_number: 3420897194 (uint32z)
+    //   time_created: 1062594924 (uint32)   # 2023-09-02 13:15:24 +0000 UTC
+    //   unknown: 4294967295 (uint32)
+    //   manufacturer: 1 (uint16)            # garmin
+    //   product: 3992 (uint16)              # fr255 (Forerunner 255)
+    //   number: 65535 (uint16)
+    //   type: 4 (enum)                      # activity
 }
 ```
 
@@ -833,6 +842,7 @@ package main
 import (
     "bufio"
     "encoding/binary"
+    "fmt"
     "os"
 
     "github.com/muktihari/fit/decoder"
@@ -852,11 +862,8 @@ func main() {
     _, err = dec.Decode(bufio.NewReader(f), func(flag decoder.RawFlag, b []byte) error {
         switch flag {
         case decoder.RawFlagFileHeader:
-            if err := proto.Validate(b[1]); err != nil {
-                return err
-            }
             if binary.LittleEndian.Uint32(b[4:8]) == 0 {
-                return decoder.ErrDataSizeZero
+                return fmt.Errorf("invalid data size: %w", decoder.ErrNotFITFile)
             }
             if b[0] == 14 {
                 hash16.Write(b[:12])
@@ -943,7 +950,7 @@ func main() {
 Note:
 
 - By default, Encoder will use protocol version in FileHeader for each FIT file, if it's not specified, it will use protocol version 1.0 (proto.V1). If you want to use specific protocol version for the entire encoding regardless the value in FileHeader, please use this Encode Option: WithProtocolVersion. See [Available Encode Options](#Available-Encode-Options)
-- Encoder already implements efficient io.Writer buffering, DO NOT wrap io.Writer (such as \*os.File) with buffer such as using \*bufio.Writer; Doing so will greatly reduce performance.
+- Encoder already implements efficient io.Writer buffering, DO NOT wrap a writer (such as \*os.File) with buffer such as using \*bufio.Writer. Not only this will make it buffering twice, but also preventing encoder to optimize the encoding process. Encoder will encode faster if given writer implements either io.WriteSeeker or io.WriterAt compared to a writer which only implement io.Writer. The bufio.Writer warps a writer in a way that preventing us to access certain functionality.
 
 ### Encode Protocol Messages
 
@@ -1222,7 +1229,7 @@ func main() {
    enc := encoder.New(f, encoder.WithBigEndian())
    ```
 
-1. **WithHeaderOption**: directs the Encoder to use this option instead of default HeaderOptionNormal and local message type zero.
+1. **WithHeaderOption**: directs the Encoder to use this option instead of default HeaderOptionNormal and local message type zero (0).
 
    - If HeaderOptionNormal is selected, valid local message type value is 0-15; invalid values will be treated as 15.
    - If HeaderOptionCompressedTimestamp is selected, valid local message type value is 0-3; invalid values will be treated as 3.
@@ -1231,9 +1238,12 @@ func main() {
 
    - Otherwise, no change will be made and the Encoder will use default values.
 
-   NOTE: To minimize the required RAM for decoding, it's recommended to use a minimal number of local message type.
-   For instance, embedded devices may only support decoding data from local message type 0. Additionally,
-   multiple local message types should be avoided in file types like settings, where messages of the same type
+   To minimize file size, use the highest supported local message type value, which produces the most compact output.
+
+   To minimize the required RAM for decoding on embedded devices, it's recommended to use a minimal number of local message type. 
+   Some embedded devices may only support decoding data from local message type zero (0).
+
+   Additionally, multiple local message types should be avoided in file types like settings, where messages of the same type
    can be grouped together.
 
    Example:
@@ -1320,10 +1330,7 @@ import (
     "github.com/muktihari/fit/profile/filedef"
 )
 
-var (
-    pool    = sync.Pool{New: func() any { return encoder.New(nil) }}
-    bufpool = sync.Pool{New: func() any { return &bufferAt{new(bytes.Buffer)} }}
-)
+var pool = sync.Pool{New: func() any { return encoder.New(nil) }}
 
 func main() {
     srv := http.NewServeMux()
@@ -1331,15 +1338,9 @@ func main() {
         enc := pool.Get().(*encoder.Encoder)
         defer pool.Put(enc)  // put encoder back to the pool
 
-        // Inmem writer for faster encoding since w does not
-        // implement io.WriterAt or io.WriteSeeker.
-        buf := bufpool.Get().(*bufferAt)
-        defer bufpool.Put(buf)
-        buf.Reset()
-
         // Assign writer and options just like
         // when using encoder.New().
-        enc.Reset(buf)
+        enc.Reset(w)
 
         // Assume the data is in filedef.Activity JSON format encoding.
         var activity filedef.Activity
@@ -1355,22 +1356,8 @@ func main() {
             writeError(w, err)
             return
         }
-
-        if _, err := buf.WriteTo(w); err != nil {
-            writeError(w, err)
-            return
-        }
     })
     log.Fatal(http.ListenAndServe(":8080", srv))
-}
-
-// bufferAt is a wrapper to enable io.WriterAt functionality.
-type bufferAt struct{ *bytes.Buffer }
-
-var _ io.WriterAt = (*bufferAt)(nil)
-
-func (b *bufferAt) WriteAt(p []byte, off int64) (int, error) {
-    return copy(b.Bytes()[off:], p), nil
 }
 
 func writeError(w http.ResponseWriter, err error) {
