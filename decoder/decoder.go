@@ -209,13 +209,9 @@ func (d *Decoder) Reset(r io.Reader, opts ...Option) {
 	d.releaseTemporaryObjects()
 
 	// Reuse listeners' slices
-	for i := range d.options.mesgListeners {
-		d.options.mesgListeners[i] = nil // avoid memory leaks
-	}
+	clear(d.options.mesgListeners) // avoid memory leaks
 	mesgListeners := d.options.mesgListeners[:0]
-	for i := range d.options.mesgDefListeners {
-		d.options.mesgDefListeners[i] = nil // avoid memory leaks
-	}
+	clear(d.options.mesgDefListeners) // avoid memory leaks
 	mesgDefListeners := d.options.mesgDefListeners[:0]
 
 	d.options = defaultOptions()
@@ -239,22 +235,20 @@ func (d *Decoder) reset() {
 	d.messages = nil
 	d.crc = 0
 	d.fileId = nil
+	for i := range d.localMessageDefinitions {
+		d.localMessageDefinitions[i].Header = 0
+	}
+	clear(d.developerDataIndexSeen[:])
 }
 
 // releaseTemporaryObjects releases objects that being created during a single decode process
 // by stops referencing those objects so it can be garbage-collected on next GC cycle.
 func (d *Decoder) releaseTemporaryObjects() {
-	for i := range d.localMessageDefinitions {
-		d.localMessageDefinitions[i].Header = 0
-	}
-	d.fieldsArray = [255]proto.Field{}
-	d.developerFieldsArray = [255]proto.DeveloperField{}
-	d.fileId = nil
+	clear(d.fieldsArray[:])
+	clear(d.developerFieldsArray[:])
 	d.messages = nil
-	d.developerDataIndexSeen = [4]uint64{}
-	for i := range d.fieldDescriptions {
-		d.fieldDescriptions[i] = nil
-	}
+	d.fileId = nil
+	clear(d.fieldDescriptions)
 	d.fieldDescriptions = d.fieldDescriptions[:0]
 }
 
