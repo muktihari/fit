@@ -367,7 +367,7 @@ func TestPeekFileHeader(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(*fileHeader, tc.fileHeader); diff != "" {
+			if diff := cmp.Diff(fileHeader, tc.fileHeader); diff != "" {
 				t.Fatal(diff)
 			}
 		})

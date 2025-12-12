@@ -331,11 +331,11 @@ func (d *Decoder) discardMessages() (err error) {
 // PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader.
 //
 // If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
-func (d *Decoder) PeekFileHeader() (*proto.FileHeader, error) {
+func (d *Decoder) PeekFileHeader() (proto.FileHeader, error) {
 	if d.err = d.decodeFileHeaderOnce(); d.err != nil {
-		return nil, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
+		return proto.FileHeader{}, fmt.Errorf("decode file header [byte pos: %d]: %w", d.n, d.err)
 	}
-	return &d.fileHeader, nil
+	return d.fileHeader, nil
 }
 
 // PeekFileId decodes only up to FileId message without decoding the whole reader.
