@@ -22,7 +22,7 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Session struct {
-	Timestamp                     time.Time // Units: s; Sesson end time.
+	Timestamp                     time.Time // Units: s
 	StartTime                     time.Time
 	TimeInHrZone                  []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInSpeedZone               []uint32 // Array: [N]; Scale: 1000; Units: s
@@ -2262,7 +2262,7 @@ func (m *Session) SetMessageIndex(v typedef.MessageIndex) *Session {
 
 // SetTimestamp sets Timestamp value.
 //
-// Units: s; Sesson end time.
+// Units: s
 func (m *Session) SetTimestamp(v time.Time) *Session {
 	m.Timestamp = v
 	return m
