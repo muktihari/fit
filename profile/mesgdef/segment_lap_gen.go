@@ -22,7 +22,7 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentLap struct {
-	Timestamp                   time.Time // Units: s; Lap end time.
+	Timestamp                   time.Time // Units: s
 	StartTime                   time.Time
 	Name                        string
 	TimeInHrZone                []uint32 // Array: [N]; Scale: 1000; Units: s
@@ -1363,7 +1363,7 @@ func (m *SegmentLap) SetMessageIndex(v typedef.MessageIndex) *SegmentLap {
 
 // SetTimestamp sets Timestamp value.
 //
-// Units: s; Lap end time.
+// Units: s
 func (m *SegmentLap) SetTimestamp(v time.Time) *SegmentLap {
 	m.Timestamp = v
 	return m

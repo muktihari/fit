@@ -17,7 +17,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21171] }
+func _() { _ = [1]struct{}{}[profile.Version-21188] }
 
 func TypedefString(pt profile.ProfileType, v proto.Value) string {
 	switch pt {
@@ -443,6 +443,8 @@ func TypedefString(pt profile.ProfileType, v proto.Value) string {
 		return typedef.TapSensitivity(v.Uint8()).String()
 	case profile.RadarThreatLevelType:
 		return typedef.RadarThreatLevelType(v.Uint8()).String()
+	case profile.SleepDisruptionSeverity:
+		return typedef.SleepDisruptionSeverity(v.Uint8()).String()
 	case profile.MaxMetSpeedSource:
 		return typedef.MaxMetSpeedSource(v.Uint8()).String()
 	case profile.MaxMetHeartRateSource:
