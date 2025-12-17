@@ -352,3 +352,19 @@ Thank you, [contributors](https://github.com/muktihari/fit/graphs/contributors)!
 ## Sponsorship
 
 If you find this project helpful, please consider giving it a GitHub star. You can also contribute to the development of this project by [becoming a sponsor](https://github.com/sponsors/muktihari). Every bit of support, even just buying me a coffee, truly means a lot. Thank you!
+
+## License
+
+This library is licensed under the [BSD 3-Clause License](./LICENSE).
+
+The file `internal/cmd/fitgen/Profile.xlsx` and all files under `testdata/from_official_sdk/*` are licensed under the [FIT SDK License].
+These files are used for code generation and testing only.
+
+The FIT Protocol and FIT file format are proprietary to Garmin and are licensed under the [FIT Protocol License].
+Use of this library may require compliance with the [FIT Protocol License].
+
+This project is not affiliated with or endorsed by Garmin.
+It is provided "as is" without warranty. Users are responsible for complying with all applicable licenses and laws.
+
+[FIT Protocol License]: https://www.thisisant.com/developer/ant/licensing/flexible-and-interoperable-data-transfer-fit-protocol-license
+[FIT SDK License]: ./LICENSE-FIT-SDK "https://developer.garmin.com/fit/download"
