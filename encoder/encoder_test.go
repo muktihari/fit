@@ -1086,10 +1086,6 @@ func TestEncodeMessage(t *testing.T) {
 			if (tc.mesg.Header & proto.DevDataMask) == proto.DevDataMask {
 				t.Fatalf("message header should not contain Developer Data Flag")
 			}
-
-			if enc.mesgDef.Architecture != tc.endianness {
-				t.Fatalf("expected endianness: %d, got: %d", tc.endianness, enc.mesgDef.Architecture)
-			}
 		})
 	}
 }
@@ -1389,7 +1385,7 @@ func TestCompressTimestampInHeader(t *testing.T) {
 	}
 }
 
-func TestNewMessageDefinition(t *testing.T) {
+func TestMarshalMessageDefinition(t *testing.T) {
 	tt := []struct {
 		name    string
 		mesg    *proto.Message
@@ -1556,16 +1552,9 @@ func TestNewMessageDefinition(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			enc := New(nil)
 			enc.options.endianness = tc.arch
-			mesgDef := enc.newMessageDefinition(tc.mesg)
-			if diff := cmp.Diff(mesgDef, tc.mesgDef,
-				cmp.Transformer("DeveloperFieldDefinitions",
-					func(devFields []proto.DeveloperFieldDefinition) []proto.DeveloperFieldDefinition {
-						if len(devFields) == 0 {
-							return nil
-						}
-						return devFields
-					}),
-			); diff != "" {
+			mesgDef := enc.marshalMessageDefinition(tc.mesg)
+			expected, _ := tc.mesgDef.MarshalAppend(nil)
+			if diff := cmp.Diff(expected, mesgDef); diff != "" {
 				t.Fatal(diff)
 			}
 		})
