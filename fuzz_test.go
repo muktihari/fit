@@ -52,12 +52,8 @@ func generateSeedCorpus(f *testing.F) {
 
 		dec := decoder.New(file, decoder.WithIgnoreChecksum())
 
-		mv := encoder.NewMessageValidator(
-			encoder.ValidatorWithPreserveInvalidValues())
-
 		buf := &bufferAt{new(bytes.Buffer)}
 		enc := encoder.New(buf,
-			encoder.WithMessageValidator(mv),
 			encoder.WithProtocolVersion(proto.V2),
 		)
 
@@ -88,12 +84,8 @@ func FuzzDecodeEncodeRoundTrip(f *testing.F) {
 		r := bytes.NewReader(in)
 		dec := decoder.New(r, decoder.WithIgnoreChecksum())
 
-		mv := encoder.NewMessageValidator(
-			encoder.ValidatorWithPreserveInvalidValues())
-
 		buf := &bufferAt{new(bytes.Buffer)}
 		enc := encoder.New(buf,
-			encoder.WithMessageValidator(mv),
 			encoder.WithProtocolVersion(proto.V2),
 		)
 
