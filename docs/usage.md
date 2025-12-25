@@ -1178,35 +1178,9 @@ func main() {
 
 1. **WithMessageValidator**: directs the Encoder to use this message validator instead of the default one.
 
-   - Encode Invalid Values (default: Invalid values are omitted)
-
-     Example:
-
-     ```go
-     enc := encoder.New(f, encoder.WithMessageValidator(
-         encoder.NewMessageValidator(
-             encoder.ValidatorWithPreserveInvalidValues(),
-         )),
-     )
-     ```
-
-   - Validate Developer Field with custom Factory (default: factory.StandardFactory())
-
-     If Developer Field contains a valid NativeMesgNum and NativeFieldNum, the value should be treated as native value (scale, offset, etc shall apply). To be able to check Nativeness, we need to look up the message's field in the factory and only then we can validate it such as validating scale & offset of the value. By applying this option, user can now use their own Factory.
-
-     Example:
-
-     ```go
-     fac := factory.New()
-     /* fill manufacturer specific messages in fac */
-     enc := encoder.New(f, encoder.WithMessageValidator(
-         encoder.NewMessageValidator(
-             encoder.ValidatorWithFactory(fac),
-         )),
-     )
-     ```
-
-   - If you love to live dangerously, you can always bypass the message validator. It might speed up the encoding process, but be warned—it's prone to errors. So, only go for it if you know what you're doing!
+   - By default, we provide a minimalistic message validation process that handles common cases. You can always define your own message validation. 
+     For example, when Developer Field contains NativeMesgNum and NativeFieldNum, we let you handle validation as you see fit, since we have limited context about that process.
+     You can also bypass the message validator. It might speed up the encoding process, but be warned—it's prone to errors. So, only go for it if you know what you're doing!
 
    ```go
      // Define your own message validator, for example
