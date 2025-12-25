@@ -63,8 +63,6 @@ type Encoder struct {
 	// and will change every rollover event occurrence.
 	timestampReference uint32
 
-	mesgDef proto.MessageDefinition // Temporary message definition to reduce alloc.
-
 	// Dynamic-sized buffer for encoding, starting at 1536 bytes (see PR #415 and #416 for details).
 	// It starts small but grows as needed and may only grow when using Message's MarshalAppend.
 	buf []byte
@@ -180,10 +178,6 @@ func New(w io.Writer, opts ...Option) *Encoder {
 		protocolValidator: new(proto.Validator),
 		localMesgNumLRU:   new(lru),
 		buf:               make([]byte, 0, 1536),
-		mesgDef: proto.MessageDefinition{
-			FieldDefinitions:          make([]proto.FieldDefinition, 0, 255),
-			DeveloperFieldDefinitions: make([]proto.DeveloperFieldDefinition, 0, 255),
-		},
 	}
 	e.Reset(w, opts...)
 	return e
@@ -455,8 +449,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 		e.compressTimestampIntoHeader(mesg)
 	}
 
-	mesgDef := e.newMessageDefinition(mesg)
-	b, _ := mesgDef.MarshalAppend(e.buf[:0])
+	b := e.marshalMessageDefinition(mesg)
 	localMesgNum, isNewMesgDef := e.localMesgNumLRU.Put(b) // This might alloc memory since we need to copy the item.
 
 	b[0] |= localMesgNum // Update the message definition header.
@@ -478,7 +471,7 @@ func (e *Encoder) encodeMessage(mesg *proto.Message) (err error) {
 	}
 
 	// At this point, e.buf may grow. Re-assign e.buf in case slice has grown.
-	e.buf, err = mesg.MarshalAppend(e.buf[:0], mesgDef.Architecture)
+	e.buf, err = mesg.MarshalAppend(e.buf[:0], e.options.endianness)
 	if err != nil {
 		return fmt.Errorf("marshal message: %w", err)
 	}
@@ -514,38 +507,43 @@ func (e *Encoder) compressTimestampIntoHeader(mesg *proto.Message) {
 	mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
 }
 
-func (e *Encoder) newMessageDefinition(mesg *proto.Message) *proto.MessageDefinition {
-	e.mesgDef.Header = proto.MesgDefinitionMask
-	e.mesgDef.Reserved = 0
-	e.mesgDef.Architecture = e.options.endianness
-	e.mesgDef.MesgNum = mesg.Num
-	e.mesgDef.FieldDefinitions = e.mesgDef.FieldDefinitions[:0]
-	e.mesgDef.DeveloperFieldDefinitions = e.mesgDef.DeveloperFieldDefinitions[:0]
+func (e *Encoder) marshalMessageDefinition(mesg *proto.Message) []byte {
+	b := append(e.buf[:0],
+		proto.MesgDefinitionMask, // header
+		0,                        // reserved
+		e.options.endianness,     // architecture
+	)
 
+	if e.options.endianness == proto.LittleEndian {
+		b = binary.LittleEndian.AppendUint16(b, uint16(mesg.Num))
+	} else {
+		b = binary.BigEndian.AppendUint16(b, uint16(mesg.Num))
+	}
+
+	b = append(b, byte(len(mesg.Fields)))
 	for i := range mesg.Fields {
-		e.mesgDef.FieldDefinitions = append(e.mesgDef.FieldDefinitions,
-			proto.FieldDefinition{
-				Num:      mesg.Fields[i].Num,
-				Size:     byte(mesg.Fields[i].Value.Size()),
-				BaseType: mesg.Fields[i].BaseType,
-			})
+		b = append(b,
+			mesg.Fields[i].Num,
+			byte(mesg.Fields[i].Value.Size()),
+			byte(mesg.Fields[i].BaseType),
+		)
 	}
 
 	if len(mesg.DeveloperFields) == 0 {
-		return &e.mesgDef
+		return b
 	}
 
-	e.mesgDef.Header |= proto.DevDataMask
+	b[0] |= proto.DevDataMask
+	b = append(b, byte(len(mesg.DeveloperFields)))
 	for i := range mesg.DeveloperFields {
-		e.mesgDef.DeveloperFieldDefinitions = append(e.mesgDef.DeveloperFieldDefinitions,
-			proto.DeveloperFieldDefinition{
-				Num:                mesg.DeveloperFields[i].Num,
-				Size:               byte(mesg.DeveloperFields[i].Value.Size()),
-				DeveloperDataIndex: mesg.DeveloperFields[i].DeveloperDataIndex,
-			})
+		b = append(b,
+			mesg.DeveloperFields[i].Num,
+			byte(mesg.DeveloperFields[i].Value.Size()),
+			mesg.DeveloperFields[i].DeveloperDataIndex,
+		)
 	}
 
-	return &e.mesgDef
+	return b
 }
 
 func (e *Encoder) encodeCRC() error {
