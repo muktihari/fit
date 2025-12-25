@@ -242,7 +242,7 @@ func TestOptions(t *testing.T) {
 			expected: options{
 				localMessageType: 0,
 				endianness:       proto.LittleEndian,
-				messageValidator: NewMessageValidator(),
+				messageValidator: new(messageValidator),
 				writeBufferSize:  defaultWriteBufferSize,
 			},
 		},

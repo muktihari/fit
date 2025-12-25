@@ -22,7 +22,7 @@ import (
 )
 
 func TestNewStream(t *testing.T) {
-	mv := NewMessageValidator()
+	mv := new(messageValidator)
 	tt := []struct {
 		name            string
 		w               io.Writer

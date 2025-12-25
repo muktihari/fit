@@ -187,10 +187,9 @@ func BenchmarkEncodeWriterAt(b *testing.B) {
 }
 
 func BenchmarkReset(b *testing.B) {
-	mv := encoder.NewMessageValidator()
 	b.Run("benchmark New()", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			_ = encoder.New(nil, encoder.WithMessageValidator(mv))
+			_ = encoder.New(nil)
 		}
 	})
 	b.Run("benchmark Reset()", func(b *testing.B) {
@@ -199,7 +198,7 @@ func BenchmarkReset(b *testing.B) {
 		b.StartTimer()
 
 		for i := 0; i < b.N; i++ {
-			enc.Reset(nil, encoder.WithMessageValidator(mv))
+			enc.Reset(nil)
 		}
 	})
 }

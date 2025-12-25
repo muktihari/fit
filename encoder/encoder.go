@@ -190,16 +190,21 @@ func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	e.n = 0
 	e.lastFileHeaderPos = 0
 
+	oldmv := e.options.messageValidator
 	e.options = defaultOptions()
 	for i := range opts {
 		opts[i](&e.options)
 	}
 
-	e.w = newWriteBuffer(w, e.options.writeBufferSize)
-
 	if e.options.messageValidator == nil {
-		e.options.messageValidator = NewMessageValidator()
+		if _, ok := oldmv.(*messageValidator); ok {
+			e.options.messageValidator = oldmv // Reuse
+		} else {
+			e.options.messageValidator = new(messageValidator)
+		}
 	}
+
+	e.w = newWriteBuffer(w, e.options.writeBufferSize)
 
 	e.reset()
 

@@ -7,12 +7,10 @@ package encoder
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile"
 	"github.com/muktihari/fit/profile/basetype"
@@ -24,49 +22,8 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-func TestMessageValidatorOption(t *testing.T) {
-	fac := factory.New()
-	tt := []struct {
-		name    string
-		opts    []ValidatorOption
-		options validatorOptions
-	}{
-		{
-			name: "defaultValidatorOptions",
-			options: validatorOptions{
-				omitInvalidValues: true,
-				factory:           factory.StandardFactory(),
-			},
-		},
-		{
-			name: "with options",
-			opts: []ValidatorOption{
-				ValidatorWithPreserveInvalidValues(),
-				ValidatorWithFactory(fac),
-			},
-			options: validatorOptions{
-				omitInvalidValues: false,
-				factory:           fac,
-			},
-		},
-	}
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			mv := NewMessageValidator(tc.opts...).(*messageValidator)
-			if diff := cmp.Diff(mv.options, tc.options,
-				cmp.AllowUnexported(validatorOptions{}),
-				cmp.Transformer("factory", func(factory Factory) any {
-					return reflect.ValueOf(factory).Pointer()
-				}),
-			); diff != "" {
-				t.Fatal(diff)
-			}
-		})
-	}
-}
-
 func TestValidatorReset(t *testing.T) {
-	mv := NewMessageValidator().(*messageValidator)
+	mv := new(messageValidator)
 
 	mv.developerDataIndexSeen[0>>6] |= 1 << (0 & 63)
 	mv.fieldDescriptions = append(mv.fieldDescriptions, mesgdef.NewFieldDescription(nil))
@@ -137,12 +94,12 @@ func TestMessageValidatorValidate(t *testing.T) {
 			mesgs: []proto.Message{
 				{Num: mesgnum.Record, Fields: []proto.Field{
 					factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
-					func() proto.Field {
-						field := factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed)
-						field.IsExpandedField = true
-						field.Value = proto.Uint32(1000)
-						return field
-					}(),
+					{
+						FieldBase:       factory.CreateField(mesgnum.Record, fieldnum.RecordEnhancedSpeed).FieldBase,
+						IsExpandedField: true,
+						Value:           proto.Uint32(1000),
+					},
+					factory.CreateField(mesgnum.Record, fieldnum.RecordCadence).WithValue(uint8(110)),
 				}},
 			},
 		},
@@ -291,7 +248,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		{
 			name: "developer field value size exceed max allowed",
 			mesgValidator: func() MessageValidator {
-				mesgValidator := NewMessageValidator().(*messageValidator)
+				mesgValidator := new(messageValidator)
 				mesgValidator.developerDataIndexSeen[0>>6] |= 1 << (0 & 63)
 
 				fieldDescription := proto.Message{
@@ -366,35 +323,6 @@ func TestMessageValidatorValidate(t *testing.T) {
 				}},
 				{
 					Num: mesgnum.Record,
-					Fields: []proto.Field{
-						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
-					},
-					DeveloperFields: []proto.DeveloperField{
-						{
-							DeveloperDataIndex: 0,
-							Num:                0,
-							Value:              proto.Float64(6960.8),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "mesg contain developer field with native value scaled",
-			mesgs: []proto.Message{
-				{Num: mesgnum.DeveloperDataId, Fields: []proto.Field{
-					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdDeveloperDataIndex).WithValue(uint8(0)),
-					factory.CreateField(mesgnum.DeveloperDataId, fieldnum.DeveloperDataIdApplicationId).WithValue([]byte{0, 1, 2, 3}),
-				}},
-				{Num: mesgnum.FieldDescription, Fields: []proto.Field{
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionDeveloperDataIndex).WithValue(uint8(0)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldDefinitionNumber).WithValue(uint8(0)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFieldName).WithValue("Altitude"),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeMesgNum).WithValue(uint16(mesgnum.Record)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionNativeFieldNum).WithValue(uint8(fieldnum.RecordAltitude)),
-					factory.CreateField(mesgnum.FieldDescription, fieldnum.FieldDescriptionFitBaseTypeId).WithValue(uint8(basetype.Uint16)),
-				}},
-				{
 					Fields: []proto.Field{
 						factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(time.Now())),
 					},
@@ -492,6 +420,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 					},
 				},
 			},
+			errs: []error{nil, nil, errValueTypeMismatch},
 		},
 		{
 			name:  "error no fields",
@@ -504,7 +433,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			mesgValidator := tc.mesgValidator
 			if mesgValidator == nil {
-				mesgValidator = NewMessageValidator()
+				mesgValidator = new(messageValidator)
 			}
 
 			if tc.errs == nil {
@@ -526,7 +455,7 @@ func TestMessageValidatorValidate(t *testing.T) {
 
 func BenchmarkValidate(b *testing.B) {
 	b.StopTimer()
-	mesgValidator := NewMessageValidator()
+	mesgValidator := new(messageValidator)
 	mesg := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed).WithValue(uint16(1000)),
 		factory.CreateField(mesgnum.Record, fieldnum.RecordAltitude).WithValue(uint16(10000)),

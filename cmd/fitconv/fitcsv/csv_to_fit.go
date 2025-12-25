@@ -54,11 +54,6 @@ func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
 	opts := []encoder.Option{
 		encoder.WithProtocolVersion(proto.V2),
 		encoder.WithHeaderOption(encoder.HeaderOptionNormal, 15),
-		encoder.WithMessageValidator(
-			encoder.NewMessageValidator(
-				encoder.ValidatorWithPreserveInvalidValues(),
-			),
-		),
 	}
 
 	switch fitWriter.(type) {
