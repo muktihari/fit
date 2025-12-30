@@ -485,8 +485,11 @@ func TestValidateMessages(t *testing.T) {
 			enc := New(nil)
 			// Protocol Version is now selected by selectProtocolVersion method as we allow dynamic protocol version
 			// based on FileHeader. This by pass it since we don't encode file header.
-			enc.protocolValidator.ProtocolVersion = tc.protocolVersion
-			err := enc.validateMessages(tc.messages)
+			fit := &proto.FIT{
+				FileHeader: proto.FileHeader{ProtocolVersion: tc.protocolVersion},
+				Messages:   tc.messages,
+			}
+			err := enc.validate(fit)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}
@@ -982,7 +985,7 @@ func TestEncodeHeader(t *testing.T) {
 				t.Fatal(diff)
 			}
 
-			if enc.protocolValidator.ProtocolVersion != tc.protocolVersion {
+			if tc.header.ProtocolVersion != tc.protocolVersion {
 				t.Fatalf("expected protocol version: %v, got: %v",
 					tc.protocolVersion, enc.options.protocolVersion)
 			}
@@ -1697,7 +1700,6 @@ func TestReset(t *testing.T) {
 				cmpopts.IgnoreUnexported(writeSeeker{}),
 				cmp.FilterValues(func(x, y MessageValidator) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y hash.Hash16) bool { return true }, cmp.Ignore()),
-				cmp.FilterValues(func(x, y *proto.Validator) bool { return true }, cmp.Ignore()),
 				cmp.FilterValues(func(x, y *lru) bool { return true }, cmp.Ignore()),
 			); diff != "" {
 				t.Fatal(diff)

@@ -39,7 +39,7 @@ func (e *StreamEncoder) WriteMessage(mesg *proto.Message) error {
 		}
 		e.fileHeaderWritten = true
 	}
-	if err := e.enc.protocolValidator.ValidateMessage(mesg); err != nil {
+	if err := proto.Validator.ValidateMessage(mesg, e.fileHeader.ProtocolVersion); err != nil {
 		return fmt.Errorf("protocol validation: mesgNum: %d (%s): %w", mesg.Num, mesg.Num, err)
 	}
 	if err := e.enc.options.messageValidator.Validate(mesg); err != nil {
